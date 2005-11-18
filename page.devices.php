@@ -24,20 +24,20 @@ extract($_REQUEST);
 //if submitting form, update database
 switch ($action) {
 	case "add":
-		adddevice($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
 		//generateMeetme();
 		//generateExtensions();
 		needreload();
 	break;
 	case "del":
-		deldevice($extdisplay);
+		core_devices_del($extdisplay);
 		//generateMeetme();
 		//generateExtensions();
 		needreload();
 	break;
 	case "edit":  //just delete and re-add
-		deldevice($extdisplay);
-		adddevice($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+		core_devices_del($extdisplay);
+		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
 		//generateMeetme();
 		//generateExtensions();
 		needreload();
@@ -52,7 +52,7 @@ switch ($action) {
 
 <div class="rnav">
 <?php 
-$devices = getdevices();
+$devices = core_devices_list();
 drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 ?>
 </div>
@@ -75,7 +75,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
 <?php if ($extdisplay) {	
-	$deviceInfo=getdeviceInfo($extdisplay);
+	$deviceInfo=core_devices_get($extdisplay);
 	extract($deviceInfo,EXTR_PREFIX_ALL,'devinfo');
 	$tech = $devinfo_tech;
 	if (is_array($deviceInfo)) extract($deviceInfo);
@@ -129,7 +129,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 					<option value="new"><?php echo _("New User")?>
 			<?php 
 				//get unique extensions
-				$users = getextens();
+				$users = core_users_list();
 				if (isset($users)) {
 					foreach ($users as $auser) {
 						echo '<option value="'.$auser[0].'" '.($user == $auser[0] ? 'SELECTED' : '').'>'.$auser[0];	

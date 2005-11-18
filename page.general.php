@@ -25,6 +25,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['FAX_RX_EMAIL'],'FAX_RX_EMAIL'),
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
+						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						);
 
@@ -67,6 +68,15 @@ foreach ($globals as $global) {
 	<br><br>
 	<?php echo _("Extension prefix for dialing direct to voicemail:")?>
 	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo $VM_PREFIX?>"/>
+	<br><br>
+	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span><br>
+t: Allow the called user to transfer the call by hitting #<br>
+T: Allow the calling user to transfer the call by hitting #<br>
+r: Generate a ringing tone for the calling party<br>
+w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)<br>
+W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)<br>
+	</span></a>
+	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo $DIAL_OPTIONS?>"/>
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>

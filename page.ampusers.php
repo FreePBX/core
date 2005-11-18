@@ -49,20 +49,20 @@ if (isset($_REQUEST["sections"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addampuser":
-		core_addAmpUser($username, $password, $extension_low, $extension_high, $deptname, $sections);
+		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
 		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 	break;
 	case "editampuser":
-		core_deleteAmpUser($userdisplay);
-		core_addAmpUser($username, $password, $extension_low, $extension_high, $deptname, $sections);
+		core_ampusers_del($userdisplay);
+		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
 		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 	break;
 	case "delampuser":
-		core_deleteAmpUser($userdisplay);
+		core_ampusers_del($userdisplay);
 		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
@@ -78,7 +78,7 @@ switch ($action) {
 
 <?php 
 //get existing trunk info
-$tresults = core_getAmpUsers();
+$tresults = core_ampusers_list();
 
 foreach ($tresults as $tresult) {
     echo "<li><a id=\"".($userdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".$display."&userdisplay=".$tresult[0]."\">".$tresult[0]."</a></li>";

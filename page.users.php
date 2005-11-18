@@ -73,10 +73,9 @@ if (isset($extension) && !checkRange($extension)){
 } else {
 
 	//if submitting form, update database
-	// hmm, with device / user separation, only "fixed" devices use hint
 	switch ($action) {
 		case "add":
-			adduser($_REQUEST,$vmcontext);
+			core_users_add($_REQUEST,$vmcontext);
 
 			//write out extensions_additional.conf
 			exec($wScript1);			
@@ -85,7 +84,7 @@ if (isset($extension) && !checkRange($extension)){
 			needreload();
 		break;
 		case "del":
-			deluser($extdisplay,$incontext,$uservm);
+			core_users_del($extdisplay,$incontext,$uservm);
 			//write out extensions_additional.conf
 			exec($wScript1);			
 			//write out meetme_additional.conf
@@ -93,8 +92,8 @@ if (isset($extension) && !checkRange($extension)){
 			needreload();
 		break;
 		case "edit":  //just delete and re-add
-			deluser($extdisplay,$incontext,$uservm);
-			adduser($_REQUEST,$vmcontext);
+			core_users_del($extdisplay,$incontext,$uservm);
+			core_users_add($_REQUEST,$vmcontext);
 			//write out extensions_additional.conf
 			exec($wScript1);			
 			//write out meetme_additional.conf
@@ -109,7 +108,7 @@ if (isset($extension) && !checkRange($extension)){
 
 <div class="rnav">
 <?php 
-$extens = getextens();
+$extens = core_users_list();
 drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 ?>
 </div>
@@ -123,7 +122,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
 <?php if ($extdisplay) {	
-	$extenInfo=getExtenInfo($extdisplay);
+	$extenInfo=core_users_get($extdisplay);
 	extract($extenInfo);
 	if (is_array($deviceInfo)) extract($deviceInfo);
 ?>

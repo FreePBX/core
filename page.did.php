@@ -11,115 +11,13 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-function getIncoming(){
-	global $db;
-	$sql = "SELECT extension,cidnum FROM incoming";
-	$results = $db->getAll($sql,DB_FETCHMODE_ASSOC);
-	if(DB::IsError($result)) {
-		die($result->getMessage());
-	}
-	return $results;
-}
-
-function getIncomingInfo($extension="",$cidnum=""){
-	global $db;
-	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
-	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
-	if(DB::IsError($result)) {
-		die($result->getMessage());
-	}
-	return $results;
-}
-
-function delIncoming($extension,$cidnum){
-	global $db;
-	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
-	$results = $db->query($sql);
-	if(DB::IsError($result)) {
-		die($result->getMessage());
-	}
-	
-	// now delete from extensions table
-	
-	if(empty($extension)) {
-		$extension = "s";
-		$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-	}
-	$account = $extension.(empty($cidnum)?"":"/".$cidnum);
-	
-	$sql="DELETE FROM extensions WHERE context = \"ext-did\" AND extension = \"$account\"";
-	$results = $db->query($sql);
-	if(DB::IsError($result)) {
-		die($result->getMessage());
-	}
-	
-	if ($catchaccount) {
-		$sql="DELETE FROM extensions WHERE context = \"ext-did\" AND extension = \"$catchaccount\"";
-		$results = $db->query($sql);
-		if(DB::IsError($result)) {
-			die($result->getMessage());
-		}
-	}
-}
-
-function addIncoming($incoming){
-	global $db;
-	extract($incoming); // create variables from request
-	$existing=getIncomingInfo($extension,$cidnum);
-	if (empty($existing)) {
-		$destination=buildActualGoto($incoming,0); //temporary workaround to get the actual goto destination string
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\")";
-		$results = $db->query($sql);
-		if(DB::IsError($result)) {
-			die($result->getMessage());
-		}
-		
-		//now write the priorities to the extensions table - This section will change in AMP2
-		
-		//sub a blank extension with 's'
-		$extension = (empty($extension)?"s":$extension);
-		$account = $extension.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
-		if ($extension == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
-			$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-			$addarray[] = array('ext-did',$catchaccount,"1",'Goto',$account,'','0');
-		}
-		$i=1;
-		$addarray[] = array('ext-did',$account,$i++,'SetVar','FROM_DID='.$account,'','0');
-		if ($faxexten != "default") {
-			$addarray[] = array('ext-did',$account,$i++,'SetVar','FAX_RX='.$faxexten,'','0');
-		}
-		if (!empty($faxemail)) {
-			$addarray[] = array('ext-did',$account,$i++,'SetVar','FAX_RX_EMAIL='.$faxemail,'','0');
-		}
-		if ($answer == "1") {
-			$addarray[] = array('ext-did',$account,$i++,'Answer','','','0');
-			$addarray[] = array('ext-did',$account,$i++,'Wait',$wait,'','0');	
-		}
-		if ($privacyman == "1") {
-			$addarray[] = array('ext-did',$account,$i++,'PrivacyManager','','','0');	
-		}
-		
-		if (empty($destination)) { //temporary use of 'incoming calls' until a time of day module is created
-			$addarray[] = array('ext-did',$account,$i++,'Goto','from-pstn,s,1','','0');
-		} else {
-			$addarray[] = array('ext-did',$account,$i++,'Goto',$destination,'','0');
-		}
-		foreach($addarray as $add) {
-			addextensions($add);
-		}
-
-	} else {
-		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
-	}
-}
-
 
 //script to write extensions_additional.conf file from mysql
 $wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
 	
 $action = $_REQUEST['action'];
 $extdisplay=$_REQUEST['extdisplay'];
-$dispnum = 7; //used for switch on config.php
+$dispnum = 'did'; //used for switch on config.php
 
 $account = $_REQUEST['account'];	
 $goto = $_REQUEST['goto0'];
@@ -130,20 +28,20 @@ switch ($action) {
 		//create variables from request
 		extract($_REQUEST);
 		//add details to teh 'incoming' table
-		addIncoming($_REQUEST);
+		core_did_add($_REQUEST);
 		exec($wScript1);
 		needreload();
 	break;
 	case 'delIncoming':
 		$extarray=explode('/',$extdisplay,2);
-		delIncoming($extarray[0],$extarray[1]);
+		core_did_del($extarray[0],$extarray[1]);
 		exec($wScript1);
 		needreload();
 	break;
 	case 'edtIncoming':
 		$extarray=explode('/',$extdisplay,2);
-		delIncoming($extarray[0],$extarray[1]);
-		addIncoming($_REQUEST);
+		core_did_del($extarray[0],$extarray[1]);
+		core_did_add($_REQUEST);
 		$extdisplay=$_REQUEST['extension']."/".$_REQUEST['cidnum'];
 		exec($wScript1);
 		needreload();
@@ -157,7 +55,7 @@ switch ($action) {
     <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $dispnum?>"><?php echo _("Add Incoming Route")?></a><br></li>
 <?php 
 //get unique incoming routes
-$inroutes = getIncoming();
+$inroutes = core_did_list();
 if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'current':'')."\" href=\"config.php?display=".$dispnum."&extdisplay={$inroute['extension']}/{$inroute['cidnum']}\">{$inroute['extension']}/{$inroute['cidnum']}</a></li>";
@@ -178,7 +76,7 @@ if (isset($inroutes)) {
 <?php if ($extdisplay) {	
 	//create variables for the selected route's settings
 	$extarray=explode('/',$extdisplay,2);
-	$ininfo=getIncomingInfo($extarray[0],$extarray[1]);
+	$ininfo=core_did_get($extarray[0],$extarray[1]);
 	if (is_array($ininfo)) extract($ininfo);
 ?>
 		<h2><?php echo _("Route")?>: <?php echo $extdisplay; ?></h2>
@@ -215,7 +113,7 @@ if (isset($inroutes)) {
 					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
 			<?php 
 				//get unique devices
-				$devices = getdevices();
+				$devices = core_devices_list();
 				if (isset($devices)) {
 					foreach ($devices as $device) {
 						echo '<option value="'.$device[0].'" '.($faxexten == $device[0] ? 'SELECTED' : '').'>'.$device[1].' &lt;'.$device[0].'&gt;';
@@ -267,7 +165,7 @@ if (isset($inroutes)) {
 		
 <?php 
 //draw goto selects
-echo drawselects('editGRP',$destination,0);
+echo drawselects($destination,0);
 ?>
 		
 		<tr><td colspan=2>

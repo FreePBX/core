@@ -84,8 +84,8 @@ if (isset($extension) && !checkRange($extension)){
 	//if submitting form, update database
 	switch ($action) {
 		case "add":
-			adddevice($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
-			adduser($_REQUEST,$vmcontext);
+			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+			core_users_add($_REQUEST,$vmcontext);
 	
 			//write out extensions_additional.conf
 			exec($wScript1);			
@@ -94,8 +94,8 @@ if (isset($extension) && !checkRange($extension)){
 			needreload();
 		break;
 		case "del":
-			deldevice($extdisplay);
-			deluser($extdisplay,$incontext,$uservm);
+			core_devices_del($extdisplay);
+			core_users_del($extdisplay,$incontext,$uservm);
 			//write out extensions_additional.conf
 			exec($wScript1);			
 			//write out meetme_additional.conf
@@ -103,10 +103,10 @@ if (isset($extension) && !checkRange($extension)){
 			needreload();
 		break;
 		case "edit":  //just delete and re-add
-			deldevice($extdisplay);
-			adddevice($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
-			deluser($extdisplay,$incontext,$uservm);
-			adduser($_REQUEST,$vmcontext);
+			core_devices_del($extdisplay);
+			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+			core_users_del($extdisplay,$incontext,$uservm);
+			core_users_add($_REQUEST,$vmcontext);
 			//write out extensions_additional.conf
 			exec($wScript1);			
 			//write out meetme_additional.conf
@@ -114,8 +114,8 @@ if (isset($extension) && !checkRange($extension)){
 			needreload();
 		break;
 		case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
-			users2astdb();
-			devices2astdb();
+			core_users2astdb();
+			core_devices2astdb();
 		break;
 	}
 }
@@ -124,7 +124,7 @@ if (isset($extension) && !checkRange($extension)){
 
 <div class="rnav">
 <?php 
-$devices = getdevices();
+$devices = core_devices_list();
 drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"));
 ?>
 </div>
@@ -147,9 +147,9 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"))
 		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
 <?php if ($extdisplay) {	
-	$deviceInfo=getdeviceInfo($extdisplay);
+	$deviceInfo=core_devices_get($extdisplay);
 	extract($deviceInfo,EXTR_PREFIX_ALL,'devinfo');
-	$extenInfo=getExtenInfo($extdisplay);
+	$extenInfo=core_users_get($extdisplay);
 	extract($extenInfo);
 	$tech = $devinfo_tech;
 	if (is_array($deviceInfo)) extract($deviceInfo);
