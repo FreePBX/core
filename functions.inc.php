@@ -6,12 +6,31 @@ function core_destinations() {
 	//get the list of meetmes
 	$results = core_users_list();
 	
+	if (isset($results)) {
+		//get voicemail
+		$uservm = getVoicemail();
+		$vmcontexts = array_keys($uservm);
+		foreach ($results as $thisext) {
+			$extnum = $thisext[0];
+			// search vm contexts for this extensions mailbox
+			foreach ($vmcontexts as $vmcontext) {
+				if(isset($uservm[$vmcontext][$extnum])){
+				//	$vmname = $uservm[$vmcontext][$extnum]['name'];
+				//	$vmboxes[$extnum] = array($extnum, '"' . $vmname . '" <' . $extnum . '>');
+				$vmboxes[$extnum] = true;
+				}
+			}
+		}
+	}
+	
 	// return an associative array with destination and description
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
 		foreach($results as $result){
 				$extens[] = array('destination' => 'ext-local,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
-				$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => ''.$result['1'].' voicemail');
+				if($vmboxes[$result['0']]) {
+					$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => 'voicemail box '.$result['0']);
+				}
 		}
 	}
 	
