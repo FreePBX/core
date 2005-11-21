@@ -163,10 +163,12 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
 	
 	//ensure this id is not already in use
 	$devices = core_devices_list();
-	foreach($devices as $device) {
-		if ($device[0]==$id) {
-			echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
-			return false;
+	if (is_array($devices)) {
+		foreach($devices as $device) {
+			if ($device[0]==$id) {
+				echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
+				return false;
+			}
 		}
 	}
 	//unless defined, $dial is TECH/id
@@ -623,10 +625,12 @@ function core_users_add($vars,$vmcontext) {
 	global $amp_conf;
 	//ensure this id is not already in use
 	$extens = getextens();
-	foreach($extens as $exten) {
-		if ($exten[0]==$extension) {
-			echo "<script>javascript:alert('"._("This user extension is already in use")."');</script>";
-			return false;
+	if(is_array($extens)) {
+		foreach($extens as $exten) {
+			if ($exten[0]==$extension) {
+				echo "<script>javascript:alert('"._("This user extension is already in use")."');</script>";
+				return false;
+			}
 		}
 	}
 	
