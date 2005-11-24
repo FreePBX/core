@@ -27,7 +27,7 @@ $wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_f
 $localPrefixFile = "/etc/asterisk/localprefixes.conf";
 
 
-$display='6'; 
+$display='trunks'; 
 $extdisplay=$_REQUEST['extdisplay'];
 $action = $_REQUEST['action'];
 $tech = strtolower($_REQUEST['tech']);
@@ -70,14 +70,9 @@ if (isset($_REQUEST["dialrules"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addtrunk":
-		$trunknum = addTrunk($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $dialrules);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $dialrules);
 		
-		/* //DIALRULES
-		// add rules to extensions
-		addTrunkRules($channelid, $dialrules);
-		*/
-		
-		addDialRules($trunknum, $dialrules);
+		core_trunks_addDialRules($trunknum, $dialrules);
 		
 		exec($extenScript);
 		exec($sipScript);
@@ -88,7 +83,7 @@ switch ($action) {
 		$extdisplay = "OUT_".$trunknum; // make sure we're now editing the right trunk
 	break;
 	case "edittrunk":
-		editTrunk($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register);
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register);
 		
 		/* //DIALRULES
 		deleteTrunkRules($channelid);
@@ -96,7 +91,7 @@ switch ($action) {
 		*/
 		
 		// this can rewrite too, so edit is the same
-		addDialRules($trunknum, $dialrules);
+		core_trunks_addDialRules($trunknum, $dialrules);
 		
 		exec($extenScript);
 		exec($sipScript);
@@ -106,12 +101,12 @@ switch ($action) {
 	break;
 	case "deltrunk":
 	
-		deleteTrunk($trunknum);
+		core_trunks_del($trunknum);
 		
 		/* //DIALRULES
 		deleteTrunkRules($channelid);
 		*/
-		deleteDialRules($trunknum);
+		core_trunks_deleteDialRules($trunknum);
 		
 		
 		exec($extenScript);
@@ -187,7 +182,7 @@ foreach ($globals as $global) {
 
 <?php 
 //get existing trunk info
-$tresults = gettrunks();
+$tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
     echo "<li><a id=\"".($extdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".$display."&extdisplay={$tresult[0]}\" title=\"".$tresult[1]."\">"._("Trunk")." ".substr(ltrim($tresult[1],"AMP:"),0,15)."</a></li>";
@@ -213,7 +208,7 @@ if (!$tech && !$extdisplay) {
 	if ($extdisplay) {
 		//list($trunk_tech, $trunk_name) = explode("/",$tname);
 		//if ($trunk_tech == "IAX2") $trunk_tech = "IAX"; // same thing
-		$tech = getTrunkTech($trunknum);
+		$tech = core_trunks_getTrunkTech($trunknum);
 
 		$outcid = ${"OUTCID_".$trunknum};
 		$maxchans = ${"OUTMAXCHANS_".$trunknum};
@@ -222,25 +217,25 @@ if (!$tech && !$extdisplay) {
 		if ($tech!="enum") {
 	
 			if (!isset($channelid)) {
-				$channelid = getTrunkTrunkName($trunknum); 
+				$channelid = core_trunks_getTrunkTrunkName($trunknum); 
 			}
 
 			if ($tech!="custom") {  // custom trunks will not have user/peer details in database table
 				// load from db
 				if (!isset($peerdetails)) {	
-					$peerdetails = getTrunkPeerDetails($trunknum);
+					$peerdetails = core_trunks_getTrunkPeerDetails($trunknum);
 				}
 	
 				if (!isset($usercontext)) {	
-					$usercontext = getTrunkUserContext($trunknum); 
+					$usercontext = core_trunks_getTrunkUserContext($trunknum); 
 				}
 	
 				if (!isset($userconfig)) {	
-					$userconfig = getTrunkUserConfig($trunknum);
+					$userconfig = core_trunks_getTrunkUserConfig($trunknum);
 				}
 					
 				if (!isset($register)) {	
-					$register = getTrunkRegister($trunknum);
+					$register = core_trunks_getTrunkRegister($trunknum);
 				}
 			}
 		}
@@ -252,7 +247,7 @@ if (!$tech && !$extdisplay) {
 		*/
 		
 		if (count($dialrules) == 0) {
-			if ($temp = getDialRules($trunknum)) {
+			if ($temp = core_trunks_getDialRules($trunknum)) {
 				foreach ($temp as $key=>$val) {
 					// extract all ruleXX keys
 					if (preg_match("/^rule\d+$/",$key)) {
@@ -269,7 +264,7 @@ if (!$tech && !$extdisplay) {
 <?php 
 
 		// find which routes use this trunk
-		$routes = gettrunkroutes($trunknum);
+		$routes = core_trunks_gettrunkroutes($trunknum);
 		$num_routes = count($routes);
 		if ($num_routes > 0) {
 			echo "<a href=# class=\"info\">"._("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"))."<span>";

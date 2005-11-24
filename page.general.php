@@ -58,7 +58,7 @@ foreach ($globals as $global) {
 ?>
 
 <form name="general" action="config.php" method="post">
-<input type="hidden" name="display" value="5"/>
+<input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
 
 <h5><?php echo _("Dialing Options")?></h5>

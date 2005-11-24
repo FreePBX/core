@@ -25,7 +25,7 @@ $iaxScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_
 //script to write op_server.cfg file from mysql 
 $wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
 
-$display='8'; 
+$display='routing'; 
 $extdisplay=$_REQUEST['extdisplay'];
 $action = $_REQUEST['action'];
 
@@ -58,8 +58,8 @@ if (isset($_REQUEST["dialpattern"])) {
 }
 	
 if ( (isset($_REQUEST['reporoutedirection'])) && (isset($_REQUEST['reporoutekey']))) {
-	$routepriority = getroutenames();
-	$routepriority = setroutepriority($routepriority, $_REQUEST['reporoutedirection'], $_REQUEST['reporoutekey']);
+	$routepriority = core_routing_getroutenames();
+	$routepriority = core_routing_setroutepriority($routepriority, $_REQUEST['reporoutedirection'], $_REQUEST['reporoutekey']);
 }
 
 $trunkpriority = array();
@@ -99,7 +99,7 @@ $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		addRoute($routename, $dialpattern, $trunkpriority,"new", $routepass);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass);
 		exec($extenScript);
 		needreload();
 		$extdisplay = ''; // resets back to main screen
@@ -109,25 +109,25 @@ switch ($action) {
 		$trunkpriority=array();
 	break;
 	case "editroute":
-		editRoute($routename, $dialpattern, $trunkpriority, $routepass);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass);
 		exec($extenScript);
 		needreload();
 	break;
 	case "delroute":
-		deleteRoute($extdisplay);
+		core_routing_del($extdisplay);
 		// re-order the routes to make sure that there are no skipped numbers.
 		// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
 		// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
 		// so we are left with 001-test1, 002-test3
-		$routepriority = getroutenames();
-		$routepriority = setroutepriority($routepriority, '','');
+		$routepriority = core_routing_getroutenames();
+		$routepriority = core_routing_setroutepriority($routepriority, '','');
 		exec($extenScript);
 		needreload();
 		
 		$extdisplay = ''; // resets back to main screen
 	break;
 	case 'renameroute':
-		if (renameRoute($routename, $_REQUEST["newroutename"])) {
+		if (core_routing_rename($routename, $_REQUEST["newroutename"])) {
 			exec($extenScript);
 			needreload();
 		} else {
@@ -209,7 +209,7 @@ foreach ($globals as $global) {
 $reporoutedirection = $_REQUEST['reporoutedirection'];
 $reporoutekey = $_REQUEST['reporoutekey'];
 $key = -1;
-$routepriority = getroutenames();
+$routepriority = core_routing_getroutenames();
 $positions=count($routepriority);
 foreach ($routepriority as $tresult) {
 $key++;
@@ -244,15 +244,15 @@ if ($extdisplay) {
 	// load from db
 	
 	if (!isset($_REQUEST["dialpattern"])) {
-		$dialpattern = getroutepatterns($extdisplay);
+		$dialpattern = core_routing_getroutepatterns($extdisplay);
 	}
 	
 	if (!isset($_REQUEST["trunkpriority"])) {
-		$trunkpriority = getroutetrunks($extdisplay);
+		$trunkpriority = core_routing_getroutetrunks($extdisplay);
 	}
 	
 	if (!isset($_REQUEST["routepass"])) {
-		$routepass = getroutepassword($extdisplay);
+		$routepass = core_routing_getroutepassword($extdisplay);
 	}
 	
 	echo "<h2>"._("Edit Route")."</h2>";
@@ -261,7 +261,7 @@ if ($extdisplay) {
 }
 
 // build trunks associative array
-foreach (gettrunks() as $temp) {
+foreach (core_trunks_list() as $temp) {
 	$trunks[$temp[0]] = $temp[1];
 }
 

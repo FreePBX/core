@@ -18,7 +18,7 @@ $wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_
 
 
 $action = $_REQUEST['action'];
-$dispnum = 9; //used for switch on config.php
+$dispnum = "incoming"; //used for switch on config.php
 
 
 //if submitting form, update database
