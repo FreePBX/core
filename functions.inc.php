@@ -37,6 +37,30 @@ function core_destinations() {
 	return $extens;
 }
 
+/* 	Generates dialplan for "core" components (extensions & inbound routing)
+	We call this via genConf() 
+*/
+function core_get_config($engine) {
+	global $ext;  // is this the best way to pass this?
+	switch($engine) {
+		case "asterisk":
+			/* inbound routing extensions */
+			foreach(core_did_list() as $item) {
+				$did = core_did_get($item['extension'],$item['cidnum']);
+				$exten = $did['extension'];
+				// destination field in 'incoming' database is backwards from what ext_goto expects
+				$goto_context = strtok($did['destination'],',');
+				$goto_exten = strtok(',');
+				$goto_pri = strtok(',');
+				
+				
+				$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
+				$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+			}
+		break;
+	}
+}
+
 /* begin page.ampusers.php functions */
 
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
