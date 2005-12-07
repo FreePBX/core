@@ -48,14 +48,23 @@ function core_get_config($engine) {
 			foreach(core_did_list() as $item) {
 				$did = core_did_get($item['extension'],$item['cidnum']);
 				$exten = $did['extension'];
+				$cidnum = $did['cidnum'];
 				// destination field in 'incoming' database is backwards from what ext_goto expects
 				$goto_context = strtok($did['destination'],',');
 				$goto_exten = strtok(',');
 				$goto_pri = strtok(',');
 				
-				
+				//sub a blank extension with 's'
+				$exten = (empty($exten)?"s":$exten);
+				$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
 				$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
 				$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+				
+				if ($exten == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
+					$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
+					$ext->add('ext-did', $catchaccount, '', new ext_setvar('FROM_DID',$catchaccount));
+					$ext->add('ext-did', $catchaccount, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+				}
 			}
 		break;
 	}
