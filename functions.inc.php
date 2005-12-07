@@ -38,7 +38,7 @@ function core_destinations() {
 }
 
 /* 	Generates dialplan for "core" components (extensions & inbound routing)
-	We call this via genConf() 
+	We call this with retrieve_conf
 */
 function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
