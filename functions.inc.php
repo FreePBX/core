@@ -49,6 +49,7 @@ function core_get_config($engine) {
 				$did = core_did_get($item['extension'],$item['cidnum']);
 				$exten = $did['extension'];
 				$cidnum = $did['cidnum'];
+				
 				// destination field in 'incoming' database is backwards from what ext_goto expects
 				$goto_context = strtok($did['destination'],',');
 				$goto_exten = strtok(',');
@@ -58,13 +59,35 @@ function core_get_config($engine) {
 				$exten = (empty($exten)?"s":$exten);
 				$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
 				$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
-				$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+				//$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
 				
 				if ($exten == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
 					$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
 					$ext->add('ext-did', $catchaccount, '', new ext_setvar('FROM_DID',$catchaccount));
 					$ext->add('ext-did', $catchaccount, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
 				}
+				
+				if ($item['faxexten'] != "default") {
+					$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
+				}
+				if (!empty($item['faxemail'])) {
+					$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxexten']));
+				}
+				if ($item['answer'] == "1") {
+					$ext->add('ext-did', $exten, '', new ext_answer(''));
+					$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
+				}
+				if ($item['privacyman'] == "1") {
+					$ext->add('ext-did', $exten, '', new ext_privacymanager(''));
+				}
+				
+				//temporary use of 'incoming calls' until a time of day module is created
+				if (empty($item['destination'])) { 
+					$ext->add('ext-did', $exten, '', new ext_goto('1','s','from-pstn'));
+				} else {
+					$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+				}
+				
 			}
 		break;
 	}
@@ -107,7 +130,7 @@ function core_ampusers_list() {
 /* begin page.did.php functions */
 
 function core_did_list(){
-	$sql = "SELECT extension,cidnum FROM incoming";
+	$sql = "SELECT * FROM incoming";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
@@ -119,66 +142,15 @@ function core_did_get($extension="",$cidnum=""){
 function core_did_del($extension,$cidnum){
 	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
 	sql($sql);
-	
-	// now delete from extensions table
-	
-	if(empty($extension)) {
-		$extension = "s";
-		$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-	}
-	$account = $extension.(empty($cidnum)?"":"/".$cidnum);
-	
-	$sql="DELETE FROM extensions WHERE context = \"ext-did\" AND extension = \"$account\"";
-	sql($sql);
-	
-	if ($catchaccount) {
-		$sql="DELETE FROM extensions WHERE context = \"ext-did\" AND extension = \"$catchaccount\"";
-		sql($sql);
-	}
 }
 
 function core_did_add($incoming){
 	extract($incoming); // create variables from request
 	$existing=core_did_get($extension,$cidnum);
 	if (empty($existing)) {
-		$destination=$core0;
+		$destination=${$goto_indicate0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\")";
 		sql($sql);
-		
-		//now write the priorities to the extensions table - This section will change in AMP2
-		
-		//sub a blank extension with 's'
-		$extension = (empty($extension)?"s":$extension);
-		$account = $extension.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
-		if ($extension == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
-			$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-			$addarray[] = array('ext-did',$catchaccount,"1",'Goto',$account,'','0');
-		}
-		$i=1;
-		$addarray[] = array('ext-did',$account,$i++,'SetVar','FROM_DID='.$account,'','0');
-		if ($faxexten != "default") {
-			$addarray[] = array('ext-did',$account,$i++,'SetVar','FAX_RX='.$faxexten,'','0');
-		}
-		if (!empty($faxemail)) {
-			$addarray[] = array('ext-did',$account,$i++,'SetVar','FAX_RX_EMAIL='.$faxemail,'','0');
-		}
-		if ($answer == "1") {
-			$addarray[] = array('ext-did',$account,$i++,'Answer','','','0');
-			$addarray[] = array('ext-did',$account,$i++,'Wait',$wait,'','0');	
-		}
-		if ($privacyman == "1") {
-			$addarray[] = array('ext-did',$account,$i++,'PrivacyManager','','','0');	
-		}
-		
-		if (empty($destination)) { //temporary use of 'incoming calls' until a time of day module is created
-			$addarray[] = array('ext-did',$account,$i++,'Goto','from-pstn,s,1','','0');
-		} else {
-			$addarray[] = array('ext-did',$account,$i++,'Goto',$destination,'','0');
-		}
-		foreach($addarray as $add) {
-			addextensions($add);
-		}
-
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
 	}
