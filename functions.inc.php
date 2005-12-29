@@ -646,7 +646,7 @@ function core_hint_get($account){
 	//determine what devices this user is associated with
 	$sql = "SELECT dial from devices where user = '{$account}'";
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	print_r($results);
+	//print_r($results);
 	
 	//create an array of strings
 	if (is_array($results)){
@@ -724,7 +724,7 @@ function core_users_add($vars,$vmcontext) {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
-	//write to extensions table - AMP2 will not do this
+/*	//write to extensions table - AMP2 will not do this
 	//update ext-local context in extensions.conf
 	
 	//warning: as of 009 we aren't allowing a user to use any mailbox but their own 
@@ -732,7 +732,7 @@ function core_users_add($vars,$vmcontext) {
 	//$mailb = ($vm == 'disabled' || $mailbox == '') ? 'novm' : $mailbox;
 	$mailb = ($vm == 'disabled') ? 'novm' : $extension;
 	
-	addaccount($extension,$mailb);
+	addaccount($extension,$mailb);*/
 	
 	/*core_hint_add($extension);*/
 	
@@ -816,10 +816,10 @@ function core_users_del($extension,$incontext,$uservm){
 	//take care of voicemail.conf
 	unset($uservm[$incontext][$extension]);
 	saveVoicemail($uservm);
-		
+	/*	
 	//delete the extension info from extensions table
 	delextensions('ext-local',$extension);
-	
+	*/
 	/*//delete hint
 	core_hint_del($extension);*/
 }
