@@ -89,6 +89,21 @@ function core_get_config($engine) {
 				}
 				
 			}
+			
+			/* user extensions */
+			foreach(core_users_list() as $item) {
+				$exten = core_users_get($item[0]);
+				$vm = ($exten['voicemail'] == "enabled" ? $exten['extension'] : "novm");
+				
+				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
+				
+				if($vm != "novm")
+					$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm));
+					
+				$hint = core_hint_get($exten['extension']);
+				if (!empty($hint))
+					$ext->addHint('ext-local', $exten['extension'], $hint);
+			}
 		break;
 	}
 }
@@ -244,9 +259,9 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
 	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
 	exec($wOpScript);
 	
-	if($user != "none") {
+/*	if($user != "none") {
 		core_hint_add($user);
-	}
+	}*/
 	
 	//if we are requesting a new user, let's jump to users.php
 	if ($jump) {
@@ -306,7 +321,7 @@ function core_devices_del($account){
 	exec($wOpScript);
 	
 	//take care of any hint priority
-	core_hint_add($devinfo['user']);
+	/*core_hint_add($devinfo['user']);*/
 }
 
 function core_devices_get($account){
@@ -326,6 +341,7 @@ function core_devices_get($account){
 	return $results;
 }
 
+/*
 //TODO it is current not possible to use ${variables} for a HINT extensions (ie: for adhoc devices).
 //Because of this limitation, the only way to update HINTs for adhoc devices, is to make the change 
 //via the amp admin, so that a dialplan rewrite $ reload can be performed.
@@ -363,6 +379,8 @@ function core_hint_del($user) {
 	$wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
 	exec($wScript1);
 }
+
+*/
 
 // this function rebuilds the astdb based on device table contents
 // used on devices.php if action=resetall
@@ -624,7 +642,28 @@ function core_devices_getzap($account) {
 
 
 
-
+function core_hint_get($account){
+	//determine what devices this user is associated with
+	$sql = "SELECT dial from devices where user = '{$account}'";
+	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+	print_r($results);
+	
+	//create an array of strings
+	if (is_array($results)){
+		foreach ($results as $result) {
+			$dial[] = $result['dial'];
+		}
+	}
+	
+	//create a string with & delimiter
+	if (is_array($dial)){
+		$hint = implode($dial,"&");
+	} else {
+		$hint = $results[0]['dial'];
+	}
+	
+	return $hint;
+}
 
 
 
@@ -633,7 +672,7 @@ function core_devices_getzap($account) {
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
 function core_users_list() {
-	$results = sql("SELECT extension,name FROM users ORDER BY extension","getAll");
+	$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
 
 	//only allow extensions that are within administrator's allowed range
 	foreach($results as $result){
@@ -665,7 +704,7 @@ function core_users_add($vars,$vmcontext) {
 	$recording = "out=".$record_out."|in=".$record_in;
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$voicemail\",\"$ringtimer\",\"$noanswer\",\"$recording\",'$outboundcid')";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$vm\",\"$ringtimer\",\"$noanswer\",\"$recording\",'$outboundcid')";
 	$results = $db->query($sql);
 	if(DB::IsError($results)) {
         die($results->getMessage().$sql);
@@ -695,7 +734,7 @@ function core_users_add($vars,$vmcontext) {
 	
 	addaccount($extension,$mailb);
 	
-	core_hint_add($extension);
+	/*core_hint_add($extension);*/
 	
 	
 	//take care of voicemail.conf if using voicemail
@@ -781,8 +820,8 @@ function core_users_del($extension,$incontext,$uservm){
 	//delete the extension info from extensions table
 	delextensions('ext-local',$extension);
 	
-	//delete hint
-	core_hint_del($extension);
+	/*//delete hint
+	core_hint_del($extension);*/
 }
 
 /* end page.users.php functions */
