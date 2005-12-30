@@ -104,9 +104,43 @@ function core_get_config($engine) {
 				if (!empty($hint))
 					$ext->addHint('ext-local', $exten['extension'], $hint);
 			}
+			
+			/* dialplan globals */
+			// modules should NOT use the globals table to store anything!
+			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
+			// I'm cheating for core functionality - do as I say, not as I do ;-)		
+			$sql = "SELECT * FROM globals";
+			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+			foreach($globals as $global) {
+				$ext->addGlobal($global['variable'],$global['value']);
+			}
+			
+			/* outbound routes */
+			// modules should use their own table for storage (and module_get_config() to add dialplan)
+			// modules should NOT use the extension table to store anything!
+			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes'";
+			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
+			foreach($outrts as $outrt) {
+				$ext->addInclude('outbound-allroutes',$outrt['application']);
+				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY priority ASC";
+				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+				$ext->add($outrt['application'], $thisrt[0]['extension'], '', new ext_macro($thisrt[0]['args']));
+				$ext->add($outrt['application'], $thisrt[1]['extension'], '', new ext_macro($thisrt[1]['args']));
+			}
 		break;
 	}
 }
+
+
+
+
+
+
+
+
+
+
 
 /* begin page.ampusers.php functions */
 
@@ -1000,7 +1034,6 @@ function core_trunks_list() {
 	        die($result->getMessage()."<br><br>".$sql);	
 	    }
 		$unique_trunks[] = array('OUT_1','ZAP/g0');
-		core_trunks_addOutTrunk("1");
 	}
 	// asort($unique_trunks);
 	return $unique_trunks;
@@ -1018,14 +1051,6 @@ function core_trunks_writeoutids() {
 	}
 	
 	sql("UPDATE globals SET value = '$outids' WHERE variable = 'DIALOUTIDS'");
-}
-
-//add trunk to outbound-trunks context
-function core_trunks_addOutTrunk($trunknum) {
-
-	$result = sql("INSERT INTO extensions (context, extension, priority, application, args, descr, flags) VALUES ('outbound-trunks', '_\${DIAL_OUT_".$trunknum."}.', '1', 'Macro', 'dialout,".$trunknum.",\${EXTEN}', NULL , '0')");
-
-    return $result;
 }
 
 function core_trunks_addTrunkRegister($trunknum,$tech,$reg) {
@@ -1629,4 +1654,7 @@ function core_routing_getroutepassword($route) {
 }
 
 /* end page.routing.php functions */
+
+
+
 ?>
