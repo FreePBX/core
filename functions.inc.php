@@ -1655,6 +1655,4 @@ function core_routing_getroutepassword($route) {
 
 /* end page.routing.php functions */
 
-
-
 ?>
