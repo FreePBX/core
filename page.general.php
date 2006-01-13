@@ -101,7 +101,7 @@ W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)<b
 		<option value="system" <?php  echo ($FAX_RX == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
 <?php 
 	//get unique devices
-	$devices = getdevices();
+	$devices = core_devices_list();
 	if (isset($devices)) {
 		foreach ($devices as $device) {
 			echo '<option value="'.$device[0].'" '.($FAX_RX == $device[0] ? 'SELECTED' : '').'>'.$device[1].' &lt;'.$device[0].'&gt;';
