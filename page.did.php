@@ -51,7 +51,9 @@ switch ($action) {
 $inroutes = core_did_list();
 if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
-		echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'current':'')."\" href=\"config.php?display=".$dispnum."&extdisplay={$inroute['extension']}/{$inroute['cidnum']}\">{$inroute['extension']}/{$inroute['cidnum']}</a></li>";
+		$displaydid = ( empty($inroute['extension'])? "any DID" : $inroute['extension'] );
+		$displaycid = ( empty($inroute['cidnum'])? "any CID" : $inroute['cidnum'] );
+		echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'current':'')."\" href=\"config.php?display=".$dispnum."&extdisplay={$inroute['extension']}/{$inroute['cidnum']}\">{$displaydid} / {$displaycid}</a></li>";
 	}
 }
 ?>
@@ -97,11 +99,11 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
 		<tr>
 			<td>
-				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The AMP Default is defined in General Settings.")?></span></a>:
+				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.")?></span></a>:
 			</td>
 			<td>
 				<select name="faxexten">
-					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("AMP default")?>
+					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
 					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
 			<?php 
@@ -160,12 +162,6 @@ if (isset($inroutes)) {
 //draw goto selects
 echo drawselects($destination,0);
 ?>
-		
-		<tr><td colspan=2>
-		<input type="radio" name="goto_indicate0" value="" <?php echo empty($destination) ? 'CHECKED=CHECKED' : '';?> /> 
-			<?php echo _("Use 'Incoming Calls' settings");?><br>
-			<br>				
-		</td></tr>
 		
 		<tr>
 		<td colspan="2"><br><h6>
