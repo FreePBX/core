@@ -91,6 +91,7 @@ function core_get_config($engine) {
 			}
 			
 			/* user extensions */
+			$ext->addInclude('from-internal-additional','ext-local');
 			foreach(core_users_list() as $item) {
 				$exten = core_users_get($item[0]);
 				$vm = ($exten['voicemail'] == "enabled" ? $exten['extension'] : "novm");
@@ -120,6 +121,7 @@ function core_get_config($engine) {
 			// modules should NOT use the extension table to store anything!
 			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes'";
 			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+			$ext->addInclude('from-internal-additional','outbound-allroutes');
 			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
