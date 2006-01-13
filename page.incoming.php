@@ -13,9 +13,6 @@
 ?>
 
 <?php 
-//script to write conf file from mysql
-$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-
 
 $action = $_REQUEST['action'];
 $dispnum = "incoming"; //used for switch on config.php
@@ -35,9 +32,7 @@ if ($action == 'editglobals') {
 		echo $action.'<br>';
 		die($result->getMessage());
 	}
-	//write out conf file
-	exec($wScript);
-	
+
 	//indicate 'need reload' link in header.php 
 	needreload();
 	

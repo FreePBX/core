@@ -13,18 +13,6 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-//script to write conf file from mysql
-$extenScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-
-//script to write sip conf file from mysql
-$sipScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-
-//script to write iax conf file from mysql
-$iaxScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-
-//script to write op_server.cfg file from mysql 
-$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-
 $display='routing'; 
 $extdisplay=$_REQUEST['extdisplay'];
 $action = $_REQUEST['action'];
@@ -100,7 +88,6 @@ $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
 switch ($action) {
 	case "addroute":
 		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass);
-		exec($extenScript);
 		needreload();
 		$extdisplay = ''; // resets back to main screen
 		$routename = ''; // resets back to main screen
@@ -110,7 +97,6 @@ switch ($action) {
 	break;
 	case "editroute":
 		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass);
-		exec($extenScript);
 		needreload();
 	break;
 	case "delroute":
@@ -121,14 +107,12 @@ switch ($action) {
 		// so we are left with 001-test1, 002-test3
 		$routepriority = core_routing_getroutenames();
 		$routepriority = core_routing_setroutepriority($routepriority, '','');
-		exec($extenScript);
 		needreload();
 		
 		$extdisplay = ''; // resets back to main screen
 	break;
 	case 'renameroute':
 		if (core_routing_rename($routename, $_REQUEST["newroutename"])) {
-			exec($extenScript);
 			needreload();
 		} else {
 			echo "<script language=\"javascript\">alert('"._("Error renaming route: duplicate name")."');</script>";
@@ -138,7 +122,6 @@ switch ($action) {
 
 	break;
 	case 'prioritizeroute':
-		exec($extenScript);
 		needreload();
 	break;
 	case 'populatenpanxx':

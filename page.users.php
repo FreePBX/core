@@ -13,14 +13,6 @@
 
 include 'common/php-asmanager.php';
 
-
-
-//script to write extensions_additional.conf file from mysql
-$wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-
-//script to write meetme_additional.conf file from mysql 
-$wMeetScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_meetme_conf_from_mysql.pl';
-
 $dispnum = 'users'; //used for switch in config.php
 
 //create vars from the request
@@ -76,28 +68,15 @@ if (isset($extension) && !checkRange($extension)){
 	switch ($action) {
 		case "add":
 			core_users_add($_REQUEST,$vmcontext);
-
-			//write out extensions_additional.conf
-			exec($wScript1);			
-			//write out meetme_additional.conf
-			exec($wMeetScript);
 			needreload();
 		break;
 		case "del":
 			core_users_del($extdisplay,$incontext,$uservm);
-			//write out extensions_additional.conf
-			exec($wScript1);			
-			//write out meetme_additional.conf
-			exec($wMeetScript);
 			needreload();
 		break;
 		case "edit":  //just delete and re-add
 			core_users_del($extdisplay,$incontext,$uservm);
 			core_users_add($_REQUEST,$vmcontext);
-			//write out extensions_additional.conf
-			exec($wScript1);			
-			//write out meetme_additional.conf
-			exec($wMeetScript);
 			needreload();
 		break;
 	}

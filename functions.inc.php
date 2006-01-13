@@ -291,10 +291,6 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
 		$funct($id);
 	}
 	
-	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
-	
 /*	if($user != "none") {
 		core_hint_add($user);
 	}*/
@@ -352,12 +348,6 @@ function core_devices_del($account){
 		$funct($account);
 	}
 	
-	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
-	
-	//take care of any hint priority
-	/*core_hint_add($devinfo['user']);*/
 }
 
 function core_devices_get($account){
@@ -376,47 +366,6 @@ function core_devices_get($account){
 	
 	return $results;
 }
-
-/*
-//TODO it is current not possible to use ${variables} for a HINT extensions (ie: for adhoc devices).
-//Because of this limitation, the only way to update HINTs for adhoc devices, is to make the change 
-//via the amp admin, so that a dialplan rewrite $ reload can be performed.
-function core_hint_add($account){
-	global $currentFile;	
-	//delete any existing hint for this extension
-	core_hint_del($account);
-	
-	//determine what devices this user is associated with
-	$sql = "SELECT dial from devices where user = '{$account}'";
-	$results = sql($sql,"getOne");
-	
-	//create a string 
-	if (isset($results)){
-		if (strpos($results,"&"))
-			$hint = implode($results,"&");
-		else
-			$hint = $results;
-	}
-
-	//Add 'hint' priority if passed
-	if (isset($hint)) {
-		$sql = "INSERT INTO extensions (context, extension, priority, application) VALUES ('ext-local', '".$account."', 'hint', '".$hint."')";
-		sql($sql);
-	}
-	$wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-	exec($wScript1);
-}
-
-function core_hint_del($user) {
-	global $currentFile;
-	//delete from devices table
-	$sql="DELETE FROM extensions WHERE extension = \"{$user}\" AND priority = \"hint\"";
-	sql($sql);
-	$wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-	exec($wScript1);
-}
-
-*/
 
 // this function rebuilds the astdb based on device table contents
 // used on devices.php if action=resetall
@@ -517,8 +466,8 @@ function core_devices_addsip($account) {
 		   
 
 	//script to write sip conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
+	//exec($wScript);
 
 }
 
@@ -532,11 +481,11 @@ function core_devices_delsip($account) {
 	}
 
 	//script to write sip conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
+	//exec($wScript);
 	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
+	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
+	//exec($wOpScript);
 }
 
 function core_devices_getsip($account) {
@@ -578,11 +527,11 @@ function core_devices_addiax2($account) {
 
 
 	//script to write iax2 conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
+	//exec($wScript);
 	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
+	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
+	//exec($wOpScript);
 }
 
 function core_devices_deliax2($account) {
@@ -595,11 +544,11 @@ function core_devices_deliax2($account) {
 	}
 	
 	//script to write iax2 conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
+	//exec($wScript);
 	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
+	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
+	//exec($wOpScript);
 }
 
 function core_devices_getiax2($account) {
@@ -640,11 +589,11 @@ function core_devices_addzap($account) {
 
 
 	//script to write zap conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
+	//exec($wScript);
 	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
+	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
+	//exec($wOpScript);
 }
 
 function core_devices_delzap($account) {
@@ -657,11 +606,11 @@ function core_devices_delzap($account) {
 	}
 	
 	//script to write zap conf file from mysql
-	$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
-	exec($wScript);
+	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
+	//exec($wScript);
 	//script to write op_server.cfg file from mysql 
-	$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	exec($wOpScript);
+	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
+	//exec($wOpScript);
 }
 
 function core_devices_getzap($account) {

@@ -12,18 +12,6 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-//script to write conf file from mysql
-$extenScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-
-//script to write sip conf file from mysql
-$sipScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-
-//script to write iax conf file from mysql
-$iaxScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-
-//script to write op_server.cfg file from mysql 
-$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-
 
 $userdisplay = $_REQUEST['userdisplay'];
 $action = $_REQUEST['action'];
@@ -50,20 +38,17 @@ if (isset($_REQUEST["sections"])) {
 switch ($action) {
 	case "addampuser":
 		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
-		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 	break;
 	case "editampuser":
 		core_ampusers_del($userdisplay);
 		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
-		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 	break;
 	case "delampuser":
 		core_ampusers_del($userdisplay);
-		exec($wOpScript);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 		$userdisplay = ""; // go "add" screen

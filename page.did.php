@@ -10,10 +10,6 @@
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
-
-
-//script to write extensions_additional.conf file from mysql
-$wScript1 = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
 	
 $action = $_REQUEST['action'];
 $extdisplay=$_REQUEST['extdisplay'];
@@ -29,13 +25,11 @@ switch ($action) {
 		extract($_REQUEST);
 		//add details to teh 'incoming' table
 		core_did_add($_REQUEST);
-		exec($wScript1);
 		needreload();
 	break;
 	case 'delIncoming':
 		$extarray=explode('/',$extdisplay,2);
 		core_did_del($extarray[0],$extarray[1]);
-		exec($wScript1);
 		needreload();
 	break;
 	case 'edtIncoming':
@@ -43,7 +37,6 @@ switch ($action) {
 		core_did_del($extarray[0],$extarray[1]);
 		core_did_add($_REQUEST);
 		$extdisplay=$_REQUEST['extension']."/".$_REQUEST['cidnum'];
-		exec($wScript1);
 		needreload();
 	break;
 }

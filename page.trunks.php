@@ -12,18 +12,6 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-//script to write conf file from mysql
-$extenScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_extensions_from_mysql.pl';
-
-//script to write sip conf file from mysql
-$sipScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-
-//script to write iax conf file from mysql
-$iaxScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-
-//script to write op_server.cfg file from mysql 
-$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-
 $localPrefixFile = "/etc/asterisk/localprefixes.conf";
 
 
@@ -73,11 +61,6 @@ switch ($action) {
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $dialrules);
 		
 		core_trunks_addDialRules($trunknum, $dialrules);
-		
-		exec($extenScript);
-		exec($sipScript);
-		exec($iaxScript);
-		exec($wOpScript);
 		needreload();
 		
 		$extdisplay = "OUT_".$trunknum; // make sure we're now editing the right trunk
@@ -92,11 +75,6 @@ switch ($action) {
 		
 		// this can rewrite too, so edit is the same
 		core_trunks_addDialRules($trunknum, $dialrules);
-		
-		exec($extenScript);
-		exec($sipScript);
-		exec($iaxScript);
-		exec($wOpScript);
 		needreload();
 	break;
 	case "deltrunk":
@@ -107,12 +85,6 @@ switch ($action) {
 		deleteTrunkRules($channelid);
 		*/
 		core_trunks_deleteDialRules($trunknum);
-		
-		
-		exec($extenScript);
-		exec($sipScript);
-		exec($iaxScript);
-		exec($wOpScript);
 		needreload();
 		
 		$extdisplay = ''; // resets back to main screen
