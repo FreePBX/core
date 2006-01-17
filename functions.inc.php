@@ -118,10 +118,12 @@ function core_get_config($engine) {
 			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
-				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY priority ASC";
+				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' GROUP BY extension ASC";
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-				$ext->add($outrt['application'], $thisrt[0]['extension'], '', new ext_macro($thisrt[0]['args']));
-				$ext->add($outrt['application'], $thisrt[1]['extension'], '', new ext_macro($thisrt[1]['args']));
+				foreach($thisrt as $exten) {
+					$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
+					$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
+				}
 			}
 		break;
 	}
