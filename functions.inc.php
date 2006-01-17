@@ -87,7 +87,7 @@ function core_get_config($engine) {
 			$ext->addInclude('from-internal-additional','ext-local');
 			foreach(core_users_list() as $item) {
 				$exten = core_users_get($item[0]);
-				$vm = ($exten['voicemail'] == "enabled" ? $exten['extension'] : "novm");
+				$vm = ($exten['voicemail'] == "disabled" ? "novm" : $exten['extension']);
 				
 				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
 				
