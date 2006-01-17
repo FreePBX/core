@@ -349,7 +349,7 @@ function core_devices_get($account){
 	$results = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 	
 	//take care of sip/iax/zap config
-	$funct = "get".strtolower($results['tech']);
+	$funct = "core_devices_get".strtolower($results['tech']);
 	if(function_exists($funct)){
 		$devtech = $funct($account);
 		if (is_array($devtech)){
