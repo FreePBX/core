@@ -83,11 +83,12 @@ if (isset($_REQUEST["trunkpriority"])) {
 
 $routename = isset($_REQUEST["routename"]) ? $_REQUEST["routename"] : "";
 $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
+$emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency);
 		needreload();
 		$extdisplay = ''; // resets back to main screen
 		$routename = ''; // resets back to main screen
@@ -96,7 +97,7 @@ switch ($action) {
 		$trunkpriority=array();
 	break;
 	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency);
 		needreload();
 	break;
 	case "delroute":
@@ -238,6 +239,10 @@ if ($extdisplay) {
 		$routepass = core_routing_getroutepassword($extdisplay);
 	}
 	
+	if (!isset($_REQUEST["emergency"])) {
+		$emergency = core_routing_getrouteemergency($extdisplay);
+	}
+	
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
 	echo "<h2>"._("Add Route")."</h2>";
@@ -290,6 +295,10 @@ if ($extdisplay) { // editing
 		<tr>
 			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>"/></td>
+		</tr>
+		<tr>
+			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>?:</td>
+			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?> /></td>
 		</tr>
 		<tr>
 			<td colspan="2">

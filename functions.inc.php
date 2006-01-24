@@ -118,11 +118,16 @@ function core_get_config($engine) {
 			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
-				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' GROUP BY extension ASC";
+				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, priority ASC";
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 				foreach($thisrt as $exten) {
-					$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
-					$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
+					//if emergencyroute, then set channel var
+					if(strpos($exten['args'],"EMERGENCYROUTE") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
+					if(strpos($exten['args'],"dialout-trunk") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
+					if(strpos($exten['args'],"outisbusy") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
 				}
 			}
 		break;
@@ -227,7 +232,7 @@ function core_devices_list() {
 }
 
 
-function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
+function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null){
 	global $amp_conf;
 	global $currentFile;
 	
@@ -254,8 +259,13 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
 		$jump = true;
 	}
 	
+	if(!empty($emergency_cid))
+		   $emergency_cid = addslashes($emergency_cid);
+	if(!empty($description))
+		  $description = addslashes($description);
+	
 	//insert into devices table
-	$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description) values (\"$id\",\"$tech\",\"$dial\",\"$devicetype\",\"$user\",\"$description\")";
+	$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (\"$id\",\"$tech\",\"$dial\",\"$devicetype\",\"$user\",\"$description\",\"$emergency_cid\")";
 	sql($sql);
 	
 	//add details to astdb
@@ -264,6 +274,8 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description){
 		$astman->database_put("DEVICE",$id."/dial",$dial);
 		$astman->database_put("DEVICE",$id."/type",$devicetype);
 		$astman->database_put("DEVICE",$id."/user",$user);
+		if(!empty($emergency_cid))
+			$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
 		if($user != "none") {
 			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 			if (!empty($existingdevices)) {
@@ -329,6 +341,7 @@ function core_devices_del($account){
 		$astman->database_del("DEVICE",$account."/dial");
 		$astman->database_del("DEVICE",$account."/type");
 		$astman->database_del("DEVICE",$account."/user");
+		$astman->database_del("DEVICE",$account."/emergency_cid");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
@@ -1252,7 +1265,7 @@ function core_routing_getroutenames() {
 				}
 				
 				// add this as a new route
-				core_routes_add($name, $patterns, $trunks,"new");
+				core_routing_add($name, $patterns, $trunks,"new");
 			}
 			
 			
@@ -1357,7 +1370,7 @@ function core_routing_setroutepriorityvalue($key)
 }
 
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass) {
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "") {
 	global $db;
 
 	$trunktech=array();
@@ -1406,8 +1419,27 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass) {
 			$pattern = "_".$pattern;
 		}
 		
+		// 1st priority is emergency dialing variable (if set)
+		if(!empty($emergency)) {
+			   $startpriority = 1;
+			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
+			   $sql .= "('outrt-".$name."', ";
+			   $sql .= "'".$pattern."', ";
+			   $sql .= "'".$startpriority."', ";
+			   $sql .= "'SetVar', ";
+			   $sql .= "'EMERGENCYROUTE=YES', ";
+			   $sql .= "'Use Emergency CID for device')";
+		} else {
+			   $startpriority = 0;
+		}
+		
+		$result = $db->query($sql);
+		if(DB::IsError($result)) {
+			   die($result->getMessage());
+		}
+
 		foreach ($trunks as $priority => $trunk) {
-			$priority += 1; // since arrays are 0-based, but we want priorities to start at 1
+			$priority += $startpriority + 1; // since arrays are 0-based, but we want priorities to start at 1
 			
 			$sql = "INSERT INTO extensions (context, extension, priority, application, args) VALUES ";
 			$sql .= "('outrt-".$name."', ";
@@ -1478,9 +1510,9 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass) {
 	
 }
 
-function core_routing_edit($name, $patterns, $trunks, $pass) {
+function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="") {
 	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass);
+	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency);
 }
 
 function core_routing_del($name) {
@@ -1597,6 +1629,22 @@ function core_routing_getroutepassword($route) {
 	}
 	return $password;
 	
+}
+
+//get emergency state for this route
+function core_routing_getrouteemergency($route) {
+       global $db;
+       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'EMERGENCYROUTE%') ";
+       $results = $db->getOne($sql);
+       if(DB::IsError($results)) {
+               die($results->getMessage());
+       }
+       if (preg_match('/^.*=(.*)/', $results, $matches)) {
+               $emergency = $matches[1];
+       } else {
+               $emergency = "";
+       }
+       return $emergency;
 }
 
 /* end page.routing.php functions */

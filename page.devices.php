@@ -24,7 +24,7 @@ extract($_REQUEST);
 //if submitting form, update database
 switch ($action) {
 	case "add":
-		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 		//generateMeetme();
 		//generateExtensions();
 		needreload();
@@ -37,7 +37,7 @@ switch ($action) {
 	break;
 	case "edit":  //just delete and re-add
 		core_devices_del($extdisplay);
-		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+		core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 		//generateMeetme();
 		//generateExtensions();
 		needreload();
@@ -109,6 +109,14 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 			</td><td>
 				<input type="text" name="description" value="<?php echo $devinfo_description ?>"/>
 			</td>
+		</tr>
+
+		<tr>
+			   <td>
+					   <a href="#" class="info"><?php echo _("Emergency CID")?><span><?php echo _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.")?><br></span></a>:
+			   </td><td>
+					   <input type="text" name="emergency_cid" value="<?php echo $devinfo_emergency_cid ?>"/>
+			   </td>
 		</tr>
 
 		<tr>

@@ -78,7 +78,7 @@ if (isset($extension) && !checkRange($extension)){
 	//if submitting form, update database
 	switch ($action) {
 		case "add":
-			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			core_users_add($_REQUEST,$vmcontext);
 			needreload();
 		break;
@@ -89,7 +89,7 @@ if (isset($extension) && !checkRange($extension)){
 		break;
 		case "edit":  //just delete and re-add
 			core_devices_del($extdisplay);
-			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description);
+			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			core_users_del($extdisplay,$incontext,$uservm);
 			core_users_add($_REQUEST,$vmcontext);
 			needreload();
@@ -182,7 +182,15 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"))
 				<input type="text" name="outboundcid" value="<?php echo htmlentities($outboundcid) ?>"/>
 			</td>
 		</tr>
-		
+
+		<tr>
+			   <td>
+					   <a href="#" class="info"><?php echo _("Emergency CID")?><span><?php echo _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.")?><br></span></a>:
+			   </td><td>
+					   <input type="text" name="emergency_cid" value="<?php echo $emergency_cid ?>"/>
+			   </td>
+		</tr>
+
 		<tr>
 			<td>
 				<a href="#" class="info"><?php echo _("Record Incoming")?><span><?php echo _("Record all inbound calls received at this extension.")?><br></span></a>:
