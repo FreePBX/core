@@ -1429,17 +1429,17 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			   $sql .= "'SetVar', ";
 			   $sql .= "'EMERGENCYROUTE=YES', ";
 			   $sql .= "'Use Emergency CID for device')";
+			   $result = $db->query($sql);
+				if(DB::IsError($result)) {
+					   die($result->getMessage());
+				}
 		} else {
 			   $startpriority = 0;
 		}
-		
-		$result = $db->query($sql);
-		if(DB::IsError($result)) {
-			   die($result->getMessage());
-		}
 
 		foreach ($trunks as $priority => $trunk) {
-			$priority += $startpriority + 1; // since arrays are 0-based, but we want priorities to start at 1
+			$priority += $startpriority;
+			$priority += 1; // since arrays are 0-based, but we want priorities to start at 1
 			
 			$sql = "INSERT INTO extensions (context, extension, priority, application, args) VALUES ";
 			$sql .= "('outrt-".$name."', ";
