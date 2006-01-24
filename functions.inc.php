@@ -683,7 +683,7 @@ function core_users_add($vars,$vmcontext) {
 	global $db;
 	global $amp_conf;
 	//ensure this id is not already in use
-	$extens = getextens();
+	$extens = core_users_list();
 	if(is_array($extens)) {
 		foreach($extens as $exten) {
 			if ($exten[0]==$extension) {
