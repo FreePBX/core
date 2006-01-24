@@ -442,7 +442,6 @@ function core_users2astdb(){
 
 //add to sip table
 function core_devices_addsip($account) {
-	sipexists();
 	global $db;
 	global $currentFile;
 	$sipfields = array(array($account,'account',$account),
@@ -570,7 +569,6 @@ function core_devices_getiax2($account) {
 }
 
 function core_devices_addzap($account) {
-	zapexists();
 	global $db;
 	global $currentFile;
 	$zapfields = array(
