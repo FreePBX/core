@@ -1010,7 +1010,7 @@ function core_trunks_writeoutids() {
 	sql("UPDATE globals SET value = '$outids' WHERE variable = 'DIALOUTIDS'");
 }
 
-function core_trunks_addTrunkRegister($trunknum,$tech,$reg) {
+function core_trunks_addRegister($trunknum,$tech,$reg) {
 	sql("INSERT INTO $tech (id, keyword, data) values ('9999999$trunknum','register','$reg')");
 }
 
