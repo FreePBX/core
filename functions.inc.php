@@ -1435,6 +1435,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			   $startpriority = 0;
 		}
 
+		$first_trunk = 1;
 		foreach ($trunks as $priority => $trunk) {
 			$priority += $startpriority;
 			$priority += 1; // since arrays are 0-based, but we want priorities to start at 1
@@ -1444,18 +1445,25 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			$sql .= "'".$pattern."', ";
 			$sql .= "'".$priority."', ";
 			$sql .= "'Macro', ";
-			if ($trunktech[$trunk] == "ENUM")
-				$sql .= "'dialout-enum,".substr($trunk,4).",\${".$exten."},".$pass."'"; // cut off OUT_ from $trunk
+			if ($first_trunk)
+				$pass_str = $pass;
 			else
-				$sql .= "'dialout-trunk,".substr($trunk,4).",\${".$exten."},".$pass."'"; // cut off OUT_ from $trunk
+				$pass_str = "";
+
+			if ($trunktech[$trunk] == "ENUM")
+				$sql .= "'dialout-enum,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
+			else
+				$sql .= "'dialout-trunk,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
 			$sql .= ")";
 			
 			$result = $db->query($sql);
 			if(DB::IsError($result)) {
 				die($result->getMessage());
 			}
-			//blank pass so that it isn't added for additional trunks
-			$pass = "";
+			//To identify the first trunk in a pattern
+			//so that passwords are in the first trunk in
+			//each pattern
+			$first_trunk = 0;
 		}
 		
 		$priority += 1;
