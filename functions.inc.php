@@ -694,12 +694,12 @@ function core_users_add($vars,$vmcontext) {
 	//build the recording variable
 	$recording = "out=".$record_out."|in=".$record_in;
 	
+	//escape quotes and any other bad chars:
+	$outboundcid = addslashes($outboundcid);
+	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$vm\",\"$ringtimer\",\"$noanswer\",\"$recording\",'$outboundcid')";
-	$results = $db->query($sql);
-	if(DB::IsError($results)) {
-        die($results->getMessage().$sql);
-	}
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$vm\",\"$ringtimer\",\"$noanswer\",\"$recording\",\"$outboundcid\")";
+	sql($sql);
 	
 	//write to astdb
 	$astman = new AGI_AsteriskManager();
