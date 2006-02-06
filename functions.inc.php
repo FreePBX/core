@@ -126,6 +126,8 @@ function core_get_config($engine) {
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
 					if(strpos($exten['args'],"dialout-trunk") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
+					if(strpos($exten['args'],"dialout-enum") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					if(strpos($exten['args'],"outisbusy") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
 				}
