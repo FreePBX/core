@@ -115,7 +115,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"))
 <?php 
 	if ($action == 'del') {
 		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
-	} else if(empty($tech) && (!is_string($extdisplay))) {
+	} else if(empty($tech) && ($extdisplay == null)) {
 ?>
 		<h2><?php echo _("Add an Extension")?></h2>
 		<h5><?php echo _("Select device technology:")?></h5>
@@ -127,7 +127,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"))
 	} else {
 		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
-<?php if (is_string($extdisplay)) {	
+<?php if ($extdisplay != null) {	
 	$deviceInfo=core_devices_get($extdisplay);
 	extract($deviceInfo,EXTR_PREFIX_ALL,'devinfo');
 	$extenInfo=core_users_get($extdisplay);
