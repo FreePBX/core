@@ -100,7 +100,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 	} else {
 		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
-<?php if ($extdisplay) {	
+<?php if (is_string($extdisplay)) {	
 	$extenInfo=core_users_get($extdisplay);
 	extract($extenInfo);
 	if (is_array($deviceInfo)) extract($deviceInfo);
