@@ -329,11 +329,14 @@ function core_devices_del($account){
 		if ($user != "none") {
 				// Remove the device record from the user's device list
 				$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
-				$userdevices = str_replace($account."&", "", $userdevices."&");
+				/*$userdevices = str_replace($account."&", "", $userdevices."&");
 				// If there was more than one device, remove the extra "&" at the end.
 				if (substr($userdevices, -1, 1) == "&") {
 					$userdevices = substr($userdevices, 0, -1);
-				}
+				}*/
+                                $userdevicesarr = explode("&", $userdevices);
+                                array_splice($userdevicesarr, array_search($account, $userdevicesarr), 1);
+                                $userdevices = implode("&", $userdevicesarr);
 				if (empty($userdevices)) {
 						$astman->database_del("AMPUSER",$deviceuser."/device");
 				} else {
