@@ -290,9 +290,17 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
-	//voicemail symlink
-	exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
-	exec("/bin/ln -s /var/spool/asterisk/voicemail/default/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
+	// create a voicemail symlink if needed
+	$thisUser = core_users_get($user);
+	if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "disabled")) {
+		if(empty($thisUser['voicemail']))
+			$vmcontext = "default";
+		else 
+			$vmcontext = $thisUser['voicemail'];
+		//voicemail symlink
+		exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
+		exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
+	}
 		
 	//take care of sip/iax/zap config
 	$funct = "core_devices_add".strtolower($tech);
@@ -407,9 +415,17 @@ function core_devices2astdb(){
 					$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
 			}
 			
-			//voicemail symlink
-			exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
-			exec("/bin/ln -s /var/spool/asterisk/voicemail/default/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
+			// create a voicemail symlink if needed
+			$thisUser = core_users_get($user);
+			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "disabled")) {
+				if(empty($thisUser['voicemail']))
+					$vmcontext = "default";
+				else 
+					$vmcontext = $thisUser['voicemail'];
+				//voicemail symlink
+				exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
+				exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
+			}
 		}
 	} else {
 		echo "Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
@@ -438,6 +454,7 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/recording",$recording);
 			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$outboundcid."\"");
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".$name."\"");
+			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
 		}	
 	} else {
 		echo "Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
@@ -701,9 +718,16 @@ function core_users_add($vars,$vmcontext) {
 	
 	//escape quotes and any other bad chars:
 	$outboundcid = addslashes($outboundcid);
+
+	//if voicemail is enabled, set the box@context to use
+	if(isset($vm) && $vm == "enabled") {
+		$voicemail = $vmcontext;
+	} else {
+		$voicemail = "disabled";
+	}
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$vm\",\"$ringtimer\",\"$noanswer\",\"$recording\",\"$outboundcid\")";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$voicemail\",\"$ringtimer\",\"$noanswer\",\"$recording\",\"$outboundcid\")";
 	sql($sql);
 	
 	//write to astdb
@@ -715,6 +739,7 @@ function core_users_add($vars,$vmcontext) {
 		$astman->database_put("AMPUSER",$extension."/recording",$recording);
 		$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$outboundcid."\"");
 		$astman->database_put("AMPUSER",$extension."/cidname","\"".$name."\"");
+		$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
@@ -798,12 +823,13 @@ function core_users_del($extension,$incontext,$uservm){
 	//delete details to astdb
 	$astman = new AGI_AsteriskManager();
 	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
-		$astman->database_del("AMPUSER",$extension."/password",$password);
-		$astman->database_del("AMPUSER",$extension."/ringtimer",$ringtimer);
-		$astman->database_del("AMPUSER",$extension."/noanswer",$noasnwer);
-		$astman->database_del("AMPUSER",$extension."/recording",$recording);
-		$astman->database_del("AMPUSER",$extension."/outboundcid","\"".$outboundcid."\"");
-		$astman->database_del("AMPUSER",$extension."/cidname","\"".$name."\"");
+		$astman->database_del("AMPUSER",$extension."/password");
+		$astman->database_del("AMPUSER",$extension."/ringtimer");
+		$astman->database_del("AMPUSER",$extension."/noanswer");
+		$astman->database_del("AMPUSER",$extension."/recording");
+		$astman->database_del("AMPUSER",$extension."/outboundcid");
+		$astman->database_del("AMPUSER",$extension."/cidname");
+		$astman->database_del("AMPUSER",$extension."/voicemail");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
