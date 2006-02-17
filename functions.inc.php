@@ -1064,7 +1064,7 @@ function core_trunks_addDialRules($trunknum, $dialrules) {
 function core_trunks_readDialRulesFile() {
 	global $localPrefixFile; // probably not the best way
 	
-	core_trunks_parse_conf($localPrefixFile, &$conf, &$section);
+	core_trunks_parse_conf($localPrefixFile, $conf, $section);
 	
 	return $conf;
 }
