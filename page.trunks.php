@@ -170,11 +170,11 @@ foreach ($tresults as $tresult) {
 if (!$tech && !$extdisplay) {
 ?>
 	<h2><?php echo _("Add a Trunk")?></h2>
-	<a href="<?php echo $_REQUEST['PHP_SELF'].'?display='.$display; ?>&tech=ZAP"><?php echo _("Add ZAP Trunk")?></a><br><br>
-	<a href="<?php echo $_REQUEST['PHP_SELF'].'?display='.$display; ?>&tech=IAX2"><?php echo _("Add IAX2 Trunk")?></a><br><br>
-	<a href="<?php echo $_REQUEST['PHP_SELF'].'?display='.$display; ?>&tech=SIP"><?php echo _("Add SIP Trunk")?></a><br><br>
-	<a href="<?php echo $_REQUEST['PHP_SELF'].'?display='.$display; ?>&tech=ENUM"><?php echo _("Add ENUM Trunk")?></a><br><br>
-	<a href="<?php echo $_REQUEST['PHP_SELF'].'?display='.$display; ?>&tech=CUSTOM"><?php echo _("Add Custom Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=ZAP"><?php echo _("Add ZAP Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=IAX2"><?php echo _("Add IAX2 Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=SIP"><?php echo _("Add SIP Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=ENUM"><?php echo _("Add ENUM Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=CUSTOM"><?php echo _("Add Custom Trunk")?></a><br><br>
 <?php 
 } else {
 	if ($extdisplay) {

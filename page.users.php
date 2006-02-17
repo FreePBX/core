@@ -98,7 +98,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 	if ($action == 'del') {
 		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
 	} else {
-		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>
 <?php if (is_string($extdisplay)) {	
 	$extenInfo=core_users_get($extdisplay);
@@ -110,7 +110,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 <?php } else { ?>
 		<h2><?php echo _("Add User/Extension")?></h2>
 <?php } ?>
-		<form name="addNew" action="<?php $_REQUEST['PHP_SELF'] ?>" method="post">
+		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edit' : 'add') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">

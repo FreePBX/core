@@ -66,7 +66,7 @@ if (isset($inroutes)) {
 		echo '<br><h3>Route '.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
 	} else {
 		
-		$delURL = $_REQUEST['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
+		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
 ?>
 <?php if ($extdisplay) {	
 	//create variables for the selected route's settings
@@ -79,7 +79,7 @@ if (isset($inroutes)) {
 <?php } else { ?>
 		<h2><?php echo _("Add Incoming Route")?></h2>
 <?php } ?>
-		<form name="editGRP" action="<?php $_REQUEST['PHP_SELF'] ?>" method="post">
+		<form name="editGRP" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
