@@ -33,7 +33,7 @@ $uservm = getVoicemail();
 $vmcontexts = array_keys($uservm);
 $vm=false;
 foreach ($vmcontexts as $vmcontext) {
-	if(isset($uservm[$vmcontext][$extdisplay])){
+	if(isset($extdisplay) && isset($uservm[$vmcontext][$extdisplay])){
 		//echo $extdisplay.' found in context '.$vmcontext.'<hr>';
 		$incontext = $vmcontext;  //the context for the current extension
 		$vmpwd = $uservm[$vmcontext][$extdisplay]['pwd'];
@@ -71,11 +71,12 @@ if (isset($extension) && !checkRange($extension)){
 	echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
 } else {
 	//deviceid and extension are the same and fixed
-	$deviceid = $extension;
-	$deviceuser = $extension;
-	$description = $_REQUEST['name'];
+	$deviceid = $deviceuser = isset($extension)?$extension:'';
+	$description = isset($_REQUEST['name'])?$_REQUEST['name']:'';
 
 	//if submitting form, update database
+	if (!isset($action)) 
+		$action='';
 	switch ($action) {
 		case "add":
 			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
@@ -106,7 +107,7 @@ if (isset($extension) && !checkRange($extension)){
 <div class="rnav">
 <?php 
 $devices = core_devices_list();
-drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"));
+drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, isset($extdisplay)?$extdisplay:null, _("Extension"));
 ?>
 </div>
 
@@ -115,7 +116,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Extension"))
 <?php 
 	if ($action == 'del') {
 		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
-	} else if(empty($tech) && ($extdisplay == null)) {
+	} else if(empty($tech) && !isset($extdisplay)) {
 ?>
 		<h2><?php echo _("Add an Extension")?></h2>
 		<h5><?php echo _("Select device technology:")?></h5>
@@ -320,20 +321,20 @@ if($extdisplay) {
 					<td>
 						<a href="#" class="info"><?php echo _("voicemail password")?><span><?php echo _("This is the password used to access the voicemail system.<br><br>This password can only contain numbers.<br><br>A user can change the password you enter here after logging into the voicemail system (*98) with a phone.")?><br><br></span></a>: 
 					</td><td>
-						<input size="10" type="text" name="vmpwd" value="<?php echo $vmpwd ?>"/>
+						<input size="10" type="text" name="vmpwd" value="<?php echo isset($vmpwd)?$vmpwd:'' ?>"/>
 					</td>
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("email address")?><span><?php echo _("The email address that voicemails are sent to.")?></span></a>: </td>
-					<td><input type="text" name="email" value="<?php  echo $email; ?>"/></td>
+					<td><input type="text" name="email" value="<?php echo isset($email)?$email:''; ?>"/></td>
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("pager email address")?><span><?echo _("Pager/mobile email address that short voicemail notifcations are sent to.")?></span></a>: </td>
-					<td><input type="text" name="pager" value="<?php  echo $pager; ?>"/></td>
+					<td><input type="text" name="pager" value="<?php echo isset($pager)?$pager:''; ?>"/></td>
 				</tr>
 				<tr>
  					<td><a href="#" class="info"><?php echo _("email attachment")?><span><?php echo _("Option to attach voicemails to email.")?></span></a>: </td>
- 					<?php if ($vmops_attach == "yes"){?>
+ 					<?php if (isset($vmops_attach) && $vmops_attach == "yes"){?>
  					<td><input  type="radio" name="attach" value="attach=yes" checked=checked/> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="attach" value="attach=no"/> <?php echo _("no");?></td>
  					<?php } else{ ?>
  					<td><input  type="radio" name="attach" value="attach=yes" /> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="attach" value="attach=no" checked=checked /> <?php echo _("no");?></td> <?php }?>
@@ -341,7 +342,7 @@ if($extdisplay) {
  
 				<tr>
  					<td><a href="#" class="info"><?php echo _("Play CID")?><span><?php echo _("Read back caller's telephone number prior to playing the incoming message, and just after announcing the date and time the message was left.")?></span></a>: </td>
- 					<?php if ($vmops_saycid == "yes"){?>
+ 					<?php if (isset($vmops_saycid) && $vmops_saycid == "yes"){?>
  					<td><input  type="radio" name="saycid" value="saycid=yes" checked=checked/> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="saycid" value="saycid=no"/> <?php echo _("no");?></td>
  					<?php } else{ ?>
  					<td><input  type="radio" name="saycid" value="saycid=yes" /> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="saycid" value="saycid=no" checked=checked /> <?php echo _("no");?></td> <?php }?>
@@ -349,7 +350,7 @@ if($extdisplay) {
 
 				<tr>
  					<td><a href="#" class="info"><?php echo _("Play Envelope")?><span><?php echo _("Envelope controls whether or not the voicemail system will play the message envelope (date/time) before playing the voicemail message. This settng does not affect the operation of the envelope option in the advanced voicemail menu.")?></span></a>: </td>
- 					<?php if ($vmops_envelope == "yes"){?>
+ 					<?php if (isset($vmops_envelope) && $vmops_envelope == "yes"){?>
  					<td><input  type="radio" name="envelope" value="envelope=yes" checked=checked/> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="envelope" value="envelope=no"/> <?php echo _("no");?></td>
  					<?php } else{ ?>
  					<td><input  type="radio" name="envelope" value="envelope=yes" /> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="envelope" value="envelope=no" checked=checked /> <?php echo _("no");?></td> <?php }?>
@@ -358,7 +359,7 @@ if($extdisplay) {
 				<tr>
  					<td><a href="#" class="info"><?php echo _("Delete Vmail")?><span><?php echo _("If set to \"yes\" the message will be deleted from the voicemailbox (after having been emailed). Provides functionality that allows a user to receive their voicemail via email alone, rather than having the voicemail able to be retrieved from the Webinterface or the Extension handset.  CAUTION: MUST HAVE attach voicemail to email SET TO YES OTHERWISE YOUR MESSAGES WILL BE LOST FOREVER.")?>
 </span></a>: </td>
- 					<?php if ($vmops_delete == "yes"){?>
+ 					<?php if (isset($vmops_delete) && $vmops_delete == "yes"){?>
  					<td><input  type="radio" name="delete" value="delete=yes" checked=checked/> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input  type="radio" name="delete" value="delete=no"/> <?php echo _("no");?></td>
  					<?php } else{ ?>
  					<td><input  type="radio" name="delete" value="delete=yes" /> <?php echo _("yes");?> &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="delete" value="delete=no" checked=checked /> <?php echo _("no");?></td> <?php }?>
@@ -366,7 +367,7 @@ if($extdisplay) {
  				
  				<tr>
 					<td><a href="#" class="info">vm options<span><?php echo _("Separate options with pipe ( | )")?><br><br>ie: review=yes|maxmessage=60</span></a>: </td>
-					<td><input size="20" type="text" name="options" value="<?php  echo $options; ?>" /></td>
+					<td><input size="20" type="text" name="options" value="<?php  echo isset($options)?$options:''; ?>" /></td>
 				</tr>
 				<tr>
 					<td><?php echo _("vm context:")?> </td>

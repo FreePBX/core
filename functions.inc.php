@@ -313,7 +313,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	}*/
 	
 	//if we are requesting a new user, let's jump to users.php
-	if ($jump) {
+	if (isset($jump)) {
 		echo("<script language=\"JavaScript\">window.location=\"config.php?display=users&extdisplay={$id}&name={$description}\";</script>");
 	}
 }
@@ -334,7 +334,7 @@ function core_devices_del($account){
 	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
 		// If a user was selected, remove this device from the user
 		$deviceuser = $astman->database_get("DEVICE",$account."/user");
-		if ($user != "none") {
+		if (isset($user) && $user != "none") {
 				// Remove the device record from the user's device list
 				$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
 				/*$userdevices = str_replace($account."&", "", $userdevices."&");
@@ -467,25 +467,25 @@ function core_devices_addsip($account) {
 	global $db;
 	global $currentFile;
 	$sipfields = array(array($account,'account',$account),
-	array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),
-	array($account,'secret',($_REQUEST['secret'])?$_REQUEST['secret']:''),
-	array($account,'canreinvite',($_REQUEST['canreinvite'])?$_REQUEST['canreinvite']:'no'),
-	array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
-	array($account,'dtmfmode',($_REQUEST['dtmfmode'])?$_REQUEST['dtmfmode']:''),
-	array($account,'host',($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),
-	array($account,'type',($_REQUEST['type'])?$_REQUEST['type']:'friend'),
-	array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
-	array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
-	array($account,'nat',($_REQUEST['nat'])?$_REQUEST['nat']:'never'),
-	array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'5060'),
-	array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'no'),
-	array($account,'callgroup',($_REQUEST['callgroup'])?$_REQUEST['callgroup']:''),
-	array($account,'pickupgroup',($_REQUEST['pickupgroup'])?$_REQUEST['pickupgroup']:''),
-	array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
-	array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
-	array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),
-	array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
-	array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
+	array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
+	array($account,'secret',(isset($_REQUEST['secret']))?$_REQUEST['secret']:''),
+	array($account,'canreinvite',(isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),
+	array($account,'context',(isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),
+	array($account,'dtmfmode',(isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),
+	array($account,'host',(isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),
+	array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),
+	array($account,'mailbox',(isset($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),
+	array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account),
+	array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'never'),
+	array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),
+	array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'no'),
+	array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
+	array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
+	array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),
+	array($account,'allow',(isset($_REQUEST['allow']))?$_REQUEST['allow']:''),
+	array($account,'record_in',(isset($_REQUEST['record_in']))?$_REQUEST['record_in']:'On-Demand'),
+	array($account,'record_out',(isset($_REQUEST['record_out']))?$_REQUEST['record_out']:'On-Demand'),
+	array($account,'callerid',(isset($_REQUEST['description']))?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
 
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
@@ -727,19 +727,34 @@ function core_users_add($vars,$vmcontext) {
 	}
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"$extension\",\"$password\",\"$name\",\"$voicemail\",\"$ringtimer\",\"$noanswer\",\"$recording\",\"$outboundcid\")";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"";
+	$sql.= "$extension\", \"";
+	$sql.= isset($password)?$password:'';
+	$sql.= "\", \"";
+	$sql.= isset($name)?$name:'';
+	$sql.= "\", \"";
+	$sql.= isset($voicemail)?$voicemail:'default';
+	$sql.= "\", \"";
+	$sql.= isset($ringtimer)?$ringtimer:'';
+	$sql.= "\", \"";
+	$sql.= isset($noanswer)?$noanswer:'';
+	$sql.= "\", \"";
+	$sql.= isset($recording)?$recording:'';
+	$sql.= "\", \"";
+	$sql.= isset($outboundcid)?$outboundcid:'';
+	$sql.= "\")";
 	sql($sql);
 	
 	//write to astdb
 	$astman = new AGI_AsteriskManager();
 	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
-		$astman->database_put("AMPUSER",$extension."/password",$password);
-		$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
-		$astman->database_put("AMPUSER",$extension."/noanswer",$noasnwer);
-		$astman->database_put("AMPUSER",$extension."/recording",$recording);
-		$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$outboundcid."\"");
-		$astman->database_put("AMPUSER",$extension."/cidname","\"".$name."\"");
-		$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
+		$astman->database_put("AMPUSER",$extension."/password",isset($password)?$password:'');
+		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
+		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
+		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
+		$astman->database_put("AMPUSER",$extension."/outboundcid","\"".isset($outboundcid)?$outboundcid:''."\"");
+		$astman->database_put("AMPUSER",$extension."/cidname","\"".isset($name)?$name:''."\"");
+		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
