@@ -11,7 +11,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-$action = $_REQUEST['action'];
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
 
 //if submitting form, update database
