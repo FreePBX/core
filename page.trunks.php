@@ -150,7 +150,7 @@ foreach ($globals as $global) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Trunk")?></a><br></li>
+    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Trunk")?></a></li>
 
 <?php 
 //get existing trunk info

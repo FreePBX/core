@@ -59,7 +59,7 @@ switch ($action) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php  echo ($userdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add User")?></a><br></li>
+    <li><a id="<?php  echo ($userdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add User")?></a></li>
 
 <?php 
 //get existing trunk info

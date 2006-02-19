@@ -188,7 +188,7 @@ foreach ($globals as $global) {
 
 
 <div class="rnav">
-    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Route")?></a><br></li>
+    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Route")?></a></li>
 <?php 
 $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
 $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
