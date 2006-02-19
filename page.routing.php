@@ -14,11 +14,11 @@
 //GNU General Public License for more details.
 
 $display='routing'; 
-$extdisplay=$_REQUEST['extdisplay'];
-$action = $_REQUEST['action'];
+$extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
-$repotrunkdirection = $_REQUEST['repotrunkdirection'];
-$repotrunkkey = $_REQUEST['repotrunkkey'];
+$repotrunkdirection = isset($_REQUEST['repotrunkdirection'])?$_REQUEST['repotrunkdirection']:'';
+$repotrunkkey = isset($_REQUEST['repotrunkkey'])?$_REQUEST['repotrunkkey']:'';
 
 
 $dialpattern = array();
@@ -190,8 +190,8 @@ foreach ($globals as $global) {
 <div class="rnav">
     <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Route")?></a><br></li>
 <?php 
-$reporoutedirection = $_REQUEST['reporoutedirection'];
-$reporoutekey = $_REQUEST['reporoutekey'];
+$reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
+$reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
 $key = -1;
 $routepriority = core_routing_getroutenames();
 $positions=count($routepriority);

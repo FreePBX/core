@@ -11,12 +11,11 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 	
-$action = $_REQUEST['action'];
-$extdisplay=$_REQUEST['extdisplay'];
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+$extdisplay= isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $dispnum = 'did'; //used for switch on config.php
-
-$account = $_REQUEST['account'];	
-$goto = $_REQUEST['goto0'];
+$account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
+$goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 
 //update db if submiting form
 switch ($action) {
@@ -87,11 +86,11 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.')?></span></a>:</td>
-			<td><input type="text" name="extension" value="<?php echo $extension ?>"></td>
+			<td><input type="text" name="extension" value="<?php echo isset($extension)?$extension:''; ?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info.')?></span></a>:</td>
-			<td><input type="text" name="cidnum" value="<?php echo $cidnum ?>"></td>
+			<td><input type="text" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>"></td>
 		</tr>
 		<tr>
 			<td><br></td>
@@ -103,6 +102,13 @@ if (isset($inroutes)) {
 			</td>
 			<td>
 				<select name="faxexten">
+<?php 
+// Cleaning up warnings. I should do this a better way.
+if (!isset($faxexten))
+	$faxexten = null;
+if (!isset($faxemail))
+	$faxemail = null;
+?>
 					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
 					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
@@ -134,6 +140,12 @@ if (isset($inroutes)) {
 			<td><a href="#" class="info"><?php echo _("Immediate Answer")?><span><?php echo _('Answer calls the moment they are detected?  Note: If using a "Fax Extension" (above) you may wish to enable this so that we can listen for a fax tone.')?></span></a>:</td>
 			<td>
 				<select name="answer">
+<?php
+if (!isset($answer))
+	$answer = '0';
+if (!isset($privacyman))
+	$privacyman = '0';
+?>
 					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
 					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
 				</select>
@@ -141,7 +153,7 @@ if (isset($inroutes)) {
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
-			<td><input type="text" name="wait" size="3" value="<?php echo $wait ?>"></td>
+			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
@@ -160,7 +172,7 @@ if (isset($inroutes)) {
 		
 <?php 
 //draw goto selects
-echo drawselects($destination,0);
+echo drawselects(isset($destination)?$destination:null,0);
 ?>
 		
 		<tr>

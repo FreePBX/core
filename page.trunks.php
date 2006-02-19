@@ -16,9 +16,9 @@ $localPrefixFile = "/etc/asterisk/localprefixes.conf";
 
 
 $display='trunks'; 
-$extdisplay=$_REQUEST['extdisplay'];
-$action = $_REQUEST['action'];
-$tech = strtolower($_REQUEST['tech']);
+$extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+$tech = strtolower(isset($_REQUEST['tech'])?$_REQUEST['tech']:'');
 
 $trunknum = ltrim($extdisplay,'OUT_');
 

@@ -1160,7 +1160,10 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
-			$confdetail .= $result[0] .'='. $result[1] . "\n";
+			if (isset($confdetail))
+				$confdetail .= $result[0] .'='. $result[1] . "\n";
+			else
+				$confdetail = $result[0] .'='. $result[1] . "\n";
 		}
 	}
 	return $confdetail;
@@ -1178,7 +1181,7 @@ function core_trunks_getTrunkUserContext($trunknum) {
 			$account = $result[1];
 		}
 	}
-	return $account;
+	return isset($account)?$account:null;
 }
 
 //get and print user config (prefixed with 5 9's)
@@ -1193,10 +1196,13 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
-			$confdetail .= $result[0] .'='. $result[1] . "\n";
+			if (isset($confdetail))
+				$confdetail .= $result[0] .'='. $result[1] . "\n";
+			else
+				$confdetail = $result[0] .'='. $result[1] . "\n";
 		}
 	}
-	return $confdetail;
+	return isset($confdetail)?$confdetail:null;
 }
 
 //get trunk account register string

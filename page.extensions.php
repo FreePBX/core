@@ -62,7 +62,8 @@ foreach ($vmcontexts as $vmcontext) {
 
 $vmcontext = $_SESSION["AMP_user"]->_deptname; //AMP Users can only add to their department's context
 if (empty($vmcontext)) 
-	$vmcontext = ($_REQUEST['vmcontext'] ? $_REQUEST['vmcontext'] : $incontext);
+	if (isset($incontext))
+		$vmcontext = isset($_REQUEST['vmcontext'])?$_REQUEST['vmcontext']:$incontext;
 if (empty($vmcontext))
 	$vmcontext = 'default';
 
