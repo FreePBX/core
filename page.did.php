@@ -44,7 +44,7 @@ switch ($action) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $dispnum?>"><?php echo _("Add Incoming Route")?></a><br></li>
+    <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $dispnum?>"><?php echo _("Add Incoming Route")?></a></li>
 <?php 
 //get unique incoming routes
 $inroutes = core_did_list();
