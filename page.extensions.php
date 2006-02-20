@@ -164,7 +164,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 			<td>
 				<a href="#" class="info"><?php echo _("Display Name")?><span><?php echo _("The caller id name for this device will be set to this.")?><br></span></a>:
 			</td><td>
-				<input type="text" name="name" value="<?php echo $devinfo_description ?>"/>
+				<input type="text" name="description" value="<?php echo $devinfo_description ?>"/>
 			</td>
 		</tr>
 		<input type="hidden" name="devicetype" value="fixed"/>
