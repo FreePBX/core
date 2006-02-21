@@ -752,7 +752,7 @@ function core_users_add($vars,$vmcontext) {
 		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
 		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
-		$astman->database_put("AMPUSER",$extension."/outboundcid","\"".isset($outboundcid)?$outboundcid:''."\"");
+		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidname","\"".isset($name)?$name:''."\"");
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->disconnect();
