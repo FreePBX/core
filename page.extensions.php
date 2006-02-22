@@ -73,7 +73,7 @@ if (isset($extension) && !checkRange($extension)){
 } else {
 	//deviceid and extension are the same and fixed
 	$deviceid = $deviceuser = isset($extension)?$extension:'';
-	$description = isset($_REQUEST['name'])?$_REQUEST['name']:'';
+	$description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
 
 	//if submitting form, update database
 	if (!isset($action)) 
