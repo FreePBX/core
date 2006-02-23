@@ -283,7 +283,9 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			if (!empty($existingdevices)) {
 					$existingdevices .= "&";
 			}
-			$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
+			//only append device value if this id doesn't exist in it already
+			if(strpos($existingdevices,$id."&") === false) 
+				$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
 		}
 		$astman->disconnect();
 	} else {
