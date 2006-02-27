@@ -1683,7 +1683,7 @@ function core_routing_getroutepassword($route) {
 	if(DB::IsError($results)) {
 		die($results->getMessage());
 	}
-	if (preg_match('/^.*,.*,.*,(\d+)/', $results, $matches)) {
+	if (preg_match('/^.*,.*,.*,(\d+|\/\S+)/', $results, $matches)) {
 		$password = $matches[1];
 	} else {
 		$password = "";

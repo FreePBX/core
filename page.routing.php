@@ -293,7 +293,7 @@ if ($extdisplay) { // editing
 <?php  } ?>
 		</tr>
 		<tr>
-			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
+			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>"/></td>
 		</tr>
 		<tr>
