@@ -847,6 +847,7 @@ function core_users_del($extension,$incontext,$uservm){
 		$astman->database_del("AMPUSER",$extension."/outboundcid");
 		$astman->database_del("AMPUSER",$extension."/cidname");
 		$astman->database_del("AMPUSER",$extension."/voicemail");
+		$astman->database_del("AMPUSER",$extension."/device");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
