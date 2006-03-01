@@ -1022,23 +1022,34 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum) {
 //get unique trunks
 function core_trunks_list() {
 	global $db;
+	global $amp_conf;
 	
-	// we have to escape _ for mysql: normally a wildcard
-	$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT\\\_%' ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0","getAll"); 
+	if ( $amp_conf["AMPDBENGINE"] == "sqlite")
+	{
+		// TODO: sqlite work arround - diego 
+		$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll"); 
+	}
+	else
+	{
+		// we have to escape _ for mysql: normally a wildcard
+		$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT\\\_%' ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0","getAll"); 
+	}
 
 	//if no trunks have ever been defined, then create the proper variables with the default zap trunk
-	if (count($unique_trunks) == 0) {
+	if (count($unique_trunks) == 0) 
+	{
 		//If all trunks have been deleted from admin, dialoutids might still exist
 		sql("DELETE FROM globals WHERE variable = 'DIALOUTIDS'");
 	
 		$glofields = array(array('OUT_1','ZAP/g0'),
 							array('DIAL_OUT_1','9'),
 							array('DIALOUTIDS','1'));
-	    $compiled = $db->prepare('INSERT INTO globals (variable, value) values (?,?)');
+		$compiled = $db->prepare('INSERT INTO globals (variable, value) values (?,?)');
 		$result = $db->executeMultiple($compiled,$glofields);
-	    if(DB::IsError($result)) {
-	        die($result->getMessage()."<br><br>".$sql);	
-	    }
+		if(DB::IsError($result))
+		{
+			die($result->getMessage()."<br><br>".$sql);	
+		}
 		$unique_trunks[] = array('OUT_1','ZAP/g0');
 	}
 	// asort($unique_trunks);
@@ -1262,9 +1273,21 @@ function core_trunks_deleteDialRules($trunknum) {
 /* begin page.routing.php functions */
 
 //get unique outbound route names
-function core_routing_getroutenames() {
-	$results = sql("SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
-	// we SUBSTRING() to remove "outrt-"
+function core_routing_getroutenames() 
+{
+	global $amp_conf;
+	
+	if ( $amp_conf["AMPDBENGINE"] == "sqlite")
+	{
+		// TODO: sqlite work arround - diego
+		$results = sql("SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
+	}
+	else
+	{
+		// we SUBSTRING() to remove "outrt-"
+		$results = sql("SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
+	}
+
 
 	if (count($results) == 0) {
 		// see if they're still using the old dialprefix method
