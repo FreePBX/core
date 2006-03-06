@@ -720,6 +720,7 @@ function core_users_add($vars,$vmcontext) {
 	
 	//escape quotes and any other bad chars:
 	$outboundcid = addslashes($outboundcid);
+	$name = addslashes($name);
 
 	//if voicemail is enabled, set the box@context to use
 	if(isset($vm) && $vm == "enabled") {
@@ -755,7 +756,7 @@ function core_users_add($vars,$vmcontext) {
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
 		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
-		$astman->database_put("AMPUSER",$extension."/cidname","\"".isset($name)?$name:''."\"");
+		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
 		$astman->disconnect();
