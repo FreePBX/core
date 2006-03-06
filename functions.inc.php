@@ -242,7 +242,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	$devices = core_devices_list();
 	if (is_array($devices)) {
 		foreach($devices as $device) {
-			if ($device[0]==$id) {
+			if ($device[0] === $id) {
 				echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
 				return false;
 			}
@@ -708,8 +708,8 @@ function core_users_add($vars,$vmcontext) {
 	$extens = core_users_list();
 	if(is_array($extens)) {
 		foreach($extens as $exten) {
-			if ($exten[0]==$extension) {
-				echo "<script>javascript:alert('"._("This user extension is already in use")."');</script>";
+			if ($exten===$extension) {
+				echo "<script>javascript:alert('"._("This user {$thisexten}/{$extension} extension is already in use")."');</script>";
 				return false;
 			}
 		}
