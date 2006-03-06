@@ -757,6 +757,7 @@ function core_users_add($vars,$vmcontext) {
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidname","\"".isset($name)?$name:''."\"");
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
+		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
@@ -862,6 +863,25 @@ function core_users_del($extension,$incontext,$uservm){
 	*/
 	/*//delete hint
 	core_hint_del($extension);*/
+}
+
+function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){
+	global $db;
+	global $amp_conf;
+	
+	//I we are editing, we need to remember existing user<->device mapping, so we can delete and re-add
+	$astman = new AGI_AsteriskManager();
+	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+		$ud = $astman->database_get("AMPUSER",$extension."/device");
+		$vars['device'] = $ud;
+	} else {
+		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+	}
+	
+	//delete and re-add
+	core_users_del($extension,$incontext,$uservm);
+	core_users_add($vars,$vmcontext);
+	
 }
 
 /* end page.users.php functions */

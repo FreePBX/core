@@ -74,9 +74,8 @@ if (isset($extension) && !checkRange($extension)){
 			core_users_del($extdisplay,$incontext,$uservm);
 			needreload();
 		break;
-		case "edit":  //just delete and re-add
-			core_users_del($extdisplay,$incontext,$uservm);
-			core_users_add($_REQUEST,$vmcontext);
+		case "edit":
+			core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
 			needreload();
 		break;
 	}

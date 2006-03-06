@@ -92,8 +92,7 @@ if (isset($extension) && !checkRange($extension)){
 		case "edit":  //just delete and re-add
 			core_devices_del($extdisplay);
 			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
-			core_users_del($extdisplay,$incontext,$uservm);
-			core_users_add($_REQUEST,$vmcontext);
+			core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
 			needreload();
 		break;
 		case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
