@@ -45,58 +45,64 @@ function core_get_config($engine) {
 	switch($engine) {
 		case "asterisk":
 			/* inbound routing extensions */
-			foreach(core_did_list() as $item) {
-				$did = core_did_get($item['extension'],$item['cidnum']);
-				$exten = $did['extension'];
-				$cidnum = $did['cidnum'];
-								
-				//sub a blank extension with 's'
-				$exten = (empty($exten)?"s":$exten);
-				$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
-				$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
-				
-				if ($exten == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
-					$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-					$ext->add('ext-did', $catchaccount, '', new ext_goto('1','s','ext-did'));
+			$didlist = core_did_list();
+			if(is_array($didlist)){
+				foreach($didlist as $item) {
+					$did = core_did_get($item['extension'],$item['cidnum']);
+					$exten = $did['extension'];
+					$cidnum = $did['cidnum'];
+									
+					//sub a blank extension with 's'
+					$exten = (empty($exten)?"s":$exten);
+					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
+					$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
+					
+					if ($exten == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
+						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
+						$ext->add('ext-did', $catchaccount, '', new ext_goto('1','s','ext-did'));
+					}
+					
+					if ($item['faxexten'] != "default") {
+						$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
+					}
+					if (!empty($item['faxemail'])) {
+						$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
+					}
+					if ($item['answer'] == "1") {
+						$ext->add('ext-did', $exten, '', new ext_answer(''));
+						$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
+					}
+					if ($item['privacyman'] == "1") {
+						$ext->add('ext-did', $exten, '', new ext_privacymanager(''));
+					}
+					
+					//the goto destination
+					// destination field in 'incoming' database is backwards from what ext_goto expects
+					$goto_context = strtok($did['destination'],',');
+					$goto_exten = strtok(',');
+					$goto_pri = strtok(',');
+					$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+					
 				}
-				
-				if ($item['faxexten'] != "default") {
-					$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
-				}
-				if (!empty($item['faxemail'])) {
-					$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
-				}
-				if ($item['answer'] == "1") {
-					$ext->add('ext-did', $exten, '', new ext_answer(''));
-					$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
-				}
-				if ($item['privacyman'] == "1") {
-					$ext->add('ext-did', $exten, '', new ext_privacymanager(''));
-				}
-				
-				//the goto destination
-				// destination field in 'incoming' database is backwards from what ext_goto expects
-				$goto_context = strtok($did['destination'],',');
-				$goto_exten = strtok(',');
-				$goto_pri = strtok(',');
-				$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
-				
 			}
 			
 			/* user extensions */
 			$ext->addInclude('from-internal-additional','ext-local');
-			foreach(core_users_list() as $item) {
-				$exten = core_users_get($item[0]);
-				$vm = ($exten['voicemail'] == "disabled" ? "novm" : $exten['extension']);
-				
-				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
-				
-				if($vm != "novm")
-					$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm));
+			$userlist = core_users_list();
+			if (is_array($userlist)) {
+				foreach($userlist as $item) {
+					$exten = core_users_get($item[0]);
+					$vm = ($exten['voicemail'] == "disabled" ? "novm" : $exten['extension']);
 					
-				$hint = core_hint_get($exten['extension']);
-				if (!empty($hint))
-					$ext->addHint('ext-local', $exten['extension'], $hint);
+					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
+					
+					if($vm != "novm")
+						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm));
+						
+					$hint = core_hint_get($exten['extension']);
+					if (!empty($hint))
+						$ext->addHint('ext-local', $exten['extension'], $hint);
+				}
 			}
 			
 			/* dialplan globals */
