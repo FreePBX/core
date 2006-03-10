@@ -286,12 +286,14 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
 		if($user != "none") {
 			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
-			if (!empty($existingdevices)) {
-					$existingdevices .= "&";
+			if (empty($existingdevices)) {
+				$astman->database_put("AMPUSER",$user."/device",$id);
+			} else {
+				$existingdevices .= "&";
+				//only append device value if this id doesn't exist in it already
+				if(strpos($existingdevices,$id."&") === false) // if not containing $id 
+					$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
 			}
-			//only append device value if this id doesn't exist in it already
-			if(strpos($existingdevices,$id."&")) // if not containing $id 
-				$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
 		}
 		$astman->disconnect();
 	} else {
