@@ -335,16 +335,12 @@ function core_devices_del($account){
 	//get all info about device
 	$devinfo = core_devices_get($account);
 	
-	//delete from devices table
-	$sql="DELETE FROM devices WHERE id = \"$account\"";
-	sql($sql);
-	
 	//delete details to astdb
 	$astman = new AGI_AsteriskManager();
 	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
 		// If a user was selected, remove this device from the user
 		$deviceuser = $astman->database_get("DEVICE",$account."/user");
-		if (isset($user) && $user != "none") {
+		if (isset($deviceuser) && $deviceuser != "none") {
 				// Remove the device record from the user's device list
 				$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
 				/*$userdevices = str_replace($account."&", "", $userdevices."&");
@@ -366,19 +362,22 @@ function core_devices_del($account){
 		$astman->database_del("DEVICE",$account."/user");
 		$astman->database_del("DEVICE",$account."/emergency_cid");
 		$astman->disconnect();
+
+		//delete from devices table
+		$sql="DELETE FROM devices WHERE id = \"$account\"";
+		sql($sql);
+
+		//voicemail symlink
+		exec("rm -f /var/spool/asterisk/voicemail/device/".$account);
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-	
-	//voicemail symlink
-	exec("rm -f /var/spool/asterisk/voicemail/device/".$account);
 	
 	//take care of sip/iax/zap config
 	$funct = "core_devices_del".strtolower($devinfo['tech']);
 	if(function_exists($funct)){
 		$funct($account);
 	}
-	
 }
 
 function core_devices_get($account){
