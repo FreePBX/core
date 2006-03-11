@@ -44,7 +44,7 @@ switch ($action) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $dispnum?>"><?php echo _("Add Incoming Route")?></a></li>
+    <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
 <?php 
 //get unique incoming routes
 $inroutes = core_did_list();
@@ -52,7 +52,7 @@ if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		$displaydid = ( empty($inroute['extension'])? "any DID" : $inroute['extension'] );
 		$displaycid = ( empty($inroute['cidnum'])? "any CID" : $inroute['cidnum'] );
-		echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'current':'')."\" href=\"config.php?display=".$dispnum."&extdisplay={$inroute['extension']}/{$inroute['cidnum']}\">{$displaydid} / {$displaycid}</a></li>";
+		echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'current':'')."\" href=\"config.php?display=".urlencode($dispnum)."&extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$displaydid} / {$displaycid}</a></li>";
 	}
 }
 ?>
@@ -61,10 +61,9 @@ if (isset($inroutes)) {
 <div class="content">
 <?php 
 	
-	if ($action == 'delDID') {
+	if ($action == 'delIncoming') {
 		echo '<br><h3>Route '.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
 	} else {
-		
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
 ?>
 <?php if ($extdisplay) {	
