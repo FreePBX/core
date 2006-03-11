@@ -58,10 +58,10 @@ foreach ($globals as $global) {
 <h5><?php echo _("Dialing Options")?></h5>
 <p>
 	<?php echo _("Number of seconds to ring phones before sending callers to voicemail:")?>
-	<input type="text" size="2" name="RINGTIMER" value="<?php  echo $RINGTIMER?>"/>
+	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>"/>
 	<br><br>
 	<?php echo _("Extension prefix for dialing direct to voicemail:")?>
-	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo $VM_PREFIX?>"/>
+	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>"/>
 	<br><br>
 	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span><br>
 t: Allow the called user to transfer the call by hitting #<br>
@@ -70,7 +70,7 @@ r: Generate a ringing tone for the calling party<br>
 w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)<br>
 W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)<br>
 	</span></a>
-	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo $DIAL_OPTIONS?>"/>
+	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>"/>
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>
@@ -107,7 +107,7 @@ W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)<b
 </p>
 <p>
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("to have faxes emailed to:")?>
-	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo $FAX_RX_EMAIL?>"/>
+	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>"/>
 </p>
 <br>
 <h6>

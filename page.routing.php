@@ -288,7 +288,7 @@ if ($extdisplay) { // editing
 			</td>
 <?php  } else { // new ?>
 			<td>
-				<input type="text" size="20" name="routename" value="<?php echo $routename;?>"/>
+				<input type="text" size="20" name="routename" value="<?php echo htmlspecialchars($routename);?>"/>
 			</td>
 <?php  } ?>
 		</tr>

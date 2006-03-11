@@ -292,14 +292,14 @@ if (!$tech && !$extdisplay) {
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Setting this option will override all clients' caller IDs for calls placed out this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to simply pass client caller IDs.")?><br><br></span></a>: 
 				</td><td>
-					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>"/>
+					<input type="text" size="20" name="outcid" value="<?php echo htmlspecialchars($outcid);?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo _("Controls the maximum number of channels (simultaneous calls) that can be used on this trunk, including both incoming and outgoing calls. Leave blank to specify no maximum.")?></span></a>: 
 				</td><td>
-					<input type="text" size="3" name="maxchans" value="<?php echo $maxchans; ?>"/>
+					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>"/>
 				</td>
 			</tr>
 			<tr>
@@ -513,7 +513,7 @@ if (!$tech && !$extdisplay) {
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line.<br><br>Most users should leave this option blank.")?></span></a>: 
 				</td><td>
-					<input type="text" size="8" name="dialoutprefix" value="<?php echo $dialoutprefix ?>"/>
+					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>"/>
 				</td>
 			</tr>
 			<tr>
@@ -530,7 +530,7 @@ if (!$tech && !$extdisplay) {
 					<td>
 						<a href=# class="info"><?php echo _("Zap Identifier (trunk name)")?><span><br><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
 					</td><td>
-						<input type="text" size="8" name="channelid" value="<?php echo $channelid ?>"/>
+						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
 					</td>
 				</tr>
@@ -544,7 +544,7 @@ if (!$tech && !$extdisplay) {
 					<td>
 						<a href=# class="info"><?php echo _("Custom Dial String")?><span><?php echo _("Define the custom Dial String.  Include the token")?> $OUTNUM$ <?php echo _("wherever the number to dial should go.<br><br><b>examples:</b><br><br>CAPI/XXXXXXXX:b")?>$OUTNUM$<?php echo _(",30,r<br>H323/")?>$OUTNUM$@XX.XX.XX.XX<br>OH323/$OUTNUM$@XX.XX.XX.XX:XXXX<br>vpb/1-1/$OUTNUM$</span></a>: 
 					</td><td>
-						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo $channelid ?>"/>
+						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
 					</td>
 				</tr>	
@@ -556,7 +556,7 @@ if (!$tech && !$extdisplay) {
 					<td>
 						<a href=# class="info"><?php echo _("Trunk Name")?><span><br><?php echo _("Give this trunk a unique name.  Example: myiaxtel")?><br><br></span></a>: 
 					</td><td>
-						<input type="text" size="14" name="channelid" value="<?php echo $channelid ?>"/>
+						<input type="text" size="14" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
 					</td>
 				</tr>
 				<tr>
@@ -566,7 +566,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<textarea rows="10" cols="40" name="peerdetails"><?php echo $peerdetails ?></textarea>
+						<textarea rows="10" cols="40" name="peerdetails"><?php echo htmlspecialchars($peerdetails) ?></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -578,7 +578,7 @@ if (!$tech && !$extdisplay) {
 					<td>
 						<a href=# class="info"><?php echo _("USER Context")?><span><br><?php echo _("This is most often the account name or number your provider expects.<br><br>This USER Context will be used to define the below user details.")?></span></a>: 
 					</td><td>
-						<input type="text" size="14" name="usercontext" value="<?php echo $usercontext  ?>"/>
+						<input type="text" size="14" name="usercontext" value="<?php echo htmlspecialchars($usercontext)  ?>"/>
 					</td>
 				</tr>
 				<tr>
@@ -588,7 +588,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<textarea rows="10" cols="40" name="userconfig"><?php echo $userconfig; ?></textarea>
+						<textarea rows="10" cols="40" name="userconfig"><?php echo htmlspecialchars($userconfig); ?></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -603,7 +603,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<input type="text" size="40" name="register" value="<?php echo $register ?>"/>
+						<input type="text" size="40" name="register" value="<?php echo htmlspecialchars($register) ?>"/>
 					</td>
 				</tr>
 	<?php 

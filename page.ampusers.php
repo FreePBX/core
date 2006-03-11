@@ -145,16 +145,16 @@ foreach ($tresults as $tresult) {
 				<td>
 					<a href=# class="info"><?php echo _("Department Name<span>Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.</span>")?></a>: 
 				</td><td>
-					<input type="text" size="20" name="deptname" value="<?php echo $deptname;?>"/>
+					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Extension Range<span>Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.</span>")?></a>: 
 				</td><td>
-					<input type="text" size="5" name="extension_low" value="<?php echo $extension_low;?>"/>
+					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>"/>
 					&nbsp;to
-					<input type="text" size="5" name="extension_high" value="<?php echo $extension_high;?>"/>
+					<input type="text" size="5" name="extension_high" value="<?php echo htmlspecialchars($extension_high);?>"/>
 				</td>
 			</tr>
 			<tr>

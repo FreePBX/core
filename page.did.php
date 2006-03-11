@@ -85,11 +85,11 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.')?></span></a>:</td>
-			<td><input type="text" name="extension" value="<?php echo isset($extension)?$extension:''; ?>"></td>
+			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info.')?></span></a>:</td>
-			<td><input type="text" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>"></td>
+			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>"></td>
 		</tr>
 		<tr>
 			<td><br></td>
@@ -128,7 +128,7 @@ if (!isset($faxemail))
 				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the AMP default in General Settings.")?></span></a>:
 			</td>
 			<td>
-				<input type="text" size="20" name="faxemail" value="<?php echo $faxemail?>"/>
+				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>"/>
 			</td>
 		</tr>
 		<tr>
