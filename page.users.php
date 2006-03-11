@@ -138,7 +138,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 			<td>
 				<a href="#" class="info"><?php echo _("Display Name")?><span><?php echo _("The caller id name for calls from this user will be set to this name.")?><br></span></a>:
 			</td><td>
-				<input type="text" name="name" value="<?php echo $name ?>"/>
+				<input type="text" name="name" value="<?php echo htmlspecialchars($name) ?>"/>
 			</td>
 		</tr>
 		
@@ -207,11 +207,11 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("email address")?><span><?php echo _("The email address that voicemails are sent to.")?></span></a>: </td>
-					<td><input type="text" name="email" value="<?php  echo $email; ?>"/></td>
+					<td><input type="text" name="email" value="<?php  echo htmlspecialchars($email); ?>"/></td>
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("pager email address")?><span><?echo _("Pager/mobile email address that short voicemail notifcations are sent to.")?></span></a>: </td>
-					<td><input type="text" name="pager" value="<?php  echo $pager; ?>"/></td>
+					<td><input type="text" name="pager" value="<?php  echo htmlspecialchars($pager); ?>"/></td>
 				</tr>
 				<tr>
  					<td><a href="#" class="info"><?php echo _("email attachment")?><span><?php echo _("Option to attach voicemails to email.")?></span></a>: </td>
@@ -248,7 +248,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
  				
  				<tr>
 					<td><a href="#" class="info">vm options<span><?php echo _("Separate options with pipe ( | )")?><br><br>ie: review=yes|maxmessage=60</span></a>: </td>
-					<td><input size="20" type="text" name="options" value="<?php  echo $options; ?>" /></td>
+					<td><input size="20" type="text" name="options" value="<?php  echo htmlspecialchars($options); ?>" /></td>
 				</tr>
 				<tr>
 					<td><?php echo _("vm context:")?> </td>

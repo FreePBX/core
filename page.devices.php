@@ -107,7 +107,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 			<td>
 				<a href="#" class="info"><?php echo _("Description")?><span><?php echo _("The caller id name for this device will be set to this description until it is logged into.")?><br></span></a>:
 			</td><td>
-				<input type="text" name="description" value="<?php echo $devinfo_description ?>"/>
+				<input type="text" name="description" value="<?php echo htmlspecialchars($devinfo_description) ?>"/>
 			</td>
 		</tr>
 
@@ -115,7 +115,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 			   <td>
 					   <a href="#" class="info"><?php echo _("Emergency CID")?><span><?php echo _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.")?><br></span></a>:
 			   </td><td>
-					   <input type="text" name="emergency_cid" value="<?php echo $devinfo_emergency_cid ?>"/>
+					   <input type="text" name="emergency_cid" value="<?php echo htmlspecialchars($devinfo_emergency_cid) ?>"/>
 			   </td>
 		</tr>
 
@@ -221,14 +221,14 @@ switch(strtolower($tech)) {
 
 if($extdisplay) {
 	foreach($basic as $key => $value) {
-		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
+		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"".htmlspecialchars($$key)."\"/></td></tr>";
 	}
 	foreach($advanced as $key => $value) {
-		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
+		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"".htmlspecialchars($$key)."\"/></td></tr>";
 	}
 } else {
 	foreach($basic as $key => $value) {
-		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"{$value}\"/></td></tr>";
+		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"".htmlspecialchars($value)."\"/></td></tr>";
 	}
 	foreach($advanced as $key => $value) {
 		echo "<input type=\"hidden\" name=\"{$key}\" value=\"{$value}\"/>";

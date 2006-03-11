@@ -166,7 +166,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 			<td>
 				<a href="#" class="info"><?php echo _("Display Name")?><span><?php echo _("The caller id name for this device will be set to this.")?><br></span></a>:
 			</td><td>
-				<input type="text" name="description" value="<?php echo $devinfo_description ?>"/>
+				<input type="text" name="description" value="<?php echo htmlspecialchars($devinfo_description) ?>"/>
 			</td>
 		</tr>
 		<input type="hidden" name="devicetype" value="fixed"/>
@@ -191,7 +191,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 			   <td>
 					   <a href="#" class="info"><?php echo _("Emergency CID")?><span><?php echo _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.")?><br></span></a>:
 			   </td><td>
-					   <input type="text" name="emergency_cid" value="<?php echo $emergency_cid ?>"/>
+					   <input type="text" name="emergency_cid" value="<?php echo htmlspecialchars($emergency_cid) ?>"/>
 			   </td>
 		</tr>
 
@@ -329,11 +329,11 @@ if($extdisplay) {
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("email address")?><span><?php echo _("The email address that voicemails are sent to.")?></span></a>: </td>
-					<td><input type="text" name="email" value="<?php echo isset($email)?$email:''; ?>"/></td>
+					<td><input type="text" name="email" value="<?php echo htmlspecialchars(isset($email)?$email:''); ?>"/></td>
 				</tr>
 				<tr>
 					<td><a href="#" class="info"><?php echo _("pager email address")?><span><?echo _("Pager/mobile email address that short voicemail notifcations are sent to.")?></span></a>: </td>
-					<td><input type="text" name="pager" value="<?php echo isset($pager)?$pager:''; ?>"/></td>
+					<td><input type="text" name="pager" value="<?php echo htmlspecialchars(isset($pager)?$pager:''); ?>"/></td>
 				</tr>
 				<tr>
  					<td><a href="#" class="info"><?php echo _("email attachment")?><span><?php echo _("Option to attach voicemails to email.")?></span></a>: </td>
@@ -370,7 +370,7 @@ if($extdisplay) {
  				
  				<tr>
 					<td><a href="#" class="info">vm options<span><?php echo _("Separate options with pipe ( | )")?><br><br>ie: review=yes|maxmessage=60</span></a>: </td>
-					<td><input size="20" type="text" name="options" value="<?php  echo isset($options)?$options:''; ?>" /></td>
+					<td><input size="20" type="text" name="options" value="<?php  echo htmlspecialchars(isset($options)?$options:''); ?>" /></td>
 				</tr>
 				<tr>
 					<td><?php echo _("vm context:")?> </td>
