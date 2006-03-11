@@ -75,6 +75,9 @@ function core_get_config($engine) {
 					if ($item['privacyman'] == "1") {
 						$ext->add('ext-did', $exten, '', new ext_privacymanager(''));
 					}
+					if (!empty($item['alertinfo'])) {
+						$ext->add('ext-did', $exten, '', new ext_setvar("_ALERT_INFO", $item['alertinfo']));
+					}
 					
 					//the goto destination
 					// destination field in 'incoming' database is backwards from what ext_goto expects
@@ -208,7 +211,7 @@ function core_did_add($incoming){
 	$existing=core_did_get($extension,$cidnum);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\")";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\")";
 		sql($sql);
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";

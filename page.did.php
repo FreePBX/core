@@ -107,6 +107,9 @@ if (!isset($faxexten))
 	$faxexten = null;
 if (!isset($faxemail))
 	$faxemail = null;
+
+if (!isset($alertinfo))
+	$alertinfo = 0;
 ?>
 					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
@@ -154,6 +157,8 @@ if (!isset($privacyman))
 			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
 			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
 		</tr>
+
+
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
 			<td>
@@ -163,6 +168,29 @@ if (!isset($privacyman))
 				</select>
 			</td>
 		</tr>
+
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
+			<td>
+				<?php
+				$default = (isset($alertinfo) ? $alertinfo : '');
+				?>
+				<select name="alertinfo">
+					<option value=""><?php echo _("None")?>
+					<option value="Bellcore-r1"<?php echo ($default === 'Bellcore-r1' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r1")?>
+					<option value="Bellcore-r2"<?php echo ($default === 'Bellcore-r2' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r2")?>
+					<option value="Bellcore-r3"<?php echo ($default === 'Bellcore-r3' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r3")?>
+					<option value="Bellcore-r4"<?php echo ($default === 'Bellcore-r4' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r4")?>
+					<option value="Bellcore-r5"<?php echo ($default === 'Bellcore-r5' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r5")?>
+					<option value="Bellcore-r6"<?php echo ($default === 'Bellcore-r6' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r6")?>
+					<option value="Bellcore-r7"<?php echo ($default === 'Bellcore-r7' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r7")?>
+				</select>
+			</td>
+		</tr>
+
+
+
+
 		<tr>
 			<td><br></td>
 		</tr>		
