@@ -188,7 +188,7 @@ foreach ($globals as $global) {
 
 
 <div class="rnav">
-    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo $display?>"><?php echo _("Add Route")?></a></li>
+    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Route")?></a></li>
 <?php 
 $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
 $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
@@ -199,7 +199,7 @@ foreach ($routepriority as $tresult) {
 $key++;
 ?>
 			<?php   // move up
-    			echo "<li><a id=\"".($extdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".$display."&extdisplay={$tresult[0]}\">$key ". substr($tresult[0],4)."</a>";
+    			echo "<li><a id=\"".($extdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".urlencode($display)."&extdisplay=".urlencode($tresult[0])."\">$key ". substr($tresult[0],4)."</a>";
 			if ($key > 0) {?>
 				<img src="images/scrollup.gif" onclick="repositionRoute('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } else { ?>
@@ -255,7 +255,7 @@ foreach (core_trunks_list() as $temp) {
 
 if ($extdisplay) { // editing
 ?>
-	<p><a href="config.php?display=<?php echo $display ?>&extdisplay=<?php echo $extdisplay ?>&action=delroute"><?php echo _("Delete Route")?> <?php  echo substr($extdisplay,4); ?></a></p>
+	<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute"><?php echo _("Delete Route")?> <?php  echo substr($extdisplay,4); ?></a></p>
 <?php  } ?>
 
 	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST">

@@ -66,10 +66,10 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 ?>
 		<h2><?php echo _("Add a Device")?></h2>
 		<h5><?php echo _("Select device technology:")?></h5>
-		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=sip"><?php echo _("SIP")?></a><br><br>
-		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=iax2"><?php echo _("IAX2")?></a><br><br>
-		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=zap"><?php echo _("ZAP")?></a><br><br>
-		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.$display; ?>&tech=custom"><?php echo _("Custom")?></a><br><br>
+		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=sip"><?php echo _("SIP")?></a><br><br>
+		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=iax2"><?php echo _("IAX2")?></a><br><br>
+		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=zap"><?php echo _("ZAP")?></a><br><br>
+		<li><a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=custom"><?php echo _("Custom")?></a><br><br>
 <?php
 	} else {
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
