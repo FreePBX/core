@@ -292,7 +292,7 @@ if (!$tech && !$extdisplay) {
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Setting this option will override all clients' caller IDs for calls placed out this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to simply pass client caller IDs.")?><br><br></span></a>: 
 				</td><td>
-					<input type="text" size="20" name="outcid" value="<?php echo htmlspecialchars($outcid);?>"/>
+					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>"/>
 				</td>
 			</tr>
 			<tr>
