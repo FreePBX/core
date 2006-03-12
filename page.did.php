@@ -137,17 +137,31 @@ if (!isset($alertinfo))
 		<tr>
 			<td><br></td>
 		</tr>
-		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Immediate Answer")?><span><?php echo _('Answer calls the moment they are detected?  Note: If using a "Fax Extension" (above) you may wish to enable this so that we can listen for a fax tone.')?></span></a>:</td>
-			<td>
-				<select name="answer">
 <?php
 if (!isset($answer))
 	$answer = '0';
 if (!isset($privacyman))
 	$privacyman = '0';
 ?>
+		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
+			<td>
+				<select name="privacyman">
+					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
+					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><br></td>
+		</tr>		
+		
+		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Immediate Answer")?><span><?php echo _('Answer calls the moment they are detected?  Note: If using a "Fax Extension" (above) you may wish to enable this so that we can listen for a fax tone.')?></span></a>:</td>
+			<td>
+				<select name="answer">
 					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
 					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
 				</select>
@@ -159,15 +173,6 @@ if (!isset($privacyman))
 		</tr>
 
 
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
-			<td>
-				<select name="privacyman">
-					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
-					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
-				</select>
-			</td>
-		</tr>
 
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
