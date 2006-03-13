@@ -85,7 +85,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 <?php } else { ?>
 		<h2><?php echo _("Add")." ".strtoupper($tech)." "._("Device")?></h2>
 <?php } ?>
-		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
+		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return addNew_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edit' : 'add') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -238,11 +238,51 @@ if($extdisplay) {
 			
 		<tr>
 			<td colspan=2>
-				<br><br><h6><input name="Submit" type="button" value="<?php echo _("Submit")?>" onclick="javascript:if(addNew.deviceid.value=='' || parseInt(addNew.deviceid.value)!=addNew.deviceid.value) {alert('<?php echo _("Please enter a device id.")?>')} else {addNew.submit();}"></h6>
+				<br><br><h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>">
+				</h6>
 			</td>
 		</tr>
 		</table>
+
+<script languague="javascript">
+<!--
+
+var theForm = document.addNew;
+if (theForm.deviceid.value == "") {
+	theForm.deviceid.focus();
+} else {
+	theForm.description.focus();
+}
+
+function addNew_onsubmit() {
+	defaultEmptyOK = false;
+	if (!isInteger(theForm.deviceid.value))
+		return warnInvalid(theForm.deviceid, "Please enter a device id.");
 		
+	if (!isAlphanumeric(theForm.description.value) || isWhitespace(theForm.description.value))
+		return warnInvalid(theForm.description, "Please enter a valid Description for this device");
+		
+	defaultEmptyOK = true;
+	if (!isCallerID(theForm.emergency_cid.value))
+		return warnInvalid(theForm.emergency_cid, "Please enter a valid Emergency CID");
+		
+	
+	defaultEmptyOK = false;
+	if (theForm.dtmfmode != undefined && isEmpty(theForm.dtmfmode.value))
+		return warnInvalid(theForm.dtmfmode, "Please enter the dtmfmode for this device");
+
+	if (theForm.channel != undefined && isEmpty(theForm.channel.value))
+		return warnInvalid(theForm.channel, "Please enter the channel for this device");
+
+	if (theForm.secret != undefined && isEmpty(theForm.secret.value))
+		return confirm("You havn't entered a Secret for this device, although this is possible it's generally bad practice to not assign a 'secret' to a device.\n\nAre you sure you want to leave the Secret blank?");
+
+	return true;
+}
+
+-->
+</script>
+
 		</form>
 <?php 		
 	} //end if action == delGRP
