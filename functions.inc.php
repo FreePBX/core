@@ -73,7 +73,15 @@ function core_get_config($engine) {
 						$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
 					}
 					if ($item['privacyman'] == "1") {
-						$ext->add('ext-did', $exten, '', new ext_privacymanager(''));
+						// crude fix for issue where some proviers give things like
+						// 'anonymous' where the number should be, this makes the 
+						// PrivacyManger thing there IS callerid info, which is wrong
+						$ext->add('ext-did', $exten, '', new ext_setvar('KEEPCID','${CALLERID(num)}'));
+						$ext->add('ext-did', $exten, '', new ext_setvar('TESTCID','${MATH(${CALLERID(num)}+1)}'));
+						$ext->add('ext-did', $exten, '', new ext_gotoif('$[foo${TESTCID} = foo]','CLEARCID','PRIVMGR'));
+						$ext->add('ext-did', $exten, 'CLEARCID', new ext_setvar('CALLERID(num)',''));
+						$ext->add('ext-did', $exten, 'PRIVMGR', new ext_privacymanager(''));
+						$ext->add('ext-did', $exten, '', new ext_setvar('CALLERID(num)','${KEEPCID}'));
 					}
 					if (!empty($item['alertinfo'])) {
 						$ext->add('ext-did', $exten, '', new ext_setvar("_ALERT_INFO", $item['alertinfo']));
