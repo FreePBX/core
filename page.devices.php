@@ -61,7 +61,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 <div class="content">
 <?php 
 	if ($action == 'del') {
-		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
+		echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else if(empty($tech) && ($extdisplay == null)) {
 ?>
 		<h2><?php echo _("Add a Device")?></h2>

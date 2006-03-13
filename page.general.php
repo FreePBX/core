@@ -64,11 +64,11 @@ foreach ($globals as $global) {
 	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>"/>
 	<br><br>
 	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span><br>
-t: Allow the called user to transfer the call by hitting #<br>
-T: Allow the calling user to transfer the call by hitting #<br>
-r: Generate a ringing tone for the calling party<br>
-w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)<br>
-W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)<br>
+<?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
+<?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
+<?php echo _("r: Generate a ringing tone for the calling party")?><br>
+<?php echo _("w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)")?><br>
+<?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 	</span></a>
 	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>"/>
 </p>

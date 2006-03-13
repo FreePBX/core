@@ -245,7 +245,7 @@ if (!$tech && !$extdisplay) {
 			}
 			echo "</span></a>";
 		} else {
-			echo "<b>WARNING:</b> <a href=# class=\"info\">"._("This trunk is not used by any routes!")."<span>";
+			echo "<b>"._("WARNING:")."</b> <a href=# class=\"info\">"._("This trunk is not used by any routes!")."<span>";
 			echo _("This trunk will not be able to be used for outbound calls until a route is setup that uses it. Click on <b>Outbound Routes</b> to setup routing.");
 			echo "</span></a>";
 		}

@@ -448,7 +448,7 @@ function core_devices2astdb(){
 			}
 		}
 	} else {
-		echo "Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
+		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
 	}
 	return $astman->disconnect();
 }
@@ -477,7 +477,7 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
 		}	
 	} else {
-		echo "Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
+		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
 	}
 	return $astman->disconnect();
 }

@@ -167,11 +167,11 @@ foreach ($tresults as $tresult) {
 				foreach ($amp_sections as $key=>$value) {
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
-					echo ">".$value."</option>";
+					echo ">"._($value)."</option>";
 				}
 				echo "<option value=\"*\"";
 				if (in_array("*", $sections)) echo " SELECTED";
-				echo ">ALL SECTIONS</option>";
+				echo ">"._("ALL SECTIONS")."</option>";
 ?>					
 					</select>
 				</td>
@@ -179,7 +179,7 @@ foreach ($tresults as $tresult) {
 			
 			<tr>
 				<td colspan="2">
-					<h6><input name="Submit" type="button" value="Submit Changes" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')"></h6>
+					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')"></h6>
 				</td>
 			</tr>
 			</table>

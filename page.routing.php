@@ -271,7 +271,7 @@ if ($extdisplay) { // editing
 			<td>
 				<?php echo substr($extdisplay,4);?>
 				<input type="hidden" id="routename" name="routename" value="<?php echo $extdisplay;?>"/>
-				<input type="button" onClick="renameRoute();" value="Rename" style="font-size:10px;"  />
+				<input type="button" onClick="renameRoute();" value="<?php echo _("Rename")?>" style="font-size:10px;"  />
 				<input type="hidden" id="newroutename" name="newroutename" value=""/>
 				<script language="javascript">
 				function renameRoute() {
@@ -297,7 +297,7 @@ if ($extdisplay) { // editing
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>"/></td>
 		</tr>
 		<tr>
-			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>?:</td>
+			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>:</td>
 			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?> /></td>
 		</tr>
 		<tr>
@@ -350,7 +350,7 @@ $key += 1; // this will be the next key value
 			</td>
 		</tr>
 		<tr>
-			<td><?php echo ("Insert:")?></td>
+			<td><?php echo _("Insert:")?></td>
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
 			
@@ -427,15 +427,15 @@ $key += 1; // this will be the next key value
 			--></script>
 			<td>
 				<select onChange="insertCode();" id="inscode">
-					<option value="">Pick pre-defined patterns</option>
-					<option value="local">Local 7 digit</option>
-					<option value="local10">Local 7/10 digit</ption>
-					<option value="tollfree">Toll-free</option>
-					<option value="ld">Long-distance</option>
-					<option value="int">International</option>
-					<option value="info">Information</option>
-					<option value="emerg">Emergency</option>
-					<option value="lookup">Lookup local prefixes</option>
+			<option value=""><?php echo _("Pick pre-defined patterns")?></option>
+			<option value="local"><?php echo _("Local 7 digit")?></option>
+			<option value="local10"><?php echo _("Local 7/10 digit")?></option>
+			<option value="tollfree"><?php echo _("Toll-free")?></option>
+			<option value="ld"><?php echo _("Long-distance")?></option>
+			<option value="int"><?php echo _("International")?></option>
+			<option value="info"><?php echo _("Information")?></option>
+			<option value="emerg"><?php echo _("Emergency")?></option>
+			<option value="lookup"><?php echo _("Lookup local prefixes")?></option>
 				</select>
 			</td>
 		</tr>

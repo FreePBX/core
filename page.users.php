@@ -95,7 +95,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 <div class="content">
 <?php 
 	if ($action == 'del') {
-		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
+		echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else {
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 ?>

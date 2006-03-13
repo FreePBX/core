@@ -118,7 +118,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 <div class="content">
 <?php 
 	if ($action == 'del') {
-		echo '<br><h3>'.$extdisplay.' deleted!</h3><br><br><br><br><br><br><br><br>';
+		echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else if(empty($tech) && !isset($extdisplay)) {
 ?>
 		<h2><?php echo _("Add an Extension")?></h2>
@@ -175,7 +175,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 		
 		<tr>
 			<td colspan="2">
-				<h5><br>Extension Options<hr></h5>
+				<h5><br><?php echo _("Extension Options")?><hr></h5>
 			</td>
 		</tr>
 		
@@ -221,7 +221,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 		
 		<tr>
 			<td colspan="2">
-				<h5><br>Device Options<hr></h5>
+				<h5><br><?php echo _("Device Options")?><hr></h5>
 			</td>
 		</tr>
 		
@@ -295,10 +295,10 @@ switch(strtolower($tech)) {
 
 if($extdisplay) {
 	foreach($basic as $key => $value) {
-		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
+		echo "<tr><td>"._("{$key}")."</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
 	}
 	foreach($advanced as $key => $value) {
-		echo "<tr><td>{$key}</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
+		echo "<tr><td>"._("{$key}")."</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
 	}
 } else {
 	foreach($basic as $key => $value) {
@@ -369,7 +369,7 @@ if($extdisplay) {
  				</tr>
  				
  				<tr>
-					<td><a href="#" class="info">vm options<span><?php echo _("Separate options with pipe ( | )")?><br><br>ie: review=yes|maxmessage=60</span></a>: </td>
+					<td><a href="#" class="info"><?php echo _("vm options")?><span><?php echo _("Separate options with pipe ( | )")?><br><br><?php echo _("ie: review=yes|maxmessage=60")?></span></a>: </td>
 					<td><input size="20" type="text" name="options" value="<?php  echo htmlspecialchars(isset($options)?$options:''); ?>" /></td>
 				</tr>
 				<tr>
