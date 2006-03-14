@@ -642,7 +642,7 @@ function trunkEdit_onsubmit(act) {
 	
 	<?php if ($tech != "enum") { ?>
 	defaultEmptyOK = true;
-	if (!isAlphanumeric(theForm.channelid.value))
+	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 		return warnInvalid(theForm.channelid, "Invalid Trunk Name entered");
 	
 	if (theForm.channelid.value == theForm.usercontext.value)
