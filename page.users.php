@@ -265,6 +265,11 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 <script language="javascript">
 <!--
 var theForm = document.addNew;
+if (theForm.extension.value == "") {
+	theForm.extension.focus();
+} else {
+	theForm.name.focus();
+}
 
 function addNew_onsubmit() {
 	defaultEmptyOK = false;
