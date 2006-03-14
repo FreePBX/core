@@ -274,8 +274,13 @@ function addNew_onsubmit() {
 	if (theForm.channel != undefined && isEmpty(theForm.channel.value))
 		return warnInvalid(theForm.channel, "Please enter the channel for this device");
 
-	if (theForm.secret != undefined && isEmpty(theForm.secret.value))
-		return confirm("You havn't entered a Secret for this device, although this is possible it's generally bad practice to not assign a 'secret' to a device.\n\nAre you sure you want to leave the Secret blank?");
+	if (theForm.secret != undefined && isEmpty(theForm.secret.value)) {
+		var cnf = confirm("You havn't entered a Secret for this device, although this is possible it's generally bad practice to not assign a 'secret' to a device.\n\nAre you sure you want to leave the Secret empty?");
+		if (!cnf) {
+			theForm.secret.focus();
+			return false;
+		}
+	}
 
 	return true;
 }
