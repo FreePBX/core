@@ -258,7 +258,7 @@ if ($extdisplay) { // editing
 	<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute"><?php echo _("Delete Route")?> <?php  echo substr($extdisplay,4); ?></a></p>
 <?php  } ?>
 
-	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST">
+	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay ? "editroute" : "addroute") ?>');">
 		<input type="hidden" name="display" value="<?php echo $display?>"/>
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 		<input type="hidden" id="action" name="action" value=""/>
@@ -512,9 +512,49 @@ $name = "";
 		<tr>
 			<td colspan="2">
 			<br>
-				<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkRoute(routeEdit, '<?php echo ($extdisplay ? "editroute" : "addroute") ?>')"></h6>
+				<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>">
+				<input type="button" onclick="alert(routeEdit_onsubmit());">
+				</h6>
 			</td>
 		</tr>
 		</table>
-	</form>
+ 
+<script language="javascript">
+<!--
+
+var theForm = document.routeEdit;
+
+if (theForm.routename.value == "") {
+	theForm.routename.focus();
+} else {
+	theForm.routepass.focus();
+}
+
+function routeEdit_onsubmit(act) {
+	defaultEmptyOK = false;
+	if (!isAlphanumeric(theForm.routename.value))
+		return warnInvalid(theForm.routename, "Route name is invalid, please try again");
 	
+	defaultEmptyOK = true;
+	if (!isInteger(theForm.routepass.value))
+		return warnInvalid(theForm.routepass,"Route password must be numberic or leave blank to disable");
+	
+	defaultEmptyOK = false;
+	if (!isDialpattern(theForm.dialpattern.value))
+		return warnInvalid(theForm.dialpattern, "Dial pattern is invalid");
+		
+	if (theForm.trunkpri0.value == "") { // should they all be checked ?
+		theForm.trunkpri0.focus();
+		alert("<?php echo _("At least one trunk must be picked"); ?>");
+		return false;
+	}
+	
+	theForm.action.value = act;
+	return true;
+}
+
+-->
+</script>
+
+</form>
+
