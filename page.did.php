@@ -77,7 +77,7 @@ if (isset($inroutes)) {
 <?php } else { ?>
 		<h2><?php echo _("Add Incoming Route")?></h2>
 <?php } ?>
-		<form name="editGRP" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
+		<form name="editGRP" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return editGRP_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -195,11 +195,48 @@ echo drawselects(isset($destination)?$destination:null,0);
 		
 		<tr>
 		<td colspan="2"><br><h6>
-			<input name="Submit" type="button" value="<?php echo _("Submit")?>" onclick="checkDID(editGRP);">
+			<input name="Submit" type="submit" value="<?php echo _("Submit")?>">
 		</h6></td>		
 		
 		</tr>
 		</table>
+<script language="javascript">
+<!--
+
+var theForm = document.editGRP;
+
+theForm.extension.focus();
+
+function editGRP_onsubmit() {
+	setDestinations(theForm,1);
+	
+	defaultEmptyOK = true;
+	if (!isInteger(theForm.extension.value))
+		return warnInvalid(theForm.extension, "Please enter a valid DID Number");
+	
+	if (!isInteger(theForm.cidnum.value))
+		return warnInvalid(theForm.cidnum, "Please enter a valid Caller ID Number");
+	
+	if (!isEmail(theForm.faxemail.value))
+		return warnInvalid(theForm.faxemail, "Please enter a valid Fax Email or leave it empty to use the default");
+	
+	if (!isInteger(theForm.wait.value))
+		return warnInvalid(theForm.wait, "Please enter a valid number for Pause after answer");
+	
+	if (!validateDestinations(theForm,1,true))
+		return false;
+	
+	// warning about 'any DID / any CID'
+	if (theForm.extension.value == "" && theForm.cidnum.value == "") {
+		if (!confirm("Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?"))
+			return false;
+	}
+	
+	return true;
+}
+
+-->
+</script>
 		</form>
 <?php 		
 	} //end if action == delGRP
