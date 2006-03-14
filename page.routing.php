@@ -512,8 +512,7 @@ $name = "";
 		<tr>
 			<td colspan="2">
 			<br>
-				<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>">
-				<input type="button" onclick="alert(routeEdit_onsubmit());">
+				<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 				</h6>
 			</td>
 		</tr>
