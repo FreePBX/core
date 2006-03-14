@@ -109,7 +109,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 <?php } else { ?>
 		<h2><?php echo _("Add User/Extension")?></h2>
 <?php } ?>
-		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
+		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return addNew_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edit' : 'add') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -258,11 +258,66 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 		</td></tr>
 		<tr>
 			<td colspan=2>
-				<br><br><h6><input name="Submit" type="button" value="<?php echo _("Submit")?>" onclick="javascript:if(addNew.extension.value=='' || parseInt(addNew.extension.value)!=addNew.extension.value) {alert('<?php echo _("Please enter an extension number.")?>')} else {addNew.submit();}"></h6>
+				<br><br><h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>"></h6>
 			</td>
 		</tr>
 		</table>
+<script language="javascript">
+<!--
+var theForm = document.addNew;
+
+function addNew_onsubmit() {
+	defaultEmptyOK = false;
+	if (!isInteger(theForm.extension.value))
+		return warnInvalid(theForm.extension, "Please enter a valid extension number.");
+	
+	defaultEmptyOK = true;
+	if (!isInteger(theForm.password.value) && !isWhitespace(theForm.password.value))
+		return warnInvalid(theForm.password, "Please enter valid User Password using numbers only");
+	
+	defaultEmptyOK = false;
+	if (!isAlphanumeric(theForm.name.value))
+		return warnInvalid(theForm.name, "Please enter a valid Display Name");
 		
+	defaultEmptyOK = true;
+	if (!isCallerID(theForm.outboundcid.value))
+		return warnInvalid(theForm.outboundcid, "Please enter a valid Outbound CID");
+		
+	// voicemail stuff
+	if (theForm.vm.value == "enabled") {
+		defaultEmptyOK = false;
+		if (!isInteger(theForm.vmpwd.value))
+			return warnInvalid(theForm.vmpwd, "Please enter a valid Voicemail Password, using digits only");
+		
+		defaultEmptyOK = true;
+		if (!isEmail(theForm.email.value))
+			return warnInvalid(theForm.email, "Please enter a valid Email Address");
+			
+		if (!isEmail(theForm.pager.value))
+			return warnInvalid(theForm.pager, "Please enter a valid Pager Email Address");
+			
+		defaultEmptyOK = false;
+		if (isEmpty(theForm.vmcontext.value) || isWhitespace(theForm.vmcontext.value))
+			return warnInvalid(theForm.vmcontext, "VM Context cannot be blank");
+		
+	}
+
+	<?php if ( (isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '') == '' ) { // adding so check for empty password ?>
+	// check for password and warn if none entered
+	if (isEmpty(theForm.password.value)) {
+		var cnf = confirm("You have not entered a User Password.  While this is acceptable, this user will not be able to login to an AdHoc device.\n\nAre you sure you wish to leave the User Password empty?");
+		if (!cnf) {
+			theForm.password.focus();
+			return false;
+		}
+	}
+	<?php } ?>
+	
+	return true;
+}
+
+-->
+</script>
 		</form>
 <?php 		
 	} //end if action-del
