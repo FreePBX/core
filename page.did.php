@@ -176,21 +176,7 @@ if (!isset($privacyman))
 
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
-			<td>
-				<?php
-				$default = (isset($alertinfo) ? $alertinfo : '');
-				?>
-				<select name="alertinfo">
-					<option value=""><?php echo _("None")?>
-					<option value="Bellcore-r1"<?php echo ($default === 'Bellcore-r1' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r1")?>
-					<option value="Bellcore-r2"<?php echo ($default === 'Bellcore-r2' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r2")?>
-					<option value="Bellcore-r3"<?php echo ($default === 'Bellcore-r3' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r3")?>
-					<option value="Bellcore-r4"<?php echo ($default === 'Bellcore-r4' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r4")?>
-					<option value="Bellcore-r5"<?php echo ($default === 'Bellcore-r5' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r5")?>
-					<option value="Bellcore-r6"<?php echo ($default === 'Bellcore-r6' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r6")?>
-					<option value="Bellcore-r7"<?php echo ($default === 'Bellcore-r7' ? ' SELECTED' : '')?>><?php echo _("Bellcore-r7")?>
-				</select>
-			</td>
+			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>"></td>
 		</tr>
 
 
