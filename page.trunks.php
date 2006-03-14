@@ -277,7 +277,7 @@ if (!$tech && !$extdisplay) {
 	} 
 ?>
 	
-		<form name="trunkEdit" action="config.php" method="post">
+		<form name="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>
@@ -516,12 +516,14 @@ if (!$tech && !$extdisplay) {
 					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>"/>
 				</td>
 			</tr>
+			<?php if ($tech != "enum") { ?>
 			<tr>
 				<td colspan="2">
 					<br><h4><?php echo _("Outgoing Settings")?></h4>
 				</td>
 			</tr>
-	
+			<?php } ?>
+
 	<?php 
 	switch ($tech) {
 		case "zap":
@@ -613,10 +615,46 @@ if (!$tech && !$extdisplay) {
 				
 			<tr>
 				<td colspan="2">
-					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkTrunk(trunkEdit, '<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>')"></h6>
+					<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>"></h6>
 				</td>
 			</tr>
 			</table>
+<script languague="javascript">
+<!--
+
+var theForm = document.trunkEdit;
+
+theForm.outcid.focus();
+
+function trunkEdit_onsubmit(act) {
+	defaultEmptyOK = true;
+	if (!isCallerID(theForm.outcid.value))
+		return warnInvalid(theForm.outcid, "Invalid Outbound Caller ID");
+	
+	if (!isInteger(theForm.maxchans.value))
+		return warnInvalid(theForm.maxchans, "Invalid Maximum Channels");
+	
+	if (!isDialpattern(theForm.dialrules.value))
+		return warnInvalid(theForm.dialrules, "Invalid Dial Rules");
+	
+	if (!isInteger(theForm.dialoutprefix.value))
+		return warnInvalid(theForm.dialoutprefix, "Invalid Outbound Dial Prefix");
+	
+	<?php if ($tech != "enum") { ?>
+	defaultEmptyOK = true;
+	if (!isAlphanumeric(theForm.channelid.value))
+		return warnInvalid(theForm.channelid, "Invalid Trunk Name entered");
+	
+	if (theForm.channelid.value == theForm.usercontext.value)
+		return warnInvalid(theForm.usercontext, "Trunk Name and User Context cannot be set to the same value");
+	<?php } ?>
+	
+	theForm.action.value = act;
+	return true;
+}
+-->
+</script>
+
 		</form>
 <?php  
 }
