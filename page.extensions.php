@@ -144,7 +144,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 <?php } else { ?>
 		<h2><?php echo _("Add")." ".strtoupper($tech)." "._("Extension")?></h2>
 <?php } ?>
-		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post">
+		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return addNew_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edit' : 'add') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -383,7 +383,6 @@ if($extdisplay) {
 		<tr>
 			<td colspan=2>
 				<br><br><h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>">
-				<input type="button" onclick="alert(addNew_onsubmit());"></h6>
 			</td>
 		</tr>
 		</table>
