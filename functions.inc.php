@@ -689,10 +689,14 @@ function core_hint_get($account){
 	}
 	
 	//create a string with & delimiter
-	if (is_array($dial)){
+	if (isset($dial) && is_array($dial)){
 		$hint = implode($dial,"&");
 	} else {
-		$hint = $results[0]['dial'];
+		if (isset($results[0]['dial'])) {
+			$hint = $results[0]['dial'];
+		} else {
+			$hint = null;
+		}
 	}
 	
 	return $hint;
