@@ -278,10 +278,12 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		$jump = true;
 	}
 	
-	if(!empty($emergency_cid))
-		   $emergency_cid = addslashes($emergency_cid);
-	if(!empty($description))
-		  $description = addslashes($description);
+	if(!get_magic_quotes_gpc()) {
+		if(!empty($emergency_cid))
+			$emergency_cid = addslashes($emergency_cid);
+		if(!empty($description))
+			$description = addslashes($description);
+	}
 	
 	//insert into devices table
 	$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (\"$id\",\"$tech\",\"$dial\",\"$devicetype\",\"$user\",\"$description\",\"$emergency_cid\")";
@@ -741,8 +743,10 @@ function core_users_add($vars,$vmcontext) {
 	$recording = "out=".$record_out."|in=".$record_in;
 	
 	//escape quotes and any other bad chars:
-	$outboundcid = addslashes($outboundcid);
-	$name = addslashes($name);
+	if(!get_magic_quotes_gpc()) {
+		$outboundcid = addslashes($outboundcid);
+		$name = addslashes($name);
+	}
 
 	//if voicemail is enabled, set the box@context to use
 	if(isset($vm) && $vm == "enabled") {
