@@ -150,6 +150,13 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 		<tr>
 			<td><br></td>
 		</tr>
+
+		<tr>
+			<td colspan="2">
+				<h5><br>Device Options<hr></h5>
+			</td>
+		</tr>
+		
 		
 <?php
 switch(strtolower($tech)) {
