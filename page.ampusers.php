@@ -119,6 +119,13 @@ foreach ($tresults as $tresult) {
 					<h4><?php echo _("General Settings")?></h4>
 				</td>
 			</tr>
+<?php if ($amp_conf["AUTHTYPE"] != "database") { ?>			
+			<tr>
+				<td colspan="2">
+	<b>NOTE:</b> AUTHTYPE is not set to 'database' in /etc/amportal.conf - Module crippled.<br /><br />
+				</td>
+			</tr>
+<?php } ?>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Username<span>Create a unique username for this new user</span>")?></a>: 
