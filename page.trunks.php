@@ -637,7 +637,7 @@ function trunkEdit_onsubmit(act) {
 	if (!isDialpattern(theForm.dialrules.value))
 		return warnInvalid(theForm.dialrules, "Invalid Dial Rules");
 	
-	if (!isInteger(theForm.dialoutprefix.value))
+	if (!isDialidentifier(theForm.dialoutprefix.value))
 		return warnInvalid(theForm.dialoutprefix, "Invalid Outbound Dial Prefix");
 	
 	<?php if ($tech != "enum") { ?>
