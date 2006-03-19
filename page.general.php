@@ -113,7 +113,7 @@ foreach ($globals as $global) {
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 </h6>
-<script languague="javascript">
+<script language="javascript">
 <!--
 
 var theForm = document.general;
@@ -138,8 +138,7 @@ function general_onsubmit() {
 	return true;
 }
 
-
--->
+//-->
 </script>
 </form>
 

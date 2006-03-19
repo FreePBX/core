@@ -251,7 +251,7 @@ if($extdisplay) {
 		</tr>
 		</table>
 
-<script languague="javascript">
+<script language="javascript">
 <!--
 
 var theForm = document.addNew;
@@ -299,7 +299,7 @@ function addNew_onsubmit() {
 	return true;
 }
 
--->
+//-->
 </script>
 
 		</form>

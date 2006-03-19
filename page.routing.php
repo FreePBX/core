@@ -557,7 +557,35 @@ function routeEdit_onsubmit(act) {
 	return true;
 }
 
--->
+function repositionTrunk(repositiondirection,repositionkey,key,direction) {
+	if(direction == "up"){
+		document.getElementById('repotrunkdirection').value=direction;
+		document.getElementById('repotrunkkey').value=key;
+	}else if(direction == "down" ){
+		document.getElementById('repotrunkdirection').value=direction;
+		document.getElementById('repotrunkkey').value=key;
+	}
+	document.getElementById('routeEdit').submit();
+}
+
+function deleteTrunk(key) {
+	document.getElementById('trunkpri'+key).value = '';
+	document.getElementById('routeEdit').submit();
+}
+
+function repositionRoute(key,direction){
+	if(direction == "up"){
+		document.getElementById('reporoutedirection').value=direction;
+		document.getElementById('reporoutekey').value=key;
+	}else if(direction == "down" ){
+		document.getElementById('reporoutedirection').value=direction;
+		document.getElementById('reporoutekey').value=key;
+	}
+	document.getElementById('action').value='prioritizeroute';
+	document.getElementById('routeEdit').submit();
+}
+
+//-->
 </script>
 
 </form>

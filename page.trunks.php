@@ -619,7 +619,8 @@ if (!$tech && !$extdisplay) {
 				</td>
 			</tr>
 			</table>
-<script languague="javascript">
+
+<script language="javascript">
 <!--
 
 var theForm = document.trunkEdit;
@@ -659,7 +660,8 @@ function trunkEdit_onsubmit(act) {
 	theForm.action.value = act;
 	return true;
 }
--->
+
+//-->
 </script>
 
 		</form>

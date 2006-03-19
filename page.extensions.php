@@ -389,6 +389,7 @@ if($extdisplay) {
 
 <script language="javascript">
 <!--
+
 var theForm = document.addNew;
 if (theForm.extension.value == "") {
 	theForm.extension.focus();
@@ -460,7 +461,19 @@ function addNew_onsubmit() {
 	return true;
 }
 
--->
+function checkVoicemail(theForm) {
+	$vm = theForm.elements["vm"].value;
+	if ($vm == 'disabled') {
+		document.getElementById('voicemail').style.display='none';
+		theForm.vmpwd.value = '';
+		theForm.email.value = '';
+		theForm.pager.value = '';
+	} else {
+		document.getElementById('voicemail').style.display='block';
+	}
+}
+
+//-->
 </script>
 
 		</form>

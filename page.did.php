@@ -241,7 +241,7 @@ function editGRP_onsubmit() {
 	return true;
 }
 
--->
+//-->
 </script>
 		</form>
 <?php 		
