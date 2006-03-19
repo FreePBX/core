@@ -262,27 +262,34 @@ if (theForm.deviceid.value == "") {
 }
 
 function addNew_onsubmit() {
+	var msgInvalidDevID = "<?php echo _('Please enter a device id.'); ?>";
+	var msgInvalidDevDesc = "<?php echo _('Please enter a valid Description for this device'); ?>";
+	var msgInvalidEmergCID = "<?php echo _('Please enter a valid Emergency CID'); ?>";
+	var msgInvalidDTMFMODE = "<?php echo _('Please enter the dtmfmode for this device'); ?>";
+	var msgInvalidChannel = "<?php echo _('Please enter the channel for this device'); ?>";
+	var msgConfirmSecret = "<?php echo _('You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?'); ?>";
+	
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.deviceid.value))
-		return warnInvalid(theForm.deviceid, "Please enter a device id.");
+		return warnInvalid(theForm.deviceid, msgInvalidDevID);
 		
 	if (!isAlphanumeric(theForm.description.value) || isWhitespace(theForm.description.value))
-		return warnInvalid(theForm.description, "Please enter a valid Description for this device");
+		return warnInvalid(theForm.description, msgInvalidDevDesc);
 		
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.emergency_cid.value))
-		return warnInvalid(theForm.emergency_cid, "Please enter a valid Emergency CID");
+		return warnInvalid(theForm.emergency_cid, msgInvalidEmergCID);
 		
 	
 	defaultEmptyOK = false;
 	if (theForm.dtmfmode != undefined && isEmpty(theForm.dtmfmode.value))
-		return warnInvalid(theForm.dtmfmode, "Please enter the dtmfmode for this device");
+		return warnInvalid(theForm.dtmfmode, msgInvalidDTMFMODE);
 
 	if (theForm.channel != undefined && isEmpty(theForm.channel.value))
-		return warnInvalid(theForm.channel, "Please enter the channel for this device");
+		return warnInvalid(theForm.channel, msgInvalidChannel);
 
 	if (theForm.secret != undefined && isEmpty(theForm.secret.value)) {
-		var cnf = confirm("You havn't entered a Secret for this device, although this is possible it's generally bad practice to not assign a 'secret' to a device.\n\nAre you sure you want to leave the Secret empty?");
+		var cnf = confirm(msgConfirmSecret);
 		if (!cnf) {
 			theForm.secret.focus();
 			return false;

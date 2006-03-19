@@ -397,72 +397,60 @@ if (theForm.extension.value == "") {
 }
 
 function addNew_onsubmit() {
-	//defaultEmptyOK = false;
-	//if (!isInteger(theForm.deviceid.value))
-	//	return warnInvalid(theForm.deviceid, "Please enter a device id.");
-	
-	//defaultEmptyOK = true;
-	//if (!isInteger(theForm.password.value) && !isWhitespace(theForm.password.value))
-	//	return warnInvalid(theForm.password, "Please enter valid User Password using numbers only");
-	
-	//defaultEmptyOK = false;
-	//if (!isAlphanumeric(theForm.name.value))
-	//	return warnInvalid(theForm.name, "Please enter a valid Display Name");
-	
-	<?php if ( (isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '') == '' ) { // adding so check for empty password ?>
-	// check for password and warn if none entered
-	//if (isEmpty(theForm.password.value)) {
-	//	var cnf = confirm("You have not entered a User Password.  While this is acceptable, this user will not be able to login to an AdHoc device.\n\nAre you sure you wish to leave the User Password empty?");
-	//	if (!cnf) {
-	//		theForm.password.focus();
-	//		return false;
-	//	}
-	//}
-	<?php } ?>
+	var msgInvalidExtNum = "<?php echo _('Please enter a valid extension number.'); ?>";
+	var msgInvalidDevDesc = "<?php echo _('Please enter a valid Description for this device'); ?>";
+	var msgInvalidOutboundCID = "<?php echo _('Please enter a valid Outbound CID'); ?>";
+	var msgInvalidEmergCID = "<?php echo _('Please enter a valid Emergency CID'); ?>";
+	var msgInvalidDTMFMODE = "<?php echo _('Please enter the dtmfmode for this device'); ?>";
+	var msgInvalidChannel = "<?php echo _('Please enter the channel for this device'); ?>";
+	var msgInvalidVmPwd = "<?php echo _('Please enter a valid Voicemail Password, using digits only'); ?>";
+	var msgInvalidEmail = "<?php echo _('Please enter a valid Email Address'); ?>";
+	var msgInvalidPager = "<?php echo _('Please enter a valid Pager Email Address'); ?>";
+	var msgInvalidVMContext = "<?php echo _('VM Context cannot be blank'); ?>";
+	var msgConfirmSecret = "<?php echo _('You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?'); ?>";
 
-////////////////////////
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.extension.value))
-		return warnInvalid(theForm.extension, "Please enter a valid extension number.");
+		return warnInvalid(theForm.extension, msgInvalidExtNum);
 
 	if (!isAlphanumeric(theForm.description.value) || isWhitespace(theForm.description.value))
-		return warnInvalid(theForm.description, "Please enter a valid Description for this device");
+		return warnInvalid(theForm.description, msgInvalidDevDesc);
 
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.outboundcid.value))
-		return warnInvalid(theForm.outboundcid, "Please enter a valid Outbound CID");
+		return warnInvalid(theForm.outboundcid, msgInvalidOutboundCID);
 
 	if (!isCallerID(theForm.emergency_cid.value))
-		return warnInvalid(theForm.emergency_cid, "Please enter a valid Emergency CID");
+		return warnInvalid(theForm.emergency_cid, msgInvalidEmergCID);
 
 	defaultEmptyOK = false;
 	if (theForm.dtmfmode != undefined && isEmpty(theForm.dtmfmode.value))
-		return warnInvalid(theForm.dtmfmode, "Please enter the dtmfmode for this device");
+		return warnInvalid(theForm.dtmfmode, msgInvalidDTMFMODE);
 
 	if (theForm.channel != undefined && isEmpty(theForm.channel.value))
-		return warnInvalid(theForm.channel, "Please enter the channel for this device");
+		return warnInvalid(theForm.channel, msgInvalidChannel);
 
 	// voicemail stuff
 	if (theForm.vm.value == "enabled") {
 		defaultEmptyOK = false;
 		if (!isInteger(theForm.vmpwd.value))
-			return warnInvalid(theForm.vmpwd, "Please enter a valid Voicemail Password, using digits only");
+			return warnInvalid(theForm.vmpwd, msgInvalidVmPwd);
 		
 		defaultEmptyOK = true;
 		if (!isEmail(theForm.email.value))
-			return warnInvalid(theForm.email, "Please enter a valid Email Address");
+			return warnInvalid(theForm.email, msgInvalidEmail);
 			
 		if (!isEmail(theForm.pager.value))
-			return warnInvalid(theForm.pager, "Please enter a valid Pager Email Address");
+			return warnInvalid(theForm.pager, msgInvalidPager);
 			
 		defaultEmptyOK = false;
 		if (isEmpty(theForm.vmcontext.value) || isWhitespace(theForm.vmcontext.value))
-			return warnInvalid(theForm.vmcontext, "VM Context cannot be blank");
+			return warnInvalid(theForm.vmcontext, msgInvalidVMContext);
 		
 	}
 
 	if (theForm.secret != undefined && isEmpty(theForm.secret.value)) {
-		var cnf = confirm("You havn't entered a Secret for this device, although this is possible it's generally bad practice to not assign a 'secret' to a device.\n\nAre you sure you want to leave the Secret empty?");
+		var cnf = confirm(msgConfirmSecret);
 		if (!cnf) {
 			theForm.secret.focus();
 			return false;

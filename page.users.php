@@ -272,45 +272,55 @@ if (theForm.extension.value == "") {
 }
 
 function addNew_onsubmit() {
+	var msgInvalidExtNum = "<?php echo _('Please enter a valid extension number.'); ?>";
+	var msgInvalidExtPwd = "<?php echo _('Please enter valid User Password using numbers only'); ?>";
+	var msgInvalidDispName = "<?php echo _('Please enter a valid Display Name'); ?>";
+	var msgInvalidOutboundCID = "<?php echo _('Please enter a valid Outbound CID'); ?>";
+	var msgInvalidVmPwd = "<?php echo _('Please enter a valid Voicemail Password, using digits only'); ?>";
+	var msgInvalidEmail = "<?php echo _('Please enter a valid Email Address'); ?>";
+	var msgInvalidPager = "<?php echo _('Please enter a valid Pager Email Address'); ?>";
+	var msgInvalidVMContext = "<?php echo _('VM Context cannot be blank'); ?>";
+	var msgConfirmBlankUserPwd = "<?php echo _('You have not entered a User Password.  While this is acceptable, this user will not be able to login to an AdHoc device.\n\nAre you sure you wish to leave the User Password empty?'); ?>";
+	
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.extension.value))
-		return warnInvalid(theForm.extension, "Please enter a valid extension number.");
+		return warnInvalid(theForm.extension, msgInvalidExtNum);
 	
 	defaultEmptyOK = true;
 	if (!isInteger(theForm.password.value) && !isWhitespace(theForm.password.value))
-		return warnInvalid(theForm.password, "Please enter valid User Password using numbers only");
+		return warnInvalid(theForm.password, msgInvalidExtPwd);
 	
 	defaultEmptyOK = false;
 	if (!isAlphanumeric(theForm.name.value))
-		return warnInvalid(theForm.name, "Please enter a valid Display Name");
+		return warnInvalid(theForm.name, msgInvalidDispName);
 		
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.outboundcid.value))
-		return warnInvalid(theForm.outboundcid, "Please enter a valid Outbound CID");
+		return warnInvalid(theForm.outboundcid, msgInvalidOutboundCID);
 		
 	// voicemail stuff
 	if (theForm.vm.value == "enabled") {
 		defaultEmptyOK = false;
 		if (!isInteger(theForm.vmpwd.value))
-			return warnInvalid(theForm.vmpwd, "Please enter a valid Voicemail Password, using digits only");
+			return warnInvalid(theForm.vmpwd, msgInvalidVmPwd);
 		
 		defaultEmptyOK = true;
 		if (!isEmail(theForm.email.value))
-			return warnInvalid(theForm.email, "Please enter a valid Email Address");
+			return warnInvalid(theForm.email, msgInvalidEmail);
 			
 		if (!isEmail(theForm.pager.value))
-			return warnInvalid(theForm.pager, "Please enter a valid Pager Email Address");
+			return warnInvalid(theForm.pager, msgInvalidPager);
 			
 		defaultEmptyOK = false;
 		if (isEmpty(theForm.vmcontext.value) || isWhitespace(theForm.vmcontext.value))
-			return warnInvalid(theForm.vmcontext, "VM Context cannot be blank");
+			return warnInvalid(theForm.vmcontext, msgInvalidVMContext);
 		
 	}
 
 	<?php if ( (isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '') == '' ) { // adding so check for empty password ?>
 	// check for password and warn if none entered
 	if (isEmpty(theForm.password.value)) {
-		var cnf = confirm("You have not entered a User Password.  While this is acceptable, this user will not be able to login to an AdHoc device.\n\nAre you sure you wish to leave the User Password empty?");
+		var cnf = confirm(msgConfirmBlankUserPwd);
 		if (!cnf) {
 			theForm.password.focus();
 			return false;
