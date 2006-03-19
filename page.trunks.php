@@ -619,7 +619,8 @@ if (!$tech && !$extdisplay) {
 				</td>
 			</tr>
 			</table>
-<script languague="javascript">
+
+<script language="javascript">
 <!--
 
 var theForm = document.trunkEdit;
@@ -627,32 +628,40 @@ var theForm = document.trunkEdit;
 theForm.outcid.focus();
 
 function trunkEdit_onsubmit(act) {
+	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
+	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
+	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
+	var msgInvalidOutboundDialPrefix = "<?php echo _('Invalid Outbound Dial Prefix'); ?>";
+	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
+	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
+
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.outcid.value))
-		return warnInvalid(theForm.outcid, "Invalid Outbound Caller ID");
+		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
 	
 	if (!isInteger(theForm.maxchans.value))
-		return warnInvalid(theForm.maxchans, "Invalid Maximum Channels");
+		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
 	
 	if (!isDialpattern(theForm.dialrules.value))
-		return warnInvalid(theForm.dialrules, "Invalid Dial Rules");
+		return warnInvalid(theForm.dialrules, msgInvalidDialRules);
 	
 	if (!isInteger(theForm.dialoutprefix.value))
-		return warnInvalid(theForm.dialoutprefix, "Invalid Outbound Dial Prefix");
+		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
 	
 	<?php if ($tech != "enum") { ?>
 	defaultEmptyOK = true;
 	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
-		return warnInvalid(theForm.channelid, "Invalid Trunk Name entered");
+		return warnInvalid(theForm.channelid, msgInvalidTrunkName);
 	
 	if (theForm.channelid.value == theForm.usercontext.value)
-		return warnInvalid(theForm.usercontext, "Trunk Name and User Context cannot be set to the same value");
+		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	<?php } ?>
 	
 	theForm.action.value = act;
 	return true;
 }
--->
+
+//-->
 </script>
 
 		</form>

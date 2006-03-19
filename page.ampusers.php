@@ -192,3 +192,27 @@ foreach ($tresults as $tresult) {
 			</table>
 		</form>
 
+<script language="javascript">
+<!--
+
+function checkAmpUser(theForm, action) {
+	$username = theForm.username.value;
+	$deptname = theForm.deptname.value;
+	
+	if ($username == "") {
+		<?php echo "alert('"._("Username must not be blank")."')"?>;
+	} else if (!$username.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
+		<?php echo "alert('"._("Username cannot start with a number, and can only contain letters and numbers")."')"?>;
+	} else if ($deptname == "default") {
+		<?php echo "alert('"._("For security reasons, you cannot use the department name default")."')"?>;
+	} else if ($deptname != "" && !$deptname.match('^[a-zA-Z0-9]+$')) {
+		<?php echo "alert('"._("Department name cannot have a space")."')"?>;
+	} else {
+		theForm.action.value = action;
+		theForm.submit();
+	}
+}
+
+//-->
+</script>
+

@@ -208,34 +208,40 @@ var theForm = document.editGRP;
 theForm.extension.focus();
 
 function editGRP_onsubmit() {
+	var msgInvalidDIDNumb = "<?php echo _('Please enter a valid DID Number'); ?>";
+	var msgInvalidCIDNum = "<?php echo _('Please enter a valid Caller ID Number'); ?>";
+	var msgInvalidFaxEmail = "<?php echo _('Please enter a valid Fax Email or leave it empty to use the default'); ?>";
+	var msgInvalidPause = "<?php echo _('Please enter a valid number for Pause after answer'); ?>";
+	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
+
 	setDestinations(theForm,1);
 	
 	defaultEmptyOK = true;
 	if (!isInteger(theForm.extension.value))
-		return warnInvalid(theForm.extension, "Please enter a valid DID Number");
+		return warnInvalid(theForm.extension, msgInvalidDIDNumb);
 	
 	if (!isInteger(theForm.cidnum.value))
-		return warnInvalid(theForm.cidnum, "Please enter a valid Caller ID Number");
+		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
 	if (!isEmail(theForm.faxemail.value))
-		return warnInvalid(theForm.faxemail, "Please enter a valid Fax Email or leave it empty to use the default");
+		return warnInvalid(theForm.faxemail, msgInvalidFaxEmail);
 	
 	if (!isInteger(theForm.wait.value))
-		return warnInvalid(theForm.wait, "Please enter a valid number for Pause after answer");
+		return warnInvalid(theForm.wait, msgInvalidPause);
 	
 	if (!validateDestinations(theForm,1,true))
 		return false;
 	
 	// warning about 'any DID / any CID'
 	if (theForm.extension.value == "" && theForm.cidnum.value == "") {
-		if (!confirm("Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?"))
+		if (!confirm(msgConfirmDIDCIDBlank))
 			return false;
 	}
 	
 	return true;
 }
 
--->
+//-->
 </script>
 		</form>
 <?php 		

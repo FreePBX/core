@@ -51,7 +51,7 @@ foreach ($globals as $global) {
 
 ?>
 
-<form name="general" action="config.php" method="post">
+<form name="general" action="config.php" method="post" onsubmit="return general_onsubmit();">
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
 
@@ -111,6 +111,34 @@ foreach ($globals as $global) {
 </p>
 <br>
 <h6>
-	<input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkGeneral(general)">
+	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 </h6>
+<script language="javascript">
+<!--
+
+var theForm = document.general;
+
+function general_onsubmit() {
+	var msgInvalidSeconds = "<?php echo _('Please enter a valid Number of Seconds'); ?>";
+	var msgInvalidDefaultFaxEmail = "<?php echo _('Please enter a valid Fax Email'); ?>";
+
+	defaultEmptyOK = false;
+	if (!isInteger(theForm.RINGTIMER.value))
+		return warnInvalid(theForm.RINGTIMER, msgInvalidSeconds);
+
+	// Fax email must be present if selected 'system', otherwise optional
+	if (theForm.FAX_RX.value == "system") {
+		defaultEmptyOK = false;
+	} else {
+		defaultEmptyOK = true;
+	}
+	if (!isEmail(theForm.FAX_RX_EMAIL.value))
+		return warnInvalid(theForm.FAX_RX_EMAIL, msgInvalidDefaultFaxEmail);
+	
+	return true;
+}
+
+//-->
+</script>
 </form>
+

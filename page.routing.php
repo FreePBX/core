@@ -530,21 +530,26 @@ if (theForm.routename.value == "") {
 }
 
 function routeEdit_onsubmit(act) {
+	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
+	var msgInvalidRoutePwd = "<?php echo _('Route password must be numberic or leave blank to disable'); ?>";
+	var msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
+	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
+	
 	defaultEmptyOK = false;
 	if (!isAlphanumeric(theForm.routename.value))
-		return warnInvalid(theForm.routename, "Route name is invalid, please try again");
+		return warnInvalid(theForm.routename, msgInvalidRouteName);
 	
 	defaultEmptyOK = true;
 	if (!isInteger(theForm.routepass.value))
-		return warnInvalid(theForm.routepass,"Route password must be numberic or leave blank to disable");
+		return warnInvalid(theForm.routepass, msgInvalidRoutePwd);
 	
 	defaultEmptyOK = false;
 	if (!isDialpattern(theForm.dialpattern.value))
-		return warnInvalid(theForm.dialpattern, "Dial pattern is invalid");
+		return warnInvalid(theForm.dialpattern, msgInvalidDialPattern);
 		
 	if (theForm.trunkpri0.value == "") { // should they all be checked ?
 		theForm.trunkpri0.focus();
-		alert("<?php echo _("At least one trunk must be picked"); ?>");
+		alert(msgInvalidTrunkSelection);
 		return false;
 	}
 	
@@ -552,7 +557,35 @@ function routeEdit_onsubmit(act) {
 	return true;
 }
 
--->
+function repositionTrunk(repositiondirection,repositionkey,key,direction) {
+	if(direction == "up"){
+		document.getElementById('repotrunkdirection').value=direction;
+		document.getElementById('repotrunkkey').value=key;
+	}else if(direction == "down" ){
+		document.getElementById('repotrunkdirection').value=direction;
+		document.getElementById('repotrunkkey').value=key;
+	}
+	document.getElementById('routeEdit').submit();
+}
+
+function deleteTrunk(key) {
+	document.getElementById('trunkpri'+key).value = '';
+	document.getElementById('routeEdit').submit();
+}
+
+function repositionRoute(key,direction){
+	if(direction == "up"){
+		document.getElementById('reporoutedirection').value=direction;
+		document.getElementById('reporoutekey').value=key;
+	}else if(direction == "down" ){
+		document.getElementById('reporoutedirection').value=direction;
+		document.getElementById('reporoutekey').value=key;
+	}
+	document.getElementById('action').value='prioritizeroute';
+	document.getElementById('routeEdit').submit();
+}
+
+//-->
 </script>
 
 </form>
