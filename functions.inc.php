@@ -129,7 +129,7 @@ function core_get_config($engine) {
 			/* outbound routes */
 			// modules should use their own table for storage (and module_get_config() to add dialplan)
 			// modules should NOT use the extension table to store anything!
-			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes'";
+			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes' ORDER BY application";
 			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
 			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
