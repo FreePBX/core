@@ -292,7 +292,7 @@ function addNew_onsubmit() {
 		return warnInvalid(theForm.password, msgInvalidExtPwd);
 	
 	defaultEmptyOK = false;
-	if (!isAlphanumeric(theForm.name.value))
+	if (!isCallerID(theForm.name.value))
 		return warnInvalid(theForm.name, msgInvalidDispName);
 		
 	defaultEmptyOK = true;

@@ -414,7 +414,7 @@ function addNew_onsubmit() {
 	if (!isInteger(theForm.extension.value))
 		return warnInvalid(theForm.extension, msgInvalidExtNum);
 
-	if (!isAlphanumeric(theForm.description.value) || isWhitespace(theForm.description.value))
+	if (!isCallerID(theForm.description.value))
 		return warnInvalid(theForm.description, msgInvalidDevDesc);
 
 	defaultEmptyOK = true;
