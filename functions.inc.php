@@ -488,6 +488,7 @@ function core_users2astdb(){
 function core_devices_addsip($account) {
 	global $db;
 	global $currentFile;
+
 	$sipfields = array(array($account,'account',$account),
 	array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
 	array($account,'secret',(isset($_REQUEST['secret']))?$_REQUEST['secret']:''),
@@ -496,7 +497,7 @@ function core_devices_addsip($account) {
 	array($account,'dtmfmode',(isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),
 	array($account,'host',(isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),
 	array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),
-	array($account,'mailbox',(isset($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),
+	array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
 	array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account),
 	array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'never'),
 	array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),
