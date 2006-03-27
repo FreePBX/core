@@ -562,7 +562,7 @@ function core_devices_addiax2($account) {
 	array($account,'type',($_REQUEST['type'])?$_REQUEST['type']:'friend'),
 	array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
 	array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
-	array($account,'port',($_REQUEST['iaxport'])?$_REQUEST['iaxport']:'4569'),
+	array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569'),
 	array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'no'),
 	array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
 	array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
