@@ -200,7 +200,7 @@ function core_ampusers_list() {
 /* begin page.did.php functions */
 
 function core_did_list(){
-	$sql = "SELECT * FROM incoming";
+	$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
