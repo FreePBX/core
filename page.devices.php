@@ -153,7 +153,7 @@ drawListMenu($devices, $_REQUEST['skip'], $dispnum, $extdisplay, _("Device"));
 
 		<tr>
 			<td colspan="2">
-				<h5><br>Device Options<hr></h5>
+				<h5><br><?php echo _("Device Options"); ?><hr></h5>
 			</td>
 		</tr>
 		

@@ -144,7 +144,7 @@ drawListMenu($extens, $_REQUEST['skip'], $dispnum, $extdisplay, _("User"));
 		
 		<tr>
 			<td colspan="2">
-				<h5><br>Extension Options<hr></h5>
+				<h5><br><?php echo _("Extension Options"); ?><hr></h5>
 			</td>
 		</tr>
 		
