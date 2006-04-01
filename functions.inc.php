@@ -34,7 +34,11 @@ function core_destinations() {
 		}
 	}
 	
-	return $extens;
+	if (isset($extens))
+		return $extens;
+	else
+		return null;
+
 }
 
 /* 	Generates dialplan for "core" components (extensions & inbound routing)
@@ -720,8 +724,12 @@ function core_users_list() {
 			$extens[] = array($result[0],$result[1]);
 		}
 	}
-	if (isset($extens)) sort($extens);
-	return $extens;
+	if (isset($extens)) {
+		sort($extens);
+		return $extens;
+	} else {
+		return null;
+	}
 }
 
 function core_users_add($vars,$vmcontext) {
