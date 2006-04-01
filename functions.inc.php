@@ -254,7 +254,7 @@ function core_devices_list() {
 		sort($extens);
 		return $extens;
 	} else { 
-		return null
+		return null;
 	}
 }
 
