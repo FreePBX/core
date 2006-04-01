@@ -25,6 +25,13 @@ $dispnum = 'extensions'; //used for switch in config.php
 //create vars from the request
 extract($_REQUEST);
 
+// Clean up warnings for undef'ed vars
+if (!isset($extdisplay)) $extdisplay='';
+if (!isset($record_in)) $record_in='';
+if (!isset($record_out)) $record_out='';
+if (!isset($emergencycid)) $emergencycid='';
+if (!isset($outboundcid)) $outboundcid='';
+
 //make sure we can connect to Asterisk Manager
 checkAstMan();
 

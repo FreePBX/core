@@ -250,8 +250,12 @@ function core_devices_list() {
 			$extens[] = array($result[0],$result[1]);
 		}
 	}
-	if (isset($extens)) sort($extens);
-	return $extens;
+	if (isset($extens)) {
+		sort($extens);
+		return $extens;
+	} else { 
+		return null
+	}
 }
 
 
