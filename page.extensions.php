@@ -126,7 +126,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 <?php 
 	if ($action == 'del') {
 		echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
-	} else if(empty($tech) && !isset($extdisplay)) {
+	} else if(empty($tech) && empty($extdisplay)) {
 ?>
 		<h2><?php echo _("Add an Extension")?></h2>
 		<h5><?php echo _("Select device technology:")?></h5>
