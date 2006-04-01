@@ -300,7 +300,7 @@ switch(strtolower($tech)) {
 	break;
 }
 
-if($extdisplay) {
+if($extdisplay != '') {
 	foreach($basic as $key => $value) {
 		echo "<tr><td>"._("{$key}")."</td><td><input type=\"text\" name=\"{$key}\" value=\"{$$key}\"/></td></tr>";
 	}
