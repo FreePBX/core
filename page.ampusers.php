@@ -13,7 +13,7 @@
 //GNU General Public License for more details.
 
 
-$userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']'';
+$userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
 // populate some global variables from the request string
