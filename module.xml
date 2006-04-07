@@ -1,0 +1,22 @@
+<module>
+	<rawname>core</rawname>
+	<type>setup</type>
+	<name>Core</name>
+	<author>core team</author>
+	<version>1.0</version>
+	<requirements>
+		<file>/usr/sbin/asterisk</file>
+	</requirements>
+	<menuitems>
+		<extensions>Extensions</extensions>
+		<users>Users</users>
+		<devices>Devices</devices>
+		<did>Inbound Routes</did>
+		<routing>Outbound Routes</routing>
+		<trunks>Trunks</trunks>
+		<general>General Settings</general>
+		<ampusers>Administrators</ampusers>
+	</menuitems>
+	<location>release/core-1.0.tgz</location>
+	<info>http://freepbx.org/wiki/Core</info>
+</module>
