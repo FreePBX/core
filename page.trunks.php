@@ -266,7 +266,7 @@ if (!$tech && !$extdisplay) {
 		// only for iax2/sip
 		$peerdetails = "host=***provider ip address***\nusername=***userid***\nsecret=***password***\ntype=peer";
 		$usercontext = "";
-		$userconfig = "secret=***password***\ntype=user\ncontext=from-pstn";
+		$userconfig = "secret=***password***\ntype=user\ncontext=from-trunk";
 		$register = "";
 		
 		$localpattern = "NXXXXXX";
