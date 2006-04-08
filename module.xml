@@ -1,6 +1,7 @@
 <module>
 	<rawname>core</rawname>
 	<type>setup</type>
+	<category>Basic</category>
 	<name>Core</name>
 	<author>core team</author>
 	<version>1.0</version>
