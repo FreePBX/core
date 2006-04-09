@@ -99,7 +99,7 @@ if (isset($inroutes)) {
 			<td>
 				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.")?></span></a>:
 			</td>
-			<td>
+			<td>&nbsp;
 				<select name="faxexten">
 <?php 
 // Cleaning up warnings. I should do this a better way.
