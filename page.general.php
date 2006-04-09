@@ -112,7 +112,7 @@ foreach ($globals as $global) {
 </p>
 <h5><?php echo _("International Tone Settings")?></h5>
 <p>
-	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Dial/Ring/Busy Tones")?><span><?php echo _("Select which country you are in, to get the correct Dial, Ring, Busy, etc tones.")?></span></a> 
+	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Indications")?><span><?php echo _("Select which country you are in")?></span></a> 
 	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
 		general_display_zones($TONEZONE); 
 		else
