@@ -189,6 +189,7 @@ function core_get_config($engine) {
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
 				}
 			}
+			general_generate_indications();
 		break;
 	}
 }
@@ -1872,6 +1873,21 @@ function general_display_zones($curzone) {
 			echo "<option value='{$zone['iso']}'>{$zone['name']}</option>\n";
 	}
 	
+}
+
+function general_generate_indications() {
+	global $db;
+
+	$sql = "SELECT value FROM globals WHERE variable='TONEZONE'";
+	$result = $db->getRow($sql,DB_FETCHMODE_ASSOC);
+	$fd = fopen("/etc/asterisk/indications.conf", "w");
+	fwrite($fd, "[general]\ncountry=".$result['value']."\n\n");
+
+	$zonelist = general_get_zonelist();
+	foreach ($zonelist as $zone) {
+		fwrite($fd, "[{$zone['iso']}]\n{$zone['conf']}\n\n");
+	}
+	fclose($fd);
 }
 /* end page.routing.php functions */
 
