@@ -51,7 +51,7 @@ function core_get_config($engine) {
 	
 	switch($engine) {
 		case "asterisk":
-			// FeatureCodes for logon / logoff
+			// FeatureCodes
 			$fcc = new featurecode($modulename, 'userlogoff');
 			$fc_userlogon = $fcc->getCodeActive();
 			unset($fcc);
@@ -60,6 +60,11 @@ function core_get_config($engine) {
 			$fc_userlogoff = $fcc->getCodeActive();
 			unset($fcc);
 
+			$fcc = new featurecode($modulename, 'zapbarge');
+			$fc_zapbarge = $fcc->getCodeActive();
+			unset($fcc);
+
+			// Log on / off -- all in one context
 			if ($fc_userlogoff != '' || $fc_userlogon != '') {
 				$ext->addInclude('from-internal-additional', 'app-userlogonoff'); // Add the include from from-internal
 				
@@ -77,6 +82,18 @@ function core_get_config($engine) {
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon,${EXTEN:'.$clen.'}'));
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
 				}
+			}
+			
+			// zap barge
+			if ($fc_zapbarge != '') {
+				$ext->addInclude('from-internal-additional', 'app-zapbarge'); // Add the include from from-internal
+				
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_macro('user-callerid'));
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_setvar('GROUP()','${CALLERID(number)}'));
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_answer(''));
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_wait(1));
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_zapbarge(''));
+				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_hangup(''));
 			}
 			
 			/* inbound routing extensions */
