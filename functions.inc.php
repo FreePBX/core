@@ -76,6 +76,11 @@ function core_get_config($engine) {
 						$ext->add('ext-did', $exten, '', new ext_answer(''));
 						$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
 					}
+					if ($item['answer'] == "2") { // NVFaxDetect
+						$ext->add('ext-did', $exten, '', new ext_answer(''));
+						$ext->add('ext-did', $exten, '', new ext_playtones('ring'));
+						$ext->add('ext-did', $exten, '', new ext_nvfaxdetect($item['wait']));
+					}
 					if ($item['privacyman'] == "1") {
 						// crude fix for issue where some proviers give things like
 						// 'anonymous' where the number should be, this makes the 
