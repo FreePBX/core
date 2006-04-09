@@ -107,7 +107,8 @@ if (!isset($faxexten))
 	$faxexten = null;
 if (!isset($faxemail))
 	$faxemail = null;
-
+if (!isset($answer))
+	$answer = '0';
 if (!isset($alertinfo))
 	$alertinfo = 0;
 ?>
@@ -135,11 +136,23 @@ if (!isset($alertinfo))
 			</td>
 		</tr>
 		<tr>
+			<td><a href="#" class="info"><?php echo _("Fax Detection Type")?><span><?php echo _('Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.')?></span></a>:</td>
+			<td>&nbsp;
+				<select name="answer">
+					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("None")?>
+					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Zaptel")?>
+					<option value="2" <?php  echo ($answer == '2' ? 'SELECTED' : '')?>><?php echo _("NVFax")?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
+			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
+		</tr>
+		<tr>
 			<td><br></td>
 		</tr>
 <?php
-if (!isset($answer))
-	$answer = '0';
 if (!isset($privacyman))
 	$privacyman = '0';
 ?>
@@ -158,20 +171,6 @@ if (!isset($privacyman))
 		</tr>		
 		
 		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Fax Detection Type")?><span><?php echo _('Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.')?></span></a>:</td>
-			<td>&nbsp;
-				<select name="answer">
-					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("None")?>
-					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Zaptel")?>
-					<option value="2" <?php  echo ($answer == '2' ? 'SELECTED' : '')?>><?php echo _("NVFax")?>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
-			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
-		</tr>
 
 
 
