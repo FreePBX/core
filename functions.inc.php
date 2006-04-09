@@ -46,8 +46,39 @@ function core_destinations() {
 */
 function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
+	
+	$modulename = "core";
+	
 	switch($engine) {
 		case "asterisk":
+			// FeatureCodes for logon / logoff
+			$fcc = new featurecode($modulename, 'userlogoff');
+			$fc_userlogon = $fcc->getCodeActive();
+			unset($fcc);
+
+			$fcc = new featurecode($modulename, 'userlogon');
+			$fc_userlogoff = $fcc->getCodeActive();
+			unset($fcc);
+
+			if ($fc_userlogoff != '' || $fc_userlogon != '') {
+				$ext->addInclude('from-internal-additional', 'app-userlogonoff'); // Add the include from from-internal
+				
+				if ($fc_userlogoff != '') {
+					$ext->add('app-userlogonoff', $fc_userlogoff, '', new ext_macro('user-logoff'));
+					$ext->add('app-userlogonoff', $fc_userlogoff, '', new ext_hangup(''));
+				}
+	
+				if ($fc_userlogon != '') {
+					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon'));
+					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
+					
+					$clen = strlen($fc_userlogon);
+					$fc_userlogon = "_$fc_userlogon.";
+					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon,${EXTEN:'.$clen.'}'));
+					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
+				}
+			}
+			
 			/* inbound routing extensions */
 			$didlist = core_did_list();
 			if(is_array($didlist)){
