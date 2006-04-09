@@ -22,6 +22,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
+						array($_REQUEST['TONEZONE'], 'TONEZONE'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						);
 
@@ -109,7 +110,18 @@ foreach ($globals as $global) {
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("to have faxes emailed to:")?>
 	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>"/>
 </p>
-<br>
+<h5><?php echo _("International Tone Settings")?></h5>
+<p>
+	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Dial/Ring/Busy Tones")?><span><?php echo _("Select which country you are in, to get the correct Dial, Ring, Busy, etc tones.")?></span></a> 
+	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
+		general_display_zones($TONEZONE); 
+		else
+		general_display_zones('us'); 
+		?>
+</p>
+<br />
+<br />
+
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 </h6>
