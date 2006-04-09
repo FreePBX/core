@@ -64,6 +64,14 @@ function core_get_config($engine) {
 			$fc_zapbarge = $fcc->getCodeActive();
 			unset($fcc);
 
+			$fcc = new featurecode($modulename, 'simu_pstn');
+			$fc_simu_pstn = $fcc->getCodeActive();
+			unset($fcc);
+
+			$fcc = new featurecode($modulename, 'simu_fax');
+			$fc_simu_fax = $fcc->getCodeActive();
+			unset($fcc);
+
 			// Log on / off -- all in one context
 			if ($fc_userlogoff != '' || $fc_userlogon != '') {
 				$ext->addInclude('from-internal-additional', 'app-userlogonoff'); // Add the include from from-internal
@@ -94,6 +102,21 @@ function core_get_config($engine) {
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_wait(1));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_zapbarge(''));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_hangup(''));
+			}
+			
+			// Simulate options (ext-test)
+			if ($fc_simu_pstn != '' || $fc_simu_fax != '') {
+				$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
+				
+				if ($fc_simu_pstn != '') {
+					$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', 's', 'from-pstn'));
+				}
+
+				if ($fc_simu_fax != '') {
+					$ext->add('ext-test', $fc_simu_fax, '', new ext_goto('1', 'in_fax', 'ext-fax'));
+				}
+
+				$ext->add('ext-test', 'h', '', new ext_macro('hangupcall'));
 			}
 			
 			/* inbound routing extensions */

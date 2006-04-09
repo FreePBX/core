@@ -18,4 +18,16 @@ $fcc->setDefault('888');
 $fcc->update();
 unset($fcc);
 
+$fcc = new featurecode('core', 'simu_pstn');
+$fcc->setDescription('Simulate Incoming Call');
+$fcc->setDefault('7777');
+$fcc->update();
+unset($fcc);
+
+$fcc = new featurecode('core', 'simu_fax');
+$fcc->setDescription('Simulate Incoming FAX Call');
+$fcc->setDefault('666');
+$fcc->update();
+unset($fcc);
+
 ?>
