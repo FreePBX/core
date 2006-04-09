@@ -1865,7 +1865,7 @@ function general_get_zonelist() {
 
 function general_display_zones($curzone) {
 	$zonelist = general_get_zonelist();
-	echo "<select name='tonezone'>\n";
+	echo "<select name='TONEZONE'>\n";
 	foreach ($zonelist as $zone) {
 		if ($zone['iso'] == $curzone) 
 			echo "<option selected value='{$zone['iso']}'>{$zone['name']}</option>\n";
