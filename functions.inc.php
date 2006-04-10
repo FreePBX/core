@@ -718,6 +718,7 @@ function core_devices_addzap($account) {
 	array($account,'callprogress',($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no'),
 	array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),
 	array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
+	array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
 	array($account,'channel',($_REQUEST['channel'])?$_REQUEST['channel']:''));
 
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
