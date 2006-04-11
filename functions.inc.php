@@ -123,59 +123,95 @@ function core_get_config($engine) {
 			$didlist = core_did_list();
 			if(is_array($didlist)){
 				foreach($didlist as $item) {
-					$did = core_did_get($item['extension'],$item['cidnum']);
+					$did = core_did_get($item['extension'],$item['cidnum'],$item['channel']);
 					$exten = $did['extension'];
 					$cidnum = $did['cidnum'];
-									
-					//sub a blank extension with 's'
+					$channel = $did['channel'];
+
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
-					$ext->add('ext-did', $exten, '', new ext_setvar('FROM_DID',$exten));
+
+					if (empty($channel))
+						$context = "ext-did";
+					else {
+						$context = "macro-from-zaptel-{$channel}";
+						if (!isset($zapchan[$channel])) {
+							// create the macro-from-zaptel-$chan context and load up the
+							// startup settings
+							$ext->add($context, 's', '', new ext_noop('Entering '.$context.' with DID = ${DID}'));
+							$zapchan[$channel] = "unfinished";
+						}
+					}
+
+					//sub a blank extension with 's'
+					$ext->add($context, $exten, '', new ext_setvar('FROM_DID',$exten));
 					
-					if ($exten == "s") {  //if the exten is s, then also make a catchall for undefined DIDs
+					if ($exten == "s" && $context == "ext-did") {  
+						//if the exten is s, then also make a catchall for undefined DIDs if it's not a zaptel route
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-						$ext->add('ext-did', $catchaccount, '', new ext_goto('1','s','ext-did'));
+						$ext->add($context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 					}
 					
 					if ($item['faxexten'] != "default") {
-						$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
+						$ext->add($context, $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
 					}
 					if (!empty($item['faxemail'])) {
-						$ext->add('ext-did', $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
+						$ext->add($context, $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
 					}
 					if ($item['answer'] == "1") {
-						$ext->add('ext-did', $exten, '', new ext_answer(''));
-						$ext->add('ext-did', $exten, '', new ext_wait($item['wait']));
+						$ext->add($context, $exten, '', new ext_answer(''));
+						$ext->add($context, $exten, '', new ext_wait($item['wait']));
 					}
 					if ($item['answer'] == "2") { // NVFaxDetect
-						$ext->add('ext-did', $exten, '', new ext_answer(''));
-						$ext->add('ext-did', $exten, '', new ext_playtones('ring'));
-						$ext->add('ext-did', $exten, '', new ext_nvfaxdetect($item['wait']));
+						$ext->add($context, $exten, '', new ext_answer(''));
+						$ext->add($context, $exten, '', new ext_playtones('ring'));
+						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']));
 					}
 					if ($item['privacyman'] == "1") {
 						// crude fix for issue where some proviers give things like
 						// 'anonymous' where the number should be, this makes the 
 						// PrivacyManger thing there IS callerid info, which is wrong
-						$ext->add('ext-did', $exten, '', new ext_setvar('KEEPCID','${CALLERID(num)}'));
-						$ext->add('ext-did', $exten, '', new ext_gotoif('$[foo${CALLERID(num):0:1} = foo+]','CIDTEST2','CIDTEST1'));
-						$ext->add('ext-did', $exten, 'CIDTEST1', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num)})}'));
-						$ext->add('ext-did', $exten, '', new ext_goto('TESTRESULT'));
-						$ext->add('ext-did', $exten, 'CIDTEST2', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num):1})}'));
-						$ext->add('ext-did', $exten, 'TESTRESULT', new ext_gotoif('$[foo${TESTCID} = foo]','CLEARCID','PRIVMGR'));
-						$ext->add('ext-did', $exten, 'CLEARCID', new ext_setvar('CALLERID(num)',''));
-						$ext->add('ext-did', $exten, 'PRIVMGR', new ext_privacymanager(''));
+						$ext->add($context, $exten, '', new ext_setvar('KEEPCID','${CALLERID(num)}'));
+						$ext->add($context, $exten, '', new ext_gotoif('$[foo${CALLERID(num):0:1} = foo+]','CIDTEST2','CIDTEST1'));
+						$ext->add($context, $exten, 'CIDTEST1', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num)})}'));
+						$ext->add($context, $exten, '', new ext_goto('TESTRESULT'));
+						$ext->add($context, $exten, 'CIDTEST2', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num):1})}'));
+						$ext->add($context, $exten, 'TESTRESULT', new ext_gotoif('$[foo${TESTCID} = foo]','CLEARCID','PRIVMGR'));
+						$ext->add($context, $exten, 'CLEARCID', new ext_setvar('CALLERID(num)',''));
+						$ext->add($context, $exten, 'PRIVMGR', new ext_privacymanager(''));
 						//$ext->add('ext-did', $exten, '', new ext_setvar('CALLERID(num)','${KEEPCID}'));
 					}
 					if (!empty($item['alertinfo'])) {
-						$ext->add('ext-did', $exten, '', new ext_setvar("_ALERT_INFO", $item['alertinfo']));
+						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", $item['alertinfo']));
 					}
 					
+					// If we're doing a zaptel route, now we need to do the gotos ONLY IF it's the first time round.
+					// Except for the fact that this doesn't work. Not at all. Dial returns -1 and hangs up the 
+					// call. This is fixed in 1.4 with TryExec(), but until then, we can't match on zap
+					// _and_ anything else.  When we decide to say 'Only 1.4!' then we can reenable this
+					// and use TryExec(Goto..) and then check ${TRYSTATUS} for FAILED or SUCCESS. I didn't
+					// bother actually writing that, as the syntax may change.
+					//if (isset($zapchan[$channel]) && $zapchan[$channel] == "unfinished") {
+					//	$ext->add($context, 's', '', new ext_gotoif('$[ "${DID}" = "s" ]', 'nos', 'sok'));
+					//	$ext->add($context, 's', 'nos', new ext_noop('Skipping ${DID} because it is s'));
+					//	$ext->add($context, 's', '', new ext_goto("trycid"));
+					//	$ext->add($context, 's', 'sok', new ext_noop('Trying ${DID}'));
+					//	$ext->add($context, 's', '', new ext_goto("1", '${DID}'));
+					//	$ext->add($context, 's', 'trycid', new ext_gotoif('$[ "${CALLERID(num)}" = "" ]', 'nocid', 'cidok'));
+					//	$ext->add($context, 's', 'nocid', new ext_noop('Skipping empty CallerID Num'));
+					//	$ext->add($context, 's', '', new ext_goto("end"));
+					//	$ext->add($context, 's', 'cidok', new ext_noop('Trying ${DID}/${CALLERID(num)}'));
+					//	$ext->add($context, 's', '', new ext_goto("1", '${DID}/${CALLERID(num)}'));
+					//	$ext->add($context, 's', 'end', new ext_noop('End of macro init'));
+						// Now set $zapchan[$channel] so we don't do this again
+						$zapchan[$channel] = "set";
+					//}
 					//the goto destination
 					// destination field in 'incoming' database is backwards from what ext_goto expects
 					$goto_context = strtok($did['destination'],',');
 					$goto_exten = strtok(',');
 					$goto_pri = strtok(',');
-					$ext->add('ext-did', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
 					
 				}
 			}
@@ -288,22 +324,22 @@ function core_did_list(){
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
-function core_did_get($extension="",$cidnum=""){
-	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
+function core_did_get($extension="",$cidnum="",$channel=""){
+	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\" AND channel = \"$channel\"";
 	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 }
 
-function core_did_del($extension,$cidnum){
-	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
+function core_did_del($extension,$cidnum, $channel){
+	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\" AND channel = \"$channel\"";
 	sql($sql);
 }
 
 function core_did_add($incoming){
 	extract($incoming); // create variables from request
-	$existing=core_did_get($extension,$cidnum);
+	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\")";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\", \"$channel\")";
 		sql($sql);
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
