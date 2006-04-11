@@ -227,9 +227,8 @@ function editGRP_onsubmit() {
 	setDestinations(theForm,1);
 	
 	defaultEmptyOK = true;
-//	Note, DID's can contain *'s, #'s, strings, anything. VSP's are wierd like that.
-//	if (!isInteger(theForm.extension.value))
-//		return warnInvalid(theForm.extension, msgInvalidDIDNumb);
+	if (!isDialpattern(theForm.extension.value))
+		return warnInvalid(theForm.extension, msgInvalidDIDNumb);
 	
 	if (!isInteger(theForm.cidnum.value))
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
