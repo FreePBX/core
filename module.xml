@@ -3,7 +3,6 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<author>core team</author>
 	<version>1.1</version>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
