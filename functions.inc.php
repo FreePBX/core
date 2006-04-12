@@ -122,6 +122,7 @@ function core_get_config($engine) {
 			/* inbound routing extensions */
 			$didlist = core_did_list();
 			if(is_array($didlist)){
+				$catchall = false;
 				foreach($didlist as $item) {
 					$did = core_did_get($item['extension'],$item['cidnum'],$item['channel']);
 					$exten = $did['extension'];
@@ -149,6 +150,8 @@ function core_get_config($engine) {
 					if ($exten == "s" && $context == "ext-did") {  
 						//if the exten is s, then also make a catchall for undefined DIDs if it's not a zaptel route
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
+						if ($catchaccount == "_X.") 
+							$catchall = true;
 						$ext->add($context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 					}
 					
@@ -214,6 +217,17 @@ function core_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
 					
 				}
+				// If there's not a catchall, make one with an error message
+				if (!$catchall) {
+					$ext->add('ext-did', 's', '', new ext_noop("No DID or CID Match"));
+					$ext->add('ext-did', 's', '', new ext_answer(''));
+					$ext->add('ext-did', 's', '', new ext_wait('2'));
+					$ext->add('ext-did', 's', '', new ext_playback('ss-noservice'));
+					$ext->add('ext-did', 's', '', new ext_sayalpha('${FROM_DID}'));
+					$ext->add('ext-did', '_[*#X].', '', new ext_setvar('FROM_DID', '${EXTEN}'));
+					$ext->add('ext-did', '_[*#X].', '', new ext_goto('1','s','ext-did'));
+				}
+					
 			}
 			
 			/* user extensions */
