@@ -119,9 +119,6 @@ foreach ($globals as $global) {
 		general_display_zones('us'); 
 		?>
 </p>
-<br />
-<br />
-
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 </h6>

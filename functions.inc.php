@@ -1966,6 +1966,7 @@ function general_display_zones($curzone) {
 		else	
 			echo "<option value='{$zone['iso']}'>{$zone['name']}</option>\n";
 	}
+	echo "</select>";
 	
 }
 
