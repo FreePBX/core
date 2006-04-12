@@ -88,7 +88,7 @@ if (isset($inroutes)) {
 		<table>
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.<br><br>You can also use a pattern match (eg _2[345]X) to match a range of numbers')?></span></a>:</td>
 			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>"></td>
 		</tr>
 		<tr>
