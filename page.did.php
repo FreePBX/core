@@ -189,7 +189,11 @@ if (!isset($privacyman))
 		</tr>
 
 
-
+<?php
+	// implementation of module hook
+	// object was initialized in config.php
+	echo $module_hook->hookHtml;
+?>
 
 		<tr>
 			<td><br></td>
