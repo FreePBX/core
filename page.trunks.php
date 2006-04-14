@@ -645,7 +645,7 @@ function trunkEdit_onsubmit(act) {
 	if (!isDialpattern(theForm.dialrules.value))
 		return warnInvalid(theForm.dialrules, msgInvalidDialRules);
 	
-	if (!isDialPrefix(theForm.dialoutprefix.value) && theForm.dialoutprefix.value != "w")
+	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
 		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
 	
 	<?php if ($tech != "enum") { ?>
@@ -661,6 +661,22 @@ function trunkEdit_onsubmit(act) {
 	return true;
 }
 
+function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)
+    var i;
+
+    if (isEmpty(s)) 
+       if (isDialIdentifierSpecial.arguments.length == 1) return defaultEmptyOK;
+       else return (isDialIdentifierSpecial.arguments[1] == true);
+
+    for (i = 0; i < s.length; i++)
+    {   
+        var c = s.charAt(i);
+
+        if ( !isDialDigitChar(c) && (c != "w") && (c != "W") && (c != "q") && (c != "Q") ) return false;
+    }
+
+    return true;
+}
 //-->
 </script>
 
