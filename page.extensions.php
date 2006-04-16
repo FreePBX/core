@@ -90,8 +90,8 @@ if (isset($extension) && !checkRange($extension)){
 		$action='';
 	switch ($action) {
 		case "add":
-			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			core_users_add($_REQUEST,$vmcontext);
+			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			needreload();
 		break;
 		case "del":
