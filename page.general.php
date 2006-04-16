@@ -23,6 +23,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
+						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						);
 
@@ -118,6 +119,18 @@ foreach ($globals as $global) {
 		else
 		general_display_zones('us'); 
 		?>
+</p>
+<h5><?php echo _("Security Settings")?></h5>
+<p>
+	<a href=# class="info"><?php echo _("Allow Anonymous Inbound SIP Calls?")?><span><br>
+<?php echo _("** WARNING **")?><br><br>
+<?php echo _("Setting this to 'yes' will potentially allow ANYBODY to call into your Asterisk server using the SIP protocol")?><br><br>
+<?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
+	</span></a>
+	<select name="ALLOW_SIP_ANON">
+	<option value="<?php echo _("no"); ?>"><?php echo _("no"); ?></option>
+	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="<?php echo _("yes"); ?>"><?php echo _("yes"); ?></option>
+	</select>
 </p>
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
