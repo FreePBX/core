@@ -241,7 +241,7 @@ function core_get_config($engine) {
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
 					
 					if($vm != "novm")
-						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm));
+						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',"$vm,DIRECTDIAL"));
 						
 					$hint = core_hint_get($exten['extension']);
 					if (!empty($hint))
