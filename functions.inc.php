@@ -52,11 +52,11 @@ function core_get_config($engine) {
 	switch($engine) {
 		case "asterisk":
 			// FeatureCodes
-			$fcc = new featurecode($modulename, 'userlogoff');
+			$fcc = new featurecode($modulename, 'userlogon');
 			$fc_userlogon = $fcc->getCodeActive();
 			unset($fcc);
 
-			$fcc = new featurecode($modulename, 'userlogon');
+			$fcc = new featurecode($modulename, 'userlogoff');
 			$fc_userlogoff = $fcc->getCodeActive();
 			unset($fcc);
 
