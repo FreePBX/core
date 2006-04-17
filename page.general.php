@@ -113,7 +113,7 @@ foreach ($globals as $global) {
 </p>
 <h5><?php echo _("International Tone Settings")?></h5>
 <p>
-	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Indications")?><span><?php echo _("Select which country you are in")?></span></a> 
+	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Indications")?><span><?php echo _("Select which country you are in")?></span></a>&nbsp;
 	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
 		general_display_zones($TONEZONE); 
 		else
@@ -126,7 +126,7 @@ foreach ($globals as $global) {
 <?php echo _("** WARNING **")?><br><br>
 <?php echo _("Setting this to 'yes' will potentially allow ANYBODY to call into your Asterisk server using the SIP protocol")?><br><br>
 <?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
-	</span></a>
+	</span></a>&nbsp;
 	<select name="ALLOW_SIP_ANON">
 	<option value="<?php echo _("no"); ?>"><?php echo _("no"); ?></option>
 	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="<?php echo _("yes"); ?>"><?php echo _("yes"); ?></option>
