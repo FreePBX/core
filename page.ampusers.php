@@ -77,7 +77,7 @@ foreach ($tresults as $tresult) {
 <?php 
 
 	if ($userdisplay) {
-		echo "<h2>"._("Edit AMP User")."</h2>";
+		echo "<h2>"._("Edit Administrator")."</h2>";
 		
 		$user = getAmpUser($userdisplay);
 		
@@ -104,7 +104,7 @@ foreach ($tresults as $tresult) {
 		$sections = array("*");
 		
 	
-		echo "<h2>"._("Add AMP User")."</h2>";
+		echo "<h2>"._("Add Administrator")."</h2>";
 	} 
 ?>
 	
