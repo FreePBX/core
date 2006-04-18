@@ -19,6 +19,7 @@ if ($action == 'editglobals') {
 	$globalfields = array(array($_REQUEST['RINGTIMER'],'RINGTIMER'),
 						array($_REQUEST['FAX_RX'],'FAX_RX'),
 						array($_REQUEST['FAX_RX_EMAIL'],'FAX_RX_EMAIL'),
+						array($_REQUEST['FAX_RX_FROM'],'FAX_RX_FROM'),
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
@@ -110,6 +111,10 @@ foreach ($globals as $global) {
 <p>
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("to have faxes emailed to:")?>
 	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>"/>
+</p>
+<p>
+	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("that faxes appear to come from:")?>
+	<input type="text" size="20" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>"/>
 </p>
 <h5><?php echo _("International Tone Settings")?></h5>
 <p>
