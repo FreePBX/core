@@ -151,6 +151,10 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 <?php } else { ?>
 		<h2><?php echo _("Add")." ".strtoupper($tech)." "._("Extension")?></h2>
 <?php } ?>
+<?php
+		// implementation of module hook
+		echo $module_hook->hookHtml;
+?>
 		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return addNew_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edit' : 'add') ?>">

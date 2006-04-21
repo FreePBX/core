@@ -296,6 +296,11 @@ if ($extdisplay) { // editing
 			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>"/></td>
 		</tr>
+<?php
+	// implementation of module hook
+	// object was initialized in config.php
+	echo $module_hook->hookHtml;
+?>
 		<tr>
 			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>:</td>
 			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?> /></td>
