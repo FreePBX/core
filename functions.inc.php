@@ -175,11 +175,11 @@ function core_get_config($engine) {
 						// 'anonymous' where the number should be, this makes the 
 						// PrivacyManger thing there IS callerid info, which is wrong
 						$ext->add($context, $exten, '', new ext_setvar('KEEPCID','${CALLERID(num)}'));
-						$ext->add($context, $exten, '', new ext_gotoif('$[foo${CALLERID(num):0:1} = foo+]','CIDTEST2','CIDTEST1'));
+						$ext->add($context, $exten, '', new ext_gotoif('$["foo${CALLERID(num):0:1}"="foo+"]','CIDTEST2','CIDTEST1'));
 						$ext->add($context, $exten, 'CIDTEST1', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num)})}'));
 						$ext->add($context, $exten, '', new ext_goto('TESTRESULT'));
 						$ext->add($context, $exten, 'CIDTEST2', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num):1})}'));
-						$ext->add($context, $exten, 'TESTRESULT', new ext_gotoif('$[foo${TESTCID} = foo]','CLEARCID','PRIVMGR'));
+						$ext->add($context, $exten, 'TESTRESULT', new ext_gotoif('$["foo${TESTCID}"="foo"]','CLEARCID','PRIVMGR'));
 						$ext->add($context, $exten, 'CLEARCID', new ext_setvar('CALLERID(num)',''));
 						$ext->add($context, $exten, 'PRIVMGR', new ext_privacymanager(''));
 						//$ext->add('ext-did', $exten, '', new ext_setvar('CALLERID(num)','${KEEPCID}'));
