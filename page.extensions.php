@@ -166,7 +166,7 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 
 		<tr <?php echo ($extdisplay ? 'style="display:none"':'') ?>>
 			<td>
-				<a href="#" class="info"><?php echo _("Extension Number")?><span><?php echo _('Use a unique number.  The device will use this number to authenicate to the system, and users will dial it to ring the device.')?></span></a>:
+				<a href="#" class="info"><?php echo _("Extension Number")?><span><?php echo _('Use a unique number.  The device will use this number to authenicate to the system, and users will dial it to ring the device.').' '._('You can not use 0')?></span></a>:
 			</td>
 			<td>
 				<input type="text" name="extension" value="<?php echo $extdisplay ?>">
@@ -422,7 +422,7 @@ function addNew_onsubmit() {
 	var msgConfirmSecret = "<?php echo _('You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?'); ?>";
 
 	defaultEmptyOK = false;
-	if (!isInteger(theForm.extension.value))
+	if (!isInteger(theForm.extension.value) || (theForm.extension.value == '0'))
 		return warnInvalid(theForm.extension, msgInvalidExtNum);
 
 	if (!isCallerID(theForm.description.value))
