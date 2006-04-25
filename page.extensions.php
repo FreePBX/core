@@ -422,7 +422,7 @@ function addNew_onsubmit() {
 	var msgConfirmSecret = "<?php echo _('You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?'); ?>";
 
 	defaultEmptyOK = false;
-	if (!isInteger(theForm.extension.value) || (theForm.extension.value == '0'))
+	if (!isInteger(theForm.extension.value))
 		return warnInvalid(theForm.extension, msgInvalidExtNum);
 
 	if (!isCallerID(theForm.description.value))
