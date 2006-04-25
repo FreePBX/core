@@ -24,6 +24,36 @@ foreach ($set_globals as $var) {
 	}
 }
 
+//Search ALL active modules while generating admin access list
+$active_modules = core_ampusers_get_actmodules(2);
+
+if(is_array($active_modules)){
+       foreach($active_modules as $key => $module) {
+               //create an array of module sections to display
+                       if (is_array($module['items'])) {
+                               foreach($module['items'] as $itemKey => $itemName) {
+                                       $module_list[$itemKey] = $itemName;
+                               }
+                       }
+               //sort it? probably not right but was getting in a mess to be honest
+               //so something better than nothing
+               if (is_array($module_list))
+                       asort($module_list);
+       }
+}
+
+// extensions vs device/users ... module_list setting
+if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
+       unset($module_list["extensions"]);
+} else {
+       unset($module_list["devices"]);
+       unset($module_list["users"]);
+}
+
+// add the APPLY Changes bar to module list
+$module_list[99] = _("Apply Changes Bar");
+
+
 $sections = array();
 if (isset($_REQUEST["sections"])) {
 	if (is_array($_REQUEST["sections"])) {
@@ -171,7 +201,7 @@ foreach ($tresults as $tresult) {
 					<select multiple name="sections[]">
 					<option>
 <?php 
-				foreach ($amp_sections as $key=>$value) {
+				foreach ($module_list as $key=>$value) {
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
 					echo ">"._($value)."</option>";

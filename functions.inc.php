@@ -299,6 +299,19 @@ function core_get_config($engine) {
 
 /* begin page.ampusers.php functions */
 
+function core_ampusers_get_actmodules($status) {
+       $modules = find_allmodules();
+       //$return_modules = $modules;
+       // add only modules of type=$status
+       foreach(array_keys($modules) as $key) {
+               //remove modules not matching status or type
+               if(isset($modules[$key]['status']) && $modules[$key]['status'] == $status && isset($modules[$key]['type'])) {
+                       $return_modules[$key] = $modules[$key];
+               }
+       }
+       return $return_modules;
+}
+
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
 	$sql = "INSERT INTO ampusers (username, password, extension_low, extension_high, deptname, sections) VALUES (";
 	$sql .= "'".$username."',";
