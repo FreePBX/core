@@ -23,6 +23,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
+                                                array($_REQUEST['TRUNK_OPTIONS'],'TRUNK_OPTIONS'),
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
@@ -74,6 +75,15 @@ foreach ($globals as $global) {
 <?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 	</span></a>
 	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>"/>
+	<br><br>
+	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span><br>
+<?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
+<?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
+<?php echo _("r: Generate a ringing tone for the calling party")?><br>
+<?php echo _("w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)")?><br>
+<?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
+	</span></a>
+	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>"/>
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>

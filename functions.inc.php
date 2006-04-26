@@ -229,6 +229,42 @@ function core_get_config($engine) {
 				}
 					
 			}
+
+			/* MODIFIED (PL)
+			 *
+			 * Add Direct DIDs
+			 *
+			 * This functions creates a new context, ext-did-direct, used to route an incoming DID directly to the specified user.
+ 			 * The purpose is to use when a user has a personal external DID. This keeps it clean and easy to administer.
+ 			 * Any conflict with those routes will depend on which of the two contexts are included first in the extensions.conf file.
+ 			 *
+ 			 * Calls are sent to context from-did-direct though this feature. You must create that context in extenions.conf or
+ 			 * in extensions_custom.conf and it should look something like:
+ 			 *
+ 			 * [from-did-direct]
+ 			 * include => ext-grouppersonal
+ 			 * include => ext-local
+ 			 *
+ 			 * This is so that personal ring groups are used if they exist for the direct did and if not, then the local extension.
+			 * If the module is not implented, it will just go to the users extension.
+ 			 */
+
+			$directdidlist = core_directdid_list();
+			if(is_array($directdidlist)){
+				foreach($directdidlist as $item) {
+					$exten = $item['directdid'];
+					$ext->add('ext-did-direct', $exten, '', new ext_setvar('FROM_DID',$exten));
+					if (!empty($item['didalert'])) {
+						$ext->add('ext-did-direct', $exten, '', new ext_setvar("_ALERT_INFO", $item['didalert']));
+					}
+					$goto_context = 'from-did-direct';
+					$goto_exten = $item['extension'];
+					$goto_pri = 1;
+					$ext->add('ext-did-direct', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+
+				}
+			}
+
 			
 			/* user extensions */
 			$ext->addInclude('from-internal-additional','ext-local');
@@ -911,9 +947,19 @@ function core_users_add($vars,$vmcontext) {
 	} else {
 		$voicemail = "disabled";
 	}
+
+	// MODIFICATION: (PL)
+	// Added for directdid and didalert l for Alert Info distinctive ring)
+	//
+	// cleanup any non numeric characters prior to inserting into the database
+	// then add directdid to the insert command.
+	//
+
+        $directdid = preg_replace("/[^0-9]/" ,"", trim($directdid));
+
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -928,6 +974,10 @@ function core_users_add($vars,$vmcontext) {
 	$sql.= isset($recording)?$recording:'';
 	$sql.= "\", \"";
 	$sql.= isset($outboundcid)?$outboundcid:'';
+	$sql.= "\", \"";
+	$sql.= isset($directdid)?$directdid:'';
+	$sql.= "\", \"";
+	$sql.= isset($didalert)?$didalert:'';
 	$sql.= "\")";
 	sql($sql);
 	
@@ -1067,6 +1117,12 @@ function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){
 	core_users_add($vars,$vmcontext);
 	
 }
+
+function core_directdid_list(){
+	$sql = "SELECT extension, directdid, didalert FROM users WHERE directdid IS NOT NULL AND directdid != ''";
+	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+}
+
 
 /* end page.users.php functions */
 

@@ -148,12 +148,13 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 ?>
 		<h2><?php echo strtoupper($tech)." "._("Extension")?>: <?php echo $extdisplay; ?></h2>
 		<p><a href="<?php echo $delURL ?>"><?php echo _("Delete Extension")?> <?php echo $extdisplay ?></a></p>
-<?php } else { ?>
+<?php 
+		// implementation of module hook
+		echo $module_hook->hookHtml;
+} else { ?>
 		<h2><?php echo _("Add")." ".strtoupper($tech)." "._("Extension")?></h2>
 <?php } ?>
 <?php
-		// implementation of module hook
-		echo $module_hook->hookHtml;
 ?>
 		<form name="addNew" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return addNew_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
@@ -190,6 +191,22 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 			</td>
 		</tr>
 		
+		<tr>
+			<td>
+				<a href="#" class="info"><?php echo _("Direct DID")?><span><?php echo _("The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped.")?><br></span></a>:
+			</td><td>
+				<input type="text" name="directdid" value="<?php echo htmlentities($directdid) ?>"/>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<a href="#" class="info"><?php echo _("DID Alert Info")?><span><?php echo _("Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set")?><br></span></a>:
+			</td><td>
+				<input type="text" name="didalert" value="<?php echo htmlentities($didalert) ?>"/>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				<a href="#" class="info"><?php echo _("Outbound CID")?><span><?php echo _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this extension.")?><br></span></a>:
