@@ -181,7 +181,7 @@ function core_get_config($engine) {
 						$ext->add($context, $exten, 'CIDTEST2', new ext_setvar('TESTCID','${MATH(1+${CALLERID(num):1})}'));
 						$ext->add($context, $exten, 'TESTRESULT', new ext_gotoif('$["foo${TESTCID}"="foo"]','CLEARCID','PRIVMGR'));
 						$ext->add($context, $exten, 'CLEARCID', new ext_setvar('CALLERID(num)',''));
-						$ext->add($context, $exten, 'PRIVMGR', new ext_privacymanager(''));
+						$ext->add($context, $exten, 'PRIVMGR', new ext_privacymanager('3|8'));
 						//$ext->add('ext-did', $exten, '', new ext_setvar('CALLERID(num)','${KEEPCID}'));
 					}
 					if (!empty($item['alertinfo'])) {
