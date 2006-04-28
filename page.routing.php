@@ -475,7 +475,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 				<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:0px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
 			<?php   // move up
 			if ($key > 0) {?>
-				<img src="images/scrollup.gif" onclick="repositionTrunk(repotrunkdirection,repotrunkkey, '<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
+				<img src="images/scrollup.gif" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  }
@@ -483,7 +483,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 			// move down
 			
 			if ($key < ($positions-1)) {?>
-				<img src="images/scrolldown.gif" onclick="repositionTrunk(repotrunkdirection,repotrunkkey, '<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
+				<img src="images/scrolldown.gif" onclick="repositionTrunk('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } ?>
@@ -562,7 +562,7 @@ function routeEdit_onsubmit(act) {
 	return true;
 }
 
-function repositionTrunk(repositiondirection,repositionkey,key,direction) {
+function repositionTrunk(key,direction) {
 	if(direction == "up"){
 		document.getElementById('repotrunkdirection').value=direction;
 		document.getElementById('repotrunkkey').value=key;
