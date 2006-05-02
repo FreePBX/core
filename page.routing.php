@@ -541,7 +541,7 @@ function routeEdit_onsubmit(act) {
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
 	
 	defaultEmptyOK = false;
-	if (!isAlphanumeric(theForm.routename.value))
+	if (isEmpty(theForm.routename.value))
 		return warnInvalid(theForm.routename, msgInvalidRouteName);
 	
 	defaultEmptyOK = true;
