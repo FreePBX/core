@@ -138,7 +138,7 @@ if (!isset($alertinfo))
 		</tr>
 		<tr>
 			<td>
-				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the AMP default in General Settings.")?></span></a>:
+				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings.")?></span></a>:
 			</td>
 			<td>
 				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>"/>
