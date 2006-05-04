@@ -940,11 +940,11 @@ function core_users_add($vars,$vmcontext) {
 	// MODIFICATION: (PL)
 	// Added for directdid and didalert l for Alert Info distinctive ring)
 	//
-	// cleanup any non numeric characters prior to inserting into the database
+	// cleanup any non dial pattern characters prior to inserting into the database
 	// then add directdid to the insert command.
 	//
+        $directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 
-        $directdid = preg_replace("/[^0-9]/" ,"", trim($directdid));
 
 	
 	//insert into users table
