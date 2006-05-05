@@ -234,7 +234,7 @@ function editGRP_onsubmit() {
 	if (!isDialpattern(theForm.extension.value))
 		return warnInvalid(theForm.extension, msgInvalidDIDNumb);
 	
-	if (!isInteger(theForm.cidnum.value))
+	if (!isDialpattern(theForm.cidnum.value))
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
 	if (!isEmail(theForm.faxemail.value))
