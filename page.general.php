@@ -16,14 +16,17 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
 //if submitting form, update database
 if ($action == 'editglobals') {
-	$globalfields = array(array($_REQUEST['RINGTIMER'],'RINGTIMER'),
+	$globalfields = array(
+						array($_REQUEST['RINGTIMER'],'RINGTIMER'),
 						array($_REQUEST['FAX_RX'],'FAX_RX'),
 						array($_REQUEST['FAX_RX_EMAIL'],'FAX_RX_EMAIL'),
 						array($_REQUEST['FAX_RX_FROM'],'FAX_RX_FROM'),
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
+						array($_REQUEST['VM_DDTYPE'],'VM_DDTYPE'),
+						array($_REQUEST['VM_GAIN'],'VM_GAIN'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
-                                                array($_REQUEST['TRUNK_OPTIONS'],'TRUNK_OPTIONS'),
+						array($_REQUEST['TRUNK_OPTIONS'],'TRUNK_OPTIONS'),
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
@@ -61,12 +64,6 @@ foreach ($globals as $global) {
 
 <h5><?php echo _("Dialing Options")?></h5>
 <p>
-	<?php echo _("Number of seconds to ring phones before sending callers to voicemail:")?>
-	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>"/>
-	<br><br>
-	<?php echo _("Extension prefix for dialing direct to voicemail:")?>
-	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>"/>
-	<br><br>
 	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span><br>
 <?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
 <?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
@@ -84,6 +81,30 @@ foreach ($globals as $global) {
 <?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 	</span></a>
 	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>"/>
+</p>
+
+<h5><?php echo _("Voicemail")?></h5>
+<p>
+	<?php echo _("Number of seconds to ring phones before sending callers to voicemail:")?>
+	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>"/>
+	<br><br>
+	<?php echo _("Extension prefix for dialing direct to voicemail:")?>
+	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>"/>
+	<br><br>
+	<?php echo _("Direct Dial to Voicemail message type:")?>
+	<select name="VM_DDTYPE">
+	<option value=""><?php echo _("Default"); ?></option>
+	<option value="u"<?php if ($VM_DDTYPE == "u") echo " SELECTED"; ?>><?php echo _("Unavailable"); ?></option>
+	<option value="su"<?php if ($VM_DDTYPE == "su") echo " SELECTED"; ?>><?php echo _("Unavailable")."--"._("no instructions"); ?></option>
+	<option value="b"<?php if ($VM_DDTYPE == "b") echo " SELECTED"; ?>><?php echo _("Busy"); ?></option>
+	<option value="sb"<?php if ($VM_DDTYPE == "sb") echo " SELECTED"; ?>><?php echo _("Busy")."--"._("no instructions"); ?></option>
+	<option value="s"<?php if ($VM_DDTYPE == "s") echo " SELECTED"; ?>><?php echo ("No Message"); ?></option>
+	</select>
+	<br><br>
+	<a href=# class="info"><?php echo _("Use gain when recording the voicemail message (optional):")?><span>
+	<?php echo _("Use the specified amount of gain when recording the voicemail message."); ?><br><br>
+	<?php echo _("The units are whole-number decibels (dB)."); ?></span></a>
+	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>"/>
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>
@@ -126,7 +147,7 @@ foreach ($globals as $global) {
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("that faxes appear to come from:")?>
 	<input type="text" size="20" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>"/>
 </p>
-<h5><?php echo _("International Tone Settings")?></h5>
+<h5><?php echo _("International Settings")?></h5>
 <p>
 	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Indications")?><span><?php echo _("Select which country you are in")?></span></a>&nbsp;
 	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
