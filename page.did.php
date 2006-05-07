@@ -227,12 +227,16 @@ function editGRP_onsubmit() {
 	var msgInvalidFaxEmail = "<?php echo _('Please enter a valid Fax Email or leave it empty to use the default'); ?>";
 	var msgInvalidPause = "<?php echo _('Please enter a valid number for Pause after answer'); ?>";
 	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
-
+	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number or for advanced users, a valid Asterisk Dial Pattern\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
+	
 	setDestinations(theForm,1);
 	
 	defaultEmptyOK = true;
-	if (!isDialpattern(theForm.extension.value))
-		return warnInvalid(theForm.extension, msgInvalidDIDNumb);
+	if (!isDialpattern(theForm.extension.value)) {
+		// warn the user that DID is normally numbers
+		if (!confirm(msgConfirmDIDNonStd))
+			return false;
+	}
 	
 	if (!isDialpattern(theForm.cidnum.value))
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
