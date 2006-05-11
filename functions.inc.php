@@ -981,6 +981,9 @@ function core_users_add($vars,$vmcontext) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
+		if (isset($amp_conf['ENABLECW']) && $amp_conf['ENABLECW'] == "yes") {
+			$astman->database_put("CW",$extension,"\"ENABLED\"");
+		}
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
@@ -1086,6 +1089,23 @@ function core_users_del($extension,$incontext,$uservm){
 	*/
 	/*//delete hint
 	core_hint_del($extension);*/
+}
+
+function core_users_cleanastdb($extension) {
+	// This is called to remove any ASTDB traces of the user after a deletion. Otherwise,
+	// call forwarding, call waiting settings could hang around and bite someone if they
+	// recycle an extension. Is called from page.xtns and page.users.
+	global $amp_conf;
+
+	$astman = new AGI_AsteriskManager();
+	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
+		$astman->database_del("CW",$extension);
+		$astman->database_del("CF",$extension);
+		$astman->database_del("CFB",$extension);
+		$astman->database_del("CFU",$extension);
+	} else {
+		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+	}
 }
 
 function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){

@@ -72,6 +72,7 @@ if (isset($extension) && !checkRange($extension)){
 		break;
 		case "del":
 			core_users_del($extdisplay,$incontext,$uservm);
+			core_users_cleanastdb($extdisplay) 
 			needreload();
 		break;
 		case "edit":

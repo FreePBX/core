@@ -97,6 +97,7 @@ if (isset($extension) && !checkRange($extension)){
 		case "del":
 			core_devices_del($extdisplay);
 			core_users_del($extdisplay,$incontext,$uservm);
+			core_users_cleanastdb($extdisplay);
 			needreload();
 		break;
 		case "edit":  //just delete and re-add
