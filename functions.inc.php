@@ -152,6 +152,7 @@ function core_get_config($engine) {
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
 						if ($catchaccount == "_X.") 
 							$catchall = true;
+						$ext->add($context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
 						$ext->add($context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 					}
 					
@@ -214,6 +215,7 @@ function core_get_config($engine) {
 					$ext->add('ext-did', 's', '', new ext_playback('ss-noservice'));
 					$ext->add('ext-did', 's', '', new ext_sayalpha('${FROM_DID}'));
 					$ext->add('ext-did', '_[*#X].', '', new ext_setvar('FROM_DID', '${EXTEN}'));
+					$ext->add('ext-did', '_[*#X].', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
 					$ext->add('ext-did', '_[*#X].', '', new ext_goto('1','s','ext-did'));
 				}
 					
