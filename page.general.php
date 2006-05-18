@@ -164,8 +164,8 @@ foreach ($globals as $global) {
 <?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
 	</span></a>&nbsp;
 	<select name="ALLOW_SIP_ANON">
-	<option value="<?php echo _("no"); ?>"><?php echo _("no"); ?></option>
-	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="<?php echo _("yes"); ?>"><?php echo _("yes"); ?></option>
+	<option value="no"><?php echo _("no"); ?></option>
+	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="yes"><?php echo _("yes"); ?></option>
 	</select>
 </p>
 <h6>
