@@ -295,7 +295,7 @@ function core_get_config($engine) {
 			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
-				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, priority ASC";
+				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 				foreach($thisrt as $exten) {
 					//if emergencyroute, then set channel var
