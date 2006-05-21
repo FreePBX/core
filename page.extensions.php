@@ -104,8 +104,36 @@ if (isset($extension) && !checkRange($extension)){
 			core_devices_del($extdisplay);
 			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
+			// Need to re-propogate all the vm info here, because it could have changed
+			$uservm = getVoicemail();
+			$vmcontexts = array_keys($uservm);
+			$vm=false;
+			foreach ($vmcontexts as $vmcontext) {
+				if(isset($uservm[$vmcontext][$extdisplay])){
+					$incontext = $vmcontext;  //the context for the current extension
+					$vmpwd = $uservm[$vmcontext][$extdisplay]['pwd'];
+					$name = $uservm[$vmcontext][$extdisplay]['name'];
+					$email = $uservm[$vmcontext][$extdisplay]['email'];
+					$pager = $uservm[$vmcontext][$extdisplay]['pager'];
+					$options="";
+					if (is_array($uservm[$vmcontext][$extdisplay]['options'])) {
+						$alloptions = array_keys($uservm[$vmcontext][$extdisplay]['options']);
+						if (isset($alloptions)) {
+							foreach ($alloptions as $option) {
+								if ( ($option!="attach") && ($option!="envelope") && ($option!="saycid") && ($option!="delete") && ($option!='') )
+								$options .= $option.'='.$uservm[$vmcontext][$extdisplay]['options'][$option].'|';
+							}
+							$options = rtrim($options,'|');
+							// remove the = sign if there are no options set
+							$options = rtrim($options,'=');
+						}
+						extract($uservm[$vmcontext][$extdisplay]['options'], EXTR_PREFIX_ALL, "vmops");
+					}
+					$vm=true;
+				}
+			}
 			needreload();
-		break;
+                break;
 		case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
 			core_users2astdb();
 			core_devices2astdb();
