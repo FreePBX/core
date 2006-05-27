@@ -310,7 +310,7 @@ if ($extdisplay) { // editing
 				<br>
 				<a href=# class="info"><?php echo _("Dial Patterns")?><span><?php echo _("A Dial Pattern is a unique set of digits that will select this trunk. Enter one dial pattern per line.")?><br><br><b><?php echo _("Rules:")?></b><br>
    <strong>X</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br>
-   <strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit form 1-9")?><br>
+   <strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br>
    <strong>N</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br>
    <strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br>
    <strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters")?> <br>
