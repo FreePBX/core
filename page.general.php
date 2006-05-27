@@ -109,8 +109,7 @@ foreach ($globals as $global) {
 
 <h5><?php echo _("Company Directory")?></h5>
 <p>
-	<?php echo _("Find users in the")?> <a href=# class="info"><?php echo _("Company Directory")?><span><br>
-	<?php echo _("Callers who are greeted by a Digital Receptionist can dial pound (#) to access the Company Directory.<br><br>Internal extensions can dial *411 to access the Company Directory.")?></span></a> <?php echo _("by:")?>
+	<?php echo _("Find users in the Company Directory by:")?>
 	<select name="DIRECTORY">
 		<option value="first" <?php  echo ($DIRECTORY == 'first' ? 'SELECTED' : '')?>><?php echo _("first name")?>
 		<option value="last" <?php  echo ($DIRECTORY == 'last' ? 'SELECTED' : '')?>><?php echo _("last name")?>
