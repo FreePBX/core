@@ -266,9 +266,12 @@ function core_get_config($engine) {
 					$vm = ($exten['voicemail'] == "disabled" ? "novm" : $exten['extension']);
 					
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
+					$ext->add('ext-local', $exten['extension'], '', new ext_hangup(''));
 					
-					if($vm != "novm")
+					if($vm != "novm") {
 						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',"$vm,DIRECTDIAL"));
+						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_hangup(''));
+					}
 						
 					$hint = core_hint_get($exten['extension']);
 					if (!empty($hint))
