@@ -642,7 +642,7 @@ function trunkEdit_onsubmit(act) {
 	if (!isInteger(theForm.maxchans.value))
 		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
 	
-	if (!isDialpattern(theForm.dialrules.value))
+	if (!isDialrule(theForm.dialrules.value))
 		return warnInvalid(theForm.dialrules, msgInvalidDialRules);
 	
 	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
