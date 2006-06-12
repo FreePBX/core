@@ -633,6 +633,7 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
 	var msgInvalidOutboundDialPrefix = "<?php echo _('Invalid Outbound Dial Prefix'); ?>";
 	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
+	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>";
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 
 	defaultEmptyOK = true;
@@ -648,10 +649,16 @@ function trunkEdit_onsubmit(act) {
 	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
 		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
 	
-	<?php if ($tech != "enum") { ?>
+	<?php if ($tech != "enum" && $tech != "custom") { ?>
 	defaultEmptyOK = true;
 	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 		return warnInvalid(theForm.channelid, msgInvalidTrunkName);
+	
+	if (theForm.channelid.value == theForm.usercontext.value)
+		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+	<?php } else if ($tech == "custom") { ?>
+	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+		return warnInvalid(theForm.channelid, msgInvalidChannelName);
 	
 	if (theForm.channelid.value == theForm.usercontext.value)
 		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
