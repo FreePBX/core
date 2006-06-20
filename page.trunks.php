@@ -89,37 +89,41 @@ switch ($action) {
 		
 		$extdisplay = ''; // resets back to main screen
 	break;
-	case "populatenpanxx": 
+	case "populatenpanxx7": 
+	case "populatenpanxx10": 
 		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
 			// first thing we do is grab the exch:
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_URL, "http://members.dandy.net/~czg/lca_prefix.php?npa=".$matches[1]."&nxx=".$matches[2]."&ocn=&pastdays=0&nextdays=0");
-			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; Amportal Local Trunks Configuration)");
+			curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
+			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
 			$str = curl_exec($ch);
 			curl_close($ch);
-			
-			if (preg_match("/exch=(\d+)/",$str, $matches)) {
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_URL, "http://members.dandy.net/~czg/lprefix.php?exch=".$matches[1]);
-				curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; Amportal Local Trunks Configuration)");
-				$str = curl_exec($ch);
-				curl_close($ch);
-				
-				foreach (explode("\n", $str) as $line) {
-					if (preg_match("/^(\d{3});(\d{3})/", $line, $matches)) {
-						$dialrules[] = "1".$matches[1]."|".$matches[2]."XXXX";
-						//$localprefixes[] = "1".$matches[1].$matches[2];
+
+			// quick 'n dirty - nabbed from PEAR
+			require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
+			require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
+
+			$xml = new xml_unserializer;
+			$xml->unserialize($str);
+			$xmldata = $xml->getUnserializedData();
+
+			if (isset($xmldata['lca-data']['prefix'])) {
+				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+					if ($action == 'populatenpanxx10') {
+						// 10 digit dialing
+						$dialrules[] = '1|'.$prefix['npa'].$prefix['nxx'].'XXXX';
+					} else {
+						$dialrules[] = '1'.$prefix['npa'].'|'.$prefix['nxx'].'XXXX';
 					}
 				}
-				
+
 				// check for duplicates, and re-sequence
 				$dialrules = array_values(array_unique($dialrules));
 			} else {
 				$errormsg = _("Error fetching prefix list for: "). $_REQUEST["npanxx"];
 			}
-			
+
 		} else {
 			// what a horrible error message... :p
 			$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
@@ -335,14 +339,15 @@ if (!$tech && !$extdisplay) {
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always add prefix to local numbers")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
-						<option value="lookup"><?php echo _("Lookup and remove local prefixes")?></option>
+						<option value="lookup7"><?php echo _("Lookup and remove local prefixes (7-digit dialing)")?></option>
+						<option value="lookup10"><?php echo _("Lookup and remove local prefixes (10-digit dialing)")?></option>
 					</select>
 				</td>
 			</tr>
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
 			
-			function populateLookup() {
+			function populateLookup(digits) {
 <?php 
 	if (function_exists("curl_init")) { // curl is installed
 ?>				
@@ -353,8 +358,12 @@ if (!$tech && !$extdisplay) {
 				} while (!npanxx.match("^[2-9][0-9][0-9][-]?[2-9][0-9][0-9]$") && <?php echo '!alert("'._("Invalid NPA-NXX. Must be of the format \'NXX-NXX\'").'")'?>);
 				
 				document.getElementById('npanxx').value = npanxx;
-				trunkEdit.action.value = "populatenpanxx";
-				trunkEdit.submit();
+				if (digits == 10) {
+					document.trunkEdit.action.value = "populatenpanxx10";
+				} else {
+					document.trunkEdit.action.value = "populatenpanxx7";
+				}
+				document.trunkEdit.submit();
 <?php  
 	} else { // curl is not installed
 ?>
@@ -408,8 +417,11 @@ if (!$tech && !$extdisplay) {
 					case "remove":
 						populateRemove();
 					break;
-					case "lookup":
-						populateLookup();
+					case "lookup7":
+						populateLookup(7);
+					break;
+					case "lookup10":
+						populateLookup(10);
 					break;
 				}
 				document.getElementById('autopop').value = '';
@@ -633,7 +645,6 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
 	var msgInvalidOutboundDialPrefix = "<?php echo _('Invalid Outbound Dial Prefix'); ?>";
 	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
-	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>";
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 
 	defaultEmptyOK = true;
@@ -643,22 +654,16 @@ function trunkEdit_onsubmit(act) {
 	if (!isInteger(theForm.maxchans.value))
 		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
 	
-	if (!isDialrule(theForm.dialrules.value))
+	if (!isDialpattern(theForm.dialrules.value))
 		return warnInvalid(theForm.dialrules, msgInvalidDialRules);
 	
 	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
 		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
 	
-	<?php if ($tech != "enum" && $tech != "custom") { ?>
+	<?php if ($tech != "enum") { ?>
 	defaultEmptyOK = true;
 	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 		return warnInvalid(theForm.channelid, msgInvalidTrunkName);
-	
-	if (theForm.channelid.value == theForm.usercontext.value)
-		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-	<?php } else if ($tech == "custom") { ?>
-	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
-		return warnInvalid(theForm.channelid, msgInvalidChannelName);
 	
 	if (theForm.channelid.value == theForm.usercontext.value)
 		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);

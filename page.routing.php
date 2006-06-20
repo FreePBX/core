@@ -130,26 +130,24 @@ switch ($action) {
 			// first thing we do is grab the exch:
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_URL, "http://members.dandy.net/~czg/lca_prefix.php?npa=".$matches[1]."&nxx=".$matches[2]."&ocn=&pastdays=0&nextdays=0");
-			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; Amportal Local Trunks Configuration)");
+			curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
+			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
 			$str = curl_exec($ch);
 			curl_close($ch);
-			
-			if (preg_match("/exch=(\d+)/",$str, $matches)) {
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_URL, "http://members.dandy.net/~czg/lprefix.php?exch=".$matches[1]);
-				curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; Amportal Local Trunks Configuration)");
-				$str = curl_exec($ch);
-				curl_close($ch);
-				
-				foreach (explode("\n", $str) as $line) {
-					if (preg_match("/^(\d{3});(\d{3})/", $line, $matches)) {
-						$dialpattern[] = "1".$matches[1].$matches[2]."XXXX";
-						//$localprefixes[] = "1".$matches[1].$matches[2];
-					}
+
+			// quick 'n dirty - nabbed from PEAR
+			require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
+			require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
+
+			$xml = new xml_unserializer;
+			$xml->unserialize($str);
+			$xmldata = $xml->getUnserializedData();
+
+			if (isset($xmldata['lca-data']['prefix'])) {
+				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+					$dialpattern[] = $prefix['npa'].$prefix['nxx'].'XXXX';
 				}
-				
+
 				// check for duplicates, and re-sequence
 				$dialpattern = array_values(array_unique($dialpattern));
 			} else {
