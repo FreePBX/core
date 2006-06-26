@@ -581,7 +581,7 @@ function core_devices_get($account){
 	
 	//take care of sip/iax/zap config
 	$funct = "core_devices_get".strtolower($results['tech']);
-	if(function_exists($funct)){
+	if(!empty($results['tech']) && function_exists($funct)){
 		$devtech = $funct($account);
 		if (is_array($devtech)){
 			$results = array_merge($results,$devtech);
