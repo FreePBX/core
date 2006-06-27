@@ -35,7 +35,6 @@ switch ($action) {
 		$extarray=explode('/',$extdisplay,3);
 		core_did_del($extarray[0],$extarray[1],$extarray[2]);
 		core_did_add($_REQUEST);
-		$extdisplay=$_REQUEST['extension']."/".$_REQUEST['cidnum'];
 		needreload();
 	break;
 }
