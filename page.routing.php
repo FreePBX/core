@@ -492,6 +492,11 @@ foreach ($trunkpriority as $key=>$trunk) {
 
 $key += 1; // this will be the next key value
 $name = "";
+
+// display 1 additional box if editing, or one for each trunk (to a max of 3)
+$num_new_boxes = ($extdisplay ? 1 : ((count($trunks) > 3) ? 3 : count($trunks)));
+
+for ($i=0; $i < $num_new_boxes; $i++) {
 ?>
 		<tr>
 			<td> &nbsp </td>
@@ -506,12 +511,16 @@ $name = "";
 				</select>
 			</td>
 		</tr>
+<?php } //for 0..$num_new_boxes ?>
+
+<?php if ($extdisplay): // editing ?>
 		<tr>
 			<td></td>
 			<td>
 				<input type="submit" value="<?php echo _("Add")?>">
 			</td>
 		</tr>
+<?php endif; // if $extdisplay ?>
 		<tr>
 			<td colspan="2">
 			<br>
