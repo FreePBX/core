@@ -72,6 +72,10 @@ function core_get_config($engine) {
 			$fc_simu_fax = $fcc->getCodeActive();
 			unset($fcc);
 
+			$fcc = new featurecode($modulename, 'pickup');
+			$fc_pickup = $fcc->getCodeActive();
+			unset($fcc);
+
 			// Log on / off -- all in one context
 			if ($fc_userlogoff != '' || $fc_userlogon != '') {
 				$ext->addInclude('from-internal-additional', 'app-userlogonoff'); // Add the include from from-internal
@@ -91,6 +95,16 @@ function core_get_config($engine) {
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
 				}
 			}
+
+			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs as a number to dial
+			// when a user pushes a flashing BLF. 
+		//	if ($fc_pickup != '') {
+				$ext->addInclude('from-internal-additional', 'app-pickup');
+				$fclen = strlen($fc_pickup);
+				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_NoOp('Attempt to Pickup ${EXTEN:'.$fclen.'} by ${CALLERID(num)}'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_pickup('${EXTEN:'.$fclen.'}'));
+		//	}
+			
 			
 			// zap barge
 			if ($fc_zapbarge != '') {

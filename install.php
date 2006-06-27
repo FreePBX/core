@@ -30,4 +30,10 @@ $fcc->setDefault('666');
 $fcc->update();
 unset($fcc);
 
+$fcc = new featurecode('core', 'pickup');
+$fcc->setDescription('Call Pickup (Can be used with GXP-2000)');
+$fcc->setDefault('**');
+$fcc->update();
+unset($fcc);
+
 ?>
