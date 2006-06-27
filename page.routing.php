@@ -340,7 +340,7 @@ $key += 1; // this will be the next key value
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-				<br><input type="submit" value="Add">
+				<br><input type="submit" value="<?php echo _("Add"); ?>">
 			</td>
 		</tr>
 <?php  */ ?>
