@@ -2058,4 +2058,225 @@ function general_generate_indications() {
 }
 /* end page.routing.php functions */
 
+
+// init registered 'your' config load and config process functions
+function core_users_configpageinit($dispnum) {
+	global $currentcomponent;
+
+	//if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
+	if ( $dispnum == 'users' ) {
+		// Add the 'proces' function
+		$currentcomponent->addguifunc('core_users_configpageload');
+		$currentcomponent->addprocessfunc('core_users_configprocess');			
+	}
+}
+
+function core_users_configpageload() {
+	global $currentcomponent;
+
+	// Init vars from $_REQUEST[]
+	$action = $_REQUEST['action'];
+	$extdisplay = $_REQUEST['extdisplay'];
+	
+	if ($action == 'del') {
+		//echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
+		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
+	} else {
+		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+	
+		if (is_string($extdisplay)) {	
+			$extenInfo=core_users_get($extdisplay);
+			extract($extenInfo);
+			if (is_array($deviceInfo))
+				extract($deviceInfo);
+	
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
+			$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+		} else {
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add User/Extension'), 0);
+		}
+		
+		// Setup vars for use in the gui later on
+		$recarray[] = array('value' => 'Adhoc',
+							'text'  => 'On Demand'
+		);
+		$recarray[] = array('value' => 'Always',
+							'text'  => 'Always'
+		);
+		$recarray[] = array('value' => 'Never',
+							'text'  => 'Never'
+		);
+							
+		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
+		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
+		
+		$msgInvalidExtNum = 'Please enter a valid extension number.';
+		$msgInvalidExtPwd = 'Please enter valid User Password using numbers only';
+		$msgInvalidDispName = 'Please enter a valid Display Name';
+		$msgInvalidOutboundCID = 'Please enter a valid Outbound CID';
+		
+		// This is the actual gui stuff
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
+		
+		// old style module hooks now broken....we don't need two methods anyway, do we?
+		//$currentcomponent->addguielem('_top', new guielement('modulehook', $module_hook->hookHtml));
+		
+		$section = ($extdisplay ? 'Edit User' : 'Add User');
+		if ( $extdisplay ) {
+			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay));
+		} else {
+			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false));
+		}
+		$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', "A user will enter this password when logging onto a device. $fc_logon logs into a device.  $fc_logoff logs out of a device.", '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
+		// extra JS function check required for blank password warning -- call last in the onsubmit() function
+		$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
+		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name.', '!isCallerID()', $msgInvalidOutboundCID, false));
+		
+		$section = 'Extension Options';
+		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."));
+		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', "Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set"));
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
+		
+		$section = 'Recording Options';
+		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $recarray, $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $recarray, $record_out, 'Record Outgoing', "Record all outbound calls received at this extension.", false));
+	}
+}
+
+function core_users_configprocess() {
+	include 'common/php-asmanager.php';
+	
+	//create vars from the request
+	extract($_REQUEST);
+	
+	//make sure we can connect to Asterisk Manager
+	checkAstMan();
+
+	//check if the extension is within range for this user
+	if (isset($extension) && !checkRange($extension)){
+		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
+	} else {
+	
+		//if submitting form, update database
+		switch ($action) {
+			case "add":
+				core_users_add($_REQUEST,$vmcontext);
+				needreload();
+			break;
+			case "del":
+				core_users_del($extdisplay,$incontext,$uservm);
+				core_users_cleanastdb($extdisplay);
+				needreload();
+			break;
+			case "edit":
+				core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
+				needreload();
+			break;
+		}
+	}
+
+}
+
+///////////////////////////////////////////////////////////
+// ** THIS FUNCTION SHOULD BE IN THE VOICEMAIL MODULE ** //
+///////////////////////////////////////////////////////////
+
+function core_configpageinit($dispnum) {
+	global $currentcomponent;
+
+	//if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
+	if ( $dispnum == 'users' ) {
+		// Add the 'proces' function
+		$currentcomponent->addguifunc('voicemail_users_configpageload');
+	}
+}
+
+function voicemail_users_configpageload() {
+	global $currentcomponent;
+
+	// Init vars from $_REQUEST[]
+	$action = $_REQUEST['action'];
+	$extdisplay = $_REQUEST['extdisplay'];
+	
+	if ($action != 'del') {		
+		// Setup vars for use in the gui later on
+		$enarray[] = array( 'value' => 'enabled',
+							'text'  => 'Enabled'
+		);					
+		$enarray[] = array( 'value' => 'disabled',
+							'text'  => 'Disabled'
+		);
+		
+		$ynarray[] = array( 'value'	=> 'yes',
+							'text'	=> 'yes'
+		);
+		$ynarray[] = array( 'value'	=> 'no',
+							'text'	=> 'no'
+		);
+
+		//read in the voicemail.conf and set appropriate variables for display
+		$uservm = getVoicemail();
+		$vmcontexts = array_keys($uservm);
+		$vm=false;
+		foreach ($vmcontexts as $vmcontext) {
+			if(isset($uservm[$vmcontext][$extdisplay])){
+				//echo $extdisplay.' found in context '.$vmcontext.'<hr>';
+				$incontext = $vmcontext;  //the context for the current extension
+				$vmpwd = $uservm[$vmcontext][$extdisplay]['pwd'];
+				$name = $uservm[$vmcontext][$extdisplay]['name'];
+				$email = $uservm[$vmcontext][$extdisplay]['email'];
+				$pager = $uservm[$vmcontext][$extdisplay]['pager'];
+				//loop through all options
+				$options="";
+				if (is_array($uservm[$vmcontext][$extdisplay]['options'])) {
+					$alloptions = array_keys($uservm[$vmcontext][$extdisplay]['options']);
+					if (isset($alloptions)) {
+						foreach ($alloptions as $option) {
+							if ( ($option!="attach") && ($option!="envelope") && ($option!="saycid") && ($option!="delete") && ($option!='') )
+								$options .= $option.'='.$uservm[$vmcontext][$extdisplay]['options'][$option].'|';
+						}
+						$options = rtrim($options,'|');
+						// remove the = sign if there are no options set
+						$options = rtrim($options,'=');
+						
+					}
+					extract($uservm[$vmcontext][$extdisplay]['options'], EXTR_PREFIX_ALL, "vmops");
+				}
+				$vm=true;
+			}
+		}
+		
+		$vmcontext = $_SESSION["AMP_user"]->_deptname; //AMP Users can only add to their department's context
+		if (empty($vmcontext)) 
+			$vmcontext = ($_REQUEST['vmcontext'] ? $_REQUEST['vmcontext'] : $incontext);
+		if (empty($vmcontext))
+			$vmcontext = 'default';
+		
+		if ( $vm==true ) {
+			$vmselect = "enabled";
+		} else {
+			$vmselect = "disabled";
+		}
+		
+		$fc_vm = featurecodes_getFeatureCode('voicemail', 'dialvoicemail');
+
+		$msgInvalidVmPwd = 'Please enter a valid Voicemail Password, using digits only';
+		$msgInvalidEmail = 'Please enter a valid Email Address';
+		$msgInvalidPager = 'Please enter a valid Pager Email Address';
+		$msgInvalidVMContext = 'VM Context cannot be blank';
+
+		$section = 'Voicemail & Directory';
+		$currentcomponent->addguielem($section, new gui_selectbox('vm', $enarray, $vmselect, 'Status', '', false));
+		$currentcomponent->addguielem($section, new gui_textbox('vmpwd', $vmpwd, 'voicemail password', "This is the password used to access the voicemail system.<br><br>This password can only contain numbers.<br><br>A user can change the password you enter here after logging into the voicemail system ($fc_vm) with a phone.", "isVoiceMailEnabled() && !isInteger()", $msgInvalidVmPwd, false));
+		$currentcomponent->addguielem($section, new gui_textbox('email', $email, 'email address', "The email address that voicemails are sent to.", "isVoiceMailEnabled() && !isEmail()", $msgInvalidEmail, true));
+		$currentcomponent->addguielem($section, new gui_textbox('pager', $pager, 'pager email address', "Pager/mobile email address that short voicemail notifcations are sent to.", "isVoiceMailEnabled() && !isEmail()", $msgInvalidEmail, true));
+		$currentcomponent->addguielem($section, new gui_radio('attach', $ynarray, $vmops_attach, 'email attachment', "Option to attach voicemails to email."));
+		$currentcomponent->addguielem($section, new gui_radio('saycid', $ynarray, $vmops_saycid, 'Play CID', "Read back caller's telephone number prior to playing the incoming message, and just after announcing the date and time the message was left."));
+		$currentcomponent->addguielem($section, new gui_radio('envelope', $ynarray, $vmops_envelope, 'Play Envelope', "Envelope controls whether or not the voicemail system will play the message envelope (date/time) before playing the voicemail message. This settng does not affect the operation of the envelope option in the advanced voicemail menu."));
+		$currentcomponent->addguielem($section, new gui_radio('delete', $ynarray, $vmops_delete, 'Delete Vmail', "If set to \"yes\" the message will be deleted from the voicemailbox (after having been emailed). Provides functionality that allows a user to receive their voicemail via email alone, rather than having the voicemail able to be retrieved from the Webinterface or the Extension handset.  CAUTION: MUST HAVE attach voicemail to email SET TO YES OTHERWISE YOUR MESSAGES WILL BE LOST FOREVER."));
+		$currentcomponent->addguielem($section, new gui_textbox('options', $options, 'vm options', 'Separate options with pipe ( | )<br><br>ie: review=yes|maxmessage=60'));
+		$currentcomponent->addguielem($section, new gui_textbox('vmcontext', $vmcontext, 'vm context', '', 'isVoiceMailEnabled() && isEmpty()', $msgInvalidVMContext, false));
+	}
+}
 ?>
