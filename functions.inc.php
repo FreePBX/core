@@ -15,9 +15,9 @@ function core_destinations() {
 			// search vm contexts for this extensions mailbox
 			foreach ($vmcontexts as $vmcontext) {
 				if(isset($uservm[$vmcontext][$extnum])){
-				//	$vmname = $uservm[$vmcontext][$extnum]['name'];
-				//	$vmboxes[$extnum] = array($extnum, '"' . $vmname . '" <' . $extnum . '>');
-				$vmboxes[$extnum] = true;
+					//$vmname = $uservm[$vmcontext][$extnum]['name'];
+					//$vmboxes[$extnum] = array($extnum, '"' . $vmname . '" <' . $extnum . '>');
+					$vmboxes[$extnum] = true;
 				}
 			}
 		}
@@ -26,11 +26,11 @@ function core_destinations() {
 	// return an associative array with destination and description
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
-		foreach($results as $result){
-				$extens[] = array('destination' => 'ext-local,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
-				if(isset($vmboxes[$result['0']])) {
-					$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => 'voicemail box '.$result['0']);
-				}
+		foreach($results as $result) {
+			$extens[] = array('destination' => 'ext-local,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
+			if(isset($vmboxes[$result['0']])) {
+				$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => 'voicemail box '.$result['0']);
+			}
 		}
 	}
 	
@@ -515,6 +515,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$vmcontext = "default";
 		else 
 			$vmcontext = $thisUser['voicemail'];
+		
 		//voicemail symlink
 		exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
 		exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
@@ -549,21 +550,23 @@ function core_devices_del($account){
 		// If a user was selected, remove this device from the user
 		$deviceuser = $astman->database_get("DEVICE",$account."/user");
 		if (isset($deviceuser) && $deviceuser != "none") {
-				// Remove the device record from the user's device list
-				$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
-				/*$userdevices = str_replace($account."&", "", $userdevices."&");
-				// If there was more than one device, remove the extra "&" at the end.
-				if (substr($userdevices, -1, 1) == "&") {
-					$userdevices = substr($userdevices, 0, -1);
-				}*/
-                                $userdevicesarr = explode("&", $userdevices);
-                                array_splice($userdevicesarr, array_search($account, $userdevicesarr), 1);
-                                $userdevices = implode("&", $userdevicesarr);
-				if (empty($userdevices)) {
-						$astman->database_del("AMPUSER",$deviceuser."/device");
-				} else {
-						$astman->database_put("AMPUSER",$deviceuser."/device",$userdevices);
-				}
+			// Remove the device record from the user's device list
+			$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
+			/*$userdevices = str_replace($account."&", "", $userdevices."&");
+			
+			// If there was more than one device, remove the extra "&" at the end.
+			if (substr($userdevices, -1, 1) == "&") {
+				$userdevices = substr($userdevices, 0, -1);
+			}*/
+			$userdevicesarr = explode("&", $userdevices);
+			array_splice($userdevicesarr, array_search($account, $userdevicesarr), 1);
+			$userdevices = implode("&", $userdevicesarr);
+			
+			if (empty($userdevices)) {
+					$astman->database_del("AMPUSER",$deviceuser."/device");
+			} else {
+					$astman->database_put("AMPUSER",$deviceuser."/device",$userdevices);
+			}
 		}
 		$astman->database_del("DEVICE",$account."/dial");
 		$astman->database_del("DEVICE",$account."/type");
@@ -595,7 +598,7 @@ function core_devices_get($account){
 	
 	//take care of sip/iax/zap config
 	$funct = "core_devices_get".strtolower($results['tech']);
-	if(!empty($results['tech']) && function_exists($funct)){
+	if (!empty($results['tech']) && function_exists($funct)) {
 		$devtech = $funct($account);
 		if (is_array($devtech)){
 			$results = array_merge($results,$devtech);
@@ -616,7 +619,7 @@ function core_devices2astdb(){
 
 	//add details to astdb
 	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
+	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
 		$astman->database_deltree("DEVICE");
 		foreach($devresults as $dev) {
 			extract($dev);	
@@ -710,29 +713,18 @@ function core_devices_addsip($account) {
 	if(DB::IsError($result)) {
 		die($result->getDebugInfo()."<br><br>".'error adding to SIP table');	
 	}
-		   
-
-	//script to write sip conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-	//exec($wScript);
-
 }
 
 function core_devices_delsip($account) {
 	global $db;
 	global $currentFile;
-    $sql = "DELETE FROM sip WHERE id = '$account'";
-    $result = $db->query($sql);
-    if(DB::IsError($result)) {
-        die($result->getMessage().$sql);
+	
+	$sql = "DELETE FROM sip WHERE id = '$account'";
+	$result = $db->query($sql);
+	
+	if(DB::IsError($result)) {
+		die($result->getMessage().$sql);
 	}
-
-	//script to write sip conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_sip_conf_from_mysql.pl';
-	//exec($wScript);
-	//script to write op_server.cfg file from mysql 
-	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	//exec($wOpScript);
 }
 
 function core_devices_getsip($account) {
@@ -742,6 +734,7 @@ function core_devices_getsip($account) {
 	if(DB::IsError($results)) {
 		$results = null;
 	}
+	
 	return $results;
 }
 
@@ -749,6 +742,7 @@ function core_devices_getsip($account) {
 function core_devices_addiax2($account) {
 	global $db;
 	global $currentFile;
+	
 	$iaxfields = array(array($account,'account',$account),
 	array($account,'secret',($_REQUEST['secret'])?$_REQUEST['secret']:''),
 	array($account,'notransfer',($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),
@@ -770,32 +764,19 @@ function core_devices_addiax2($account) {
 	$result = $db->executeMultiple($compiled,$iaxfields);
 	if(DB::IsError($result)) {
 		die($result->getMessage()."<br><br>error adding to IAX table");	
-	}	
-
-
-	//script to write iax2 conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-	//exec($wScript);
-	//script to write op_server.cfg file from mysql 
-	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	//exec($wOpScript);
+	}
 }
 
 function core_devices_deliax2($account) {
 	global $db;
 	global $currentFile;
-    $sql = "DELETE FROM iax WHERE id = '$account'";
-    $result = $db->query($sql);
-    if(DB::IsError($result)) {
-        die($result->getMessage().$sql);
-	}
 	
-	//script to write iax2 conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_iax_conf_from_mysql.pl';
-	//exec($wScript);
-	//script to write op_server.cfg file from mysql 
-	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	//exec($wOpScript);
+	$sql = "DELETE FROM iax WHERE id = '$account'";
+	$result = $db->query($sql);
+	
+	if(DB::IsError($result)) {
+		die($result->getMessage().$sql);
+	}
 }
 
 function core_devices_getiax2($account) {
@@ -805,12 +786,14 @@ function core_devices_getiax2($account) {
 	if(DB::IsError($results)) {
 		$results = null;
 	}
+	
 	return $results;
 }
 
 function core_devices_addzap($account) {
 	global $db;
 	global $currentFile;
+	
 	$zapfields = array(
 	array($account,'account',$account),
 	array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
@@ -832,32 +815,18 @@ function core_devices_addzap($account) {
 	$result = $db->executeMultiple($compiled,$zapfields);
 	if(DB::IsError($result)) {
 		die($result->getMessage()."<br><br>error adding to ZAP table");	
-	}	
-
-
-	//script to write zap conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
-	//exec($wScript);
-	//script to write op_server.cfg file from mysql 
-	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	//exec($wOpScript);
+	}
 }
 
 function core_devices_delzap($account) {
 	global $db;
 	global $currentFile;
-    $sql = "DELETE FROM zap WHERE id = '$account'";
-    $result = $db->query($sql);
-    if(DB::IsError($result)) {
-        die($result->getMessage().$sql);
-	}
 	
-	//script to write zap conf file from mysql
-	//$wScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_zap_conf_from_mysql.pl';
-	//exec($wScript);
-	//script to write op_server.cfg file from mysql 
-	//$wOpScript = rtrim($_SERVER['SCRIPT_FILENAME'],$currentFile).'retrieve_op_conf_from_mysql.pl';
-	//exec($wOpScript);
+	$sql = "DELETE FROM zap WHERE id = '$account'";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		die($result->getMessage().$sql);
+	}
 }
 
 function core_devices_getzap($account) {
@@ -916,6 +885,7 @@ function core_users_list() {
 			$extens[] = array($result[0],$result[1]);
 		}
 	}
+	
 	if (isset($extens)) {
 		sort($extens);
 		return $extens;
@@ -1043,13 +1013,15 @@ function core_users_add($vars,$vmcontext) {
 			$vmoptions[$vmoption[0]] = $vmoption[1];
 		$vmoption = explode("=",$delete);
 			$vmoptions[$vmoption[0]] = $vmoption[1];
+			
 		$uservm[$vmcontext][$extension] = array(
-									'mailbox' => $extension, 
-									'pwd' => $vmpwd,
-									'name' => $name,
-									'email' => $email,
-									'pager' => $pager,
-									'options' => $vmoptions);
+			'mailbox' => $extension, 
+			'pwd' => $vmpwd,
+			'name' => $name,
+			'email' => $email,
+			'pager' => $pager,
+			'options' => $vmoptions
+		);
 	}
 	saveVoicemail($uservm);
 }
@@ -1060,8 +1032,9 @@ function core_users_get($extension){
 	$sql = "SELECT * FROM users WHERE extension = '$extension'";
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
-        die($results->getMessage().$sql);
+		die($results->getMessage().$sql);
 	}
+	
 	//explode recording vars
 	$recording = explode("|",$results['recording']);
 	$recout = substr($recording[0],4);
@@ -1080,7 +1053,7 @@ function core_users_del($extension,$incontext,$uservm){
 	$sql="DELETE FROM users WHERE extension = \"$extension\"";
 	$results = $db->query($sql);
 	if(DB::IsError($results)) {
-        die($results->getMessage().$sql);
+		die($results->getMessage().$sql);
 	}
 
 	//delete details to astdb
@@ -1102,6 +1075,7 @@ function core_users_del($extension,$incontext,$uservm){
 	//take care of voicemail.conf
 	unset($uservm[$incontext][$extension]);
 	saveVoicemail($uservm);
+	
 	/*	
 	//delete the extension info from extensions table
 	delextensions('ext-local',$extension);
@@ -1315,6 +1289,7 @@ function core_trunks_list() {
 	if ( $amp_conf["AMPDBENGINE"] == "sqlite")
 	{
 		// TODO: sqlite work arround - diego 
+		// need to reorder the trunks in PHP code
 		$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll"); 
 	}
 	else
@@ -1672,8 +1647,7 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 	unset($temptrunk);
 	$routepriority = array_values($routepriority); // resequence our numbers
 	$counter=0;
-	foreach ($routepriority as $tresult) 
-	{
+	foreach ($routepriority as $tresult) {
 		$order=core_routing_setroutepriorityvalue($counter++);
 		$sql = sprintf("Update extensions set context='outrt-%s-%s' WHERE context='outrt-%s'",$order,substr($tresult[0],4), $tresult[0]);
 		$result = $db->query($sql); 
@@ -1681,12 +1655,14 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 			die($result->getMessage()); 
 		}
 	}
+	
 	// Delete and readd the outbound-allroutes entries
 	$sql = "delete from  extensions WHERE context='outbound-allroutes'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
         	die($result->getMessage().$sql);
 	}
+	
 	$sql = "SELECT DISTINCT context FROM extensions WHERE context like 'outrt-%' ORDER BY context";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
@@ -1710,11 +1686,11 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 			die($result->getMessage(). $sql); 
  		}
 	}
+	
 	$sql = "SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
         // we SUBSTRING() to remove "outrt-"
         $routepriority = $db->getAll($sql);
-        if(DB::IsError($routepriority))
-        {
+        if(DB::IsError($routepriority)) {
                 die($routepriority->getMessage());
         }
         return ($routepriority);
@@ -1750,21 +1726,19 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 		$trunktech[$tr[0]]=$tech;
 	}
 	
- 	if ($method=="new")
-	{	
-            $sql="select DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context";
-            $routepriority = $db->getAll($sql);
-            if(DB::IsError($result)) {
-                    die($result->getMessage());
-            }
-            $order=core_routing_setroutepriorityvalue(count($routepriority));
-	 	$name = sprintf ("%s-%s",$order,$name);
+ 	if ($method=="new") {	
+		$sql="select DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context";
+		$routepriority = $db->getAll($sql);
+		if(DB::IsError($result)) {
+			die($result->getMessage());
+		}
+		$order=core_routing_setroutepriorityvalue(count($routepriority));
+		$name = sprintf ("%s-%s",$order,$name);
 	}
 	$trunks = array_values($trunks); // probably already done, but it's important for our dialplan
 
 	
 	foreach ($patterns as $pattern) {
-		
 		if (false !== ($pos = strpos($pattern,"|"))) {
 			// we have a | meaning to not pass the digits on
 			// (ie, 9|NXXXXXX should use the pattern _9NXXXXXX but only pass NXXXXXX, not the leading 9)
@@ -1785,20 +1759,20 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 		
 		// 1st priority is emergency dialing variable (if set)
 		if(!empty($emergency)) {
-			   $startpriority = 1;
-			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-			   $sql .= "('outrt-".$name."', ";
-			   $sql .= "'".$pattern."', ";
-			   $sql .= "'".$startpriority."', ";
-			   $sql .= "'SetVar', ";
-			   $sql .= "'EMERGENCYROUTE=YES', ";
-			   $sql .= "'Use Emergency CID for device')";
-			   $result = $db->query($sql);
-				if(DB::IsError($result)) {
-					   die($result->getMessage());
-				}
+			$startpriority = 1;
+			$sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
+			$sql .= "('outrt-".$name."', ";
+			$sql .= "'".$pattern."', ";
+			$sql .= "'".$startpriority."', ";
+			$sql .= "'SetVar', ";
+			$sql .= "'EMERGENCYROUTE=YES', ";
+			$sql .= "'Use Emergency CID for device')";
+			$result = $db->query($sql);
+			if(DB::IsError($result)) {
+				die($result->getMessage());
+			}
 		} else {
-			   $startpriority = 0;
+			$startpriority = 0;
 		}
 
 		$first_trunk = 1;
@@ -1999,24 +1973,25 @@ function core_routing_getroutepassword($route) {
 	} else {
 		$password = "";
 	}
-	return $password;
 	
+	return $password;
 }
 
 //get emergency state for this route
 function core_routing_getrouteemergency($route) {
-       global $db;
-       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'EMERGENCYROUTE%') ";
-       $results = $db->getOne($sql);
-       if(DB::IsError($results)) {
-               die($results->getMessage());
-       }
-       if (preg_match('/^.*=(.*)/', $results, $matches)) {
-               $emergency = $matches[1];
-       } else {
-               $emergency = "";
-       }
-       return $emergency;
+	global $db;
+	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'EMERGENCYROUTE%') ";
+	$results = $db->getOne($sql);
+	if(DB::IsError($results)) {
+		die($results->getMessage());
+	}
+	if (preg_match('/^.*=(.*)/', $results, $matches)) {
+		$emergency = $matches[1];
+	} else {
+		$emergency = "";
+	}
+	
+	return $emergency;
 }
 
 function general_get_zonelist() {
