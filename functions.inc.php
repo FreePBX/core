@@ -98,12 +98,12 @@ function core_get_config($engine) {
 
 			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs as a number to dial
 			// when a user pushes a flashing BLF. 
-		//	if ($fc_pickup != '') {
+			if ($fc_pickup != '') {
 				$ext->addInclude('from-internal-additional', 'app-pickup');
 				$fclen = strlen($fc_pickup);
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_NoOp('Attempt to Pickup ${EXTEN:'.$fclen.'} by ${CALLERID(num)}'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_pickup('${EXTEN:'.$fclen.'}'));
-		//	}
+			}
 			
 			
 			// zap barge
