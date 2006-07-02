@@ -2065,6 +2065,11 @@ function core_users_configpageinit($dispnum) {
 
 	//if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 	if ( $dispnum == 'users' ) {
+		// Setup option list we need
+		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', 'On Demand');
+		$currentcomponent->addoptlistitem('recordoptions', 'Always', 'Always');
+		$currentcomponent->addoptlistitem('recordoptions', 'Never', 'Never');
+						
 		// Add the 'proces' function
 		$currentcomponent->addguifunc('core_users_configpageload');
 		$currentcomponent->addprocessfunc('core_users_configprocess');			
@@ -2079,7 +2084,6 @@ function core_users_configpageload() {
 	$extdisplay = $_REQUEST['extdisplay'];
 	
 	if ($action == 'del') {
-		//echo '<br><h3>'.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 	} else {
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
@@ -2096,17 +2100,7 @@ function core_users_configpageload() {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add User/Extension'), 0);
 		}
 		
-		// Setup vars for use in the gui later on
-		$recarray[] = array('value' => 'Adhoc',
-							'text'  => 'On Demand'
-		);
-		$recarray[] = array('value' => 'Always',
-							'text'  => 'Always'
-		);
-		$recarray[] = array('value' => 'Never',
-							'text'  => 'Never'
-		);
-							
+		// Setup vars for use in the gui later on							
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
 		
@@ -2114,13 +2108,10 @@ function core_users_configpageload() {
 		$msgInvalidExtPwd = 'Please enter valid User Password using numbers only';
 		$msgInvalidDispName = 'Please enter a valid Display Name';
 		$msgInvalidOutboundCID = 'Please enter a valid Outbound CID';
-		
+
 		// This is the actual gui stuff
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
-		
-		// old style module hooks now broken....we don't need two methods anyway, do we?
-		//$currentcomponent->addguielem('_top', new guielement('modulehook', $module_hook->hookHtml));
 		
 		$section = ($extdisplay ? 'Edit User' : 'Add User');
 		if ( $extdisplay ) {
@@ -2137,10 +2128,10 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."));
 		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', "Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set"));
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
-		
+
 		$section = 'Recording Options';
-		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $recarray, $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
-		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $recarray, $record_out, 'Record Outgoing', "Record all outbound calls received at this extension.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', "Record all outbound calls received at this extension.", false));
 	}
 }
 
@@ -2187,6 +2178,16 @@ function core_configpageinit($dispnum) {
 
 	//if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 	if ( $dispnum == 'users' ) {
+		// Setup two option lists we need
+		// Enable / Disable list
+		$currentcomponent->addoptlistitem('vmena', 'enabled', 'Enabled');
+		$currentcomponent->addoptlistitem('vmena', 'disabled', 'Disabled');
+		$currentcomponent->setoptlistopts('vmena', 'sort', false);
+		// Yes / No Radio button list
+		$currentcomponent->addoptlistitem('vmyn', 'yes', 'yes');
+		$currentcomponent->addoptlistitem('vmyn', 'no', 'no');
+		$currentcomponent->setoptlistopts('vmyn', 'sort', false);
+
 		// Add the 'proces' function
 		$currentcomponent->addguifunc('voicemail_users_configpageload');
 	}
@@ -2200,21 +2201,6 @@ function voicemail_users_configpageload() {
 	$extdisplay = $_REQUEST['extdisplay'];
 	
 	if ($action != 'del') {		
-		// Setup vars for use in the gui later on
-		$enarray[] = array( 'value' => 'enabled',
-							'text'  => 'Enabled'
-		);					
-		$enarray[] = array( 'value' => 'disabled',
-							'text'  => 'Disabled'
-		);
-		
-		$ynarray[] = array( 'value'	=> 'yes',
-							'text'	=> 'yes'
-		);
-		$ynarray[] = array( 'value'	=> 'no',
-							'text'	=> 'no'
-		);
-
 		//read in the voicemail.conf and set appropriate variables for display
 		$uservm = getVoicemail();
 		$vmcontexts = array_keys($uservm);
@@ -2267,14 +2253,14 @@ function voicemail_users_configpageload() {
 		$msgInvalidVMContext = 'VM Context cannot be blank';
 
 		$section = 'Voicemail & Directory';
-		$currentcomponent->addguielem($section, new gui_selectbox('vm', $enarray, $vmselect, 'Status', '', false));
+		$currentcomponent->addguielem($section, new gui_selectbox('vm', $currentcomponent->getoptlist('vmena'), $vmselect, 'Status', '', false));
 		$currentcomponent->addguielem($section, new gui_textbox('vmpwd', $vmpwd, 'voicemail password', "This is the password used to access the voicemail system.<br><br>This password can only contain numbers.<br><br>A user can change the password you enter here after logging into the voicemail system ($fc_vm) with a phone.", "isVoiceMailEnabled() && !isInteger()", $msgInvalidVmPwd, false));
 		$currentcomponent->addguielem($section, new gui_textbox('email', $email, 'email address', "The email address that voicemails are sent to.", "isVoiceMailEnabled() && !isEmail()", $msgInvalidEmail, true));
 		$currentcomponent->addguielem($section, new gui_textbox('pager', $pager, 'pager email address', "Pager/mobile email address that short voicemail notifcations are sent to.", "isVoiceMailEnabled() && !isEmail()", $msgInvalidEmail, true));
-		$currentcomponent->addguielem($section, new gui_radio('attach', $ynarray, $vmops_attach, 'email attachment', "Option to attach voicemails to email."));
-		$currentcomponent->addguielem($section, new gui_radio('saycid', $ynarray, $vmops_saycid, 'Play CID', "Read back caller's telephone number prior to playing the incoming message, and just after announcing the date and time the message was left."));
-		$currentcomponent->addguielem($section, new gui_radio('envelope', $ynarray, $vmops_envelope, 'Play Envelope', "Envelope controls whether or not the voicemail system will play the message envelope (date/time) before playing the voicemail message. This settng does not affect the operation of the envelope option in the advanced voicemail menu."));
-		$currentcomponent->addguielem($section, new gui_radio('delete', $ynarray, $vmops_delete, 'Delete Vmail', "If set to \"yes\" the message will be deleted from the voicemailbox (after having been emailed). Provides functionality that allows a user to receive their voicemail via email alone, rather than having the voicemail able to be retrieved from the Webinterface or the Extension handset.  CAUTION: MUST HAVE attach voicemail to email SET TO YES OTHERWISE YOUR MESSAGES WILL BE LOST FOREVER."));
+		$currentcomponent->addguielem($section, new gui_radio('attach', $currentcomponent->getoptlist('vmyn'), $vmops_attach, 'email attachment', "Option to attach voicemails to email."));
+		$currentcomponent->addguielem($section, new gui_radio('saycid', $currentcomponent->getoptlist('vmyn'), $vmops_saycid, 'Play CID', "Read back caller's telephone number prior to playing the incoming message, and just after announcing the date and time the message was left."));
+		$currentcomponent->addguielem($section, new gui_radio('envelope', $currentcomponent->getoptlist('vmyn'), $vmops_envelope, 'Play Envelope', "Envelope controls whether or not the voicemail system will play the message envelope (date/time) before playing the voicemail message. This settng does not affect the operation of the envelope option in the advanced voicemail menu."));
+		$currentcomponent->addguielem($section, new gui_radio('delete', $currentcomponent->getoptlist('vmyn'), $vmops_delete, 'Delete Vmail', "If set to \"yes\" the message will be deleted from the voicemailbox (after having been emailed). Provides functionality that allows a user to receive their voicemail via email alone, rather than having the voicemail able to be retrieved from the Webinterface or the Extension handset.  CAUTION: MUST HAVE attach voicemail to email SET TO YES OTHERWISE YOUR MESSAGES WILL BE LOST FOREVER."));
 		$currentcomponent->addguielem($section, new gui_textbox('options', $options, 'vm options', 'Separate options with pipe ( | )<br><br>ie: review=yes|maxmessage=60'));
 		$currentcomponent->addguielem($section, new gui_textbox('vmcontext', $vmcontext, 'vm context', '', 'isVoiceMailEnabled() && isEmpty()', $msgInvalidVMContext, false));
 	}
