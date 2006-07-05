@@ -903,8 +903,8 @@ function core_users_add($vars,$vmcontext) {
 	$extens = core_users_list();
 	if(is_array($extens)) {
 		foreach($extens as $exten) {
-			if ($exten===$extension) {
-				echo "<script>javascript:alert('"._("This user {$thisexten}/{$extension} extension is already in use")."');</script>";
+			if ($exten[0]===$extension) {
+				echo "<script>javascript:alert('"._("This user")." ({$thisexten}) "._("or extension")." ({$extension}) "._("is already in use")."');</script>";
 				return false;
 			}
 		}
