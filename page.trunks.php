@@ -612,7 +612,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<a href=# class="info"><?php echo _("Register String")?><span><br><?php echo _("Most VoIP providers require your system to REGISTER with theirs. Enter the registration line here.<br><br>example:<br><br>username:password@switch.voipprovider.com")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("Register String")?><span><br><?php echo _("Most VoIP providers require your system to REGISTER with theirs. Enter the registration line here.<br><br>example:<br><br>username:password@switch.voipprovider.com.<br><br>Many providers will require you to provide a DID number, ex: username:password@switch.voipprovider.com/didnumber in order for any DID matching to work.")?><br><br></span></a>: 
 					</td>
 				</tr>
 				<tr>
