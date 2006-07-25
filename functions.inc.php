@@ -3,6 +3,14 @@
 // The destinations this module provides
 // returns a associative arrays with keys 'destination' and 'description'
 function core_destinations() {
+	//static destinations
+	$extens = array();
+	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => 'Hangup');
+	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => 'Congestion');
+	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => 'Busy');
+	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => 'Play SIT Tone (Zapateller)');
+	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => 'Put caller on hold forever');
+	
 	//get the list of meetmes
 	$results = core_users_list();
 	
@@ -336,6 +344,32 @@ function core_get_config($engine) {
 				}
 			}
 			general_generate_indications();
+
+			// "blackhole" destinations
+			$ext->add('app-blackhole', 'hangup', '', new ext_noop('Blackhole Dest: Hangup'));
+			$ext->add('app-blackhole', 'hangup', '', new ext_hangup());
+
+			$ext->add('app-blackhole', 'zapateller', '', new ext_noop('Blackhole Dest: Play SIT Tone'));
+			$ext->add('app-blackhole', 'zapateller', '', new ext_answer());
+			$ext->add('app-blackhole', 'zapateller', '', new ext_zapateller());
+			// Should hangup ?
+			// $ext->add('app-blackhole', 'zapateller', '', new ext_hangup());
+					
+			$ext->add('app-blackhole', 'musiconhold', '', new ext_noop('Blackhole Dest: Put caller on hold forever'));
+			$ext->add('app-blackhole', 'musiconhold', '', new ext_answer());
+			$ext->add('app-blackhole', 'musiconhold', '', new ext_musiconhold());
+
+			$ext->add('app-blackhole', 'congestion', '', new ext_noop('Blackhole Dest: Congestion'));
+			$ext->add('app-blackhole', 'congestion', '', new ext_answer());
+			$ext->add('app-blackhole', 'congestion', '', new ext_playtones(congestion));
+			$ext->add('app-blackhole', 'congestion', '', new ext_congestion());
+			$ext->add('app-blackhole', 'congestion', '', new ext_hangup());
+
+			$ext->add('app-blackhole', 'busy', '', new ext_noop('Blackhole Dest: Busy'));
+			$ext->add('app-blackhole', 'busy', '', new ext_answer());
+			$ext->add('app-blackhole', 'busy', '', new ext_playtones(busy));
+			$ext->add('app-blackhole', 'busy', '', new ext_busy());
+			$ext->add('app-blackhole', 'busy', '', new ext_hangup());
 		break;
 	}
 }
