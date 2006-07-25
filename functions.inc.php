@@ -133,6 +133,9 @@ function core_get_config($engine) {
 				$ext->add('ext-test', 'h', '', new ext_macro('hangupcall'));
 			}
 			
+			/* Always have Fax detection in ext-did, no matter what */
+			$ext->add('ext-did', 'fax', , new ext_goto('1','in_fax','ext-fax'));
+
 			/* inbound routing extensions */
 			$didlist = core_did_list();
 			if(is_array($didlist)){
