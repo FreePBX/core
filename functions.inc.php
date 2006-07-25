@@ -415,11 +415,11 @@ function core_did_del($extension,$cidnum, $channel){
 }
 
 function core_did_add($incoming){
-	extract($incoming); // create variables from request
+	foreach ($incoming as $key => $val) { ${$key} = urlencode($val); } // create variables from request
 	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\", \"$channel\", \"$ringing\")";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing')";
 		sql($sql);
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
