@@ -415,7 +415,7 @@ function core_did_del($extension,$cidnum, $channel){
 }
 
 function core_did_add($incoming){
-	foreach ($incoming as $key => $val) { ${$key} = urlencode($val); } // create variables from request
+	foreach ($incoming as $key => $val) { ${$key} = addslashes($val); } // create variables from request
 	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
