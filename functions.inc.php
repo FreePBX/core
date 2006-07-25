@@ -158,9 +158,15 @@ function core_get_config($engine) {
 						}
 					}
 
-					//sub a blank extension with 's'
+					// Start inbound processing. Unneeded line to be possibly overridden by something in 
+					// extensions_custom.conf
 					$ext->add($context, $exten, '', new ext_setvar('FROM_DID',$exten));
-					
+
+					// If we require RINGING, signal it as soon as we enter.
+					if ($item['ringing'] === "CHECKED") {
+						$ext->add($context, $exten, '', new ext_ringing(''));
+					}
+
 					if ($exten == "s" && $context == "ext-did") {  
 						//if the exten is s, then also make a catchall for undefined DIDs if it's not a zaptel route
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
@@ -410,7 +416,7 @@ function core_did_add($incoming){
 	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\", \"$channel\")";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing) values (\"$cidnum\",\"$extension\",\"$destination\",\"$faxexten\",\"$faxemail\",\"$answer\",\"$wait\",\"$privacyman\",\"$alertinfo\", \"$channel\", \"$ringing\")";
 		sql($sql);
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
