@@ -29,6 +29,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['TRUNK_OPTIONS'],'TRUNK_OPTIONS'),
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
+						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						);
 
@@ -116,9 +117,12 @@ foreach ($globals as $global) {
 		<option value="both" <?php  echo ($DIRECTORY == 'both' ? 'SELECTED' : '')?>><?php echo _("first or last name")?>
 	</select> 
 	<br><br>
-	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Play extension number")?><span><?php echo _("Plays a message \"Please hold while I transfer you to extension xxx\" that lets the caller know what extension to use in the future.")?></span></a> <?php echo _("to caller before transferring call")?>
+	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Play extension number")?><span><?php echo _("Plays a message \"Please hold while I transfer you to extension xxx\" that lets the caller know what extension to use in the future.")?></span></a> <?php echo _("to caller before transferring call")?><br><br>
+	<a href=# class="info"><?php echo _("Operator Extension:")?><span>
+	<?php echo _("When users hit '0' in the directory, they are put through to this number. Note that it"); ?>
+	<?php echo _(" does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
+	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>"/>
 </p>
-
 <h5><?php echo _("Fax Machine")?></h5>
 <p>
 	<?php echo _("Extension of")?> <a class="info" href="#"><?php echo _("fax machine")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br>Selecting 'disabled' will result in incoming calls being answered more quickly.")?></span></a> <?php echo _("for receiving faxes:")?>
