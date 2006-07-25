@@ -134,7 +134,7 @@ function core_get_config($engine) {
 			}
 			
 			/* Always have Fax detection in ext-did, no matter what */
-			$ext->add('ext-did', 'fax', , new ext_goto('1','in_fax','ext-fax'));
+			$ext->add('ext-did', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 
 			/* inbound routing extensions */
 			$didlist = core_did_list();
