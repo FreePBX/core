@@ -144,8 +144,18 @@ switch ($action) {
 			$xmldata = $xml->getUnserializedData();
 
 			if (isset($xmldata['lca-data']['prefix'])) {
+				// we do the loops separately so patterns are grouped together
+				
+				// always drop 1 prefix
+				$dialpattern[] = '1|NXXNXXXXXX';
+				
+				// match NPA+NXX
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
 					$dialpattern[] = $prefix['npa'].$prefix['nxx'].'XXXX';
+				}
+				// add NPA to 7-digits
+				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+					$dialpattern[] = $prefix['npa'].'+'.$prefix['nxx'].'XXXX';
 				}
 
 				// check for duplicates, and re-sequence

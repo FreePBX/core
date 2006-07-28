@@ -109,13 +109,31 @@ switch ($action) {
 			$xmldata = $xml->getUnserializedData();
 
 			if (isset($xmldata['lca-data']['prefix'])) {
-				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-					if ($action == 'populatenpanxx10') {
-						// 10 digit dialing
-						$dialrules[] = '1|'.$prefix['npa'].$prefix['nxx'].'XXXX';
-					} else {
-						$dialrules[] = '1'.$prefix['npa'].'|'.$prefix['nxx'].'XXXX';
+				
+				if ($action == 'populatenpanxx10') {
+					// 10 digit dialing
+					// - add area code to 7 digits
+					// - match local 10 digits
+					// - add 1 to anything else
+					$dialrules[] = $matches[1].'NXXXXXX';
+					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+						$dialrules[] = $prefix['npa'].$prefix['nxx'].'XXXX';
 					}
+					// if a number was not matched as local, dial it with '1' prefix
+					$dialrules[] = '1+NXXNXXXXXX';
+				} else {
+					// 7 digit dialing
+					// - drop area code from local numbers
+					// - match local 7 digit numbers
+					// - add 1 to everything else
+					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+						$dialrules[] = $prefix['npa'].'|'.$prefix['nxx'].'XXXX';
+					}
+					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+						$dialrules[] = $prefix['nxx'].'XXXX';
+					}
+					$dialrules[] = '1+NXXNXXXXXX';
+					$dialrules[] = '1'.$matches[1].'+NXXXXXX';
 				}
 
 				// check for duplicates, and re-sequence
@@ -332,15 +350,15 @@ if (!$tech && !$extdisplay) {
 				<td>
 					<a href=# class="info"><?php echo _("Dial rules wizards")?><span>
 					<strong><?php echo _("Always add prefix to local numbers")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
-					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"16135551234\", it can be converted to \"555-1234\".")?><br>
-					<strong><?php echo _("Lookup and remove local prefixes")?></strong> <?php echo _("is the same as Remove prefix from local numbers, but uses the database at http://members.dandy.net/~czg/search.html to find your local calling area (NA-only)")?><br>
+					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
+					<strong><?php echo _("Setup dialing for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+areacode for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
 				</td><td valign="top">&nbsp;&nbsp;<select id="autopop" name="autopop" onChange="changeAutoPop(); ">
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always add prefix to local numbers")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
-						<option value="lookup7"><?php echo _("Lookup and remove local prefixes (7-digit dialing)")?></option>
-						<option value="lookup10"><?php echo _("Lookup and remove local prefixes (10-digit dialing)")?></option>
+						<option value="lookup7"><?php echo _("Setup dialing for local trunk (7-digit dialing)")?></option>
+						<option value="lookup10"><?php echo _("Setup dialing for local trunk (10-digit dialing)")?></option>
 					</select>
 				</td>
 			</tr>
