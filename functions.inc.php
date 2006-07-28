@@ -1114,7 +1114,8 @@ function core_users_del($extension,$incontext,$uservm){
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-	
+
+	$uservm = getVoicemail();
 	//take care of voicemail.conf
 	unset($uservm[$incontext][$extension]);
 	saveVoicemail($uservm);
