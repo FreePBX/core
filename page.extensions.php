@@ -275,6 +275,82 @@ drawListMenu($devices, isset($_REQUEST['skip'])?$_REQUEST['skip']:0, $dispnum, i
 				</select>
 			</td>
 		</tr>
+
+			<td><br></td>
+
+		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
+		<tr>
+			<td>
+				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.")?></span></a>:
+			</td>
+			<td>&nbsp;
+				<select name="faxexten">
+<?php 
+// Cleaning up warnings. I should do this a better way.
+if (!isset($faxexten))
+	$faxexten = null;
+if (!isset($faxemail))
+	$faxemail = null;
+if (!isset($answer))
+	$answer = '0';
+?>
+					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
+					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
+					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
+			<?php 
+				//get unique devices
+				$devices = core_devices_list();
+				if (isset($devices)) {
+					foreach ($devices as $device) {
+						echo '<option value="'.$device[0].'" '.($faxexten == $device[0] ? 'SELECTED' : '').'>'.$device[1].' &lt;'.$device[0].'&gt;';
+					}
+				}
+			?>	
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings.")?></span></a>:
+			</td>
+			<td>
+				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Fax Detection Type")?><span><?php echo _('Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.')?></span></a>:</td>
+			<td>&nbsp;
+				<select name="answer">
+					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("None")?>
+					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Zaptel")?>
+					<option value="2" <?php  echo ($answer == '2' ? 'SELECTED' : '')?>><?php echo _("NVFax")?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
+			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
+		</tr>
+		<tr>
+			<td><br></td>
+		</tr>
+<?php
+if (!isset($privacyman))
+	$privacyman = '0';
+?>
+		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
+			<td>
+				<select name="privacyman">
+					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
+					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><br></td>
+		</tr>		
 		
 		<tr>
 			<td colspan="2">

@@ -264,7 +264,7 @@ function core_get_config($engine) {
  			 * in extensions_custom.conf and it should look something like:
  			 *
  			 * [from-did-direct]
- 			 * include => ext-grouppersonal
+ 			 * include => ext-findmefollow
  			 * include => ext-local
  			 *
  			 * This is so that personal ring groups are used if they exist for the direct did and if not, then the local extension.
@@ -273,16 +273,41 @@ function core_get_config($engine) {
 
 			$directdidlist = core_directdid_list();
 			if(is_array($directdidlist)){
+				$context = "ext-did-direct";
+				/* Always have Fax detection in ext-did, no matter what */
+				$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 				foreach($directdidlist as $item) {
 					$exten = $item['directdid'];
-					$ext->add('ext-did-direct', $exten, '', new ext_setvar('FROM_DID',$exten));
+					$ext->add($context, $exten, '', new ext_setvar('FROM_DID',$exten));
+
+					
+					if ($item['faxexten'] != "default") {
+						$ext->add($context, $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
+					}
+					if (!empty($item['faxemail'])) {
+						$ext->add($context, $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
+					}
+					if ($item['answer'] == "1") {
+						$ext->add($context, $exten, '', new ext_answer(''));
+						$ext->add($context, $exten, '', new ext_wait($item['wait']));
+					}
+					if ($item['answer'] == "2") { // NVFaxDetect
+						$ext->add($context, $exten, '', new ext_answer(''));
+						$ext->add($context, $exten, '', new ext_playtones('ring'));
+						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']));
+					}
+					if ($item['privacyman'] == "1") {
+						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
+					}
+
+
 					if (!empty($item['didalert'])) {
-						$ext->add('ext-did-direct', $exten, '', new ext_setvar("_ALERT_INFO", $item['didalert']));
+						$ext->add($context, $exten, '', new ext_setvar("_ALERT_INFO", $item['didalert']));
 					}
 					$goto_context = 'from-did-direct';
 					$goto_exten = $item['extension'];
 					$goto_pri = 1;
-					$ext->add('ext-did-direct', $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
 
 				}
 			}
@@ -980,7 +1005,7 @@ function core_users_add($vars,$vmcontext) {
 
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -999,9 +1024,21 @@ function core_users_add($vars,$vmcontext) {
 	$sql.= isset($directdid)?$directdid:'';
 	$sql.= "\", \"";
 	$sql.= isset($didalert)?$didalert:'';
+
+	$sql.= "\", \"";
+	$sql.= isset($faxexten)?$faxexten:'';
+	$sql.= "\", \"";
+	$sql.= isset($faxemail)?$faxemail:'';
+	$sql.= "\", \"";
+	$sql.= isset($answer)?$answer:'';
+	$sql.= "\", \"";
+	$sql.= isset($wait)?$wait:'';
+	$sql.= "\", \"";
+	$sql.= isset($privacyman)?$privacyman:'';
+
 	$sql.= "\")";
 	sql($sql);
-	
+
 	//write to astdb
 	$astman = new AGI_AsteriskManager();
 	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
@@ -1165,9 +1202,10 @@ function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){
 }
 
 function core_directdid_list(){
-	$sql = "SELECT extension, directdid, didalert FROM users WHERE directdid IS NOT NULL AND directdid != ''";
+	$sql = "SELECT extension, directdid, didalert, faxexten, faxemail, answer, wait, privacyman FROM users WHERE directdid IS NOT NULL AND directdid != ''";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
+
 
 
 /* end page.users.php functions */
