@@ -370,6 +370,7 @@ switch(strtolower($tech)) {
 			'echocancel' => 'yes',
 			'echocancelwhenbridged' => 'no',
 			'echotraining' => '800',
+			'immediate' => 'no',			
 			'busydetect' => 'no',
 			'busycount' => '7',
 			'callprogress' => 'no',
