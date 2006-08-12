@@ -31,6 +31,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
+						array(isset($_REQUEST['VM_OPTS']) ? $_REQUEST['VM_OPTS'] : "",'VM_OPTS'),
 						);
 
 	$compiled = $db->prepare('UPDATE globals SET value = ? WHERE variable = ?');
@@ -106,6 +107,8 @@ foreach ($globals as $global) {
 	<?php echo _("Use the specified amount of gain when recording the voicemail message."); ?><br><br>
 	<?php echo _("The units are whole-number decibels (dB)."); ?></span></a>
 	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>"/>
+	<br><br>
+	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo ($VM_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Do Not Play")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a> <?php echo _("please leave message after tone to caller")?>
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>
