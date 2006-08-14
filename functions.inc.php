@@ -360,6 +360,8 @@ function core_get_config($engine) {
 					//if emergencyroute, then set channel var
 					if(strpos($exten['args'],"EMERGENCYROUTE") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
+					if(strpos($exten['args'],"INTRACOMPANYROUTE") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("INTRACOMPANYROUTE",substr($exten['args'],18)));
 					if(strpos($exten['args'],"dialout-trunk") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					if(strpos($exten['args'],"dialout-enum") !== false)
@@ -1793,7 +1795,7 @@ function core_routing_setroutepriorityvalue($key)
 }
 
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "") {
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "") {
 	global $db;
 
 	$trunktech=array();
@@ -1856,6 +1858,22 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			}
 		} else {
 			$startpriority = 0;
+		}
+
+		// Next Priority (either first or second depending on above)
+		if(!empty($intracompany)) {
+			   $startpriority += 1;
+			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
+			   $sql .= "('outrt-".$name."', ";
+			   $sql .= "'".$pattern."', ";
+			   $sql .= "'".$startpriority."', ";
+			   $sql .= "'SetVar', ";
+			   $sql .= "'INTRACOMPANYROUTE=YES', ";
+			   $sql .= "'Preserve Intenal CID Info')";
+			   $result = $db->query($sql);
+				if(DB::IsError($result)) {
+					   die($result->getMessage());
+				}
 		}
 
 		$first_trunk = 1;
@@ -1939,9 +1957,9 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 }
 
-function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="") {
+function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "") {
 	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency);
+	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany);
 }
 
 function core_routing_del($name) {
@@ -2075,6 +2093,23 @@ function core_routing_getrouteemergency($route) {
 	}
 	
 	return $emergency;
+}
+
+//get intracompany routing status for this route
+function core_routing_getrouteintracompany($route) {
+
+       global $db;
+       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'INTRACOMPANYROUTE%') ";
+       $results = $db->getOne($sql);
+       if(DB::IsError($results)) {
+               die($results->getMessage());
+       }
+       if (preg_match('/^.*=(.*)/', $results, $matches)) {
+               $intracompany = $matches[1];
+       } else {
+               $intracompany = "";
+       }
+       return $intracompany;
 }
 
 function general_get_zonelist() {

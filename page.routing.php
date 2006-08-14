@@ -84,11 +84,12 @@ if (isset($_REQUEST["trunkpriority"])) {
 $routename = isset($_REQUEST["routename"]) ? $_REQUEST["routename"] : "";
 $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
 $emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
+$intracompany = isset($_REQUEST["intracompany"]) ? $_REQUEST["intracompany"] : "";
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany);
 		needreload();
 		$extdisplay = ''; // resets back to main screen
 		$routename = ''; // resets back to main screen
@@ -97,7 +98,7 @@ switch ($action) {
 		$trunkpriority=array();
 	break;
 	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany);
 		needreload();
 	break;
 	case "delroute":
@@ -251,6 +252,10 @@ if ($extdisplay) {
 		$emergency = core_routing_getrouteemergency($extdisplay);
 	}
 	
+	if (!isset($_REQUEST["intracompany"])) {
+		$intracompany = core_routing_getrouteintracompany($extdisplay);
+	}
+	
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
 	echo "<h2>"._("Add Route")."</h2>";
@@ -312,6 +317,10 @@ if ($extdisplay) { // editing
 		<tr>
 			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>:</td>
 			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?> /></td>
+		</tr>
+		<tr>
+			<td><a href=# class="info"><?php echo _("Intra Company Route")?><span><?php echo _("Optional: Selecting this option will treat this route as a intra-company connection, preserving the internal Caller ID information and not use the outbound CID of either the extension or trunk.</span>")?></a>:</td>
+			<td><input type="checkbox" name="intracompany" value="yes" <?php echo ($intracompany ? "CHECKED" : "") ?> /></td>
 		</tr>
 		<tr>
 			<td colspan="2">
