@@ -2187,7 +2187,27 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', 'On Demand');
 		$currentcomponent->addoptlistitem('recordoptions', 'Always', 'Always');
 		$currentcomponent->addoptlistitem('recordoptions', 'Never', 'Never');
-						
+
+		$currentcomponent->addoptlistitem('faxdetecttype', '0', 'None');
+		$currentcomponent->addoptlistitem('faxdetecttype', '1', 'Zaptel');
+		$currentcomponent->addoptlistitem('faxdetecttype', '2', 'NVFax');
+
+		$currentcomponent->addoptlistitem('privyn', '0', 'No');
+		$currentcomponent->addoptlistitem('privyn', '1', 'Yes');
+		$currentcomponent->setoptlistopts('privyn', 'sort', false);
+
+		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'freePBX default');
+		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', 'disabled');
+		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
+
+		//get unique devices to finishoff faxdestoptions list
+		$devices = core_devices_list();
+		if (isset($devices)) {
+			foreach ($devices as $device) {
+				$currentcomponent->addoptlistitem('faxdestoptions', $device[0], "$device[1] <$device[0]>");
+			}
+		}
+
 		// Add the 'proces' function
 		$currentcomponent->addguifunc('core_users_configpageload');
 		$currentcomponent->addprocessfunc('core_users_configprocess');			
@@ -2214,6 +2234,9 @@ function core_users_configpageload() {
 	
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 			$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+	                // Effectively this should go here: echo $module_hook->hookHtml;
+			// However that is achieved with these new modulehooks???
+
 		} else {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add User/Extension'), 0);
 		}
@@ -2250,6 +2273,26 @@ function core_users_configpageload() {
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
 		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', "Record all outbound calls received at this extension.", false));
+
+		// TODO: NEED TO FIND THE RIGHT PLACE TO CHECK THESE
+		//
+		// TODO: Also Need to find how to set defaults on the gui elements below
+		//
+		array($account,'faxeten',(isset($_REQUEST['faxeten']))?$_REQUEST['faxeten']:null);
+		array($account,'faxemail',(isset($_REQUEST['faxemail']))?$_REQUEST['faxemail']:null);
+		array($account,'answer',(isset($_REQUEST['answer']))?$_REQUEST['answer']:'0');
+		array($account,'wait',(isset($_REQUEST['wait']))?$_REQUEST['wait']:'0');
+		array($account,'privacyman',(isset($_REQUEST['privacyman']))?$_REQUEST['privacyman']:'0');
+
+		$section = 'Fax Handling';
+		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.", false));
+		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', "Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings"));
+		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', "Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.", false));
+		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', 'The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.', '!isInteger()', $msgInvalidPause, false));
+
+		$section = 'Privacy';
+		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', "If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.", false));
+
 	}
 }
 
@@ -2369,6 +2412,7 @@ function voicemail_users_configpageload() {
 		$msgInvalidEmail = 'Please enter a valid Email Address';
 		$msgInvalidPager = 'Please enter a valid Pager Email Address';
 		$msgInvalidVMContext = 'VM Context cannot be blank';
+		$msgInvalidPause = 'Please enter a valid pause time in seconds, using digits only';
 
 		$section = 'Voicemail & Directory';
 		$currentcomponent->addguielem($section, new gui_selectbox('vm', $currentcomponent->getoptlist('vmena'), $vmselect, 'Status', '', false));
