@@ -18,6 +18,12 @@ $fcc->setDefault('888');
 $fcc->update();
 unset($fcc);
 
+$fcc = new featurecode('core', 'chanspy');
+$fcc->setDescription('ChanSpy');
+$fcc->setDefault('555');
+$fcc->update();
+unset($fcc);
+
 $fcc = new featurecode('core', 'simu_pstn');
 $fcc->setDescription('Simulate Incoming Call');
 $fcc->setDefault('7777');

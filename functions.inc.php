@@ -72,6 +72,10 @@ function core_get_config($engine) {
 			$fc_zapbarge = $fcc->getCodeActive();
 			unset($fcc);
 
+			$fcc = new featurecode($modulename, 'chanspy');
+			$fc_chanspy = $fcc->getCodeActive();
+			unset($fcc);
+
 			$fcc = new featurecode($modulename, 'simu_pstn');
 			$fc_simu_pstn = $fcc->getCodeActive();
 			unset($fcc);
@@ -124,6 +128,16 @@ function core_get_config($engine) {
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_wait(1));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_zapbarge(''));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_hangup(''));
+			}
+
+			// chan spy
+			if ($fc_chanspy != '') {
+				$ext->addInclude('from-internal-additional', 'app-chanspy'); // Add the include from from-internal
+				$ext->add('app-chanspy', $fc_chanspy, '', new ext_macro('user-callerid'));
+				$ext->add('app-chanspy', $fc_chanspy, '', new ext_answer(''));
+				$ext->add('app-chanspy', $fc_chanspy, '', new ext_wait(1));
+				$ext->add('app-chanspy', $fc_chanspy, '', new ext_chanspy(''));
+				$ext->add('app-chanspy', $fc_chanspy, '', new ext_hangup(''));
 			}
 			
 			// Simulate options (ext-test)
