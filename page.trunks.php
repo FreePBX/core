@@ -312,7 +312,7 @@ if (!$tech && !$extdisplay) {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>. You can also use the magic string 'hidden' to hide the CallerID sent out over ISDN lines ONLY (E1/T1/J1/BRI)")?><br><br></span></a>: 
 				</td><td>
 					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>"/>
 				</td>
