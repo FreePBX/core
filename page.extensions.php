@@ -36,7 +36,7 @@ if (!isset($outboundcid)) $outboundcid='';
 checkAstMan();
 
 //read in the voicemail.conf and set appropriate variables for display
-$uservm = getVoicemail();
+$uservm = voicemail_getVoicemail();
 $vmcontexts = array_keys($uservm);
 $vm=false;
 foreach ($vmcontexts as $vmcontext) {
@@ -105,7 +105,7 @@ if (isset($extension) && !checkRange($extension)){
 			core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
 			core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
 			// Need to re-propogate all the vm info here, because it could have changed
-			$uservm = getVoicemail();
+			$uservm = voicemail_getVoicemail();
 			$vmcontexts = array_keys($uservm);
 			$vm=false;
 			foreach ($vmcontexts as $vmcontext) {
