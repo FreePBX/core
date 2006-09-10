@@ -14,9 +14,9 @@ function core_destinations() {
 	//get the list of meetmes
 	$results = core_users_list();
 	
-	if (isset($results)) {
+	if (isset($results) && function_exists('voicemail_getVoicemail')) {
 		//get voicemail
-		$uservm = getVoicemail();
+		$uservm = voicemail_getVoicemail();
 		$vmcontexts = array_keys($uservm);
 		foreach ($results as $thisext) {
 			$extnum = $thisext[0];
@@ -979,7 +979,7 @@ function core_users_list() {
 	}
 }
 
-function core_users_add($vars,$vmcontext) {
+function core_users_add($vars) {
 	extract($vars);
 	
 	global $db;
@@ -1005,10 +1005,14 @@ function core_users_add($vars,$vmcontext) {
 	}
 
 	//if voicemail is enabled, set the box@context to use
-	if(isset($vm) && $vm == "enabled") {
-		$voicemail = $vmcontext;
-	} else {
-		$voicemail = "disabled";
+	//havn't checked but why is voicemail needed on users anyway?  Doesn't exactly make it modular !
+	if ( function_exists('voicemail_mailbox_get') ) {
+		$vmbox = voicemail_mailbox_get($extension);
+		if ( $vmbox == null ) {
+			$voicemail = "disabled";
+		} else {
+			$voicemail = $vmbox['vmcontext'];
+		}
 	}
 
 	// MODIFICATION: (PL)
@@ -1017,9 +1021,7 @@ function core_users_add($vars,$vmcontext) {
 	// cleanup any non dial pattern characters prior to inserting into the database
 	// then add directdid to the insert command.
 	//
-        $directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
-
-
+    $directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 	
 	//insert into users table
 	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman) values (\"";
@@ -1073,54 +1075,7 @@ function core_users_add($vars,$vmcontext) {
 		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
-	}
-	
-/*	//write to extensions table - AMP2 will not do this
-	//update ext-local context in extensions.conf
-	
-	//warning: as of 009 we aren't allowing a user to use any mailbox but their own 
-	//This may affect some upgraders as it is possible in previous versions!
-	//$mailb = ($vm == 'disabled' || $mailbox == '') ? 'novm' : $mailbox;
-	$mailb = ($vm == 'disabled') ? 'novm' : $extension;
-	
-	addaccount($extension,$mailb);*/
-	
-	/*core_hint_add($extension);*/
-	
-	
-	//take care of voicemail.conf if using voicemail
-	$uservm = getVoicemail();
-	unset($uservm[$incontext][$account]);
-	
-	if ($vm != 'disabled')
-	{ 
-		// need to check if there are any options entered in the text field
-		if ($_REQUEST['options']!=''){
-			$options = explode("|",$_REQUEST['options']);
-			foreach($options as $option) {
-				$vmoption = explode("=",$option);
-				$vmoptions[$vmoption[0]] = $vmoption[1];
-			}
-		}
-		$vmoption = explode("=",$attach);
-			$vmoptions[$vmoption[0]] = $vmoption[1];
-		$vmoption = explode("=",$saycid);
-			$vmoptions[$vmoption[0]] = $vmoption[1];
-		$vmoption = explode("=",$envelope);
-			$vmoptions[$vmoption[0]] = $vmoption[1];
-		$vmoption = explode("=",$delete);
-			$vmoptions[$vmoption[0]] = $vmoption[1];
-			
-		$uservm[$vmcontext][$extension] = array(
-			'mailbox' => $extension, 
-			'pwd' => $vmpwd,
-			'name' => $name,
-			'email' => $email,
-			'pager' => $pager,
-			'options' => $vmoptions
-		);
-	}
-	saveVoicemail($uservm);
+	}	
 }
 
 function core_users_get($extension){
@@ -1142,7 +1097,7 @@ function core_users_get($extension){
 	return $results;
 }
 
-function core_users_del($extension,$incontext,$uservm){
+function core_users_del($extension){
 	global $db;
 	global $amp_conf;
 	
@@ -1168,18 +1123,6 @@ function core_users_del($extension,$incontext,$uservm){
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-
-	$uservm = getVoicemail();
-	//take care of voicemail.conf
-	unset($uservm[$incontext][$extension]);
-	saveVoicemail($uservm);
-	
-	/*	
-	//delete the extension info from extensions table
-	delextensions('ext-local',$extension);
-	*/
-	/*//delete hint
-	core_hint_del($extension);*/
 }
 
 function core_users_cleanastdb($extension) {
@@ -1199,7 +1142,7 @@ function core_users_cleanastdb($extension) {
 	}
 }
 
-function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){
+function core_users_edit($extension,$vars){
 	global $db;
 	global $amp_conf;
 	
@@ -1213,8 +1156,8 @@ function core_users_edit($extension,$vars,$vmcontext,$incontext,$uservm){
 	}
 	
 	//delete and re-add
-	core_users_del($extension,$incontext,$uservm);
-	core_users_add($vars,$vmcontext);
+	core_users_del($extension);
+	core_users_add($vars);
 	
 }
 
@@ -2225,7 +2168,11 @@ function core_users_configpageinit($dispnum) {
 
 		// Add the 'proces' function
 		$currentcomponent->addguifunc('core_users_configpageload');
-		$currentcomponent->addprocessfunc('core_users_configprocess');			
+		// Ensure users is called in middle order ($sortorder = 5), this is to allow
+		// other modules to call stuff before / after the processing of users if needed
+		// e.g. Voicemail module needs to create mailbox BEFORE the users as the mailbox
+		// context is needed by the add users function
+		$currentcomponent->addprocessfunc('core_users_configprocess', 5);			
 	}
 }
 
@@ -2315,25 +2262,23 @@ function core_users_configprocess() {
 	if (isset($extension) && !checkRange($extension)){
 		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
 	} else {
-	
 		//if submitting form, update database
 		switch ($action) {
 			case "add":
-				core_users_add($_REQUEST,$vmcontext);
+				core_users_add($_REQUEST);
 				needreload();
 			break;
 			case "del":
-				core_users_del($extdisplay,$incontext,$uservm);
+				core_users_del($extdisplay);
 				core_users_cleanastdb($extdisplay);
 				needreload();
 			break;
 			case "edit":
-				core_users_edit($extdisplay,$_REQUEST,$vmcontext,$incontext,$uservm);
+				core_users_edit($extdisplay,$_REQUEST);
 				needreload();
 			break;
 		}
 	}
-
 }
 
 ?>

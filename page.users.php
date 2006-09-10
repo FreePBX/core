@@ -44,9 +44,5 @@ function checkBlankUserPwd() {
 	return true;
 }
 
-function isVoiceMailEnabled(notused) {
-	return (theForm.vm.value == "enabled");
-}
-
 //-->
 </script>
