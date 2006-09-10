@@ -771,26 +771,45 @@ function core_devices_addsip($account) {
 	global $db;
 	global $currentFile;
 
-	$sipfields = array(array($account,'account',$account),
-	array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
-	array($account,'secret',(isset($_REQUEST['secret']))?$_REQUEST['secret']:''),
-	array($account,'canreinvite',(isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),
-	array($account,'context',(isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),
-	array($account,'dtmfmode',(isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),
-	array($account,'host',(isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),
-	array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),
-	array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),
-	array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account),
-	array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'never'),
-	array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),
-	array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'no'),
-	array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
-	array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
-	array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),
-	array($account,'allow',(isset($_REQUEST['allow']))?$_REQUEST['allow']:''),
-	array($account,'record_in',(isset($_REQUEST['record_in']))?$_REQUEST['record_in']:'On-Demand'),
-	array($account,'record_out',(isset($_REQUEST['record_out']))?$_REQUEST['record_out']:'On-Demand'),
-	array($account,'callerid',(isset($_REQUEST['description']))?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
+	foreach ($_REQUEST as $req=>$data) {
+		if ( substr($req, 0, 8) == 'devinfo_' ) {
+			$keyword = substr($req, 8);
+			$sipfields[] = array($account, $keyword, $data);
+		}
+	}
+	
+	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
+		$sipfields = array(
+			//array($account,'account',$account),
+			array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
+			array($account,'secret',(isset($_REQUEST['secret']))?$_REQUEST['secret']:''),
+			array($account,'canreinvite',(isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),
+			array($account,'context',(isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),
+			array($account,'dtmfmode',(isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),
+			array($account,'host',(isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),
+			array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),
+			array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),
+			array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account),
+			array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'never'),
+			array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),
+			array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'no'),
+			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
+			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
+			array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),
+			array($account,'allow',(isset($_REQUEST['allow']))?$_REQUEST['allow']:'')
+			//array($account,'record_in',(isset($_REQUEST['record_in']))?$_REQUEST['record_in']:'On-Demand'),
+			//array($account,'record_out',(isset($_REQUEST['record_out']))?$_REQUEST['record_out']:'On-Demand'),
+			//array($account,'callerid',(isset($_REQUEST['description']))?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>')
+		);
+	}
+
+	// Very bad
+	$sipfields[] = array($account,'account',$account);	
+	$sipfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	
+	// Where is this in the interface ??????
+	$sipfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
+	$sipfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand');
 
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
@@ -827,23 +846,42 @@ function core_devices_addiax2($account) {
 	global $db;
 	global $currentFile;
 	
-	$iaxfields = array(array($account,'account',$account),
-	array($account,'secret',($_REQUEST['secret'])?$_REQUEST['secret']:''),
-	array($account,'notransfer',($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),
-	array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
-	array($account,'host',($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),
-	array($account,'type',($_REQUEST['type'])?$_REQUEST['type']:'friend'),
-	array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
-	array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
-	array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569'),
-	array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'no'),
-	array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
-	array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
-	array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),
-	array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),
-	array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
-	array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
+	foreach ($_REQUEST as $req=>$data) {
+		if ( substr($req, 0, 8) == 'devinfo_' ) {
+			$keyword = substr($req, 8);
+			$iaxfields[] = array($account, $keyword, $data);
+		}
+	}
+	
+	if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
+		$iaxfields = array(
+			//array($account,'account',$account),
+			array($account,'secret',($_REQUEST['secret'])?$_REQUEST['secret']:''),
+			array($account,'notransfer',($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),
+			array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
+			array($account,'host',($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),
+			array($account,'type',($_REQUEST['type'])?$_REQUEST['type']:'friend'),
+			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
+			array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
+			array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569'),
+			array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'no'),
+			array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
+			array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
+			array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:'')
+			//array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),
+			//array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
+			//array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>')
+		);
+	}
 
+	// Very bad
+	$iaxfields[] = array($account,'account',$account);	
+	$iaxfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	
+	// Where is this in the interface ??????
+	$iaxfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
+	$iaxfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand');
+	
 	$compiled = $db->prepare('INSERT INTO iax (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$iaxfields);
 	if(DB::IsError($result)) {
@@ -878,23 +916,41 @@ function core_devices_addzap($account) {
 	global $db;
 	global $currentFile;
 	
-	$zapfields = array(
-	array($account,'account',$account),
-	array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
-	array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
-	array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),
-	array($account,'signalling',($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks'),
-	array($account,'echocancel',($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes'),
-	array($account,'echocancelwhenbridged',($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no'),
-	array($account,'immediate',($_REQUEST['immediate'])?$_REQUEST['immediate']:'no'),	
-	array($account,'echotraining',($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800'),
-	array($account,'busydetect',($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no'),
-	array($account,'busycount',($_REQUEST['busycount'])?$_REQUEST['busycount']:'7'),
-	array($account,'callprogress',($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no'),
-	array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),	
-	array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
-	array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
-	array($account,'channel',($_REQUEST['channel'])?$_REQUEST['channel']:''));
+	foreach ($_REQUEST as $req=>$data) {
+		if ( substr($req, 0, 8) == 'devinfo_' ) {
+			$keyword = substr($req, 8);
+			$zapfields[] = array($account, $keyword, $data);
+		}
+	}
+	
+	if ( !is_array($zapfields) ) { // left for compatibilty....lord knows why !
+		$zapfields = array(
+			//array($account,'account',$account),
+			array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
+			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
+			//array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),
+			array($account,'signalling',($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks'),
+			array($account,'echocancel',($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes'),
+			array($account,'echocancelwhenbridged',($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no'),
+			array($account,'immediate',($_REQUEST['immediate'])?$_REQUEST['immediate']:'no'),	
+			array($account,'echotraining',($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800'),
+			array($account,'busydetect',($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no'),
+			array($account,'busycount',($_REQUEST['busycount'])?$_REQUEST['busycount']:'7'),
+			array($account,'callprogress',($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no'),
+			//array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),	
+			//array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
+			array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
+			array($account,'channel',($_REQUEST['channel'])?$_REQUEST['channel']:'')
+		);
+	}
+
+	// Very bad
+	$zapfields[] = array($account,'account',$account);	
+	$zapfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	
+	// Where is this in the interface ??????
+	$zapfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
+	$zapfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand');
 
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zapfields);
@@ -2135,6 +2191,7 @@ function general_generate_indications() {
 /* end page.routing.php functions */
 
 
+
 // init registered 'your' config load and config process functions
 function core_users_configpageinit($dispnum) {
 	global $currentcomponent;
@@ -2145,10 +2202,12 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', 'On Demand');
 		$currentcomponent->addoptlistitem('recordoptions', 'Always', 'Always');
 		$currentcomponent->addoptlistitem('recordoptions', 'Never', 'Never');
+		$currentcomponent->setoptlistopts('recordoptions', 'sort', false);
 
 		$currentcomponent->addoptlistitem('faxdetecttype', '0', 'None');
 		$currentcomponent->addoptlistitem('faxdetecttype', '1', 'Zaptel');
 		$currentcomponent->addoptlistitem('faxdetecttype', '2', 'NVFax');
+		$currentcomponent->setoptlistopts('faxdetecttype', 'sort', false);
 
 		$currentcomponent->addoptlistitem('privyn', '0', 'No');
 		$currentcomponent->addoptlistitem('privyn', '1', 'Yes');
@@ -2157,6 +2216,7 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'freePBX default');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', 'disabled');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
+		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
 
 		//get unique devices to finishoff faxdestoptions list
 		$devices = core_devices_list();
@@ -2166,7 +2226,7 @@ function core_users_configpageinit($dispnum) {
 			}
 		}
 
-		// Add the 'proces' function
+		// Add the 'proces' functions
 		$currentcomponent->addguifunc('core_users_configpageload');
 		// Ensure users is called in middle order ($sortorder = 5), this is to allow
 		// other modules to call stuff before / after the processing of users if needed
@@ -2221,7 +2281,7 @@ function core_users_configpageload() {
 		} else {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false));
 		}
-		$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', "A user will enter this password when logging onto a device. $fc_logon logs into a device.  $fc_logoff logs out of a device.", '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
+		$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
 		// extra JS function check required for blank password warning -- call last in the onsubmit() function
 		$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name.', '!isCallerID()', $msgInvalidOutboundCID, false));
@@ -2279,6 +2339,225 @@ function core_users_configprocess() {
 			break;
 		}
 	}
+}
+
+
+function core_devices_configpageinit($dispnum) {
+	global $currentcomponent;
+
+	//if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
+	if ( $dispnum == 'devices' ) {
+		// Setup arrays for device types
+		$currentcomponent->addgeneralarray('devtechs');
+		
+		// Some errors for the validation bits
+		$msgInvalidDTMFMODE = 'Please enter the dtmfmode for this device';
+		$msgInvalidChannel = 'Please enter the channel for this device';
+		$msgConfirmSecret = 'You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?';
+		$msgInvalidSecret = 'Please enter a Secret for this device';
+		
+		// zap
+		$tmparr = array();
+		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
+		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
+		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'level' => 1);
+		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
+		$tmparr['busydetect'] = array('value' => 'no', 'level' => 1);
+		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
+		$tmparr['callprogress'] = array('value' => 'no', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
+		unset($tmparr);
+		
+		// iax2
+		$tmparr = array();
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['notransfer'] = array('value' => 'yes', 'level' => 1);
+		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
+		$tmparr['port'] = array('value' => '4569', 'level' => 1);
+		$tmparr['qualify'] = array('value' => 'no', 'level' => 1);
+		$tmparr['disallow'] = array('value' => '', 'level' => 1);
+		$tmparr['allow'] = array('value' => '', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
+		unset($tmparr);
+
+		// sip
+		$tmparr = array();
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
+		$tmparr['canreinvite'] = array('value' => 'no', 'level' => 1);
+		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
+		$tmparr['nat'] = array('value' => 'never', 'level' => 1);
+		$tmparr['port'] = array('value' => '5060', 'level' => 1);
+		$tmparr['qualify'] = array('value' => 'no', 'level' => 1);
+		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
+		$tmparr['disallow'] = array('value' => '', 'level' => 1);
+		$tmparr['allow'] = array('value' => '', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
+		unset($tmparr);
+
+		// custom
+		$tmparr = array();
+		$tmparr['dial'] = array('value' => '', 'level' => 0);
+		$currentcomponent->addgeneralarrayitem('devtechs', 'custom', $tmparr);
+		unset($tmparr);
+		
+		// Devices list
+		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', 'Other (Custom) Device');
+		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', 'Generic ZAP Device');
+		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', 'Generic IAX2 Device');
+		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', 'Generic SIP Device');
+
+		// Option lists used by the gui
+		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', 'Fixed');
+		$currentcomponent->addoptlistitem('devicetypelist', 'adhoc', 'Adhoc');
+		$currentcomponent->setoptlistopts('devicetypelist', 'sort', false);
+		
+		$currentcomponent->addoptlistitem('deviceuserlist', 'none', 'none');
+		$currentcomponent->addoptlistitem('deviceuserlist', 'new', 'New User');
+		$users = core_users_list();
+		if (isset($users)) {
+			foreach ($users as $auser) {
+				$currentcomponent->addoptlistitem('deviceuserlist', $auser[0], $auser[0]);
+			}
+		}
+		$currentcomponent->setoptlistopts('deviceuserlist', 'sort', false);
+
+		// Add the 'proces' functions
+		$currentcomponent->addguifunc('core_devices_configpageload');
+		$currentcomponent->addprocessfunc('core_devices_configprocess');
+	}
+}
+
+function core_devices_configpageload() {
+	global $currentcomponent;
+
+	// Init vars from $_REQUEST[]
+	$action = $_REQUEST['action'];
+	$extdisplay = $_REQUEST['extdisplay'];
+	$tech_hardware = $_REQUEST['tech_hardware'];
+	
+	if ( $action == 'del' ) { // Deleted
+
+		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
+
+	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
+
+		$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add Device'), 0);
+		$currentcomponent->addguielem('_top', new gui_label('instructions', 'Please select your Device below then click Submit'));
+		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', 'Device', '', false));
+
+	} else {
+
+		$deviceInfo = array();
+		if ( $extdisplay ) { // Editing
+
+			$deviceInfo = core_devices_get($extdisplay);
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
+
+			$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+			$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Device")." $extdisplay", $delURL, true, false), 0);
+
+		} else {
+
+			$tmparr = explode('_', $tech_hardware);
+			$deviceInfo['tech'] = $tmparr[0];
+			$deviceInfo['hardware'] = $tmparr[1];
+			unset($tmparr);
+			
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Device')), 0);
+
+		}
+
+		extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
+
+		// Setup vars for use in the gui later on							
+		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
+		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
+
+		$msgInvalidDevID = 'Please enter a device id.';
+		$msgInvalidDevDesc = 'Please enter a valid Description for this device';
+		$msgInvalidEmergCID = 'Please enter a valid Emergency CID';
+		
+		// Actual gui
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
+
+		$section = "Device Info";
+		if ( $extdisplay ) { // Editing
+			$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
+		} else { // Adding
+			$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, 'Device ID', 'Give your device a unique integer ID.  The device will use this ID to authenicate to the system.', '!isInteger()', $msgInvalidDevID, false));
+		}
+		$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', 'The caller id name for this device will be set to this description until it is logged into.', '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
+		$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
+		$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.').' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', 'Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting "New User", a new User Extension of the same Device ID will be set as the Default User.', false));
+		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
+		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
+
+		$section = "Device Options";
+		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
+		foreach ($devopts as $devopt=>$devoptarr) {
+			$devopname = 'devinfo_'.$devopt;
+			$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
+			$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
+			$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+			
+			if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
+				$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg));
+			} else { // add so only basic
+				$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent));
+			}
+			
+		}
+	}
+}
+
+function core_devices_configprocess() {
+	include 'common/php-asmanager.php';
+
+	//make sure we can connect to Asterisk Manager
+	checkAstMan();
+	
+	//create vars from the request
+	extract($_REQUEST);
+
+	//if submitting form, update database
+	switch ($action) {
+        case "add":
+                core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
+                needreload();
+        break;
+        case "del":
+                core_devices_del($extdisplay);
+                needreload();
+        break;
+        case "edit":  //just delete and re-add
+                core_devices_del($extdisplay);
+                core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
+                needreload();
+        break;
+        case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
+                users2astdb();
+                devices2astdb();
+        break;
+	}	
 }
 
 ?>
