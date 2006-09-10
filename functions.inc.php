@@ -545,11 +545,19 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		}
 	}
 	//unless defined, $dial is TECH/id
-	//zap is an exception
-	if (empty($dial) && strtolower($tech) == "zap")
-		$dial = "ZAP/".$_REQUEST['channel'];
-	if (empty($dial))
-		$dial = strtoupper($tech)."/".$id;
+	if ( $dial == '' ) {
+		//zap is an exception
+		if ( strtolower($tech) == "zap" ) {
+			$zapchan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
+			$dial = 'ZAP/'.$zapchan;
+		} else {
+			$dial = strtoupper($tech)."/".$id;
+		}
+	}
+	//if (empty($dial) && strtolower($tech) == "zap")
+	//	$dial = "ZAP/".($_REQUEST['channel'] != '' ? $_REQUEST['channel'] : $_REQUEST['devinfo_channel']);
+	//if (empty($dial))
+	//	$dial = strtoupper($tech)."/".$id;
 	
 	//check to see if we are requesting a new user
 	if ($user == "new") {
@@ -774,7 +782,11 @@ function core_devices_addsip($account) {
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
-			$sipfields[] = array($account, $keyword, $data);
+			if ( $keyword == 'dial' && $data == '' ) {
+				$sipfields[] = array($account, $keyword, 'SIP/'.$account);
+			} else {
+				$sipfields[] = array($account, $keyword, $data);
+			}
 		}
 	}
 	
@@ -849,7 +861,11 @@ function core_devices_addiax2($account) {
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
-			$iaxfields[] = array($account, $keyword, $data);
+			if ( $keyword == 'dial' && $data == '' ) {
+				$iaxfields[] = array($account, $keyword, 'IAX/'.$account);
+			} else {
+				$iaxfields[] = array($account, $keyword, $data);
+			}
 		}
 	}
 	
@@ -919,7 +935,12 @@ function core_devices_addzap($account) {
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
-			$zapfields[] = array($account, $keyword, $data);
+			if ( $keyword == 'dial' && $data == '' ) {
+				$zapchan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
+				$zapfields[] = array($account, $keyword, 'ZAP/'.$zapchan);
+			} else {
+				$zapfields[] = array($account, $keyword, $data);
+			}
 		}
 	}
 	
@@ -2196,8 +2217,7 @@ function general_generate_indications() {
 function core_users_configpageinit($dispnum) {
 	global $currentcomponent;
 
-	//if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
-	if ( $dispnum == 'users' ) {
+	if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 		// Setup option list we need
 		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', 'On Demand');
 		$currentcomponent->addoptlistitem('recordoptions', 'Always', 'Always');
@@ -2240,24 +2260,37 @@ function core_users_configpageload() {
 	global $currentcomponent;
 
 	// Init vars from $_REQUEST[]
+	$display = $_REQUEST['display'];
 	$action = $_REQUEST['action'];
 	$extdisplay = $_REQUEST['extdisplay'];
-	
-	if ($action == 'del') {
+
+	if ( $action == 'del' ) { // Deleted
+
 		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
+
+	} elseif ( $display == 'extensions' && ($extdisplay == '' && $_REQUEST['tech_hardware'] == '') ) { // Adding
+
+		// do nothing as you want the Devices to handle this bit
+
 	} else {
+
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 	
-		if (is_string($extdisplay)) {	
+		if ( is_string($extdisplay) ) {	
 			$extenInfo=core_users_get($extdisplay);
 			extract($extenInfo);
 			if (is_array($deviceInfo))
 				extract($deviceInfo);
 	
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
-			$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+			if ( $display == 'extensions' ) {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
+				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
+			} else {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
+				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+			}
 
-		} else {
+		} elseif ( $display != 'extensions' ) {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add User/Extension'), 0);
 		}
 		
@@ -2275,15 +2308,21 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 		
-		$section = ($extdisplay ? 'Edit User' : 'Add User');
+		if ( $display == 'extensions' ) {
+			$section = ($extdisplay ? 'Edit Extension' : 'Add Extension');			
+		} else {
+			$section = ($extdisplay ? 'Edit User' : 'Add User');
+		}
 		if ( $extdisplay ) {
 			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay));
 		} else {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false));
 		}
-		$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
-		// extra JS function check required for blank password warning -- call last in the onsubmit() function
-		$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
+		if ( $display != 'extensions' ) {
+			$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
+			// extra JS function check required for blank password warning -- call last in the onsubmit() function
+			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
+		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name.', '!isCallerID()', $msgInvalidOutboundCID, false));
 		
 		$section = 'Extension Options';
@@ -2310,7 +2349,8 @@ function core_users_configpageload() {
 }
 
 function core_users_configprocess() {
-	include 'common/php-asmanager.php';
+	if ( !class_exists('agi_asteriskmanager') )
+		include 'common/php-asmanager.php';
 	
 	//create vars from the request
 	extract($_REQUEST);
@@ -2345,8 +2385,7 @@ function core_users_configprocess() {
 function core_devices_configpageinit($dispnum) {
 	global $currentcomponent;
 
-	//if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
-	if ( $dispnum == 'devices' ) {
+	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
 		// Setup arrays for device types
 		$currentcomponent->addgeneralarray('devtechs');
 		
@@ -2448,17 +2487,23 @@ function core_devices_configpageload() {
 	global $currentcomponent;
 
 	// Init vars from $_REQUEST[]
+	$display = $_REQUEST['display'];
 	$action = $_REQUEST['action'];
 	$extdisplay = $_REQUEST['extdisplay'];
 	$tech_hardware = $_REQUEST['tech_hardware'];
 	
 	if ( $action == 'del' ) { // Deleted
 
-		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
+		if ( $display != 'extensions' )
+			$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
 
-		$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add Device'), 0);
+		if ( $display != 'extensions') {
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add Device'), 0);
+		} else {
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add an Extension'), 0);
+		}
 		$currentcomponent->addguielem('_top', new gui_label('instructions', 'Please select your Device below then click Submit'));
 		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', 'Device', '', false));
 
@@ -2468,11 +2513,14 @@ function core_devices_configpageload() {
 		if ( $extdisplay ) { // Editing
 
 			$deviceInfo = core_devices_get($extdisplay);
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
-			$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
-			$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Device")." $extdisplay", $delURL, true, false), 0);
+			if ( $display != 'extensions' ) {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
+				$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Device")." $extdisplay", $delURL, true, false), 0);
+			}
+	
 		} else {
 
 			$tmparr = explode('_', $tech_hardware);
@@ -2480,11 +2528,16 @@ function core_devices_configpageload() {
 			$deviceInfo['hardware'] = $tmparr[1];
 			unset($tmparr);
 			
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Device')), 0);
+			if ( $display != 'extensions' ) {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Device')), 0);
+			} else {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Extension')), 0);
+			}
 
 		}
 
-		extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
+		if ( is_array($deviceInfo) )
+			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
 
 		// Setup vars for use in the gui later on							
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
@@ -2493,25 +2546,31 @@ function core_devices_configpageload() {
 		$msgInvalidDevID = 'Please enter a device id.';
 		$msgInvalidDevDesc = 'Please enter a valid Description for this device';
 		$msgInvalidEmergCID = 'Please enter a valid Emergency CID';
+		$msgInvalidExtNum = 'Please enter a valid extension number.';
 		
 		// Actual gui
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
-		$section = "Device Info";
-		if ( $extdisplay ) { // Editing
-			$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
-		} else { // Adding
-			$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, 'Device ID', 'Give your device a unique integer ID.  The device will use this ID to authenicate to the system.', '!isInteger()', $msgInvalidDevID, false));
+		if ( $display != 'extensions' ) {
+			$section = 'Device Info';
+			if ( $extdisplay ) { // Editing
+				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
+			} else { // Adding
+				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, 'Device ID', 'Give your device a unique integer ID.  The device will use this ID to authenicate to the system.', '!isInteger()', $msgInvalidDevID, false));
+			}
+			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', 'The caller id name for this device will be set to this description until it is logged into.', '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
+			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.').' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), false));
+			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', 'Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting "New User", a new User Extension of the same Device ID will be set as the Default User.', false));
+		} else {
+			$section = 'Extension Options';
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', 'The caller id name for this device will be set to this description until it is logged into.', '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
-		$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
-		$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.').' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), false));
-		$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', 'Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting "New User", a new User Extension of the same Device ID will be set as the Default User.', false));
 		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
-		$section = "Device Options";
+		$section = 'Device Options';
 		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 		foreach ($devopts as $devopt=>$devoptarr) {
 			$devopname = 'devinfo_'.$devopt;
@@ -2530,7 +2589,8 @@ function core_devices_configpageload() {
 }
 
 function core_devices_configprocess() {
-	include 'common/php-asmanager.php';
+	if ( !class_exists('agi_asteriskmanager') )
+		include 'common/php-asmanager.php';
 
 	//make sure we can connect to Asterisk Manager
 	checkAstMan();
@@ -2538,6 +2598,13 @@ function core_devices_configprocess() {
 	//create vars from the request
 	extract($_REQUEST);
 
+	// fixed users only in extensions mode
+	if ( $display == 'extensions' ) {
+		$devicetype = 'fixed';
+		$deviceid = $deviceuser = $extension;
+        $description = $name;
+	}
+	
 	//if submitting form, update database
 	switch ($action) {
         case "add":
