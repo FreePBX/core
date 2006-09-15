@@ -231,6 +231,7 @@ function editGRP_onsubmit() {
 	var msgInvalidPause = "<?php echo _('Please enter a valid number for Pause after answer'); ?>";
 	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
 	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number or for advanced users, a valid Asterisk Dial Pattern\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
+	var msgConfirmDIDNoSlash = "<?php echo _('A Slash (\'/\') is never a valid DID. Please remove it and try again'); ?>";
 	
 	setDestinations(theForm,1);
 	
@@ -241,6 +242,10 @@ function editGRP_onsubmit() {
 			return false;
 	}
 	
+	if (isInside(theForm.extension.value, "/")) {
+		warnInvalid(theForm.extension, msgConfirmDIDNoSlash);
+		return false;
+	}
 	if (!isDialpattern(theForm.cidnum.value))
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
