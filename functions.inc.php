@@ -2608,7 +2608,7 @@ function core_devices_configprocess() {
 	//if submitting form, update database
 	switch ($action) {
         case "add":
-                core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
+                core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
                 needreload();
         break;
         case "del":
@@ -2617,7 +2617,7 @@ function core_devices_configprocess() {
         break;
         case "edit":  //just delete and re-add
                 core_devices_del($extdisplay);
-                core_devices_add($deviceid,$tech,$dial,$devicetype,$deviceuser,$description,$emergency_cid);
+                core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
                 needreload();
         break;
         case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
