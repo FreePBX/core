@@ -2254,15 +2254,16 @@ function core_users_configpageload() {
 	global $currentcomponent;
 
 	// Init vars from $_REQUEST[]
-	$display = $_REQUEST['display'];
-	$action = $_REQUEST['action'];
-	$extdisplay = $_REQUEST['extdisplay'];
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
+	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
+	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 
 	if ( $action == 'del' ) { // Deleted
 
 		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 
-	} elseif ( $display == 'extensions' && ($extdisplay == '' && $_REQUEST['tech_hardware'] == '') ) { // Adding
+	} elseif ( $display == 'extensions' && ($extdisplay == '' && $tech_hardware == '') ) { // Adding
 
 		// do nothing as you want the Devices to handle this bit
 
@@ -2357,6 +2358,7 @@ function core_users_configprocess() {
 		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
 	} else {
 		//if submitting form, update database
+		if (!isset($action)) $action = null;
 		switch ($action) {
 			case "add":
 				core_users_add($_REQUEST);
@@ -2481,10 +2483,10 @@ function core_devices_configpageload() {
 	global $currentcomponent;
 
 	// Init vars from $_REQUEST[]
-	$display = $_REQUEST['display'];
-	$action = $_REQUEST['action'];
-	$extdisplay = $_REQUEST['extdisplay'];
-	$tech_hardware = $_REQUEST['tech_hardware'];
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
+	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
+	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 	
 	if ( $action == 'del' ) { // Deleted
 
@@ -2591,6 +2593,11 @@ function core_devices_configprocess() {
 	
 	//create vars from the request
 	extract($_REQUEST);
+
+	$extension = isset($extension)?$extension:null;
+	$deviceid = isset($deviceid)?$deviceid:null;
+	$name = isset($name)?$name:null;
+	$action = isset($action)?$action:null;
 
 	// fixed users only in extensions mode
 	if ( $display == 'extensions' ) {

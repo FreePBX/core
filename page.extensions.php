@@ -14,7 +14,11 @@
 
 <div class="rnav">
 <?php 
+$skip = isset($_REQUEST['skip'])?$_REQUEST['skip']:null;
+$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
+$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 $extens = core_users_list();
-drawListMenu($extens, $_REQUEST['skip'], $_REQUEST['display'], $_REQUEST['extdisplay'], _("Extension"));
+
+drawListMenu($extens, $skip, $display, $extdisplay, _("Extension"));
 ?>
 </div>
