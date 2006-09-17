@@ -15,6 +15,7 @@
 
 $userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+$tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
 
 // populate some global variables from the request string
 $set_globals = array("username","password","extension_high","extension_low","deptname");
