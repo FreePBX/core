@@ -16,6 +16,7 @@ $extdisplay= isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $dispnum = 'did'; //used for switch on config.php
 $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
+$ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
 
 //update db if submiting form
 switch ($action) {
