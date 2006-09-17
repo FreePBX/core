@@ -2274,7 +2274,7 @@ function core_users_configpageload() {
 		if ( is_string($extdisplay) ) {	
 			$extenInfo=core_users_get($extdisplay);
 			extract($extenInfo);
-			if (is_array($deviceInfo))
+			if (isset($deviceInfo) && is_array($deviceInfo))
 				extract($deviceInfo);
 	
 			if ( $display == 'extensions' ) {
