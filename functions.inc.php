@@ -1612,7 +1612,7 @@ function core_trunks_getTrunkRegister($trunknum) {
 	foreach ($results as $result) {
 			$register = $result[1];
 	}
-	return $register;
+	return isset($register)?$register:null;
 }
 
 function core_trunks_getDialRules($trunknum) {
@@ -1627,13 +1627,11 @@ function core_trunks_getDialRules($trunknum) {
 function core_trunks_gettrunkroutes($trunknum) {
 	$results = sql("SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%')ORDER BY context ","getAll");
 	
-	$routes = array();
 	foreach ($results as $row) {
 		$routes[$row[0]] = $row[1];
 	}
-	
 	// array(routename=>priority)
-	return $routes;
+	return isset($routes)?$routes:null;
 }
 
 function core_trunks_deleteDialRules($trunknum) {
@@ -1646,10 +1644,6 @@ function core_trunks_deleteDialRules($trunknum) {
 }
 
 /* end page.trunks.php functions */
-
-
-
-
 
 
 /* begin page.routing.php functions */
