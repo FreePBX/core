@@ -54,7 +54,8 @@ function core_destinations() {
 */
 function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
-	
+	global $version;  // this is not the best way to pass this, this should be passetd together with $engine
+
 	$modulename = "core";
 	
 	switch($engine) {
@@ -108,13 +109,16 @@ function core_get_config($engine) {
 				}
 			}
 
-			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs as a number to dial
+			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs and SNOMs as a number to dial
 			// when a user pushes a flashing BLF. 
 			if ($fc_pickup != '') {
 				$ext->addInclude('from-internal-additional', 'app-pickup');
 				$fclen = strlen($fc_pickup);
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_NoOp('Attempt to Pickup ${EXTEN:'.$fclen.'} by ${CALLERID(num)}'));
-				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_pickup('${EXTEN:'.$fclen.'}'));
+				if (strstr($version, 'BRI')) 
+					$ext->add('app-pickup', "_$fc_pickup.", '', new ext_dpickup('${EXTEN:'.$fclen.'}'));
+				else
+					$ext->add('app-pickup', "_$fc_pickup.", '', new ext_pickup('${EXTEN:'.$fclen.'}'));
 			}
 			
 			
