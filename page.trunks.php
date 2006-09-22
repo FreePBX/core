@@ -31,25 +31,22 @@ foreach ($set_globals as $var) {
 	}
 }
 
-$dialrules = array();
 if (isset($_REQUEST["dialrules"])) {
 	//$dialpattern = $_REQUEST["dialpattern"];
 	$dialrules = explode("\n",$_REQUEST["dialrules"]);
+	print $_REQUEST["dialrules"]." I am your bitch\n";
 
-	if (!$dialrules) {
-		$dialrules = array();
-	}
-	
-	foreach (array_keys($dialrules) as $key) {
-		//trim it
-		$dialrules[$key] = trim($dialrules[$key]);
-		
-		// remove blanks
-		if ($dialrules[$key] == "") unset($dialrules[$key]);
-		
-		// remove leading underscores (we do that on backend)
-		if ($dialrules[$key][0] == "_") $dialrules[$key] = substr($dialrules[$key],1);
-	}
+	if (is_array($dialrules))
+		foreach (array_keys($dialrules) as $key) {
+			//trim it
+			$dialrules[$key] = trim($dialrules[$key]);
+			
+			// remove blanks
+			if ($dialrules[$key] == "") unset($dialrules[$key]);
+			
+			// remove leading underscores (we do that on backend)
+			if ($dialrules[$key][0] == "_") $dialrules[$key] = substr($dialrules[$key],1);
+		}
 	
 	// check for duplicates, and re-sequence
 	$dialrules = array_values(array_unique($dialrules));
@@ -341,7 +338,13 @@ if (!$tech && !$extdisplay) {
 	<strong>+</strong>&nbsp;&nbsp;&nbsp; <?php echo _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)")?>
 					</span></a>:
 				</td><td valign="top">&nbsp;
-					<textarea id="dialrules" cols="20" rows="<?php  $rows = count($dialrules)+1; echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) ); ?>" name="dialrules"><?php echo implode("\n",$dialrules);?></textarea><br>
+					<textarea id="dialrules" cols="20" rows="<?php  
+						if (is_array($dialrules)) {
+							$rows = count($dialrules)+1; 
+							echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) );
+						} else {
+							echo "5";
+						} ?>" name="dialrules"><?php echo is_array($dialrules)?implode("\n",$dialrules); ?></textarea><br>
 					
 					<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>" />
 				</td>
@@ -709,7 +712,7 @@ function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e
     {   
         var c = s.charAt(i);
 
-        if ( !isDialDigitChar(c) && (c != "w") && (c != "W") && (c != "q") && (c != "Q") ) return false;
+        if ( !isDialDigitChar(c) && (c != "w") && (c != "W") && (c != "q") && (c != "Q") && (c != "+") ) return false;
     }
 
     return true;
