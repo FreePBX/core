@@ -34,7 +34,6 @@ foreach ($set_globals as $var) {
 if (isset($_REQUEST["dialrules"])) {
 	//$dialpattern = $_REQUEST["dialpattern"];
 	$dialrules = explode("\n",$_REQUEST["dialrules"]);
-	print $_REQUEST["dialrules"]." I am your bitch\n";
 
 	if (is_array($dialrules))
 		foreach (array_keys($dialrules) as $key) {
@@ -344,7 +343,7 @@ if (!$tech && !$extdisplay) {
 							echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) );
 						} else {
 							echo "5";
-						} ?>" name="dialrules"><?php echo is_array($dialrules)?implode("\n",$dialrules); ?></textarea><br>
+						} ?>" name="dialrules"><?php if(is_array($dialrules)) { echo implode("\n",$dialrules); } ?></textarea><br>
 					
 					<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>" />
 				</td>
