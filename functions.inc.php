@@ -224,7 +224,7 @@ function core_get_config($engine) {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
 					}
 					if (!empty($item['alertinfo'])) {
-						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", $item['alertinfo']));
+						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
 					}
 					
 					// If we're doing a zaptel route, now we need to do the gotos ONLY IF it's the first time round.
@@ -320,7 +320,7 @@ function core_get_config($engine) {
 
 
 					if (!empty($item['didalert'])) {
-						$ext->add($context, $exten, '', new ext_setvar("_ALERT_INFO", $item['didalert']));
+						$ext->add($context, $exten, '', new ext_setvar("_ALERT_INFO", str_replace(';', '\;', $item['didalert'])));
 					}
 					$goto_context = 'from-did-direct';
 					$goto_exten = $item['extension'];
