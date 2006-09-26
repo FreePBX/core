@@ -18,7 +18,7 @@
 // the relevent page.php file unnessassary
 
 $extens = core_users_list();
-drawListMenu($extens, $_REQUEST['skip'], $_REQUEST['display'], $_REQUEST['extdisplay'], _("User"));
+drawListMenu($extens, $skip, $type, $display, $extdisplay, _("User"));
 ?>
 </div>
 

@@ -15,6 +15,6 @@
 <div class="rnav">
 <?php 
 $devices = core_devices_list();
-drawListMenu($devices, $_REQUEST['skip'], $_REQUEST['display'], $_REQUEST['extdisplay'], _("Device"));
+drawListMenu($devices, $skip, $type, $display, $extdisplay, _("Device"));
 ?>
 </div>
