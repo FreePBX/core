@@ -26,7 +26,7 @@ foreach ($set_globals as $var) {
 }
 
 //Search ALL active modules while generating admin access list
-$active_modules = core_ampusers_get_actmodules(2);
+$active_modules = module_getinfo(false, MODULE_STATUS_ENABLED);
 
 if(is_array($active_modules)){
        foreach($active_modules as $key => $module) {
