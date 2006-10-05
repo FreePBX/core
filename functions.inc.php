@@ -2613,8 +2613,8 @@ function core_devices_configprocess() {
                 needreload();
         break;
         case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
-                users2astdb();
-                devices2astdb();
+                core_users2astdb();
+                core_devices2astdb();
         break;
 	}	
 }
