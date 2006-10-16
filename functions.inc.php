@@ -793,9 +793,9 @@ function core_devices_addsip($account) {
 			array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),
 			array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),
 			array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account),
-			array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'never'),
+			array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes'),
 			array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),
-			array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'no'),
+			array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),
 			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
 			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
 			array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),
@@ -871,7 +871,7 @@ function core_devices_addiax2($account) {
 			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
 			array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
 			array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569'),
-			array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'no'),
+			array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'yes'),
 			array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
 			array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
 			array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:'')
@@ -941,6 +941,7 @@ function core_devices_addzap($account) {
 			array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
 			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
 			//array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),
+			array($account,'immediate',($_REQUEST['immediate'])?$_REQUEST['immediate']:'no'),
 			array($account,'signalling',($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks'),
 			array($account,'echocancel',($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes'),
 			array($account,'echocancelwhenbridged',($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no'),
@@ -2386,6 +2387,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr = array();
 		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['immediate'] = array('value' => 'no', 'level' => 1);
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
 		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'level' => 1);
@@ -2407,7 +2409,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
 		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
 		$tmparr['port'] = array('value' => '4569', 'level' => 1);
-		$tmparr['qualify'] = array('value' => 'no', 'level' => 1);
+		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['disallow'] = array('value' => '', 'level' => 1);
 		$tmparr['allow'] = array('value' => '', 'level' => 1);
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
@@ -2424,9 +2426,9 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
 		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
-		$tmparr['nat'] = array('value' => 'never', 'level' => 1);
+		$tmparr['nat'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['port'] = array('value' => '5060', 'level' => 1);
-		$tmparr['qualify'] = array('value' => 'no', 'level' => 1);
+		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['disallow'] = array('value' => '', 'level' => 1);
