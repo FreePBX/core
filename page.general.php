@@ -28,6 +28,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
 						array($_REQUEST['TRUNK_OPTIONS'],'TRUNK_OPTIONS'),
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
+						array($_REQUEST['TIMEFORMAT'], 'TIMEFORMAT'),
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
@@ -161,6 +162,13 @@ foreach ($globals as $global) {
 		else
 		general_display_zones('us'); 
 		?>
+</p>
+<p>
+	<a class="info" href="#"><?php echo _("24-hour format")?><span><?php echo _("Select Yes if you use 24-hour format or No if you are using 12-hour am/pm format")?></span></a>&nbsp;
+	<select name="TIMEFORMAT">
+		<option value="IMp"><?php echo _("no"); ?></option>
+		<option value="kM" <?php echo (($TIMEFORMAT=="kM") ? 'selected="selected"' : '');?>><?php echo _("yes"); ?></option>
+	</select>
 </p>
 <h5><?php echo _("Security Settings")?></h5>
 <p>
