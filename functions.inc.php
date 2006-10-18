@@ -2245,6 +2245,10 @@ function core_users_configpageinit($dispnum) {
 function core_users_configpageload() {
 	global $currentcomponent;
 
+	// Ensure variables possibly extracted later exist
+	$name = $directdid = $didalert = $outboundcid = $answer = null;
+	$record_in = $record_out = $faxexten = $faxemail = null;
+
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
@@ -2525,6 +2529,9 @@ function core_devices_configpageload() {
 
 		}
 
+		// Ensure they exist before the extract
+		$devinfo_description = $devinfo_emergency_cid = null;
+		$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
 		if ( is_array($deviceInfo) )
 			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
 
