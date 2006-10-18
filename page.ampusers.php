@@ -31,7 +31,7 @@ $active_modules = module_getinfo(false, MODULE_STATUS_ENABLED);
 if(is_array($active_modules)){
        foreach($active_modules as $key => $module) {
                //create an array of module sections to display
-                       if (is_array($module['items'])) {
+                       if (isset($module['items']) && is_array($module['items'])) {
                                foreach($module['items'] as $itemKey => $itemName) {
                                        $module_list[$itemKey] = $itemName;
                                }
