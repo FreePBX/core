@@ -235,6 +235,9 @@ if (!$tech && !$extdisplay) {
 			$dialrules = getTrunkDialRules($trunknum);
 		}
 		*/
+		if (!isset($dialrules)) { $dialrules = null; }
+		if (!isset($dialrules)) { $dialrules = null; }
+
 		
 		if (count($dialrules) == 0) {
 			if ($temp = core_trunks_getDialRules($trunknum)) {

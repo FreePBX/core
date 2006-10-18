@@ -1435,6 +1435,7 @@ function core_trunks_writeoutids() {
 	// we have to escape _ for mysql: normally a wildcard
 	$unique_trunks = sql("SELECT variable FROM globals WHERE variable LIKE 'OUT\\\_%'","getAll"); 
 
+	$outids = null; // Start off with nothing
 	foreach ($unique_trunks as $unique_trunk) {
 		$outid = strtok($unique_trunk[0],"_");
 		$outid = strtok("_");
