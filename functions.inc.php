@@ -1078,7 +1078,7 @@ function core_users_add($vars) {
 	if ( function_exists('voicemail_mailbox_get') ) {
 		$vmbox = voicemail_mailbox_get($extension);
 		if ( $vmbox == null ) {
-			$voicemail = "disabled";
+			$voicemail = "novm";
 		} else {
 			$voicemail = $vmbox['vmcontext'];
 		}
