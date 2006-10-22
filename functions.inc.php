@@ -524,6 +524,7 @@ function core_devices_list() {
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null){
 	global $amp_conf;
 	global $currentFile;
+	global $astman;
 	
 	//ensure this id is not already in use
 	$devices = core_devices_list();
@@ -568,8 +569,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	sql($sql);
 	
 	//add details to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		$astman->database_put("DEVICE",$id."/dial",$dial);
 		$astman->database_put("DEVICE",$id."/type",$devicetype);
 		$astman->database_put("DEVICE",$id."/user",$user);
@@ -586,7 +586,6 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 					$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
 			}
 		}
-		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -623,13 +622,13 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 function core_devices_del($account){
 	global $amp_conf;
 	global $currentFile;
+	global $astman;
 	
 	//get all info about device
 	$devinfo = core_devices_get($account);
 	
 	//delete details to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		// If a user was selected, remove this device from the user
 		$deviceuser = $astman->database_get("DEVICE",$account."/user");
 		if (isset($deviceuser) && $deviceuser != "none") {
@@ -655,7 +654,6 @@ function core_devices_del($account){
 		$astman->database_del("DEVICE",$account."/type");
 		$astman->database_del("DEVICE",$account."/user");
 		$astman->database_del("DEVICE",$account."/emergency_cid");
-		$astman->disconnect();
 
 		//delete from devices table
 		$sql="DELETE FROM devices WHERE id = \"$account\"";
@@ -694,23 +692,23 @@ function core_devices_get($account){
 // this function rebuilds the astdb based on device table contents
 // used on devices.php if action=resetall
 function core_devices2astdb(){
-	require_once('common/php-asmanager.php');
-	checkAstMan();
+	global $astman;
 	global $amp_conf;
+
+	checkAstMan();
 	$sql = "SELECT * FROM devices";
 	$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
 	//add details to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		$astman->database_deltree("DEVICE");
-		foreach($devresults as $dev) {
+		foreach ($devresults as $dev) {
 			extract($dev);	
 			$astman->database_put("DEVICE",$id."/dial",$dial);
 			$astman->database_put("DEVICE",$id."/type",$devicetype);
 			$astman->database_put("DEVICE",$id."/user",$user);		
 			// If a user is selected, add this device to the user
-			if($user != "none") {
+			if ($user != "none") {
 					$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 					if (!empty($existingdevices)) {
 							$existingdevices .= "&";
@@ -733,21 +731,20 @@ function core_devices2astdb(){
 	} else {
 		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
 	}
-	return $astman->disconnect();
 }
 
 // this function rebuilds the astdb based on users table contents
 // used on devices.php if action=resetall
 function core_users2astdb(){
-	require_once('common/php-asmanager.php');
-	checkAstMan();
 	global $amp_conf;
+	global $astman;
+
+	checkAstMan();
 	$sql = "SELECT * FROM users";
 	$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 	
 	//add details to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		$astman->database_deltree("AMPUSER");
 		foreach($userresults as $usr) {
 			extract($usr);
@@ -762,7 +759,11 @@ function core_users2astdb(){
 	} else {
 		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
 	}
-	return $astman->disconnect();
+
+//	TODO: this was...	
+// 	return $astman->disconnect();
+//	is "true" the correct value...?
+	return true;
 }
 
 //add to sip table
@@ -1053,6 +1054,8 @@ function core_users_add($vars) {
 	
 	global $db;
 	global $amp_conf;
+	global $astman;
+
 	//ensure this id is not already in use
 	$extens = core_users_list();
 	if(is_array($extens)) {
@@ -1090,7 +1093,7 @@ function core_users_add($vars) {
 	// cleanup any non dial pattern characters prior to inserting into the database
 	// then add directdid to the insert command.
 	//
-    $directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 	
 	//insert into users table
 	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman) values (\"";
@@ -1128,8 +1131,7 @@ function core_users_add($vars) {
 	sql($sql);
 
 	//write to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
+	if ($astman) {
 		$astman->database_put("AMPUSER",$extension."/password",isset($password)?$password:'');
 		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
@@ -1141,10 +1143,9 @@ function core_users_add($vars) {
 		if (isset($amp_conf['ENABLECW']) && $amp_conf['ENABLECW'] == "yes") {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
 		}
-		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
-	}	
+	}
 }
 
 function core_users_get($extension){
@@ -1169,6 +1170,7 @@ function core_users_get($extension){
 function core_users_del($extension){
 	global $db;
 	global $amp_conf;
+	global $astman;
 	
 	//delete from devices table
 	$sql="DELETE FROM users WHERE extension = \"$extension\"";
@@ -1178,8 +1180,7 @@ function core_users_del($extension){
 	}
 
 	//delete details to astdb
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
+	if ($astman) {
 		$astman->database_del("AMPUSER",$extension."/password");
 		$astman->database_del("AMPUSER",$extension."/ringtimer");
 		$astman->database_del("AMPUSER",$extension."/noanswer");
@@ -1188,7 +1189,6 @@ function core_users_del($extension){
 		$astman->database_del("AMPUSER",$extension."/cidname");
 		$astman->database_del("AMPUSER",$extension."/voicemail");
 		$astman->database_del("AMPUSER",$extension."/device");
-		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -1199,9 +1199,9 @@ function core_users_cleanastdb($extension) {
 	// call forwarding, call waiting settings could hang around and bite someone if they
 	// recycle an extension. Is called from page.xtns and page.users.
 	global $amp_conf;
+	global $astman;
 
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {	
+	if ($astman) {
 		$astman->database_del("CW",$extension);
 		$astman->database_del("CF",$extension);
 		$astman->database_del("CFB",$extension);
@@ -1214,10 +1214,10 @@ function core_users_cleanastdb($extension) {
 function core_users_edit($extension,$vars){
 	global $db;
 	global $amp_conf;
+	global $astman;
 	
 	//I we are editing, we need to remember existing user<->device mapping, so we can delete and re-add
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		$ud = $astman->database_get("AMPUSER",$extension."/device");
 		$vars['device'] = $ud;
 	} else {
