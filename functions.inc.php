@@ -337,7 +337,7 @@ function core_get_config($engine) {
 			if (is_array($userlist)) {
 				foreach($userlist as $item) {
 					$exten = core_users_get($item[0]);
-					$vm = ($exten['voicemail'] == "disabled" ? "novm" : $exten['extension']);
+					$vm = ($exten['voicemail'] == "novm" ? "novm" : $exten['extension']);
 					
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
 					$ext->add('ext-local', $exten['extension'], '', new ext_hangup(''));
@@ -592,7 +592,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	
 	// create a voicemail symlink if needed
 	$thisUser = core_users_get($user);
-	if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "disabled")) {
+	if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 		if(empty($thisUser['voicemail']))
 			$vmcontext = "default";
 		else 
@@ -718,7 +718,7 @@ function core_devices2astdb(){
 			
 			// create a voicemail symlink if needed
 			$thisUser = core_users_get($user);
-			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "disabled")) {
+			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 				if(empty($thisUser['voicemail']))
 					$vmcontext = "default";
 				else 
