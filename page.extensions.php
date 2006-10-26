@@ -17,4 +17,5 @@
 $extens = core_users_list();
 drawListMenu($extens, $skip, $type, $display, $extdisplay, _("Extension"));
 ?>
+	<br />
 </div>

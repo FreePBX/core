@@ -197,7 +197,8 @@ foreach ($globals as $global) {
 
 
 <div class="rnav">
-    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Route")?></a></li>
+<ul>
+	<li><a <?php  echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Route")?></a></li>
 <?php 
 $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
 $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
@@ -205,28 +206,28 @@ $key = -1;
 $routepriority = core_routing_getroutenames();
 $positions=count($routepriority);
 foreach ($routepriority as $tresult) {
-$key++;
-?>
-			<?php   // move up
-    			echo "<li><a id=\"".($extdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".urlencode($display)."&extdisplay=".urlencode($tresult[0])."\">$key ". substr($tresult[0],4)."</a>";
-			if ($key > 0) {?>
-				<img src="images/scrollup.gif" onclick="repositionRoute('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
-			<?php  } else { ?>
-				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
-			<?php  }
-			
-			// move down
-			
-			if ($key < ($positions-1)) {?>
-				<img src="images/scrolldown.gif" onclick="repositionRoute('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
-			<?php  } else { ?>
-				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
-			<?php  } 
-			echo "</li>";?>
-			
-<?php 
+	$key++;
+		echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult[0] ? 'class="current"':'') .
+			" href=\"config.php?display=" . 
+			urlencode($display)."&amp;extdisplay=" . 
+			urlencode($tresult[0]) . "\">$key " . substr($tresult[0],4)."</a>\n";
+
+		if ($key > 0)
+			echo "\t\t<img src=\"images/scrollup.gif\" onclick=\"repositionRoute('$key','up')\" alt='" .  _("Move Up") .
+				"' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		else
+			echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+
+		// move down
+		if ($key < ($positions-1))
+			echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key>','down')\" alt='" . _("Move Down") .
+				"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		else 
+			echo "\t\t<img src='images/blank.gif' style='loat:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+			echo "\t</li>\n";
 } // foreach
 ?>
+</ul>
 </div>
 
 <div class="content">

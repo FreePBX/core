@@ -44,7 +44,8 @@ switch ($action) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
+<ul>
+	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
 <?php 
 //get unique incoming routes
 $inroutes = core_did_list();
@@ -54,12 +55,13 @@ if (isset($inroutes)) {
  		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
 		$zapchan = ( strlen($inroute['channel'])? "Zaptel Channel {$inroute['channel']}" : "" );
 		if ($zapchan != "") 
-			echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'current':'nul')."\" href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$zapchan} </a></li>";
+			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$zapchan} </a></li>\n";
 		else
-			echo "<li><a id=\"".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'current':'nul')."\" href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$displaydid} / {$displaycid} {$zapchan} </a></li>";
+			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$displaydid} / {$displaycid} {$zapchan} </a></li>\n";
 	}
 }
 ?>
+</ul>
 </div>
 
 <div class="content">

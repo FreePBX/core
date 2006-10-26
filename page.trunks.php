@@ -168,17 +168,18 @@ foreach ($globals as $global) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php  echo ($extdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Trunk")?></a></li>
-
+<ul>
+	<li><a <?php  echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Trunk")?></a></li>
 <?php 
 //get existing trunk info
 $tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
-    echo "<li><a id=\"".($extdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".urlencode($display)."&extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\">"._("Trunk")." ".substr(ltrim($tresult[1],"AMP:"),0,15)."</a></li>";
+    echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\">"._("Trunk")." ".substr(ltrim($tresult[1],"AMP:"),0,15)."</a></li>\n";
 }
 
 ?>
+</ul>
 </div>
 
 <div class="content">
@@ -188,11 +189,11 @@ foreach ($tresults as $tresult) {
 if (!$tech && !$extdisplay) {
 ?>
 	<h2><?php echo _("Add a Trunk")?></h2>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=ZAP"><?php echo _("Add ZAP Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=IAX2"><?php echo _("Add IAX2 Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=SIP"><?php echo _("Add SIP Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=ENUM"><?php echo _("Add ENUM Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&tech=CUSTOM"><?php echo _("Add Custom Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=ZAP"><?php echo _("Add ZAP Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=IAX2"><?php echo _("Add IAX2 Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=SIP"><?php echo _("Add SIP Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=ENUM"><?php echo _("Add ENUM Trunk")?></a><br><br>
+	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=CUSTOM"><?php echo _("Add Custom Trunk")?></a><br><br>
 <?php 
 } else {
 	if ($extdisplay) {
@@ -253,7 +254,7 @@ if (!$tech && !$extdisplay) {
 		
 		echo "<h2>".sprintf(_("Edit %s Trunk"),strtoupper($tech))."</h2>";
 ?>
-		<p><a title="<?php echo $channelid ?>" href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=deltrunk"><?php echo _("Delete Trunk")?> <?php  echo substr($channelid,0,20); ?></a></p>
+		<p><a title="<?php echo $channelid ?>" href="config.php?display=<?php echo urlencode($display) ?>&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk"><?php echo _("Delete Trunk")?> <?php  echo substr($channelid,0,20); ?></a></p>
 <?php 
 
 		// find which routes use this trunk

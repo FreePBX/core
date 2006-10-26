@@ -90,17 +90,17 @@ switch ($action) {
 </div>
 
 <div class="rnav">
-    <li><a id="<?php  echo ($userdisplay=='' ? 'current':'') ?>" href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add User")?></a></li>
-
+<ul>
+	<li><a <?php  echo ($userdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add User")?></a></li>
 <?php 
 //get existing trunk info
 $tresults = core_ampusers_list();
 
 foreach ($tresults as $tresult) {
-    echo "<li><a id=\"".($userdisplay==$tresult[0] ? 'current':'')."\" href=\"config.php?display=".urlencode($display)."&userdisplay=".urlencode($tresult[0])."\">".$tresult[0]."</a></li>";
+    echo "\t<li><a ".($userdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;userdisplay=".urlencode($tresult[0])."\">".$tresult[0]."</a></li>\n";
 }
-
 ?>
+</ul>
 </div>
 
 <div class="content">
@@ -120,7 +120,7 @@ foreach ($tresults as $tresult) {
 		$sections = $user["sections"];
 		
 ?>
-		<p><a href="config.php?display=<?php echo urlencode($display) ?>&userdisplay=<?php echo urlencode($userdisplay) ?>&action=delampuser"><?php echo _("Delete User")?> <?php  echo $userdisplay; ?></a></p>
+		<p><a href="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser"><?php echo _("Delete User")?> <?php  echo $userdisplay; ?></a></p>
 <?php 
 
 	} else {
