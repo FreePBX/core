@@ -884,7 +884,7 @@ function core_devices_addiax2($account) {
 
 	// Very bad
 	$iaxfields[] = array($account,'account',$account);	
-	$iaxfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	$iaxfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
 	
 	// Where is this in the interface ??????
 	$iaxfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
