@@ -33,13 +33,9 @@ if(is_array($active_modules)){
                //create an array of module sections to display
                        if (isset($module['items']) && is_array($module['items'])) {
                                foreach($module['items'] as $itemKey => $itemName) {
-                                       $module_list[$itemKey] = $itemName;
+                                       $module_list[$itemKey] = array('category' => $module['category'], 'name' => $itemName);
                                }
                        }
-               //sort it? probably not right but was getting in a mess to be honest
-               //so something better than nothing
-               if (is_array($module_list))
-                       asort($module_list);
        }
 }
 
@@ -51,9 +47,14 @@ if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "devicea
        unset($module_list["users"]);
 }
 
-// add the APPLY Changes bar to module list
-$module_list[99] = _("Apply Changes Bar");
+// no more adding the APPLY Changes bar to module list because array_multisort messes up integer array keys
+// $module_list['99'] = array('category' => NULL, 'name' => _("Apply Changes Bar"));
 
+foreach ($module_list as $key => $row) {
+	$module_category[$key] = $row['category'];
+	$module_name[$key] = $row['name'];
+}
+array_multisort($module_category, SORT_ASC, $module_name, SORT_ASC, $module_list);
 
 $sections = array();
 if (isset($_REQUEST["sections"])) {
@@ -200,16 +201,32 @@ foreach ($tresults as $tresult) {
 					<a href=# class="info"><?php echo _("Admin Access<span>Select the Admin Sections this user should have access to.</span>")?></a>: 
 				</td><td>&nbsp;
 					<select multiple name="sections[]">
-					<option>
+					<option />
 <?php 
-				foreach ($module_list as $key=>$value) {
+				$prev_category = NULL;
+				foreach ($module_list as $key => $row) {
+					if ($row['category'] != $prev_category) {
+						if ($prev_category)
+							echo "</optgroup>\n";
+						echo "<optgroup label=\""._($row['category'])."\">\n";
+						$prev_category = $row['category'];
+					}
+
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
-					echo ">"._($value)."</option>";
+					echo ">"._($row['name'])."</option>\n";
 				}
+				echo "</optgroup>\n";
+
+				// Apply Changes Bar
+				echo "<option value=\"99\"";
+				if (in_array("99", $sections)) echo " SELECTED";
+				echo ">"._("Apply Changes Bar")."</option>\n";
+
+				// All Sections
 				echo "<option value=\"*\"";
 				if (in_array("*", $sections)) echo " SELECTED";
-				echo ">"._("ALL SECTIONS")."</option>";
+				echo ">"._("ALL SECTIONS")."</option>\n";
 ?>					
 					</select>
 				</td>
