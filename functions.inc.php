@@ -750,7 +750,7 @@ function core_users2astdb(){
 			extract($usr);
 			$astman->database_put("AMPUSER",$extension."/password",$password);
 			$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
-			$astman->database_put("AMPUSER",$extension."/noanswer",$noasnwer);
+			$astman->database_put("AMPUSER",$extension."/noanswer",$noanswer);
 			$astman->database_put("AMPUSER",$extension."/recording",$recording);
 			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".addslashes($outboundcid)."\"");
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".addslashes($name)."\"");
