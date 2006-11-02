@@ -531,7 +531,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</select>
 			</td>
 		</tr>
-<?php } //for 0..$num_new_boxes ?>
+<?php 
+	$key++;
+} //for 0..$num_new_boxes ?>
 
 <?php if ($extdisplay): // editing ?>
 		<tr>
