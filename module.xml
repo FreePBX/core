@@ -11,7 +11,7 @@
 		<extensions>Extensions</extensions>
 		<users>Users</users>
 		<devices>Devices</devices>
-		<did>Inbound Routes</did>
+		<did category="Inbound Call Control">Inbound Routes</did>
 		<routing>Outbound Routes</routing>
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>
