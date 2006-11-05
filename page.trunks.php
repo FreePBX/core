@@ -24,11 +24,16 @@ $trunknum = ltrim($extdisplay,'OUT_');
 
 
 // populate some global variables from the request string
-$set_globals = array("outcid","maxchans","dialoutprefix","channelid","peerdetails","usercontext","userconfig","register");
+$set_globals = array("outcid","maxchans","dialoutprefix","channelid","peerdetails","usercontext","userconfig","register","keepcid");
 foreach ($set_globals as $var) {
 	if (isset($_REQUEST[$var])) {
 		$$var = stripslashes( $_REQUEST[$var] );
 	}
+}
+
+// ensure that keepcid is set to something:
+if (!isset($keepcid)) {
+	$keepcid = "off";
 }
 
 if (isset($_REQUEST["dialrules"])) {
@@ -54,7 +59,7 @@ if (isset($_REQUEST["dialrules"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addtrunk":
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $dialrules);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
 		
 		core_trunks_addDialRules($trunknum, $dialrules);
 		needreload();
@@ -62,7 +67,7 @@ switch ($action) {
 		$extdisplay = "OUT_".$trunknum; // make sure we're now editing the right trunk
 	break;
 	case "edittrunk":
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register);
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
 		
 		/* //DIALRULES
 		deleteTrunkRules($channelid);
@@ -204,6 +209,7 @@ if (!$tech && !$extdisplay) {
 		$outcid = ${"OUTCID_".$trunknum};
 		$maxchans = ${"OUTMAXCHANS_".$trunknum};
 		$dialoutprefix = ${"OUTPREFIX_".$trunknum};
+		$keepcid = ${"OUTKEEPCID_".$trunknum};
 		
 		if ($tech!="enum") {
 	
@@ -312,11 +318,17 @@ if (!$tech && !$extdisplay) {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>. You can also use the magic string 'hidden' to hide the CallerID sent out over ISDN lines ONLY (E1/T1/J1/BRI)")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>. You can also use the magic string 'hidden' to hide the CallerID sent out over Digital lines ONLY (E1/T1/J1/BRI/SIP/IAX)")?><br><br></span></a>: 
 				</td><td>
 					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>"/>
 				</td>
 			</tr>
+			<tr>
+				<td>
+					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VSP's will drop the call if you try to send an invalid CallerID. Use this to never send a CallerID that you haven't explicitly specified. You will notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly.")."<br />"._("It's safe to leave this switched off");?><br /><br /></span></a>:
+				</td><td>
+					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?>/>
+				</td>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo _("Controls the maximum number of channels (simultaneous calls) that can be used on this trunk, including both incoming and outgoing calls. Leave blank to specify no maximum.")?></span></a>: 

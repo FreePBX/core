@@ -1246,7 +1246,7 @@ function core_directdid_list(){
 /* begin page.trunks.php functions */
 
 // we're adding ,don't require a $trunknum
-function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register) {
+function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
 	global $db;
 	
 	// find the next available ID
@@ -1257,7 +1257,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		}
 	}
 	
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
 	
 	return $trunknum;
 }
@@ -1270,7 +1270,7 @@ function core_trunks_del($trunknum, $tech = null) {
 	}
 
 	//delete from globals table
-	sql("DELETE FROM globals WHERE variable LIKE '%OUT_$trunknum' OR variable IN ('OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum')");
+	sql("DELETE FROM globals WHERE variable LIKE '%OUT_$trunknum' OR variable IN ('OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum','OUTKEEPCID_$trunknum')");
 	
 	//write outids
 	core_trunks_writeoutids();
@@ -1287,16 +1287,16 @@ function core_trunks_del($trunknum, $tech = null) {
 	}
 }
 
-function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register) {
+function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
 	//echo "editTrunk($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register)";
 	$tech = core_trunks_getTrunkTech($trunknum);
 	core_trunks_del($trunknum, $tech);
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
-function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register) {
+function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
 	global $db;
 	
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
@@ -1312,6 +1312,7 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 			array('OUTPREFIX_'.$trunknum, $dialoutprefix),
 			array('OUTMAXCHANS_'.$trunknum, $maxchans),
 			array('OUTCID_'.$trunknum, $outcid),
+			array('OUTKEEPCID_'.$trunknum, $keepcid),
 			);
 			
 	unset($techtemp); 
