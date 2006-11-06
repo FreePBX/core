@@ -1159,11 +1159,15 @@ function core_users_get($extension){
 	
 	//explode recording vars
 	$recording = explode("|",$results['recording']);
-	$recout = substr($recording[0],4);
-	$recin = substr($recording[1],3);
-	$results['record_in']=$recin;
-	$results['record_out']=$recout;
-
+	if (isset($recording[1])) {
+		$recout = substr($recording[0],4);
+		$recin = substr($recording[1],3);
+		$results['record_in']=$recin;
+		$results['record_out']=$recout;
+	} else {
+		$results['record_in']='Adhoc';
+		$results['record_out']='Adhoc';
+	}
 	return $results;
 }
 
