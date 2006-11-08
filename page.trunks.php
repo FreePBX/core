@@ -209,7 +209,7 @@ if (!$tech && !$extdisplay) {
 		$outcid = ${"OUTCID_".$trunknum};
 		$maxchans = ${"OUTMAXCHANS_".$trunknum};
 		$dialoutprefix = ${"OUTPREFIX_".$trunknum};
-		$keepcid = ${"OUTKEEPCID_".$trunknum};
+		$keepcid = isset(${"OUTKEEPCID_".$trunknum})?${"OUTKEEPCID_".$trunknum}:'';
 		
 		if ($tech!="enum") {
 	
