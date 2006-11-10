@@ -809,7 +809,7 @@ function core_devices_addsip($account) {
 
 	// Very bad
 	$sipfields[] = array($account,'account',$account);	
-	$sipfields[] = array($account,'callerid',($_REQUEST['outboundcid'])?$_REQUEST['outboundcid']." <".$account.'>':'device'." <".$account.'>');
+	$sipfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
 	
 	// Where is this in the interface ??????
 	$sipfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
