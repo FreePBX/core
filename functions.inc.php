@@ -2369,6 +2369,9 @@ function core_users_configprocess() {
 			case "del":
 				core_users_del($extdisplay);
 				core_users_cleanastdb($extdisplay);
+				if (function_exists(findmefollow_del)) {
+				    findmefollow_del($extdisplay);
+				}
 				needreload();
 			break;
 			case "edit":
