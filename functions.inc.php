@@ -2314,9 +2314,9 @@ function core_users_configpageload() {
 			$section = ($extdisplay ? 'Edit User' : 'Add User');
 		}
 		if ( $extdisplay ) {
-			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay));
+			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2);
 		} else {
-			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false));
+			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false), 3);
 		}
 		if ( $display != 'extensions' ) {
 			$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
@@ -2326,7 +2326,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidOutboundCID, false));
 		
 		$section = 'Extension Options';
-		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."));
+		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."), 3);
 		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', "Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set"));
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
 
@@ -2336,14 +2336,14 @@ function core_users_configpageload() {
 
 		$section = 'Fax Handling';
 		$wait = (isset($wait) ? $wait : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.", false), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', "Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings"));
 		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', "Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.", false));
 		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', 'The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.', '!isInteger()', $msgInvalidPause, false));
 
 		$section = 'Privacy';
 		$privacyman = (isset($privacyman) ? $privacyman : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', "If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', "If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.", false), 4);
 
 	}
 }
@@ -2587,9 +2587,9 @@ function core_devices_configpageload() {
 			$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
 			
 			if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
-				$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg));
+				$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
 			} else { // add so only basic
-				$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent));
+				$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
 			}
 			
 		}
