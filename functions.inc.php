@@ -2462,10 +2462,12 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 		
 		// Devices list
-		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', 'Other (Custom) Device');
-		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', 'Generic ZAP Device');
-		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', 'Generic IAX2 Device');
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', 'Generic SIP Device');
+		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', 'Generic IAX2 Device');
+		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', 'Generic ZAP Device');
+		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', 'Other (Custom) Device');
+		$currentcomponent->setoptlistopts('devicelist', 'sort', false);
+
 
 		// Option lists used by the gui
 		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', 'Fixed');
