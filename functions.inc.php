@@ -885,6 +885,11 @@ function core_devices_addiax2($account) {
 	// Very bad
 	$iaxfields[] = array($account,'account',$account);	
 	$iaxfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	// Asterisk treats no caller ID from an IAX device as 'hide callerid', and ignores the caller ID
+	// set in iax.conf. As we rely on this for pretty much everything, we need to specify the 
+	// callerid as a variable which gets picked up in macro-callerid.
+	// Ref - http://bugs.digium.com/view.php?id=456
+	$iaxfields[] = array($account,'setvar',"REALCALLERIDNUM=$account");
 	
 	// Where is this in the interface ??????
 	$iaxfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
