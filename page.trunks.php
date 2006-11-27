@@ -63,8 +63,7 @@ switch ($action) {
 		
 		core_trunks_addDialRules($trunknum, $dialrules);
 		needreload();
-		
-		$extdisplay = "OUT_".$trunknum; // make sure we're now editing the right trunk
+		redirect_standard();
 	break;
 	case "edittrunk":
 		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
@@ -77,6 +76,7 @@ switch ($action) {
 		// this can rewrite too, so edit is the same
 		core_trunks_addDialRules($trunknum, $dialrules);
 		needreload();
+		redirect_standard('extdisplay');
 	break;
 	case "deltrunk":
 	
@@ -87,8 +87,7 @@ switch ($action) {
 		*/
 		core_trunks_deleteDialRules($trunknum);
 		needreload();
-		
-		$extdisplay = ''; // resets back to main screen
+		redirect_standard();
 	break;
 	case "populatenpanxx7": 
 	case "populatenpanxx10": 

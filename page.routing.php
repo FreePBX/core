@@ -91,15 +91,12 @@ switch ($action) {
 	case "addroute":
 		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany);
 		needreload();
-		$extdisplay = ''; // resets back to main screen
-		$routename = ''; // resets back to main screen
-		$routepass = ''; // resets back to main screen
-		$dialpattern=array();
-		$trunkpriority=array();
+		redirect_standard();
 	break;
 	case "editroute":
 		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany);
 		needreload();
+		redirect_standard('extdisplay');
 	break;
 	case "delroute":
 		core_routing_del($extdisplay);
@@ -110,8 +107,7 @@ switch ($action) {
 		$routepriority = core_routing_getroutenames();
 		$routepriority = core_routing_setroutepriority($routepriority, '','');
 		needreload();
-		
-		$extdisplay = ''; // resets back to main screen
+		redirect_standard();
 	break;
 	case 'renameroute':
 		if (core_routing_rename($routename, $_REQUEST["newroutename"])) {

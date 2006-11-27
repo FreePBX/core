@@ -72,21 +72,21 @@ switch ($action) {
 		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
 		//indicate 'need reload' link in footer.php 
 		needreload();
-		redirect('config.php?type=setup&display=ampusers');
+		redirect_standard();
 	break;
 	case "editampuser":
 		core_ampusers_del($userdisplay);
 		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
 		//indicate 'need reload' link in footer.php 
 		needreload();
-		redirect('config.php?type=setup&display=ampusers');
+		redirect_standard('userdisplay');
 	break;
 	case "delampuser":
 		core_ampusers_del($userdisplay);
 		//indicate 'need reload' link in footer.php 
 		needreload();
 		$userdisplay = ""; // go "add" screen
-		redirect('config.php?type=setup&display=ampusers');
+		redirect_standard();
 	break;
 }
 
