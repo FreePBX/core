@@ -2373,7 +2373,7 @@ function core_users_configprocess() {
 			case "add":
 				core_users_add($_REQUEST);
 				needreload();
-				redirect_standard();
+				redirect_standard(true);
 			break;
 			case "del":
 				core_users_del($extdisplay);
@@ -2382,12 +2382,12 @@ function core_users_configprocess() {
 				    findmefollow_del($extdisplay);
 				}
 				needreload();
-				redirect_standard();
+				redirect_standard(true);
 			break;
 			case "edit":
 				core_users_edit($extdisplay,$_REQUEST);
 				needreload();
-				redirect_standard('extdisplay');
+				redirect_standard(true);
 			break;
 		}
 	}
@@ -2633,18 +2633,18 @@ function core_devices_configprocess() {
         case "add":
                 core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
                 needreload();
-		redirect_standard();
+		redirect_standard(true);
         break;
         case "del":
                 core_devices_del($extdisplay);
                 needreload();
-		redirect_standard();
+		redirect_standard(true);
         break;
         case "edit":  //just delete and re-add
                 core_devices_del($extdisplay);
                 core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
                 needreload();
-		redirect_standard('extdisplay');
+		redirect_standard(true);
         break;
         case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
                 core_users2astdb();
