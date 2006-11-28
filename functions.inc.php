@@ -2328,7 +2328,7 @@ function core_users_configpageload() {
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidOutboundCID, false));
+		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
 		
 		$section = 'Extension Options';
 		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."), 3);
