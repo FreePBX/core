@@ -854,7 +854,7 @@ function core_devices_addiax2($account) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
 			if ( $keyword == 'dial' && $data == '' ) {
-				$iaxfields[] = array($account, $keyword, 'IAX/'.$account);
+				$iaxfields[] = array($account, $keyword, 'IAX2/'.$account);
 			} else {
 				$iaxfields[] = array($account, $keyword, $data);
 			}
