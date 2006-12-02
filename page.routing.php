@@ -85,16 +85,17 @@ $routename = isset($_REQUEST["routename"]) ? $_REQUEST["routename"] : "";
 $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
 $emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
 $intracompany = isset($_REQUEST["intracompany"]) ? $_REQUEST["intracompany"] : "";
+$mohsilence = isset($_REQUEST["mohsilence"]) ? $_REQUEST["mohsilence"] : "";
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence);
 		needreload();
 		redirect_standard();
 	break;
 	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
@@ -252,6 +253,10 @@ if ($extdisplay) {
 	if (!isset($_REQUEST["intracompany"])) {
 		$intracompany = core_routing_getrouteintracompany($extdisplay);
 	}
+
+	if (!isset($_REQUEST["mohsilence"])) {
+		$mohsilence = core_routing_getroutemohsilence($extdisplay);
+	}
 	
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
@@ -319,6 +324,24 @@ if ($extdisplay) { // editing
 			<td><a href=# class="info"><?php echo _("Intra Company Route")?><span><?php echo _("Optional: Selecting this option will treat this route as a intra-company connection, preserving the internal Caller ID information and not use the outbound CID of either the extension or trunk.</span>")?></a>:</td>
 			<td><input type="checkbox" name="intracompany" value="yes" <?php echo ($intracompany ? "CHECKED" : "") ?> /></td>
 		</tr>
+<?php   if (function_exists('music_list')) { ?>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose to disable Music on Hold for this route. This is useful for know conference bridge lines or other calls where you don't want to broadcast music when you put a call on hold. You can alternatively choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
+			<td>
+				&nbsp;&nbsp;<select name="mohsilence"/>
+				<?php
+					$tresults = music_list("/var/lib/asterisk/mohmp3");
+					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
+					if (isset($tresults[0])) {
+						foreach ($tresults as $tresult) {
+							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+						}
+					}
+				?>		
+				</select>		
+			</td>
+		</tr>
+<?php } ?>
 		<tr>
 			<td colspan="2">
 				<br>

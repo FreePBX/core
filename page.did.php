@@ -125,6 +125,8 @@ if (!isset($answer))
 	$answer = '0';
 if (!isset($alertinfo))
 	$alertinfo = 0;
+if (!isset($mohclass))
+	$mohclass = 'default';
 ?>
 					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
@@ -192,6 +194,25 @@ if (!isset($privacyman))
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
 			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>"></td>
 		</tr>
+<?php   if (function_exists('music_list')) { ?>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a></td>
+			<td>
+				&nbsp;&nbsp;<select name="mohclass"/>
+				<?php
+					$tresults = music_list("/var/lib/asterisk/mohmp3");
+					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
+					echo '<option value="none">'._("No Music")."</option>";
+					if (isset($tresults[0])) {
+						foreach ($tresults as $tresult) {
+							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+						}
+					}
+				?>		
+				</select>		
+			</td>
+		</tr>
+<?php } ?>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
 			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?> /></td>
