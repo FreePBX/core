@@ -326,7 +326,7 @@ if ($extdisplay) { // editing
 		</tr>
 <?php   if (function_exists('music_list')) { ?>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose to disable Music on Hold for this route. This is useful for know conference bridge lines or other calls where you don't want to broadcast music when you put a call on hold. You can alternatively choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
+			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
 			<td>
 				&nbsp;&nbsp;<select name="mohsilence"/>
 				<?php
