@@ -324,7 +324,7 @@ if (!$tech && !$extdisplay) {
 			</tr>
 			<tr>
 				<td>
-					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VSP's will drop the call if you try to send an invalid CallerID. Use this to never send a CallerID that you haven't explicitly specified. You will notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly.")."<br />"._("It's safe to leave this switched off");?><br /><br /></span></a>:
+					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk")."<br />"._("It's safe to leave this switched");?><br /><br /></span></a>:
 				</td><td>
 					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?>/>
 				</td>
