@@ -182,6 +182,7 @@ function core_get_config($engine) {
 						if (!isset($zapchan[$channel])) {
 							// create the macro-from-zaptel-$chan context and load up the
 							// startup settings
+							$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 							$ext->add($context, 's', '', new ext_noop('Entering '.$context.' with DID = ${DID}'));
 							$zapchan[$channel] = "unfinished";
 						}
