@@ -191,6 +191,10 @@ function core_get_config($engine) {
 					// extensions_custom.conf
 					$ext->add($context, $exten, '', new ext_setvar('FROM_DID',$exten));
 
+					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
+					    $ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+					}
+
 					// If we require RINGING, signal it as soon as we enter.
 					if ($item['ringing'] === "CHECKED") {
 						$ext->add($context, $exten, '', new ext_ringing(''));
@@ -298,6 +302,9 @@ function core_get_config($engine) {
 					$exten = $item['directdid'];
 					$ext->add($context, $exten, '', new ext_setvar('FROM_DID',$exten));
 
+					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
+						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+					}
 					
 					if ($item['faxexten'] != "default") {
 						$ext->add($context, $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
@@ -380,6 +387,8 @@ function core_get_config($engine) {
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
 					if(strpos($exten['args'],"INTRACOMPANYROUTE") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("INTRACOMPANYROUTE",substr($exten['args'],18)));
+					if(strpos($exten['args'],"MOHCLASS") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS",substr($exten['args'],9)));
 					if(strpos($exten['args'],"dialout-trunk") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					if(strpos($exten['args'],"dialout-enum") !== false)
@@ -485,7 +494,7 @@ function core_did_add($incoming){
 	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
 		$destination=${$goto_indicate0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass')";
 		sql($sql);
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
@@ -1104,7 +1113,7 @@ function core_users_add($vars) {
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman,mohclass) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -1134,7 +1143,8 @@ function core_users_add($vars) {
 	$sql.= isset($wait)?$wait:'';
 	$sql.= "\", \"";
 	$sql.= isset($privacyman)?$privacyman:'';
-
+	$sql.= "\", \"";
+        $sql.= isset($mohclass)?$mohclass:'';
 	$sql.= "\")";
 	sql($sql);
 
@@ -1243,7 +1253,7 @@ function core_users_edit($extension,$vars){
 }
 
 function core_directdid_list(){
-	$sql = "SELECT extension, directdid, didalert, faxexten, faxemail, answer, wait, privacyman FROM users WHERE directdid IS NOT NULL AND directdid != ''";
+	$sql = "SELECT extension, directdid, didalert, mohclass, faxexten, faxemail, answer, wait, privacyman FROM users WHERE directdid IS NOT NULL AND directdid != ''";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
@@ -1829,7 +1839,8 @@ function core_routing_setroutepriorityvalue($key)
 }
 
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "") {
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "") {
+
 	global $db;
 
 	$trunktech=array();
@@ -1904,6 +1915,22 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			   $sql .= "'SetVar', ";
 			   $sql .= "'INTRACOMPANYROUTE=YES', ";
 			   $sql .= "'Preserve Intenal CID Info')";
+			   $result = $db->query($sql);
+				if(DB::IsError($result)) {
+					   die($result->getMessage());
+				}
+		}
+
+		// Next Priority (either first, second or third depending on above)
+		if(!empty($mohsilence) && trim($mohsilence) != 'default') {
+			   $startpriority += 1;
+			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
+			   $sql .= "('outrt-".$name."', ";
+			   $sql .= "'".$pattern."', ";
+			   $sql .= "'".$startpriority."', ";
+			   $sql .= "'SetVar', ";
+			   $sql .= "'MOHCLASS=".$mohsilence."', ";
+			   $sql .= "'Do not play moh on this route')";
 			   $result = $db->query($sql);
 				if(DB::IsError($result)) {
 					   die($result->getMessage());
@@ -1991,9 +2018,9 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 }
 
-function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "") {
+function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="") {
 	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany);
+	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence);
 }
 
 function core_routing_del($name) {
@@ -2146,6 +2173,23 @@ function core_routing_getrouteintracompany($route) {
        return $intracompany;
 }
 
+//get mohsilence routing status for this route
+function core_routing_getroutemohsilence($route) {
+
+       global $db;
+       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'MOHCLASS%') ";
+       $results = $db->getOne($sql);
+       if(DB::IsError($results)) {
+               die($results->getMessage());
+       }
+       if (preg_match('/^.*=(.*)/', $results, $matches)) {
+               $mohsilence = $matches[1];
+       } else {
+               $mohsilence = "";
+       }
+       return $mohsilence;
+}
+
 function general_get_zonelist() {
 	return array(
  array ( "name" => "Austria",  "iso" => "at", "conf" => "ringcadence = 1000,5000\ndial = 420\nbusy = 420/400,0/400\nring = 420/1000,0/5000\ncongestion = 420/200,0/200\ncallwaiting = 420/40,0/1960\ndialrecall = 420\nrecord = 1400/80,0/14920\ninfo = 950/330,1450/330,1850/330,0/1000\nstutter = 380+420\n"),
@@ -2238,6 +2282,16 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
 		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
 
+		if (function_exists('music_list')) {
+		    $tresults = music_list("/var/lib/asterisk/mohmp3");
+		    if (isset($tresults[0])) {
+			foreach ($tresults as $tresult) {
+			    $currentcomponent->addoptlistitem('mohclass', $tresult, $tresult);
+			}
+		    $currentcomponent->setoptlistopts('mohclass', 'sort', false);
+		    }
+		}
+
 		//get unique devices to finishoff faxdestoptions list
 		$devices = core_devices_list();
 		if (isset($devices)) {
@@ -2261,7 +2315,7 @@ function core_users_configpageload() {
 
 	// Ensure variables possibly extracted later exist
 	$name = $directdid = $didalert = $outboundcid = $answer = null;
-	$record_in = $record_out = $faxexten = $faxemail = null;
+	$record_in = $record_out = $faxexten = $faxemail = $mohclass =  null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -2328,11 +2382,14 @@ function core_users_configpageload() {
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidOutboundCID, false));
+		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
 		
 		$section = 'Extension Options';
 		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."), 3);
 		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', "Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set"));
+		if (function_exists('music_list')) {
+		    $currentcomponent->addguielem($section, new gui_selectbox('mohclass', $currentcomponent->getoptlist('mohclass'), $mohclass, 'Music on Hold', "Set the MoH class that will be used for calls that come in on this Direct DID. For example, choose a type appropriate for a originating country which may have announcements in their language. Only effects MoH class when the call came in from the Direct DID.", false));
+		}
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
 
 		$section = 'Recording Options';
@@ -2640,9 +2697,7 @@ function core_devices_configprocess() {
         case "del":
                 core_devices_del($extdisplay);
                 needreload();
-		if ($deviceuser != 'new') {
-			redirect_standard_continue();
-		}
+		redirect_standard_continue();
         break;
         case "edit":  //just delete and re-add
                 core_devices_del($extdisplay);
