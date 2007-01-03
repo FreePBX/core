@@ -144,16 +144,17 @@ switch ($action) {
 			if (isset($xmldata['lca-data']['prefix'])) {
 				// we do the loops separately so patterns are grouped together
 				
-				// always drop 1 prefix
-				$dialpattern[] = '1|NXXNXXXXXX';
-				
+				// match 1+NPA+NXX (dropping 1)
+				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+					$dialpattern[] = '1|'.$prefix['npa'].$prefix['nxx'].'XXXX';
+				}
 				// match NPA+NXX
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
 					$dialpattern[] = $prefix['npa'].$prefix['nxx'].'XXXX';
 				}
-				// add NPA to 7-digits
+				// match 7-digits
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-					$dialpattern[] = $prefix['npa'].'+'.$prefix['nxx'].'XXXX';
+					$dialpattern[] = $prefix['nxx'].'XXXX';
 				}
 
 				// check for duplicates, and re-sequence
@@ -392,7 +393,11 @@ $key += 1; // this will be the next key value
 			</td>
 		</tr>
 		<tr>
-			<td><?php echo _("Insert:")?></td>
+			<td>
+			<a href=# class="info"><?php echo _("Dial patterns wizards")?><span>
+					<strong><?php echo _("These options provide a quick way to add outbound dialing rules. Follow the prompts for each.")?><br>
+					<strong><?php echo _("Lookup local prefixes")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7, 10 or 11 digits (5551234, 6135551234, 16135551234) to access this route.")?><br>
+					</span></a>:
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
 			
@@ -402,7 +407,7 @@ $key += 1; // this will be the next key value
 ?>				
 				//var npanxx = prompt("What is your areacode + prefix (NPA-NXX)?", document.getElementById('areacode').value);
 				do {
-					var npanxx = <?php echo 'prompt("'._("What is your areacode + prefix (NPA-NXX)?\\n\\n(Note: this database contains North American numbers only, and is not guaranteed to be 100% accurate. You will still have the option of modifying results.)\\n\\nThis may take a few seconds.").'")'?>;
+					var npanxx = <?php echo 'prompt("'._("What is your areacode + prefix (NPA-NXX)?\\n\\n(Note: this database contains North American numbers only, and is not guaranteed to be 100% accurate. You will still have the option of modifying results.)\\n\\nThis may take a few seconds.").'")' ?>;
 					if (npanxx == null) return;
 				} while (!npanxx.match("^[2-9][0-9][0-9][-]?[2-9][0-9][0-9]$") && <?php echo '!alert("'._("Invalid NPA-NXX. Must be of the format \'NXX-NXX\'").'")'?>);
 				
@@ -469,7 +474,7 @@ $key += 1; // this will be the next key value
 			--></script>
 			<td>
 				<select onChange="insertCode();" id="inscode">
-			<option value=""><?php echo _("Pick pre-defined patterns")?></option>
+			<option value=""><?php echo _("(pick one)")?></option>
 			<option value="local"><?php echo _("Local 7 digit")?></option>
 			<option value="local10"><?php echo _("Local 7/10 digit")?></option>
 			<option value="tollfree"><?php echo _("Toll-free")?></option>

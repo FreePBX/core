@@ -116,6 +116,10 @@ switch ($action) {
 					// - match local 10 digits
 					// - add 1 to anything else
 					$dialrules[] = $matches[1].'NXXXXXX';
+					// add NPA to 7-digits
+					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+						$dialrules[] = $prefix['npa'].'+'.$prefix['nxx'].'XXXX';
+					}
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
 						$dialrules[] = $prefix['npa'].$prefix['nxx'].'XXXX';
 					}
@@ -367,16 +371,16 @@ if (!$tech && !$extdisplay) {
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Dial rules wizards")?><span>
-					<strong><?php echo _("Always add prefix to local numbers")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
+					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
-					<strong><?php echo _("Setup dialing for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+areacode for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
+					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+areacode for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
 				</td><td valign="top">&nbsp;&nbsp;<select id="autopop" name="autopop" onChange="changeAutoPop(); ">
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
-						<option value="always"><?php echo _("Always add prefix to local numbers")?></option>
+						<option value="always"><?php echo _("Always dial with prefix")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
-						<option value="lookup7"><?php echo _("Setup dialing for local trunk (7-digit dialing)")?></option>
-						<option value="lookup10"><?php echo _("Setup dialing for local trunk (10-digit dialing)")?></option>
+						<option value="lookup7"><?php echo _("Lookup numbers for local trunk (7-digit dialing)")?></option>
+						<option value="lookup10"><?php echo _("Lookup numbers for local trunk (10-digit dialing)")?></option>
 					</select>
 				</td>
 			</tr>
