@@ -786,6 +786,8 @@ function core_devices_addsip($account) {
 			$keyword = substr($req, 8);
 			if ( $keyword == 'dial' && $data == '' ) {
 				$sipfields[] = array($account, $keyword, 'SIP/'.$account);
+			} elseif ($keyword == 'mailbox' && $data == '') {
+				$sipfields[] = array($account,'mailbox',$account.'@device');
 			} else {
 				$sipfields[] = array($account, $keyword, $data);
 			}
@@ -865,6 +867,8 @@ function core_devices_addiax2($account) {
 			$keyword = substr($req, 8);
 			if ( $keyword == 'dial' && $data == '' ) {
 				$iaxfields[] = array($account, $keyword, 'IAX2/'.$account);
+			} elseif ($keyword == 'mailbox' && $data == '') {
+				$iaxfields[] = array($account,'mailbox',$account.'@device');
 			} else {
 				$iaxfields[] = array($account, $keyword, $data);
 			}
@@ -945,6 +949,8 @@ function core_devices_addzap($account) {
 			if ( $keyword == 'dial' && $data == '' ) {
 				$zapchan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
 				$zapfields[] = array($account, $keyword, 'ZAP/'.$zapchan);
+			} elseif ($keyword == 'mailbox' && $data == '') {
+				$zapfields[] = array($account,'mailbox',$account.'@device');
 			} else {
 				$zapfields[] = array($account, $keyword, $data);
 			}
