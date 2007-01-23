@@ -1559,7 +1559,7 @@ function core_trunks_getTrunkTrunkName($trunknum) {
 	}
 	
 	if(strpos($results[0][0],"AMP:") === 0) {  //custom trunks begin with AMP:
-		$tname = ltrim($results[0][0],"AMP:");
+		$tname = substr($results[0][0],4);
 	} else {
 	strtok($results[0][0],'/');
 		$tname = strtok('/'); // the text _after_ technology.  ie: ZAP/g0 is g0

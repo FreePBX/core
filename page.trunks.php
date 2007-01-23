@@ -183,7 +183,7 @@ foreach ($globals as $global) {
 $tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
-    echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\">"._("Trunk")." ".substr(ltrim($tresult[1],"AMP:"),0,15)."</a></li>\n";
+    echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\">"._("Trunk")." ".(strpos($tresult[1],'AMP:')===0 ? substr($tresult[1],4,15) : substr($tresult[1],0,15))."</a></li>\n";
 }
 
 ?>

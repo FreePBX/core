@@ -509,7 +509,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 				<option value=""></option>
 				<?php 
 				foreach ($trunks as $name=>$display) {
-					echo "<option id=\"trunk".$key."\" value=\"".$name."\" ".($name == $trunk ? "selected" : "").">".$display."</option>";
+					echo "<option id=\"trunk".$key."\" value=\"".$name."\" ".($name == $trunk ? "selected" : "").">".(strpos($display,'AMP:')===0 ? substr($display,4) : $display)."</option>";
 				}
 				?>
 				</select>
@@ -549,7 +549,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<option value="" SELECTED></option>
 				<?php 
 				foreach ($trunks as $name=>$display) {
-					echo "<option value=\"".$name."\">".ltrim($display,"AMP:")."</option>";
+					echo "<option value=\"".$name."\">".(strpos($display,'AMP:')===0 ? substr($display,4) : $display)."</option>";
 				}
 				?>
 				</select>
