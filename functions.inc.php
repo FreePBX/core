@@ -2653,6 +2653,7 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
 		$section = 'Device Options';
+		$currentcomponent->addguielem($section, new gui_label('techlabel', sprintf(_("This device uses %s technology."),$devinfo_tech)),4);
 		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 		foreach ($devopts as $devopt=>$devoptarr) {
 			$devopname = 'devinfo_'.$devopt;
