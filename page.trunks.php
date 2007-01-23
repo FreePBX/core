@@ -687,6 +687,7 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
 	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
+	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
 
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.outcid.value))
@@ -715,7 +716,16 @@ function trunkEdit_onsubmit(act) {
 	if (theForm.channelid.value == theForm.usercontext.value) 
 		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	<?php } ?>
-	
+
+	<?php if ($tech == "sip" || $tech = "iax2") { ?>
+	if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && 
+		(!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) &&
+			(theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
+				if (confirm(msgConfirmBlankContext) == false)
+				return false;
+			}
+	<?php } ?>
+
 	theForm.action.value = act;
 	return true;
 }
