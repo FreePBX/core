@@ -1103,6 +1103,7 @@ function core_users_add($vars) {
 		$vmbox = voicemail_mailbox_get($extension);
 		if ( $vmbox == null ) {
 			$voicemail = "novm";
+			$vmx_state = "false";
 		} else {
 			$voicemail = $vmbox['vmcontext'];
 		}
@@ -1168,6 +1169,48 @@ function core_users_add($vars) {
 		if (isset($amp_conf['ENABLECW']) && $amp_conf['ENABLECW'] == "yes") {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
 		}
+
+		if ($vmx_state) {
+
+			$unavail_mode="enabled";
+			$busy_mode="disabled";
+			$vmx_state=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
+
+			if (trim($vmx_state) == 'blocked') {
+
+				$astman->database_put("AMPUSER", "$extension/vmx/unavail/state", "$unavail_mode");
+				$astman->database_put("AMPUSER", "$extension/vmx/busy/state", "$busy_mode");
+
+			} elseif (trim($vmx_state) != 'enabled' && trim($vmx_state) != 'disabled') {
+
+				$repeat="1";
+				$timeout="2";
+				$vmxopts_timeout="";
+				$loops="1";
+
+				$mode="unavail";
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$unavail_mode");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/repeat", "$repeat");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/timeout", "$timeout");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/loops", "$loops");
+
+				$mode="busy";
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$busy_mode");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/repeat", "$repeat");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/timeout", "$timeout");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
+				$astman->database_put("AMPUSER", "$extension/vmx/$mode/loops", "$loops");
+				
+			}
+		} else {
+			$vmx_state=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
+			if (trim($vmx_state) == 'enabled' || trim($vmx_state) == 'disabled' || trim($vmx_state) == 'blocked') {
+				$astman->database_put("AMPUSER", "$extension/vmx/unavail/state", "blocked");
+				$astman->database_put("AMPUSER", "$extension/vmx/busy/state", "blocked");
+			}
+		}
+		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -1193,6 +1236,14 @@ function core_users_get($extension){
 		$results['record_in']='Adhoc';
 		$results['record_out']='Adhoc';
 	}
+	$astman = new AGI_AsteriskManager();
+	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
+		$astman->disconnect();
+	} else {
+		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+	}
+
 	return $results;
 }
 
@@ -1235,6 +1286,7 @@ function core_users_cleanastdb($extension) {
 		$astman->database_del("CF",$extension);
 		$astman->database_del("CFB",$extension);
 		$astman->database_del("CFU",$extension);
+		$astman->database_deltree("AMPUSER",$extension."/vmx/");
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}

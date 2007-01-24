@@ -33,6 +33,21 @@ if ($action == 'editglobals') {
 						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						array(isset($_REQUEST['VM_OPTS']) ? $_REQUEST['VM_OPTS'] : "",'VM_OPTS'),
+
+						array(isset($_REQUEST['VMX_CONTEXT']) ? $_REQUEST['VMX_CONTEXT'] : "",'VMX_CONTEXT'),
+						array(isset($_REQUEST['VMX_PRI']) ? $_REQUEST['VMX_PRI'] : "",'VMX_PRI'),
+						array(isset($_REQUEST['VMX_TIMEDEST_CONTEXT']) ? $_REQUEST['VMX_TIMEDEST_CONTEXT'] : "",'VMX_TIMEDEST_CONTEXT'),
+						array(isset($_REQUEST['VMX_TIMEDEST_EXT']) ? $_REQUEST['VMX_TIMEDEST_EXT'] : "",'VMX_TIMEDEST_EXT'),
+						array(isset($_REQUEST['VMX_TIMEDEST_PRI']) ? $_REQUEST['VMX_TIMEDEST_PRI'] : "",'VMX_TIMEDEST_PRI'),
+						array(isset($_REQUEST['VMX_LOOPDEST_CONTEXT']) ? $_REQUEST['VMX_LOOPDEST_CONTEXT'] : "",'VMX_LOOPDEST_CONTEXT'),
+						array(isset($_REQUEST['VMX_LOOPDEST_EXT']) ? $_REQUEST['VMX_LOOPDEST_EXT'] : "",'VMX_LOOPDEST_EXT'),
+						array(isset($_REQUEST['VMX_LOOPDEST_PRI']) ? $_REQUEST['VMX_LOOPDEST_PRI'] : "",'VMX_LOOPDEST_PRI'),
+						array(isset($_REQUEST['VMX_OPTS_TIMEOUT']) ? $_REQUEST['VMX_OPTS_TIMEOUT'] : "",'VMX_OPTS_TIMEOUT'),
+						array(isset($_REQUEST['VMX_OPTS_LOOP']) ? $_REQUEST['VMX_OPTS_LOOP'] : "",'VMX_OPTS_LOOP'),
+						array(isset($_REQUEST['VMX_OPTS_DOVM']) ? $_REQUEST['VMX_OPTS_DOVM'] : "",'VMX_OPTS_DOVM'),
+						array(isset($_REQUEST['VMX_TIMEOUT']) ? $_REQUEST['VMX_TIMEOUT'] : "",'VMX_TIMEOUT'),
+						array(isset($_REQUEST['VMX_REPEAT']) ? $_REQUEST['VMX_REPEAT'] : "",'VMX_REPEAT'),
+						array(isset($_REQUEST['VMX_LOOPS']) ? $_REQUEST['VMX_LOOPS'] : "",'VMX_LOOPS'),
 						);
 
 	$compiled = $db->prepare('UPDATE globals SET value = ? WHERE variable = ?');
@@ -110,6 +125,130 @@ foreach ($globals as $global) {
 	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>"/>
 	<br><br>
 	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo ($VM_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Do Not Play")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a> <?php echo _("please leave message after tone to caller")?>
+</p>
+
+<h5><?php echo _("Voicemail VmX Locator")?></h5>
+	<table>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Default Context & Pri:")?><span>
+			<?php echo _("Default to use if only an number/extension are provided."); ?></span></a>
+			</td>
+			<td><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
+			<td></td>
+			<td><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>"/><small><?php echo _("pri")?></small></td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Timeout/#-press default:")?><span>
+			<?php echo _("This is the default location that a caller will be sent if they don't press any key (timeout) or press # which is interpreted as a timeout. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
+			</td>
+			<td><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
+			<td><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>"/><small><?php echo _("exten")?></small></td>
+			<td><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>"/><small><?php echo _("pri")?></small></td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Loop Exceed default:")?><span>
+			<?php echo _("This is the default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
+			</td>
+			<td><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
+			<td><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>"/><small><?php echo _("exten")?></small></td>
+			<td><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>"/><small><?php echo _("pri")?></small></td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Timeout VM Msg:")?><span>
+			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_OPTS_TIMEOUT">
+				<option value=""  <?php  echo ($VMX_OPTS_TIMEOUT == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value="s" <?php  echo ($VMX_OPTS_TIMEOUT == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
+			</select> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Max Loop VM Msg:")?><span>
+			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_OPTS_LOOP">
+				<option value=""  <?php  echo ($VMX_OPTS_LOOP == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value="s" <?php  echo ($VMX_OPTS_LOOP == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
+			</select> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Direct VM Option")?><span>
+			<?php echo _("If a user defined option is to go to voicmail (using the 'dovm' extension) this is the default option if not specified by the user's settings."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_OPTS_DOVM">
+				<option value=""  <?php  echo ($VMX_OPTS_DOVM == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value="s" <?php  echo ($VMX_OPTS_DOVM == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
+			</select> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Msg Timeout:")?><span>
+			<?php echo _("Time ot wait after message has played to timeout and/or repeat the message if no entry pressed."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_TIMEOUT">
+<?php
+			for ($i=0;$i<16;$i++) { 
+				$VMX_TIMEOUT = (!isset($VMX_TIMEOUT) || $VMX_TIMEOUT == '')?2:$VMX_TIMEOUT;
+?>
+				<option value="<?php echo $i?>"  <?php  echo ($VMX_TIMEOUT == $i ? 'SELECTED' : '') ?>><?php echo $i?>
+<?php
+				}
+?>
+			</select></td><td><small><?php echo _("seconds")?></small>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Msg Play:")?><span>
+			<?php echo _("Number of times to play the recorded message if the caller does not press any options and it times out."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_REPEAT">
+<?php
+			for ($i=1;$i<5;$i++) { 
+				$VMX_REPEAT = (!isset($VMX_REPEAT) || $VMX_REPEAT == '')?1:$VMX_REPEAT;
+?>
+				<option value="<?php echo $i?>"  <?php  echo ($VMX_REPEAT == $i ? 'SELECTED' : '') ?>><?php echo $i?>
+<?php
+				}
+?>
+			</select></td><td><small><?php echo _("times")?></small> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Error Re-tries:")?><span>
+			<?php echo _("Number of times to play invalid options and repeat the message upon receiving an undefined option."); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="VMX_LOOPS">
+<?php
+			for ($i=1;$i<5;$i++) { 
+				$VMX_REPEAT = (!isset($VMX_LOOPS) || $VMX_LOOPS == '')?1:$VMX_LOOPS;
+?>
+				<option value="<?php echo $i?>"  <?php  echo ($VMX_LOOPS == $i ? 'SELECTED' : '') ?>><?php echo $i?>
+<?php
+				}
+?>
+			</select></td><td><small><?php echo _("times")?></small> 
+			</td>
+		</tr>
+	</table>
+<p>
+
 </p>
 
 <h5><?php echo _("Company Directory")?></h5>
