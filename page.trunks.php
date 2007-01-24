@@ -24,7 +24,7 @@ $trunknum = ltrim($extdisplay,'OUT_');
 
 
 // populate some global variables from the request string
-$set_globals = array("outcid","maxchans","dialoutprefix","channelid","peerdetails","usercontext","userconfig","register","keepcid");
+$set_globals = array("outcid","maxchans","dialoutprefix","channelid","peerdetails","usercontext","userconfig","register","keepcid","failtrunk","disabletrunk");
 foreach ($set_globals as $var) {
 	if (isset($_REQUEST[$var])) {
 		$$var = stripslashes( $_REQUEST[$var] );
@@ -34,6 +34,13 @@ foreach ($set_globals as $var) {
 // ensure that keepcid is set to something:
 if (!isset($keepcid)) {
 	$keepcid = "off";
+}
+// ensure that failtrunk is set to something:
+if (!isset($failtrunk)) {
+	$failtrunk = "";
+}
+if (!isset($disabletrunk)) {
+	$disabletrunk = "off";
 }
 
 if (isset($_REQUEST["dialrules"])) {
@@ -59,14 +66,18 @@ if (isset($_REQUEST["dialrules"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addtrunk":
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
+		if (!isset($failtrunk))
+		    $failtrunk="";
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk),$disabletrunk);
 		
 		core_trunks_addDialRules($trunknum, $dialrules);
 		needreload();
 		redirect_standard();
 	break;
 	case "edittrunk":
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
+		if (!isset($failtrunk))
+		    $failtrunk="";
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk);
 		
 		/* //DIALRULES
 		deleteTrunkRules($channelid);
@@ -183,7 +194,8 @@ foreach ($globals as $global) {
 $tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
-    echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\">"._("Trunk")." ".(strpos($tresult[1],'AMP:')===0 ? substr($tresult[1],4,15) : substr($tresult[1],0,15))."</a></li>\n";
+	$background = ($tresult[2] == 'on')?'#DDD':'#FFF';
+	echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\" style=\"background: $background;\" >"._("Trunk")." ".substr(ltrim($tresult[1],"AMP:"),0,15)."</a></li>\n";
 }
 
 ?>
@@ -213,6 +225,9 @@ if (!$tech && !$extdisplay) {
 		$maxchans = ${"OUTMAXCHANS_".$trunknum};
 		$dialoutprefix = ${"OUTPREFIX_".$trunknum};
 		$keepcid = isset(${"OUTKEEPCID_".$trunknum})?${"OUTKEEPCID_".$trunknum}:'';
+		$failtrunk = isset(${"OUTFAIL_".$trunknum})?${"OUTFAIL_".$trunknum}:'';
+		$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
+		$disabletrunk = isset(${"OUTDISABLE_".$trunknum})?${"OUTDISABLE_".$trunknum}:'';
 		
 		if ($tech!="enum") {
 	
@@ -339,6 +354,24 @@ if (!$tech && !$extdisplay) {
 					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>"/>
 				</td>
 			</tr>
+
+			<tr>
+			    <td><a class="info" href="#"><?php echo _("Disable Trunk")?><span><?php echo _("Check this to disable this trunk in all routes where it is used.")?></span></a>:
+			    </td>
+			    <td>
+				<input type='checkbox' name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><small><?php echo _("Disable")?></small>
+			    </td>
+			</tr>
+
+			<tr>
+			    <td><a class="info" href="#"><?php echo _("Monitor Trunk Failures")?><span><?php echo _("If checked, supply the name of a custom AGI Script that will be called to report, log, email or otherwise take some action on trunk failures that are not caused by either NOANSWER or CANCEL.")?></span></a>:
+			    </td>
+			    <td>
+				<input <?php if (!$failtrunk_enable) echo "disabled style='background: #DDD;'"?> type="text" size="20" name="failtrunk" value="<?php echo htmlspecialchars($failtrunk)?>"/>
+				<input type='checkbox' name='failtrunk_enable' id="failtrunk_enable" value='1' <?php if ($failtrunk_enable) { echo 'CHECKED'; }?> OnClick='disable_field(failtrunk,failtrunk_enable); return true;'><small><?php echo _("Enable")?></small>
+			    </td>
+			</tr>
+
 			<tr>
 				<td colspan="2">
 					<br><h4><?php echo _("Outgoing Dial Rules")?></h4>
@@ -387,6 +420,29 @@ if (!$tech && !$extdisplay) {
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
 			
+			function disable_field(field, field_enable) {
+			    if (field_enable.checked) {
+				field.style.backgroundColor = '#FFF';
+				field.disabled = false;
+			    }
+			    else {
+				field.style.backgroundColor = '#DDD';
+				field.disabled = true;
+			    }
+			}
+
+			function disable_verify(field) {
+			    if (field.checked) {
+				var answer=confirm("Are you sure you want to disable this trunk in all routes it is used?");
+				if (!answer) {
+				    field.checked = false;
+				}
+			    }
+			    else {
+				alert("You have enabled this trunk in all routes it is used");
+			    }
+			}
+
 			function populateLookup(digits) {
 <?php 
 	if (function_exists("curl_init")) { // curl is installed

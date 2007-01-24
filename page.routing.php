@@ -267,6 +267,7 @@ if ($extdisplay) {
 // build trunks associative array
 foreach (core_trunks_list() as $temp) {
 	$trunks[$temp[0]] = $temp[1];
+	$trunkstate[$temp[0]] = $temp[2];
 }
 
 if ($extdisplay) { // editing
@@ -505,11 +506,15 @@ foreach ($trunkpriority as $key=>$trunk) {
 			<td align="right"><?php echo $key; ?>&nbsp;&nbsp;
 			</td>
 			<td>
-				<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]">
-				<option value=""></option>
+		<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]" style="background: <?php echo $trunkstate[$trunk]=="off"?"#FFF":"#DDD" ?> ;" onChange="showDisable(<?php echo $key ?>); return true;">
+				<option value="" style="background: #FFF;"></option>
 				<?php 
 				foreach ($trunks as $name=>$display) {
-					echo "<option id=\"trunk".$key."\" value=\"".$name."\" ".($name == $trunk ? "selected" : "").">".(strpos($display,'AMP:')===0 ? substr($display,4) : $display)."</option>";
+					if ($trunkstate[$name] == 'off') {
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #FFF;\" ".($name == $trunk ? "selected" : "").">".$display."</option>";
+					} else {
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #DDD;\" ".($name == $trunk ? "selected" : "").">".$display."</option>";
+					}
 				}
 				?>
 				</select>
@@ -549,7 +554,11 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<option value="" SELECTED></option>
 				<?php 
 				foreach ($trunks as $name=>$display) {
-					echo "<option value=\"".$name."\">".(strpos($display,'AMP:')===0 ? substr($display,4) : $display)."</option>";
+					if ($trunkstate[$name] == 'off') {
+					echo "<option value=\"".$name."\">".ltrim($display,"AMP:")."</option>";
+					} else {
+					echo "<option value=\"".$name."\" style=\"background: #DDD;\" >*".ltrim($display,"AMP:")."*</option>";
+					}
 				}
 				?>
 				</select>
@@ -585,6 +594,22 @@ if (theForm.routename.value == "") {
 	theForm.routename.focus();
 } else {
 	theForm.routepass.focus();
+}
+
+function showDisable(key) {
+<?php
+	$bgmap = 'bgc = {';
+	foreach ($trunks as $name=>$display) {
+		$bgmap .= " \"$name\":";
+		$bgmap .= ($trunkstate[$name] == 'off')?'"#FFF",':'"#DDD",';
+	}
+	echo rtrim($bgmap,',')." };\n";
+?>
+	if (document.getElementById('trunkpri'+key).value =='') {
+		document.getElementById('trunkpri'+key).style.background = '#FFF';
+	} else {
+		document.getElementById('trunkpri'+key).style.background = bgc[document.getElementById('trunkpri'+key).value];
+	}
 }
 
 function routeEdit_onsubmit(act) {

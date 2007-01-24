@@ -1275,7 +1275,7 @@ function core_directdid_list(){
 /* begin page.trunks.php functions */
 
 // we're adding ,don't require a $trunknum
-function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
+function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk) {
 	global $db;
 	
 	// find the next available ID
@@ -1286,7 +1286,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		}
 	}
 	
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk);
 	
 	return $trunknum;
 }
@@ -1299,7 +1299,7 @@ function core_trunks_del($trunknum, $tech = null) {
 	}
 
 	//delete from globals table
-	sql("DELETE FROM globals WHERE variable LIKE '%OUT_$trunknum' OR variable IN ('OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum','OUTKEEPCID_$trunknum')");
+	sql("DELETE FROM globals WHERE variable LIKE '%OUT_$trunknum' OR variable IN ('OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum','OUTKEEPCID_$trunknum','OUTFAIL_$trunknum','OUTDISABLE_$trunknum')");
 	
 	//write outids
 	core_trunks_writeoutids();
@@ -1316,16 +1316,16 @@ function core_trunks_del($trunknum, $tech = null) {
 	}
 }
 
-function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
+function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk) {
 	//echo "editTrunk($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register)";
 	$tech = core_trunks_getTrunkTech($trunknum);
 	core_trunks_del($trunknum, $tech);
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
-function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid) {
+function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk) {
 	global $db;
 	
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
@@ -1342,6 +1342,8 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 			array('OUTMAXCHANS_'.$trunknum, $maxchans),
 			array('OUTCID_'.$trunknum, $outcid),
 			array('OUTKEEPCID_'.$trunknum, $keepcid),
+			array('OUTFAIL_'.$trunknum, $failtrunk),
+			array('OUTDISABLE_'.$trunknum, $disabletrunk),
 			);
 			
 	unset($techtemp); 
@@ -1353,25 +1355,27 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 	}
 	
 	core_trunks_writeoutids();
+
+	$disable_flag = ($disabletrunk == "on")?1:0;
 	
 	switch (strtolower($tech)) {
 		case "iax":
 		case "iax2":
-			core_trunks_addSipOrIax($peerdetails,'iax',$channelid,$trunknum);
+			core_trunks_addSipOrIax($peerdetails,'iax',$channelid,$trunknum,$disable_flag);
 			if ($usercontext != ""){
-				core_trunks_addSipOrIax($userconfig,'iax',$usercontext,'9'.$trunknum);
+				core_trunks_addSipOrIax($userconfig,'iax',$usercontext,'9'.$trunknum,$disable_flag);
 			}
 			if ($register != ""){
-				core_trunks_addRegister($trunknum,'iax',$register);
+				core_trunks_addRegister($trunknum,'iax',$register,$disable_flag);
 			}
 		break;
 		case "sip":
-			core_trunks_addSipOrIax($peerdetails,'sip',$channelid,$trunknum);
+			core_trunks_addSipOrIax($peerdetails,'sip',$channelid,$trunknum,$disable_flag);
 			if ($usercontext != ""){
-				core_trunks_addSipOrIax($userconfig,'sip',$usercontext,'9'.$trunknum);
+				core_trunks_addSipOrIax($userconfig,'sip',$usercontext,'9'.$trunknum,$disable_flag);
 			}
 			if ($register != ""){
-				core_trunks_addRegister($trunknum,'sip',$register);
+				core_trunks_addRegister($trunknum,'sip',$register,$disable_flag);
 			}
 		break;
 	}	
@@ -1394,7 +1398,7 @@ function core_trunks_getTrunkTech($trunknum) {
 }
 
 //add trunk info to sip or iax table
-function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum) {
+function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_flag=0) {
 	global $db;
 	
 	$confitem['account'] = $channelid;
@@ -1415,10 +1419,10 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum) {
 	foreach($confitem as $k=>$v) {
 		$dbconfitem[]=array($k,$v);
 	}
-	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data) values ('9999$trunknum',?,?)");
+	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");
 	$result = $db->executeMultiple($compiled,$dbconfitem);
 	if(DB::IsError($result)) {
-		die($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data) values ('9999$trunknum',?,?)");	
+		die($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");	
 	}
 }
 
@@ -1431,12 +1435,32 @@ function core_trunks_list() {
 	{
 		// TODO: sqlite work arround - diego 
 		// need to reorder the trunks in PHP code
-		$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll"); 
+		$sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
+		$sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\_%') d ";
+		$sqlstr .= "ON substring(t.variable,5) = substring(d.variable,12) WHERE t.variable LIKE 'OUT\_%' ";
+		$sqlstr .= "UNION ALL ";
+		$sqlstr .= "SELECT v.variable, v.value, concat(substring(v.value,1,0),'off') state  FROM `globals` v ";
+		$sqlstr .= "WHERE v.variable LIKE 'OUT\_%' AND concat('OUTDISABLE_',substring(v.variable,5)) NOT IN ";
+		$sqlstr .= " ( SELECT variable from globals WHERE variable LIKE 'OUTDISABLE\_%' ) ";
+		$sqlstr .= "ORDER BY variable";
+
+		//$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll"); 
+		$unique_trunks = sql($sqlstr,"getAll"); 
 	}
 	else
 	{
 		// we have to escape _ for mysql: normally a wildcard
-		$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT\\\_%' ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0","getAll"); 
+		$sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
+		$sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\\\_%') d ";
+		$sqlstr .= "ON substring(t.variable,5) = substring(d.variable,12) WHERE t.variable LIKE 'OUT\\\_%' ";
+		$sqlstr .= "UNION ALL ";
+		$sqlstr .= "SELECT v.variable, v.value, concat(substring(v.value,1,0),'off') state  FROM `globals` v ";
+		$sqlstr .= "WHERE v.variable LIKE 'OUT\\\_%' AND concat('OUTDISABLE_',substring(v.variable,5)) NOT IN ";
+		$sqlstr .= " ( SELECT variable from globals WHERE variable LIKE 'OUTDISABLE\\\_%' ) ";
+		$sqlstr .= "ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0";
+
+		//$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT\\\_%' ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0","getAll"); 
+		$unique_trunks = sql($sqlstr,"getAll"); 
 	}
 
 	//if no trunks have ever been defined, then create the proper variables with the default zap trunk
@@ -1475,8 +1499,8 @@ function core_trunks_writeoutids() {
 	sql("UPDATE globals SET value = '$outids' WHERE variable = 'DIALOUTIDS'");
 }
 
-function core_trunks_addRegister($trunknum,$tech,$reg) {
-	sql("INSERT INTO $tech (id, keyword, data) values ('9999999$trunknum','register','$reg')");
+function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
+	sql("INSERT INTO $tech (id, keyword, data, flags) values ('9999999$trunknum','register','$reg','$disable_flag')");
 }
 
 
