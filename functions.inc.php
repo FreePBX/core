@@ -346,6 +346,9 @@ function core_get_config($engine) {
 				foreach($userlist as $item) {
 					$exten = core_users_get($item[0]);
 					$vm = ($exten['voicemail'] == "novm" ? "novm" : $exten['extension']);
+
+					if (isset($exten['ringtimer']) && $exten['ringtimer'] != 0)
+						$ext->add('ext-local', $exten['extension'], '', new ext_setvar('__RINGTIMER',$exten['ringtimer']));
 					
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
 					$ext->add('ext-local', $exten['extension'], '', new ext_hangup(''));
@@ -2361,6 +2364,12 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('privyn', '1', 'Yes');
 		$currentcomponent->setoptlistopts('privyn', 'sort', false);
 
+		$currentcomponent->addoptlistitem('ringtime', '0', 'Default');
+		for ($i=1; $i <= 120; $i++) {
+			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
+		}
+		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
+
 		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'freePBX default');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', 'disabled');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
@@ -2475,6 +2484,8 @@ function core_users_configpageload() {
 		    $currentcomponent->addguielem($section, new gui_selectbox('mohclass', $currentcomponent->getoptlist('mohclass'), $mohclass, 'Music on Hold', "Set the MoH class that will be used for calls that come in on this Direct DID. For example, choose a type appropriate for a originating country which may have announcements in their language. Only effects MoH class when the call came in from the Direct DID.", false));
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
+		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
+		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', "Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored.", false));
 
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
