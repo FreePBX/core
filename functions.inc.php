@@ -497,7 +497,7 @@ function core_did_add($incoming){
 	foreach ($incoming as $key => $val) { ${$key} = addslashes($val); } // create variables from request
 	$existing=core_did_get($extension,$cidnum,$channel);
 	if (empty($existing)) {
-		$destination=${$goto_indicate0.'0'};
+		$destination=${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass')";
 		sql($sql);
 	} else {
