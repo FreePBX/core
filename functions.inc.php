@@ -1487,7 +1487,7 @@ function core_trunks_list() {
 	global $db;
 	global $amp_conf;
 	
-	if ( $amp_conf["AMPDBENGINE"] == "sqlite")
+	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
 	{
 		// TODO: sqlite work arround - diego 
 		// need to reorder the trunks in PHP code
@@ -1756,7 +1756,7 @@ function core_routing_getroutenames()
 {
 	global $amp_conf;
 	
-	if ( $amp_conf["AMPDBENGINE"] == "sqlite")
+	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
 	{
 		// TODO: sqlite work arround - diego
 		$results = sql("SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
