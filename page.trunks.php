@@ -773,7 +773,7 @@ function trunkEdit_onsubmit(act) {
 		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	<?php } ?>
 
-	<?php if ($tech == "sip" || $tech = "iax2") { ?>
+	<?php if ($tech == "sip" || $tech == "iax2") { ?>
 	if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && 
 		(!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) &&
 			(theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
