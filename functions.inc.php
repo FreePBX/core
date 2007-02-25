@@ -539,12 +539,14 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	global $currentFile;
 	global $astman;
 	
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
+
 	//ensure this id is not already in use
 	$devices = core_devices_list();
 	if (is_array($devices)) {
 		foreach($devices as $device) {
 			if ($device[0] === $id) {
-				echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
+				if ($display <> 'extensions') echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
 				return false;
 			}
 		}
@@ -2524,9 +2526,10 @@ function core_users_configprocess() {
 		if (!isset($action)) $action = null;
 		switch ($action) {
 			case "add":
-				core_users_add($_REQUEST);
-				needreload();
-				redirect_standard_continue();
+				if (core_users_add($_REQUEST)) {
+					needreload();
+					redirect_standard_continue();
+				}
 			break;
 			case "del":
 				core_users_del($extdisplay);
@@ -2785,10 +2788,11 @@ function core_devices_configprocess() {
 	//if submitting form, update database
 	switch ($action) {
         case "add":
-                core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
-                needreload();
-		if ($deviceuser != 'new') {
-			redirect_standard_continue();
+		if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
+			needreload();
+			if ($deviceuser != 'new') {
+				redirect_standard_continue();
+			}
 		}
         break;
         case "del":
