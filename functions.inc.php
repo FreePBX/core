@@ -361,6 +361,9 @@ function core_get_config($engine) {
 					$hint = core_hint_get($exten['extension']);
 					if (!empty($hint))
 						$ext->addHint('ext-local', $exten['extension'], $hint);
+					if ($exten['sipname']) {
+						$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
+					}
 				}
 			}
 			
@@ -538,9 +541,9 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	global $amp_conf;
 	global $currentFile;
 	global $astman;
-	
-	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
+	
 	//ensure this id is not already in use
 	$devices = core_devices_list();
 	if (is_array($devices)) {
@@ -1075,6 +1078,23 @@ function core_users_list() {
 	}
 }
 
+function core_sipname_check($sipname) {
+	global $db;
+	if (!isset($sipname) || trim($sipname)=='')
+		return true;
+
+	$sql = "SELECT sipname FROM users WHERE sipname = '$sipname'";
+	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
+	if(DB::IsError($results)) {
+        die($results->getMessage().$sql);
+	}
+	
+	if (isset($results['sipname']) && trim($results['sipname']) == $sipname) 
+		return false;
+	else
+		return true;
+}
+
 function core_users_add($vars) {
 	extract($vars);
 	
@@ -1091,6 +1111,12 @@ function core_users_add($vars) {
 				return false;
 			}
 		}
+	}
+
+	$sipname = preg_replace("/\s/" ,"", trim($sipname));
+	if (! core_sipname_check($sipname)) {
+		echo "<script>javascript:alert('"._("This sipname: {$sipname} is already in use")."');</script>";
+		return false;
 	}
 	
 	//build the recording variable
@@ -1126,7 +1152,7 @@ function core_users_add($vars) {
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman,mohclass) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman,mohclass,sipname) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -1157,7 +1183,9 @@ function core_users_add($vars) {
 	$sql.= "\", \"";
 	$sql.= isset($privacyman)?$privacyman:'';
 	$sql.= "\", \"";
-        $sql.= isset($mohclass)?$mohclass:'';
+	$sql.= isset($mohclass)?$mohclass:'';
+	$sql.= "\", \"";
+	$sql.= isset($sipname)?$sipname:'';
 	$sql.= "\")";
 	sql($sql);
 
@@ -1313,8 +1341,10 @@ function core_users_edit($extension,$vars){
 	}
 	
 	//delete and re-add
-	core_users_del($extension);
-	core_users_add($vars);
+	if (core_sipname_check($vars['sipname'])) {
+		core_users_del($extension);
+		core_users_add($vars);
+	}
 	
 }
 
@@ -2411,7 +2441,7 @@ function core_users_configpageload() {
 
 	// Ensure variables possibly extracted later exist
 	$name = $directdid = $didalert = $outboundcid = $answer = null;
-	$record_in = $record_out = $faxexten = $faxemail = $mohclass =  null;
+	$record_in = $record_out = $faxexten = $faxemail = $mohclass = $sipname = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -2479,6 +2509,7 @@ function core_users_configpageload() {
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
+		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', "If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them."));
 		
 		$section = 'Extension Options';
 		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."), 3);
@@ -2788,8 +2819,8 @@ function core_devices_configprocess() {
 	//if submitting form, update database
 	switch ($action) {
         case "add":
-		if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
-			needreload();
+                if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
+                	needreload();
 			if ($deviceuser != 'new') {
 				redirect_standard_continue();
 			}
