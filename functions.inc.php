@@ -1243,7 +1243,6 @@ function core_users_add($vars) {
 				$astman->database_put("AMPUSER", "$extension/vmx/busy/state", "blocked");
 			}
 		}
-		$astman->disconnect();
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
