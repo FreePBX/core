@@ -1252,6 +1252,7 @@ function core_users_add($vars) {
 function core_users_get($extension){
 	global $db;
 	global $amp_conf;
+	global $astman;
 	//get all the variables for the meetme
 	$sql = "SELECT * FROM users WHERE extension = '$extension'";
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
@@ -1270,12 +1271,10 @@ function core_users_get($extension){
 		$results['record_in']='Adhoc';
 		$results['record_out']='Adhoc';
 	}
-	$astman = new AGI_AsteriskManager();
-	if ($res = $astman->connect("127.0.0.1", $amp_conf["AMPMGRUSER"] , $amp_conf["AMPMGRPASS"])) {
+	if ($astman) {
 		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
-		$astman->disconnect();
 	} else {
-		print("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 
 	return $results;
