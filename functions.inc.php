@@ -635,6 +635,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	if (isset($jump)) {
 		echo("<script language=\"JavaScript\">window.location=\"config.php?display=users&extdisplay={$id}&name={$description}\";</script>");
 	}
+	return true;
 }
 
 function core_devices_del($account){
@@ -1246,6 +1247,7 @@ function core_users_add($vars) {
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
+	return true;
 }
 
 function core_users_get($extension){
@@ -1518,7 +1520,7 @@ function core_trunks_list() {
 	global $db;
 	global $amp_conf;
 	
-	if ( $amp_conf["AMPDBENGINE"] == "sqlite3")
+	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
 	{
 		// TODO: sqlite work arround - diego 
 		// need to reorder the trunks in PHP code
@@ -1787,7 +1789,7 @@ function core_routing_getroutenames()
 {
 	global $amp_conf;
 	
-	if ( $amp_conf["AMPDBENGINE"] == "sqlite3")
+	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
 	{
 		// TODO: sqlite work arround - diego
 		$results = sql("SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
