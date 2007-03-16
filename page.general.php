@@ -94,9 +94,9 @@ foreach ($globals as $global) {
 	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span><br>
 <?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
 <?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
-<?php echo _("r: Generate a ringing tone for the calling party")?><br>
 <?php echo _("w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 <?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
+<?php echo _("r: You SHOULD NOT use this option on outbound trunks")?><br>
 	</span></a>
 	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>"/>
 </p>
@@ -329,9 +329,24 @@ foreach ($globals as $global) {
 
 var theForm = document.general;
 
+function hasRing (s) {
+	if (s.indexOf('r') >= 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function warnConfirm (theField, s) {
+    theField.focus();
+    theField.select();
+		return confirm(s);
+}
+
 function general_onsubmit() {
 	var msgInvalidSeconds = "<?php echo _('Please enter a valid Number of Seconds'); ?>";
 	var msgInvalidDefaultFaxEmail = "<?php echo _('Please enter a valid Fax Email'); ?>";
+	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signalling. Asterisk will generate a ringing tone until the signalling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
 
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.RINGTIMER.value))
@@ -345,6 +360,9 @@ function general_onsubmit() {
 	}
 	if (!isEmail(theForm.FAX_RX_EMAIL.value))
 		return warnInvalid(theForm.FAX_RX_EMAIL, msgInvalidDefaultFaxEmail);
+
+	if (hasRing(theForm.TRUNK_OPTIONS.value))
+		return warnConfirm(theForm.TRUNK_OPTIONS, msgRingOptionOutboundTrunk);
 	
 	return true;
 }
