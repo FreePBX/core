@@ -1193,19 +1193,21 @@ function core_users_add($vars) {
 
 	//write to astdb
 	if ($astman) {
+		$cid_masquerade = (isset($cid_masquerade) && trim($cid_masquerade) != "")?trim($cid_masquerade):$extension;
 		$astman->database_put("AMPUSER",$extension."/password",isset($password)?$password:'');
 		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
 		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
+		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
 		if (isset($amp_conf['ENABLECW']) && $amp_conf['ENABLECW'] == "yes") {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
 		}
 
-		if ($vmx_state) {
+		if ($vmx_state && $voicemail != "novm") {
 
 			$unavail_mode="enabled";
 			$busy_mode="disabled";
@@ -1275,6 +1277,8 @@ function core_users_get($extension){
 	}
 	if ($astman) {
 		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
+		$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
+		$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -1302,6 +1306,7 @@ function core_users_del($extension){
 		$astman->database_del("AMPUSER",$extension."/recording");
 		$astman->database_del("AMPUSER",$extension."/outboundcid");
 		$astman->database_del("AMPUSER",$extension."/cidname");
+		$astman->database_del("AMPUSER",$extension."/cidnum");
 		$astman->database_del("AMPUSER",$extension."/voicemail");
 		$astman->database_del("AMPUSER",$extension."/device");
 	} else {
@@ -2442,7 +2447,7 @@ function core_users_configpageload() {
 
 	// Ensure variables possibly extracted later exist
 	$name = $directdid = $didalert = $outboundcid = $answer = null;
-	$record_in = $record_out = $faxexten = $faxemail = $mohclass = $sipname = null;
+	$record_in = $record_out = $faxexten = $faxemail = $mohclass = $sipname = $cid_masquerade = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -2485,6 +2490,7 @@ function core_users_configpageload() {
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
 		
 		$msgInvalidExtNum = 'Please enter a valid extension number.';
+		$msgInvalidCidNum = 'Please enter a valid CID Num Alias (must be a valid number).';
 		$msgInvalidExtPwd = 'Please enter valid User Password using numbers only';
 		$msgInvalidDispName = 'Please enter a valid Display Name';
 		$msgInvalidOutboundCID = 'Please enter a valid Outbound CID';
@@ -2510,6 +2516,8 @@ function core_users_configpageload() {
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
+		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
+		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', 'The CID Number to user for internal calls, if different then the extension number. This is used to masquerade as a different user. A common example is a team support persons who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no efffect on external calls.', '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', "If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them."));
 		
 		$section = 'Extension Options';
