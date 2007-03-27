@@ -619,7 +619,7 @@ if (!$tech && !$extdisplay) {
 */?>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line.<br><br>Most users should leave this option blank.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dialtone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>: 
 				</td><td>
 					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>"/>
 				</td>
