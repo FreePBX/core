@@ -1502,7 +1502,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	foreach ($lines as $line) {
 		$line = trim($line);
 		if (count(split('=',$line)) > 1) {
-			$tmp = split('=',$line);
+			$tmp = split('=',$line,2);
 			$key=trim($tmp[0]);
 			$value=trim($tmp[1]);
 			if (isset($confitem[$key]) && !empty($confitem[$key]))
