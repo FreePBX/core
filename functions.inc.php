@@ -191,6 +191,10 @@ function core_get_config($engine) {
 					// Start inbound processing. Unneeded line to be possibly overridden by something in 
 					// extensions_custom.conf
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID',$exten));
+					// always set callerID name
+					$ext->add($context, $exten, '', new ext_gotoif('$[ "${CALLERID(name)}" != "" ] ','cidok'));
+					$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${CALLERID(num)}'));
+					$ext->add($context, $exten, 'cidok', new ext_noop('CallerID is ${CALLERID(all)}'));
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
 					    $ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
@@ -302,6 +306,10 @@ function core_get_config($engine) {
 				foreach($directdidlist as $item) {
 					$exten = $item['directdid'];
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID',$exten));
+					// always set callerID name
+					$ext->add($context, $exten, '', new ext_gotoif('$[ "${CALLERID(name)}" != "" ] ','cidok'));
+					$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${CALLERID(num)}'));
+					$ext->add($context, $exten, 'cidok', new ext_noop('CallerID is ${CALLERID(all)}'));
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
 						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
