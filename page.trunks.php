@@ -12,7 +12,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-$localPrefixFile = "/etc/asterisk/localprefixes.conf";
+$localPrefixFile = rtrim($amp_conf['astetcdir'],DIRECTORY_SEPARATOR)."/localprefixes.conf";
 
 
 $display='trunks'; 
