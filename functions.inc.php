@@ -2375,10 +2375,14 @@ function general_display_zones($curzone) {
 
 function general_generate_indications() {
 	global $db;
+	global $asterisk_conf;
 
 	$sql = "SELECT value FROM globals WHERE variable='TONEZONE'";
 	$result = $db->getRow($sql,DB_FETCHMODE_ASSOC);
-	$fd = fopen("/etc/asterisk/indications.conf", "w");
+
+	$filename = isset($asterisk_conf["astetcdir"]) && $asterisk_conf["astetcdir"] != '' ? rtrim($asterisk_conf["astetcdir"],DIRECTORY_SEPARATOR) : "/etc/asterisk";
+	$filename .= "/indications.conf";
+	$fd = fopen($filename, "w");
 	fwrite($fd, "[general]\ncountry=".$result['value']."\n\n");
 
 	$zonelist = general_get_zonelist();
