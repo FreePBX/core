@@ -512,8 +512,10 @@ function core_did_add($incoming){
 		$destination=${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass')";
 		sql($sql);
+		return true;
 	} else {
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
+		return false;
 	}
 }
 

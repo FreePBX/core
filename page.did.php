@@ -24,9 +24,10 @@ switch ($action) {
 		//create variables from request
 		extract($_REQUEST);
 		//add details to teh 'incoming' table
-		core_did_add($_REQUEST);
-		needreload();
-		redirect_standard();
+		if (core_did_add($_REQUEST)) {
+			needreload();
+			redirect_standard();
+		}
 	break;
 	case 'delIncoming':
 		$extarray=explode('/',$extdisplay,3);
