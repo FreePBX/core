@@ -510,8 +510,17 @@ function core_did_del($extension,$cidnum, $channel){
 
 function core_did_edit($old_extension,$old_cidnum, $old_channel, $incoming){
 
+	$old_extension = addslashes(trim($old_extension));
+	$old_cidnum = addslashes(trim($old_cidnum));
+	$old_channel = addslashes(trim($old_channel));
+
+	$incoming['extension'] = trim($incoming['extension']);
+	$incoming['cidnum'] = trim($incoming['cidnum']);
+	$incoming['channel'] = trim($incoming['channel']);
+
 	$extension = addslashes($incoming['extension']);
 	$cidnum = addslashes($incoming['cidnum']);
+	$channel = addslashes($incoming['channel']);
 
 	// if did or cid changed, then check to make sure that this pair is not already being used.
 	//
@@ -1176,15 +1185,17 @@ function core_users_add($vars) {
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
 	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
-	$existing=core_did_get($directdid,"","");
-	$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
-	if (!empty($existing) || !empty($existing_directdid)) {
-		if (!empty($existing)) {
-			echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
-		} else {
-			echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+	if (trim($directdid) != "") {
+		$existing=core_did_get($directdid,"","");
+		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
+		if (!empty($existing) || !empty($existing_directdid)) {
+			if (!empty($existing)) {
+				echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
+			} else {
+				echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+			}
+			return false;
 		}
-		return false;
 	}
 
 	$sipname = preg_replace("/\s/" ,"", trim($sipname));
@@ -1430,7 +1441,7 @@ function core_users_edit($extension,$vars){
 	//
 	$directdid=$vars['directdid'];
 	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
-	if ($directdid != "") {
+	if (trim($directdid) != "") {
 		$existing=core_did_get($directdid,"","");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
 		if (!empty($existing) || !empty($existing_directdid)) {
