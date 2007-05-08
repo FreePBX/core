@@ -37,10 +37,10 @@ switch ($action) {
 	break;
 	case 'edtIncoming':
 		$extarray=explode('/',$extdisplay,3);
-		core_did_del($extarray[0],$extarray[1],$extarray[2]);
-		core_did_add($_REQUEST);
-		needreload();
-		redirect_standard();
+		if (core_did_edit($extarray[0],$extarray[1],$extarray[2],$_REQUEST)) {
+			needreload();
+			redirect_standard();
+		}
 	break;
 }
 

@@ -166,6 +166,7 @@ function core_get_config($engine) {
 			$didlist = core_did_list();
 			if(is_array($didlist)){
 				$catchall = false;
+				$catchall_context='ext-did-catchall';
 				foreach($didlist as $item) {
 					$did = core_did_get($item['extension'],$item['cidnum'],$item['channel']);
 					$exten = $did['extension'];
@@ -210,8 +211,8 @@ function core_get_config($engine) {
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
 						if ($catchaccount == "_X.") 
 							$catchall = true;
-						$ext->add($context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
-						$ext->add($context, $catchaccount, '', new ext_goto('1','s','ext-did'));
+						$ext->add($catchall_context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
+						$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 					}
 					
 					if ($item['faxexten'] != "default") {
@@ -267,14 +268,14 @@ function core_get_config($engine) {
 				}
 				// If there's not a catchall, make one with an error message
 				if (!$catchall) {
-					$ext->add('ext-did', 's', '', new ext_noop("No DID or CID Match"));
-					$ext->add('ext-did', 's', '', new ext_answer(''));
-					$ext->add('ext-did', 's', '', new ext_wait('2'));
-					$ext->add('ext-did', 's', '', new ext_playback('ss-noservice'));
-					$ext->add('ext-did', 's', '', new ext_sayalpha('${FROM_DID}'));
-					$ext->add('ext-did', '_[*#X].', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
-					$ext->add('ext-did', '_[*#X].', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
-					$ext->add('ext-did', '_[*#X].', '', new ext_goto('1','s','ext-did'));
+					$ext->add($catchall_context, 's', '', new ext_noop("No DID or CID Match"));
+					$ext->add($catchall_context, 's', '', new ext_answer(''));
+					$ext->add($catchall_context, 's', '', new ext_wait('2'));
+					$ext->add($catchall_context, 's', '', new ext_playback('ss-noservice'));
+					$ext->add($catchall_context, 's', '', new ext_sayalpha('${FROM_DID}'));
+					$ext->add($catchall_context, '_[*#X].', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
+					$ext->add($catchall_context, '_[*#X].', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
+					$ext->add($catchall_context, '_[*#X].', '', new ext_goto('1','s','ext-did'));
 				}
 					
 			}
@@ -300,9 +301,11 @@ function core_get_config($engine) {
 
 			$directdidlist = core_directdid_list();
 			if(is_array($directdidlist)){
-				$context = "ext-did-direct";
-				/* Always have Fax detection in ext-did, no matter what */
-				$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
+				$context = "ext-did";
+				if(!is_array($didlist)){
+					/* if not set above, add one here */
+					$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
+				}
 				foreach($directdidlist as $item) {
 					$exten = $item['directdid'];
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID',$exten));
@@ -505,16 +508,61 @@ function core_did_del($extension,$cidnum, $channel){
 	sql($sql);
 }
 
+function core_did_edit($old_extension,$old_cidnum, $old_channel, $incoming){
+
+	$extension = addslashes($incoming['extension']);
+	$cidnum = addslashes($incoming['cidnum']);
+
+	// if did or cid changed, then check to make sure that this pair is not already being used.
+	//
+	if (($extension != $old_extension) || ($cidnum != $old_cidnum)) {
+		$existing=core_did_get($extension,$cidnum,$channel);
+		if (empty($existing) && (trim($cidnum) == "")) {
+			$existing_directdid = core_users_directdid_get($extension);
+		} else {
+			$existing_directdid = "";
+		}
+	} else {
+		$existing = $existing_directdid = "";
+	}
+
+	if (empty($existing) && empty($existing_directdid)) {
+		core_did_del($old_extension,$old_cidnum,$old_channel);
+		core_did_add($incoming);
+		return true;
+	} else {
+		if (!empty($existing)) {
+			echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
+		} else {
+			echo "<script>javascript:alert('"._("A directdid for this DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+		}
+		return false;
+	}
+}
+
 function core_did_add($incoming){
 	foreach ($incoming as $key => $val) { ${$key} = addslashes($val); } // create variables from request
+
+	// Check to make sure the did is not being used elsewhere
+	//
 	$existing=core_did_get($extension,$cidnum,$channel);
-	if (empty($existing)) {
+	if (empty($existing) && (trim($cidnum) == "")) {
+		$existing_directdid = core_users_directdid_get($extension);
+	} else {
+		$existing_directdid = "";
+	}
+
+	if (empty($existing) && empty($existing_directdid)) {
 		$destination=${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass')";
 		sql($sql);
 		return true;
 	} else {
-		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")."')</script>";
+		if (!empty($existing)) {
+			echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
+		} else {
+			echo "<script>javascript:alert('"._("A directdid for this DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+		}
 		return false;
 	}
 }
@@ -1125,6 +1173,20 @@ function core_users_add($vars) {
 		}
 	}
 
+	// clean and check the did to make sure it is not being used by another extension or in did routing
+	//
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
+	$existing=core_did_get($directdid,"","");
+	$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
+	if (!empty($existing) || !empty($existing_directdid)) {
+		if (!empty($existing)) {
+			echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
+		} else {
+			echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+		}
+		return false;
+	}
+
 	$sipname = preg_replace("/\s/" ,"", trim($sipname));
 	if (! core_sipname_check($sipname)) {
 		echo "<script>javascript:alert('"._("This sipname: {$sipname} is already in use")."');</script>";
@@ -1160,7 +1222,6 @@ function core_users_add($vars) {
 	//
 	// Clean replace any <> with () in display name - should have javascript stopping this but ...
 	//
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
 	//insert into users table
@@ -1324,6 +1385,15 @@ function core_users_del($extension){
 	}
 }
 
+function core_users_directdid_get($directdid=""){
+	if (empty($directdid)) {
+		return array();
+	} else {
+		$sql = "SELECT * FROM users WHERE directdid = \"$directdid\"";
+		return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+	}
+}
+
 function core_users_cleanastdb($extension) {
 	// This is called to remove any ASTDB traces of the user after a deletion. Otherwise,
 	// call forwarding, call waiting settings could hang around and bite someone if they
@@ -1356,11 +1426,27 @@ function core_users_edit($extension,$vars){
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
+	// clean and check the did to make sure it is not being used by another extension or in did routing
+	//
+	$directdid=$vars['directdid'];
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
+	$existing=core_did_get($directdid,"","");
+	$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
+	if (!empty($existing) || !empty($existing_directdid)) {
+		if (!empty($existing)) {
+			echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
+		} else {
+			echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
+		}
+		return false;
+	}
+
 	//delete and re-add
 	if (core_sipname_check($vars['sipname'])) {
 		core_users_del($extension);
 		core_users_add($vars);
 	}
+	return true;
 	
 }
 
@@ -2584,6 +2670,9 @@ function core_users_configprocess() {
 				if (core_users_add($_REQUEST)) {
 					needreload();
 					redirect_standard_continue();
+				} else {
+					// really bad hack - but if core_users_add fails, want to stop core_devices_add
+					$GLOBALS['abort'] = true;
 				}
 			break;
 			case "del":
@@ -2596,9 +2685,13 @@ function core_users_configprocess() {
 				redirect_standard_continue();
 			break;
 			case "edit":
-				core_users_edit($extdisplay,$_REQUEST);
-				needreload();
-				redirect_standard_continue('extdisplay');
+				if (core_users_edit($extdisplay,$_REQUEST)) {
+					needreload();
+					redirect_standard_continue('extdisplay');
+				} else {
+					// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
+					$GLOBALS['abort'] = true;
+				}
 			break;
 		}
 	}
@@ -2813,7 +2906,6 @@ function core_devices_configpageload() {
 			} else { // add so only basic
 				$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
 			}
-			
 		}
 	}
 }
@@ -2842,30 +2934,36 @@ function core_devices_configprocess() {
 	
 	//if submitting form, update database
 	switch ($action) {
-        case "add":
-                if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
-                	needreload();
-			if ($deviceuser != 'new') {
-				redirect_standard_continue();
+		case "add":
+		// really bad hack - but if core_users_add fails, want to stop core_devices_add
+		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
+				needreload();
+				if ($deviceuser != 'new') {
+					redirect_standard_continue();
+				}
 			}
 		}
-        break;
-        case "del":
-                core_devices_del($extdisplay);
-                needreload();
-		redirect_standard_continue();
-        break;
-        case "edit":  //just delete and re-add
-                core_devices_del($extdisplay);
-                core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
-                needreload();
-		redirect_standard_continue('extdisplay');
-        break;
-        case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
-                core_users2astdb();
-                core_devices2astdb();
-        break;
-	}	
+		break;
+		case "del":
+			core_devices_del($extdisplay);
+			needreload();
+			redirect_standard_continue();
+		break;
+		case "edit":  //just delete and re-add
+			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
+			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+				core_devices_del($extdisplay);
+				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
+				needreload();
+				redirect_standard_continue('extdisplay');
+			}
+			break;
+			case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
+				core_users2astdb();
+				core_devices2astdb();
+			break;
+	}
 }
 
 ?>
