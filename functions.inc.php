@@ -1635,9 +1635,10 @@ function core_trunks_list() {
 	global $db;
 	global $amp_conf;
 	
-	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
+	if ($amp_conf["AMPDBENGINE"] == "sqlite3")
 	{
-		// TODO: sqlite work arround - diego 
+		// TODO: sqlite work arround - diego
+		// TODO: WILL NOT WORK, need to remove the usage of SUBSTRING
 		// need to reorder the trunks in PHP code
 		$sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
 		$sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\_%') d ";
@@ -1876,10 +1877,25 @@ function core_trunks_getDialRules($trunknum) {
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
-	$results = sql("SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%')ORDER BY context ","getAll");
-	
+	global $amp_conf;
+
+	if ($amp_conf["AMPDBENGINE"] == "sqlite3")
+		$sql_code = "SELECT DISTINCT              context, priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%') ORDER BY context";
+	else
+		$sql_code = "SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%') ORDER BY context";
+
+	$results = sql( $sql_code, "getAll" );
+
 	foreach ($results as $row) {
-		$routes[$row[0]] = $row[1];
+		// original code was:
+		// 	$routes[$row[0]] = $row[1];
+		// but substring is not supported in sqlite3.
+		// how about we remove the 2nd part of the "if"? and use the same code on all DB's?
+
+		$t = ($amp_conf["AMPDBENGINE"] == "sqlite3") ? substr( $row[0], 7 ) : $row[0];
+		$r = $row[1];
+		$routes[ $r ] = $t;
+
 	}
 	// array(routename=>priority)
 	return isset($routes)?$routes:null;
@@ -1904,10 +1920,16 @@ function core_routing_getroutenames()
 {
 	global $amp_conf;
 	
-	if ( ($amp_conf["AMPDBENGINE"] == "sqlite") || ($amp_conf["AMPDBENGINE"] == "sqlite3") )
+	if ($amp_conf["AMPDBENGINE"] == "sqlite3") 
 	{
-		// TODO: sqlite work arround - diego
+		// SUBSTRING is not supported under sqlite3, we need to filter
+		// this in php. I am not sure why "6" and not "7"
+		// but I don't really care -> it works :)
 		$results = sql("SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
+		foreach( array_keys($results) as $idx )
+		{
+			 $results[$idx][0] = substr( $results[$idx][0], 6);
+		}
 	}
 	else
 	{
@@ -2051,14 +2073,21 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
  		}
 	}
 	
-	$sql = "SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
+	if ( $amp_conf["AMPDBENGINE"] == "sqlite3")
+		$sql = "SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
+	else
+		$sql = "SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
+
         // we SUBSTRING() to remove "outrt-"
         $routepriority = $db->getAll($sql);
         if(DB::IsError($routepriority)) {
                 die($routepriority->getMessage());
         }
+
+	// TODO: strip the context on the sqlite3 backend
+	// not sure where does it effects, since this is working on my setup...
+	// welcome to funky town
         return ($routepriority);
-	
 }
 
 function core_routing_setroutepriorityvalue($key)
