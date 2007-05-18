@@ -1147,12 +1147,12 @@ function core_users_list() {
 	}
 }
 
-function core_sipname_check($sipname) {
+function core_sipname_check($sipname, $extension) {
 	global $db;
 	if (!isset($sipname) || trim($sipname)=='')
 		return true;
 
-	$sql = "SELECT sipname FROM users WHERE sipname = '$sipname'";
+	$sql = "SELECT sipname FROM users WHERE sipname = '$sipname' AND extension != '$extension'";
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
         die($results->getMessage().$sql);
@@ -1199,7 +1199,7 @@ function core_users_add($vars) {
 	}
 
 	$sipname = preg_replace("/\s/" ,"", trim($sipname));
-	if (! core_sipname_check($sipname)) {
+	if (! core_sipname_check($sipname, $extension)) {
 		echo "<script>javascript:alert('"._("This sipname: {$sipname} is already in use")."');</script>";
 		return false;
 	}
@@ -1455,7 +1455,7 @@ function core_users_edit($extension,$vars){
 	}
 
 	//delete and re-add
-	if (core_sipname_check($vars['sipname'])) {
+	if (core_sipname_check($vars['sipname'],$extension)) {
 		core_users_del($extension);
 		core_users_add($vars);
 	}
