@@ -16,7 +16,7 @@
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>
 		<ampusers>Administrators</ampusers>
-		<wiki type="tool" category="Support" sort="5" href="http://www.freepbx.org/wiki/GettingSupport" target="_blank">FreePBX.org Wiki</wiki>
+		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/core-1.1.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
