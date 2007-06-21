@@ -1,0 +1,126 @@
+#!/usr/bin/php -q
+<?php
+/**
+// recordingcheck Copyright (C) Coalescent Systems Inc. (info@coalescentsystems.ca)
+// Asterisk Management Portal Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either version 2
+//of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+The program checks determines if Asterisk should record a call
+*/
+
+define("AGIBIN_DIR", "/var/lib/asterisk/agi-bin");
+
+include(AGIBIN_DIR."/phpagi.php");
+
+
+/**********************************************************************************************************************/
+
+$agi = new AGI();
+
+$timestamp = $argv[1];
+$uniqueid = $argv[2];
+$type = $agi->get_variable("ARG2");
+
+switch($type['data']) {
+	case "Group":
+	
+		$r = $agi->get_variable("ARG1");
+		if ($r["result"] == 0) {
+			$agi->verbose("Extension List not set -- nothing to do");
+			exit(1);
+		}
+		$extenlist = $r["data"];
+		
+		$agi->set_variable("RecEnable", "DISABLED"); //disable by default
+		
+		$list = explode("-",$extenlist);
+		if(!empty($list)) {
+			foreach($list as $exten) {
+				$setting = $agi->database_get("AMPUSER",$exten."/recording");
+				if ($setting["result"] == 0) {
+					$agi->verbose("No DB Entry AMPUSER/$exten/recording - Not recording");
+					exit(1);
+				}
+				//explode recording vars
+				$recording = explode("|",$setting["data"]);
+				$recout = substr($recording[0],4);
+				$recin = substr($recording[1],3);
+				if ($recin == "Always") {
+					$agi->verbose("Recording enable for ".$exten);
+					$agi->verbose("CALLFILENAME=g{$exten}-{$timestamp}-{$uniqueid}");
+					$agi->set_variable("CALLFILENAME","g{$exten}-{$timestamp}-{$uniqueid}");
+					$agi->set_priority(999);
+					exit(0);
+				}
+			}
+		} else {
+			$agi->verbose("Extension List is empty -- nothing to do");
+			exit(1);		
+		}
+	
+	break;
+	case "OUT":
+		$exten = $agi->get_variable("ARG1");
+		
+		$options = $agi->database_get("AMPUSER","{$exten['data']}/recording");
+		
+		if ($options["result"] == "0") {
+			$agi->verbose("No AMPUSER db entry for ".$exten["data"].". Not recording");
+			exit(1);		
+		}
+
+		//explode recording vars
+		$recording = explode("|",$options["data"]);
+		$recout = substr($recording[0],4);
+		$recin = substr($recording[1],3);
+	
+		if($recout == "Always") {
+			$agi->verbose("Outbound recording enabled.");
+			$agi->verbose("CALLFILENAME=OUT{$exten['data']}-{$timestamp}-{$uniqueid}");
+			$agi->set_variable("CALLFILENAME","OUT{$exten['data']}-{$timestamp}-{$uniqueid}");
+			$agi->set_priority(999);
+			exit(0);
+		} else {
+			$agi->verbose("Outbound recording not enabled");
+			exit(1);		
+		}
+	break;
+	case "IN":
+		$exten = $agi->get_variable("ARG1");	
+		$options = $agi->database_get("AMPUSER","{$exten['data']}/recording");
+		
+		if ($options["result"] == "0") {
+			$agi->verbose("No AMPUSER db entry for ".$exten["data"].". Not recording");
+			exit(1);		
+		}
+		//explode recording vars
+		$recording = explode("|",$options["data"]);
+		$recout = substr($recording[0],4);
+		$recin = substr($recording[1],3);
+		
+		if($recin == "Always")  {
+			$agi->verbose("Inbound recording enabled.");
+			$agi->verbose("CALLFILENAME={$timestamp}-{$uniqueid}");
+			$agi->set_variable("CALLFILENAME","{$timestamp}-{$uniqueid}");
+			$agi->set_priority(999);
+			exit(0);	
+		} else {
+			$agi->verbose("Inbound recording not enabled");
+			exit(1);		
+		}
+	break;
+}
+
+// we just exit with no changes to the variable.
+exit(1);
+
+?>

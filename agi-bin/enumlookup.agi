@@ -1,0 +1,130 @@
+#!/usr/bin/php -q
+<?php
+
+// Replacement for Asterisk's ENUMLOOKUP function. 
+// Written by Rob Thomas <xrobau@gmail.com>
+// Released under Version 2 of the GPL
+// Originally written for use with freePBX.
+
+// Based on e164.org's enum.php script, available on http://www.e164.org/enum.phps
+
+require_once "phpagi.php";
+
+$AGI = new AGI();
+$lookup = get_var( $AGI, "DIAL_NUMBER" );
+
+$enums = Array('e164.org', 'e164.arpa', 'e164.info');
+
+// Go through the ENUM providers and look for the number.
+
+$dialstr = "";
+
+foreach ($enums as $enum) {
+	// Are we using php5 and can use get_dns_record?
+		if (function_exists("dns_get_record")) {
+			$arr = get_php5($lookup, $enum);
+	// else, do we have Pear Net DNS?
+	// Disabled, as I couldn't easily get it working on my machine
+	//} elseif ((@include 'Net/DNS.php') =='OK') {
+	//	$arr = get_pear($arpa);
+	} else {
+		@exec('dig -h > /dev/null 2>&1 ', $res, $var);
+		if ($var != 127) { 
+			$arr = get_dig($lookup, $enum);
+		} else {
+			$AGI->verbose("ENUM LOOKUPS DISABLED due to php5 not being installed AND no dig command", "0");
+		}
+	}
+	if (isset($arr[0])) {
+		foreach($arr as $key => $row) {
+			$order[$key] = $row["order"];
+			$prio[$key] = $row["prio"];
+		}
+		array_multisort($order, SORT_ASC, $prio, SORT_ASC, $arr);
+		foreach ($arr as $key => $row) {
+			if (eregi('SIP|IAX', $row['tech']))
+				$dialstr .= $row['URI']."|";
+		}
+	}
+}
+
+$AGI->verbose("Setting DIALARR to $dialstr", 3);
+$AGI->set_variable("DIALARR", $dialstr);
+
+function get_dig($lookup, $enum) {
+	global $AGI;
+
+	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);;
+	$arpa = "";
+	for ($i = 0; $i < strlen($lookup); $i++) {
+		$arpa = $lookup[$i].".".$arpa;
+	}
+	$lines = trim(`/usr/bin/dig +short ${arpa}${enum} naptr`);
+	$lines = explode("\n", $lines);
+	foreach($lines as $line) {
+		$line = trim($line);
+		if (preg_match("/^;;/", $line))
+			continue;
+		if (!isset($arr)) $arr = array();
+		$line = str_replace("\t", " ", $line);
+		while(strstr($line, "  "))
+			$line = str_replace("  ", " ", $line);
+		$line = str_replace("\"", "", $line);
+		$line = str_replace("\'", "", $line);
+		$line = str_replace(" ", "|", $line);
+		$bits = explode("|", $line);
+		$bit = explode("!", stripslashes($bits[4]));
+		$URI = ereg_replace($bit[1], $bit[2], "+".$lookup);
+		if($URI[3] == ":")
+			$URI[3] = "/";
+		if($URI[4] == ":")
+		$URI[4] = "/";
+		$arr[] = array("order" => $bits[0], "prio" => $bits[1], "tech" => $bits[3], "URI" => $URI);
+	}
+	if (isset($arr[0])) {
+		return $arr;
+	} else {
+		return null;
+	}
+}
+
+function get_php5($lookup, $enum) {
+	global $AGI;
+
+	$AGI->verbose("Looking up $lookup on $enum via dns_get_record",3);
+
+	$arpa = "";
+	for ($i = 0; $i < strlen($lookup); $i++) {
+		$arpa = $lookup[$i].".".$arpa;
+	}
+	$res = dns_get_record("$arpa$enum", DNS_NAPTR);
+	foreach ($res as $entry) {
+		if (!isset($arr)) $arr = array();
+		$bit = explode("!", $entry['regex']);
+		$URI = ereg_replace($bit[1], $bit[2], "+".$lookup);
+		if($URI[3] == ":") $URI[3] = "/";
+		if($URI[4] == ":") $URI[4] = "/";
+		$arr[] = array("order" => $entry['order'], "prio" => $entry['pref'], "tech" => $entry['services'], "URI" => $URI);
+	}
+	if (isset($arr[0])) {
+		return $arr;
+	} else {
+		return null;
+	}
+}
+
+
+// helper functions
+function get_var( $agi, $value)
+{
+	$r = $agi->get_variable( $value );
+
+	if ($r['result'] == 1)
+	{
+		$result = $r['data'];
+		return $result;
+	}
+	else return '';
+}
+
+?>

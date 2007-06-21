@@ -1,0 +1,500 @@
+#!/usr/bin/php -q
+<?php
+
+/**
+// AGI directory Copyright (C) 2005 Greg MacLellan (greg@mtechsolutions.ca)
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either version 2
+//of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+
+*/
+
+define("AGIBIN_DIR", dirname(__FILE__));
+define("DIRECTORY_FILE", "/etc/asterisk/voicemail.conf");
+
+// where is voicemail stored?
+define("VOICEMAIL_DIR", "/var/spool/asterisk/voicemail/%s/%d");
+
+// where shold we store logs? (fixes #1912)
+define("LOG_DIR", "/var/log/asterisk/");
+
+// set to 1 to say "zed" instead of "zee"
+define("SAY_ZED",0);
+
+/******************************************************************************/
+
+define("DEBUG", 0);
+
+define("DIR_LAST", 0);
+define("DIR_FIRST", 1);
+define("DIR_BOTH", 2);
+
+define("NUM_DIGITS", 3);
+define("MAX_REPEAT", 2); // how many times can we repeat the menu before hanging up?
+
+// ordinal values of digits
+define("D_0",48);
+define("D_1",49);
+define("D_2",50);
+define("D_3",51);
+define("D_4",52);
+define("D_5",53);
+define("D_6",54);
+define("D_7",55);
+define("D_8",56);
+define("D_9",57);
+define("D_POUND",35);
+define("D_STAR",42);
+
+include(AGIBIN_DIR."/phpagi.php");
+
+function output(&$var) {
+	if (DEBUG) {
+		global $logfile;
+		
+		if (!isset($logfile)) return false;
+		
+		ob_start();
+		var_dump($var);
+		$output = ob_get_contents();
+		ob_end_clean();
+		fwrite($logfile, $output);
+	}
+}
+
+
+function parse_voicemailconf($filename, &$vmconf, &$section) {
+	if (is_null($vmconf)) {
+		$vmconf = array();
+	}
+	if (is_null($section)) {
+		$section = "general";
+	}
+	
+	if (file_exists($filename)) {
+		$fd = fopen($filename, "r");
+		while ($line = fgets($fd, 1024)) {
+			if (preg_match("/^\s*(\d+)\s*=>\s*(\d+),(.*),(.*),(.*),(.*)\s*([;#].*)?/",$line,$matches)) {
+				// "mailbox=>password,name,email,pager,options"
+				// this is a voicemail line	
+				$vmconf[$section][ $matches[1] ] = array("mailbox"=>$matches[1],
+									"pwd"=>$matches[2],
+									"name"=>$matches[3],
+									"email"=>$matches[4],
+									"pager"=>$matches[5],
+									);
+								
+				// parse options
+				foreach (explode("|",$matches[6]) as $opt) {
+					$temp = explode("=",$opt);
+					if (isset($temp[1])) {
+						list($key,$value) = $temp;
+						$vmconf[$section][ $matches[1] ]["options"][$key] = $value;
+					}
+				}
+			} else if (preg_match("/^\s*(\d+)\s*=>\s*dup,(.*)\s*([;#].*)?/",$line,$matches)) {
+				// "mailbox=>dup,name"
+				// duplace name line
+				$vmconf[$section][ $matches[1] ]["dups"][] = $matches[2];
+			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
+				// include another file
+				
+				if ($matches[1][0] == "/") {
+					// absolute path
+					$filename = $matches[1];
+				} else {
+					// relative path
+					$filename =  dirname($filename)."/".$matches[1];
+				}
+				
+				parse_voicemailconf($filename, $vmconf, $section);
+				
+			} else if (preg_match("/^\s*\[(.+)\]/",$line,$matches)) {
+				// section name
+				$section = strtolower($matches[1]);
+			} else if (preg_match("/^\s*([a-zA-Z0-9-_]+)\s*=\s*(.*?)\s*([;#].*)?$/",$line,$matches)) {
+				// name = value
+				// option line
+				$vmconf[$section][ $matches[1] ] = $matches[2];
+			}
+		}
+	}
+}
+
+
+/** Play a bunch of files, optionally accepting input and looping
+ * @param $files		The file/files to play (for multiple files, pass array)
+ * @param $escape_digits	The DTMF tones that can be pressed & returned, ie, "123*"
+ * @param $timeout		The timeout waiting for a digit, or 0 to not wait at all.
+ * @param $max_digits		Maximum number of digits to get. **NOT IMPLEMENTED YET.. 1 only**
+ * @param $loop			False for no loop, or an integer >0 being the number of times to loop. 
+ * @param $loopreturn		Value to return when the loop expires
+*/
+function stream_multiple($files, $escape_digits = "", $timeout = 0, $max_digits = 1, $loop = false, $loopreturn = 0) {
+	global $agi;
+	
+	if (!is_array($files)) {
+		$files = array($files);
+	}
+	
+	$i = 0;
+	do {
+		foreach ($files as $file) {
+			$agi->verbose("-- Playing '".$file."' (language 'en')");
+			$r = $agi->stream_file($file, $escape_digits);
+			$agi->conlog("stream_multiple: $file returned ".$r["result"]);
+			switch ($r["result"]) {
+				case 0: // they did nothing
+				break;
+				case -1: // they hungup
+					$agi->verbose("remote user hungup");
+					return -1;
+				break;
+				default: // they pressed a key
+					return $r["result"];
+				break;
+			}
+		}
+		
+		if ($timeout > 0) {
+			$r = $agi->wait_for_digit($timeout);
+			if (($r["result"] != 0) || (!$loop)) {
+				// return only if the reult is not 0 (timeout)
+				// or we're not doing a loop
+				return $r["result"];
+			}
+		}
+		
+		if ($loop && (++$i > $loop)) {
+			return $loopreturn;
+		}
+	} while ($loop);
+	
+	return 0;
+}
+
+/** If $file.(wav|WAV|gsm|GSM) exists
+ */
+function sound_file_exists($file) {
+	global $agi;
+	
+	foreach (array("gsm","GSM","wav","WAV") as $ext) {
+		if (file_exists($file.".".$ext)) {
+			$agi->verbose("Found ".$file.".".$ext, 2);
+			return true;
+		}
+	}
+	return false;
+}
+
+function string_to_digits($string) {
+	$out = "";
+	
+	for($i=0; $i<strlen($string); $i++) {
+		switch (strtoupper($string[$i])) {
+			case '1':
+				$out .= '1';
+			break;
+			case '2': case 'A': case 'B': case 'C':
+				$out .= '2';
+			break;
+			case '3': case 'D': case 'E': case 'F':
+				$out .= '3';
+			break;
+			case '4': case 'G': case 'H': case 'I':
+				$out .= '4';
+			break;
+			case '5': case 'J': case 'K': case 'L':
+				$out .= '5';
+			break;
+			case '6': case 'M': case 'N': case 'O':
+				$out .= '6';
+			break;
+			case '7': case 'P': case 'Q': case 'R': case 'S':
+				$out .= '7';
+			break;
+			case '8': case 'T': case 'U': case 'V':
+				$out .= '8';
+			break;
+			case '9': case 'W': case 'X': case 'Y': case 'Z':
+				$out .= '9';
+			break;
+		}
+		
+		if ($i+1 == NUM_DIGITS) break;
+	}
+	
+	return $out;
+}
+
+function say_alpha($string,$escape_digits) {
+	$string = strtolower($string);
+	$files = array();
+	
+	for($i=0; $i<strlen($string); $i++) {
+		if (('a' <= $string[$i]) && ($string[$i] <= 'z')) {
+		
+			if (($string[$i] == 'z') && SAY_ZED) {
+				$files[] = "letters/zed";
+			} else {
+				$files[] = "letters/".$string[$i];
+			}
+			
+		} else if (('1' <= $string[$i]) && ($string[$i] <= '0')) {
+			$files[] = "digits/".$string[$i];
+			
+		} else {
+			switch ($string[$i]) {
+				case "@": $files[] = "letters/at"; break;
+				case "-": $files[] = "letters/dash"; break;
+				case "$": $files[] = "letters/dollar"; break;
+				case ".": $files[] = "letters/dot"; break;
+				case "=": $files[] = "letters/equals"; break;
+				case "!": $files[] = "letters/exclaimation-point"; break;
+				case "+": $files[] = "letters/plus"; break;
+				case "/": case "\\": $files[] = "letters/slash"; break;
+				case " ": $files[] = "letters/space"; break;
+			}
+		}
+	}
+	
+	return stream_multiple($files,$escape_digits);
+}
+
+function do_directory($type, &$directory, $dial_context, $say_exten, $operator) {
+	global $agi;
+	
+	$escape_digits = "1*";
+	if ($operator) $escape_digits .= "0";
+	
+	switch ($type) {
+		case DIR_FIRST: $intro = ($operator ? "dir-intro-fn-oper" : "dir-intro-fn"); break;
+		case DIR_BOTH: $intro = ($operator ? "dir-intro-fnln-oper" : "dir-intro-fnln"); break;
+		case DIR_LAST: default: $intro = ($operator ? "dir-intro-oper" : "dir-intro"); break;
+	}
+	
+	$loop = 0;
+	while ($loop < MAX_REPEAT) {
+		$r = $agi->get_data($intro, 4000, NUM_DIGITS);
+		
+		if (($r["result"] == "0") && $operator) {
+			// operator
+			$agi->verbose("Dropping to operator");
+			// switch to o,1 in the current context
+			$agi->set_extension("o");
+			$agi->set_priority("1");
+			// exiting application immediately!
+			exit(0);
+		}
+		$digits = $r["result"];
+		
+		usleep(500); // pause a bit, so digit presses get cleared
+		
+		if ($digits !== "") {
+			// they entered SOMETHING, reset our loop
+			$loop = 0;
+		}
+		
+		$i = 0;
+		$digit = false;
+		if (isset($directory[$digits]) && isset($directory[$digits][$i])) {
+			$loop = 0; // reset loop counter
+			do {
+				$match = & $directory[$digits][$i];
+				
+				$maindirname = sprintf(VOICEMAIL_DIR, $match["context"], $match["ext"]);
+
+				if (sound_file_exists($maindirname."/greet")) {
+					$r = $agi->stream_file($maindirname."/greet",$escape_digits);
+					if ($r["result"] > 0) $digit = $r["result"];
+				} else {
+					$digit = say_alpha($match["name"],$escape_digits);
+				}
+				
+				if (!$digit) {
+					$digit = stream_multiple("dir-instr", $escape_digits, 3000);
+				}
+				
+				switch ($digit) {
+					case D_1: // dial this
+						if ($say_exten) {
+							$agi->stream_file("pls-hold-while-try");
+							$agi->stream_file("to-extension");
+
+							$agi->say_digits($match["ext"]);
+						}
+						$agi->conlog("Dial ".$match["ext"]);
+						
+						$agi->set_context($dial_context);
+						$agi->set_extension($match["ext"]);
+						$agi->set_priority("1");
+						exit(0);
+					break;
+					case D_STAR: // not correct
+						$i += 1;
+					break;
+					case D_0: // operator
+						if ($operator) {
+							$agi->verbose("Dropping to operator");
+							// switch to o,1 in the current context
+							$agi->set_extension("o");
+							$agi->set_priority("1");
+							// exiting application immediately!
+							exit(0);
+						}
+					break;
+					case -1: // hungup
+						$agi->conlog("User hungup");
+						exit(1);
+					break;
+					case 0: // no response
+						$loop++;
+					break;
+					case -2: // loop timed out
+						$agi->stream_file("goodbye");
+						$agi->hangup();
+						exit(0);
+					break;
+				}
+				
+				if ($digit !== 0) {
+					$loop = 0;
+				}
+				$digit = false;
+			} while (isset($directory[$digits][$i]) && ($loop < MAX_REPEAT));
+			
+			if (!isset($directory[$digits][$i])) {
+				$agi->stream_file("dir-nomore");
+				$loop = 0; // reset our loop counter so it doesn't hangup
+			}
+		} else if (!empty($digits) || ($digits === "0")) {
+			// strict type checking as they may have entered "0" (string) which is empty()
+			$agi->stream_file("dir-nomatch");
+		} // else, we timed out
+		
+		$loop++;
+	}
+}
+
+/******************************************************************************/
+
+$agi = new AGI;
+
+if (DEBUG) $logfile = fopen( LOG_DIR . "directory.log","w");
+
+$vmconf = array();
+$null = null;
+parse_voicemailconf(DIRECTORY_FILE, $vmconf, $null);
+
+
+if (!$argv[1]) {
+	$agi->verbose("Notice: vm-context not specified.  Using 'default'");
+	$vm_context = "default";
+} else {
+	$vm_context = trim($argv[1]);
+}
+
+if (!isset($vmconf[$vm_context]) && ($vm_context != "general")) {
+	// we make an exception for "general" context,as it just includes other contexts
+	$agi->verbose("Cannot find context ".$vm_context." in ".DIRECTORY_FILE);
+	exit(1);
+}
+
+if (isset($argv[2])) {
+	$dial_context = trim($argv[2]);
+} else {
+	$dial_context = $vm_context;
+}
+
+$operator = false;
+$dir_type = DIR_FIRST;
+$say_exten = false;
+
+if (isset($argv[3])) {
+	for($i=0; $i<strlen($argv[3]); $i++) {
+		switch ($argv[3][$i]) {
+			case "f": case "F": 
+				$dir_type = DIR_FIRST;
+			break;
+			case "l": case "L": 
+				$dir_type = DIR_LAST;
+			break;
+			case "b": case "B": 
+				$dir_type = DIR_BOTH;
+			break;
+			case "o": case "O": 
+				$operator = true;
+			break;
+			case "e": case "E": 
+				$say_exten = true;
+			break;
+		}
+	}
+}
+
+if ($vm_context == "general") {
+	$boxes = array();
+	foreach ($vmconf as $context=>$arr) {
+		// skip if it's general context -- this doesn't contain mailboxes
+		if ($context == "general") continue;
+		
+		foreach ($arr as $key=>$box) {
+			// we could do if !isset($boxes[$key]) to NOT override mailboxes
+			
+			// add in the context, otherwise we don't know what it is
+			$box["context"] = $context;
+			
+			$boxes[$key] = $box;
+		}
+	}
+} else {
+	$boxes = &$vmconf[$vm_context];
+}
+
+$directory = array();
+foreach ($boxes as $box) {
+	if (!empty($box["name"])) {
+		$name = explode(" ",$box["name"]);
+		
+		if (isset($box["context"])) {
+			$context = $box["context"];
+		} else {
+			$context = $vm_context;
+		}
+		
+		switch ($dir_type) {
+			case DIR_FIRST: // first name only
+				$digits = string_to_digits($name[0]);
+				$directory[$digits][] = array("ext"=>$box["mailbox"], "name"=>$box["name"], "context"=>$context);
+			break;
+			case DIR_BOTH: // all names
+				foreach ($name as $temp) {
+					$digits = string_to_digits($temp);
+					$directory[$digits][] = array("ext"=>$box["mailbox"], "name"=>$box["name"], "context"=>$context);
+				}
+			break;
+			case DIR_LAST: default: // last name only
+				$digits = string_to_digits(end($name));
+				$directory[$digits][] = array("ext"=>$box["mailbox"], "name"=>$box["name"], "context"=>$context);
+			break;
+		}
+	}
+}
+
+if (DEBUG) {
+	output($argv);
+	output($dir_type);
+	output($directory);
+}
+
+do_directory($dir_type, $directory, $dial_context, $say_exten, $operator);
+	
+?>

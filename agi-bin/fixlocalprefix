@@ -1,0 +1,233 @@
+#!/usr/bin/php -q
+<?php
+/**
+// fixlocalprefix Copyright (C) 2005 Greg MacLellan (greg@mtechsolutions.ca)
+// Asterisk Management Portal Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either version 2
+//of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+
+This program takes a number, checks it against a list of patterns for a specific trunk, and modifies the number based
+on the rules for that number.
+
+Two variables are required:
+
+DIAL_NUMBER - the number to be dialed (this will be modified, if necessary)
+DIAL_TRUNK - the trunk number to use
+
+The list of prefixes is contained in LOCALPREFIX_FILE (defined below, defaults to /etc/asterisk/localprefixes.conf). This
+file has the format:
+
+	[trunk-1]
+	rule1=1613|NXXXXXX
+	rule2=1519|555XXXX
+	rule2=1519|54[0-9]XXXX
+	
+	[trunk-2]
+	rule1=1613+NXXXXXX
+	rule2=1519+12XXXXX
+
+
+The section read depends on the value of DIAL_TRUNK. 
+
+A | means to drop the number before the |. In this example, if DIAL_NUMBER is "16135551234" and DIAL_TRUNK is "1", 
+DIAL_NUMBER will become "5551234" (rule1). If DIAL_NUMBER is "15195551234", it will become "5551234" (rule2). 
+"15195435555" will become "5435555" (rule3).
+
+A + means to prefix the beginning digits to the following pattern. In this example, if DIAL_NUMBER is 5551234, and 
+DIAL_TRUNK is "2", DIAL_NUMBER will become "16135551234". If DIAL_NUMBER is "1235555", it will match rule2 and
+become "15191235555". 
+
+If no number is matched, DIAL_NUMBER is left untouched, and the script will exit with return value 0. If any errors 
+occur, DIAL_NUMBER is left untouched and the script will exit with return value 1.
+
+There is no limit to the number of rules that may be defined.
+
+You can also use #include filename.conf to include other files. Sections are preserved when including, which may
+cause undesired behaviour if not planned for. For example:
+
+localprefixes.conf:
+	[trunk-1]
+	#include t1.conf
+	rule1=1613|453XXXX
+	rule2=1613|384XXXX
+	
+t1.conf:
+	[trunk-2]
+	rule1=141|NXXXXXX
+	
+rule1 and rule2 defined in localprefixes.conf will actually belong to [trunk-2], and additionally, rule1 in 
+localprefixes.conf will override the rule1 defined in t1.conf.
+
+*/
+
+define("AGIBIN_DIR", "/var/lib/asterisk/agi-bin");
+define("LOCALPREFIX_FILE", "/etc/asterisk/localprefixes.conf");
+
+include(AGIBIN_DIR."/phpagi.php");
+
+function parse_conf($filename, &$conf, &$section) {
+	if (is_null($conf)) {
+		$conf = array();
+	}
+	if (is_null($section)) {
+		$section = "general";
+	}
+	
+	if (file_exists($filename)) {
+		$fd = fopen($filename, "r");
+		while ($line = fgets($fd, 1024)) {
+			if (preg_match("/^\s*([a-zA-Z0-9-_]+)\s*=\s*(.*?)\s*([;#].*)?$/",$line,$matches)) {
+				// name = value
+				// option line
+				$conf[$section][ $matches[1] ] = $matches[2];
+			} else if (preg_match("/^\s*\[(.+)\]/",$line,$matches)) {
+				// section name
+				$section = strtolower($matches[1]);
+			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
+				// include another file
+				
+				if ($matches[1][0] == "/") {
+					// absolute path
+					$filename = $matches[1];
+				} else {
+					// relative path
+					$filename =  dirname($filename)."/".$matches[1];
+				}
+				
+				parse_conf($filename, $conf, $section);
+			}
+		}
+	}
+}
+
+function sanitizeNumber($number) {
+	global $agi;
+	if (strpos($number,"-") !== false) {
+		$agi->verbose("Stripping hyphens");
+		$number = str_replace("-","",$number);
+	}
+	return $number;	
+}
+
+function fixNumber($pattern, $number, &$agi) {
+	// valid chars in a pattern are 0-9XNZwW#*\.\[\]\-\+\|
+	$chars = '0-9XNZwW#*\.\[\]\-'; //escaped pcre-ready
+	
+	// convert x n and z to uppercase
+	$regex = str_replace(array('x','n','z'), array('X','N','Z'), $pattern);
+	// sanitize the pattern - remove any non-pattern chars
+	$regex = preg_replace("/[^0-9XNZwW#*\.\[\]\-\+\|]/", "", $regex);
+	// Also kill the '-' characters outside of groups
+	$regex = preg_replace("/((?:\[[^\]]*\])*)([^\[\]\-]*)-?/", "$1$2", $regex);
+
+	$agi->verbose('Using pattern '.$regex, 4);
+	// attempt to grab the pieces of the pattern
+	if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\|)?(([0-9XNZwW#*\.\[\]\-]+)\+)?([0-9XNZwW#*\.\[\]\-]+)$/', $regex, $matches)) {
+		// one of NXXXXXX, 613|NXXXXXX   1+NXXXXXX    613|1+NXXXXXX,  
+		// matches[2] = drop (eg 613),  matches[4] = prefix (eg 1),  matches[5] = rest of number (eg NXXXXX)
+		
+		$drop = $matches[2];
+		$prefix = $matches[4];
+		$static = $matches[5];
+	} else if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\+)?(([0-9XNZwW#*\.\[\]\-]+)\|)?([0-9XNZwW#*\.\[\]\-]+)$/', $regex, $matches)) {
+		// one of NXXXXXX,  613|NXXXXXX   1+NXXXXXX    1+613|NXXXXXX
+		// matches[2] = prefix (eg 1),  matches[4] = drop (eg 613),  matches[5] = rest of number (eg NXXXXX)
+		
+		$drop = $matches[4];
+		$prefix = $matches[2];
+		$static = $matches[5];
+	} else {
+		if (!is_null($agi)) {
+			$agi->verbose('Could not understand pattern "'.$pattern.'" ('.$regex.')', 1);
+		}
+		return $false;
+	}
+	
+	// convert asterisk pattern matching into perl regular expression
+	$regex = str_replace(
+			array(
+				"X",
+				"Z",
+				"N",
+				".",
+			),
+			array(
+				"[0-9]",
+				"[1-9]",
+				"[2-9]",
+				"[0-9#*]+",
+			),
+			// note, we're doing a subpattern match on the static portion so it can be extracted later
+			$drop.'('.$static.')');
+	
+	if (preg_match('/^'.$regex.'$/', $number, $matches)) {
+		return $prefix.$matches[1];
+	}
+	return false;
+}
+
+/**********************************************************************************************************************/
+
+$agi = new AGI();
+
+if (file_exists(LOCALPREFIX_FILE)) {
+	parse_conf(LOCALPREFIX_FILE, $conf, $section);
+	if (count($conf) == 0) {
+//		$agi->verbose("Could not parse ".LOCALPREFIX_FILE);
+		exit(1);
+	}
+} else {
+	$agi->verbose("Could not open ".LOCALPREFIX_FILE);
+	exit(1);
+}
+
+$r = $agi->get_variable("DIAL_NUMBER");
+if ($r["result"] == 0) {
+	$agi->verbose("DIAL_NUMBER not set -- nothing to do");
+	exit(1);
+}
+$number = $r["data"];
+
+$number = sanitizeNumber($number);
+
+$r = $agi->get_variable("DIAL_TRUNK");
+if ($r["result"] == 0) {
+	$agi->verbose("DIAL_TRUNK not set -- nothing to do");
+	exit(1);
+}
+$trunk = $r["data"];
+
+
+if (isset($conf["trunk-$trunk"])) {
+	foreach ($conf["trunk-$trunk"] as $key=>$rule) {
+		// extract all ruleXX keys
+		//$agi->conlog("$key = $rule");
+		if (preg_match("/^rule\d+$/",$key)) {
+			// $rule is a dial rule
+			
+			if ($newnum = fixNumber($rule, $number, $agi)) {
+				$agi->verbose('Dialpattern '.$rule.' matched. '.$number.' -> '.$newnum, 2);
+				$agi->set_variable("DIAL_NUMBER", $newnum);
+				
+				// reverted back form r2080 (r2081 on trac) so that any pattern match will end
+				// the loop. This needs to stay like this for backwards compatibility and often
+				// patterns are used to avoid matching substitution rules for exception cases.
+				exit(0);
+			} // else, it didn't match this rule
+		} // else, this isn't a rule
+	} 
+} // else, no config for this section
+
+// we just exit with no changes to the variable.
+exit(0);
+
+?>
