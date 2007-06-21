@@ -22,6 +22,6 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/core-1.1.tgz</location>
+	<location>release/2.3/core-2.3.0beta1.0.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
 </module>
