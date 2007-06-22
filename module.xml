@@ -3,8 +3,9 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta1.0</version>
+	<version>2.3.0beta1.1</version>
 	<changelog>
+		*2.3.0beta1.1* Change core destinations to from-did-direct from ext-local so that findmefollow is used if present
 		*2.3.0beta1.0* First release online upradeable core module
 		*1.2* Core modules code when part of framework
 	</changelog>

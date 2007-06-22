@@ -35,7 +35,8 @@ function core_destinations() {
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
 		foreach($results as $result) {
-			$extens[] = array('destination' => 'ext-local,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
+			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
+
 			if(isset($vmboxes[$result['0']])) {
 				$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => 'voicemail box '.$result['0']);
 			}
