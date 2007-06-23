@@ -2570,7 +2570,7 @@ function core_users_configpageinit($dispnum) {
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
 
-		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'freePBX default');
+		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'FreePBX default');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', 'disabled');
 		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
 		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
@@ -2697,8 +2697,8 @@ function core_users_configpageload() {
 
 		$section = 'Fax Handling';
 		$wait = (isset($wait) ? $wait : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.", false), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', "Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings"));
+		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.", false), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', "Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings"));
 		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', "Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.", false));
 		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', 'The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.', '!isInteger()', $msgInvalidPause, false));
 

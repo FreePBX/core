@@ -18,7 +18,7 @@
 // info@coalescentsystems.ca
 // 
 // This script has been ported to PHP by 
-// Diego Iastrubni <diego.iastrubni@xorcom.com> and the freePBX community
+// Diego Iastrubni <diego.iastrubni@xorcom.com> and the FreePBX community
 
 $config = parse_amportal_conf( "/etc/amportal.conf" );
 

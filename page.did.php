@@ -112,7 +112,7 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
 		<tr>
 			<td>
-				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The freePBX default is defined in General Settings.")?></span></a>:
+				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.")?></span></a>:
 			</td>
 			<td>&nbsp;
 				<select name="faxexten">
@@ -129,7 +129,7 @@ if (!isset($alertinfo))
 if (!isset($mohclass))
 	$mohclass = 'default';
 ?>
-					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("freePBX default")?>
+					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("FreePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
 					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
 			<?php 
@@ -146,7 +146,7 @@ if (!isset($mohclass))
 		</tr>
 		<tr>
 			<td>
-				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the freePBX default in General Settings.")?></span></a>:
+				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings.")?></span></a>:
 			</td>
 			<td>
 				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>"/>

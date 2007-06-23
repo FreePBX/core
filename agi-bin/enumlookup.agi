@@ -4,7 +4,7 @@
 // Replacement for Asterisk's ENUMLOOKUP function. 
 // Written by Rob Thomas <xrobau@gmail.com>
 // Released under Version 2 of the GPL
-// Originally written for use with freePBX.
+// Originally written for use with FreePBX.
 
 // Based on e164.org's enum.php script, available on http://www.e164.org/enum.phps
 
