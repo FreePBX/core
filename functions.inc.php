@@ -1302,7 +1302,7 @@ function core_users_add($vars) {
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
-		if (isset($amp_conf['ENABLECW']) && $amp_conf['ENABLECW'] == "yes") {
+		if (!isset($amp_conf['ENABLECW']) || strtolower($amp_conf['ENABLECW']) != "no") {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
 		}
 
