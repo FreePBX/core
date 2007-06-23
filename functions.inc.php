@@ -494,8 +494,15 @@ function core_ampusers_list() {
 
 /* begin page.did.php functions */
 
-function core_did_list(){
-	$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
+function core_did_list($order='extension'){
+	switch ($order) {
+		case 'description':
+			$sql = "SELECT * FROM incoming ORDER BY description,extension,cidnum";
+			break;
+		case 'extension':
+		default:
+			$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
+	}
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
@@ -564,7 +571,7 @@ function core_did_add($incoming){
 
 	if (empty($existing) && empty($existing_directdid)) {
 		$destination=${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass, description) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass', '$description')";
 		sql($sql);
 		return true;
 	} else {

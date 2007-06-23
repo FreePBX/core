@@ -17,6 +17,7 @@ $dispnum = 'did'; //used for switch on config.php
 $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
+$description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
 
 //update db if submiting form
 switch ($action) {
@@ -52,16 +53,17 @@ switch ($action) {
 	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
 <?php 
 //get unique incoming routes
-$inroutes = core_did_list();
+$inroutes = core_did_list('description');
 if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		$displaydid = ( empty($inroute['extension'])? _("any DID") : $inroute['extension'] );
  		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
 		$zapchan = ( strlen($inroute['channel'])? "Zaptel Channel {$inroute['channel']}" : "" );
+		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
 		if ($zapchan != "") 
-			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$zapchan} </a></li>\n";
+			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$desc} {$zapchan} </a></li>\n";
 		else
-			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$displaydid} / {$displaycid} {$zapchan} </a></li>\n";
+			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
 }
 ?>
@@ -82,8 +84,8 @@ if (isset($inroutes)) {
 	$ininfo=core_did_get($extarray[0],$extarray[1],$extarray[2]);
 	if (is_array($ininfo)) extract($ininfo);
 ?>
-		<h2><?php echo _("Route")?>: <?php echo $extdisplay; ?></h2>
-		<p><a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo $extdisplay ?></a></p>
+		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
+		<p><a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo !empty($description)?$description:$extdisplay ?></a></p>
 <?php } else { ?>
 		<h2><?php echo _("Add Incoming Route")?></h2>
 <?php } ?>
@@ -93,6 +95,10 @@ if (isset($inroutes)) {
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
 		<table>
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Description")?><span><?php echo _('Provide a meaningful description of what this incoming route is')?></span></a>:</td>
+			<td><input type="text" name="description" value="<?php echo htmlspecialchars(isset($description)?$description:''); ?>"></td>
+		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.<br><br>You can also use a pattern match (eg _2[345]X) to match a range of numbers')?></span></a>:</td>
 			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>"></td>
