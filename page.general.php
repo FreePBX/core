@@ -163,7 +163,7 @@ foreach ($globals as $global) {
 			</td>
 			<td align=right>
 			<select name="VMX_OPTS_TIMEOUT">
-				<option value=""  <?php  echo ($VMX_OPTS_TIMEOUT == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value=""  <?php  echo ($VMX_OPTS_TIMEOUT == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_TIMEOUT == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
 			</td>
@@ -175,7 +175,7 @@ foreach ($globals as $global) {
 			</td>
 			<td align=right>
 			<select name="VMX_OPTS_LOOP">
-				<option value=""  <?php  echo ($VMX_OPTS_LOOP == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value=""  <?php  echo ($VMX_OPTS_LOOP == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_LOOP == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
 			</td>
@@ -187,7 +187,7 @@ foreach ($globals as $global) {
 			</td>
 			<td align=right>
 			<select name="VMX_OPTS_DOVM">
-				<option value=""  <?php  echo ($VMX_OPTS_DOVM == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instrucitons")?>
+				<option value=""  <?php  echo ($VMX_OPTS_DOVM == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_DOVM == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
 			</td>
