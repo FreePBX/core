@@ -34,13 +34,13 @@ switch ($action) {
 		$extarray=explode('/',$extdisplay,3);
 		core_did_del($extarray[0],$extarray[1],$extarray[2]);
 		needreload();
-		redirect_standard('extdisplay');
+		redirect_standard();
 	break;
 	case 'edtIncoming':
 		$extarray=explode('/',$extdisplay,3);
 		if (core_did_edit($extarray[0],$extarray[1],$extarray[2],$_REQUEST)) {
 			needreload();
-			redirect_standard();
+			redirect_standard('extdisplay');
 		}
 	break;
 }
