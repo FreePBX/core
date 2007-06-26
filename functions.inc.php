@@ -1463,9 +1463,9 @@ function core_users_edit($extension,$vars){
 	
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
-	$directdid=$vars['directdid'];
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 	if (trim($directdid) != "") {
+		$directdid=$vars['directdid'];
+		$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 		$existing=core_did_get($directdid,"","");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
 		if (!empty($existing) || !empty($existing_directdid)) {
