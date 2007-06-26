@@ -1461,14 +1461,14 @@ function core_users_edit($extension,$vars){
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
+	$directdid=$vars['directdid'];
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
 	if (trim($directdid) != "") {
-		$directdid=$vars['directdid'];
-		$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
 		$existing=core_did_get($directdid,"","");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
-		if (!empty($existing) || !empty($existing_directdid)) {
+		if (!empty($existing) || (!empty($existing_directdid) && $existing_directdid['extension'] != $extension)) {
 			if (!empty($existing)) {
 				echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
 			} else {
