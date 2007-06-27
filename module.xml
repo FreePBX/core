@@ -3,9 +3,10 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta1.2</version>
+	<version>2.3.0beta1.3</version>
 	<candisable>no</candisable>
 	<changelog>
+		*2.3.0beta1.3* #1633 proper display after deleting, #1747 add South Africa to indications.conf, #2024 can't edit exten with directdid set
 		*2.3.0beta1.2* Changed CW default to on, changed freePBX to FreePBX
 		*2.3.0beta1.1* Change core destinations to from-did-direct from ext-local so that findmefollow is used if present
 		*2.3.0beta1.0* First release online upradeable core module
@@ -25,7 +26,7 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.3/core-2.3.0beta1.2.tgz</location>
+	<location>release/2.3/core-2.3.0beta1.3.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
-	<md5sum>1f6fc5c968385994e8a777af1df532e0</md5sum>
+	<md5sum>6a4bb320de56eed620307e559f42c766</md5sum>
 </module>
