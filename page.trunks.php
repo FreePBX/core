@@ -387,7 +387,7 @@ if (!$tech && !$extdisplay) {
 	<strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters (not allowed before a | or +)")?><br />
 	<strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("removes a dialing prefix from the number (for example, 613|NXXXXXX would match when some dialed \"6135551234\" but would only pass \"5551234\" to the trunk)")?>
 	<strong>+</strong>&nbsp;&nbsp;&nbsp; <?php echo _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)")?><br /><br />
-	<?php echo _("You can also use both + and |, for example: 011+0|1ZXXXXXXXXX would match \"012555555555\" and dial it as \"0112555555555\" Note that the order does not matter, eg. 0|011+1ZXXXXXXXXX does the same thing."); ?>
+	<?php echo _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing."); ?>
 					</span></a>:
 				</td><td valign="top">&nbsp;
 					<textarea id="dialrules" cols="20" rows="<?php  
