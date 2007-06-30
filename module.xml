@@ -6,6 +6,7 @@
 	<version>2.3.0beta1.3</version>
 	<candisable>no</candisable>
 	<changelog>
+		*2.3.0beta1.4* #1522 DeadAGI back to AGI, fixed Trunk Dial Rules tooltip, added wanrnings comments to agi-bin scripts
 		*2.3.0beta1.3* #1633 proper display after deleting, #1747 add South Africa to indications.conf, #2024 can't edit exten with directdid set
 		*2.3.0beta1.2* Changed CW default to on, changed freePBX to FreePBX
 		*2.3.0beta1.1* Change core destinations to from-did-direct from ext-local so that findmefollow is used if present
