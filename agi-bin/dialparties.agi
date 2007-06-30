@@ -20,6 +20,13 @@
 // This script has been ported to PHP by 
 // Diego Iastrubni <diego.iastrubni@xorcom.com> and the FreePBX community
 
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
 $config = parse_amportal_conf( "/etc/amportal.conf" );
 
 require_once "phpagi.php";

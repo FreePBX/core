@@ -12,6 +12,13 @@ varname: The variable to return the new list in
 listseparator: The separator.  This defaults to "&" if it is not specified.
 */
 
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
 define("AGIBIN_DIR", dirname(__FILE__));
 
 include(AGIBIN_DIR."/phpagi.php");

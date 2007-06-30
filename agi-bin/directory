@@ -17,6 +17,13 @@
 
 */
 
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
 define("AGIBIN_DIR", dirname(__FILE__));
 define("DIRECTORY_FILE", "/etc/asterisk/voicemail.conf");
 

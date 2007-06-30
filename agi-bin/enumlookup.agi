@@ -8,6 +8,13 @@
 
 // Based on e164.org's enum.php script, available on http://www.e164.org/enum.phps
 
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
 require_once "phpagi.php";
 
 $AGI = new AGI();

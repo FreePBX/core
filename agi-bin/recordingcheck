@@ -17,6 +17,13 @@
 The program checks determines if Asterisk should record a call
 */
 
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
 define("AGIBIN_DIR", "/var/lib/asterisk/agi-bin");
 
 include(AGIBIN_DIR."/phpagi.php");
