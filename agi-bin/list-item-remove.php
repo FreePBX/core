@@ -19,9 +19,7 @@ listseparator: The separator.  This defaults to "&" if it is not specified.
  * to keep it from getting changed.
  */
 
-define("AGIBIN_DIR", dirname(__FILE__));
-
-include(AGIBIN_DIR."/phpagi.php");
+include("phpagi.php");
 
 $agi = new AGI;
 

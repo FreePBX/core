@@ -19,7 +19,6 @@
  * This script is auto-copied from an included module and will get overwritten.
  * If you modify it, you must change it to write only, in the agi-bin directory,
  * to keep it from getting changed.
- */
 
 
 This program takes a number, checks it against a list of patterns for a specific trunk, and modifies the number based
@@ -76,10 +75,12 @@ localprefixes.conf will override the rule1 defined in t1.conf.
 
 */
 
-define("AGIBIN_DIR", "/var/lib/asterisk/agi-bin");
+// TODO: Hardcoded path, this needs removing (means we need to parse amprotal.conf or change where these are stored!
+//       or maybe retrieve_conf can special handle them at install time.
+//
 define("LOCALPREFIX_FILE", "/etc/asterisk/localprefixes.conf");
 
-include(AGIBIN_DIR."/phpagi.php");
+include("phpagi.php");
 
 function parse_conf($filename, &$conf, &$section) {
 	if (is_null($conf)) {

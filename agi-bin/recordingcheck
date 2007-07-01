@@ -24,9 +24,8 @@ The program checks determines if Asterisk should record a call
  * to keep it from getting changed.
  */
 
-define("AGIBIN_DIR", "/var/lib/asterisk/agi-bin");
 
-include(AGIBIN_DIR."/phpagi.php");
+include("phpagi.php");
 
 
 /**********************************************************************************************************************/

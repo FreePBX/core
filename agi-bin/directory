@@ -24,7 +24,10 @@
  * to keep it from getting changed.
  */
 
-define("AGIBIN_DIR", dirname(__FILE__));
+// TODO: These are all hardcoded, means we are going to have to parse!
+//       or maybe retrieve_conf can special handle them at cp time.
+//
+
 define("DIRECTORY_FILE", "/etc/asterisk/voicemail.conf");
 
 // where is voicemail stored?
@@ -61,7 +64,7 @@ define("D_9",57);
 define("D_POUND",35);
 define("D_STAR",42);
 
-include(AGIBIN_DIR."/phpagi.php");
+include("phpagi.php");
 
 function output(&$var) {
 	if (DEBUG) {
