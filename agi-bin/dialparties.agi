@@ -27,8 +27,6 @@
  * to keep it from getting changed.
  */
 
-$config = parse_amportal_conf( "/etc/amportal.conf" );
-
 require_once "phpagi.php";
 require_once "phpagi-asmanager.php";
 
@@ -48,8 +46,22 @@ $dsarray	= array();	// This will hold all the dial strings, used to check for du
 $AGI = new AGI();
 debug("Starting New Dialparties.agi", 1);
 
+// Get required channels variables that used to come from amportal.conf
+$ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
+$ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
+
+
+// get cwinusebusy, and just to make sure it has been set until testing has been done
+// and assured this channel variable is set consistantly, make sure it is valid.
+//
+// TODO: take out the checking after confirmed it is always done righto
+//
+$cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
+$cwinusebusy = (trim($cwinusebusy) == "false") ? false : true;
+
+
 $astman = new AGI_AsteriskManager( );	
-if (!$astman->connect("127.0.0.1", $config["AMPMGRUSER"] , $config["AMPMGRPASS"])) {
+if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
 	exit (1);
 }
 	
@@ -402,7 +414,7 @@ foreach ( $ext as $k )
 			{
 				debug("Extension $extnum is available",1);
 			}
-		} elseif ($rgmethod == "none" && $exthascw == 1 && strtoupper(trim($config['CWINUSEBUSY'])) == "YES") {
+		} elseif ($rgmethod == "none" && $exthascw == 1 && $cwinusebusy) {
 
 			$extstate = is_ext_avail($extnum);
 			if ($extstate == 1) {
@@ -703,7 +715,6 @@ function mycallback( $rc )
 
 function is_ext_avail( $extnum )
 {
-	global $config;
 	global $astman;
 	
 	$status = $astman->ExtensionState( $extnum, 'from-internal' );

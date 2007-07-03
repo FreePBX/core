@@ -29,7 +29,7 @@ Two variables are required:
 DIAL_NUMBER - the number to be dialed (this will be modified, if necessary)
 DIAL_TRUNK - the trunk number to use
 
-The list of prefixes is contained in LOCALPREFIX_FILE (defined below, defaults to /etc/asterisk/localprefixes.conf). This
+The list of prefixes is contained in $localprefix_file (defined below, defaults to /etc/asterisk/localprefixes.conf). This
 file has the format:
 
 	[trunk-1]
@@ -75,12 +75,20 @@ localprefixes.conf will override the rule1 defined in t1.conf.
 
 */
 
-// TODO: Hardcoded path, this needs removing (means we need to parse amprotal.conf or change where these are stored!
-//       or maybe retrieve_conf can special handle them at install time.
-//
-define("LOCALPREFIX_FILE", "/etc/asterisk/localprefixes.conf");
-
 include("phpagi.php");
+
+function get_var( $agi, $value)
+{
+	$r = $agi->get_variable( $value );
+	
+	if ($r['result'] == 1)
+	{
+		$result = $r['data'];
+		return $result;
+	}
+	else
+		return '';
+}
 
 function parse_conf($filename, &$conf, &$section) {
 	if (is_null($conf)) {
@@ -187,14 +195,16 @@ function fixNumber($pattern, $number, &$agi) {
 
 $agi = new AGI();
 
-if (file_exists(LOCALPREFIX_FILE)) {
-	parse_conf(LOCALPREFIX_FILE, $conf, $section);
+$localprefix_file = get_var($agi, "ASTETCDIR")."/localprefix.conf";
+
+if (file_exists($localprefix_file)) {
+	parse_conf($localprefix_file, $conf, $section);
 	if (count($conf) == 0) {
-//		$agi->verbose("Could not parse ".LOCALPREFIX_FILE);
+//		$agi->verbose("Could not parse ".$localprefix_file);
 		exit(1);
 	}
 } else {
-	$agi->verbose("Could not open ".LOCALPREFIX_FILE);
+	$agi->verbose("Could not open ".$localprefix_file);
 	exit(1);
 }
 

@@ -24,18 +24,6 @@
  * to keep it from getting changed.
  */
 
-// TODO: These are all hardcoded, means we are going to have to parse!
-//       or maybe retrieve_conf can special handle them at cp time.
-//
-
-define("DIRECTORY_FILE", "/etc/asterisk/voicemail.conf");
-
-// where is voicemail stored?
-define("VOICEMAIL_DIR", "/var/spool/asterisk/voicemail/%s/%d");
-
-// where shold we store logs? (fixes #1912)
-define("LOG_DIR", "/var/log/asterisk/");
-
 // set to 1 to say "zed" instead of "zee"
 define("SAY_ZED",0);
 
@@ -65,6 +53,19 @@ define("D_POUND",35);
 define("D_STAR",42);
 
 include("phpagi.php");
+
+function get_var( $agi, $value)
+{
+	$r = $agi->get_variable( $value );
+	
+	if ($r['result'] == 1)
+	{
+		$result = $r['data'];
+		return $result;
+	}
+	else
+		return '';
+}
 
 function output(&$var) {
 	if (DEBUG) {
@@ -320,7 +321,7 @@ function do_directory($type, &$directory, $dial_context, $say_exten, $operator) 
 			do {
 				$match = & $directory[$digits][$i];
 				
-				$maindirname = sprintf(VOICEMAIL_DIR, $match["context"], $match["ext"]);
+				$maindirname = sprintf($voicemail_dir, $match["context"], $match["ext"]);
 
 				if (sound_file_exists($maindirname."/greet")) {
 					$r = $agi->stream_file($maindirname."/greet",$escape_digits);
@@ -398,11 +399,19 @@ function do_directory($type, &$directory, $dial_context, $say_exten, $operator) 
 
 $agi = new AGI;
 
-if (DEBUG) $logfile = fopen( LOG_DIR . "directory.log","w");
+$directory_file = get_var($agi, "ASTETCDIR")."/voicemail.conf";
+
+// where is voicemail stored?
+$voicemail_dir  = get_var($agi, "ASTSPOOLDIR")."/voicemail/%s/%d";
+
+// where should we store logs? (fixes #1912)
+$log_dir        = get_var($agi, "ASTLOGDIR");
+
+if (DEBUG) $logfile = fopen( $log_dir . "/directory.log","w");
 
 $vmconf = array();
 $null = null;
-parse_voicemailconf(DIRECTORY_FILE, $vmconf, $null);
+parse_voicemailconf($directory_file, $vmconf, $null);
 
 
 if (!$argv[1]) {
@@ -414,7 +423,7 @@ if (!$argv[1]) {
 
 if (!isset($vmconf[$vm_context]) && ($vm_context != "general")) {
 	// we make an exception for "general" context,as it just includes other contexts
-	$agi->verbose("Cannot find context ".$vm_context." in ".DIRECTORY_FILE);
+	$agi->verbose("Cannot find context ".$vm_context." in ".$directory_file);
 	exit(1);
 }
 

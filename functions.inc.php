@@ -56,6 +56,7 @@ function core_destinations() {
 function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
 	global $version;  // this is not the best way to pass this, this should be passetd together with $engine
+	global $amp_conf;
 
 	$modulename = "core";
 	
@@ -383,10 +384,47 @@ function core_get_config($engine) {
 			// modules should NOT use the globals table to store anything!
 			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
 			// I'm cheating for core functionality - do as I say, not as I do ;-)		
+
+			// Auto add these globals to give access to agi scripts and other needs, unless defined in the global table.
+			//
+			$amp_conf_globals = array( 
+				"ASTETCDIR", 
+				"ASTMODDIR", 
+				"ASTVARLIBDIR", 
+				"ASTAGIDIR", 
+				"ASTSPOOLDIR", 
+				"ASTRUNDIR", 
+				"ASTLOGDIR",
+				"CWINUSEBUSY",
+				"AMPMGRUSER",
+				"AMPMGRPASS"
+			);
+
 			$sql = "SELECT * FROM globals";
 			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			foreach($globals as $global) {
 				$ext->addGlobal($global['variable'],$global['value']);
+
+				// now if for some reason we have a variable in the global table
+				// that is in our $amp_conf_globals list, then remove it so we
+				// don't duplicate, the sql table will take precedence
+				//
+				if (array_key_exists($global['variable'],$amp_conf_globals)) {
+					$rm_keys = array_keys($amp_conf_globals,$global['variable']);
+					foreach ($rm_keys as $index) {
+						unset($amp_conf_globals[$index]);
+					}
+				}
+			}
+			foreach ($amp_conf_globals as $global) {
+				if (isset($amp_conf[$global])) {
+					$value = $amp_conf[$global];
+					if ($value === true || $value === false) {
+						$value = ($value) ? 'true':'false';
+					}
+					$ext->addGlobal($global, $value);
+					out("Added to globals: $global = $value");
+				}
 			}
 			
 			/* outbound routes */
@@ -1309,7 +1347,7 @@ function core_users_add($vars) {
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
-		if (!isset($amp_conf['ENABLECW']) || strtolower($amp_conf['ENABLECW']) != "no") {
+		if ($amp_conf['ENABLECW']) {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
 		}
 
