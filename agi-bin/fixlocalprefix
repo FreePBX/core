@@ -195,7 +195,7 @@ function fixNumber($pattern, $number, &$agi) {
 
 $agi = new AGI();
 
-$localprefix_file = get_var($agi, "ASTETCDIR")."/localprefix.conf";
+$localprefix_file = get_var($agi, "ASTETCDIR")."/localprefixes.conf";
 
 if (file_exists($localprefix_file)) {
 	parse_conf($localprefix_file, $conf, $section);
