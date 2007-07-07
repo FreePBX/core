@@ -238,6 +238,18 @@ function core_get_config($engine) {
 					if (!empty($item['alertinfo'])) {
 						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
 					}
+					// Add CID prefix, no need to do checks for existing pre-pends, this is an incoming did so this should
+					// be the first time the CID is manipulated. We set _RGPREFIX which is the same used throughout the different
+					// modules.
+					//
+					// TODO: If/When RGPREFIX is added to trunks, then see code in ringgroups to strip prefix if added here.
+					//
+					// TODO: core FreePBX documentation about this standard. (and probably rename from RGPREFIX to CIDPREFIX)
+					//
+					if (!empty($item['grppre'])) {
+						$ext->add($context, $exten, '', new ext_setvar('_RGPREFIX', $item['grppre']));
+						$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${RGPREFIX}${CALLERID(name)}'));
+					}
 					
 					// If we're doing a zaptel route, now we need to do the gotos ONLY IF it's the first time round.
 					// Except for the fact that this doesn't work. Not at all. Dial returns -1 and hangs up the 
@@ -609,7 +621,7 @@ function core_did_add($incoming){
 
 	if (empty($existing) && empty($existing_directdid)) {
 		$destination=${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass, description) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass', '$description')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass', '$description', '$grppre')";
 		sql($sql);
 		return true;
 	} else {

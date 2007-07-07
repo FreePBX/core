@@ -134,6 +134,8 @@ if (!isset($alertinfo))
 	$alertinfo = 0;
 if (!isset($mohclass))
 	$mohclass = 'default';
+if (!isset($grppre))
+	$grppre = "";
 ?>
 					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("FreePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
@@ -200,6 +202,10 @@ if (!isset($privacyman))
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
 			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>"></td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("CID name prefix")?>:<span><?php echo _('You can optionally prefix the Caller ID name. ie: If you prefix with "Sales:", a call from John Doe would display as "Sales:John Doe" on the extensions that ring.')?></span></a>:</td>
+			<td><input type="text" name="grppre" size="10" value="<?php echo ($grppre)?$grppre:'' ?>"></td>
 		</tr>
 <?php   if (function_exists('music_list')) { ?>
 		<tr>
