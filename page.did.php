@@ -272,6 +272,7 @@ function editGRP_onsubmit() {
 	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
 	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number or for advanced users, a valid Asterisk Dial Pattern\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
 	var msgConfirmDIDNoSlash = "<?php echo _('A Slash (\'/\') is never a valid DID. Please remove it and try again'); ?>";
+	var msgInvalidGrpPrefix = "<?php echo _('Invalid Caller ID prefix.'); ?>";
 	
 	setDestinations(theForm,1);
 	
@@ -309,6 +310,9 @@ function editGRP_onsubmit() {
 		if (!confirm(msgConfirmDIDCIDBlank))
 			return false;
 	}
+	defaultEmptyOK = true;
+	if (!isCallerID(theForm.grppre.value))
+		return warnInvalid(theForm.grppre, msgInvalidGrpPrefix);
 	
 	return true;
 }
