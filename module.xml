@@ -32,7 +32,7 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.3/core-2.3.0beta1.8.tgz</location>
+	<location>release/2.3/core-2.3.0beta1.8.1.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
-	<md5sum>feb84912d01ba8a1de005fdaee8640d7</md5sum>
+	<md5sum>227d874b9e0dbce3c0c73c49f8684d2a</md5sum>
 </module>
