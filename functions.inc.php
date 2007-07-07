@@ -1359,8 +1359,13 @@ function core_users_add($vars) {
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
 		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
-		if ($amp_conf['ENABLECW']) {
+
+		if (trim($callwaiting) == 'enabled') {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
+		} else if (trim($callwaiting) == 'disabled') {
+			$astman->database_del("CW",$extension);
+		} else {
+			echo "ERROR: this state should not exist<br>";
 		}
 
 		if ($vmx_state && $voicemail != "novm") {
@@ -1432,6 +1437,8 @@ function core_users_get($extension){
 		$results['record_out']='Adhoc';
 	}
 	if ($astman) {
+		$cw = $astman->database_get("CW",$extension);
+		$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
 		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
 		$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
 		$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
@@ -2622,6 +2629,10 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('privyn', '1', 'Yes');
 		$currentcomponent->setoptlistopts('privyn', 'sort', false);
 
+		$currentcomponent->addoptlistitem('callwaiting', 'enabled', 'Enable');
+		$currentcomponent->addoptlistitem('callwaiting', 'disabled', 'Disable');
+		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
+
 		$currentcomponent->addoptlistitem('ringtime', '0', 'Default');
 		for ($i=1; $i <= 120; $i++) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
@@ -2748,6 +2759,14 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', "Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored.", false));
+		if (!isset($callwaiting)) {
+			if ($amp_conf['ENABLECW']) {
+				$callwaiting = 'enabled';
+			} else {
+				$callwaiting = 'disabled';
+			}
+		}
+		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, 'Call Waiting', "Set the initial/current Call Waiting state for this user's extension", false));
 
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
