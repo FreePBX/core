@@ -647,31 +647,32 @@ function core_did_add($incoming){
 //get the existing devices
 function core_devices_list($tech="all") {
 	$sql = "SELECT id,description FROM devices";
-	switch ($tech) {
-		case "iax":
+	switch (strtoupper($tech)) {
 		case "IAX":
 			$sql .= " WHERE tech = 'iax2'";
 			break;
-		case "iax2":
 		case "IAX2":
-		case "sip":
 		case "SIP":
-		case "zap":
 		case "ZAP":
 			$sql .= " WHERE tech = '".strtolower($tech)."'";
 			break;
-		case "all":
+		case "ALL":
 		default:
 	}
+	$sql .= ' ORDER BY id';
 	$results = sql($sql,"getAll");
 
 	foreach($results as $result){
 		if (checkRange($result[0])){
-			$extens[] = array($result[0],$result[1]);
+			$extens[] = array(
+				0=>$result[0],  // for backwards compatibility
+				1=>$result[1],
+				'id'=>$result[0], // FETCHMODE_ASSOC emulation
+				'description'=>$result[1],
+			);
 		}
 	}
 	if (isset($extens)) {
-		sort($extens);
 		return $extens;
 	} else { 
 		return null;
