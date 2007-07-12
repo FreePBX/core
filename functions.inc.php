@@ -5,11 +5,12 @@
 function core_destinations() {
 	//static destinations
 	$extens = array();
-	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => 'Hangup');
-	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => 'Congestion');
-	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => 'Busy');
-	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => 'Play SIT Tone (Zapateller)');
-	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => 'Put caller on hold forever');
+	$category = 'Terminate Call';
+	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => 'Hangup', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => 'Congestion', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => 'Busy', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => 'Play SIT Tone (Zapateller)', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => 'Put caller on hold forever', 'category' => $category);
 	
 	//get the list of meetmes
 	$results = core_users_list();
@@ -35,10 +36,10 @@ function core_destinations() {
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
 		foreach($results as $result) {
-			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => $result['1'].' <'.$result['0'].'>');
-
+			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' <'.$result['0'].'> '.$result['1'], 'category' => 'Extensions');
 			if(isset($vmboxes[$result['0']])) {
-				$extens[] = array('destination' => 'ext-local,${VM_PREFIX}'.$result['0'].',1', 'description' => 'voicemail box '.$result['0']);
+				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail');
+				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail');
 			}
 		}
 	}
@@ -381,6 +382,10 @@ function core_get_config($engine) {
 					if($vm != "novm") {
 						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',"$vm,DIRECTDIAL"));
 						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_hangup(''));
+						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_macro('vm',"$vm,BUSY"));
+						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_hangup(''));
+						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_macro('vm',"$vm,NOANSWER"));
+						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_hangup(''));
 					}
 						
 					$hint = core_hint_get($exten['extension']);
