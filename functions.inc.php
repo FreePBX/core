@@ -1264,7 +1264,7 @@ function core_users_add($vars) {
 
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($directdid));
 	if (trim($directdid) != "") {
 		$existing=core_did_get($directdid,"","");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
@@ -1525,7 +1525,7 @@ function core_users_edit($extension,$vars){
 	}
 	
 	$directdid=$vars['directdid'];
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-]/" ,"", trim($directdid));
+	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($directdid));
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
 	if (trim($directdid) != "") {
