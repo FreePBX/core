@@ -86,6 +86,12 @@ $timer		= get_var( $AGI, "ARG1" );
 $dialopts	= get_var( $AGI, "ARG2" );
 $rgmethod	= get_var( $AGI, "RingGroupMethod" );
 
+$alertinfo = get_var( $AGI, "ALERT_INFO");
+if ($alertinfo) {
+	debug("Setting Alert-Info:  $alertinfo", 4);
+	$AGI->set_alertinfo($alertinfo);						
+}
+
 $pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
 
 $fmgrp  = get_var( $AGI, "FMGRP" );
@@ -634,6 +640,16 @@ if (!strlen($ds))
 		}
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_priority(10); // dial command is at priority 10
+	}
+}
+
+// sanity check make sure dialstatus is set to something
+//
+if (! $ds) {
+	$dialstatus  = get_var( $AGI, "DIALSTATUS" );
+	if (! $dialstatus) {
+		debug("Setting default NOANSWER DIALSTATUS since no extensions available",3);
+		$AGI->set_variable('DIALSTATUS','NOANSWER');
 	}
 }
 
