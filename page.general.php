@@ -13,6 +13,8 @@
 
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
+$cm =& cronmanager::create($db);
+
 
 //if submitting form, update database
 if ($action == 'editglobals') {
@@ -58,10 +60,28 @@ if ($action == 'editglobals') {
 		die($result->getMessage());
 	}
 	
+	/* update online updates and email as appropriate
+	*/
+	$online_updates = isset($_REQUEST['online_updates'])? $_REQUEST['online_updates'] : 'yes';
+	$update_email   = isset($_REQUEST['update_email'])  ? $_REQUEST['update_email']   : '';
+
+	if ($online_updates == 'yes') {
+		$cm->enable_updates();
+	} else {
+		$cm->disable_updates();
+	}
+
+	// TODO: maybe check the email address a bit better server/client side
+	//
+	$cm->save_email($update_email);
+	
 	//indicate 'need reload' link in header.php 
 	needreload();
 }
-	
+
+$online_updates = $cm->updates_enabled() ? 'yes' : 'no';
+$update_email   = $cm->get_email();
+
 //get all rows relating to selected account
 $sql = "SELECT * FROM globals";
 $globals = $db->getAll($sql);
@@ -321,6 +341,31 @@ foreach ($globals as $global) {
 	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="yes"><?php echo _("yes"); ?></option>
 	</select>
 </p>
+
+<h5><?php echo _("Online Updates")?></h5>
+	<table>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Check for Updates")?><span>
+			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resuling infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided"); ?></span></a>
+			</td>
+			<td align=right>
+			<select name="online_updates">
+				<option value="yes"  <?php  echo ($online_updates == 'yes' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
+				<option value="no"   <?php  echo ($online_updates == 'no'  ? 'SELECTED' : '')?>><?php echo _("No")?>
+			</select> 
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<a href=# class="info"><?php echo _("Update Email")?><span>
+			<?php echo _("Email address where online udpates will be sent. Leaving blank will result in no udpates being sent."); ?></span></a>
+			</td>
+			<td>
+				<input type="text" size="40" name="update_email" value="<?php  echo htmlspecialchars($update_email)?>"/>
+			</td>
+		</tr>
+	</table>
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 </h6>
