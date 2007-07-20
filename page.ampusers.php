@@ -50,11 +50,12 @@ if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "devicea
 // no more adding the APPLY Changes bar to module list because array_multisort messes up integer array keys
 // $module_list['99'] = array('category' => NULL, 'name' => _("Apply Changes Bar"));
 
+// changed from $module_name to $admin_module_name because the former is used by framework
 foreach ($module_list as $key => $row) {
 	$module_category[$key] = $row['category'];
-	$module_name[$key] = $row['name'];
+	$admin_module_name[$key] = $row['name'];
 }
-array_multisort($module_category, SORT_ASC, $module_name, SORT_ASC, $module_list);
+array_multisort($module_category, SORT_ASC, $admin_module_name, SORT_ASC, $module_list);
 
 $sections = array();
 if (isset($_REQUEST["sections"])) {
