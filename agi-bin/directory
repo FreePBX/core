@@ -282,6 +282,7 @@ function say_alpha($string,$escape_digits) {
 
 function do_directory($type, &$directory, $dial_context, $say_exten, $operator) {
 	global $agi;
+	global $voicemail_dir;
 	
 	$escape_digits = "1*";
 	if ($operator) $escape_digits .= "0";
