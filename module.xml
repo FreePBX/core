@@ -3,9 +3,12 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta1.9</version>
+	<version>2.3.0beta2.0</version>
 	<candisable>no</candisable>
 	<changelog>
+		*2.3.0beta2.0* Rearranged core destinations in drawselect box, added unavail and busy for vm, #1841 directdid with + fixed, #1329 recording with CID 
+ 		               number aliasing broken, fixed 1.4 ALERT_INFO deprecated use, added online update select box to general screen, and email where to send
+		               #2115 dial-by-name directory not saying supplied name
 		*2.3.0beta1.9* Added Call Waiting enable/disable on extensions settings, default for new is still set by ENABLECW
 		*2.3.0beta1.8.1* Added javascript validation to CID Prefix
 		*2.3.0beta1.8* Added CID Prefix Prepend feature to inbound DIDs
@@ -19,6 +22,9 @@
 		*2.3.0beta1.0* First release online upradeable core module
 		*1.2* Core modules code when part of framework
 	</changelog>
+	<depends>
+		<version>2.3.0beta2</version>
+	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
