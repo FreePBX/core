@@ -1,0 +1,67 @@
+#!/usr/bin/php -q
+<?php 
+
+// Copyright (C) 2007 Atengo LLC
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+
+/* --------WARNING---------
+ * 
+ * This script is auto-copied from an included module and will get overwritten.
+ * If you modify it, you must change it to write only, in the agi-bin directory,
+ * to keep it from getting changed.
+ */
+
+/**	This function is to replace the following command, which attempts to check if a wav
+ *	file is present. At the time of writing, Asterisk had a bug that would return
+ *  bogus SYSTEMSTATUS results. This script is written to use the SYSTEMSTATUS variable
+ *  for now so that it may no longer be necessary when that command is functioning.
+ *
+ *	exten => vmx,n,TrySystem(/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.[wW][aA][vV])
+ */
+
+require_once "phpagi.php";
+
+$AGI = new AGI();
+$file		= $argv[1];
+
+if (file_exists($file.".wav") || file_exists($file.".WAV")) {
+	$AGI->set_variable('SYSTEMSTATUS','SUCCESS');
+} else {
+	$AGI->set_variable('SYSTEMSTATUS','APPERROR');
+	debug("VmX requires: $file.wav or .WAV exist in order to function",1);
+}
+
+// EOF dialparties.agi
+exit( 0 );
+
+// helper functions
+function get_var( $agi, $value)
+{
+	$r = $agi->get_variable( $value );
+	
+	if ($r['result'] == 1)
+	{
+		$result = $r['data'];
+		return $result;
+	}
+	else
+		return '';
+}
+
+function debug($string, $level=3)
+{
+	global $AGI;
+	$AGI->verbose($string, $level);
+}
+
+?>
