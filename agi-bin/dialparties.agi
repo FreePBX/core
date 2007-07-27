@@ -86,10 +86,17 @@ $timer		= get_var( $AGI, "ARG1" );
 $dialopts	= get_var( $AGI, "ARG2" );
 $rgmethod	= get_var( $AGI, "RingGroupMethod" );
 
-$alertinfo = get_var( $AGI, "ALERT_INFO");
+$alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
 	debug("Setting Alert-Info:  $alertinfo", 4);
 	$AGI->set_alertinfo($alertinfo);						
+}
+
+$sippheader = get_var( $AGI, "SIPADDHEADER" );
+if ($sippheader) {
+	$fields = explode(':',$sippheader,2);
+	debug("Setting sipheader ".$fields[0].": ".$fields[1], 4);
+	$AGI->exec_sipaddheader($fields[0], $fields[1]);
 }
 
 $pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
