@@ -2452,7 +2452,7 @@ function core_routing_getroutepatterns($route) {
 //get unique outbound route trunks for a given context
 function core_routing_getroutetrunks($route) {
 	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY priority ";
+	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
 		die($results->getMessage());
@@ -2479,7 +2479,7 @@ function core_routing_getroutetrunks($route) {
 //get password for this route
 function core_routing_getroutepassword($route) {
 	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY priority ";
+	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getOne($sql);
 	if(DB::IsError($results)) {
 		die($results->getMessage());

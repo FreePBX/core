@@ -39,6 +39,8 @@ if (!isset($keepcid)) {
 if (!isset($failtrunk)) {
 	$failtrunk = "";
 }
+$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
+
 if (!isset($disabletrunk)) {
 	$disabletrunk = "off";
 }
@@ -61,6 +63,8 @@ if (isset($_REQUEST["dialrules"])) {
 	
 	// check for duplicates, and re-sequence
 	$dialrules = array_values(array_unique($dialrules));
+} else {
+	$dialrules = '';
 }
 
 //if submitting form, update database
