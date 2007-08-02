@@ -1252,6 +1252,8 @@ function core_users_add($vars) {
 	global $amp_conf;
 	global $astman;
 
+	$thisexten = isset($thisexten) ? $thisexten : '';
+
 	//ensure this id is not already in use
 	$extens = core_users_list();
 	if(is_array($extens)) {
@@ -2681,6 +2683,7 @@ function core_users_configpageinit($dispnum) {
 
 function core_users_configpageload() {
 	global $currentcomponent;
+	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
 	$name = $directdid = $didalert = $outboundcid = $answer = null;
