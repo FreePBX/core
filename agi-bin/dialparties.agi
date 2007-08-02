@@ -99,6 +99,15 @@ if ($sippheader) {
 	$AGI->exec_sipaddheader($fields[0], $fields[1]);
 }
 
+/* TODO: this does not work but should, moved to macro-dial for now
+ *
+$mohclass = get_var( $AGI, "MOHCLASS" );
+if ($mohclass) {
+	debug("Setting MoH Class:  $mohclass", 4);
+	$AGI->set_music(true, $mohclass);						
+}
+ */
+
 $pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
 
 $fmgrp  = get_var( $AGI, "FMGRP" );

@@ -201,7 +201,8 @@ function core_get_config($engine) {
 					$ext->add($context, $exten, 'cidok', new ext_noop('CallerID is ${CALLERID(all)}'));
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
-					    $ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+						$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
 					}
 
 					// If we require RINGING, signal it as soon as we enter.
@@ -331,6 +332,7 @@ function core_get_config($engine) {
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
 						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+						$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
 					}
 					
 					if ($item['faxexten'] != "default") {
@@ -862,7 +864,6 @@ function core_devices2astdb(){
 	global $astman;
 	global $amp_conf;
 
-	checkAstMan();
 	$sql = "SELECT * FROM devices";
 	$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
@@ -895,8 +896,9 @@ function core_devices2astdb(){
 				exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
 			}
 		}
+		return true;
 	} else {
-		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
+		return false;
 	}
 }
 
@@ -906,7 +908,6 @@ function core_users2astdb(){
 	global $amp_conf;
 	global $astman;
 
-	checkAstMan();
 	$sql = "SELECT * FROM users";
 	$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 	
@@ -923,14 +924,14 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".addslashes($name)."\"");
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
 		}	
+		return true;
 	} else {
-		echo _("Cannot connect to Asterisk Manager with ").$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"];
+		return false;
 	}
 
 //	TODO: this was...	
 // 	return $astman->disconnect();
 //	is "true" the correct value...?
-	return true;
 }
 
 //add to sip table
@@ -978,7 +979,7 @@ function core_devices_addsip($account) {
 
 	// Very bad
 	$sipfields[] = array($account,'account',$account);	
-	$sipfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	$sipfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
 	
 	// Where is this in the interface ??????
 	$sipfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
@@ -2800,7 +2801,9 @@ function core_users_configprocess() {
 	extract($_REQUEST);
 	
 	//make sure we can connect to Asterisk Manager
-	checkAstMan();
+	if (!checkAstMan()) {
+		return false;
+	}
 
 	//check if the extension is within range for this user
 	if (isset($extension) && !checkRange($extension)){
@@ -2838,6 +2841,7 @@ function core_users_configprocess() {
 			break;
 		}
 	}
+	return true;
 }
 
 
@@ -3058,7 +3062,9 @@ function core_devices_configprocess() {
 		include 'common/php-asmanager.php';
 
 	//make sure we can connect to Asterisk Manager
-	checkAstMan();
+	if (!checkAstMan()) {
+		return false;
+	}
 	
 	//create vars from the request
 	extract($_REQUEST);
@@ -3107,6 +3113,7 @@ function core_devices_configprocess() {
 				core_devices2astdb();
 			break;
 	}
+	return true;
 }
 
 ?>

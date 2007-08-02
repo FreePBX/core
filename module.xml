@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta2.2</version>
+	<version>2.3.0beta2.3</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.3.0beta2.3* added xml attribute needsenginedb, #2185 make MoH settings inheritable and add inherittable  MOHCLASS to dids/directdids with MoH
 		*2.3.0beta2.2* #1907 don't send ringing, #2055 language in *99 recording, #2168 dialparties to set sip header from SIPADDHEADER channel var
 		*2.3.0beta2.1* #2155 correct trunk tooltip, #2046 workaround for Asterisk bug that breaks VmX on some systems
 		*2.3.0beta2.0* Rearranged core destinations in drawselect box, added unavail and busy for vm, #1841 directdid with + fixed, #1329 recording with CID 
@@ -32,9 +33,9 @@
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
 	<menuitems>
-		<extensions>Extensions</extensions>
-		<users>Users</users>
-		<devices>Devices</devices>
+		<extensions needsenginedb="yes">Extensions</extensions>
+		<users needsenginedb="yes">Users</users>
+		<devices needsenginedb="yes">Devices</devices>
 		<did category="Inbound Call Control" sort="-5">Inbound Routes</did>
 		<routing>Outbound Routes</routing>
 		<trunks>Trunks</trunks>
