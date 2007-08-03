@@ -1367,7 +1367,7 @@ function core_users_add($vars) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
-		$astman->database_put("AMPUSER",$extension."/device","\"".isset($device)?$device:''."\"");
+		$astman->database_put("AMPUSER",$extension."/device","\"".((isset($device))?$device:'')."\"");
 
 		if (trim($callwaiting) == 'enabled') {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
@@ -1815,7 +1815,8 @@ function core_trunks_addDialRules($trunknum, $dialrules) {
 }
 
 function core_trunks_readDialRulesFile() {
-	global $localPrefixFile; // probably not the best way
+	global $amp_conf;
+	$localPrefixFile = $amp_conf['ASTETCDIR']."/localprefixes.conf";
 	
 	core_trunks_parse_conf($localPrefixFile, $conf, $section);
 	
@@ -1823,7 +1824,8 @@ function core_trunks_readDialRulesFile() {
 }
 
 function core_trunks_writeDialRulesFile($conf) {
-	global $localPrefixFile; // probably not the best way
+	global $amp_conf;
+	$localPrefixFile = $amp_conf['ASTETCDIR']."/localprefixes.conf";
 	
 	$fd = fopen($localPrefixFile,"w");
 	foreach ($conf as $section=>$values) {
@@ -2827,7 +2829,7 @@ function core_users_configprocess() {
 			case "del":
 				core_users_del($extdisplay);
 				core_users_cleanastdb($extdisplay);
-				if (function_exists(findmefollow_del)) {
+				if (function_exists('findmefollow_del')) {
 				    findmefollow_del($extdisplay);
 				}
 				needreload();

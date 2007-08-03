@@ -12,7 +12,6 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
-$localPrefixFile = rtrim($amp_conf['ASTETCDIR'],DIRECTORY_SEPARATOR)."/localprefixes.conf";
 
 
 $display='trunks'; 
@@ -64,7 +63,7 @@ if (isset($_REQUEST["dialrules"])) {
 	// check for duplicates, and re-sequence
 	$dialrules = array_values(array_unique($dialrules));
 } else {
-	$dialrules = '';
+	$dialrules = array();
 }
 
 //if submitting form, update database
@@ -258,15 +257,6 @@ if (!$tech && !$extdisplay) {
 				}
 			}
 		}
-		
-		/* //DIALRULES
-		if (!isset($_REQUEST["dialrules"])) { // we check REQUEST because dialrules() is always an array
-			$dialrules = getTrunkDialRules($trunknum);
-		}
-		*/
-		if (!isset($dialrules)) { $dialrules = null; }
-		if (!isset($dialrules)) { $dialrules = null; }
-
 		
 		if (count($dialrules) == 0) {
 			if ($temp = core_trunks_getDialRules($trunknum)) {

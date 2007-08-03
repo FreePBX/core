@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta2.3.2</version>
+	<version>2.3.0beta2.3.3</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.3.0beta2.3.3* fixed some uninitialized variables, #2210 trunk dialpatterns not being retrieved in gui
 		*2.3.0beta2.3.2* #2151 fix trunk ordering when more than 9 trunks used, and some unitialized vars
 		*2.3.0beta2.3.1* #2199 fix ENABLECW behavior on new extensions
 		*2.3.0beta2.3* added xml attribute needsenginedb, #2185 make MoH settings inheritable and add inherittable  MOHCLASS to dids/directdids with MoH
