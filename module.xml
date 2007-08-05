@@ -7,6 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.3.0beta2.3.5* make wiki help link always accesible in database mode
 		*2.3.0beta2.3.4* #1748 utf-8 fix, #1759 password field not in database mode, #2215 Outbound Routes highlighting in lnav
 		*2.3.0beta2.3.3* fixed some uninitialized variables, #2210 trunk dialpatterns not being retrieved in gui
 		*2.3.0beta2.3.2* #2151 fix trunk ordering when more than 9 trunks used, and some unitialized vars
@@ -45,7 +46,7 @@
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>
 		<ampusers>Administrators</ampusers>
-		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank">FreePBX Support</wiki>
+		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/2.3/core-2.3.0beta2.3.4.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
