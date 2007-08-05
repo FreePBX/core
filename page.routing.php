@@ -509,11 +509,11 @@ foreach ($trunkpriority as $key=>$trunk) {
 		<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]" style="background: <?php echo $trunkstate[$trunk]=="off"?"#FFF":"#DDD" ?> ;" onChange="showDisable(<?php echo $key ?>); return true;">
 				<option value="" style="background: #FFF;"></option>
 				<?php 
-				foreach ($trunks as $name=>$display) {
+				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off') {
-						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #FFF;\" ".($name == $trunk ? "selected" : "").">".$display."</option>";
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #FFF;\" ".($name == $trunk ? "selected" : "").">".$display_description."</option>";
 					} else {
-						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #DDD;\" ".($name == $trunk ? "selected" : "").">".$display."</option>";
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #DDD;\" ".($name == $trunk ? "selected" : "").">".$display_description."</option>";
 					}
 				}
 				?>
@@ -553,11 +553,11 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]">
 				<option value="" SELECTED></option>
 				<?php 
-				foreach ($trunks as $name=>$display) {
+				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off') {
-					echo "<option value=\"".$name."\">".ltrim($display,"AMP:")."</option>";
+					echo "<option value=\"".$name."\">".ltrim($display_description,"AMP:")."</option>";
 					} else {
-					echo "<option value=\"".$name."\" style=\"background: #DDD;\" >*".ltrim($display,"AMP:")."*</option>";
+					echo "<option value=\"".$name."\" style=\"background: #DDD;\" >*".ltrim($display_description,"AMP:")."*</option>";
 					}
 				}
 				?>
@@ -599,7 +599,7 @@ if (theForm.routename.value == "") {
 function showDisable(key) {
 <?php
 	$bgmap = 'bgc = {';
-	foreach ($trunks as $name=>$display) {
+	foreach ($trunks as $name=>$display_description) {
 		$bgmap .= " \"$name\":";
 		$bgmap .= ($trunkstate[$name] == 'off')?'"#FFF",':'"#DDD",';
 	}
