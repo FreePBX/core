@@ -158,7 +158,7 @@ foreach ($tresults as $tresult) {
 <?php if ($amp_conf["AUTHTYPE"] != "database") { ?>			
 			<tr>
 				<td colspan="2">
-	<b>NOTE:</b> AUTHTYPE is not set to 'database' in /etc/amportal.conf - Module crippled.<br /><br />
+	<?php echo '<b>'._("NOTE:").'</b>'._("AUTHTYPE is not set to 'database' in /etc/amportal.conf - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless AUTHTYPE is set to 'database'.") ?><br /><br />
 				</td>
 			</tr>
 <?php } ?>
@@ -169,7 +169,6 @@ foreach ($tresults as $tresult) {
 					<input type="text" size="20" name="username" value="<?php echo $username;?>"/>
 				</td>
 			</tr>
-<?php  if ($amp_conf["AUTHTYPE"] == "database") { ?>			
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Password<span>Create a password for this new user</span>")?></a>: 
@@ -177,7 +176,6 @@ foreach ($tresults as $tresult) {
 					<input type="password" size="20" name="password" value="<?php echo $password;?>"/>
 				</td>
 			</tr>
-<?php  } ?>
 			<tr>
 				<td colspan="2">
 					<br>
