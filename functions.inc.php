@@ -1721,7 +1721,9 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 }
 
 //get unique trunks
-function core_trunks_list() {
+function core_trunks_list($assoc = false) {
+	// TODO: $assoc default to true, eventually..
+
 	global $db;
 	global $amp_conf;
 	
@@ -1776,7 +1778,23 @@ function core_trunks_list() {
 		$unique_trunks[] = array('OUT_1','ZAP/g0');
 	}
 	// asort($unique_trunks);
-	return $unique_trunks;
+
+	if ($assoc) {
+		$trunkinfo = array();
+
+		foreach ($unique_trunks as $trunk) {
+			list($tech,$name) = explode('/',$trunk[1]);
+			$trunkinfo[$name] = array(
+				'name' => $name,
+				'tech' => $tech,
+				'globalvar' => $trunk[0], // ick
+				'value' => $trunk[2], // ??  no idea what this is.
+			);	
+		}
+		return $trunkinfo;
+	} else {
+		return $unique_trunks;
+	}
 }
 
 //write the OUTIDS global variable (used in dialparties.agi)
