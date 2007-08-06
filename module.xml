@@ -7,7 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.3.0beta2.3.5* make wiki help link always accesible in database mode, fix for #2209
+		*2.3.0beta2.3.5* make wiki help link always accesible in database mode, fix for #2209, added includes to sip.conf, cleanup in dialparties.agi
 		*2.3.0beta2.3.4* #1748 utf-8 fix, #1759 password field not in database mode, #2215 Outbound Routes highlighting in lnav
 		*2.3.0beta2.3.3* fixed some uninitialized variables, #2210 trunk dialpatterns not being retrieved in gui
 		*2.3.0beta2.3.2* #2151 fix trunk ordering when more than 9 trunks used, and some unitialized vars
