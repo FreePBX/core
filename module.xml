@@ -3,7 +3,7 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0beta2.3.4</version>
+	<version>2.3.0beta2.3.5</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
@@ -48,7 +48,7 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.3/core-2.3.0beta2.3.4.tgz</location>
+	<location>release/2.3/core-2.3.0beta2.3.5.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
-	<md5sum>b178ee005c7cf065751295c925dd4d39</md5sum>
+	<md5sum>a993ee805d0c852eb152c0d0c28ed544</md5sum>
 </module>
