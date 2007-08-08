@@ -181,7 +181,7 @@ switch ($action) {
 $sql = "SELECT * FROM globals";
 $globals = $db->getAll($sql);
 if(DB::IsError($globals)) {
-die($globals->getMessage());
+die_freepbx($globals->getMessage());
 }
 
 //create a set of variables that match the items in global[0]

@@ -988,7 +988,7 @@ function core_devices_addsip($account) {
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
 	if(DB::IsError($result)) {
-		die($result->getDebugInfo()."<br><br>".'error adding to SIP table');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error adding to SIP table');	
 	}
 }
 
@@ -1000,7 +1000,7 @@ function core_devices_delsip($account) {
 	$result = $db->query($sql);
 	
 	if(DB::IsError($result)) {
-		die($result->getMessage().$sql);
+		die_freepbx($result->getMessage().$sql);
 	}
 }
 
@@ -1070,7 +1070,7 @@ function core_devices_addiax2($account) {
 	$compiled = $db->prepare('INSERT INTO iax (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$iaxfields);
 	if(DB::IsError($result)) {
-		die($result->getMessage()."<br><br>error adding to IAX table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to IAX table");	
 	}
 }
 
@@ -1082,7 +1082,7 @@ function core_devices_deliax2($account) {
 	$result = $db->query($sql);
 	
 	if(DB::IsError($result)) {
-		die($result->getMessage().$sql);
+		die_freepbx($result->getMessage().$sql);
 	}
 }
 
@@ -1148,7 +1148,7 @@ function core_devices_addzap($account) {
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zapfields);
 	if(DB::IsError($result)) {
-		die($result->getMessage()."<br><br>error adding to ZAP table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to ZAP table");	
 	}
 }
 
@@ -1159,7 +1159,7 @@ function core_devices_delzap($account) {
 	$sql = "DELETE FROM zap WHERE id = '$account'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($result->getMessage().$sql);
+		die_freepbx($result->getMessage().$sql);
 	}
 }
 
@@ -1236,7 +1236,7 @@ function core_sipname_check($sipname, $extension) {
 	$sql = "SELECT sipname FROM users WHERE sipname = '$sipname' AND extension != '$extension'";
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
-        die($results->getMessage().$sql);
+        die_freepbx($results->getMessage().$sql);
 	}
 	
 	if (isset($results['sipname']) && trim($results['sipname']) == $sipname) 
@@ -1431,7 +1431,7 @@ function core_users_get($extension){
 	$sql = "SELECT * FROM users WHERE extension = '$extension'";
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
-		die($results->getMessage().$sql);
+		die_freepbx($results->getMessage().$sql);
 	}
 	
 	//explode recording vars
@@ -1467,7 +1467,7 @@ function core_users_del($extension){
 	$sql="DELETE FROM users WHERE extension = \"$extension\"";
 	$results = $db->query($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage().$sql);
+		die_freepbx($results->getMessage().$sql);
 	}
 
 	//delete details to astdb
@@ -1645,7 +1645,7 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 	$compiled = $db->prepare('INSERT INTO globals (variable, value) values (?,?)');
 	$result = $db->executeMultiple($compiled,$glofields);
 	if(DB::IsError($result)) {
-		die($result->getMessage()."<br><br>".$sql);
+		die_freepbx($result->getMessage()."<br><br>".$sql);
 	}
 	
 	core_trunks_writeoutids();
@@ -1716,7 +1716,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");
 	$result = $db->executeMultiple($compiled,$dbconfitem);
 	if(DB::IsError($result)) {
-		die($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");	
+		die_freepbx($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");	
 	}
 }
 
@@ -1773,7 +1773,7 @@ function core_trunks_list($assoc = false) {
 		$result = $db->executeMultiple($compiled,$glofields);
 		if(DB::IsError($result))
 		{
-			die($result->getMessage()."<br><br>".$sql);	
+			die_freepbx($result->getMessage()."<br><br>".$sql);	
 		}
 		$unique_trunks[] = array('OUT_1','ZAP/g0');
 	}
@@ -2148,7 +2148,7 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 		$sql = sprintf("Update extensions set context='outrt-%s-%s' WHERE context='outrt-%s'",$order,substr($tresult[0],4), $tresult[0]);
 		$result = $db->query($sql); 
 		if(DB::IsError($result)) {     
-			die($result->getMessage()); 
+			die_freepbx($result->getMessage()); 
 		}
 	}
 	
@@ -2156,13 +2156,13 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 	$sql = "delete from  extensions WHERE context='outbound-allroutes'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-        	die($result->getMessage().$sql);
+        	die_freepbx($result->getMessage().$sql);
 	}
 	
 	$sql = "SELECT DISTINCT context FROM extensions WHERE context like 'outrt-%' ORDER BY context";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 
 	$priority_loops=1;	
@@ -2179,7 +2179,7 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 		//$sql = sprintf("Update extensions set application='outrt-%s-%s' WHERE context='outbound-allroutes' and  application='outrt-%s'",$order,substr($tresult[0],4), $tresult[0]);
 		$result = $db->query($sql); 
 		if(DB::IsError($result)) {     
-			die($result->getMessage(). $sql); 
+			die_freepbx($result->getMessage(). $sql); 
  		}
 	}
 	
@@ -2191,7 +2191,7 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
         // we SUBSTRING() to remove "outrt-"
         $routepriority = $db->getAll($sql);
         if(DB::IsError($routepriority)) {
-                die($routepriority->getMessage());
+                die_freepbx($routepriority->getMessage());
         }
 
 	// TODO: strip the context on the sqlite3 backend
@@ -2223,7 +2223,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	$sql="select * from globals WHERE variable LIKE 'OUT\\_%'";
         $result = $db->getAll($sql);
         if(DB::IsError($result)) {
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
 	foreach($result as $tr) {
 		$tech = strtok($tr[1], "/");
@@ -2234,7 +2234,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 		$sql="select DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context";
 		$routepriority = $db->getAll($sql);
 		if(DB::IsError($result)) {
-			die($result->getMessage());
+			die_freepbx($result->getMessage());
 		}
 		$order=core_routing_setroutepriorityvalue(count($routepriority));
 		$name = sprintf ("%s-%s",$order,$name);
@@ -2273,7 +2273,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			$sql .= "'Use Emergency CID for device')";
 			$result = $db->query($sql);
 			if(DB::IsError($result)) {
-				die($result->getMessage());
+				die_freepbx($result->getMessage());
 			}
 		} else {
 			$startpriority = 0;
@@ -2291,7 +2291,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			   $sql .= "'Preserve Intenal CID Info')";
 			   $result = $db->query($sql);
 				if(DB::IsError($result)) {
-					   die($result->getMessage());
+					   die_freepbx($result->getMessage());
 				}
 		}
 
@@ -2307,7 +2307,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			   $sql .= "'Do not play moh on this route')";
 			   $result = $db->query($sql);
 				if(DB::IsError($result)) {
-					   die($result->getMessage());
+					   die_freepbx($result->getMessage());
 				}
 		}
 
@@ -2334,7 +2334,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			
 			$result = $db->query($sql);
 			if(DB::IsError($result)) {
-				die($result->getMessage());
+				die_freepbx($result->getMessage());
 			}
 			//To identify the first trunk in a pattern
 			//so that passwords are in the first trunk in
@@ -2353,7 +2353,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 		
 		$result = $db->query($sql);
 		if(DB::IsError($result)) {
-			die($result->getMessage());
+			die_freepbx($result->getMessage());
 		}
 	}
 
@@ -2366,7 +2366,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	$sql = "SELECT priority FROM extensions WHERE context = 'outbound-allroutes' AND extension = 'include'";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 	$priorities = array();
 	foreach ($results as $row) {
@@ -2387,7 +2387,7 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($priority.$result->getMessage());
+		die_freepbx($priority.$result->getMessage());
 	}
 	
 }
@@ -2402,13 +2402,13 @@ function core_routing_del($name) {
 	$sql = "DELETE FROM extensions WHERE context = 'outrt-".$name."'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
 	
 	$sql = "DELETE FROM extensions WHERE context = 'outbound-allroutes' AND application = 'outrt-".$name."' ";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
 	
 	return $result;
@@ -2429,13 +2429,13 @@ function core_routing_rename($oldname, $newname) {
 	$sql = "UPDATE extensions SET context = 'outrt-".$newname."' WHERE context = 'outrt-".$oldname."'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
         $mypriority=sprintf("%d",$route_prefix);	
 	$sql = "UPDATE extensions SET application = 'outrt-".$newname."', priority = '$mypriority' WHERE context = 'outbound-allroutes' AND application = 'outrt-".$oldname."' ";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
 	
 	return true;
@@ -2447,7 +2447,7 @@ function core_routing_getroutepatterns($route) {
 	$sql = "SELECT extension, args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk%' OR args LIKE'dialout-enum%') ORDER BY extension ";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 	
 	$patterns = array();
@@ -2475,7 +2475,7 @@ function core_routing_getroutetrunks($route) {
 	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 	
 	$trunks = array();
@@ -2502,7 +2502,7 @@ function core_routing_getroutepassword($route) {
 	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getOne($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 	if (preg_match('/^.*,.*,.*,(\d+|\/\S+)/', $results, $matches)) {
 		$password = $matches[1];
@@ -2519,7 +2519,7 @@ function core_routing_getrouteemergency($route) {
 	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'EMERGENCYROUTE%') ";
 	$results = $db->getOne($sql);
 	if(DB::IsError($results)) {
-		die($results->getMessage());
+		die_freepbx($results->getMessage());
 	}
 	if (preg_match('/^.*=(.*)/', $results, $matches)) {
 		$emergency = $matches[1];
@@ -2537,7 +2537,7 @@ function core_routing_getrouteintracompany($route) {
        $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'INTRACOMPANYROUTE%') ";
        $results = $db->getOne($sql);
        if(DB::IsError($results)) {
-               die($results->getMessage());
+               die_freepbx($results->getMessage());
        }
        if (preg_match('/^.*=(.*)/', $results, $matches)) {
                $intracompany = $matches[1];
@@ -2554,7 +2554,7 @@ function core_routing_getroutemohsilence($route) {
        $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'MOHCLASS%') ";
        $results = $db->getOne($sql);
        if(DB::IsError($results)) {
-               die($results->getMessage());
+               die_freepbx($results->getMessage());
        }
        if (preg_match('/^.*=(.*)/', $results, $matches)) {
                $mohsilence = $matches[1];

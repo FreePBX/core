@@ -57,7 +57,7 @@ if ($action == 'editglobals') {
 	$result = $db->executeMultiple($compiled,$globalfields);
 	if(DB::IsError($result)) {
 		echo $action.'<br>';
-		die($result->getMessage());
+		die_freepbx($result->getMessage());
 	}
 	
 	/* update online updates and email as appropriate
@@ -86,7 +86,7 @@ $update_email   = $cm->get_email();
 $sql = "SELECT * FROM globals";
 $globals = $db->getAll($sql);
 if(DB::IsError($globals)) {
-die($globals->getMessage());
+die_freepbx($globals->getMessage());
 }
 
 //create a set of variables that match the items in global[0]
