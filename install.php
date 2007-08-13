@@ -31,7 +31,7 @@ $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'simu_fax');
-$fcc->setDescription('Simulate Incoming FAX Call');
+$fcc->setDescription('Dial System FAX');
 $fcc->setDefault('666');
 $fcc->update();
 unset($fcc);
