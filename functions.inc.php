@@ -913,7 +913,6 @@ function core_users2astdb(){
 	
 	//add details to astdb
 	if ($astman) {
-		$astman->database_deltree("AMPUSER");
 		foreach($userresults as $usr) {
 			extract($usr);
 			$astman->database_put("AMPUSER",$extension."/password",$password);
