@@ -40,6 +40,7 @@ function core_destinations() {
 			if(isset($vmboxes[$result['0']])) {
 				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail');
 				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail');
+				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail');
 			}
 		}
 	}
@@ -388,6 +389,8 @@ function core_get_config($engine) {
 						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_hangup(''));
 						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_macro('vm',"$vm,NOANSWER"));
 						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_hangup(''));
+						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_macro('vm',"$vm,NOMESSAGE"));
+						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_hangup(''));
 					}
 						
 					$hint = core_hint_get($exten['extension']);
