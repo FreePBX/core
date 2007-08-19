@@ -558,23 +558,23 @@ if (!strlen($ds)) {
 	$AGI->noop('');
 } else {
 	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
-		$ds = '|';
+		$ds = ',';
 		if ($timer) {
 			$ds .= $timer;
 		}
-		$ds .= '|' . $dialopts; // pound to transfer, provide ringing
+		$ds .= ',' . $dialopts; // pound to transfer, provide ringing
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_variable("HuntMembers",$loops);
 		$AGI->set_priority(20); // dial command is at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
 	} else {
-		$ds .= '|';
+		$ds .= ',';
 		if ($timer) {
 			$ds .= $timer;
 			if (trim($use_confirmation) != "FALSE") {
 				$AGI->set_variable('__RT',$timer);
 			}
 		}
-		$ds .= '|' . $dialopts; // pound to transfer, provide ringing
+		$ds .= ',' . $dialopts; // pound to transfer, provide ringing
 		if (trim($use_confirmation) != "FALSE") {
 			$AGI->set_variable('__RG_IDX',$ringgroup_index);
 			if ( isset($cidnum) && is_numeric($cidnum) ) {
