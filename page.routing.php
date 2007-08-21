@@ -332,7 +332,7 @@ if ($extdisplay) { // editing
 			<td>
 				&nbsp;&nbsp;<select name="mohsilence"/>
 				<?php
-					$tresults = music_list("/var/lib/asterisk/mohmp3");
+					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
 					if (isset($tresults[0])) {
 						foreach ($tresults as $tresult) {

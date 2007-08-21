@@ -213,7 +213,7 @@ if (!isset($privacyman))
 			<td>
 				&nbsp;&nbsp;<select name="mohclass"/>
 				<?php
-					$tresults = music_list("/var/lib/asterisk/mohmp3");
+					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
 					echo '<option value="none">'._("No Music")."</option>";
 					if (isset($tresults[0])) {

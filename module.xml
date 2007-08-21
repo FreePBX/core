@@ -7,9 +7,9 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.3.0.0* #2295 generate bad-nubmer in core, disable with AMPBADNUMBER=false, #2172 replace | with ,#2299 except dialparties.agi
-		*2.3.0RC1.1.2* #2265 remove DeadAGI, #2189 add no-msg dest for vm
-		*2.3.0RC1.1.1* #2253 remove default jbenable, jbforce
+		*2.3.0RC1.3* #2295 generate bad-nubmer in core, disable with AMPBADNUMBER=false, #2172 replace | with ,
+		             #2299 except dialparties.agi, #2193 hard code paths, #2296 privacy manger for 1.4
+		*2.3.0RC1.2* #2253 remove default jbenable, jbforce, remove DeadAGI, #2189 add no-msg dest for vm
 		*2.3.0RC1.1* bump to RC1 because of bug not using proper version compare
 		*2.3.0rc1.0* bump for rc1
 		*2.3.0beta2.3.5* make wiki help link always accesible in database mode, fix for #2209, added includes to sip.conf, cleanup in dialparties.agi

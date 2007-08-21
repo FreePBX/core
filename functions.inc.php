@@ -504,6 +504,24 @@ function core_get_config($engine) {
 			$ext->add('app-blackhole', 'busy', '', new ext_playtones('busy'));
 			$ext->add('app-blackhole', 'busy', '', new ext_busy());
 			$ext->add('app-blackhole', 'busy', '', new ext_hangup());
+
+			if ($amp_conf['AMPBADNUMBER'] !== false) {
+				$context = 'bad-number';
+				$exten = '_X.';
+				$ext->add($context, $exten, '', new ext_wait('1'));
+				$ext->add($context, $exten, '', new ext_playback('silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
+				$ext->add($context, $exten, '', new ext_wait('1'));
+				$ext->add($context, $exten, '', new ext_congestion('20'));
+				$ext->add($context, $exten, '', new ext_hangup());
+
+				$exten = '_*.';
+				$ext->add($context, $exten, '', new ext_wait('1'));
+				$ext->add($context, $exten, '', new ext_playback('silence/1&feature-not-avail-line&silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
+				$ext->add($context, $exten, '', new ext_wait('1'));
+				$ext->add($context, $exten, '', new ext_congestion('20'));
+				$ext->add($context, $exten, '', new ext_hangup());
+			}
+
 		break;
 	}
 }
@@ -2643,6 +2661,7 @@ function general_generate_indications() {
 // init registered 'your' config load and config process functions
 function core_users_configpageinit($dispnum) {
 	global $currentcomponent;
+	global $amp_conf;
 
 	if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 		// Setup option list we need
@@ -2676,7 +2695,7 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
 
 		if (function_exists('music_list')) {
-		    $tresults = music_list("/var/lib/asterisk/mohmp3");
+				$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 		    if (isset($tresults[0])) {
 			foreach ($tresults as $tresult) {
 			    $currentcomponent->addoptlistitem('mohclass', $tresult, $tresult);
