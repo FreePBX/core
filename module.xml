@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0RC1.2</version>
+	<version>2.3.0.0</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.3.0.0* Final Release
 		*2.3.0RC1.3* #2295 generate bad-nubmer in core, disable with AMPBADNUMBER=false, #2172 replace | with ,
 		             #2299 except dialparties.agi, #2193 hard code paths, #2296 privacy manger for 1.4
 		*2.3.0RC1.2* #2253 remove default jbenable, jbforce, remove DeadAGI, #2189 add no-msg dest for vm
@@ -53,6 +54,6 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://support.freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.3/core-2.3.0RC1.2.tgz</location>
-	<md5sum>42234800239d82e59ce179e84eb8bc10</md5sum>
+	<location>release/2.3/core-2.3.0.0.tgz</location>
+	<md5sum>42b31be2ee09e166f199fe4a4172e299</md5sum>
 </module>
