@@ -2142,7 +2142,7 @@ function core_routing_getroutenames()
 
 function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)
 {
-	global $db;
+	global $db, $amp_conf;
 	$counter=-1;
 	foreach ($routepriority as $tresult) 
 	{
