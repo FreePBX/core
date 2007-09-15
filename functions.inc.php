@@ -2665,22 +2665,22 @@ function core_users_configpageinit($dispnum) {
 
 	if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 		// Setup option list we need
-		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', 'On Demand');
-		$currentcomponent->addoptlistitem('recordoptions', 'Always', 'Always');
-		$currentcomponent->addoptlistitem('recordoptions', 'Never', 'Never');
+		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', _("On Demand"));
+		$currentcomponent->addoptlistitem('recordoptions', 'Always', _("Always"));
+		$currentcomponent->addoptlistitem('recordoptions', 'Never', _("Never"));
 		$currentcomponent->setoptlistopts('recordoptions', 'sort', false);
 
-		$currentcomponent->addoptlistitem('faxdetecttype', '0', 'None');
+		$currentcomponent->addoptlistitem('faxdetecttype', '0', _("None"));
 		$currentcomponent->addoptlistitem('faxdetecttype', '1', 'Zaptel');
 		$currentcomponent->addoptlistitem('faxdetecttype', '2', 'NVFax');
 		$currentcomponent->setoptlistopts('faxdetecttype', 'sort', false);
 
-		$currentcomponent->addoptlistitem('privyn', '0', 'No');
-		$currentcomponent->addoptlistitem('privyn', '1', 'Yes');
+		$currentcomponent->addoptlistitem('privyn', '0', _("No"));
+		$currentcomponent->addoptlistitem('privyn', '1', _("Yes"));
 		$currentcomponent->setoptlistopts('privyn', 'sort', false);
 
-		$currentcomponent->addoptlistitem('callwaiting', 'enabled', 'Enable');
-		$currentcomponent->addoptlistitem('callwaiting', 'disabled', 'Disable');
+		$currentcomponent->addoptlistitem('callwaiting', 'enabled', _("Enable"));
+		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
 
 		$currentcomponent->addoptlistitem('ringtime', '0', 'Default');
@@ -2689,9 +2689,9 @@ function core_users_configpageinit($dispnum) {
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
 
-		$currentcomponent->addoptlistitem('faxdestoptions', 'default', 'FreePBX default');
-		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', 'disabled');
-		$currentcomponent->addoptlistitem('faxdestoptions', 'system', 'system');
+		$currentcomponent->addoptlistitem('faxdestoptions', 'default', _("FreePBX default"));
+		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', _("disabled"));
+		$currentcomponent->addoptlistitem('faxdestoptions', 'system', _("system"));
 		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
 
 		if (function_exists('music_list')) {
@@ -2763,28 +2763,28 @@ function core_users_configpageload() {
 			}
 
 		} elseif ( $display != 'extensions' ) {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add User/Extension'), 0);
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add User/Extension")), 0);
 		}
 		
 		// Setup vars for use in the gui later on							
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
 		
-		$msgInvalidExtNum = 'Please enter a valid extension number.';
-		$msgInvalidCidNum = 'Please enter a valid CID Num Alias (must be a valid number).';
-		$msgInvalidExtPwd = 'Please enter valid User Password using numbers only';
-		$msgInvalidDispName = 'Please enter a valid Display Name';
-		$msgInvalidOutboundCID = 'Please enter a valid Outbound CID';
-		$msgInvalidPause = 'Please enter a valid pause time in seconds, using digits only';
+		$msgInvalidExtNum = _("Please enter a valid extension number.");
+		$msgInvalidCidNum = _("Please enter a valid CID Num Alias (must be a valid number).");
+		$msgInvalidExtPwd = _("Please enter valid User Password using numbers only");
+		$msgInvalidDispName = _("Please enter a valid Display Name");
+		$msgInvalidOutboundCID = _("Please enter a valid Outbound CID");
+		$msgInvalidPause = _("Please enter a valid pause time in seconds, using digits only");
 
 		// This is the actual gui stuff
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 		
 		if ( $display == 'extensions' ) {
-			$section = ($extdisplay ? 'Edit Extension' : 'Add Extension');			
+			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));			
 		} else {
-			$section = ($extdisplay ? 'Edit User' : 'Add User');
+			$section = ($extdisplay ? _("Edit User") : _("Add User"));
 		}
 		if ( $extdisplay ) {
 			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2);
@@ -2792,7 +2792,7 @@ function core_users_configpageload() {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false), 3);
 		}
 		if ( $display != 'extensions' ) {
-			$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
+			$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
@@ -2897,10 +2897,10 @@ function core_devices_configpageinit($dispnum) {
 		$currentcomponent->addgeneralarray('devtechs');
 		
 		// Some errors for the validation bits
-		$msgInvalidDTMFMODE = 'Please enter the dtmfmode for this device';
-		$msgInvalidChannel = 'Please enter the channel for this device';
-		$msgConfirmSecret = 'You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?';
-		$msgInvalidSecret = 'Please enter a Secret for this device';
+		$msgInvalidDTMFMODE = _("Please enter the dtmfmode for this device");
+		$msgInvalidChannel = _("Please enter the channel for this device");
+		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?");
+		$msgInvalidSecret = _("Please enter a Secret for this device");
 		
 		// zap
 		$tmparr = array();
@@ -2965,20 +2965,20 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 		
 		// Devices list
-		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', 'Generic SIP Device');
-		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', 'Generic IAX2 Device');
-		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', 'Generic ZAP Device');
-		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', 'Other (Custom) Device');
+		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
+		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
+		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
+		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
 		$currentcomponent->setoptlistopts('devicelist', 'sort', false);
 
 
 		// Option lists used by the gui
-		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', 'Fixed');
-		$currentcomponent->addoptlistitem('devicetypelist', 'adhoc', 'Adhoc');
+		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', _("Fixed"));
+		$currentcomponent->addoptlistitem('devicetypelist', 'adhoc', _("Adhoc"));
 		$currentcomponent->setoptlistopts('devicetypelist', 'sort', false);
 		
-		$currentcomponent->addoptlistitem('deviceuserlist', 'none', 'none');
-		$currentcomponent->addoptlistitem('deviceuserlist', 'new', 'New User');
+		$currentcomponent->addoptlistitem('deviceuserlist', 'none', _("none"));
+		$currentcomponent->addoptlistitem('deviceuserlist', 'new', _("New User"));
 		$users = core_users_list();
 		if (isset($users)) {
 			foreach ($users as $auser) {
@@ -3010,11 +3010,11 @@ function core_devices_configpageload() {
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
 
 		if ( $display != 'extensions') {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add Device'), 0);
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
 		} else {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', 'Add an Extension'), 0);
+			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add an Extension")), 0);
 		}
-		$currentcomponent->addguielem('_top', new gui_label('instructions', 'Please select your Device below then click Submit'));
+		$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
 		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', 'Device', '', false));
 
 	} else {
@@ -3039,9 +3039,9 @@ function core_devices_configpageload() {
 			unset($tmparr);
 			
 			if ( $display != 'extensions' ) {
-				$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Device')), 0);
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add").' '.strtoupper($deviceInfo['tech']).' '._("Device")), 0);
 			} else {
-				$currentcomponent->addguielem('_top', new gui_pageheading('title', _('Add').' '.strtoupper($deviceInfo['tech']).' '._('Extension')), 0);
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add").' '.strtoupper($deviceInfo['tech']).' '._("Extension")), 0);
 			}
 
 		}
@@ -3056,10 +3056,10 @@ function core_devices_configpageload() {
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
 
-		$msgInvalidDevID = 'Please enter a device id.';
-		$msgInvalidDevDesc = 'Please enter a valid Description for this device';
-		$msgInvalidEmergCID = 'Please enter a valid Emergency CID';
-		$msgInvalidExtNum = 'Please enter a valid extension number.';
+		$msgInvalidDevID = _("Please enter a device id.");
+		$msgInvalidDevDesc = _("Please enter a valid Description for this device");
+		$msgInvalidEmergCID = _("Please enter a valid Emergency CID");
+		$msgInvalidExtNum = _("Please enter a valid extension number.");
 		
 		// Actual gui
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
@@ -3074,7 +3074,7 @@ function core_devices_configpageload() {
 			}
 			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', 'The caller id name for this device will be set to this description until it is logged into.', '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
-			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.').' '.$fc_logon.' '._('logs into a device.').' '.$fc_logoff.' '._('logs out of a device.'), false));
+			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
 			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', 'Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting "New User", a new User Extension of the same Device ID will be set as the Default User.', false));
 		} else {
 			$section = 'Extension Options';
