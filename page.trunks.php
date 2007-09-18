@@ -337,7 +337,7 @@ if (!$tech && !$extdisplay) {
 			</tr>
 			<tr>
 				<td>
-					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk")."<br />"._("It's safe to leave this switched");?><br /><br /></span></a>:
+					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk. You must define an Outbound Caller ID on the this trunk when checking this.");?><br /><br /></span></a>:
 				</td><td>
 					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?>/>
 				</td>
@@ -738,8 +738,13 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
+	var msgNeverOverrideCIDValue = "<?php echo _('You must define an Outbound Caller ID when Choosing Never Override CallerID'); ?>";
 
 	defaultEmptyOK = true;
+
+	if (theForm.keepcid.checked && isEmpty($.trim(theForm.outcid.value)))
+		return warnInvalid(theForm.outcid, msgNeverOverrideCIDValue);
+
 	if (!isCallerID(theForm.outcid.value))
 		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
 	
