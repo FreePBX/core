@@ -508,6 +508,8 @@ function core_get_config($engine) {
 			if ($amp_conf['AMPBADNUMBER'] !== false) {
 				$context = 'bad-number';
 				$exten = '_X.';
+				$ext->add($context, $exten, '', new extension('ResetCDR()'));
+				$ext->add($context, $exten, '', new extension('NoCDR()'));
 				$ext->add($context, $exten, '', new ext_wait('1'));
 				$ext->add($context, $exten, '', new ext_playback('silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
 				$ext->add($context, $exten, '', new ext_wait('1'));
@@ -515,6 +517,8 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_hangup());
 
 				$exten = '_*.';
+				$ext->add($context, $exten, '', new extension('ResetCDR()'));
+				$ext->add($context, $exten, '', new extension('NoCDR()'));
 				$ext->add($context, $exten, '', new ext_wait('1'));
 				$ext->add($context, $exten, '', new ext_playback('silence/1&feature-not-avail-line&silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
 				$ext->add($context, $exten, '', new ext_wait('1'));
