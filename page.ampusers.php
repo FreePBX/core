@@ -33,7 +33,8 @@ if(is_array($active_modules)){
 		//create an array of module sections to display
 		if (isset($module['items']) && is_array($module['items'])) {
 			foreach($module['items'] as $itemKey => $item) {
-				$module_list[$itemKey] = $item;
+				$listKey = (!empty($item['display']) ? $item['display'] : $itemKey);
+				$module_list[ $listKey ] = $item;
 			}
 		}
 	}
