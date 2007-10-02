@@ -483,6 +483,7 @@ function core_get_config($engine) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
 				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+				$lastexten = false;
 				foreach($thisrt as $exten) {
 					//if emergencyroute, then set channel var
 					if(strpos($exten['args'],"EMERGENCYROUTE") !== false)
@@ -492,8 +493,23 @@ function core_get_config($engine) {
 					// Don't set MOHCLASS if already set, threre may be a feature code that overrode it
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
-					if(strpos($exten['args'],"dialout-trunk") !== false)
+					if(strpos($exten['args'],"dialout-trunk") !== false) {
+						if ($exten['extension'] !== $lastexten) {
+
+							// If NODEST is set, clear it. No point in remembering since dialout-trunk will just end in the
+							// bit bucket. But if answered by an outside line with transfer capability, we want NODEST to be
+							// clear so a subsequent transfer to an internal extension works and goes to voicmail or other
+							// destinations.
+							//
+							// Then do one call to user-callerid and record-enable instead of each time as in the past
+							//
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
+							$lastexten = $exten['extension'];
+						}
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
+					}
 					if(strpos($exten['args'],"dialout-enum") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					if(strpos($exten['args'],"outisbusy") !== false)
