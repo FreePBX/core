@@ -343,7 +343,17 @@ if (!$tech && !$extdisplay) {
 				</td>
 			<tr>
 				<td>
+<?php
+	if ($tech == "sip" || substr($tech,0,3) == "iax") {
+?>
+					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
+<?php
+	} else {
+?>
 					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo _("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. Inbound calls are not counted against the maximum. Leave blank to specify no maximum.")?></span></a>: 
+<?php
+	}
+?>
 				</td><td>
 					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>"/>
 				</td>
@@ -772,7 +782,7 @@ function trunkEdit_onsubmit(act) {
 		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	<?php } ?>
 
-	<?php if ($tech == "sip" || $tech == "iax2") { ?>
+	<?php if ($tech == "sip" || substr($tech,0,3) == "iax") { ?>
 	if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && 
 		(!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) &&
 			(theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {

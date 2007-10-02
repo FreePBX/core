@@ -401,7 +401,30 @@ function core_get_config($engine) {
 					}
 				}
 			}
-			
+
+			// create from-trunk context for each trunk that adds counts to channels
+			//
+			$trunklist = core_trunks_list(true);
+			if (is_array($trunklist)) {
+				foreach ($trunklist as $trunkprops) {
+					if (trim($trunkprops['value']) == 'on') {
+						// value of on is disabled and for zap we don't create a context
+						continue;
+					}
+					switch ($trunkprops['tech']) {
+						case 'IAX':
+						case 'IAX2':
+						case 'SIP':
+							$trunkgroup = $trunkprops['globalvar'];
+							$trunkcontext  = "from-trunk-".$trunkprops['name'];
+							$ext->add($trunkcontext, '_.', '', new ext_setvar('GROUP()',$trunkgroup));
+							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
+							break;
+						default:
+					}
+				}
+			}
+
 			/* dialplan globals */
 			// modules should NOT use the globals table to store anything!
 			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
