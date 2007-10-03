@@ -165,7 +165,7 @@ function fixNumber($pattern, $number, &$agi) {
 		if (!is_null($agi)) {
 			$agi->verbose('Could not understand pattern "'.$pattern.'" ('.$regex.')', 1);
 		}
-		return $false;
+		return false;
 	}
 	
 	// convert asterisk pattern matching into perl regular expression
