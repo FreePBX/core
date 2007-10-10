@@ -7,7 +7,6 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.3.0.4* #2372 require trunk Outbound CallerID when Never Overid CallerID checked, #2384 no CDR for bad-numbers
 		*2.3.0.3* #2308 FROM_DID to use ${EXTEN}, #2381 add iax_general_custom.conf, #2375 localization fixes
 		*2.3.0.2* #2330 allow '_' in route name changes, fix missing global variable.
 		*2.3.0.1* fix support link
