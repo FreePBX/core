@@ -493,7 +493,7 @@ function core_get_config($engine) {
 					// Don't set MOHCLASS if already set, threre may be a feature code that overrode it
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
-					if(strpos($exten['args'],"dialout-trunk") !== false) {
+					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false) {
 						if ($exten['extension'] !== $lastexten) {
 
 							// If NODEST is set, clear it. No point in remembering since dialout-trunk will just end in the
@@ -510,8 +510,6 @@ function core_get_config($engine) {
 						}
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					}
-					if(strpos($exten['args'],"dialout-enum") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					if(strpos($exten['args'],"outisbusy") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
 				}
