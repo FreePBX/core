@@ -2940,7 +2940,7 @@ function core_devices_configpageinit($dispnum) {
 		// Some errors for the validation bits
 		$msgInvalidDTMFMODE = _("Please enter the dtmfmode for this device");
 		$msgInvalidChannel = _("Please enter the channel for this device");
-		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device.\n\nAre you sure you want to leave the Secret empty?");
+		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
 		
 		// zap
