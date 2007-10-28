@@ -2839,7 +2839,7 @@ function core_users_configpageload() {
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
-		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', 'The CID Number to user for internal calls, if different then the extension number. This is used to masquerade as a different user. A common example is a team support persons who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no efffect on external calls.', '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
+		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', 'The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no effect on external calls.', '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', "If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them."));
 		
 		$section = 'Extension Options';
