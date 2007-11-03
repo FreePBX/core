@@ -3,10 +3,12 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.3.0.3</version>
+	<version>2.4.0alpha1.0</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.4.0alpha1.0* #2191, #2410, #2459, #2465; streamline dialout-trunk/outbound route repetition, add language support to macro-user-callerid
+		*2.3.1.0* #2372, #2384, #2408, remove double menu items (modules admin, dashboard), add macro-dialout-trunk-predial-hook
 		*2.3.0.3* #2308 FROM_DID to use ${EXTEN}, #2381 add iax_general_custom.conf, #2375 localization fixes
 		*2.3.0.2* #2330 allow '_' in route name changes, fix missing global variable.
 		*2.3.0.1* fix support link
@@ -57,6 +59,6 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.3/core-2.3.0.3.tgz</location>
-	<md5sum>951033da7f53182dc23a2a9f98395b3e</md5sum>
+	<location>release/2.4/core-2.4.0alpha1.0.tgz</location>
+	<md5sum>a9a543a85c585ac1bd0015c7a9c3702e</md5sum>
 </module>
