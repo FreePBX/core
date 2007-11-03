@@ -1337,7 +1337,7 @@ function core_users_add($vars) {
 
 	$thisexten = isset($thisexten) ? $thisexten : '';
 
-	if (trim($thisexten) == '' ) {
+	if (trim($extension) == '' ) {
 		echo "<script>javascript:alert('"._("You must put in an extension (or user) number")."');</script>";
 		return false;
 	}
@@ -1347,7 +1347,7 @@ function core_users_add($vars) {
 	if(is_array($extens)) {
 		foreach($extens as $exten) {
 			if ($exten[0]===$extension) {
-				echo "<script>javascript:alert('"._("This user")." ({$thisexten}) "._("or extension")." ({$extension}) "._("is already in use")."');</script>";
+				echo "<script>javascript:alert('".sprintf(_("This user/extension %s is already in use"),$extension)."');</script>";
 				return false;
 			}
 		}
