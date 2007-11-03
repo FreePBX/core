@@ -52,8 +52,29 @@ while (my $cmd = shift @ARGV) {
 		# It's a single word
 		$subject = $tmp;
 	}
-  # Convert %20 to spaces, leave anythign else alone.
+  # Convert %2x to proper characters, leave anything else alone.
   $subject =~ s/\%20/ /g;
+    $subject =~ s/\%21/\!/g;
+    $subject =~ s/\%22/\"/g;
+    $subject =~ s/\%23/\#/g;
+    $subject =~ s/\%24/\$/g;
+    $subject =~ s/\%25/\%/g;
+    $subject =~ s/\%26/\&/g;
+    $subject =~ s/\%27/\'/g;
+    $subject =~ s/\%28/\(/g;
+    $subject =~ s/\%29/\)/g;
+    $subject =~ s/\%2a/\*/g;
+    $subject =~ s/\%2A/\*/g;
+    $subject =~ s/\%2b/\+/g;
+    $subject =~ s/\%2B/\+/g;
+    $subject =~ s/\%2c/\,/g;
+    $subject =~ s/\%2C/\,/g;
+    $subject =~ s/\%2d/\-/g;
+    $subject =~ s/\%2D/\-/g;
+    $subject =~ s/\%2e/\./g;
+    $subject =~ s/\%2E/\./g;
+    $subject =~ s/\%2f/\//g;
+    $subject =~ s/\%2F/\//g;
   } elsif ($cmd eq "--type") {
 	my $tmp = shift @ARGV;
 	$ct = $tmp if (defined $tmp);

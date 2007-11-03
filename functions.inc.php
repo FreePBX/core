@@ -749,12 +749,19 @@ function core_devices_list($tech="all") {
 }
 
 
-function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null){
+function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
 	global $amp_conf;
 	global $currentFile;
 	global $astman;
 
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
+
+	if (trim($id) == '' ) {
+		if ($display != 'extensions') {
+			echo "<script>javascript:alert('"._("You must put in a device id")."');</script>";
+		}
+		return false;
+	}
 	
 	//ensure this id is not already in use
 	$devices = core_devices_list();
@@ -800,9 +807,21 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	
 	//add details to astdb
 	if ($astman) {
+		// if adding or editting a fixed device, user property should always be set
+		if ($devicetype == 'fixed' || !$editmode) {
+			$astman->database_put("DEVICE",$id."/user",$user);
+		}
+		// If changing from a fixed to an adhoc, the user property should be intialized
+		// to the new default, not remain as the previous fixed user
+		if ($editmode) {
+			$previous_type = $astman->database_get("DEVICE",$id."/type");
+			if ($previous_type == 'fixed' && $devicetype == 'adhoc') {
+				$astman->database_put("DEVICE",$id."/user",$user);
+			}
+		}
 		$astman->database_put("DEVICE",$id."/dial",$dial);
 		$astman->database_put("DEVICE",$id."/type",$devicetype);
-		$astman->database_put("DEVICE",$id."/user",$user);
+		$astman->database_put("DEVICE",$id."/default_user",$user);
 		if(!empty($emergency_cid))
 			$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
 		if($user != "none") {
@@ -850,7 +869,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	return true;
 }
 
-function core_devices_del($account){
+function core_devices_del($account,$editmode=false){
 	global $amp_conf;
 	global $currentFile;
 	global $astman;
@@ -881,10 +900,13 @@ function core_devices_del($account){
 					$astman->database_put("AMPUSER",$deviceuser."/device",$userdevices);
 			}
 		}
-		$astman->database_del("DEVICE",$account."/dial");
-		$astman->database_del("DEVICE",$account."/type");
-		$astman->database_del("DEVICE",$account."/user");
-		$astman->database_del("DEVICE",$account."/emergency_cid");
+		if (! $editmode) {
+			$astman->database_del("DEVICE",$account."/dial");
+			$astman->database_del("DEVICE",$account."/type");
+			$astman->database_del("DEVICE",$account."/user");
+			$astman->database_del("DEVICE",$account."/default_user");
+			$astman->database_del("DEVICE",$account."/emergency_cid");
+		}
 
 		//delete from devices table
 		$sql="DELETE FROM devices WHERE id = \"$account\"";
@@ -1314,6 +1336,11 @@ function core_users_add($vars) {
 	global $astman;
 
 	$thisexten = isset($thisexten) ? $thisexten : '';
+
+	if (trim($thisexten) == '' ) {
+		echo "<script>javascript:alert('"._("You must put in an extension (or user) number")."');</script>";
+		return false;
+	}
 
 	//ensure this id is not already in use
 	$extens = core_users_list();
@@ -3187,8 +3214,8 @@ function core_devices_configprocess() {
 		case "edit":  //just delete and re-add
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-				core_devices_del($extdisplay);
-				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid);
+				core_devices_del($extdisplay,true);
+				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
 				redirect_standard_continue('extdisplay');
 			}
