@@ -2920,6 +2920,7 @@ function core_users_configprocess() {
 	//check if the extension is within range for this user
 	if (isset($extension) && !checkRange($extension)){
 		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
+		$GLOBALS['abort'] = true;
 	} else {
 		//if submitting form, update database
 		if (!isset($action)) $action = null;
