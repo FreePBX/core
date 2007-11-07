@@ -374,7 +374,7 @@ function core_get_config($engine) {
 			if (is_array($userlist)) {
 				foreach($userlist as $item) {
 					$exten = core_users_get($item[0]);
-					$vm = ($exten['voicemail'] == "novm" ? "novm" : $exten['extension']);
+					$vm = ((($exten['voicemail'] == "novm") || ($exten['voicemail'] == "disabled") || ($exten['voicemail'] == "")) ? "novm" : $exten['extension']);
 
 					if (isset($exten['ringtimer']) && $exten['ringtimer'] != 0)
 						$ext->add('ext-local', $exten['extension'], '', new ext_setvar('__RINGTIMER',$exten['ringtimer']));
