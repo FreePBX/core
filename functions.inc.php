@@ -783,10 +783,6 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$dial = strtoupper($tech)."/".$id;
 		}
 	}
-	//if (empty($dial) && strtolower($tech) == "zap")
-	//	$dial = "ZAP/".($_REQUEST['channel'] != '' ? $_REQUEST['channel'] : $_REQUEST['devinfo_channel']);
-	//if (empty($dial))
-	//	$dial = strtoupper($tech)."/".$id;
 	
 	//check to see if we are requesting a new user
 	if ($user == "new") {
@@ -822,19 +818,24 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		$astman->database_put("DEVICE",$id."/dial",$dial);
 		$astman->database_put("DEVICE",$id."/type",$devicetype);
 		$astman->database_put("DEVICE",$id."/default_user",$user);
-		if(!empty($emergency_cid))
+		if(!empty($emergency_cid)) {
 			$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
-		if($user != "none") {
+		}
+
+		if ($user != "none") {
 			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 			if (empty($existingdevices)) {
 				$astman->database_put("AMPUSER",$user."/device",$id);
 			} else {
-				$existingdevices .= "&";
-				//only append device value if this id doesn't exist in it already
-				if(strpos($existingdevices,$id."&") === false) // if not containing $id 
-					$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
+				$existingdevices_array = explode('&',$existingdevices);
+				if (!in_array($id, $existingdevices_array)) {
+					$existingdevices_array[]=$id;
+					$existingdevices = implode('&',$existingdevices_array);
+					$astman->database_put("AMPUSER",$user."/device",$existingdevices);
+				}
 			}
 		}
+
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -884,14 +885,12 @@ function core_devices_del($account,$editmode=false){
 		if (isset($deviceuser) && $deviceuser != "none") {
 			// Remove the device record from the user's device list
 			$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
-			/*$userdevices = str_replace($account."&", "", $userdevices."&");
-			
-			// If there was more than one device, remove the extra "&" at the end.
-			if (substr($userdevices, -1, 1) == "&") {
-				$userdevices = substr($userdevices, 0, -1);
-			}*/
+
+			// We need to remove just this user and leave the rest alone
 			$userdevicesarr = explode("&", $userdevices);
-			array_splice($userdevicesarr, array_search($account, $userdevicesarr), 1);
+			$userdevicesarr_hash = array_flip($userdevicesarr);
+			unset($userdevicesarr_hash[$account]);
+			$userdevicesarr = array_flip($userdevicesarr_hash);
 			$userdevices = implode("&", $userdevicesarr);
 			
 			if (empty($userdevices)) {
@@ -2136,6 +2135,8 @@ function core_routing_getroutenames()
 	}
 
 
+	//TODO: This needs to be yanked, should be in the upgrade script somewhere not here
+	//
 	if (count($results) == 0) {
 		// see if they're still using the old dialprefix method
 		$results = sql("SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\\\_OUT\\\_%'","getAll");
