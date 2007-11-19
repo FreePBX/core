@@ -394,8 +394,9 @@ function core_get_config($engine) {
 					}
 						
 					$hint = core_hint_get($exten['extension']);
-					if (!empty($hint))
+					if (!empty($hint)) {
 						$ext->addHint('ext-local', $exten['extension'], $hint);
+					}
 					if ($exten['sipname']) {
 						$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
 					}
@@ -503,8 +504,8 @@ function core_get_config($engine) {
 							//
 							// Then do one call to user-callerid and record-enable instead of each time as in the past
 							//
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
 							$lastexten = $exten['extension'];
 						}
@@ -818,7 +819,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		$astman->database_put("DEVICE",$id."/dial",$dial);
 		$astman->database_put("DEVICE",$id."/type",$devicetype);
 		$astman->database_put("DEVICE",$id."/default_user",$user);
-		if(!empty($emergency_cid)) {
+		if($emergency_cid != '') {
 			$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
 		}
 
@@ -958,6 +959,10 @@ function core_devices2astdb(){
 			$astman->database_put("DEVICE",$id."/dial",$dial);
 			$astman->database_put("DEVICE",$id."/type",$devicetype);
 			$astman->database_put("DEVICE",$id."/user",$user);		
+			$astman->database_put("DEVICE",$id."/default_user",$user);
+			if(trim($emergency_cid) != '') {
+				$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
+			}
 			// If a user is selected, add this device to the user
 			if ($user != "none") {
 					$existingdevices = $astman->database_get("AMPUSER",$user."/device");
@@ -1260,10 +1265,20 @@ function core_devices_getzap($account) {
 
 
 function core_hint_get($account){
-	//determine what devices this user is associated with
-	$sql = "SELECT dial from devices where user = '{$account}'";
+	global $astman;
+
+	// We should always check the AMPUSER in case they logged into a device
+	// but we will fall back to the old methond if $astman not open although
+	// I'm pretty sure everything else will puke anyhow if not running
+	//
+	if ($astman) {
+		$device=$astman->database_get("AMPUSER",$account."/device");
+		$device_arr = explode('&',$device);
+		$sql = "SELECT dial from devices where id in ('".implode("','",$device_arr)."')";
+	} else {
+		$sql = "SELECT dial from devices where user = '{$account}'";
+	}
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	//print_r($results);
 	
 	//create an array of strings
 	if (is_array($results)){
@@ -1310,6 +1325,58 @@ function core_users_list() {
 	}
 }
 
+function core_check_extensions($exten=true) {
+	global $amp_conf;
+
+	$extenlist = array();
+	if (is_array($exten) && empty($exten)) {
+		return $extenlist;
+	}
+	$sql = "SELECT extension, name FROM users ";
+	if (is_array($exten)) {
+		$sql .= "WHERE extension in ('".implode("','",$exten)."')";
+	}
+	$sql .= " ORDER BY extension";
+	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
+	foreach ($results as $result) {
+		$thisexten = $result['extension'];
+		$extenlist[$thisexten]['description'] = _("User Extension: ").$result['name'];
+		$extenlist[$thisexten]['status'] = 'INUSE';
+		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+		$extenlist[$thisexten]['edit_url'] = "config.php?type=setup&display=$display&extdisplay=".urlencode($thisexten)."&skip=0";
+	}
+	return $extenlist;
+}
+
+function core_check_destinations($dest=true) {
+	global $active_modules;
+
+	$destlist = array();
+	if (is_array($dest) && empty($dest)) {
+		return $destlist;
+	}
+	$sql = "SELECT extension, cidnum, channel, description, destination FROM incoming ";
+	if ($dest !== true) {
+		$sql .= "WHERE destination in ('".implode("','",$dest)."')";
+	}
+	$sql .= "ORDER BY extension, cidnum, channel";
+	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
+	//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
+
+	foreach ($results as $result) {
+		$thisdest = $result['destination'];
+		$thisid   = $result['extension'].'/'.$result['cidnum'].'/'.$result['channel'];
+		$destlist[] = array(
+			'dest' => $thisdest,
+			'description' => 'Inbound Route: '.$result['description'].' ('.$thisid.')',
+			'edit_url' => 'config.php?display=did&extdisplay='.urlencode($thisid),
+		);
+	}
+	return $destlist;
+}
+
 function core_sipname_check($sipname, $extension) {
 	global $db;
 	if (!isset($sipname) || trim($sipname)=='')
@@ -1327,7 +1394,7 @@ function core_sipname_check($sipname, $extension) {
 		return true;
 }
 
-function core_users_add($vars) {
+function core_users_add($vars, $editmode=false) {
 	extract($vars);
 	
 	global $db;
@@ -1454,7 +1521,9 @@ function core_users_add($vars) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
-		$astman->database_put("AMPUSER",$extension."/device","\"".((isset($device))?$device:'')."\"");
+		if (!$editmode) {
+			$astman->database_put("AMPUSER",$extension."/device","\"".((isset($device))?$device:'')."\"");
+		}
 
 		if (trim($callwaiting) == 'enabled') {
 			$astman->database_put("CW",$extension,"\"ENABLED\"");
@@ -1545,7 +1614,7 @@ function core_users_get($extension){
 	return $results;
 }
 
-function core_users_del($extension){
+function core_users_del($extension, $editmode=false){
 	global $db;
 	global $amp_conf;
 	global $astman;
@@ -1558,7 +1627,7 @@ function core_users_del($extension){
 	}
 
 	//delete details to astdb
-	if ($astman) {
+	if ($astman && !$editmode) {
 		$astman->database_del("AMPUSER",$extension."/password");
 		$astman->database_del("AMPUSER",$extension."/ringtimer");
 		$astman->database_del("AMPUSER",$extension."/noanswer");
@@ -1568,8 +1637,6 @@ function core_users_del($extension){
 		$astman->database_del("AMPUSER",$extension."/cidnum");
 		$astman->database_del("AMPUSER",$extension."/voicemail");
 		$astman->database_del("AMPUSER",$extension."/device");
-	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 }
 
@@ -1633,8 +1700,8 @@ function core_users_edit($extension,$vars){
 
 	//delete and re-add
 	if (core_sipname_check($vars['sipname'],$extension)) {
-		core_users_del($extension);
-		core_users_add($vars);
+		core_users_del($extension, true);
+		core_users_add($vars, true);
 	}
 	return true;
 	
@@ -2825,10 +2892,14 @@ function core_users_configpageload() {
 	
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
-				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
+				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
+				}
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
-				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+				}
 			}
 
 		} elseif ( $display != 'extensions' ) {
@@ -2927,7 +2998,17 @@ function core_users_configprocess() {
 		if (!isset($action)) $action = null;
 		switch ($action) {
 			case "add":
-				if (core_users_add($_REQUEST)) {
+				$conflict_url = array();
+				$usage_arr = framework_check_extension_usage($_REQUEST['extension']);
+				if (!empty($usage_arr)) {
+					$GLOBALS['abort'] = true;
+					$conflict_url = framework_display_extension_usage_alert($usage_arr,true);
+					global $currentcomponent;
+					$id=0;
+					foreach ($conflict_url as $edit_link) {
+						$currentcomponent->addguielem('_top', new gui_link('conflict'.$i++, $edit_link['label'], $edit_link['url']));
+					}
+				} elseif (core_users_add($_REQUEST)) {
 					needreload();
 					redirect_standard_continue();
 				} else {
