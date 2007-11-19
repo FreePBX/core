@@ -1,0 +1,336 @@
+#!/usr/bin/php -q
+<?php
+
+	require_once "phpagi.php";
+	require_once "phpagi-asmanager.php";
+
+	/* Usage:
+	 *
+	 * AGI(user_login_out.agi,login|logout,[user])
+	 *
+	 * ARG1: action
+	 * ARG2: device
+	 * ARG3: user
+	 *
+	 * login:
+	 * Login the requested user and set hints appropriately as well as adjust
+	 * hints on any previous user that was logged in.
+	 *
+	 * logout:
+	 * Logout the current user and set hints appropriately for that user
+	 * as well as logging in the default user (if applicable) and set hints
+	 * accordingly
+	 */
+	
+	$agi = new AGI();
+
+	// get manager credentials out of the channel
+	//
+	$ampmgruser   = get_var( "AMPMGRUSER" );
+	$ampmgrpass   = get_var( "AMPMGRPASS" );
+	$astspooldir  = get_var( "ASTSPOOLDIR" );
+	/*
+	$ampmgruser  = 'admin';
+	$ampmgrpass  = 'amp111';
+	*/
+	$astman = new AGI_AsteriskManager( );	
+	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
+		exit (1);
+	}
+
+	$action      = get_action();
+	$this_device = get_this_device();
+
+	switch ($action) {
+		case 'login':
+		case 'logon':
+			$new_user = get_login_user();
+			debug("Logging in user $new_user to device $this_device");
+			user_login($this_device, $new_user);
+			break;
+		case 'logout':
+			debug("Logging out current user from device $this_device");
+			user_logout($this_device);
+			break;
+		default:
+			debug("Got unknown action: $action, exiting");
+	}
+	exit;
+
+	/*
+exten => s,n,System(rm -f ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
+exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/voicemail)}/${AMPUSER}/ ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
+*/
+
+
+	// Get the requested action (login or logout)
+	//
+	function get_action() {
+		global $argv;
+		return strtolower(trim($argv['1']));
+		//return get_var('ARG1');
+	}
+
+	// Get the device passed in (basically CID)
+	//
+	function get_this_device() {
+		global $argv;
+		return trim($argv['2']);
+		//return get_var('ARG2');
+	}
+
+	// Get the user to login to a device
+	//
+	function get_login_user() {
+		global $argv;
+		return trim($argv['3']);
+		//return get_var('ARG3');
+	}
+
+	// Login a new user to a device. If there is a current user
+	// log them out first.
+	//
+	function user_login($this_device, $new_user) {
+		debug("user_login: this_device: $this_device, new_user: $new_user",8);
+
+		$current_user = get_logged_in_user($this_device);
+		if ($current_user != $new_user) {
+			if ($current_user != '') {
+				debug("Logging out current user $current_user from device $this_device so $new_user can login",5);
+				remove_user($this_device);
+			}
+			insert_user($new_user, $this_device);
+		} else {
+			debug("User $new_user is already logged into device $this_device",5);
+		}
+	}
+
+	// Logout the current user. If device has a default user, log
+	// them in.
+	//
+	function user_logout($this_device) {
+		debug("user_logout: this_device: $this_device",8);
+
+		$current_user = get_logged_in_user($this_device);
+		$default_user = get_default_user($this_device);
+
+		if ($current_user != $default_user) {
+			remove_user($this_device);
+			if ($default_user != '') {
+				debug("Logging in default user $default_user to device $this_device",5);
+				insert_user($default_user, $this_device);
+			}
+		}
+	}
+
+	// Insert a specificed user into a specified device and then
+	// update the hint for that user to reflect the new device(s)
+	// and update the voicemial link
+	//
+	function insert_user($user, $device) {
+		debug("insert_user: user: $user, device: $device",8);
+		global $agi;
+		global $astspooldir;
+
+		set_device_user($device, $user);
+		$previous_devices = get_devices($user);
+		$new_devices = insert_device($previous_devices,$device);
+		debug("Setting user $user to devices $new_devices",5);
+		set_user_devices($user, $new_devices);
+		set_hint($user, $new_devices);
+		$vmcontext = get_voicemail_context($user);
+		if ($vmcontext != 'novm') {
+			exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
+			if ($ret) {
+				debug("Got Return code: $ret trying to: /bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device",5);
+			}
+		}
+	}
+
+	// Remove the current user from a device and then update
+	// the hint of that current user to reflect their current devices
+	//
+	function remove_user($device) {
+		debug("remove_user: device: $device",8);
+		global $agi;
+		global $astspooldir;
+
+		$current_user = get_user($device);
+		if ($current_user != '') {
+			$current_devices = get_devices($current_user);
+			$new_devices = remove_device($current_devices,$device);
+			debug("Setting user $current_user to devices $new_devices",5);
+			set_user_devices($current_user, $new_devices);
+			set_hint($current_user, $new_devices);
+			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+			if ($ret) {
+				debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
+			}
+		}
+	}
+
+	// Set the hint for a user based on the devices in their AMPUSER object
+	//
+	function set_hint($user, $devices) {
+		debug("set_hint: user: $user, devices: $devices",8);
+		global $astman;
+		global $agi;
+
+		if ($devices) {
+			$dial_string = get_dial_string($devices);
+			debug("Setting user $user hint to $dial_string",5);
+			$response = $astman->send_request('Command',array('Command'=>"add extension {$user},hint,{$dial_string} into ext-local replace"));
+		} else {
+			debug("Removing hint for user $user",5);
+			$response = $astman->send_request('Command',array('Command'=>"remove extension {$user}@ext-local hint"));
+		}
+	}
+
+	// Get the actual technology dialstrings from the DEVICE objects (used
+	// to create proper hints)
+	//
+	function get_dial_string($devices) {
+		debug("get_dial_string: devices: $devices",8);
+		global $agi;
+
+		$device_array = explode( '&', $devices );
+		foreach ($device_array as $adevice) {
+			$dds = $agi->database_get('DEVICE',$adevice.'/dial');
+			$dialstring .= $dds['data'].'&';
+		}
+		return trim($dialstring," &");
+	}
+
+	// Insert a new device into a devices string and return the new string
+	//
+	function insert_device($devices, $new_device) {
+		debug("insert_device: devices: $devices, new_device: $new_device",8);
+
+		// We could just append it but this assures no bugs duplicate the device
+		//
+		if (trim($new_device) != '') {
+			$device_arr = explode('&',$devices);
+			$device_arr[] = $new_device;
+			$device_arr = array_unique($device_arr);
+			return implode('&',$device_arr);
+		} else {
+			return $devices;
+		}
+	}
+
+	// Remove a new device from a devices string and return the new string
+	//
+	function remove_device($devices, $remove_device) {
+		debug("remove_device: devices: $devices, remove_device: $remove_device",8);
+
+		$device_arr = explode('&',$devices);
+		$device_arr_hash = array_flip($device_arr);
+		unset($device_arr_hash[$remove_device]);
+		$new_device_arr = array_flip($device_arr_hash);
+		$new_devices  = implode('&', $new_device_arr);
+		return $new_devices;
+	}
+
+	// Get the currently logged in user of a device returning blank
+	// in no logins
+	//
+	function get_logged_in_user($device) {
+		debug("get_logged_in_user: device: $device",8);
+		global $agi;
+
+		$user = $agi->database_get('DEVICE',$device.'/user');
+		if ($user['result'] == 1 && trim($user['data']) != 'none') {
+			return trim($user['data']);
+		}
+		return '';
+	}
+
+	// Get the designated default user for the device or blank if none
+	//
+	function get_default_user($device) {
+		debug("get_defualt_user: device: $device",8);
+		global $agi;
+
+		$default_user = $agi->database_get('DEVICE',$device.'/default_user');
+		if ($default_user['result'] == 1 && trim($default_user['data']) != 'none') {
+			return trim($default_user['data']);
+		}
+		return '';
+	}
+
+	// Get the list of current devices for this user
+	//
+	function get_devices($user) {
+		debug("get_devices: user: $user", 8);
+		global $agi;
+
+		$devices = $agi->database_get('AMPUSER',$user.'/device');
+		if ($devices['result'] == 1) {
+			return trim($devices['data']);
+		}
+		return '';
+	}
+
+	// Get the voicemail context for this user
+	//
+	function get_voicemail_context($user) {
+		debug("get_voicemail_context: user: $user", 8);
+		global $agi;
+
+		$devices = $agi->database_get('AMPUSER',$user.'/voicemail');
+		if ($devices['result'] == 1) {
+			return trim($devices['data']);
+		}
+		return 'novm';
+	}
+
+	// Get the user currently associated with this device or blank if none
+	//
+	function get_user($device) {
+		debug("get_user: device: $device", 8);
+		global $agi;
+
+		$user = $agi->database_get('DEVICE',$device.'/user');
+		if ($user['result'] == 1 && trim($user['data']) != 'none') {
+			return trim($user['data']);
+		}
+		return '';
+	}
+
+	// Inserts device info into AMPUSER object for specificed user
+	//
+	function set_user_devices($user, $devices) {
+		debug("set_user_devices: user: $user,  devices: $devices", 8);
+		global $agi;
+		if (empty($devices)) {
+			$agi->database_del('AMPUSER',$user.'/device');
+		} else {
+			$agi->database_put('AMPUSER',$user.'/device',$devices);
+		}
+	}
+
+	// Inserts user into DEVICE object for specified device
+	//
+	function set_device_user($device, $user) {
+		debug("set_device_user: device: $device,  user: $user", 8);
+		global $agi;
+		$agi->database_put('DEVICE',$device.'/user',$user);
+	}
+
+	// Get a channel variable
+	//
+	function get_var($value) {
+		global $agi;
+
+		$r = $agi->get_variable( $value );
+		if ($r['result'] == 1) {
+			$result = $r['data'];
+			return trim($result);
+		}
+		return '';
+	}
+
+	function debug($string, $level=3) {
+		global $agi;
+		$agi->verbose($string, $level);
+	}
