@@ -11,6 +11,7 @@ function core_destinations() {
 	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => 'Busy', 'category' => $category);
 	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => 'Play SIT Tone (Zapateller)', 'category' => $category);
 	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => 'Put caller on hold forever', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => 'Play ringtones to caller until they hangup', 'category' => $category);
 	
 	//get the list of meetmes
 	$results = core_users_list();
@@ -49,9 +50,106 @@ function core_destinations() {
 		return $extens;
 	else
 		return null;
-
 }
 
+function core_getdest($exten) {
+	$dests[] = 'from-did-direct,'.$exten.',1';
+	if (!function_exists('voicemail_mailbox_get')) {
+		return $dests;
+	}
+	$box = voicemail_mailbox_get($exten);
+	if ($box == null) {
+		return $dests;
+	}
+	$dests[] = 'ext-local,vmb'.$exten.',1';
+	$dests[] = 'ext-local,vmu'.$exten.',1';
+	$dests[] = 'ext-local,vms'.$exten.',1';
+
+	return $dests;
+}
+
+function core_getdestinfo($dest) {
+	global $active_modules;
+
+	// Check for Extension Number Destinations
+	//
+	if (substr(trim($dest),0,16) == 'from-did-direct,') {
+		$exten = explode(',',$dest);
+		$exten = $exten[1];
+		$thisexten = core_users_get($exten);
+		if (empty($thisexten)) {
+			return array();
+		} else {
+			//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
+			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+			return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
+			             'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
+								  );
+		}
+
+	// Check for voicemail box destinations
+	//
+	} else if (substr(trim($dest),0,12) == 'ext-local,vm') {
+		$exten = explode(',',$dest);
+		$exten = substr($exten[1],3);
+		if (!function_exists('voicemail_mailbox_get')) {
+			return array();
+		}
+		$thisexten = core_users_get($exten);
+		if (empty($thisexten)) {
+			return array();
+		}
+		$box = voicemail_mailbox_get($exten);
+		if ($box == null) {
+			return array();
+		}
+		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+		return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
+		             'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
+							  );
+
+	// Check for blackhole Termination Destinations
+	//
+	} else if (substr(trim($dest),0,14) == 'app-blackhole,') {
+		$exten = explode(',',$dest);
+		$exten = $exten[1];
+
+		switch ($exten) {
+			case 'hangup': 
+				$description = 'Hangup';
+				break;
+			case 'congestion': 
+				$description = 'Congestion';
+				break;
+			case 'busy': 
+				$description = 'Busy';
+				break;
+			case 'zapateller': 
+				$description = 'Play SIT Tone (Zapateller)';
+				break;
+			case 'musiconhold': 
+				$description = 'Put caller on hold forever';
+				break;
+			case 'ring': 
+				$description = 'Play ringtones to caller';
+				break;
+			default:
+				$description = false;
+		}
+		if ($description) {
+			return array('description' => 'Core: '.$description,
+		             	 'edit_url' => false,
+							  	 );
+		} else {
+			return array();
+		}
+
+	// None of the above, so not one of ours
+	//
+	} else {
+		return false;
+	}
+}
 /* 	Generates dialplan for "core" components (extensions & inbound routing)
 	We call this with retrieve_conf
 */
@@ -542,6 +640,12 @@ function core_get_config($engine) {
 			$ext->add('app-blackhole', 'busy', '', new ext_playtones('busy'));
 			$ext->add('app-blackhole', 'busy', '', new ext_busy());
 			$ext->add('app-blackhole', 'busy', '', new ext_hangup());
+
+			$ext->add('app-blackhole', 'ring', '', new ext_noop('Blackhole Dest: Ring'));
+			$ext->add('app-blackhole', 'ring', '', new ext_answer());
+			$ext->add('app-blackhole', 'ring', '', new ext_playtones('ring'));
+			$ext->add('app-blackhole', 'ring', '', new ext_wait(300));
+			$ext->add('app-blackhole', 'ring', '', new ext_hangup());
 
 			if ($amp_conf['AMPBADNUMBER'] !== false) {
 				$context = 'bad-number';
@@ -1588,6 +1692,9 @@ function core_users_get($extension){
 	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
 		die_freepbx($results->getMessage().$sql);
+	}
+	if (empty($results)) {
+		return $results;
 	}
 	
 	//explode recording vars
@@ -2894,11 +3001,21 @@ function core_users_configpageload() {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
 				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
+
+					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
+					if (!empty($usage_list)) {
+						$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
+					}
 				}
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+
+					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
+					if (!empty($usage_list)) {
+						$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
+					}
 				}
 			}
 
