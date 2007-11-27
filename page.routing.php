@@ -346,7 +346,6 @@ if ($extdisplay) { // editing
 <?php } ?>
 		<tr>
 			<td colspan="2">
-				<br>
 				<a href=# class="info"><?php echo _("Dial Patterns")?><span><?php echo _("A Dial Pattern is a unique set of digits that will select this trunk. Enter one dial pattern per line.")?><br><br><b><?php echo _("Rules:")?></b><br>
    <strong>X</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br>
    <strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br>
@@ -354,7 +353,7 @@ if ($extdisplay) { // editing
    <strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br>
    <strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters")?> <br>
    <strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("seperates a dialing prefix from the number (for example, 9|NXXXXXX would match when some dialed \"95551234\" but would only pass \"5551234\" to the trunks)")?>
-				</span></a><br><br>
+				</span></a>
 			</td>
 		</tr>
 <?php  /* old code for using textboxes -- replaced by textarea code
@@ -489,8 +488,7 @@ $key += 1; // this will be the next key value
 		</tr>
 		<tr>
 			<td colspan="2">
-			<br><br>
-				<a href=# class="info"><?php echo _("Trunk Sequence")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a><br><br>
+				<a href=# class="info"><?php echo _("Trunk Sequence")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a>
 			</td>
 		</tr>
 		<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
@@ -578,7 +576,6 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 <?php endif; // if $extdisplay ?>
 		<tr>
 			<td colspan="2">
-			<br>
 				<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
 				</h6>
 			</td>
