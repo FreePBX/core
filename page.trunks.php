@@ -289,7 +289,6 @@ if (!$tech && !$extdisplay) {
 			echo _("This trunk will not be able to be used for outbound calls until a route is setup that uses it. Click on <b>Outbound Routes</b> to setup routing.");
 			echo "</span></a>";
 		}
-		echo "<br><br>";
 
 	} else {
 		// set defaults
@@ -378,7 +377,7 @@ if (!$tech && !$extdisplay) {
 
 			<tr>
 				<td colspan="2">
-					<br><h4><?php echo _("Outgoing Dial Rules")?></h4>
+					<h4><?php echo _("Outgoing Dial Rules")?></h4>
 				</td>
 			</tr>
 			<tr>
@@ -631,7 +630,7 @@ if (!$tech && !$extdisplay) {
 			<?php if ($tech != "enum") { ?>
 			<tr>
 				<td colspan="2">
-					<br><h4><?php echo _("Outgoing Settings")?></h4>
+					<h4><?php echo _("Outgoing Settings")?></h4>
 				</td>
 			</tr>
 			<?php } ?>
@@ -685,7 +684,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<br><h4><?php echo _("Incoming Settings")?></h4>
+						<h4><?php echo _("Incoming Settings")?></h4>
 					</td>
 				</tr>
 				<tr>
@@ -707,7 +706,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<br><h4><?php echo _("Registration")?></h4>
+						<h4><?php echo _("Registration")?></h4>
 					</td>
 				</tr>
 				<tr>
