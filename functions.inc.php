@@ -270,29 +270,15 @@ function core_get_config($engine) {
 				$catchall = false;
 				$catchall_context='ext-did-catchall';
 				foreach($didlist as $item) {
-					$did = core_did_get($item['extension'],$item['cidnum'],$item['channel']);
+					$did = core_did_get($item['extension'],$item['cidnum']);
 					$exten = $did['extension'];
 					$cidnum = $did['cidnum'];
-					$channel = $did['channel'];
 
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
 
-					if (empty($channel))
-						$context = "ext-did";
-					else {
-						$context = "macro-from-zaptel-{$channel}";
-						if (!isset($zapchan[$channel])) {
-							// create the macro-from-zaptel-$chan context and load up the
-							// startup settings
-							$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
-							$ext->add($context, 's', '', new ext_noop('Entering '.$context.' with DID = ${DID}'));
-							$zapchan[$channel] = "unfinished";
-						}
-					}
+					$context = "ext-did";
 
-					// Start inbound processing. Unneeded line to be possibly overridden by something in 
-					// extensions_custom.conf
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					// always set callerID name
 					$ext->add($context, $exten, '', new ext_gotoif('$[ "${CALLERID(name)}" != "" ] ','cidok'));
@@ -310,7 +296,7 @@ function core_get_config($engine) {
 					}
 
 					if ($exten == "s" && $context == "ext-did") {  
-						//if the exten is s, then also make a catchall for undefined DIDs if it's not a zaptel route
+						//if the exten is s, then also make a catchall for undefined DIDs
 						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
 						if ($catchaccount == "_X.") 
 							$catchall = true;
@@ -352,27 +338,6 @@ function core_get_config($engine) {
 						$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${RGPREFIX}${CALLERID(name)}'));
 					}
 					
-					// If we're doing a zaptel route, now we need to do the gotos ONLY IF it's the first time round.
-					// Except for the fact that this doesn't work. Not at all. Dial returns -1 and hangs up the 
-					// call. This is fixed in 1.4 with TryExec(), but until then, we can't match on zap
-					// _and_ anything else.  When we decide to say 'Only 1.4!' then we can reenable this
-					// and use TryExec(Goto..) and then check ${TRYSTATUS} for FAILED or SUCCESS. I didn't
-					// bother actually writing that, as the syntax may change.
-					//if (isset($zapchan[$channel]) && $zapchan[$channel] == "unfinished") {
-					//	$ext->add($context, 's', '', new ext_gotoif('$[ "${DID}" = "s" ]', 'nos', 'sok'));
-					//	$ext->add($context, 's', 'nos', new ext_noop('Skipping ${DID} because it is s'));
-					//	$ext->add($context, 's', '', new ext_goto("trycid"));
-					//	$ext->add($context, 's', 'sok', new ext_noop('Trying ${DID}'));
-					//	$ext->add($context, 's', '', new ext_goto("1", '${DID}'));
-					//	$ext->add($context, 's', 'trycid', new ext_gotoif('$[ "${CALLERID(num)}" = "" ]', 'nocid', 'cidok'));
-					//	$ext->add($context, 's', 'nocid', new ext_noop('Skipping empty CallerID Num'));
-					//	$ext->add($context, 's', '', new ext_goto("end"));
-					//	$ext->add($context, 's', 'cidok', new ext_noop('Trying ${DID}/${CALLERID(num)}'));
-					//	$ext->add($context, 's', '', new ext_goto("1", '${DID}/${CALLERID(num)}'));
-					//	$ext->add($context, 's', 'end', new ext_noop('End of macro init'));
-						// Now set $zapchan[$channel] so we don't do this again
-						$zapchan[$channel] = "set";
-					//}
 					//the goto destination
 					// destination field in 'incoming' database is backwards from what ext_goto expects
 					$goto_context = strtok($did['destination'],',');
@@ -465,7 +430,19 @@ function core_get_config($engine) {
 				}
 			}
 
-			
+			// Now create macro-from-zaptel-nnn for each defined channel to route it to the DID routing
+			// Send it to from-trunk so it is handled as other dids would be handled.
+			//
+			foreach (core_zapchandids_list() as $row) {
+				$channel = $row['channel'];
+				$did     = $row['did'];
+
+				$zap_context = "macro-from-zaptel-{$channel}";
+				$ext->add($zap_context, 's', '', new ext_noop('Entering '.$zap_context.' with DID = ${DID} and setting to: '.$did));
+				$ext->add($zap_context, 's', '', new ext_setvar('__FROM_DID',$did));
+				$ext->add($zap_context, 's', '', new ext_goto('1',$did,'from-trunk'));
+			}
+
 			/* user extensions */
 			$ext->addInclude('from-internal-additional','ext-local');
 			$userlist = core_users_list();
@@ -730,34 +707,31 @@ function core_did_list($order='extension'){
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
-function core_did_get($extension="",$cidnum="",$channel=""){
-	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\" AND channel = \"$channel\"";
+function core_did_get($extension="",$cidnum=""){
+	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
 	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 }
 
-function core_did_del($extension,$cidnum, $channel){
-	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\" AND channel = \"$channel\"";
+function core_did_del($extension,$cidnum){
+	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
 	sql($sql);
 }
 
-function core_did_edit($old_extension,$old_cidnum, $old_channel, $incoming){
+function core_did_edit($old_extension,$old_cidnum, $incoming){
 
 	$old_extension = addslashes(trim($old_extension));
 	$old_cidnum = addslashes(trim($old_cidnum));
-	$old_channel = addslashes(trim($old_channel));
 
 	$incoming['extension'] = trim($incoming['extension']);
 	$incoming['cidnum'] = trim($incoming['cidnum']);
-	$incoming['channel'] = trim($incoming['channel']);
 
 	$extension = addslashes($incoming['extension']);
 	$cidnum = addslashes($incoming['cidnum']);
-	$channel = addslashes($incoming['channel']);
 
 	// if did or cid changed, then check to make sure that this pair is not already being used.
 	//
 	if (($extension != $old_extension) || ($cidnum != $old_cidnum)) {
-		$existing=core_did_get($extension,$cidnum,$channel);
+		$existing=core_did_get($extension,$cidnum);
 		if (empty($existing) && (trim($cidnum) == "")) {
 			$existing_directdid = core_users_directdid_get($extension);
 		} else {
@@ -768,7 +742,7 @@ function core_did_edit($old_extension,$old_cidnum, $old_channel, $incoming){
 	}
 
 	if (empty($existing) && empty($existing_directdid)) {
-		core_did_del($old_extension,$old_cidnum,$old_channel);
+		core_did_del($old_extension,$old_cidnum);
 		core_did_add($incoming);
 		return true;
 	} else {
@@ -786,7 +760,7 @@ function core_did_add($incoming){
 
 	// Check to make sure the did is not being used elsewhere
 	//
-	$existing=core_did_get($extension,$cidnum,$channel);
+	$existing=core_did_get($extension,$cidnum);
 	if (empty($existing) && (trim($cidnum) == "")) {
 		$existing_directdid = core_users_directdid_get($extension);
 	} else {
@@ -795,7 +769,7 @@ function core_did_add($incoming){
 
 	if (empty($existing) && empty($existing_directdid)) {
 		$destination=${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, channel, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$channel', '$ringing', '$mohclass', '$description', '$grppre')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre')";
 		sql($sql);
 		return true;
 	} else {
@@ -1460,18 +1434,18 @@ function core_check_destinations($dest=true) {
 	if (is_array($dest) && empty($dest)) {
 		return $destlist;
 	}
-	$sql = "SELECT extension, cidnum, channel, description, destination FROM incoming ";
+	$sql = "SELECT extension, cidnum, description, destination FROM incoming ";
 	if ($dest !== true) {
 		$sql .= "WHERE destination in ('".implode("','",$dest)."')";
 	}
-	$sql .= "ORDER BY extension, cidnum, channel";
+	$sql .= "ORDER BY extension, cidnum";
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
 	//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
 
 	foreach ($results as $result) {
 		$thisdest = $result['destination'];
-		$thisid   = $result['extension'].'/'.$result['cidnum'].'/'.$result['channel'];
+		$thisid   = $result['extension'].'/'.$result['cidnum'];
 		$destlist[] = array(
 			'dest' => $thisdest,
 			'description' => 'Inbound Route: '.$result['description'].' ('.$thisid.')',
@@ -1527,7 +1501,7 @@ function core_users_add($vars, $editmode=false) {
 	//
 	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($directdid));
 	if (trim($directdid) != "") {
-		$existing=core_did_get($directdid,"","");
+		$existing=core_did_get($directdid,"");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
 		if (!empty($existing) || !empty($existing_directdid)) {
 			if (!empty($existing)) {
@@ -1793,7 +1767,7 @@ function core_users_edit($extension,$vars){
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
 	if (trim($directdid) != "") {
-		$existing=core_did_get($directdid,"","");
+		$existing=core_did_get($directdid,"");
 		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
 		if (!empty($existing) || (!empty($existing_directdid) && $existing_directdid['extension'] != $extension)) {
 			if (!empty($existing)) {
@@ -1820,6 +1794,80 @@ function core_directdid_list(){
 }
 
 
+
+function core_zapchandids_add($description, $channel, $did) {
+	global $db;
+
+
+	if (!ctype_digit(trim($channel)) || trim($channel) == '') {
+		echo "<script>javascript:alert('"._('Invalid Channel Number, must be numeric and not blank')."')</script>";
+		return false;
+	}
+	if (trim($did) == '') {
+		echo "<script>javascript:alert('"._('Invalid DID, must be a non-blank DID')."')</script>";
+		return false;
+	}
+
+	$description = q($description);
+	$channel     = q($channel);
+	$did         = q($did);
+
+	$sql = "INSERT INTO zapchandids (channel, description, did) VALUES ($channel, $description, $did)";
+	$results = $db->query($sql);
+	if (DB::IsError($results)) {
+		if ($results->getCode() == DB_ERROR_ALREADY_EXISTS) {
+			echo "<script>javascript:alert('"._("Error Duplicate Channel Entry")."')</script>";
+			return false;
+		} else {
+			die_freepbx($results->getMessage()."<br><br>".$sql);
+		}
+	}
+	return true;
+}
+
+function core_zapchandids_edit($description, $channel, $did) {
+	global $db;
+
+	$description = q($description);
+	$channel     = q($channel);
+	$did         = q($did);
+
+	$sql = "UPDATE zapchandids SET description = $description, did = $did WHERE channel = $channel";
+	$results = $db->query($sql);
+	if (DB::IsError($results)) {
+		die_freepbx($results->getMessage()."<br><br>".$sql);
+	}
+	return true;
+}
+
+function core_zapchandids_delete($channel) {
+	global $db;
+
+	$channel     = q($channel);
+
+	$sql = "DELETE FROM zapchandids WHERE channel = $channel";
+	$results = $db->query($sql);
+	if (DB::IsError($results)) {
+		die_freepbx($results->getMessage()."<br><br>".$sql);
+	}
+	return true;
+}
+
+function core_zapchandids_list() {
+	global $db;
+
+	$sql = "SELECT * FROM zapchandids ORDER BY channel";
+	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+}
+
+function core_zapchandids_get($channel) {
+	global $db;
+
+	$channel     = q($channel);
+
+	$sql = "SELECT * FROM zapchandids WHERE channel = $channel";
+	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+}
 
 /* end page.users.php functions */
 

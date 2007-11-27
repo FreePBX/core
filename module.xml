@@ -7,6 +7,8 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.4.0beta1.0* addition of zapchandids page and removal of Channel in inbound routes, Extension/Destination Registry support, Adhoc Device
+		               and login/out improvments. Added ringing to Terminate Call Destinations,  #2493, #1974, #2470, #1697, #2357
 		*2.4.0alpha1.0* #2191, #2410, #2459, #2465; streamline dialout-trunk/outbound route repetition, add language support to macro-user-callerid
 		*2.3.1.0* #2372, #2384, #2408, remove double menu items (modules admin, dashboard), add macro-dialout-trunk-predial-hook
 		*2.3.0.3* #2308 FROM_DID to use ${EXTEN}, #2381 add iax_general_custom.conf, #2375 localization fixes
@@ -43,7 +45,7 @@
 		*1.2* Core modules code when part of framework
 	</changelog>
 	<depends>
-		<version>2.3.0beta2</version>
+		<version>2.4.0beta1</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
@@ -53,6 +55,7 @@
 		<users needsenginedb="yes">Users</users>
 		<devices needsenginedb="yes">Devices</devices>
 		<did category="Inbound Call Control" sort="-5">Inbound Routes</did>
+		<zapchandids category="Inbound Call Control" sort="-5">Zap Channel DIDs</zapchandids>
 		<routing>Outbound Routes</routing>
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>

@@ -24,21 +24,21 @@ switch ($action) {
 	case 'addIncoming':
 		//create variables from request
 		extract($_REQUEST);
-		//add details to teh 'incoming' table
+		//add details to the 'incoming' table
 		if (core_did_add($_REQUEST)) {
 			needreload();
 			redirect_standard();
 		}
 	break;
 	case 'delIncoming':
-		$extarray=explode('/',$extdisplay,3);
-		core_did_del($extarray[0],$extarray[1],$extarray[2]);
+		$extarray=explode('/',$extdisplay,2);
+		core_did_del($extarray[0],$extarray[1]);
 		needreload();
 		redirect_standard();
 	break;
 	case 'edtIncoming':
-		$extarray=explode('/',$extdisplay,3);
-		if (core_did_edit($extarray[0],$extarray[1],$extarray[2],$_REQUEST)) {
+		$extarray=explode('/',$extdisplay,2);
+		if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 			needreload();
 			redirect_standard('extdisplay');
 		}
@@ -58,12 +58,8 @@ if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		$displaydid = ( empty($inroute['extension'])? _("any DID") : $inroute['extension'] );
  		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
-		$zapchan = ( strlen($inroute['channel'])? "Zaptel Channel {$inroute['channel']}" : "" );
 		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
-		if ($zapchan != "") 
-			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$desc} {$zapchan} </a></li>\n";
-		else
-			echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum']."/".$inroute['channel'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."/".urlencode($inroute['channel'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
+		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
 }
 ?>
@@ -72,7 +68,6 @@ if (isset($inroutes)) {
 
 <div class="content">
 <?php 
-	
 	if ($action == 'delIncoming') {
 		echo '<br><h3>Route '.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else {
@@ -80,12 +75,12 @@ if (isset($inroutes)) {
 ?>
 <?php if ($extdisplay) {	
 	//create variables for the selected route's settings
-	$extarray=explode('/',$extdisplay,3);
-	$ininfo=core_did_get($extarray[0],$extarray[1],$extarray[2]);
+	$extarray=explode('/',$extdisplay,2);
+	$ininfo=core_did_get($extarray[0],$extarray[1]);
 	if (is_array($ininfo)) extract($ininfo);
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
-		<p><a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo !empty($description)?$description:$extdisplay ?></a></p>
+		<a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo !empty($description)?$description:$extdisplay ?></a>
 <?php } else { ?>
 		<h2><?php echo _("Add Incoming Route")?></h2>
 <?php } ?>
@@ -106,14 +101,6 @@ if (isset($inroutes)) {
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info.')?></span></a>:</td>
 			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>"></td>
-		</tr>
-		<tr><td><h4><?php echo _("OR"); ?></h4></td></tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Zaptel Channel")?><span><?php echo _('Match calls that come in on this specific Zaptel channel number. zapata.conf must have "context=from-zaptel" rather than context="from-pstn" to use this feature')?></span></a>:</td>
-			<td><input type="text" name="channel" value="<?php echo htmlspecialchars(isset($channel)?$channel:''); ?>"></td>
-		</tr>
-		<tr>
-			<td><br></td>
 		</tr>
 		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
 		<tr>
@@ -174,13 +161,11 @@ if (!isset($grppre))
 			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
 			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
 		</tr>
-		<tr>
-			<td><br></td>
-		</tr>
 <?php
 if (!isset($privacyman))
 	$privacyman = '0';
 ?>
+
 		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
@@ -191,14 +176,8 @@ if (!isset($privacyman))
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td><br></td>
-		</tr>		
 		
 		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
-
-
-
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
 			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>"></td>
@@ -230,30 +209,20 @@ if (!isset($privacyman))
 			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
 			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?> /></td>
 		</tr>
-
-
 <?php
 	// implementation of module hook
 	// object was initialized in config.php
 	echo $module_hook->hookHtml;
 ?>
-
-		<tr>
-			<td><br></td>
-		</tr>		
-		
 		<tr><td colspan="2"><h5><?php echo _("Set Destination")?><hr></h5></td></tr>
-		
 <?php 
 //draw goto selects
 echo drawselects(isset($destination)?$destination:null,0);
 ?>
-		
 		<tr>
-		<td colspan="2"><br><h6>
-			<input name="Submit" type="submit" value="<?php echo _("Submit")?>">
-		</h6></td>		
-		
+			<td colspan="2">
+				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>"></h6>
+			</td>		
 		</tr>
 		</table>
 <script language="javascript">
@@ -266,7 +235,6 @@ theForm.extension.focus();
 function editGRP_onsubmit() {
 	var msgInvalidDIDNumb = "<?php echo _('Please enter a valid DID Number'); ?>";
 	var msgInvalidCIDNum = "<?php echo _('Please enter a valid Caller ID Number'); ?>";
-	var msgCidDidWithZaptel = "<?php echo _('DID number and CID number MUST be blank when used with zaptel channel routing'); ?>";
 	var msgInvalidFaxEmail = "<?php echo _('Please enter a valid Fax Email or leave it empty to use the default'); ?>";
 	var msgInvalidPause = "<?php echo _('Please enter a valid number for Pause after answer'); ?>";
 	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
@@ -299,12 +267,6 @@ function editGRP_onsubmit() {
 	if (!validateDestinations(theForm,1,true))
 		return false;
 	
-	if (theForm.extension.value != ""  && theForm.channel.value != "" ) {
-		return warnInvalid(theForm.extension, msgCidDidWithZaptel);
-	}
-	if (theForm.cidnum.value != ""  && theForm.channel.value != "" ) {
-		return warnInvalid(theForm.cidnum, msgCidDidWithZaptel);
-	}
 	// warning about 'any DID / any CID'
 	if (theForm.extension.value == "" && theForm.cidnum.value == "" && theForm.channel.value == "" ) {
 		if (!confirm(msgConfirmDIDCIDBlank))
@@ -322,11 +284,5 @@ function editGRP_onsubmit() {
 		</form>
 <?php 		
 	} //end if action == delGRP
-	
 
 ?>
-
-
-
-
-
