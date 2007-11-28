@@ -445,6 +445,13 @@ function core_get_config($engine) {
 
 			/* user extensions */
 			$ext->addInclude('from-internal-additional','ext-local');
+
+			// If running in Dynamic mode, this will insert the hints through an Asterisk #exec call.
+			// which require "execincludes=yes" to be set in the [options] section of asterisk.conf
+			//
+			if ($amp_conf['DYNAMICHINTS']) {
+				$ext->addExec('ext-local',$amp_conf['AMPBIN'].'/generate_hints.php');
+			}
 			$userlist = core_users_list();
 			if (is_array($userlist)) {
 				foreach($userlist as $item) {
@@ -468,9 +475,13 @@ function core_get_config($engine) {
 						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_hangup(''));
 					}
 						
-					$hint = core_hint_get($exten['extension']);
-					if (!empty($hint)) {
-						$ext->addHint('ext-local', $exten['extension'], $hint);
+					// Create the hints if running in normal mode
+					//
+					if (!$amp_conf['DYNAMICHINTS']) {
+						$hint = core_hint_get($exten['extension']);
+						if (!empty($hint)) {
+							$ext->addHint('ext-local', $exten['extension'], $hint);
+						}
 					}
 					if ($exten['sipname']) {
 						$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
