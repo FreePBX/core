@@ -202,7 +202,7 @@ foreach ($tresults as $tresult) {
 			<tr>
 				<td valign="top">
 					<a href=# class="info"><?php echo _("Admin Access<span>Select the Admin Sections this user should have access to.</span>")?></a>: 
-				</td><td>&nbsp;
+				</td><td>
 					<select multiple name="sections[]">
 					<option />
 <?php 

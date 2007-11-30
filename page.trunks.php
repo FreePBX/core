@@ -345,11 +345,11 @@ if (!$tech && !$extdisplay) {
 <?php
 	if ($tech == "sip" || substr($tech,0,3) == "iax") {
 ?>
-					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
+					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
 <?php
 	} else {
 ?>
-					<a href=# class="info"><?php echo _("Maximum channels")?><span><?php echo _("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. Inbound calls are not counted against the maximum. Leave blank to specify no maximum.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo _("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. Inbound calls are not counted against the maximum. Leave blank to specify no maximum.")?></span></a>: 
 <?php
 	}
 ?>
@@ -392,7 +392,7 @@ if (!$tech && !$extdisplay) {
 	<strong>+</strong>&nbsp;&nbsp;&nbsp; <?php echo _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)")?><br /><br />
 	<?php echo _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing."); ?>
 					</span></a>:
-				</td><td valign="top">&nbsp;
+				</td><td valign="top">
 					<textarea id="dialrules" cols="20" rows="<?php  
 						if (is_array($dialrules)) {
 							$rows = count($dialrules)+1; 
@@ -406,12 +406,12 @@ if (!$tech && !$extdisplay) {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Dial rules wizards")?><span>
+					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
 					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+areacode for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
-				</td><td valign="top">&nbsp;&nbsp;<select id="autopop" name="autopop" onChange="changeAutoPop(); ">
+				</td><td valign="top"><select id="autopop" name="autopop" onChange="changeAutoPop(); ">
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always dial with prefix")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>

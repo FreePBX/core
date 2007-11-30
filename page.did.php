@@ -107,7 +107,7 @@ if (isset($inroutes)) {
 			<td>
 				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.")?></span></a>:
 			</td>
-			<td>&nbsp;
+			<td>
 				<select name="faxexten">
 <?php 
 // Cleaning up warnings. I should do this a better way.
@@ -149,7 +149,7 @@ if (!isset($grppre))
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Fax Detection Type")?><span><?php echo _('Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.')?></span></a>:</td>
-			<td>&nbsp;
+			<td>
 				<select name="answer">
 					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("None")?>
 					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Zaptel")?>
@@ -158,7 +158,7 @@ if (!isset($grppre))
 			</td>
 		</tr>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Pause after answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Pause After Answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
 			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
 		</tr>
 <?php
@@ -190,7 +190,7 @@ if (!isset($privacyman))
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a></td>
 			<td>
-				&nbsp;&nbsp;<select name="mohclass"/>
+				<select name="mohclass"/>
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
