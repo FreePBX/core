@@ -1,5 +1,250 @@
 <?php
 
+class core_conf {
+	// return an array of filenames to write
+	// files named like pinset_N
+	function get_filename() {
+		$files = array(
+			'sip_additional.conf',
+			'sip_registrations.conf',
+			'iax_additional.conf',
+			'iax_registrations.conf',
+			'zapata_additional.conf',
+			);
+		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
+			$files[] = 'sip_general_additional.conf';
+		}
+		return $files;
+	}
+	
+	// return the output that goes in each of the files
+	function generateConf($file) {
+		global $version;
+
+		switch ($file) {
+			case 'sip_general_additional.conf':
+				return $this->generate_sip_general_additional($version);
+				break;
+			case 'sip_additional.conf':
+				return $this->generate_sip_additional($version);
+				break;
+			case 'sip_registrations.conf':
+				return $this->generate_sip_registrations($version);
+				break;
+			case 'iax_additional.conf':
+				return $this->generate_iax_additional($version);
+				break;
+			case 'iax_registrations.conf':
+				return $this->generate_iax_registrations($version);
+				break;
+			case 'zapata_additional.conf':
+				return $this->generate_zapata_additional($version);
+				break;
+		}
+	}
+
+	function addSipGeneral($key, $value) {
+		$this->_sip_general[$key] = $value;
+	}
+
+	function generate_sip_general_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
+			foreach ($this->_sip_general as $key => $value) {
+				$output .= "$key=$value\n";
+			}
+		}
+		return $output;
+	}
+
+	function generate_sip_additional($ast_version) {
+		global $db;
+
+		$table_name = "sip";
+		$additional = "";
+		$output = "";
+
+		// Asterisk 1.4 requires call-limit be set for hints to work properly
+		//
+		if (version_compare($ast_version, "1.4", "ge")) { 
+			$call_limit = "call-limit=50\n";
+		} else {
+			$call_limit = "";
+		}
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+		foreach ($results as $result) {
+			$additional .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$account = $result['data'];
+			$id = $result['id'];
+			$output .= "[$account]\n";
+	
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2)) {
+   			die($results2->getMessage());
+			}
+			foreach ($results2 as $result2) {
+				$options = explode("&", $result2['data']);
+				foreach ($options as $option) {
+					$output .= $result2['keyword']."=$option\n";
+				}
+			}
+			if ($call_limit && ($id < 999900)) {
+				$output .= $call_limit;
+			}
+			$output .= $additional."\n";
+		}
+		return $output;
+	}
+
+	function generate_sip_registrations($ast_version) {
+		global $db;
+
+		$table_name = "sip";
+		$output = "";
+
+		// items with id like 9999999% get put in registrations file
+		//
+		$sql = "SELECT keyword,data from $table_name where id LIKE '9999999%' and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$output .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		return $output;
+	}
+
+	function generate_iax_additional($ast_version) {
+		global $db;
+
+		$table_name = "iax";
+		$additional = "";
+		$output = "";
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+		foreach ($results as $result) {
+			$additional .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$account = $result['data'];
+			$id = $result['id'];
+			$output .= "[$account]\n";
+	
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2)) {
+   			die($results2->getMessage());
+			}
+			foreach ($results2 as $result2) {
+				$options = explode("&", $result2['data']);
+				foreach ($options as $option) {
+					$output .= $result2['keyword']."=$option\n";
+				}
+			}
+			$output .= $additional."\n";
+		}
+		return $output;
+	}
+
+	function generate_iax_registrations($ast_version) {
+		global $db;
+
+		$table_name = "iax";
+		$output = "";
+
+		// items with id like 9999999% get put in the registration file
+		//
+		$sql = "SELECT keyword,data from $table_name where id LIKE '9999999%' and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$output .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		return $output;
+	}
+
+	function generate_zapata_additional($ast_version) {
+		global $db;
+
+		$table_name = "zap";
+
+		$additional = "";
+		$output = '';
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+		foreach ($results as $result) {
+			$additional .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+   		die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$account = $result['data'];
+			$id = $result['id'];
+			$output .= ";;;;;;[$account]\n";
+	
+			$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2)) {
+   			die($results2->getMessage());
+			}
+			$zapchannel="";
+			foreach ($results2 as $result2) {
+				if ($result2['keyword'] == 'channel') {
+					$zapchannel = $result2['data'];
+				} else {
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+				}
+			}
+			$output .= "channel=>$zapchannel\n";
+			$output .= $additional."\n";
+		}
+		return $output;
+	}
+}
+
 // The destinations this module provides
 // returns a associative arrays with keys 'destination' and 'description'
 function core_destinations() {
