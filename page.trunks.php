@@ -674,7 +674,7 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<a href=# class="info"><?php echo _("PEER Details")?><span><br><?php echo _("Modify the default PEER connection parameters for your VoIP provider.<br><br>You may need to add to the default lines listed below, depending on your provider.")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("PEER Details")?><span><br><?php echo _("Modify the default PEER connection parameters for your VoIP provider.<br><br>You may need to add to the default lines listed below, depending on your provider.<br /><br />WARNING: Oreder is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny comes first.")?><br><br></span></a>: 
 					</td>
 				</tr>
 				<tr>
@@ -696,7 +696,8 @@ if (!$tech && !$extdisplay) {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<a href=# class="info"><?php echo _("USER Details")?><span><br><?php echo _("Modify the default USER connection parameters for your VoIP provider.")?><br><br><?php echo _("You may need to add to the default lines listed below, depending on your provider.")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("USER Details")?><span><br><?php echo _("Modify the default USER connection parameters for your VoIP provider.")?><br><br><?php echo _("You may need to add to the default lines listed below, depending on your provider..<br /><br />WARNING: Oreder is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny 
+				comes first.")?><br><br></span></a>: 
 					</td>
 				</tr>
 				<tr>
