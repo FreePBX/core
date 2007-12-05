@@ -93,7 +93,7 @@ class core_conf {
 			$id = $result['id'];
 			$output .= "[$account]\n";
 	
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags";
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
    			die($results2->getMessage());
@@ -160,7 +160,7 @@ class core_conf {
 			$id = $result['id'];
 			$output .= "[$account]\n";
 	
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags";
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
    			die($results2->getMessage());
@@ -2283,10 +2283,13 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 				$confitem[$key]=$value;
 		}
 	}
+	// rember 1=disabled so we start at 2 (1 + the first 1)
+	$seq = 1;
 	foreach($confitem as $k=>$v) {
-		$dbconfitem[]=array($k,$v);
+		$seq = ($disable_flag == 1) ? 1 : $seq+1;
+		$dbconfitem[]=array($k,$v,$seq);
 	}
-	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");
+	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,?)");
 	$result = $db->executeMultiple($compiled,$dbconfitem);
 	if(DB::IsError($result)) {
 		die_freepbx($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('9999$trunknum',?,?,'$disable_flag')");	
@@ -2487,7 +2490,7 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	if ($tech == "zap") return ""; // zap has no details
 	
-	$results = sql("SELECT keyword,data FROM $tech WHERE id = '9999$trunknum' ORDER BY id","getAll");
+	$results = sql("SELECT keyword,data FROM $tech WHERE id = '9999$trunknum' ORDER BY flags","getAll");
 	
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
@@ -2505,7 +2508,7 @@ function core_trunks_getTrunkUserContext($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
 	if ($tech == "zap") return ""; // zap has no account
 	
-	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum' ORDER BY id","getAll");
+	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum'","getAll");
 
 	foreach ($results as $result) {
 		if ($result[0] == 'account') {
@@ -2523,7 +2526,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 	
 	if ($tech == "zap") return ""; // zap has no details
 	
-	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum' ORDER BY id","getAll");
+	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum' ORDER BY flags","getAll");
 
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
