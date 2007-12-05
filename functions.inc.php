@@ -542,11 +542,12 @@ function core_get_config($engine) {
 
 					if ($exten == "s" && $context == "ext-did") {  
 						//if the exten is s, then also make a catchall for undefined DIDs
-						$catchaccount = "_X.".(empty($cidnum)?"":"/".$cidnum);
-						if ($catchaccount == "_X.") 
+						$catchaccount = "_.".(empty($cidnum)?"":"/".$cidnum);
+						if ($catchaccount =="_." && ! $catchall) {
 							$catchall = true;
-						$ext->add($catchall_context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
-						$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
+							$ext->add($catchall_context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
+							$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
+						}
 					}
 					
 					if ($item['faxexten'] != "default") {
