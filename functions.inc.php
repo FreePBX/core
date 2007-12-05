@@ -1896,17 +1896,11 @@ function core_users_add($vars, $editmode=false) {
 
 				$mode="unavail";
 				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$unavail_mode");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/repeat", "$repeat");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/timeout", "$timeout");
 				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/loops", "$loops");
 
 				$mode="busy";
 				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$busy_mode");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/repeat", "$repeat");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/timeout", "$timeout");
 				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/loops", "$loops");
 				
 			}
 		} else {
