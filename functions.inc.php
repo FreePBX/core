@@ -731,6 +731,14 @@ function core_get_config($engine) {
 					if ($exten['sipname']) {
 						$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
 					}
+					// Now make a special context for the IVR inclusions of local extension dialing so that
+					// when people use the Queues breakout ability, and break out to someone's extensions, voicemail
+					// works.
+					//
+					$ivr_context = 'from-did-direct-ivr';
+					$ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+					$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
+					$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
 				}
 			}
 
