@@ -93,7 +93,7 @@ class core_conf {
 			$id = $result['id'];
 			$output .= "[$account]\n";
 	
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags";
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
    			die($results2->getMessage());
@@ -160,7 +160,7 @@ class core_conf {
 			$id = $result['id'];
 			$output .= "[$account]\n";
 	
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags";
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
    			die($results2->getMessage());
@@ -2485,7 +2485,7 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	if ($tech == "zap") return ""; // zap has no details
 	
-	$results = sql("SELECT keyword,data FROM $tech WHERE id = '9999$trunknum' ORDER BY flags","getAll");
+	$results = sql("SELECT keyword,data FROM $tech WHERE id = '9999$trunknum' ORDER BY flags, keyword DESC","getAll");
 	
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
@@ -2521,7 +2521,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 	
 	if ($tech == "zap") return ""; // zap has no details
 	
-	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum' ORDER BY flags","getAll");
+	$results = sql("SELECT keyword,data FROM $tech WHERE id = '99999$trunknum' ORDER BY flags, keyword DESC","getAll");
 
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
