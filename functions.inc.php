@@ -812,7 +812,9 @@ function core_get_config($engine) {
 					out("Added to globals: $global = $value");
 				}
 			}
-			
+			// Put the asterisk version in a global for agi etc.
+			$ext->addGlobal('ASTVERSION', $version);
+
 			/* outbound routes */
 			// modules should use their own table for storage (and module_get_config() to add dialplan)
 			// modules should NOT use the extension table to store anything!

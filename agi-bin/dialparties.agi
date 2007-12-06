@@ -48,6 +48,7 @@ debug("Starting New Dialparties.agi", 1);
 $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
 $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
 $cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
+$ast_version = get_var( $AGI, "ASTVERSION" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
@@ -581,24 +582,32 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 if (!strlen($ds)) {
 	$AGI->noop('');
 } else {
+	// Asterisk 1.6 uses , instead of | and 1.4 can't recieve a , in the ds.
+	//
+	if (version_compare($ast_version, "1.6", "ge")) { 
+		$ds_seperator = ',';
+	} else {
+		$ds_seperator = '|';
+	}
+	
 	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
-		$ds = '|';
+		$ds = $ds_seperator;
 		if ($timer) {
 			$ds .= $timer;
 		}
-		$ds .= '|' . $dialopts; // pound to transfer, provide ringing
+		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_variable("HuntMembers",$loops);
 		$AGI->set_priority("huntdial"); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
 	} else {
-		$ds .= '|';
+		$ds .= $ds_seperator;
 		if ($timer) {
 			$ds .= $timer;
 			if (trim($use_confirmation) != "FALSE") {
 				$AGI->set_variable('__RT',$timer);
 			}
 		}
-		$ds .= '|' . $dialopts; // pound to transfer, provide ringing
+		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
 		if (trim($use_confirmation) != "FALSE") {
 			$AGI->set_variable('__RG_IDX',$ringgroup_index);
 			if ( isset($cidnum) && is_numeric($cidnum) ) {
