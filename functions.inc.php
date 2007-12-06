@@ -3304,8 +3304,11 @@ function core_users_configpageload() {
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
 	
 		if ( is_string($extdisplay) ) {	
-			$extenInfo=core_users_get($extdisplay);
-			extract($extenInfo);
+
+			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+				$extenInfo=core_users_get($extdisplay);
+				extract($extenInfo);
+			}
 			if (isset($deviceInfo) && is_array($deviceInfo))
 				extract($deviceInfo);
 	
@@ -3442,6 +3445,9 @@ function core_users_configprocess() {
 					redirect_standard_continue();
 				} else {
 					// really bad hack - but if core_users_add fails, want to stop core_devices_add
+					// Comment, this does not help everywhere. Other hooks functions can hook before
+					// this like voicemail!
+					//
 					$GLOBALS['abort'] = true;
 				}
 			break;
