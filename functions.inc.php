@@ -1658,7 +1658,7 @@ function core_users_list() {
 	//only allow extensions that are within administrator's allowed range
 	foreach($results as $result){
 		if (checkRange($result[0])){
-			$extens[] = array($result[0],$result[1]);
+			$extens[] = array($result[0],$result[1],$result[2]);
 		}
 	}
 	
