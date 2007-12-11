@@ -122,6 +122,9 @@ var actionDelete = false;
 function checkZapchandid(theForm) {
 	var msgInvalidChannel = "<?php echo _('Invalid Channel Number, must be numeric and not blank'); ?>";
 	var msgInvalidDID = "<?php echo _('Invalid DID, must be a non-blank DID'); ?>";
+	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number.\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
+	var msgConfirmConvertDID = "<?php echo _('You appear to be using a converted DID in the form of zapchanNN that was automatically generated during an upgrade. You should consider assigning the DID that is normally associated with this channel to take full advantage of the inbound routing abilities. Changing the DID here will require you to make changes in the Inbound Routes tab. Do you want to continue?'); ?>";
+
 
 	// If deleting we don't care what is in the elements
 	if (actionDelete) {
@@ -134,8 +137,18 @@ function checkZapchandid(theForm) {
 	if (!isInteger(theForm.channel.value)) {
 		return warnInvalid(theForm.channel, msgInvalidChannel);
 	}
-	if (isEmpty(theForm.did.value) || !isDialpattern(theForm.did.value)) {
+	if (isEmpty(theForm.did.value)) {
 		return warnInvalid(theForm.did, msgInvalidDID);
+	}
+	if (theForm.did.value.substring(0,7) == "zapchan") {
+		if (!confirm(msgConfirmConvertDID)) {
+			return false;
+		}
+
+	} else if (!isDialpattern(theForm.did.value)) {
+		if (!confirm(msgConfirmDIDNonStd)) {
+			return false;
+		}
 	}
 
 	return true;
