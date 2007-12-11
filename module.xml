@@ -65,5 +65,5 @@
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/2.4/core-2.4.0beta1.1.tgz</location>
-	<md5sum>90816bf904f0c1e1e978853c96385125</md5sum>
+	<md5sum>f850620a7e6ca5da0c4fe21805ee68c2</md5sum>
 </module>
