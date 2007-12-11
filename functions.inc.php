@@ -14,6 +14,9 @@ class core_conf {
 		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
 			$files[] = 'sip_general_additional.conf';
 		}
+		if (isset($this->_iax_general) && is_array($this->_iax_general)) {
+			$files[] = 'iax_general_additional.conf';
+		}
 		return $files;
 	}
 	
@@ -31,6 +34,9 @@ class core_conf {
 			case 'sip_registrations.conf':
 				return $this->generate_sip_registrations($version);
 				break;
+			case 'iax_general_additional.conf':
+				return $this->generate_iax_general_additional($version);
+				break;
 			case 'iax_additional.conf':
 				return $this->generate_iax_additional($version);
 				break;
@@ -44,15 +50,30 @@ class core_conf {
 	}
 
 	function addSipGeneral($key, $value) {
-		$this->_sip_general[$key] = $value;
+		$this->_sip_general[] = array('key' => $key, 'value' => $value);
 	}
 
 	function generate_sip_general_additional($ast_version) {
 		$output = '';
 
 		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
-			foreach ($this->_sip_general as $key => $value) {
-				$output .= "$key=$value\n";
+			foreach ($this->_sip_general as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addIaxGeneral($key, $value) {
+		$this->_iax_general[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_iax_general_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_iax_general) && is_array($this->_iax_general)) {
+			foreach ($this->_iax_general as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
 			}
 		}
 		return $output;
@@ -402,11 +423,38 @@ function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
 	global $version;  // this is not the best way to pass this, this should be passetd together with $engine
 	global $amp_conf;
+	global $core_conf;
 
 	$modulename = "core";
 	
 	switch($engine) {
 		case "asterisk":
+
+			// Now add to sip_general_addtional.conf
+			//
+			if (isset($core_conf) && is_a($core_conf, "core_conf")) {
+				$core_conf->addSipGeneral('bindport','5060');
+				$core_conf->addSipGeneral('bindaddr','0.0.0.0');
+				$core_conf->addSipGeneral('disallow','all');
+				$core_conf->addSipGeneral('allow','ulaw');
+				$core_conf->addSipGeneral('allow','alaw');
+				$core_conf->addSipGeneral('context','from-sip-external');
+				$core_conf->addSipGeneral('callerid','Unknown');
+				$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
+				$core_conf->addSipGeneral('notifyringing','yes');
+				if (version_compare($ast_version, "1.4", "ge")) { 
+					$core_conf->addSipGeneral('notifyhold','yes');
+					$core_conf->addSipGeneral('limitonpeers','yes');
+				}
+				$core_conf->addIaxGeneral('bindport','4569');
+				$core_conf->addIaxGeneral('bindaddr','0.0.0.0');
+				$core_conf->addIaxGeneral('disallow','all');
+				$core_conf->addIaxGeneral('allow','ulaw');
+				$core_conf->addIaxGeneral('allow','alaw');
+				$core_conf->addIaxGeneral('allow','gsm');
+				$core_conf->addIaxGeneral('mailboxdetail','yes');
+			}
+
 			// FeatureCodes
 			$fcc = new featurecode($modulename, 'userlogon');
 			$fc_userlogon = $fcc->getCodeActive();
