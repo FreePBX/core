@@ -442,7 +442,7 @@ function core_get_config($engine) {
 				$core_conf->addSipGeneral('callerid','Unknown');
 				$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				$core_conf->addSipGeneral('notifyringing','yes');
-				if (version_compare($ast_version, "1.4", "ge")) { 
+				if (version_compare($version, "1.4", "ge")) { 
 					$core_conf->addSipGeneral('notifyhold','yes');
 					$core_conf->addSipGeneral('limitonpeers','yes');
 				}
