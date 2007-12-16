@@ -960,12 +960,263 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_hangup());
 			}
 
+			$context = 'macro-dialout-trunk';
+			$exten = 's';
+			
+			/*
+			 * dialout using a trunk, using pattern matching (don't strip any prefix)
+			 * arg1 = trunk number, arg2 = number, arg3 = route password
+			 *
+			 * MODIFIED (PL)
+			 *
+			 * Modified both Dial() commands to include the new TRUNK_OPTIONS from the general
+			 * screen of AMP
+			 */
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+			$ext->add($context, $exten, '', new ext_set('GROUP()', 'OUT_${DIAL_TRUNK}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} > ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
+			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
+			$ext->add($context, $exten, 'skipoutcid', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+			$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
+		
+			// Back to normal processing, whether intracompany or not.
+			// But add the macro-setmusic if we don't want music on this outbound call
+			$ext->add($context, $exten, '', new ext_gotoif('$[$["${MOHCLASS}" = "default"] | $["foo${MOHCLASS}" = "foo"]]', 'gocall'));  // Set to YES if we should pump silence
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', 'M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));  // set MoH or off
+		
+			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
+			// such as adding SIP header information or other requirements. All the channel variables from above are present
+			
+			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+		
+			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
+			$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '300,${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
+			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
+			
+			$ext->add($context, $exten, 'customtrunk', new ext_set('pre_num', '${CUT(OUT_${DIAL_TRUNK},$,1)}'));
+			$ext->add($context, $exten, '', new ext_set('the_num', '${CUT(OUT_${DIAL_TRUNK},$,2)}'));  // this is where we expect to find string OUTNUM
+			$ext->add($context, $exten, '', new ext_set('post_num', '${CUT(OUT_${DIAL_TRUNK},$,3)}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${the_num}" = "OUTNUM"]', 'outnum', 'skipoutnum'));  // if we didn't find "OUTNUM", then skip to Dial
+			$ext->add($context, $exten, 'outnum', new ext_set('the_num', '${OUTNUM}'));  // replace "OUTNUM" with the actual number to dial
+			$ext->add($context, $exten, 'skipoutnum', new ext_dial('${pre_num:4}${the_num}${post_num}', '300,${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
+			
+			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
+		
+			$exten = 's-BUSY';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting BUSY - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('busy'));
+			$ext->add($context, $exten, '', new ext_busy(20));
+		
+			$exten = 's-NOANSWER';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+		
+			$exten = 's-CANCEL';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting CANCEL - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+		
+			$exten = '_s-.';
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTFAIL_${ARG1}}" = "x"]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} - failing through to other trunks'));
+			
+			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+		
+			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+
+
+			/*
+			 * sets the callerid of the device to that of the logged in user
+			 *
+			 * ${AMPUSER} is set upon return to the real user despite any aliasing that may
+			 * have been set as a result of the AMPUSER/<nnn>/cidnum field. This is used by
+			 * features like DND, CF, etc. to set the proper structure on aliased instructions 
+			 */
+			$context = 'macro-user-callerid';
+			$exten = 's';
+			
+			$ext->add($context, $exten, '', new ext_noop('user-callerid: ${CALLERID(name)} ${CALLERID(number)}'));
+							
+			// make sure AMPUSER is set if it doesn't get set below			
+			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["foo${AMPUSER}" = "foo"]?${CALLERID(number)}:${AMPUSER})}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}" = "Local"]', 'report'));
+			$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
+			$ext->add($context, $exten, 'start', new ext_noop('REALCALLERIDNUM is ${REALCALLERIDNUM}'));
+			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
+			$ext->add($context, $exten, '', new ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${AMPUSERCIDNAME:1:2}" = "x"]', 'report'));
+
+			// user may masquerade as a different user internally, so set the internal cid as indicated
+			// but keep the REALCALLERID which is used to determine their true identify and lookup info
+			// during outbound calls.
+			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
+			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
+			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/language)}" != ""]', 'Set', 'LANGUAGE()=${DB(AMPUSER/${AMPUSER}/language)}'));
+			$ext->add($context, $exten, 'report', new ext_noop('TTL: ${TTL} ARG1: ${ARG1}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" ]', 'continue'));
+			$ext->add($context, $exten, 'report2', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
+			$ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
+			$ext->add($context, $exten, '', new ext_answer());
+			$ext->add($context, $exten, '', new ext_wait('2'));
+			$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+			$ext->add($context, $exten, 'continue', new ext_noop('Using CallerID ${CALLERID(all)}'));
+			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+			
+			/*
+			 * arg1 = trunk number, arg2 = number
+			 * 
+			 * Re-written to use enumlookup.agi
+			 */
+	
+			$context = 'macro-dialout-enum';
+			$exten = 's';
+	
+			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${ARG1}'));
+			$ext->add($context, $exten, '', new ext_set('GROUP()', 'OUT_${ARG1}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${ARG1}}foo" = "foo"]', 'nomax'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} > ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
+			$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+			$ext->add($context, $exten, '', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			//  Replacement for asterisk's ENUMLOOKUP function
+			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
+			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
+			// Loop through them trying them in order.
+			$ext->add($context, $exten, 'dialloop', new ext_gotoif('$["foo${DIALARR}"="foo"]', 'end'));
+			$ext->add($context, $exten, '', new ext_set('TRYDIAL', '${CUT(DIALARR,%,1)}'));
+			$ext->add($context, $exten, '', new ext_set('DIALARR', '${CUT(DIALARR,%,2-)}'));
+			$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', ''));
+			$ext->add($context, $exten, '', new ext_noop('Dial exited in macro-enum-dialout with ${DIALSTATUS}'));
+			// Now, if we're still here, that means the Dial failed for some reason. 
+			// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
+			// different channel. If there's no more left, the dialloop tag will exit.
+			$ext->add($context, $exten, '', new ext_gotoif('$[ $[ "${DIALSTATUS}" = "CHANUNAVAIL" ] | $[ "${DIALSTATUS}" = "CONGESTION" ] ]', 'dialloop'));
+			// If we're here, then it's BUSY or NOANSWER or something and well, deal with it.
+			$ext->add($context, $exten, 'dialfailed', new ext_goto(1, 's-${DIALSTATUS}'));
+			// Here are the exit points for the macro.
+			$ext->add($context, $exten, 'nochans', new ext_noop('max channels used up'));
+			$ext->add($context, $exten, 'end', new ext_noop('Exiting macro-dialout-enum'));
+			$ext->add($context, 's-BUSY', '', new ext_noop('Trunk is reporting BUSY'));
+			$ext->add($context, 's-BUSY', '', new ext_busy(20));
+			$ext->add($context, '_s-.', '', new ext_noop('Dial failed due to ${DIALSTATUS}'));			
+			
+			/*
+			 * overrides callerid out trunks
+			 * arg1 is trunk
+			 * macro-user-callerid should be called _before_ using this macro
+			 */
+
+			$context = 'macro-outbound-callerid';
+			$exten = 's';
+			
+			// Keep the original CallerID number, for failover to the next trunk.
+			$ext->add($context, $exten, '', new ext_gotoif('$["${REALCALLERIDNUM:1:2}" != ""]', 'start'));
+			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${CALLERID(number)}'));
+			$ext->add($context, $exten, 'start', new ext_noop('REALCALLERIDNUM is ${REALCALLERIDNUM}'));
+
+			// If this came through a ringgroup or CF, then we want to retain original CID unless
+			// OUTKEEPCID_${trunknum} is set.
+			// Save then CIDNAME while it is still intact in case we end up sending out this same CID
+			$ext->add($context, $exten, '', new ext_gotoif('$["${KEEPCID}" != "TRUE"]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTKEEPCID_${ARG1}}" = "xon"]', 'normcid'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["foo${REALCALLERIDNUM}" = "foo"]', 'normcid'));  // if not set to anything, go through normal processing
+			$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
+			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
+
+			// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal 
+			// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device 
+			// is set for this CID, then it must be internal 
+			// If we end up using USEROUTCID at the end, it may still be the REALCALLERIDNUM we saved above. That is determined
+			// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
+			// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
+			// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
+			$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass', 'normcid'));
+
+			$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${REALCALLERIDNUM}/outboundcid)}'));
+			$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
+			$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
+			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // empty EMERGENCY CID, so default back to trunk
+			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
+			$ext->add($context, $exten, '', new ext_goto('report'));
+			$ext->add($context, $exten, 'trunkcid', new ext_gotoif('$["${TRUNKOUTCID:1:2}" = ""]', 'usercid'));  // check for CID override for trunk (global var)
+			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${TRUNKOUTCID}'));
+			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'report'));  // check CID override for extension
+			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${USEROUTCID}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
+			$ext->add($context, $exten, 'hidecid', new ext_setcallerpres('prohib_passed_screen'));  // Only works with ISDN (T1/E1/BRI)
+			$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
+			$ext->add($context, $exten, 'report', new ext_noop('CallerID set to ${CALLERID(all)}'));			
+
+			
+			/*
+			 * Adds a dynamic agent/member to a Queue
+			 * Prompts for call-back number - in not entered, uses CIDNum
+			 */
+
+			$context = 'macro-agent-add';
+			$exten = 's';
+			
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
+			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-user'));  // get callback number from user
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" != ""]', 'a7'));  // if user just pressed # or timed out, use cidnum
+			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a3'));  // if still no number, start over
+			$ext->add($context, $exten, 'a7', new ext_gotoif('$["${CALLBACKNUM}" = "${ARG1}"]', 'invalid'));  // Error, they put in the queue number
+			$ext->add($context, $exten, '', new ext_execif('$["${ARG2}" != ""]', 'Authenticate', '${ARG2}'));
+			$ext->add($context, $exten, 'a9', new ext_addqueuemember('${ARG1}', 'Local/${CALLBACKNUM}@from-internal/n'));  // using chan_local allows us to have agents over trunks
+			$ext->add($context, $exten, '', new ext_userevent('Agentlogin', 'Agent: ${CALLBACKNUM}'));
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_playback('agent-loginok&with&extension'));
+			$ext->add($context, $exten, '', new ext_saydigits('${CALLBACKNUM}'));
+			$ext->add($context, $exten, '', new ext_hangup());
+			$ext->add($context, $exten, '', new ext_macroexit());
+			$ext->add($context, $exten, 'invalid', new ext_playback('pbx-invalid'));
+			$ext->add($context, $exten, '', new ext_goto('a3'));
+
+			/*
+			 * Removes a dynamic agent/member from a Queue
+			 * Prompts for call-back number - in not entered, uses CIDNum 
+			 */
+
+			$context = 'macro-agent-del';
+			
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
+			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-user'));  // get callback number from user
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a5', 'a7'));  // if user just pressed # or timed out, use cidnum
+			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a3'));  // if still no number, start over
+			$ext->add($context, $exten, 'a7', new ext_removequeuemember('${ARG1}', 'Local/${CALLBACKNUM}@from-internal/n'));
+			$ext->add($context, $exten, '', new ext_userevent('RefreshQueue'));
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_playback('agent-loggedoff'));
+			$ext->add($context, $exten, '', new ext_hangup());
+			
 		break;
 	}
 }
-
-
-
 
 
 
