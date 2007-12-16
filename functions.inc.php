@@ -1,8 +1,12 @@
 <?php
 
 class core_conf {
+	var $_sip_general    = array();
+	var $_iax_general    = array();
+	var $_featuregeneral = array();
+	var $_featuremap     = array();
+	var $_applicationmap = array();
 	// return an array of filenames to write
-	// files named like pinset_N
 	function get_filename() {
 		$files = array(
 			'sip_additional.conf',
@@ -10,13 +14,12 @@ class core_conf {
 			'iax_additional.conf',
 			'iax_registrations.conf',
 			'zapata_additional.conf',
+			'sip_general_additional.conf',
+			'iax_general_additional.conf',
+			'features_general_additional.conf',
+			'features_applicationmap_additional.conf',
+			'features_featuremap_additional.conf',
 			);
-		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
-			$files[] = 'sip_general_additional.conf';
-		}
-		if (isset($this->_iax_general) && is_array($this->_iax_general)) {
-			$files[] = 'iax_general_additional.conf';
-		}
 		return $files;
 	}
 	
@@ -46,6 +49,15 @@ class core_conf {
 			case 'zapata_additional.conf':
 				return $this->generate_zapata_additional($version);
 				break;
+			case 'features_general_additional.conf':
+				return $this->generate_featuregeneral_additional($version);
+				break;
+			case 'features_applicationmap_additional.conf':
+				return $this->generate_applicationmap_additional($version);
+				break;
+			case 'features_featuremap_additional.conf':
+				return $this->generate_featuremap_additional($version);
+				break;
 		}
 	}
 
@@ -73,6 +85,51 @@ class core_conf {
 
 		if (isset($this->_iax_general) && is_array($this->_iax_general)) {
 			foreach ($this->_iax_general as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addFeatureGeneral($key, $value) {
+		$this->_featuregeneral[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_featuregeneral_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_featuregeneral) && is_array($this->_featuregeneral)) {
+			foreach ($this->_featuregeneral as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addFeatureMap($key, $value) {
+		$this->_featuremap[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_featuremap_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_featuremap) && is_array($this->_featuremap)) {
+			foreach ($this->_featuremap as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addApplicationMap($key, $value) {
+		$this->_applicationmap[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_applicationmap_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_applicationmap) && is_array($this->_applicationmap)) {
+			foreach ($this->_applicationmap as $values) {
 				$output .= $values['key']."=".$values['value']."\n";
 			}
 		}
@@ -453,6 +510,10 @@ function core_get_config($engine) {
 				$core_conf->addIaxGeneral('allow','alaw');
 				$core_conf->addIaxGeneral('allow','gsm');
 				$core_conf->addIaxGeneral('mailboxdetail','yes');
+
+				$core_conf->addFeatureMap('blindxfer','##');
+				$core_conf->addFeatureMap('disconnect','**');
+				$core_conf->addFeatureMap('automon','*1');
 			}
 
 			// FeatureCodes
@@ -1217,13 +1278,6 @@ function core_get_config($engine) {
 		break;
 	}
 }
-
-
-
-
-
-
-
 
 /* begin page.ampusers.php functions */
 
