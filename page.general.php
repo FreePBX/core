@@ -347,7 +347,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Check for Updates")?><span>
-			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resuling infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided"); ?></span></a>
+			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resuling infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will trasmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is trasmitted."); ?></span></a>
 			</td>
 			<td align=right>
 			<select name="online_updates">
