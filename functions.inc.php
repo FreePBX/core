@@ -1222,9 +1222,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${TRUNKOUTCID}'));
 			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'report'));  // check CID override for extension
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${USEROUTCID}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'report', 'hidecid'));  // check CID blocking for extension
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
 			$ext->add($context, $exten, 'hidecid', new ext_setcallerpres('prohib_passed_screen'));  // Only works with ISDN (T1/E1/BRI)
-			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
+			$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
 			$ext->add($context, $exten, 'report', new ext_noop('CallerID set to ${CALLERID(all)}'));			
 
 			
