@@ -497,11 +497,15 @@ function core_get_config($engine) {
 				$core_conf->addSipGeneral('allow','alaw');
 				$core_conf->addSipGeneral('context','from-sip-external');
 				$core_conf->addSipGeneral('callerid','Unknown');
-				$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				$core_conf->addSipGeneral('notifyringing','yes');
-				if (version_compare($version, "1.4", "ge")) { 
+				if (version_compare($version, '1.4', 'ge')) { 
 					$core_conf->addSipGeneral('notifyhold','yes');
 					$core_conf->addSipGeneral('limitonpeers','yes');
+					$core_conf->addSipGeneral('tos_sip','cs3');    // Recommended setting from doc/ip-tos.txt
+					$core_conf->addSipGeneral('tos_audio','ef');   // Recommended setting from doc/ip-tos.txt
+					$core_conf->addSipGeneral('tos_video','af41'); // Recommended setting from doc/ip-tos.txt
+				} else {
+					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
 				$core_conf->addIaxGeneral('bindport','4569');
 				$core_conf->addIaxGeneral('bindaddr','0.0.0.0');
@@ -510,6 +514,9 @@ function core_get_config($engine) {
 				$core_conf->addIaxGeneral('allow','alaw');
 				$core_conf->addIaxGeneral('allow','gsm');
 				$core_conf->addIaxGeneral('mailboxdetail','yes');
+				if (version_compare($version, '1.4', 'ge')) {
+					$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
+				}
 
 				$core_conf->addFeatureMap('blindxfer','##');
 				$core_conf->addFeatureMap('disconnect','**');
@@ -1274,7 +1281,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_playback('agent-loggedoff'));
 			$ext->add($context, $exten, '', new ext_hangup());
-			
+
 		break;
 	}
 }
