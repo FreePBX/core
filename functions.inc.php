@@ -856,6 +856,11 @@ function core_get_config($engine) {
 					$ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
+					if($vm != "novm") {
+						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_setvar('__NODEST', ''));
+						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',"$vm,DIRECTDIAL"));
+					}
 				}
 			}
 
