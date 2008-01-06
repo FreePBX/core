@@ -218,13 +218,34 @@ class core_conf {
 		$additional = "";
 		$output = "";
 
+		$ver12 = version_compare($ast_version, '1.4', 'lt');
+
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
    		die($results->getMessage());
 		}
 		foreach ($results as $result) {
-			$additional .= $result['keyword']."=".$result['data']."\n";
+			if ($ver12) {
+				$additional .= $result['keyword']."=".$result['data']."\n";
+			} else {
+				$option = $result['data'];
+				switch ($result['keyword']) {
+					case 'notransfer':
+						if (strtolower($option) == 'yes') {
+							$additional .= "transfer=no\n";
+						} else if (strtolower($option) == 'no') {
+							$additional .= "transfer=yes\n";
+						} else if (strtolower($option) == 'mediaonly') {
+							$additional .= "transfer=mediaonly\n";
+						} else {
+							$additional .= $result['keyword']."=$option\n";
+						}
+						break;
+					default:
+						$additional .= $result['keyword']."=$option\n";
+				}
+			}
 		}
 
 		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
@@ -245,8 +266,28 @@ class core_conf {
 			}
 			foreach ($results2 as $result2) {
 				$options = explode("&", $result2['data']);
-				foreach ($options as $option) {
-					$output .= $result2['keyword']."=$option\n";
+				if ($ver12) {
+					foreach ($options as $option) {
+						$output .= $result2['keyword']."=$option\n";
+					}
+				} else {
+					foreach ($options as $option) {
+						switch ($result2['keyword']) {
+							case 'notransfer':
+								if (strtolower($option) == 'yes') {
+									$output .= "transfer=no\n";
+								} else if (strtolower($option) == 'no') {
+									$output .= "transfer=yes\n";
+								} else if (strtolower($option) == 'mediaonly') {
+									$output .= "transfer=mediaonly\n";
+								} else {
+									$output .= $result2['keyword']."=$option\n";
+								}
+								break;
+							default:
+								$output .= $result2['keyword']."=$option\n";
+						}
+					}
 				}
 			}
 			$output .= $additional."\n";
@@ -518,9 +559,28 @@ function core_get_config($engine) {
 					$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
 				}
 
-				$core_conf->addFeatureMap('blindxfer','##');
+				$fcc = new featurecode($modulename, 'blindxfer');
+				$code = $fcc->getCodeActive();
+				unset($fcc);
+				if ($code != '') {
+					$core_conf->addFeatureMap('blindxfer',$code);
+				}
+
+				$fcc = new featurecode($modulename, 'atxfer');
+				$code = $fcc->getCodeActive();
+				unset($fcc);
+				if ($code != '') {
+					$core_conf->addFeatureMap('atxfer',$code);
+				}
+
+				$fcc = new featurecode($modulename, 'automon');
+				$code = $fcc->getCodeActive();
+				unset($fcc);
+				if ($code != '') {
+					$core_conf->addFeatureMap('automon',$code);
+				}
+
 				$core_conf->addFeatureMap('disconnect','**');
-				$core_conf->addFeatureMap('automon','*1');
 			}
 
 			// FeatureCodes

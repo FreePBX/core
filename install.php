@@ -42,4 +42,22 @@ $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
+$fcc = new featurecode('core', 'blindxfer');
+$fcc->setDescription('In-Call Asterisk Blind Transfer');
+$fcc->setDefault('##');
+$fcc->update();
+unset($fcc);
+
+$fcc = new featurecode('core', 'atxfer');
+$fcc->setDescription('In-Call Asterisk Attended Transfer');
+$fcc->setDefault('*2');
+$fcc->update();
+unset($fcc);
+
+$fcc = new featurecode('core', 'automon');
+$fcc->setDescription('In-Call Asterisk Toggle Call Recording');
+$fcc->setDefault('*1');
+$fcc->update();
+unset($fcc);
+
 ?>
