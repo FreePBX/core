@@ -942,6 +942,11 @@ function core_get_config($engine) {
 							$ext->add($trunkcontext, '_.', '', new ext_setvar('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
 							break;
+						case 'DUNDI':
+							$macro_name = 'macro-dundi-'.substr($trunkprops['globalvar'],4);
+							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['name']);
+							$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
+							break;
 						default:
 					}
 				}
@@ -1017,7 +1022,7 @@ function core_get_config($engine) {
 					// Don't set MOHCLASS if already set, threre may be a feature code that overrode it
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
-					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false) {
+					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false || strpos($exten['args'],"dialout-dundi") !== false) {
 						if ($exten['extension'] !== $lastexten) {
 
 							// If NODEST is set, clear it. No point in remembering since dialout-trunk will just end in the
@@ -1038,6 +1043,7 @@ function core_get_config($engine) {
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
 				}
 			}
+
 			general_generate_indications();
 
 			// "blackhole" destinations
@@ -1169,6 +1175,73 @@ function core_get_config($engine) {
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
 		
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+
+
+
+
+			$context = 'macro-dialout-dundi';
+			$exten = 's';
+			
+			/*
+			 * Dialout Dundi Trunk
+			 */
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+			$ext->add($context, $exten, '', new ext_set('GROUP()', 'OUT_${DIAL_TRUNK}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} > ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
+			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
+			$ext->add($context, $exten, 'skipoutcid', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+
+			// Back to normal processing, whether intracompany or not.
+			// But add the macro-setmusic if we don't want music on this outbound call
+			$ext->add($context, $exten, '', new ext_gotoif('$[$["${MOHCLASS}" = "default"] | $["foo${MOHCLASS}" = "foo"]]', 'gocall'));  // Set to YES if we should pump silence
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', 'M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));  // set MoH or off
+		
+			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
+			// such as adding SIP header information or other requirements. All the channel variables from above are present
+			
+			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+		
+			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
+
+			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
+			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
+			
+			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
+		
+			$exten = 's-BUSY';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting BUSY - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('busy'));
+			$ext->add($context, $exten, '', new ext_busy(20));
+		
+			$exten = 's-NOANSWER';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+		
+			$exten = 's-CANCEL';
+			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting CANCEL - giving up'));
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+		
+			$exten = '_s-.';
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTFAIL_${ARG1}}" = "x"]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} - failing through to other trunks'));
+			
+			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+		
+			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+
 
 
 			/*
@@ -2782,7 +2855,7 @@ function core_trunks_list($assoc = false) {
 
 		foreach ($unique_trunks as $trunk) {
 			list($tech,$name) = explode('/',$trunk[1]);
-			$trunkinfo[$name] = array(
+			$trunkinfo[$trunk[1]] = array(
 				'name' => $name,
 				'tech' => $tech,
 				'globalvar' => $trunk[0], // ick
@@ -2988,9 +3061,9 @@ function core_trunks_gettrunkroutes($trunknum) {
 	global $amp_conf;
 
 	if ($amp_conf["AMPDBENGINE"] == "sqlite3")
-		$sql_code = "SELECT DISTINCT              context, priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%') ORDER BY context";
+		$sql_code = "SELECT DISTINCT              context, priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%' OR args LIKE 'dialout-dundi,".$trunknum.",%') ORDER BY context";
 	else
-		$sql_code = "SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%') ORDER BY context";
+		$sql_code = "SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%' OR args LIKE 'dialout-dundi,".$trunknum.",%') ORDER BY context";
 
 	$results = sql( $sql_code, "getAll" );
 
@@ -3326,10 +3399,13 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 			else
 				$pass_str = "";
 
-			if ($trunktech[$trunk] == "ENUM")
+			if ($trunktech[$trunk] == "ENUM") {
 				$sql .= "'dialout-enum,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
-			else
+			} else if ($trunktech[$trunk] == "DUNDI") {
+				$sql .= "'dialout-dundi,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
+			} else {
 				$sql .= "'dialout-trunk,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
+			}
 			$sql .= ")";
 			
 			$result = $db->query($sql);
@@ -3444,7 +3520,7 @@ function core_routing_rename($oldname, $newname) {
 //get unique outbound route patterns for a given context
 function core_routing_getroutepatterns($route) {
 	global $db;
-	$sql = "SELECT extension, args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk%' OR args LIKE'dialout-enum%') ORDER BY extension ";
+	$sql = "SELECT extension, args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk%' OR args LIKE 'dialout-enum%' OR args LIKE 'dialout-dundi%') ORDER BY extension ";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
 		die_freepbx($results->getMessage());
@@ -3472,7 +3548,7 @@ function core_routing_getroutepatterns($route) {
 //get unique outbound route trunks for a given context
 function core_routing_getroutetrunks($route) {
 	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
+	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getAll($sql);
 	if(DB::IsError($results)) {
 		die_freepbx($results->getMessage());
@@ -3490,6 +3566,10 @@ function core_routing_getroutetrunks($route) {
 			if (!in_array("OUT_".$matches[1], $trunks)) {
 				$trunks[] = "OUT_".$matches[1];
 			}
+		} else if (preg_match('/^dialout-dundi,(\d+)/', $row[0], $matches)) {
+			if (!in_array("OUT_".$matches[1], $trunks)) {
+				$trunks[] = "OUT_".$matches[1];
+			}
 		}
 	}
 	return $trunks;
@@ -3499,7 +3579,7 @@ function core_routing_getroutetrunks($route) {
 //get password for this route
 function core_routing_getroutepassword($route) {
 	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%') ORDER BY CAST(priority as UNSIGNED) ";
+	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY CAST(priority as UNSIGNED) ";
 	$results = $db->getOne($sql);
 	if(DB::IsError($results)) {
 		die_freepbx($results->getMessage());
