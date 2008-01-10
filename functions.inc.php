@@ -938,7 +938,7 @@ function core_get_config($engine) {
 						case 'IAX2':
 						case 'SIP':
 							$trunkgroup = $trunkprops['globalvar'];
-							$trunkcontext  = "from-trunk-".$trunkprops['name'];
+							$trunkcontext  = "from-trunk-".strtolower($trunkprops['tech'])."-".$trunkprops['name'];
 							$ext->add($trunkcontext, '_.', '', new ext_setvar('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
 							break;

@@ -359,7 +359,7 @@ if ($helptext != '') {
 <?php
 	if ($tech == "sip" || substr($tech,0,3) == "iax") {
 ?>
-					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
+					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$tech-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
 <?php
 	} else {
 ?>
