@@ -1207,7 +1207,7 @@ function core_get_config($engine) {
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
 			
-			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
+			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 		
 			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
@@ -1238,7 +1238,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} - failing through to other trunks'));
 			
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
-			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
 		
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 
