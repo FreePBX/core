@@ -509,9 +509,9 @@ foreach ($trunkpriority as $key=>$trunk) {
 				<?php 
 				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off') {
-						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #FFF;\" ".($name == $trunk ? "selected" : "").">".$display_description."</option>";
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #FFF;\" ".($name == $trunk ? "selected" : "").">".str_replace('AMP:', '', $display_description)."</option>";
 					} else {
-						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #DDD;\" ".($name == $trunk ? "selected" : "").">".$display_description."</option>";
+						echo "<option id=\"trunk".$key."\" name=\"trunk".$key."\" value=\"".$name."\" style=\"background: #DDD;\" ".($name == $trunk ? "selected" : "").">".str_replace('AMP:', '', $display_description)."</option>";
 					}
 				}
 				?>
@@ -553,7 +553,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<?php 
 				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off') {
-					echo "<option value=\"".$name."\">".ltrim($display_description,"AMP:")."</option>";
+					echo "<option value=\"".$name."\">".str_replace('AMP:', '', $display_description)."</option>";
 					} else {
 					echo "<option value=\"".$name."\" style=\"background: #DDD;\" >*".ltrim($display_description,"AMP:")."*</option>";
 					}
