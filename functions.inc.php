@@ -1349,7 +1349,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTKEEPCID_${ARG1}}" = "xon"]', 'normcid'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["foo${REALCALLERIDNUM}" = "foo"]', 'normcid'));  // if not set to anything, go through normal processing
 			$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
-			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
+			//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
 			// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal 
 			// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device 
@@ -1371,9 +1371,10 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${TRUNKOUTCID}'));
 			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'report'));  // check CID override for extension
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${USEROUTCID}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
+			//$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'report', 'hidecid'));  // check CID blocking for extension
 			$ext->add($context, $exten, 'hidecid', new ext_setcallerpres('prohib_passed_screen'));  // Only works with ISDN (T1/E1/BRI)
-			$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
+			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
 			$ext->add($context, $exten, 'report', new ext_noop('CallerID set to ${CALLERID(all)}'));			
 
 			
