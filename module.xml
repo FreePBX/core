@@ -7,7 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.4.0beta2.2* revert #2919, #2607, #2578, #2620, #2560, #2621, #2560, add RETURN option to macro-vm
+		*2.4.0beta2.2* revert #2919, #2607, #2578, #2620, #2560, #2621, #2560, add RETURN option to macro-vm, added DUNDi trunk type
 		*2.4.0beta2.1* #2576 fix macro-dial to hand dialparties returning with no numbers to dial
 		*2.4.0beta2.0* #2568 move features.conf to core and add support in core_conf class, add tooltip details to onlne update checking
 		*2.4.0beta1.2* #2556, #2554 move macros to auto-generation: dialout-trunk, user-callerid, dialout-enum, outbound-callerid, agent-add, agent-del
@@ -68,6 +68,6 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.4/core-2.4.0beta2.1.tgz</location>
-	<md5sum>863aa7cb6434a3c274278a4d56e7791a</md5sum>
+	<location>release/2.4/core-2.4.0beta2.2.tgz</location>
+	<md5sum>32014e97978476777d6f8eb4d2bc9887</md5sum>
 </module>
