@@ -1271,7 +1271,11 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
 			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/language)}" != ""]', 'Set', 'LANGUAGE()=${DB(AMPUSER/${AMPUSER}/language)}'));
+			if (version_compare($version, "1.4", "ge")) { 
+				$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/language)}" != ""]', 'Set', 'CHANNEL(language)=${DB(AMPUSER/${AMPUSER}/language)}'));
+			} else {
+				$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/language)}" != ""]', 'Set', 'LANGUAGE()=${DB(AMPUSER/${AMPUSER}/language)}'));
+			}
 			$ext->add($context, $exten, 'report', new ext_noop('TTL: ${TTL} ARG1: ${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" ]', 'continue'));
 			$ext->add($context, $exten, 'report2', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
@@ -1420,6 +1424,44 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_playback('agent-loggedoff'));
 			$ext->add($context, $exten, '', new ext_hangup());
 
+			$context = 'macro-systemrecording';
+			
+			$ext->add($context, 's', '', new ext_goto(1, '${ARG1}'));
+			
+			$exten = 'dorecord';
+			
+			$ext->add($context, $exten, '', new ext_record('/tmp/${AMPUSER}-ivrrecording:wav'));
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
+
+			$exten = 'docheck';
+			
+			$ext->add($context, $exten, '', new ext_playback('/tmp/${AMPUSER}-ivrrecording'));
+			$ext->add($context, $exten, '', new ext_wait(1));
+			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
+
+			$exten = 'confmenu';
+			if (version_compare($version, "1.4", "ge")) { 
+				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star,m,${CHANNEL(language)},macro-systemrecording'));
+			} else {
+				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star,m,${LANGUAGE},macro-systemrecording'));
+			}
+			$ext->add($context, $exten, '', new ext_read('RECRESULT', '', 1, '', '', 4));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x*"]', 'dorecord,1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x1"]', 'docheck,1'));
+			$ext->add($context, $exten, '', new ext_goto(1));
+			
+			$ext->add($context, '1', '', new ext_goto(1, 'docheck'));
+			$ext->add($context, '*', '', new ext_goto(1, 'dorecord'));
+			
+			$ext->add($context, 't', '', new ext_playback('goodbye'));
+			$ext->add($context, 't', '', new ext_hangup());
+			
+			$ext->add($context, 'i', '', new ext_playback('pm-invalid-option'));
+			$ext->add($context, 'i', '', new ext_goto(1, 'confmenu'));
+
+			$ext->add($context, 'h', '', new ext_hangup());
+			
 		break;
 	}
 }
