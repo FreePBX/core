@@ -114,6 +114,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		$current_user = get_logged_in_user($this_device);
 		$default_user = get_default_user($this_device);
 
+		debug("current_user: $current_user, default_user: $default_user",8);
+
 		if ($current_user != $default_user) {
 			remove_user($this_device);
 			if ($default_user != '') {
@@ -135,7 +137,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		set_device_user($device, $user);
 		$previous_devices = get_devices($user);
 		$new_devices = insert_device($previous_devices,$device);
-		debug("Setting user $user to devices $new_devices",5);
+		debug("insert_user: Setting user $user to devices $new_devices",5);
 		set_user_devices($user, $new_devices);
 		set_hint($user, $new_devices);
 		$vmcontext = get_voicemail_context($user);
@@ -159,13 +161,14 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		if ($current_user != '') {
 			$current_devices = get_devices($current_user);
 			$new_devices = remove_device($current_devices,$device);
-			debug("Setting user $current_user to devices $new_devices",5);
+			debug("remove_user: Setting user $current_user to devices $new_devices",5);
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
 			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
 			if ($ret) {
 				debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
 			}
+			set_device_user($device, 'none');
 		}
 	}
 
@@ -240,6 +243,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		$user = $agi->database_get('DEVICE',$device.'/user');
 		if ($user['result'] == 1 && trim($user['data']) != 'none') {
+			debug("get_logged_in_user: got user: ".$user['data'],8);
 			return trim($user['data']);
 		}
 		return '';
@@ -248,7 +252,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 	// Get the designated default user for the device or blank if none
 	//
 	function get_default_user($device) {
-		debug("get_defualt_user: device: $device",8);
+		debug("get_default_user: device: $device",8);
 		global $agi;
 
 		$default_user = $agi->database_get('DEVICE',$device.'/default_user');
@@ -266,6 +270,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		$devices = $agi->database_get('AMPUSER',$user.'/device');
 		if ($devices['result'] == 1) {
+			debug("get_devices: got: ".$devices['data'], 8);
 			return trim($devices['data']);
 		}
 		return '';
@@ -292,8 +297,10 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		$user = $agi->database_get('DEVICE',$device.'/user');
 		if ($user['result'] == 1 && trim($user['data']) != 'none') {
+			debug("get_user: got: ".$user['data'], 8);
 			return trim($user['data']);
 		}
+		debug("get_user: no user found", 8);
 		return '';
 	}
 
@@ -303,8 +310,10 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("set_user_devices: user: $user,  devices: $devices", 8);
 		global $agi;
 		if (empty($devices)) {
+			debug("No more devices associated with $user, deletting /device key", 8);
 			$agi->database_del('AMPUSER',$user.'/device');
 		} else {
+			debug("set_user_devices: assigning $devices to $user /device key", 8);
 			$agi->database_put('AMPUSER',$user.'/device',$devices);
 		}
 	}
