@@ -147,8 +147,10 @@ class core_conf {
 		//
 		if (version_compare($ast_version, "1.4", "ge")) { 
 			$call_limit = "call-limit=50\n";
+			$ver12 = false;
 		} else {
 			$call_limit = "";
+			$ver12 = true;
 		}
 
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
@@ -157,7 +159,20 @@ class core_conf {
    		die($results->getMessage());
 		}
 		foreach ($results as $result) {
-			$additional .= $result['keyword']."=".$result['data']."\n";
+			if ($ver12) {
+				$additional .= $result['keyword']."=".$result['data']."\n";
+			} else {
+				$option = $result['data'];
+				switch ($result['keyword']) {
+					case 'allow':
+					case 'disallow':
+						if ($option != '')
+							$additional .= $result['keyword']."=$option\n";
+						break;
+					default:
+						$additional .= $result['keyword']."=$option\n";
+				}
+			}
 		}
 
 		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
@@ -178,8 +193,22 @@ class core_conf {
 			}
 			foreach ($results2 as $result2) {
 				$options = explode("&", $result2['data']);
-				foreach ($options as $option) {
-					$output .= $result2['keyword']."=$option\n";
+				if ($ver12) {
+					foreach ($options as $option) {
+						$output .= $result2['keyword']."=$option\n";
+					}
+				} else {
+					foreach ($options as $option) {
+						switch ($result2['keyword']) {
+							case 'allow':
+							case 'disallow':
+								if ($option != '')
+									$output .= $result2['keyword']."=$option\n";
+								break;
+							default:
+								$output .= $result2['keyword']."=$option\n";
+						}
+					}
 				}
 			}
 			if ($call_limit && ($id < 999900)) {
@@ -242,6 +271,11 @@ class core_conf {
 							$additional .= $result['keyword']."=$option\n";
 						}
 						break;
+					case 'allow':
+					case 'disallow':
+						if ($option != '')
+							$additional .= $result['keyword']."=$option\n";
+						break;
 					default:
 						$additional .= $result['keyword']."=$option\n";
 				}
@@ -253,7 +287,7 @@ class core_conf {
 		if(DB::IsError($results)) {
    		die($results->getMessage());
 		}
-
+		
 		foreach ($results as $result) {
 			$account = $result['data'];
 			$id = $result['id'];
@@ -263,7 +297,7 @@ class core_conf {
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
    			die($results2->getMessage());
-			}
+			}	
 			foreach ($results2 as $result2) {
 				$options = explode("&", $result2['data']);
 				if ($ver12) {
@@ -283,6 +317,11 @@ class core_conf {
 								} else {
 									$output .= $result2['keyword']."=$option\n";
 								}
+								break;
+							case 'allow':
+							case 'disallow':
+								if ($option != '')
+									$output .= $result2['keyword']."=$option\n";
 								break;
 							default:
 								$output .= $result2['keyword']."=$option\n";
