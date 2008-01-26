@@ -147,14 +147,14 @@ function fixNumber($pattern, $number, &$agi) {
 
 	$agi->verbose('Using pattern '.$regex, 4);
 	// attempt to grab the pieces of the pattern
-	if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\|)?(([0-9XNZwW#*\.\[\]\-]+)\+)?([0-9XNZwW#*\.\[\]\-]+)$/', $regex, $matches)) {
+	if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\|)?(([0-9XNZwW#*\.\[\]\-]+)\+)?([0-9XNZwW#*\.\[\]\-]*)$/', $regex, $matches)) {
 		// one of NXXXXXX, 613|NXXXXXX   1+NXXXXXX    613|1+NXXXXXX,  
 		// matches[2] = drop (eg 613),  matches[4] = prefix (eg 1),  matches[5] = rest of number (eg NXXXXX)
 		
 		$drop = $matches[2];
 		$prefix = $matches[4];
 		$static = $matches[5];
-	} else if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\+)?(([0-9XNZwW#*\.\[\]\-]+)\|)?([0-9XNZwW#*\.\[\]\-]+)$/', $regex, $matches)) {
+	} else if (preg_match('/^(([0-9XNZwW#*\.\[\]\-]+)\+)?(([0-9XNZwW#*\.\[\]\-]+)\|)?([0-9XNZwW#*\.\[\]\-]*)$/', $regex, $matches)) {
 		// one of NXXXXXX,  613|NXXXXXX   1+NXXXXXX    1+613|NXXXXXX
 		// matches[2] = prefix (eg 1),  matches[4] = drop (eg 613),  matches[5] = rest of number (eg NXXXXX)
 		
