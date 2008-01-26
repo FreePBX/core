@@ -194,7 +194,7 @@ foreach ($globals as $global) {
 $tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
-	$background = ($tresult[2] == 'on')?'#DDD':'#FFF';
+	$background = ($tresult[2] == 'on')?'#DDD':'';
 	echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\" style=\"background: $background;\" >"._("Trunk")." ".substr(str_replace('AMP:', '', $tresult[1]),0,15)."</a></li>\n";
 }
 
