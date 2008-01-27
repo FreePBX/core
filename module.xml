@@ -7,6 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.4.0rc1.0* #2574, #2644, #2650, #2648 and bump to rc1
 		*2.4.0beta2.4* #2631 fix firstonphone, firstavailable ring strategies
 		*2.4.0beta2.3* #2626 logout user in devicesanduser mode not logging out if no default user set
 		*2.4.0beta2.2* revert #2919, #2607, #2578, #2620, #2560, #2621, #2560, add RETURN option to macro-vm, added DUNDi trunk type
