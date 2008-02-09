@@ -3950,27 +3950,27 @@ function core_users_configpageload() {
 		if ( $extdisplay ) {
 			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2);
 		} else {
-			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', 'The extension number to dial to reach this user.', '!isInteger()', $msgInvalidExtNum, false), 3);
+			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3);
 		}
 		if ( $display != 'extensions' ) {
 			$currentcomponent->addguielem($section, new gui_password('password', $password, 'User Password', _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', 'The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number.', '!isCallerID()', $msgInvalidDispName, false));
+		$currentcomponent->addguielem($section, new gui_textbox('name', $name, 'Display Name', _("The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number."), '!isCallerID()', $msgInvalidDispName, false));
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
-		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', 'The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no effect on external calls.', '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
-		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', "If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them."));
+		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
+		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")));
 		
 		$section = 'Extension Options';
-		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', "The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped."), 3);
-		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', "Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set"));
+		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', _("The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped.")), 3);
+		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', _("Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set")));
 		if (function_exists('music_list')) {
-		    $currentcomponent->addguielem($section, new gui_selectbox('mohclass', $currentcomponent->getoptlist('mohclass'), $mohclass, 'Music on Hold', "Set the MoH class that will be used for calls that come in on this Direct DID. For example, choose a type appropriate for a originating country which may have announcements in their language. Only effects MoH class when the call came in from the Direct DID.", false));
+		    $currentcomponent->addguielem($section, new gui_selectbox('mohclass', $currentcomponent->getoptlist('mohclass'), $mohclass, 'Music on Hold', _("Set the MoH class that will be used for calls that come in on this Direct DID. For example, choose a type appropriate for a originating country which may have announcements in their language. Only effects MoH class when the call came in from the Direct DID."), false));
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', "Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user.", '!isCallerID()', $msgInvalidOutboundCID, true));
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true));
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', "Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
 		if (!isset($callwaiting)) {
 			if ($amp_conf['ENABLECW']) {
 				$callwaiting = 'enabled';
@@ -3978,22 +3978,22 @@ function core_users_configpageload() {
 				$callwaiting = 'disabled';
 			}
 		}
-		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, 'Call Waiting', "Set the initial/current Call Waiting state for this user's extension", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, 'Call Waiting', _("Set the initial/current Call Waiting state for this user's extension"), false));
 
 		$section = 'Recording Options';
-		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', "Record all inbound calls received at this extension.", false));
-		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', "Record all outbound calls received at this extension.", false));
+		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', _("Record all inbound calls received at this extension."), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', _("Record all outbound calls received at this extension."), false));
 
 		$section = 'Fax Handling';
 		$wait = (isset($wait) ? $wait : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', "Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.", false), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', "Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings"));
-		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', "Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.", false));
-		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', 'The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.', '!isInteger()', $msgInvalidPause, false));
+		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings."), false), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings")));
+		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', _("Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks."), false));
+		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', _("The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed."), '!isInteger()', $msgInvalidPause, false));
 
 		$section = 'Privacy';
 		$privacyman = (isset($privacyman) ? $privacyman : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', "If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.", false), 4);
+		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', _("If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts."), false), 4);
 
 	}
 }
@@ -4247,13 +4247,13 @@ function core_devices_configpageload() {
 			} else { // Adding
 				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, 'Device ID', 'Give your device a unique integer ID.  The device will use this ID to authenicate to the system.', '!isInteger()', $msgInvalidDevID, false));
 			}
-			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', 'The caller id name for this device will be set to this description until it is logged into.', '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
+			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', _("The caller id name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));
 			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
-			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', 'Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting "New User", a new User Extension of the same Device ID will be set as the Default User.', false));
+			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
 		} else {
 			$section = 'Extension Options';
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', 'This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings.', '!isCallerID()', $msgInvalidEmergCID));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));
 		}
 		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
