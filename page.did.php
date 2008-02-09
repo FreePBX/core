@@ -10,7 +10,7 @@
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
-	
+
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $extdisplay= isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $dispnum = 'did'; //used for switch on config.php
@@ -18,6 +18,10 @@ $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
 $description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
+
+if (isset($_REQUEST['extension']) && isset($_REQUEST['cidnum'])) {
+	$extdisplay = $_REQUEST['extension']."/".$_REQUEST['cidnum'];
+}
 
 //update db if submiting form
 switch ($action) {
@@ -27,7 +31,7 @@ switch ($action) {
 		//add details to the 'incoming' table
 		if (core_did_add($_REQUEST)) {
 			needreload();
-			redirect_standard();
+			redirect_standard('extdisplay', 'extension', 'cidnum');
 		}
 	break;
 	case 'delIncoming':
@@ -40,7 +44,7 @@ switch ($action) {
 		$extarray=explode('/',$extdisplay,2);
 		if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 			needreload();
-			redirect_standard('extdisplay');
+			redirect_standard('extdisplay', 'extension', 'cidnum');
 		}
 	break;
 }
