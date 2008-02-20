@@ -13,6 +13,7 @@
 
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $extdisplay= isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
+$old_extdisplay = $extdisplay;
 $dispnum = 'did'; //used for switch on config.php
 $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
@@ -41,7 +42,7 @@ switch ($action) {
 		redirect_standard();
 	break;
 	case 'edtIncoming':
-		$extarray=explode('/',$extdisplay,2);
+		$extarray=explode('/',$old_extdisplay,2);
 		if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 			needreload();
 			redirect_standard('extdisplay', 'extension', 'cidnum');
