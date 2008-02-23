@@ -974,6 +974,10 @@ function core_get_config($engine) {
 						continue;
 					}
 					switch ($trunkprops['tech']) {
+						case 'DUNDI':
+							$macro_name = 'macro-dundi-'.substr($trunkprops['globalvar'],4);
+							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['name']);
+							$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
 						case 'IAX':
 						case 'IAX2':
 						case 'SIP':
@@ -981,11 +985,6 @@ function core_get_config($engine) {
 							$trunkcontext  = "from-trunk-".strtolower($trunkprops['tech'])."-".$trunkprops['name'];
 							$ext->add($trunkcontext, '_.', '', new ext_setvar('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
-							break;
-						case 'DUNDI':
-							$macro_name = 'macro-dundi-'.substr($trunkprops['globalvar'],4);
-							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['name']);
-							$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
 							break;
 						default:
 					}
