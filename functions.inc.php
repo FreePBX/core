@@ -163,7 +163,15 @@ class core_conf {
 				$additional .= $result['keyword']."=".$result['data']."\n";
 			} else {
 				$option = $result['data'];
-				switch ($result['keyword']) {
+				switch (strtolower($result['keyword'])) {
+					case 'insecure':
+						if ($option == 'very')
+							$additional .= "insecure=port,invite\n";
+						else if ($option == 'yes')
+							$additional .= "insecure=port\n";
+						else
+							$additional .= $result['keyword']."=$option\n";
+						break;
 					case 'allow':
 					case 'disallow':
 						if ($option != '')
@@ -199,7 +207,15 @@ class core_conf {
 					}
 				} else {
 					foreach ($options as $option) {
-						switch ($result2['keyword']) {
+						switch (strtolower($result2['keyword'])) {
+							case 'insecure':
+								if ($option == 'very')
+									$output .= "insecure=port,invite\n";
+								else if ($option == 'yes')
+									$output .= "insecure=port\n";
+								else
+									$output .= $result2['keyword']."=$option\n";
+								break;
 							case 'allow':
 							case 'disallow':
 								if ($option != '')
