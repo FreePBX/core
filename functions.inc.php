@@ -799,6 +799,18 @@ function core_get_config($engine) {
 					}
 					if ($item['privacyman'] == "1") {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
+					} else {
+						// if privacymanager is used, this is not necessary as it will not let blocked/anonymous calls through
+						// otherwise, we need to save the caller presence to set it properly if we forward the call back out the pbx
+						// note - the indirect table could go away as of 1.4.20 where it is fixed so that SetCallerPres can take
+						// the raw format.
+						//
+						if (version_compare($version, "1.6", "lt")) { 
+							$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLINGPRES_${CALLINGPRES}}'));
+						} else {
+							$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLERPRES()}'));
+						}
+						$ext->add($context, $exten, '', new ext_setcallerpres('allowed_not_screened'));
 					}
 					if (!empty($item['alertinfo'])) {
 						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
@@ -1055,6 +1067,23 @@ function core_get_config($engine) {
 			}
 			// Put the asterisk version in a global for agi etc.
 			$ext->addGlobal('ASTVERSION', $version);
+
+			// Create CallingPresTable to deal with difference that ${CALINGPRES} returns vs. what
+			// SetCallingPres() accepts. This is a workaround that gets resolved in 1.6 where
+			// function CALLINGPRES() is consistent.
+			// This should be fixed in 1.4.20 but for now we keep it in until 1.6
+			//
+			if (version_compare($version, "1.6", "lt")) { 
+				$ext->addGlobal('CALLINGPRES_0', 'allowed_not_screened');
+				$ext->addGlobal('CALLINGPRES_1', 'allowed_passed_screen');
+				$ext->addGlobal('CALLINGPRES_2', 'allowed_failed_screen');
+				$ext->addGlobal('CALLINGPRES_3', 'allowed');
+				$ext->addGlobal('CALLINGPRES_32', 'prohib_not_screened');
+				$ext->addGlobal('CALLINGPRES_33', 'prohib_passed_screen');
+				$ext->addGlobal('CALLINGPRES_34', 'prohib_failed_screen');
+				$ext->addGlobal('CALLINGPRES_35', 'prohib');
+				$ext->addGlobal('CALLINGPRES_67', 'unavailable');
+			}
 
 			/* outbound routes */
 			// modules should use their own table for storage (and module_get_config() to add dialplan)
@@ -1392,6 +1421,15 @@ function core_get_config($engine) {
 			$context = 'macro-outbound-callerid';
 			$exten = 's';
 			
+			// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
+			// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
+			//
+			if (version_compare($version, "1.6", "lt")) { 
+				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallingPres', '${CALLINGPRES_SV}'));
+			} else {
+				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
+			}
+
 			// Keep the original CallerID number, for failover to the next trunk.
 			$ext->add($context, $exten, '', new ext_gotoif('$["${REALCALLERIDNUM:1:2}" != ""]', 'start'));
 			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${CALLERID(number)}'));
