@@ -587,8 +587,6 @@ function core_get_config($engine) {
 			// Now add to sip_general_addtional.conf
 			//
 			if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-				$core_conf->addSipGeneral('bindport','5060');
-				$core_conf->addSipGeneral('bindaddr','0.0.0.0');
 				$core_conf->addSipGeneral('disallow','all');
 				$core_conf->addSipGeneral('allow','ulaw');
 				$core_conf->addSipGeneral('allow','alaw');
@@ -604,8 +602,6 @@ function core_get_config($engine) {
 				} else {
 					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
-				$core_conf->addIaxGeneral('bindport','4569');
-				$core_conf->addIaxGeneral('bindaddr','0.0.0.0');
 				$core_conf->addIaxGeneral('disallow','all');
 				$core_conf->addIaxGeneral('allow','ulaw');
 				$core_conf->addIaxGeneral('allow','alaw');
