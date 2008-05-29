@@ -232,7 +232,7 @@ if (isset($conf["trunk-$trunk"])) {
 		if (preg_match("/^rule\d+$/",$key)) {
 			// $rule is a dial rule
 			
-			if ($newnum = fixNumber($rule, $number, $agi)) {
+			if (($newnum = fixNumber($rule, $number, $agi)) !== false) {
 				$agi->verbose('Dialpattern '.$rule.' matched. '.$number.' -> '.$newnum, 2);
 				$agi->set_variable("DIAL_NUMBER", $newnum);
 				
