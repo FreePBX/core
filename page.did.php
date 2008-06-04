@@ -195,7 +195,7 @@ if (!isset($privacyman))
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a></td>
 			<td>
-				<select name="mohclass"/>
+				<select name="mohclass">
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');

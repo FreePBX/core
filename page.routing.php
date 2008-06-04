@@ -330,7 +330,7 @@ if ($extdisplay) { // editing
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
 			<td>
-				<select name="mohsilence"/>
+				<select name="mohsilence">
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
