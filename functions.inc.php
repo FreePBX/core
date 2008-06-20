@@ -1065,7 +1065,7 @@ function core_get_config($engine) {
 			$ext->addGlobal('ASTVERSION', $version);
 
 			// Create CallingPresTable to deal with difference that ${CALINGPRES} returns vs. what
-			// SetCallingPres() accepts. This is a workaround that gets resolved in 1.6 where
+			// SetCallerPres() accepts. This is a workaround that gets resolved in 1.6 where
 			// function CALLINGPRES() is consistent.
 			// This should be fixed in 1.4.20 but for now we keep it in until 1.6
 			//
@@ -1421,7 +1421,7 @@ function core_get_config($engine) {
 			// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 			//
 			if (version_compare($version, "1.6", "lt")) { 
-				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallingPres', '${CALLINGPRES_SV}'));
+				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
 			} else {
 				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
 			}
