@@ -53,8 +53,8 @@ switch($type['data']) {
 			foreach($list as $exten) {
 				$setting = $agi->database_get("AMPUSER",$exten."/recording");
 				if ($setting["result"] == 0) {
-					$agi->verbose("No DB Entry AMPUSER/$exten/recording - Not recording");
-					exit(1);
+					$agi->verbose("No DB Entry AMPUSER/$exten/recording - Not Recording for $exten, checking for others");
+					continue;
 				}
 				//explode recording vars
 				$recording = explode("|",$setting["data"]);
