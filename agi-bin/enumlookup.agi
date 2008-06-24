@@ -20,7 +20,11 @@ require_once "phpagi.php";
 $AGI = new AGI();
 $lookup = get_var( $AGI, "DIAL_NUMBER" );
 
-$enums = Array('e164.org', 'e164.arpa', 'e164.info');
+$enums = Array(
+	'e164.org', 
+	//'e164.arpa', 
+	//'e164.info',
+);
 
 // Go through the ENUM providers and look for the number.
 
