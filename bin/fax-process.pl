@@ -132,7 +132,7 @@ $attachment =~ s/^.+\///;
 # And that's pretty much all the hard work done. Now we just create the
 # headers for the MIME encapsulation: 
 my $boundary = '------FREEPBX_FAX_MAIL:'; 
-my $dtime = `date`;
+my $dtime = `date -R`;
 chomp $dtime;
 my @chrs = ('0' .. '9', 'A' .. 'Z', 'a' .. 'z'); 
 foreach (0..16) { $boundary .= $chrs[rand (scalar @chrs)]; } 
