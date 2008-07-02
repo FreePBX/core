@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.4.0.3</version>
+	<version>2.4.0.4</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.4.0.4* #2857, #2848, #2791, #2449
 		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
 		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details
 		*2.4.0.1* #2693 fix DID editing creating new DID route introduced from #2664 fix
@@ -75,6 +76,6 @@
 		<ampusers>Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.4/core-2.4.0.3.tgz</location>
-	<md5sum>4a5ea24e03d0f8a646b51240d31cf8b2</md5sum>
+	<location>release/2.4/core-2.4.0.4.tgz</location>
+	<md5sum>5dc7a7e20497e3df1acff0c1ec7a6f38</md5sum>
 </module>
