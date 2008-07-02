@@ -1502,7 +1502,7 @@ function core_get_config($engine) {
 			
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
-			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-user'));  // get callback number from user
+			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-login'));  // get callback number from user
 			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" != ""]', 'a7'));  // if user just pressed # or timed out, use cidnum
 			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
 			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
@@ -1528,7 +1528,7 @@ function core_get_config($engine) {
 			
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
-			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-user'));  // get callback number from user
+			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-logoff'));  // get callback number from user
 			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a5', 'a7'));  // if user just pressed # or timed out, use cidnum
 			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
 			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
