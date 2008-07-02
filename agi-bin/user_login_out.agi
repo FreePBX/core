@@ -29,6 +29,12 @@
 	$ampmgruser   = get_var( "AMPMGRUSER" );
 	$ampmgrpass   = get_var( "AMPMGRPASS" );
 	$astspooldir  = get_var( "ASTSPOOLDIR" );
+	$ast_version  = get_var("ASTVERSION");
+	$dnd_devstate = get_var( "DNDDEVSTATE" ) == "TRUE" ? true : false;
+	$intercom_code = get_var( "INTERCOMCODE" );
+
+	$ast_version14 = version_compare($ast_vversion, "1.4", "ge");
+
 	/*
 	$ampmgruser  = 'admin';
 	$ampmgrpass  = 'amp111';
@@ -178,14 +184,29 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("set_hint: user: $user, devices: $devices",8);
 		global $astman;
 		global $agi;
+		global $dnd_devstate;
+		global $intercom_code;
+		global $ast_version14;
+
+		// If Asterisk version >= 1.4, syntax change is 'dialplan add extension ...' vs. 'add extension ...'
+		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
 
 		if ($devices) {
 			$dial_string = get_dial_string($devices);
+			if ($dnd_devstate) {
+				$dial_string .= "&Custom:DND$user";
+			}
 			debug("Setting user $user hint to $dial_string",5);
-			$response = $astman->send_request('Command',array('Command'=>"add extension {$user},hint,{$dial_string} into ext-local replace"));
+			$response = $astman->send_request('Command',array('Command'=>$dp_pre."add extension {$user},hint,{$dial_string} into ext-local replace"));
+			if ($intercom_code != 'nointercom' && $intercom_code != '') {
+				$response = $astman->send_request('Command',array('Command'=>$dp_pre."add extension {$intercom_code}{$user},hint,{$dial_string} into ext-local replace"));
+			}
 		} else {
 			debug("Removing hint for user $user",5);
-			$response = $astman->send_request('Command',array('Command'=>"remove extension {$user}@ext-local hint"));
+			$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$user}@ext-local hint"));
+			if ($intercom_code != 'nointercom' && $intercom_code != '') {
+				$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$intercom_code}{$user}@ext-local hint"));
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.0.0* Added support for DND and Intercom hints in static and dynamic hints mode
 		*2.4.0.4* #2857, #2848, #2791, #2449
 		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
 		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details

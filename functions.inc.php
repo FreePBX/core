@@ -935,8 +935,24 @@ function core_get_config($engine) {
 			// If running in Dynamic mode, this will insert the hints through an Asterisk #exec call.
 			// which require "execincludes=yes" to be set in the [options] section of asterisk.conf
 			//
+
+			$fcc = new featurecode('paging', 'intercom-prefix');
+			$intercom_code = $fcc->getCodeActive();
+			unset($fcc);
+
+			$intercom_code = ($intercom_code == '') ? 'nointercom' : $intercom_code;
+
+			// Pass the code so agi scripts like user_login_logout know to generate hints
+			//
+			$ext->addGlobal('INTERCOMCODE',$intercom_code);
+
 			if ($amp_conf['DYNAMICHINTS']) {
-				$ext->addExec('ext-local',$amp_conf['AMPBIN'].'/generate_hints.php');
+				if ($amp_conf['USEDEVSTATE'] && function_exists('donotdisturb_get_config')) {
+					$add_dnd = ' dnd';
+				} else {
+					$add_dnd = '';
+				}
+				$ext->addExec('ext-local',$amp_conf['AMPBIN'].'/generate_hints.php '.$intercom_code.$add_dnd);
 			}
 			$userlist = core_users_list();
 			if (is_array($userlist)) {
@@ -965,8 +981,17 @@ function core_get_config($engine) {
 					//
 					if (!$amp_conf['DYNAMICHINTS']) {
 						$hint = core_hint_get($exten['extension']);
+						$dnd_string = ($amp_conf['USEDEVSTATE'] && function_exists('donotdisturb_get_config')) ? "&Custom:DND".$exten['extension'] : '';
 						if (!empty($hint)) {
-							$ext->addHint('ext-local', $exten['extension'], $hint);
+							$ext->addHint('ext-local', $exten['extension'], $hint.$dnd_string);
+							if ($intercom_code != '') {
+								$ext->addHint('ext-local', $intercom_code.$exten['extension'], $hint.$dnd_string);
+							}
+						} else if ($dnd_string) {
+							$ext->addHint('ext-local', $exten['extension'], "&Custom:DND".$exten['extension']);
+							if ($intercom_code != '') {
+								$ext->addHint('ext-local', $intercom_code.$exten['extension'], "&Custom:DND".$exten['extension']);
+							}
 						}
 					}
 					if ($exten['sipname']) {
