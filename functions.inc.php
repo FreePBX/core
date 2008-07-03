@@ -2010,6 +2010,16 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".addslashes($outboundcid)."\"");
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".addslashes($name)."\"");
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
+                        if($privacyman == "0")  {
+                                $astman->database_del("AMPUSER",$extension."/screen");
+                        }
+                        if($privacyman == "2")  {
+                                $astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
+                        }
+                        if($privacyman == "3")  {
+                                $astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
+                        }
+
 		}	
 		return true;
 	} else {
@@ -2521,6 +2531,13 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
+                if($privacyman == "2")  {
+                        $astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
+                }
+                if($privacyman == "3")  {
+                        $astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
+                }
+
 		if (!$editmode) {
 			$astman->database_put("AMPUSER",$extension."/device","\"".((isset($device))?$device:'')."\"");
 		}
@@ -2624,6 +2641,9 @@ function core_users_del($extension, $editmode=false){
 	}
 
 	//delete details to astdb
+	if($astman)  {
+		$astman->database_del("AMPUSER",$extension."/screen");
+	}
 	if ($astman && !$editmode) {
 		$astman->database_del("AMPUSER",$extension."/password");
 		$astman->database_del("AMPUSER",$extension."/ringtimer");
@@ -3895,9 +3915,11 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('faxdetecttype', '2', 'NVFax');
 		$currentcomponent->setoptlistopts('faxdetecttype', 'sort', false);
 
-		$currentcomponent->addoptlistitem('privyn', '0', _("No"));
-		$currentcomponent->addoptlistitem('privyn', '1', _("Yes"));
-		$currentcomponent->setoptlistopts('privyn', 'sort', false);
+               $currentcomponent->addoptlistitem('privoptions', '0', _("Off"));
+               $currentcomponent->addoptlistitem('privoptions', '1', _("Require Caller ID"));
+               $currentcomponent->addoptlistitem('privoptions', '2', _("Screen Caller - No Memory"));
+               $currentcomponent->addoptlistitem('privoptions', '3', _("Screen Caller - Memory"));
+               $currentcomponent->setoptlistopts('privoptions', 'sort', false);
 
 		$currentcomponent->addoptlistitem('callwaiting', 'enabled', _("Enable"));
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
@@ -4069,7 +4091,7 @@ function core_users_configpageload() {
 
 		$section = 'Privacy';
 		$privacyman = (isset($privacyman) ? $privacyman : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privyn'), $privacyman, 'Privacy Manager', _("If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts."), false), 4);
+                $currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privoptions'), $privacyman, 'Privacy Manager',_("Choose 'Require Caller ID' and If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.  If 'Screen Caller' is chosen, the caller must say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a user for their caller-id once.  Screening without memory always requires a caller to say their name."), false), 4);
 
 	}
 }

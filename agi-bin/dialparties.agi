@@ -214,7 +214,34 @@ if ($rgmethod == "ringallv2" && $fmgrp != "") {
 	}
 	debug("ringallv2 ring times: REALPRERING: $fmgrp_realprering, PRERING: $fmgrp_prering",4);
 }
+$already_screened = get_var( $AGI, "SCREEN" ); // If this is the second pass through dialparties.agi, we don't want to double-screen the caller
+// If this isn't a ring group, check to see if the user has call screening on
+$count = 0;
+foreach ($ext as $k) {
+	// Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
+	if(!$already_screened && $count == 0 && ($rgmethod == "none" || $fmgrp == $k))  { 
+ 		$from_outside  = get_var( $AGI, "FROM_DID" );
+       
+		if($from_outside)  {  // Don't screen internal calls
+ 			$screen_call = $AGI->database_get('AMPUSER', $k."/screen");
+			$screen_call = $screen_call['data'];
+			if (strlen($screen_call)) {
+				if($screen_call == "nomemory")  { // This can't go in the dialplan because macro-dial can get called multiple times
+					exec("rm -f /var/lib/asterisk/sounds/priv-callerintros/$cidnum.*");
 
+				}
+				$screen = true;
+				$AGI->set_variable('__SCREEN',$screen_call);
+				$AGI->set_variable('__SCREEN_EXTEN',$k);
+				debug("Extension $k has call screening on", 1);
+			}
+			else {
+				debug("Extension $k has call screening off", 3);
+			}
+		}
+	}
+	$count++;
+}
 // IF THE FIRST EXTENSION IS CALL FORWARD ENABLED (put in logic) then we don't do master mode
 // which means we reset the flag here after detecting that and just say we are not in master
 // mode and all is well. That means the loop below needs to be modified to detect the first
@@ -608,6 +635,9 @@ if (!strlen($ds)) {
 			}
 		}
 		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
+		if ($screen) {
+			$ds .= "p";
+		}
 		if (trim($use_confirmation) != "FALSE") {
 			$AGI->set_variable('__RG_IDX',$ringgroup_index);
 			if ( isset($cidnum) && is_numeric($cidnum) ) {
