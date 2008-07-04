@@ -757,6 +757,15 @@ function core_get_config($engine) {
 					$exten = $item['extension'];
 					$cidnum = $item['cidnum'];
 
+					// If the user put in just a cid number for routing, we add _. pattern to catch
+					// all DIDs with that CID number. Asterisk will complain about _. being dangerous
+					// but we don't want to limit this to just numberic as someone may be trying to
+					// route a non-numeric did
+					//
+					if (trim($cidnum) != '' && trim($exten) == '') {
+						$exten = '_.';
+					}
+
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
 
@@ -2360,13 +2369,8 @@ function core_users_add($vars, $editmode=false) {
 	$newdidcid = isset($newdidcid) ? $newdidcid : '';
 	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
 
-	// Asterisk does not want just CID set so if it is add _X. to the DID
-	//
-	if ($newdid == '' && $newdidcid != '') {
-		$newdid = '_X.';
-	}
 	// Well more ugliness since the javascripts are already in here
-	if ($newdid != '') {
+	if ($newdid != '' || $newdidcid != '') {
 		$existing = core_did_get($newdid, $newdidcid);
 		if (! empty($existing)) {
 			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>"."<pre>".print_r($existing,true)."</pre>";
@@ -2500,7 +2504,7 @@ function core_users_add($vars, $editmode=false) {
 
 	// Now if $newdid is set we need to add the DID to the routes
 	//
-	if ($newdid != '') {
+	if ($newdid != '' || $newdidcid != '') {
 		$did_dest                = 'from-did-direct,'.$extension.',1';
 		$did_vars['extension']   = $newdid;
 		$did_vars['cidnum']      = $newdidcid;
@@ -2630,13 +2634,8 @@ function core_users_edit($extension,$vars){
 	$newdidcid = isset($vars['newdidcid']) ? $vars['newdidcid'] : '';
 	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
 
-	// Asterisk does not want just CID set so if it is add _X. to the DID
-	//
-	if ($newdid == '' && $newdidcid != '') {
-		$newdid = '_X.';
-	}
 	// Well more ugliness since the javascripts are already in here
-	if ($newdid != '') {
+	if ($newdid != '' || $newdidcid != '') {
 		$existing = core_did_get($newdid, $newdidcid);
 		if (! empty($existing)) {
 			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>";
@@ -3782,6 +3781,7 @@ array ( "name" => "Hong Kong", "iso" => "hk", "conf" => "ringcadence = 400,200,4
  array ( "name" => "Singapore",  "iso" => "sg", "conf" => "ringcadence = 400,200,400,2000\ndial = 425\nring = 425*24/400,0/200,425*24/400,0/2000 ; modulation should be 100%, not 90%\nbusy = 425/750,0/750\ncongestion = 425/250,0/250\ncallwaiting = 425*24/300,0/200,425*24/300,0/3200\nstutter = !425/200,!0/200,!425/600,!0/200,!425/200,!0/200,!425/600,!0/200,!425/200,!0/200,!425/600,!0/200,!425/200,!0/200,!425/600,!0/200,425\ninfo = 950/330,1400/330,1800/330,0/1000 ; not currently in use acc. to reference\ndialrecall = 425*24/500,0/500,425/500,0/2500 ; unspecified in IDA reference, use repeating Holding Tone A,B\nrecord = 1400/500,0/15000 ; unspecified in IDA reference, use 0.5s tone every 15s\nnutone = 425/2500,0/500\nintrusion = 425/250,0/2000\nwarning = 425/624,0/4376 ; end of period tone, warning\nacceptance = 425/125,0/125\nholdinga = !425*24/500,!0/500 ; followed by holdingb\nholdingb = !425/500,!0/2500\n"),
  array ( "name" => "South Africa",  "iso" => "za", "conf" => "ringcadence = 400,200,400,2000\ndial = 400*33\nbusy = 400/500,0/500\nring = 400*33/400,0/200,400*33/400,0/2000\ncongestion = 400/250,0/250\ncallwaiting = 400*33/250,0/250,400*33/250,0/250,400*33/250,0/250,400*33/250,0/250\ndialrecall = 350+440\nrecord = 1400/500,0/10000\ninfo = 950/330,1400/330,1800/330,0/330\nstutter =!400*33/100,!0/100,!400*33/100,!0/100,!400*33/100,!0/100,!400*33/100,!0/100,!400*33/100,!0/100,!400*33/100,!0/100,400*33 \n"),
  array ( "name" => "Sweden",  "iso" => "se", "conf" => "ringcadence = 1000,5000\ndial = 425\nbusy = 425/250,0/250\nring = 425/1000,0/5000\ncongestion = 425/250,0/750\ncallwaiting = 425/200,0/500,425/200,0/9100\ndialrecall = !425/100,!0/100,!425/100,!0/100,!425/100,!0/100,425\nrecord = 1400/500,0/15000\ninfo = !950/332,!0/24,!1400/332,!0/24,!1800/332,!0/2024,!950/332,!0/24,!1400/332,!0/24,!1800/332,!0/2024,!950/332,!0/24,!1400/332,!0/24,!1800/332,!0/2024,!950/332,!0/24,!1400/332,!0/24,!1800/332,!0/2024,!950/332,!0/24,!1400/332,!0/24,!1800/332,0\nstutter = !425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,425\n"),
+ array ("name" => "Turkey", "iso" => "tr", "conf" => "ringcadance = 2000,4000\ndial = 450\nbusy = 450/500,0/500\nring = 450/2000,450/4000\ncongestion = 450/200,0/200,450/200,0/200,450/200,0/200,450/600,0/200\ncallwaiting = 450/200,0/600,450/200,0/8000\ndialrecall = 450/1000,0/250\nrecord = 1400/500,0/15000\ninfo = !950/300,!1400/300,!1800/300,!0/1000,!950/300,!1400/300,!1800/300,!0/1000,!950/300,!1400/300,!1800/300,!0/1000,0\n"),
  array ( "name" => "United Kingdom",  "iso" => "uk", "conf" => "ringcadence = 400,200,400,2000\ndial = 350+440\nspecialdial = 350+440/750,440/750\nbusy = 400/375,0/375\ncongestion = 400/400,0/350,400/225,0/525\nspecialcongestion = 400/200,1004/300\nunobtainable = 400\nring = 400+450/400,0/200,400+450/400,0/2000\ncallwaiting = 400/100,0/4000\nspecialcallwaiting = 400/250,0/250,400/250,0/250,400/250,0/5000\ncreditexpired = 400/125,0/125\nconfirm = 1400\nswitching = 400/200,0/400,400/2000,0/400\ninfo = 950/330,0/15,1400/330,0/15,1800/330,0/1000\nrecord = 1400/500,0/60000\nstutter = 350+440/750,440/750\n"),
  array ( "name" => "United States / North America",  "iso" => "us", "conf" => "ringcadence = 2000,4000\ndial = 350+440\nbusy = 480+620/500,0/500\nring = 440+480/2000,0/4000\ncongestion = 480+620/250,0/250\ncallwaiting = 440/300,0/10000\ndialrecall = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\nrecord = 1400/500,0/15000\ninfo = !950/330,!1400/330,!1800/330,0\nstutter = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\n"),
  array ( "name" => "United States Circa 1950/ North America",  "iso" => "us-old", "conf" => "ringcadence = 2000,4000\ndial = 600*120\nbusy = 500*100/500,0/500\nring = 420*40/2000,0/4000\ncongestion = 500*100/250,0/250\ncallwaiting = 440/300,0/10000\ndialrecall = !600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,600*120\nrecord = 1400/500,0/15000\ninfo = !950/330,!1400/330,!1800/330,0\nstutter = !600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,600*120\n"),
@@ -4001,6 +4001,9 @@ function core_users_configpageload() {
 
 
 		$section = _("Assigned DID/CID");
+		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box")), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box")), 4);
+
 		$dids = core_did_list('extension');
 		$did_count = 0;
 		foreach ($dids as $did) {
@@ -4011,7 +4014,7 @@ function core_users_configpageload() {
 
 				$addURL = $_SERVER['PHP_SELF'].'?type=setup&display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
 				$did_icon = 'images/email_edit.png';
-				$did_label = ' '.$did['extension'];
+				$did_label = trim($did['extension']) == '' ? ' Any DID' : ' '.$did['extension'];
 				if (trim($did['cidnum']) != '') {
 					$did_label .= ' / '.$did['cidnum'];
 				}
@@ -4026,9 +4029,6 @@ function core_users_configpageload() {
 				$currentcomponent->addguielem($section, new gui_link($did_count++, $did_label, $addURL, true, false), 4);
 			}
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box")), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box")), 4);
-
 
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', _("Record all inbound calls received at this extension."), false));

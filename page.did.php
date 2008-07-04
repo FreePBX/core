@@ -59,15 +59,15 @@ switch ($action) {
 </div>
 
 <?php
-$display_link = isset($extdisplay) && $extdispaly != '' ? "&amp;extdisplay=".$extdisplay : '';
+$display_link = isset($extdisplay) && $extdisplay != '' ? "&amp;extdisplay=".$extdisplay : '';
 ?>
 <div class="rnav">
 <ul>
 	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
-	<li><a <?php echo ($didfilter=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).$display_link?>"><?php echo _("View All")?></a></li>
-	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=directdid'.$display_link?>"><?php echo _("View Extensions")?></a></li>
-	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=incoming'.$display_link?>"><?php echo _("View General")?></a></li>
-	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=unassigned'.$display_link?>"><?php echo _("View Un-Assigned")?></a></li>
+	<li><a <?php echo ($didfilter=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).$display_link?>"><?php echo _("View All DIDs")?></a></li>
+	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=directdid'.$display_link?>"><?php echo _("View User DIDs")?></a></li>
+	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=incoming'.$display_link?>"><?php echo _("View General DIDs")?></a></li>
+	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=unassigned'.$display_link?>"><?php echo _("View Unused DIDs")?></a></li><hr>
 <?php 
 //get unique incoming routes
 $inroutes = core_did_list('description');
@@ -124,6 +124,23 @@ if (isset($inroutes)) {
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
 		<a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo !empty($description)?$description:$extdisplay ?></a>
+<?php
+	// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
+	//
+	$did_dest = split(',',$destination);
+	if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
+
+		if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
+			$editURL = $_SERVER['PHP_SELF'].'?display=users&extdisplay='.$did_dest[1];
+			$EXTorUSER = "User";
+		}
+		else {
+			$editURL = $_SERVER['PHP_SELF'].'?display=extensions&extdisplay='.$did_dest[1];
+			$EXTorUSER = "Extension";
+		}
+		echo "<p><a href=".$editURL."> Edit ".$EXTorUSER." ".$did_dest[1]."</a></p>";
+	}
+?>
 <?php } else { ?>
 		<h2><?php echo _("Add Incoming Route")?></h2>
 <?php } ?>
