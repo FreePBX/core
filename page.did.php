@@ -19,10 +19,15 @@ $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
 $description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
+if (isset($_REQUEST['submitclear'])) {
+	$_REQUEST[$goto0.'0'] = '';
+}
 
 if (isset($_REQUEST['extension']) && isset($_REQUEST['cidnum'])) {
 	$extdisplay = $_REQUEST['extension']."/".$_REQUEST['cidnum'];
 }
+
+$didfilter = isset($_REQUEST['didfilter'])?$_REQUEST['didfilter']:'';
 
 //update db if submiting form
 switch ($action) {
@@ -53,18 +58,51 @@ switch ($action) {
 ?>
 </div>
 
+<?php
+$display_link = isset($extdisplay) && $extdispaly != '' ? "&amp;extdisplay=".$extdisplay : '';
+?>
 <div class="rnav">
 <ul>
 	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
+	<li><a <?php echo ($didfilter=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).$display_link?>"><?php echo _("View All")?></a></li>
+	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=directdid'.$display_link?>"><?php echo _("View Extensions")?></a></li>
+	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=incoming'.$display_link?>"><?php echo _("View General")?></a></li>
+	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=unassigned'.$display_link?>"><?php echo _("View Un-Assigned")?></a></li>
 <?php 
 //get unique incoming routes
 $inroutes = core_did_list('description');
+switch ($didfilter) {
+	case 'directdid':
+		foreach ($inroutes as $key => $did_items) {
+			$did_dest = split(',',$did_items['destination']);
+			if (!isset($did_dest[0]) || $did_dest[0] != 'from-did-direct') {
+				unset($inroutes[$key]);
+			}
+		}
+		break;
+	case 'incoming':
+		foreach ($inroutes as $key => $did_items) {
+			$did_dest = split(',',$did_items['destination']);
+			if (!isset($did_dest[0]) || $did_dest[0] == 'from-did-direct') {
+				unset($inroutes[$key]);
+			}
+		}
+		break;
+	case 'unassigned':
+		foreach ($inroutes as $key => $did_items) {
+			if (isset($did_items['destination']) && $did_items['destination'] != '') {
+				unset($inroutes[$key]);
+			}
+		}
+		break;
+	default:
+}
 if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		$displaydid = ( empty($inroute['extension'])? _("any DID") : $inroute['extension'] );
  		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
 		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
-		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
+		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;didfilter=$didfilter&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
 }
 ?>
@@ -220,13 +258,20 @@ if (!isset($privacyman))
 	echo $module_hook->hookHtml;
 ?>
 		<tr><td colspan="2"><h5><?php echo _("Set Destination")?><hr></h5></td></tr>
+
 <?php 
+	if ($extdisplay) {	
+?>
+		<tr><td colspan="2"><a href="<?php echo $clrdestURL ?>"><?php echo _("Clear Destination")?></a><br /><br /></td></tr>
+<?php 
+	}
 //draw goto selects
 echo drawselects(isset($destination)?$destination:null,0);
 ?>
 		<tr>
 			<td colspan="2">
-				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>"></h6>
+				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>">&nbsp;&nbsp;
+				<input name="submitclear" type="submit" value="<?php echo _("Clear Destination & Submit")?>"></h6>
 			</td>		
 		</tr>
 		</table>

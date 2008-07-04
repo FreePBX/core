@@ -743,9 +743,11 @@ function core_get_config($engine) {
 				$catchall = false;
 				$catchall_context='ext-did-catchall';
 				foreach($didlist as $item) {
-					$did = core_did_get($item['extension'],$item['cidnum']);
-					$exten = $did['extension'];
-					$cidnum = $did['cidnum'];
+					if (trim($item['destination']) == '') {
+						continue;
+					}
+					$exten = $item['extension'];
+					$cidnum = $item['cidnum'];
 
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
@@ -826,7 +828,7 @@ function core_get_config($engine) {
 					
 					//the goto destination
 					// destination field in 'incoming' database is backwards from what ext_goto expects
-					$goto_context = strtok($did['destination'],',');
+					$goto_context = strtok($item['destination'],',');
 					$goto_exten = strtok(',');
 					$goto_pri = strtok(',');
 					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
@@ -844,76 +846,6 @@ function core_get_config($engine) {
 					$ext->add($catchall_context, '_[*#X].', '', new ext_goto('1','s','ext-did'));
 				}
 					
-			}
-
-			/* MODIFIED (PL)
-			 *
-			 * Add Direct DIDs
-			 *
-			 * This functions creates a new context, ext-did-direct, used to route an incoming DID directly to the specified user.
- 			 * The purpose is to use when a user has a personal external DID. This keeps it clean and easy to administer.
- 			 * Any conflict with those routes will depend on which of the two contexts are included first in the extensions.conf file.
- 			 *
- 			 * Calls are sent to context from-did-direct though this feature. You must create that context in extenions.conf or
- 			 * in extensions_custom.conf and it should look something like:
- 			 *
- 			 * [from-did-direct]
- 			 * include => ext-findmefollow
- 			 * include => ext-local
- 			 *
- 			 * This is so that personal ring groups are used if they exist for the direct did and if not, then the local extension.
-			 * If the module is not implented, it will just go to the users extension.
- 			 */
-
-			$directdidlist = core_directdid_list();
-			if(is_array($directdidlist)){
-				$context = "ext-did";
-				if(!is_array($didlist)){
-					/* if not set above, add one here */
-					$ext->add($context, 'fax', '', new ext_goto('1','in_fax','ext-fax'));
-				}
-				foreach($directdidlist as $item) {
-					$exten = $item['directdid'];
-					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
-					// always set callerID name
-					$ext->add($context, $exten, '', new ext_gotoif('$[ "${CALLERID(name)}" != "" ] ','cidok'));
-					$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${CALLERID(num)}'));
-					$ext->add($context, $exten, 'cidok', new ext_noop('CallerID is ${CALLERID(all)}'));
-
-					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
-						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
-						$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
-					}
-					
-					if ($item['faxexten'] != "default") {
-						$ext->add($context, $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
-					}
-					if (!empty($item['faxemail'])) {
-						$ext->add($context, $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
-					}
-					if ($item['answer'] == "1") {
-						$ext->add($context, $exten, '', new ext_answer(''));
-						$ext->add($context, $exten, '', new ext_wait($item['wait']));
-					}
-					if ($item['answer'] == "2") { // NVFaxDetect
-						$ext->add($context, $exten, '', new ext_answer(''));
-						$ext->add($context, $exten, '', new ext_playtones('ring'));
-						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']));
-					}
-					if ($item['privacyman'] == "1") {
-						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
-					}
-
-
-					if (!empty($item['didalert'])) {
-						$ext->add($context, $exten, '', new ext_setvar("_ALERT_INFO", str_replace(';', '\;', $item['didalert'])));
-					}
-					$goto_context = 'from-did-direct';
-					$goto_exten = $item['extension'];
-					$goto_pri = 1;
-					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
-
-				}
 			}
 
 			// Now create macro-from-zaptel-nnn for each defined channel to route it to the DID routing
@@ -1654,52 +1586,32 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 	//
 	if (($extension != $old_extension) || ($cidnum != $old_cidnum)) {
 		$existing=core_did_get($extension,$cidnum);
-		if (empty($existing) && (trim($cidnum) == "")) {
-			$existing_directdid = core_users_directdid_get($extension);
-		} else {
-			$existing_directdid = "";
-		}
-	} else {
-		$existing = $existing_directdid = "";
 	}
 
-	if (empty($existing) && empty($existing_directdid)) {
+	if (empty($existing)) {
 		core_did_del($old_extension,$old_cidnum);
 		core_did_add($incoming);
 		return true;
 	} else {
-		if (!empty($existing)) {
-			echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
-		} else {
-			echo "<script>javascript:alert('"._("A directdid for this DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
-		}
-		return false;
+		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 	}
+	return false;
 }
 
-function core_did_add($incoming){
+function core_did_add($incoming,$target=false){
 	foreach ($incoming as $key => $val) { ${$key} = addslashes($val); } // create variables from request
 
 	// Check to make sure the did is not being used elsewhere
 	//
 	$existing=core_did_get($extension,$cidnum);
-	if (empty($existing) && (trim($cidnum) == "")) {
-		$existing_directdid = core_users_directdid_get($extension);
-	} else {
-		$existing_directdid = "";
-	}
 
-	if (empty($existing) && empty($existing_directdid)) {
-		$destination=${$goto0.'0'};
+	if (empty($existing)) {
+		$destination= ($target) ? $target : ${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre')";
 		sql($sql);
 		return true;
 	} else {
-		if (!empty($existing)) {
-			echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
-		} else {
-			echo "<script>javascript:alert('"._("A directdid for this DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
-		}
+		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 		return false;
 	}
 }
@@ -1707,16 +1619,15 @@ function core_did_add($incoming){
 /* end page.did.php functions */
 
 
-
-
-
-
-
 /* begin page.devices.php functions */
 
 //get the existing devices
-function core_devices_list($tech="all") {
-	$sql = "SELECT id,description FROM devices";
+function core_devices_list($tech="all",$detail=false) {
+	if (strtolower($detail) == 'full') {
+		$sql = "SELECT * FROM devices";
+	} else {
+		$sql = "SELECT id,description FROM devices";
+	}
 	switch (strtoupper($tech)) {
 		case "IAX":
 			$sql .= " WHERE tech = 'iax2'";
@@ -1730,23 +1641,30 @@ function core_devices_list($tech="all") {
 		default:
 	}
 	$sql .= ' ORDER BY id';
-	$results = sql($sql,"getAll");
+	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
+	$extens = null;
 	foreach($results as $result){
-		if (checkRange($result[0])){
+		if (checkRange($result['id'])){
+
+			$record = array();
+			$record[0] = $result['id'];  // for backwards compatibility
+			$record[1] = $result['description'];  // for backwards compatibility
+			foreach ($result as $key => $value) {
+				$record[$key] = $value;
+			}
+			$extens[] = $record;
+			/*
 			$extens[] = array(
 				0=>$result[0],  // for backwards compatibility
 				1=>$result[1],
 				'id'=>$result[0], // FETCHMODE_ASSOC emulation
 				'description'=>$result[1],
 			);
+			*/
 		}
 	}
-	if (isset($extens)) {
-		return $extens;
-	} else { 
-		return null;
-	}
+	return $extens;
 }
 
 
@@ -2429,18 +2347,21 @@ function core_users_add($vars, $editmode=false) {
 		}
 	}
 
-	// clean and check the did to make sure it is not being used by another extension or in did routing
+	$newdid = isset($newdid) ? $newdid : '';
+	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
+	$newdidcid = isset($newdidcid) ? $newdidcid : '';
+	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
+
+	// Asterisk does not want just CID set so if it is add _X. to the DID
 	//
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($directdid));
-	if (trim($directdid) != "") {
-		$existing=core_did_get($directdid,"");
-		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
-		if (!empty($existing) || !empty($existing_directdid)) {
-			if (!empty($existing)) {
-				echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
-			} else {
-				echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
-			}
+	if ($newdid == '' && $newdidcid != '') {
+		$newdid = '_X.';
+	}
+	// Well more ugliness since the javascripts are already in here
+	if ($newdid != '') {
+		$existing = core_did_get($newdid, $newdidcid);
+		if (! empty($existing)) {
+			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>"."<pre>".print_r($existing,true)."</pre>";
 			return false;
 		}
 	}
@@ -2472,18 +2393,12 @@ function core_users_add($vars, $editmode=false) {
 		}
 	}
 
-	// MODIFICATION: (PL)
-	// Added for directdid and didalert l for Alert Info distinctive ring)
-	//
-	// cleanup any non dial pattern characters prior to inserting into the database
-	// then add directdid to the insert command.
-	//
 	// Clean replace any <> with () in display name - should have javascript stopping this but ...
 	//
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,directdid,didalert,faxexten,faxemail,answer,wait,privacyman,mohclass,sipname) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,privacyman,sipname) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -2499,22 +2414,7 @@ function core_users_add($vars, $editmode=false) {
 	$sql.= "\", \"";
 	$sql.= isset($outboundcid)?$outboundcid:'';
 	$sql.= "\", \"";
-	$sql.= isset($directdid)?$directdid:'';
-	$sql.= "\", \"";
-	$sql.= isset($didalert)?$didalert:'';
-
-	$sql.= "\", \"";
-	$sql.= isset($faxexten)?$faxexten:'';
-	$sql.= "\", \"";
-	$sql.= isset($faxemail)?$faxemail:'';
-	$sql.= "\", \"";
-	$sql.= isset($answer)?$answer:'';
-	$sql.= "\", \"";
-	$sql.= isset($wait)?$wait:'';
-	$sql.= "\", \"";
 	$sql.= isset($privacyman)?$privacyman:'';
-	$sql.= "\", \"";
-	$sql.= isset($mohclass)?$mohclass:'';
 	$sql.= "\", \"";
 	$sql.= isset($sipname)?$sipname:'';
 	$sql.= "\")";
@@ -2587,6 +2487,30 @@ function core_users_add($vars, $editmode=false) {
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
+
+	// OK - got this far, if they entered a new inbound DID/CID let's deal with it now
+	// remember - in the nice and ugly world of this old code, $vars has been extracted
+	// newdid and newdidcid
+
+	// Now if $newdid is set we need to add the DID to the routes
+	//
+	if ($newdid != '') {
+		$did_dest                = 'from-did-direct,'.$extension.',1';
+		$did_vars['extension']   = $newdid;
+		$did_vars['cidnum']      = $newdidcid;
+		$did_vars['faxexten']    = '';
+		$did_vars['faxemail']    = '';
+		$did_vars['answer']      = '0';
+		$did_vars['wait']        = '0';
+		$did_vars['privacyman']  = '';
+		$did_vars['alertinfo']   = '';
+		$did_vars['ringing']     = '';
+		$did_vars['mohclass']    = 'default';
+		$did_vars['description'] = '';
+		$did_vars['grppre']      = '';
+		core_did_add($did_vars, $did_dest);
+	}
+
 	return true;
 }
 
@@ -2658,12 +2582,7 @@ function core_users_del($extension, $editmode=false){
 }
 
 function core_users_directdid_get($directdid=""){
-	if (empty($directdid)) {
-		return array();
-	} else {
-		$sql = "SELECT * FROM users WHERE directdid = \"$directdid\"";
-		return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
-	}
+	return array();
 }
 
 function core_users_cleanastdb($extension) {
@@ -2698,19 +2617,23 @@ function core_users_edit($extension,$vars){
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
-	$directdid=$vars['directdid'];
-	$directdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($directdid));
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
-	if (trim($directdid) != "") {
-		$existing=core_did_get($directdid,"");
-		$existing_directdid = empty($existing)?core_users_directdid_get($directdid):$existing;
-		if (!empty($existing) || (!empty($existing_directdid) && $existing_directdid['extension'] != $extension)) {
-			if (!empty($existing)) {
-				echo "<script>javascript:alert('"._("A route with this DID already exists:")." ".$existing['extension']."')</script>";
-			} else {
-				echo "<script>javascript:alert('"._("This DID is already associated with extension:")." ".$existing_directdid['extension']." (".$existing_directdid['name'].")')</script>";
-			}
+	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
+	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
+	$newdidcid = isset($vars['newdidcid']) ? $vars['newdidcid'] : '';
+	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
+
+	// Asterisk does not want just CID set so if it is add _X. to the DID
+	//
+	if ($newdid == '' && $newdidcid != '') {
+		$newdid = '_X.';
+	}
+	// Well more ugliness since the javascripts are already in here
+	if ($newdid != '') {
+		$existing = core_did_get($newdid, $newdidcid);
+		if (! empty($existing)) {
+			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>";
 			return false;
 		}
 	}
@@ -2725,11 +2648,8 @@ function core_users_edit($extension,$vars){
 }
 
 function core_directdid_list(){
-	$sql = "SELECT extension, directdid, didalert, mohclass, faxexten, faxemail, answer, wait, privacyman FROM users WHERE directdid IS NOT NULL AND directdid != ''";
-	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+	return array();
 }
-
-
 
 function core_zapchandids_add($description, $channel, $did) {
 	global $db;
@@ -3964,13 +3884,21 @@ function core_users_configpageinit($dispnum) {
 	}
 }
 
+// Used below in usort
+function dev_grp($a, $b) {
+	if ($a['devicetype'] == $b['devicetype']) {
+		return ($a['id'] < $b['id']) ? -1 : 1;
+	} else {
+		return ($a['devicetype'] > $b['devicetype']) ? -1 : 1;
+	}
+}
+
 function core_users_configpageload() {
 	global $currentcomponent;
 	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
-	$name = $directdid = $didalert = $outboundcid = $answer = null;
-	$record_in = $record_out = $faxexten = $faxemail = $mohclass = $sipname = $cid_masquerade = null;
+	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -3992,7 +3920,7 @@ function core_users_configpageload() {
 	
 		if ( is_string($extdisplay) ) {	
 
-			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+			if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 				$extenInfo=core_users_get($extdisplay);
 				extract($extenInfo);
 			}
@@ -4001,7 +3929,7 @@ function core_users_configpageload() {
 	
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
-				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
 
 					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
@@ -4011,7 +3939,7 @@ function core_users_configpageload() {
 				}
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
-				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
 
 					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
@@ -4045,7 +3973,7 @@ function core_users_configpageload() {
 		} else {
 			$section = ($extdisplay ? _("Edit User") : _("Add User"));
 		}
-		if ( $extdisplay ) {
+		if ( trim($extdisplay) != '' ) {
 			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2);
 		} else {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, 'User Extension', _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3);
@@ -4059,14 +3987,35 @@ function core_users_configpageload() {
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, 'CID Num Alias', _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, 'SIP Alias', _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")));
+
+		// If user mode, list devices associated with this user
+		//
+		if ($display == 'users' && trim($extdisplay != '')) {
+			$section = _("User Devices");
+			$device_list = core_devices_list('all','full');
+
+			usort($device_list,'dev_grp');
+
+			$link_count = 0;
+			foreach ($device_list as $device_item) {
+				if ($device_item['user'] == $extdisplay) {
+					$addURL = $_SERVER['PHP_SELF'].'?type=setup&display=devices&skip=0&extdisplay='.$device_item['id'];
+					$device_icon = ($device_item['devicetype'] == 'fixed') ? 'images/telephone_key.png' : 'images/telephone_edit.png';
+					$device_label  = '&nbsp;';
+					$device_label .=  _('Edit:');
+					$device_label .= '&nbsp;'.$device_item['id'].'&nbsp;'.$device_item['description'];
+
+					$device_label = '<span>
+						<img width="16" height="16" border="0" title="Edit Device" alt="Edit Device" src="'.$device_icon.'"/>'.$device_label.
+						'</span> ';
+					
+					$currentcomponent->addguielem($section, new gui_link($link_count++, $device_label, $addURL, true, false), 2);
+				}
+			}
+		}
 		
 		$section = 'Extension Options';
-		$currentcomponent->addguielem($section, new gui_textbox('directdid', $directdid, 'Direct DID', _("The direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>Leave this field blank to disable the direct DID feature for this extension. All non-numeric characters will be stripped.")), 3);
-		$currentcomponent->addguielem($section, new gui_textbox('didalert', $didalert, 'DID Alert Info', _("Alert Info can be used for distinctive ring on SIP phones. Set this value to the desired Alert Info to be sent to the phone when this DID is called. Leave blank to use default values. Will have no effect if no Direct DID is set")));
-		if (function_exists('music_list')) {
-		    $currentcomponent->addguielem($section, new gui_selectbox('mohclass', $currentcomponent->getoptlist('mohclass'), $mohclass, 'Music on Hold', _("Set the MoH class that will be used for calls that come in on this Direct DID. For example, choose a type appropriate for a originating country which may have announcements in their language. Only effects MoH class when the call came in from the Direct DID."), false));
-		}
-		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true));
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
 		if (!isset($callwaiting)) {
@@ -4077,6 +4026,34 @@ function core_users_configpageload() {
 			}
 		}
 		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, 'Call Waiting', _("Set the initial/current Call Waiting state for this user's extension"), false));
+
+
+		$section = _("Assigned DID/CID");
+		$dids = core_did_list('extension');
+		$did_count = 0;
+		foreach ($dids as $did) {
+			$did_dest = split(',',$did['destination']);
+			if (isset($did_dest[1]) && $did_dest[1] == $extdisplay) {
+
+				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
+
+				$addURL = $_SERVER['PHP_SELF'].'?type=setup&display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
+				$did_icon = 'images/email_edit.png';
+				$did_label = ' '.$did['extension'];
+				if (trim($did['cidnum']) != '') {
+					$did_label .= ' / '.$did['cidnum'];
+				}
+
+				$did_label = '<span>
+					<img width="16" height="16" border="0" title="'.$did_title.'" alt="" src="'.$did_icon.'"/>'.$did_label.
+					'</span> ';
+
+				$currentcomponent->addguielem($section, new gui_link($did_count++, $did_label, $addURL, true, false), 4);
+			}
+		}
+		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box")), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box")), 4);
+
 
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', _("Record all inbound calls received at this extension."), false));
@@ -4111,7 +4088,7 @@ function core_users_configprocess() {
 	//check if the extension is within range for this user
 	if (isset($extension) && !checkRange($extension)){
 		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
-		$GLOBALS['abort'] = true;
+		$_GLOBALS['abort'] = true;
 	} else {
 		//if submitting form, update database
 		if (!isset($action)) $action = null;
@@ -4120,7 +4097,7 @@ function core_users_configprocess() {
 				$conflict_url = array();
 				$usage_arr = framework_check_extension_usage($_REQUEST['extension']);
 				if (!empty($usage_arr)) {
-					$GLOBALS['abort'] = true;
+					$_GLOBALS['abort'] = true;
 					$conflict_url = framework_display_extension_usage_alert($usage_arr,true);
 					global $currentcomponent;
 					$id=0;
@@ -4135,7 +4112,7 @@ function core_users_configprocess() {
 					// Comment, this does not help everywhere. Other hooks functions can hook before
 					// this like voicemail!
 					//
-					$GLOBALS['abort'] = true;
+					$_GLOBALS['abort'] = true;
 				}
 			break;
 			case "del":
@@ -4153,7 +4130,7 @@ function core_users_configprocess() {
 					redirect_standard_continue('extdisplay');
 				} else {
 					// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
-					$GLOBALS['abort'] = true;
+					$_GLOBALS['abort'] = true;
 				}
 			break;
 		}
@@ -4402,7 +4379,7 @@ function core_devices_configprocess() {
 	switch ($action) {
 		case "add":
 		// really bad hack - but if core_users_add fails, want to stop core_devices_add
-		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+		if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 				needreload();
 				if ($deviceuser != 'new') {
@@ -4418,7 +4395,7 @@ function core_devices_configprocess() {
 		break;
 		case "edit":  //just delete and re-add
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
-			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+			if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 				core_devices_del($extdisplay,true);
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
