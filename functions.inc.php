@@ -2531,7 +2531,7 @@ function core_users_get($extension){
 		die_freepbx($results->getMessage().$sql);
 	}
 	if (empty($results)) {
-		return $results;
+		return array();
 	}
 	
 	//explode recording vars
