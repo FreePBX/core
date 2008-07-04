@@ -4041,6 +4041,9 @@ function core_users_configpageload() {
 				if (trim($did['cidnum']) != '') {
 					$did_label .= ' / '.$did['cidnum'];
 				}
+				if (trim($did['description']) != '') {
+					$did_label .= ' ('.$did['description'].')';
+				}
 
 				$did_label = '<span>
 					<img width="16" height="16" border="0" title="'.$did_title.'" alt="" src="'.$did_icon.'"/>'.$did_label.
