@@ -2398,7 +2398,7 @@ function core_users_add($vars, $editmode=false) {
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
 	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,privacyman,sipname) values (\"";
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,sipname) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -2413,8 +2413,6 @@ function core_users_add($vars, $editmode=false) {
 	$sql.= isset($recording)?$recording:'';
 	$sql.= "\", \"";
 	$sql.= isset($outboundcid)?$outboundcid:'';
-	$sql.= "\", \"";
-	$sql.= isset($privacyman)?$privacyman:'';
 	$sql.= "\", \"";
 	$sql.= isset($sipname)?$sipname:'';
 	$sql.= "\")";
