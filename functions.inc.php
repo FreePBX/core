@@ -407,10 +407,18 @@ class core_conf {
 			}
 			$zapchannel="";
 			foreach ($results2 as $result2) {
-				if ($result2['keyword'] == 'channel') {
-					$zapchannel = $result2['data'];
-				} else {
-					$output .= $result2['keyword']."=".$result2['data']."\n";
+				switch ($result2['keyword']) {
+					case 'channel':
+						$zapchannel = $result2['data'];
+						break;
+
+					// These are not zapata.conf variables so keep out of file
+					case 'record_out':
+					case 'record_in':
+					case 'dial':
+						break;
+					default:
+						$output .= $result2['keyword']."=".$result2['data']."\n";
 				}
 			}
 			$output .= "channel=>$zapchannel\n";
@@ -3828,17 +3836,6 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('recordoptions', 'Never', _("Never"));
 		$currentcomponent->setoptlistopts('recordoptions', 'sort', false);
 
-		$currentcomponent->addoptlistitem('faxdetecttype', '0', _("None"));
-		$currentcomponent->addoptlistitem('faxdetecttype', '1', 'Zaptel');
-		$currentcomponent->addoptlistitem('faxdetecttype', '2', 'NVFax');
-		$currentcomponent->setoptlistopts('faxdetecttype', 'sort', false);
-
-               $currentcomponent->addoptlistitem('privoptions', '0', _("Off"));
-               $currentcomponent->addoptlistitem('privoptions', '1', _("Require Caller ID"));
-               $currentcomponent->addoptlistitem('privoptions', '2', _("Screen Caller - No Memory"));
-               $currentcomponent->addoptlistitem('privoptions', '3', _("Screen Caller - Memory"));
-               $currentcomponent->setoptlistopts('privoptions', 'sort', false);
-
 		$currentcomponent->addoptlistitem('callwaiting', 'enabled', _("Enable"));
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
@@ -3848,29 +3845,6 @@ function core_users_configpageinit($dispnum) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
-
-		$currentcomponent->addoptlistitem('faxdestoptions', 'default', _("FreePBX default"));
-		$currentcomponent->addoptlistitem('faxdestoptions', 'disabled', _("disabled"));
-		$currentcomponent->addoptlistitem('faxdestoptions', 'system', _("system"));
-		$currentcomponent->setoptlistopts('faxdestoptions', 'sort', false);
-
-		if (function_exists('music_list')) {
-				$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
-		    if (isset($tresults[0])) {
-			foreach ($tresults as $tresult) {
-			    $currentcomponent->addoptlistitem('mohclass', $tresult, $tresult);
-			}
-		    $currentcomponent->setoptlistopts('mohclass', 'sort', false);
-		    }
-		}
-
-		//get unique devices to finishoff faxdestoptions list
-		$devices = core_devices_list();
-		if (isset($devices)) {
-			foreach ($devices as $device) {
-				$currentcomponent->addoptlistitem('faxdestoptions', $device[0], "$device[1] <$device[0]>");
-			}
-		}
 
 		// Add the 'proces' functions
 		$currentcomponent->addguifunc('core_users_configpageload');
@@ -4059,18 +4033,6 @@ function core_users_configpageload() {
 		$section = 'Recording Options';
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', _("Record all inbound calls received at this extension."), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', _("Record all outbound calls received at this extension."), false));
-
-		$section = 'Fax Handling';
-		$wait = (isset($wait) ? $wait : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('faxexten', $currentcomponent->getoptlist('faxdestoptions'), $faxexten, 'Fax Extension', _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings."), false), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('faxemail', $faxemail, 'Fax Email', _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings")));
-		$currentcomponent->addguielem($section, new gui_selectbox('answer', $currentcomponent->getoptlist('faxdetecttype'), $answer, 'Fax Detection Type', _("Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks."), false));
-		$currentcomponent->addguielem($section, new gui_textbox('wait', $wait, 'Pause after answer', _("The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed."), '!isInteger()', $msgInvalidPause, false));
-
-		$section = 'Privacy';
-		$privacyman = (isset($privacyman) ? $privacyman : '0');
-                $currentcomponent->addguielem($section, new gui_selectbox('privacyman', $currentcomponent->getoptlist('privoptions'), $privacyman, 'Privacy Manager',_("Choose 'Require Caller ID' and If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.  If 'Screen Caller' is chosen, the caller must say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a user for their caller-id once.  Screening without memory always requires a caller to say their name."), false), 4);
-
 	}
 }
 
