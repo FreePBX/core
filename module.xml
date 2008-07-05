@@ -21,17 +21,14 @@
 		*2.4.0beta2.0* #2568 move features.conf to core and add support in core_conf class, add tooltip details to onlne update checking
 		*2.4.0beta1.2* #2556, #2554 move macros to auto-generation: dialout-trunk, user-callerid, dialout-enum, outbound-callerid, agent-add, agent-del
 		*2.4.0beta1.1* moved all sip.conf and iax.conf settings into _general_additional.conf files for auto-generation, fixes to Zap Channel DIDs validation
-		*2.4.0beta1.0* addition of zapchandids page and removal of Channel in inbound routes, Extension/Destination Registry support, Adhoc Device
-		               and login/out improvments. Added ringing to Terminate Call Destinations,  #2493, #1974, #2470, #1697, #2357, #2393 pinless dialing
-									 #2299 1.6 dialparties support, #2221, #2303, add callconfirmation option to hunt strategy, #2526, core_conf class
+		*2.4.0beta1.0* addition of zapchandids page and removal of Channel in inbound routes, Extension/Destination Registry support, Adhoc Device and login/out improvments. Added ringing to Terminate Call Destinations,  #2493, #1974, #2470, #1697, #2357, #2393 pinless dialing #2299 1.6 dialparties support, #2221, #2303, add callconfirmation option to hunt strategy, #2526, core_conf class
 		*2.4.0alpha1.0* #2191, #2410, #2459, #2465; streamline dialout-trunk/outbound route repetition, add language support to macro-user-callerid
 		*2.3.1.0* #2372, #2384, #2408, remove double menu items (modules admin, dashboard), add macro-dialout-trunk-predial-hook
 		*2.3.0.3* #2308 FROM_DID to use ${EXTEN}, #2381 add iax_general_custom.conf, #2375 localization fixes
 		*2.3.0.2* #2330 allow '_' in route name changes, fix missing global variable.
 		*2.3.0.1* fix support link
 		*2.3.0.0* Final Release
-		*2.3.0RC1.3* #2295 generate bad-nubmer in core, disable with AMPBADNUMBER=false, #2172 replace | with ,
-		             #2299 except dialparties.agi, #2193 hard code paths, #2296 privacy manger for 1.4
+		*2.3.0RC1.3* #2295 generate bad-nubmer in core, disable with AMPBADNUMBER=false, #2172 replace | with , #2299 except dialparties.agi, #2193 hard code paths, #2296 privacy manger for 1.4
 		*2.3.0RC1.2* #2253 remove default jbenable, jbforce, remove DeadAGI, #2189 add no-msg dest for vm
 		*2.3.0RC1.1* bump to RC1 because of bug not using proper version compare
 		*2.3.0rc1.0* bump for rc1
@@ -43,9 +40,7 @@
 		*2.3.0beta2.3* added xml attribute needsenginedb, #2185 make MoH settings inheritable and add inherittable  MOHCLASS to dids/directdids with MoH
 		*2.3.0beta2.2* #1907 don't send ringing, #2055 language in *99 recording, #2168 dialparties to set sip header from SIPADDHEADER channel var
 		*2.3.0beta2.1* #2155 correct trunk tooltip, #2046 workaround for Asterisk bug that breaks VmX on some systems
-		*2.3.0beta2.0* Rearranged core destinations in drawselect box, added unavail and busy for vm, #1841 directdid with + fixed, #1329 recording with CID 
- 		               number aliasing broken, fixed 1.4 ALERT_INFO deprecated use, added online update select box to general screen, and email where to send
-		               #2115 dial-by-name directory not saying supplied name
+		*2.3.0beta2.0* Rearranged core destinations in drawselect box, added unavail and busy for vm, #1841 directdid with + fixed, #1329 recording with CID number aliasing broken, fixed 1.4 ALERT_INFO deprecated use, added online update select box to general screen, and email where to send #2115 dial-by-name directory not saying supplied name
 		*2.3.0beta1.9* Added Call Waiting enable/disable on extensions settings, default for new is still set by ENABLECW
 		*2.3.0beta1.8.1* Added javascript validation to CID Prefix
 		*2.3.0beta1.8* Added CID Prefix Prepend feature to inbound DIDs
