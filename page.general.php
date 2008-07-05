@@ -19,7 +19,10 @@ $cm =& cronmanager::create($db);
 //if submitting form, update database
 if ($action == 'editglobals') {
 	$globalfields = array(
-						array($_REQUEST['RINGTIMER'],'RINGTIMER'),
+	          array($_REQUEST['MIXMON_FORMAT'],'MIXMON_FORMAT'),
+						array($_REQUEST['MIXMON_DIR'],'MIXMON_DIR'),
+						array($_REQUEST['MIXMON_POST'],'MIXMON_POST'),
+            array($_REQUEST['RINGTIMER'],'RINGTIMER'),
 						array($_REQUEST['FAX_RX'],'FAX_RX'),
 						array($_REQUEST['FAX_RX_EMAIL'],'FAX_RX_EMAIL'),
 						array($_REQUEST['FAX_RX_FROM'],'FAX_RX_FROM'),
@@ -35,7 +38,6 @@ if ($action == 'editglobals') {
 						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
 						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						array(isset($_REQUEST['VM_OPTS']) ? $_REQUEST['VM_OPTS'] : "",'VM_OPTS'),
-
 						array(isset($_REQUEST['VMX_CONTEXT']) ? $_REQUEST['VMX_CONTEXT'] : "",'VMX_CONTEXT'),
 						array(isset($_REQUEST['VMX_PRI']) ? $_REQUEST['VMX_PRI'] : "",'VMX_PRI'),
 						array(isset($_REQUEST['VMX_TIMEDEST_CONTEXT']) ? $_REQUEST['VMX_TIMEDEST_CONTEXT'] : "",'VMX_TIMEDEST_CONTEXT'),
@@ -119,6 +121,34 @@ foreach ($globals as $global) {
 <?php echo _("r: You SHOULD NOT use this option on outbound trunks")?><br>
 	</span></a>
 	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>"/>
+</p>
+
+<h5><?php echo _("Call Recording")?></h5>
+<p>
+  <a href=# class="info"><?php echo _("Call recording format:")?><span><br>
+  <?php echo _("Pick the format in which to save recorded calls")?><br>
+  </span></a>
+  <select name="MIXMON_FORMAT">
+  <option value="WAV"<?php if ($MIXMON_FORMAT == "WAV") echo " SELECTED"; ?>><?php echo _("WAV"); ?></option>
+  <option value="wav"<?php if ($MIXMON_FORMAT == "wav") echo " SELECTED"; ?>><?php echo _("wav"); ?></option>
+  <option value="ulaw"<?php if ($MIXMON_FORMAT == "ulaw") echo " SELECTED"; ?>><?php echo _("ulaw"); ?></option>
+  <option value="alaw"<?php if ($MIXMON_FORMAT == "alaw") echo " SELECTED"; ?>><?php echo _("alaw"); ?></option>
+  <option value="sln"<?php if ($MIXMON_FORMAT == "sln") echo " SELECTED"; ?>><?php echo _("sln"); ?></option>
+  <option value="gms"<?php if ($MIXMON_FORMAT == "gsm") echo " SELECTED"; ?>><?php echo _("gsm"); ?></option>
+  <option value="g729"<?php if ($MIXMON_FORMAT == "g729") echo " SELECTED"; ?>><?php echo _("g729"); ?></option>
+  </select>
+  <br><br>  
+  <a href=# class="info"><?php echo _("Recording Location:")?><span><br>
+  <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Remember to make certain that the user 
+  asterisk is running as (if other than root) has permisions to wirte to the selected directory")?><br>
+  </span></a>
+  <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>"/>
+  <br><br>
+  <a href=# class="info"><?php echo _("Run after record:")?><span><br>
+  <?php echo _("An optional script to be run after the call is hungup.")?><br>
+  </span></a>
+  <input type="text" name="MIXMON_POST" value="<?php  echo htmlspecialchars($MIXMON_POST)?>"/>
+  <br><br>
 </p>
 
 <h5><?php echo _("Voicemail")?></h5>
