@@ -345,14 +345,14 @@ if ($helptext != '') {
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>. You can also use the magic string 'hidden' to hide the CallerID sent out over Digital lines ONLY (E1/T1/J1/BRI/SIP/IAX)")?><br><br></span></a>: 
 				</td><td>
-					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>"/>
+					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk. You must define an Outbound Caller ID on the this trunk when checking this.");?><br /><br /></span></a>:
 				</td><td>
-					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?>/>
+					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?> tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			<tr>
 				<td>
@@ -369,7 +369,7 @@ if ($helptext != '') {
 	}
 ?>
 				</td><td>
-					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>"/>
+					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 
@@ -377,7 +377,7 @@ if ($helptext != '') {
 			    <td><a class="info" href="#"><?php echo _("Disable Trunk")?><span><?php echo _("Check this to disable this trunk in all routes where it is used.")?></span></a>:
 			    </td>
 			    <td>
-				<input type='checkbox' name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><small><?php echo _("Disable")?></small>
+				<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><small><?php echo _("Disable")?></small>
 			    </td>
 			</tr>
 
@@ -386,7 +386,7 @@ if ($helptext != '') {
 			    </td>
 			    <td>
 				<input <?php if (!$failtrunk_enable) echo "disabled style='background: #DDD;'"?> type="text" size="20" name="failtrunk" value="<?php echo htmlspecialchars($failtrunk)?>"/>
-				<input type='checkbox' name='failtrunk_enable' id="failtrunk_enable" value='1' <?php if ($failtrunk_enable) { echo 'CHECKED'; }?> OnClick='disable_field(failtrunk,failtrunk_enable); return true;'><small><?php echo _("Enable")?></small>
+				<input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='failtrunk_enable' id="failtrunk_enable" value='1' <?php if ($failtrunk_enable) { echo 'CHECKED'; }?> OnClick='disable_field(failtrunk,failtrunk_enable); return true;'><small><?php echo _("Enable")?></small>
 			    </td>
 			</tr>
 
@@ -408,7 +408,7 @@ if ($helptext != '') {
 	<?php echo _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing."); ?>
 					</span></a>:
 				</td><td valign="top">
-					<textarea id="dialrules" cols="20" rows="<?php  
+					<textarea id="dialrules" cols="20"  tabindex="<?php echo ++$tabindex;?>" rows="<?php  
 						if (is_array($dialrules)) {
 							$rows = count($dialrules)+1; 
 							echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) );
@@ -416,7 +416,7 @@ if ($helptext != '') {
 							echo "5";
 						} ?>" name="dialrules"><?php if(is_array($dialrules)) { echo implode("\n",$dialrules); } ?></textarea><br>
 					
-					<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>" />
+					<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>"  tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
@@ -426,7 +426,7 @@ if ($helptext != '') {
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+areacode for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
-				</td><td valign="top"><select id="autopop" name="autopop" onChange="changeAutoPop(); ">
+				</td><td valign="top"><select id="autopop"  tabindex="<?php echo ++$tabindex;?>" name="autopop" onChange="changeAutoPop(); ">
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always dial with prefix")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
@@ -639,7 +639,7 @@ if ($helptext != '') {
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dialtone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>: 
 				</td><td>
-					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>"/>
+					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<?php if ($tech != "enum") { ?>
@@ -658,7 +658,7 @@ if ($helptext != '') {
 					<td>
 						<a href=# class="info"><?php echo _("Zap Identifier (trunk name)")?><span><br><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
 					</td><td>
-						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
+						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
 					</td>
 				</tr>
@@ -672,7 +672,7 @@ if ($helptext != '') {
 					<td>
 						<a href=# class="info"><?php echo _("Custom Dial String")?><span><?php echo _("Define the custom Dial String.  Include the token")?> $OUTNUM$ <?php echo _("wherever the number to dial should go.<br><br><b>examples:</b><br><br>CAPI/XXXXXXXX/")?>$OUTNUM$<?php echo _("/b<br>H323/")?>$OUTNUM$@XX.XX.XX.XX<br>OH323/$OUTNUM$@XX.XX.XX.XX:XXXX<br>vpb/1-1/$OUTNUM$</span></a>: 
 					</td><td>
-						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
+						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
 					</td>
 				</tr>	
@@ -684,7 +684,7 @@ if ($helptext != '') {
 					<td>
 						<a href=# class="info"><?php echo _("DUNDi Mapping")?><span><?php echo _("This is the name of the DUNDi mapping as defined in the [mappings] section of remote dundi.conf peers. This corresponds to the 'include' section of the peer details in the local dundi.conf file. This requires manual configuration of DUNDi to use this trunk.")?></span></a>: 
 					</td><td>
-						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
+						<input type="text" size="35" maxlength="46" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
 					</td>
 				</tr>	
@@ -696,7 +696,7 @@ if ($helptext != '') {
 					<td>
 						<a href=# class="info"><?php echo _("Trunk Name")?><span><br><?php echo _("Give this trunk a unique name.  Example: myiaxtel")?><br><br></span></a>: 
 					</td><td>
-						<input type="text" size="14" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>"/>
+						<input type="text" size="14" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 					</td>
 				</tr>
 				<tr>
@@ -706,7 +706,7 @@ if ($helptext != '') {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<textarea rows="10" cols="40" name="peerdetails"><?php echo htmlspecialchars($peerdetails) ?></textarea>
+						<textarea rows="10" cols="40" name="peerdetails" tabindex="<?php echo ++$tabindex;?>"><?php echo htmlspecialchars($peerdetails) ?></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -718,7 +718,7 @@ if ($helptext != '') {
 					<td>
 						<a href=# class="info"><?php echo _("USER Context")?><span><br><?php echo _("This is most often the account name or number your provider expects.<br><br>This USER Context will be used to define the below user details.")?></span></a>: 
 					</td><td>
-						<input type="text" size="14" name="usercontext" value="<?php echo htmlspecialchars($usercontext)  ?>"/>
+						<input type="text" size="14" name="usercontext" value="<?php echo htmlspecialchars($usercontext)  ?>" tabindex="<?php echo ++$tabindex;?>"/>
 					</td>
 				</tr>
 				<tr>
@@ -729,7 +729,7 @@ if ($helptext != '') {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<textarea rows="10" cols="40" name="userconfig"><?php echo htmlspecialchars($userconfig); ?></textarea>
+						<textarea rows="10" cols="40" name="userconfig" tabindex="<?php echo ++$tabindex;?>"><?php echo htmlspecialchars($userconfig); ?></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -744,7 +744,7 @@ if ($helptext != '') {
 				</tr>
 				<tr>
 					<td colspan="2">
-						<input type="text" size="40" name="register" value="<?php echo htmlspecialchars($register) ?>"/>
+						<input type="text" size="40" name="register" value="<?php echo htmlspecialchars($register) ?>" tabindex="<?php echo ++$tabindex;?>" />
 					</td>
 				</tr>
 	<?php 
@@ -754,7 +754,7 @@ if ($helptext != '') {
 				
 			<tr>
 				<td colspan="2">
-					<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>"></h6>
+					<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>"></h6>
 				</td>
 			</tr>
 			</table>

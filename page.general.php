@@ -111,7 +111,7 @@ foreach ($globals as $global) {
 <?php echo _("w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 <?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 	</span></a>
-	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>"/>
+	<input type="text" size="2" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	<br><br>
 	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span><br>
 <?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
@@ -120,7 +120,7 @@ foreach ($globals as $global) {
 <?php echo _("W: Allow the calling user to start recording after pressing *1 (Asterisk v1.2)")?><br>
 <?php echo _("r: You SHOULD NOT use this option on outbound trunks")?><br>
 	</span></a>
-	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>"/>
+	<input type="text" size="2" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>" tabindex="<?php echo ++$tabindex;?>"/>
 </p>
 
 <h5><?php echo _("Call Recording")?></h5>
@@ -128,7 +128,7 @@ foreach ($globals as $global) {
   <a href=# class="info"><?php echo _("Call recording format:")?><span><br>
   <?php echo _("Pick the format in which to save recorded calls")?><br>
   </span></a>
-  <select name="MIXMON_FORMAT">
+  <select name="MIXMON_FORMAT" tabindex="<?php echo ++$tabindex;?>">
   <option value="WAV"<?php if ($MIXMON_FORMAT == "WAV") echo " SELECTED"; ?>><?php echo _("WAV"); ?></option>
   <option value="wav"<?php if ($MIXMON_FORMAT == "wav") echo " SELECTED"; ?>><?php echo _("wav"); ?></option>
   <option value="ulaw"<?php if ($MIXMON_FORMAT == "ulaw") echo " SELECTED"; ?>><?php echo _("ulaw"); ?></option>
@@ -142,25 +142,25 @@ foreach ($globals as $global) {
   <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Remember to make certain that the user 
   asterisk is running as (if other than root) has permisions to wirte to the selected directory")?><br>
   </span></a>
-  <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>"/>
+  <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
   <a href=# class="info"><?php echo _("Run after record:")?><span><br>
   <?php echo _("An optional script to be run after the call is hungup.")?><br>
   </span></a>
-  <input type="text" name="MIXMON_POST" value="<?php  echo htmlspecialchars($MIXMON_POST)?>"/>
+  <input type="text" name="MIXMON_POST" value="<?php  echo htmlspecialchars($MIXMON_POST)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
 </p>
 
 <h5><?php echo _("Voicemail")?></h5>
 <p>
 	<?php echo _("Number of seconds to ring phones before sending callers to voicemail:")?>
-	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>"/>
+	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	<br><br>
 	<?php echo _("Extension prefix for dialing direct to voicemail:")?>
-	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>"/>
+	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	<br><br>
 	<?php echo _("Direct Dial to Voicemail message type:")?>
-	<select name="VM_DDTYPE">
+	<select name="VM_DDTYPE" tabindex="<?php echo ++$tabindex;?>">
 	<option value=""><?php echo _("Default"); ?></option>
 	<option value="u"<?php if ($VM_DDTYPE == "u") echo " SELECTED"; ?>><?php echo _("Unavailable"); ?></option>
 	<option value="su"<?php if ($VM_DDTYPE == "su") echo " SELECTED"; ?>><?php echo _("Unavailable")."--"._("no instructions"); ?></option>
@@ -172,9 +172,9 @@ foreach ($globals as $global) {
 	<a href=# class="info"><?php echo _("Use gain when recording the voicemail message (optional):")?><span>
 	<?php echo _("Use the specified amount of gain when recording the voicemail message."); ?><br><br>
 	<?php echo _("The units are whole-number decibels (dB)."); ?></span></a>
-	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>"/>
+	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	<br><br>
-	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo ($VM_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Do Not Play")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a> <?php echo _("please leave message after tone to caller")?>
+	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo ($VM_OPTS ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> <a href=# class="info"><?php echo _("Do Not Play")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a> <?php echo _("please leave message after tone to caller")?>
 </p>
 
 <h5><?php echo _("Voicemail VmX Locator")?></h5>
@@ -184,27 +184,27 @@ foreach ($globals as $global) {
 			<a href=# class="info"><?php echo _("Default Context & Pri:")?><span>
 			<?php echo _("Default to use if only an number/extension are provided."); ?></span></a>
 			</td>
-			<td><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
+			<td><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("context")?></small></td>
 			<td></td>
-			<td><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>"/><small><?php echo _("pri")?></small></td>
+			<td><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("pri")?></small></td>
 		</tr>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Timeout/#-press default:")?><span>
 			<?php echo _("This is the default location that a caller will be sent if they don't press any key (timeout) or press # which is interpreted as a timeout. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
 			</td>
-			<td><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
-			<td><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>"/><small><?php echo _("exten")?></small></td>
-			<td><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>"/><small><?php echo _("pri")?></small></td>
+			<td><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("context")?></small></td>
+			<td><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("exten")?></small></td>
+			<td><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("pri")?></small></td>
 		</tr>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Loop Exceed default:")?><span>
 			<?php echo _("This is the default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
 			</td>
-			<td><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>"/><small><?php echo _("context")?></small></td>
-			<td><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>"/><small><?php echo _("exten")?></small></td>
-			<td><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>"/><small><?php echo _("pri")?></small></td>
+			<td><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("context")?></small></td>
+			<td><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("exten")?></small></td>
+			<td><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("pri")?></small></td>
 		</tr>
 		<tr>
 			<td>
@@ -212,7 +212,7 @@ foreach ($globals as $global) {
 			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_OPTS_TIMEOUT">
+			<select name="VMX_OPTS_TIMEOUT" tabindex="<?php echo ++$tabindex;?>">
 				<option value=""  <?php  echo ($VMX_OPTS_TIMEOUT == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_TIMEOUT == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
@@ -224,7 +224,7 @@ foreach ($globals as $global) {
 			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_OPTS_LOOP">
+			<select name="VMX_OPTS_LOOP" tabindex="<?php echo ++$tabindex;?>">
 				<option value=""  <?php  echo ($VMX_OPTS_LOOP == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_LOOP == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
@@ -236,7 +236,7 @@ foreach ($globals as $global) {
 			<?php echo _("If a user defined option is to go to voicmail (using the 'dovm' extension) this is the default option if not specified by the user's settings."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_OPTS_DOVM">
+			<select name="VMX_OPTS_DOVM" tabindex="<?php echo ++$tabindex;?>">
 				<option value=""  <?php  echo ($VMX_OPTS_DOVM == '' ? 'SELECTED' : '') ?>><?php echo _("Std Instructions")?>
 				<option value="s" <?php  echo ($VMX_OPTS_DOVM == 's' ? 'SELECTED' : '')?>><?php echo _("Beep Only")?>
 			</select> 
@@ -248,7 +248,7 @@ foreach ($globals as $global) {
 			<?php echo _("Time ot wait after message has played to timeout and/or repeat the message if no entry pressed."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_TIMEOUT">
+			<select name="VMX_TIMEOUT" tabindex="<?php echo ++$tabindex;?>">
 <?php
 			for ($i=0;$i<16;$i++) { 
 				$VMX_TIMEOUT = (!isset($VMX_TIMEOUT) || $VMX_TIMEOUT == '')?2:$VMX_TIMEOUT;
@@ -266,7 +266,7 @@ foreach ($globals as $global) {
 			<?php echo _("Number of times to play the recorded message if the caller does not press any options and it times out."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_REPEAT">
+			<select name="VMX_REPEAT" tabindex="<?php echo ++$tabindex;?>">
 <?php
 			for ($i=1;$i<5;$i++) { 
 				$VMX_REPEAT = (!isset($VMX_REPEAT) || $VMX_REPEAT == '')?1:$VMX_REPEAT;
@@ -284,7 +284,7 @@ foreach ($globals as $global) {
 			<?php echo _("Number of times to play invalid options and repeat the message upon receiving an undefined option."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="VMX_LOOPS">
+			<select name="VMX_LOOPS" tabindex="<?php echo ++$tabindex;?>">
 <?php
 			for ($i=1;$i<5;$i++) { 
 				$VMX_REPEAT = (!isset($VMX_LOOPS) || $VMX_LOOPS == '')?1:$VMX_LOOPS;
@@ -304,23 +304,23 @@ foreach ($globals as $global) {
 <h5><?php echo _("Company Directory")?></h5>
 <p>
 	<?php echo _("Find users in the Company Directory by:")?>
-	<select name="DIRECTORY">
+	<select name="DIRECTORY" tabindex="<?php echo ++$tabindex;?>">
 		<option value="first" <?php  echo ($DIRECTORY == 'first' ? 'SELECTED' : '')?>><?php echo _("first name")?>
 		<option value="last" <?php  echo ($DIRECTORY == 'last' ? 'SELECTED' : '')?>><?php echo _("last name")?>
 		<option value="both" <?php  echo ($DIRECTORY == 'both' ? 'SELECTED' : '')?>><?php echo _("first or last name")?>
 	</select> 
 	<br><br>
-	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?>> <a href=# class="info"><?php echo _("Play extension number")?><span><?php echo _("Plays a message \"Please hold while I transfer you to extension xxx\" that lets the caller know what extension to use in the future.")?></span></a> <?php echo _("to caller before transferring call")?><br><br>
+	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> <a href=# class="info"><?php echo _("Play extension number")?><span><?php echo _("Plays a message \"Please hold while I transfer you to extension xxx\" that lets the caller know what extension to use in the future.")?></span></a> <?php echo _("to caller before transferring call")?><br><br>
 	<a href=# class="info"><?php echo _("Operator Extension:")?><span>
 	<?php echo _("When users hit '0' in the directory, they are put through to this number. Note that it"); ?>
 	<?php echo _(" does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
-	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>"/>
+	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>" tabindex="<?php echo ++$tabindex;?>"/>
 </p>
 <h5><?php echo _("Fax Machine")?></h5>
 <p>
 	<?php echo _("Extension of")?> <a class="info" href="#"><?php echo _("fax machine")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br>Selecting 'disabled' will result in incoming calls being answered more quickly.")?></span></a> <?php echo _("for receiving faxes:")?>
 	<!--<input type="text" size="8" name="FAX_RX" value="<?php  echo $FAX_RX?>"/>-->
-	<select name="FAX_RX">
+	<select name="FAX_RX" tabindex="<?php echo ++$tabindex;?>">
 		<option value="disabled" <?php  echo ($FAX_RX == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
 		<option value="system" <?php  echo ($FAX_RX == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
 <?php 
@@ -337,11 +337,11 @@ foreach ($globals as $global) {
 </p>
 <p>
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("to have faxes emailed to:")?>
-	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>"/>
+	<input type="text" size="20" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>" tabindex="<?php echo ++$tabindex;?>"/>
 </p>
 <p>
 	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("that faxes appear to come from:")?>
-	<input type="text" size="20" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>"/>
+	<input type="text" size="20" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>" tabindex="<?php echo ++$tabindex;?>"/>
 </p>
 <h5><?php echo _("International Settings")?></h5>
 <p>
@@ -354,7 +354,7 @@ foreach ($globals as $global) {
 </p>
 <p>
 	<a class="info" href="#"><?php echo _("24-hour format")?><span><?php echo _("Select Yes if you use 24-hour format or No if you are using 12-hour am/pm format")?></span></a>&nbsp;
-	<select name="TIMEFORMAT">
+	<select name="TIMEFORMAT" tabindex="<?php echo ++$tabindex;?>">
 		<option value="IMp"><?php echo _("no"); ?></option>
 		<option value="kM" <?php echo (($TIMEFORMAT=="kM") ? 'selected="selected"' : '');?>><?php echo _("yes"); ?></option>
 	</select>
@@ -366,7 +366,7 @@ foreach ($globals as $global) {
 <?php echo _("Setting this to 'yes' will potentially allow ANYBODY to call into your Asterisk server using the SIP protocol")?><br><br>
 <?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
 	</span></a>&nbsp;
-	<select name="ALLOW_SIP_ANON">
+	<select name="ALLOW_SIP_ANON" tabindex="<?php echo ++$tabindex;?>">
 	<option value="no"><?php echo _("no"); ?></option>
 	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="yes"><?php echo _("yes"); ?></option>
 	</select>
@@ -380,7 +380,7 @@ foreach ($globals as $global) {
 			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resuling infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will trasmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is trasmitted."); ?></span></a>
 			</td>
 			<td align=right>
-			<select name="online_updates">
+			<select name="online_updates" tabindex="<?php echo ++$tabindex;?>">
 				<option value="yes"  <?php  echo ($online_updates == 'yes' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
 				<option value="no"   <?php  echo ($online_updates == 'no'  ? 'SELECTED' : '')?>><?php echo _("No")?>
 			</select> 
@@ -392,12 +392,12 @@ foreach ($globals as $global) {
 			<?php echo _("Email address where online udpates will be sent. Leaving blank will result in no udpates being sent."); ?></span></a>
 			</td>
 			<td>
-				<input type="text" size="40" name="update_email" value="<?php  echo htmlspecialchars($update_email)?>"/>
+				<input type="text" size="40" name="update_email" value="<?php  echo htmlspecialchars($update_email)?>" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 		</tr>
 	</table>
 <h6>
-	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
+	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
 </h6>
 <script language="javascript">
 <!--

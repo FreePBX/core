@@ -152,15 +152,15 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Description")?><span><?php echo _('Provide a meaningful description of what this incoming route is')?></span></a>:</td>
-			<td><input type="text" name="description" value="<?php echo htmlspecialchars(isset($description)?$description:''); ?>"></td>
+			<td><input type="text" name="description" value="<?php echo htmlspecialchars(isset($description)?$description:''); ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.<br><br>You can also use a pattern match (eg _2[345]X) to match a range of numbers')?></span></a>:</td>
-			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>"></td>
+			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info.')?></span></a>:</td>
-			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>"></td>
+			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
 		<tr>
@@ -168,7 +168,7 @@ if (isset($inroutes)) {
 				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.")?></span></a>:
 			</td>
 			<td>
-				<select name="faxexten">
+				<select name="faxexten" tabindex="<?php echo ++$tabindex;?>">
 <?php 
 // Cleaning up warnings. I should do this a better way.
 if (!isset($faxexten))
@@ -204,13 +204,13 @@ if (!isset($grppre))
 				<a class="info" href="#"><?php echo _("Fax Email")?><span><?php echo _("Email address is used if 'system' has been chosen for the fax extension above.<br><br>Leave this blank to use the FreePBX default in General Settings.")?></span></a>:
 			</td>
 			<td>
-				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>"/>
+				<input type="text" size="20" name="faxemail" value="<?php echo htmlspecialchars($faxemail)?>" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Fax Detection Type")?><span><?php echo _('Selecting Zaptel or NVFax will immediately answer the call and play ringing tones to the caller for the number of seconds in Pause below. Use NVFax on SIP or IAX trunks.')?></span></a>:</td>
 			<td>
-				<select name="answer">
+				<select name="answer" tabindex="<?php echo ++$tabindex;?>">
 					<option value="0" <?php  echo ($answer == '0' ? 'SELECTED' : '')?>><?php echo _("None")?>
 					<option value="1" <?php  echo ($answer == '1' ? 'SELECTED' : '')?>><?php echo _("Zaptel")?>
 					<option value="2" <?php  echo ($answer == '2' ? 'SELECTED' : '')?>><?php echo _("NVFax")?>
@@ -219,7 +219,7 @@ if (!isset($grppre))
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Pause After Answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
-			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>"></td>
+			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 <?php
 if (!isset($privacyman))
@@ -230,7 +230,7 @@ if (!isset($privacyman))
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
 			<td>
-				<select name="privacyman">
+				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
 					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
 					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
 				</select>
@@ -240,17 +240,17 @@ if (!isset($privacyman))
 		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
-			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>"></td>
+			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("CID name prefix")?>:<span><?php echo _('You can optionally prefix the Caller ID name. ie: If you prefix with "Sales:", a call from John Doe would display as "Sales:John Doe" on the extensions that ring.')?></span></a>:</td>
-			<td><input type="text" name="grppre" size="10" value="<?php echo ($grppre)?$grppre:'' ?>"></td>
+			<td><input type="text" name="grppre" size="10" value="<?php echo ($grppre)?$grppre:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 <?php   if (function_exists('music_list')) { ?>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a></td>
 			<td>
-				<select name="mohclass">
+				<select name="mohclass" tabindex="<?php echo ++$tabindex;?>">
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
@@ -267,7 +267,7 @@ if (!isset($privacyman))
 <?php } ?>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
-			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?> /></td>
+			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 <?php
 	// implementation of module hook
@@ -287,8 +287,8 @@ echo drawselects(isset($destination)?$destination:null,0);
 ?>
 		<tr>
 			<td colspan="2">
-				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>">&nbsp;&nbsp;
-				<input name="submitclear" type="submit" value="<?php echo _("Clear Destination & Submit")?>"></h6>
+				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>" tabindex="<?php echo ++$tabindex;?>">&nbsp;&nbsp;
+				<input name="submitclear" type="submit" value="<?php echo _("Clear Destination & Submit")?>" ></h6>
 			</td>		
 		</tr>
 		</table>

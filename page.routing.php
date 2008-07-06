@@ -305,13 +305,13 @@ if ($extdisplay) { // editing
 			</td>
 <?php  } else { // new ?>
 			<td>
-				<input type="text" size="20" name="routename" value="<?php echo htmlspecialchars($routename);?>"/>
+				<input type="text" size="20" name="routename" value="<?php echo htmlspecialchars($routename);?>" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 <?php  } ?>
 		</tr>
 		<tr>
 			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
-			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>"/></td>
+			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>" tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 <?php
 	// implementation of module hook
@@ -320,17 +320,17 @@ if ($extdisplay) { // editing
 ?>
 		<tr>
 			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>:</td>
-			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?> /></td>
+			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 		<tr>
 			<td><a href=# class="info"><?php echo _("Intra Company Route")?><span><?php echo _("Optional: Selecting this option will treat this route as a intra-company connection, preserving the internal Caller ID information and not use the outbound CID of either the extension or trunk.</span>")?></a>:</td>
-			<td><input type="checkbox" name="intracompany" value="yes" <?php echo ($intracompany ? "CHECKED" : "") ?> /></td>
+			<td><input type="checkbox" name="intracompany" value="yes" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 <?php   if (function_exists('music_list')) { ?>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
 			<td>
-				<select name="mohsilence">
+				<select name="mohsilence" tabindex="<?php echo ++$tabindex;?>">
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
@@ -363,7 +363,7 @@ foreach ($dialpattern as $key=>$pattern) {
 		<tr>
 			<td><?php echo $key ?>
 			</td><td>
-				<input type="text" size="20" name="dialpattern[<?php echo $key ?>]" value="<?php echo $dialpattern[$key] ?>"/>
+				<input type="text" size="20" name="dialpattern[<?php echo $key ?>]" value="<?php echo $dialpattern[$key] ?>" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 		</tr>
 <?php 

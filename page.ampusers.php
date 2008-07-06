@@ -167,14 +167,14 @@ foreach ($tresults as $tresult) {
 				<td>
 					<a href=# class="info"><?php echo _("Username<span>Create a unique username for this new user</span>")?></a>: 
 				</td><td>
-					<input type="text" size="20" name="username" value="<?php echo $username;?>"/>
+					<input type="text" size="20" name="username" value="<?php echo $username;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Password<span>Create a password for this new user</span>")?></a>: 
 				</td><td>
-					<input type="password" size="20" name="password" value="<?php echo $password;?>"/>
+					<input type="password" size="20" name="password" value="<?php echo $password;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
@@ -187,23 +187,23 @@ foreach ($tresults as $tresult) {
 				<td>
 					<a href=# class="info"><?php echo _("Department Name<span>Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.</span>")?></a>: 
 				</td><td>
-					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>"/>
+					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Extension Range<span>Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.</span>")?></a>: 
 				</td><td>
-					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>"/>
+					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>" tabindex="<?php echo ++$tabindex;?>"/>
 					&nbsp;to
-					<input type="text" size="5" name="extension_high" value="<?php echo htmlspecialchars($extension_high);?>"/>
+					<input type="text" size="5" name="extension_high" value="<?php echo htmlspecialchars($extension_high);?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td valign="top">
 					<a href=# class="info"><?php echo _("Admin Access<span>Select the Admin Sections this user should have access to.</span>")?></a>: 
 				</td><td>
-					<select multiple name="sections[]">
+					<select multiple name="sections[]" tabindex="<?php echo ++$tabindex;?>">
 					<option />
 <?php 
 				$prev_category = NULL;
@@ -237,7 +237,7 @@ foreach ($tresults as $tresult) {
 			
 			<tr>
 				<td colspan="2">
-					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')"></h6>
+					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')" tabindex="<?php echo ++$tabindex;?>"></h6>
 				</td>
 			</tr>
 			</table>
