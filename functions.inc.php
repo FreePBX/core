@@ -2365,6 +2365,7 @@ function core_users_add($vars, $editmode=false) {
 		}
 	}
 
+	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
 	$newdid = isset($newdid) ? $newdid : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 	$newdidcid = isset($newdidcid) ? $newdidcid : '';
@@ -2517,7 +2518,7 @@ function core_users_add($vars, $editmode=false) {
 		$did_vars['alertinfo']   = '';
 		$did_vars['ringing']     = '';
 		$did_vars['mohclass']    = 'default';
-		$did_vars['description'] = '';
+		$did_vars['description'] = $newdid_name;
 		$did_vars['grppre']      = '';
 		core_did_add($did_vars, $did_dest);
 	}
@@ -2630,6 +2631,7 @@ function core_users_edit($extension,$vars){
 	
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
+	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
 	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 	$newdidcid = isset($vars['newdidcid']) ? $vars['newdidcid'] : '';
@@ -4006,6 +4008,7 @@ function core_users_configpageload() {
 
 
 		$section = _("Assigned DID/CID");
+		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, 'DID Description', _("A description for this DID, such as \"Fax\"")), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box")), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box")), 4);
 
@@ -4027,11 +4030,11 @@ function core_users_configpageload() {
 					$did_label .= ' ('.$did['description'].')';
 				}
 
-				$did_label = '<span>
+				$did_label = '&nbsp;<span>
 					<img width="16" height="16" border="0" title="'.$did_title.'" alt="" src="'.$did_icon.'"/>'.$did_label.
 					'</span> ';
 
-				$currentcomponent->addguielem($section, new gui_link($did_count++, $did_label, $addURL, true, false), 4);
+				$currentcomponent->addguielem($section, new gui_link('did_'.$did_count++, $did_label, $addURL, true, false), 4);
 			}
 		}
 
