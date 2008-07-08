@@ -270,21 +270,23 @@ if (!$tech && !$extdisplay) {
 		}
 
 		echo "<h2>".sprintf(_("Edit %s Trunk"),strtoupper($tech))."</h2>";
+		$tlabel = sprintf(_("Delete Trunk %s"),substr($channelid,0,20));
+		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
-		<p><a title="<?php echo $channelid ?>" href="config.php?display=<?php echo urlencode($display) ?>&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk"><?php echo _("Delete Trunk")?> <?php  echo substr($channelid,0,20); ?></a></p>
+		<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=deltrunk"><?php echo $label ?></a></p>
 <?php 
 
 		// find which routes use this trunk
 		$routes = core_trunks_gettrunkroutes($trunknum);
 		$num_routes = count($routes);
 		if ($num_routes > 0) {
-			echo "<a href=# class=\"info\">"._("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"))."<span>";
+			echo "<a href=# class=\"info\">&nbsp;"._("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"))."<span>";
 			foreach($routes as $route=>$priority) {
 				echo _("Route")." <b>".$route."</b>: "._("Sequence")." <b>".$priority."</b><br>";
 			}
 			echo "</span></a>";
 		} else {
-			echo "<b>"._("WARNING:")."</b> <a href=# class=\"info\">"._("This trunk is not used by any routes!")."<span>";
+			echo "&nbsp;<b>"._("WARNING:")."</b> <a href=# class=\"info\">"._("This trunk is not used by any routes!")."<span>";
 			echo _("This trunk will not be able to be used for outbound calls until a route is setup that uses it. Click on <b>Outbound Routes</b> to setup routing.");
 			echo "</span></a>";
 		}

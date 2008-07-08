@@ -3903,7 +3903,9 @@ function core_users_configpageload() {
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
 				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
-					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Extension")." $extdisplay", $delURL, true, false), 0);
+					$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
+					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
+					$currentcomponent->addguielem('_top', new gui_link('del', $label.$extdisplay, $delURL, true, false), 0);
 
 					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
 					if (!empty($usage_list)) {
@@ -3913,7 +3915,9 @@ function core_users_configpageload() {
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
-					$currentcomponent->addguielem('_top', new gui_link('del', _("Delete User")." $extdisplay", $delURL, true, false), 0);
+					$tlabel = sprintf(_("Delete User %s"),$extdisplay);
+					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
+					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
 					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
 					if (!empty($usage_list)) {
@@ -3972,7 +3976,7 @@ function core_users_configpageload() {
 			$link_count = 0;
 			foreach ($device_list as $device_item) {
 				if ($device_item['user'] == $extdisplay) {
-					$addURL = $_SERVER['PHP_SELF'].'?type=setup&display=devices&skip=0&extdisplay='.$device_item['id'];
+					$editURL = $_SERVER['PHP_SELF'].'?type=setup&display=devices&skip=0&extdisplay='.$device_item['id'];
 					$device_icon = ($device_item['devicetype'] == 'fixed') ? 'images/telephone_key.png' : 'images/telephone_edit.png';
 					$device_label  = '&nbsp;';
 					$device_label .=  _('Edit:');
@@ -3982,7 +3986,7 @@ function core_users_configpageload() {
 						<img width="16" height="16" border="0" title="Edit Device" alt="Edit Device" src="'.$device_icon.'"/>'.$device_label.
 						'</span> ';
 					
-					$currentcomponent->addguielem($section, new gui_link($link_count++, $device_label, $addURL, true, false), 2);
+					$currentcomponent->addguielem($section, new gui_link('dev'.$link_count++, $device_label, $editURL, true, false), 2);
 				}
 			}
 		}
@@ -4242,9 +4246,17 @@ function core_devices_configpageload() {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
 				$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
-				$currentcomponent->addguielem('_top', new gui_link('del', _("Delete Device")." $extdisplay", $delURL, true, false), 0);
+				$tlabel = sprintf(_("Delete Device %s"),$extdisplay);
+				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/telephone_delete.png"/>&nbsp;'.$tlabel.'</span>';
+				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
+
+				if ($deviceInfo['device_user'] != 'none') {
+					$editURL = $_SERVER['PHP_SELF'].'?type=setup&display=users&skip=0&extdisplay='.$deviceInfo['user'];
+					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_('Edit Default User: %s'),$deviceInfo['user']) : sprintf(_('Edit Fixed User: %s'),$deviceInfo['user']);
+					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
+					$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);
+				}
 			}
-	
 		} else {
 
 			$tmparr = explode('_', $tech_hardware);
@@ -4263,8 +4275,9 @@ function core_devices_configpageload() {
 		// Ensure they exist before the extract
 		$devinfo_description = $devinfo_emergency_cid = null;
 		$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
-		if ( is_array($deviceInfo) )
+		if ( is_array($deviceInfo) ) {
 			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
+		}
 
 		// Setup vars for use in the gui later on							
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');

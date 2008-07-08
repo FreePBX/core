@@ -125,8 +125,10 @@ foreach ($tresults as $tresult) {
 		$deptname = $user["deptname"];
 		$sections = $user["sections"];
 		
+		$tlabel = sprintf(_("Delete User: %s"),$userdisplay);
+		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
-		<p><a href="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser"><?php echo _("Delete User")?> <?php  echo $userdisplay; ?></a></p>
+		<p><a href="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser"><?php echo $label ?></a></p>
 <?php 
 
 	} else {

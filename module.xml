@@ -7,7 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.5.0.0* Added support for DND and Intercom hints in static and dynamic hints mode
+		*2.5.0alpa1.0* Added DND and Intercom hints, merged directdid and incoming routes, added links between users and devices, added icons in various places
 		*2.4.0.4* #2857, #2848, #2791, #2449
 		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
 		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details
@@ -61,15 +61,15 @@
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
 	<menuitems>
-		<extensions needsenginedb="yes">Extensions</extensions>
-		<users needsenginedb="yes">Users</users>
-		<devices needsenginedb="yes">Devices</devices>
+		<extensions needsenginedb="yes" sort="-4">Extensions</extensions>
+		<users needsenginedb="yes" sort="-3">Users</users>
+		<devices needsenginedb="yes" sort="-4">Devices</devices>
 		<did category="Inbound Call Control" sort="-5">Inbound Routes</did>
 		<zapchandids category="Inbound Call Control" sort="-5">Zap Channel DIDs</zapchandids>
 		<routing>Outbound Routes</routing>
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>
-		<ampusers>Administrators</ampusers>
+		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/2.4/core-2.4.0.4.tgz</location>

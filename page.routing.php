@@ -271,9 +271,13 @@ foreach (core_trunks_list() as $temp) {
 }
 
 if ($extdisplay) { // editing
+	$tlabel = sprintf(_("Delete Route %s"),substr($extdisplay,4));
+	$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
-	<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute"><?php echo _("Delete Route")?> <?php  echo substr($extdisplay,4); ?></a></p>
-<?php  } ?>
+	<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute"><?php echo $label ?></a></p>
+<?php  
+} 
+?>
 
 	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay ? "editroute" : "addroute") ?>');">
 		<input type="hidden" name="display" value="<?php echo $display?>"/>

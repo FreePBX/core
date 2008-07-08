@@ -114,36 +114,46 @@ if (isset($inroutes)) {
 	if ($action == 'delIncoming') {
 		echo '<br><h3>Route '.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else {
-		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
 ?>
-<?php if ($extdisplay) {	
-	//create variables for the selected route's settings
-	$extarray=explode('/',$extdisplay,2);
-	$ininfo=core_did_get($extarray[0],$extarray[1]);
-	if (is_array($ininfo)) extract($ininfo);
+<?php 
+		if ($extdisplay) {	
+		//create variables for the selected route's settings
+		$extarray=explode('/',$extdisplay,2);
+		$ininfo=core_did_get($extarray[0],$extarray[1]);
+		if (is_array($ininfo)) {
+	 		extract($ininfo);
+		}
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
-		<a href="<?php echo $delURL ?>"><?php echo _("Delete Route")?> <?php echo !empty($description)?$description:$extdisplay ?></a>
 <?php
-	// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
-	//
-	$did_dest = split(',',$destination);
-	if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
+		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
+		$tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
+		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
+		echo "<p><a href=".$delURL.">".$label."</a></p>";
+		// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
+		//
+		$did_dest = split(',',$destination);
+		if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 
-		if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
-			$editURL = $_SERVER['PHP_SELF'].'?display=users&extdisplay='.$did_dest[1];
-			$EXTorUSER = "User";
+			if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
+				$editURL = $_SERVER['PHP_SELF'].'?display=users&extdisplay='.$did_dest[1];
+				$EXTorUSER = _("User");
+			}
+			else {
+				$editURL = $_SERVER['PHP_SELF'].'?display=extensions&extdisplay='.$did_dest[1];
+				$EXTorUSER = _("Extension");
+			}
+			$label = '<span><img width="16" height="16" border="0" title="'.sprintf(_("Edit %s"),$EXTorUSER).'" alt="" src="images/user_edit.png"/>&nbsp;'.sprintf(_("Edit %s %s"),$EXTorUSER, $did_dest[1]).'</span>';
+			echo "<p><a href=".$editURL.">".$label."</a></p>";
 		}
-		else {
-			$editURL = $_SERVER['PHP_SELF'].'?display=extensions&extdisplay='.$did_dest[1];
-			$EXTorUSER = "Extension";
-		}
-		echo "<p><a href=".$editURL."> Edit ".$EXTorUSER." ".$did_dest[1]."</a></p>";
-	}
 ?>
-<?php } else { ?>
-		<h2><?php echo _("Add Incoming Route")?></h2>
-<?php } ?>
+<?php 
+	} else { 
+?>
+			<h2><?php echo _("Add Incoming Route")?></h2>
+<?php 
+	} 
+?>
 		<form name="editGRP" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return editGRP_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
