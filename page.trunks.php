@@ -205,17 +205,23 @@ foreach ($tresults as $tresult) {
 <div class="content">
 
 <?php 
-
 if (!$tech && !$extdisplay) {
 ?>
 	<h2><?php echo _("Add a Trunk")?></h2>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=ZAP"><?php echo _("Add ZAP Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=IAX2"><?php echo _("Add IAX2 Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=SIP"><?php echo _("Add SIP Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=ENUM"><?php echo _("Add ENUM Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=CUSTOM"><?php echo _("Add Custom Trunk")?></a><br><br>
-	<a href="<?php echo $_SERVER['PHP_SELF'].'?display='.urlencode($display); ?>&amp;tech=DUNDI"><?php echo _("Add DUNDi Trunk")?></a><br><br>
-<?php 
+<?php
+	$baseURL   = $_SERVER['PHP_SELF'].'?display='.urlencode($display).'&';
+	$trunks = array(
+		array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk")),
+		array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk")),
+		array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk")),
+		array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk")),
+		array('url'=> $baseURL.'tech=DUNDI', 'tlabel' =>  _("Add DUNDi Trunk")),
+		array('url'=> $baseURL.'tech=CUSTOM', 'tlabel' =>  _("Add Custom Trunk")),
+	);
+	foreach ($trunks as $trunk) {
+		$label = '<span><img width="16" height="16" border="0" title="'.$trunk['tlabel'].'" alt="" src="images/core_add.png"/>&nbsp;'.$trunk['tlabel'].'</span>';
+		echo "<a href=".$trunk['url'].">".$label."</a><br /><br /";
+	}
 } else {
 	if ($extdisplay) {
 		//list($trunk_tech, $trunk_name) = explode("/",$tname);
