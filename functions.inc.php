@@ -1491,32 +1491,36 @@ function core_get_config($engine) {
 
 			$context = 'macro-systemrecording';
 			
+			//exten => s,1,Set(RECFILE=${IF($["${ARG2}" = ""]?/tmp/${AMPUSER}-ivrrecording:${ARG2})})
+			$ext->add($context, 's', '', new ext_setvar('RECFILE','${IF($["${ARG2}" = ""]?/tmp/${AMPUSER}-ivrrecording:${ARG2})}'));
+			$ext->add($context, 's', '', new ext_execif('$["${ARG3}" != ""]','Authenticate','${ARG3}'));
 			$ext->add($context, 's', '', new ext_goto(1, '${ARG1}'));
 			
 			$exten = 'dorecord';
 			
-			$ext->add($context, $exten, '', new ext_record('/tmp/${AMPUSER}-ivrrecording:wav'));
+			$ext->add($context, $exten, '', new ext_record('${RECFILE}:wav'));
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
 
 			$exten = 'docheck';
 			
-			$ext->add($context, $exten, '', new ext_playback('/tmp/${AMPUSER}-ivrrecording'));
+			$ext->add($context, $exten, '', new ext_playback('beep'));
+			$ext->add($context, $exten, 'dc_start', new ext_background('${RECFILE},m,${CHANNEL(language)},macro-systemrecording'));
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
 
 			$exten = 'confmenu';
 			if (version_compare($version, "1.4", "ge")) { 
-				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star,m,${CHANNEL(language)},macro-systemrecording'));
+				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star&astcc-followed-by-pound,m,${CHANNEL(language)},macro-systemrecording'));
 			} else {
-				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star,m,${LANGUAGE},macro-systemrecording'));
+				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star&astcc-followed-by-pound,m,${LANGUAGE},macro-systemrecording'));
 			}
 			$ext->add($context, $exten, '', new ext_read('RECRESULT', '', 1, '', '', 4));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x*"]', 'dorecord,1'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x1"]', 'docheck,1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x1"]', 'docheck,2'));
 			$ext->add($context, $exten, '', new ext_goto(1));
 			
-			$ext->add($context, '1', '', new ext_goto(1, 'docheck'));
+			$ext->add($context, '1', '', new ext_goto('dc_start', 'docheck'));
 			$ext->add($context, '*', '', new ext_goto(1, 'dorecord'));
 			
 			$ext->add($context, 't', '', new ext_playback('goodbye'));
@@ -3942,6 +3946,8 @@ function core_users_configpageload() {
 		$msgInvalidDispName = _("Please enter a valid Display Name");
 		$msgInvalidOutboundCID = _("Please enter a valid Outbound CID");
 		$msgInvalidPause = _("Please enter a valid pause time in seconds, using digits only");
+		$msgInvalidDIDNum = _("You have entered a non-standard dialpattern for your DID. You can only enter standard dialpatterns. You must use the inbound routing form  to enter non-standard patterns");
+		$msgInvalidCIDNum = _("Please enter a valid Caller ID Number or leave it blank for your Assigned DID/CID pair");
 
 		// This is the actual gui stuff
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
@@ -4009,8 +4015,8 @@ function core_users_configpageload() {
 
 		$section = _("Assigned DID/CID");
 		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, 'DID Description', _("A description for this DID, such as \"Fax\"")), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box")), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box")), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
 
 		$dids = core_did_list('extension');
 		$did_count = 0;
