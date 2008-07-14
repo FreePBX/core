@@ -694,14 +694,52 @@ function core_get_config($engine) {
 
 			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs and SNOMs as a number to dial
 			// when a user pushes a flashing BLF. 
+			//
+			// We need to add ringgoups to this so that if an extension is part of a ringgroup, we can try to pickup that
+			// extension by trying the ringgoup which is what the pickup application is going to respond to.
+			//
+			// NOTICE: this may be confusing, we check if this is a BRI build of Asterisk and use dpickup instead of pickup
+			//         if it is. So we simply assign the varaible $ext_pickup which one it is, and use that variable when
+			//         creating all the extnesions below. So those are "$ext_pickup" on purpose!
+			//
 			if ($fc_pickup != '') {
 				$ext->addInclude('from-internal-additional', 'app-pickup');
 				$fclen = strlen($fc_pickup);
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_NoOp('Attempt to Pickup ${EXTEN:'.$fclen.'} by ${CALLERID(num)}'));
-				if (strstr($version, 'BRI')) 
-					$ext->add('app-pickup', "_$fc_pickup.", '', new ext_dpickup('${EXTEN:'.$fclen.'}'));
-				else
-					$ext->add('app-pickup', "_$fc_pickup.", '', new ext_pickup('${EXTEN:'.$fclen.'}'));
+				$ext_pickup = (strstr($version, 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@from-internal'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@from-did-direct'));
+				// In order to do call pickup in ringgroups, we will need to try the ringgoup number
+				// when doing call pickup for that ringgoup so we must see who is a member of what ringgroup
+				// and then generate the dialplan
+				//
+				if (function_exists('ringgroups_list')) {
+					$rg_members = array();
+					$rg_list = ringgroups_list(true);
+					foreach ($rg_list as $item) {
+						$thisgrp = ringgroups_get($item['grpnum']);
+						$grpliststr = $thisgrp['grplist'];
+						$grplist = explode("-", $grpliststr);
+						foreach ($grplist as $exten) {
+							if (strpos($exten,"#") === false) {
+								$rg_members[$exten][] = $item['grpnum'];
+							}
+						}
+					}
+					// Now we have a hash of extensions and what ringgoups they are members of
+					// so we need to generate the callpickup dialplan for these specific extensions
+					// to try the ringgoup.
+					foreach ($rg_members as $exten => $grps) {
+						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten));
+						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-internal'));
+						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-did-direct'));
+						foreach ($grps as $grp) {
+							$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@from-internal'));
+						}
+					}
+				}
+				$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
 			}
 			
 			
