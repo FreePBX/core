@@ -719,8 +719,8 @@ function core_get_config($engine) {
 				// when doing call pickup for that ringgoup so we must see who is a member of what ringgroup
 				// and then generate the dialplan
 				//
+				$rg_members = array();
 				if (function_exists('ringgroups_list')) {
-					$rg_members = array();
 					$rg_list = ringgroups_list(true);
 					foreach ($rg_list as $item) {
 						$thisgrp = ringgroups_get($item['grpnum']);
@@ -732,21 +732,21 @@ function core_get_config($engine) {
 							}
 						}
 					}
-					// Now we have a hash of extensions and what ringgoups they are members of
-					// so we need to generate the callpickup dialplan for these specific extensions
-					// to try the ringgoup.
-					foreach ($rg_members as $exten => $grps) {
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten));
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-internal'));
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-did-direct'));
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten));
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-internal'));
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-did-direct'));
-						foreach ($grps as $grp) {
-							$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@from-internal'));
-						}
-						$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
+				}
+				// Now we have a hash of extensions and what ringgoups they are members of
+				// so we need to generate the callpickup dialplan for these specific extensions
+				// to try the ringgoup.
+				foreach ($rg_members as $exten => $grps) {
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-internal'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-did-direct'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-internal'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-did-direct'));
+					foreach ($grps as $grp) {
+						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@from-internal'));
 					}
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
 				}
 			}
 			
