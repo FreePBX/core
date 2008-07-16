@@ -1690,7 +1690,7 @@ function core_did_add($incoming,$target=false){
 /* begin page.devices.php functions */
 
 //get the existing devices
-function core_devices_list($tech="all",$detail=false) {
+function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	if (strtolower($detail) == 'full') {
 		$sql = "SELECT * FROM devices";
 	} else {
@@ -1713,7 +1713,7 @@ function core_devices_list($tech="all",$detail=false) {
 
 	$extens = null;
 	foreach($results as $result){
-		if (checkRange($result['id'])){
+		if ($get_all || checkRange($result['id'])){
 
 			$record = array();
 			$record[0] = $result['id'];  // for backwards compatibility
@@ -2493,12 +2493,12 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
-                if($privacyman == "2")  {
-                        $astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
-                }
-                if($privacyman == "3")  {
-                        $astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
-                }
+		if($privacyman == "2")  {
+			$astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
+		}
+		if($privacyman == "3")  {
+			$astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
+		}
 
 		if (!$editmode) {
 			$astman->database_put("AMPUSER",$extension."/device","\"".((isset($device))?$device:'')."\"");
@@ -2512,6 +2512,13 @@ function core_users_add($vars, $editmode=false) {
 			echo "ERROR: this state should not exist<br>";
 		}
 
+		// If voicemail enabled and vmx_state is true, then if it were blocked we set the new
+		// default modes. If it was not blocked, nor anyhting else appropriate set then it must
+		// be the first time so we intialize all the values to the defaults. (TODO: bug on this)
+		//
+		// If the value is set to false (or no voicemail) we make sure it is in a legal mode
+		// meaning it probably exists and if so we set it to blocked, otherwise we can just ignore
+		//
 		if ($vmx_state && $voicemail != "novm") {
 
 			$unavail_mode="enabled";
@@ -4045,7 +4052,7 @@ function core_users_configpageload() {
 			}
 		}
 		
-		$section = 'Extension Options';
+		$section = _("Extension Options");
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
@@ -4090,7 +4097,7 @@ function core_users_configpageload() {
 			}
 		}
 
-		$section = 'Recording Options';
+		$section = _("Recording Options");
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, 'Record Incoming', _("Record all inbound calls received at this extension."), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, 'Record Outgoing', _("Record all outbound calls received at this extension."), false));
 	}

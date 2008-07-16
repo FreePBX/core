@@ -31,6 +31,7 @@
 	$astspooldir  = get_var( "ASTSPOOLDIR" );
 	$ast_version  = get_var("ASTVERSION");
 	$dnd_devstate = get_var( "DNDDEVSTATE" ) == "TRUE" ? true : false;
+	$fm_devstate  = get_var( "FMDEVSTATE" ) == "TRUE" ? true : false;
 	$intercom_code = get_var( "INTERCOMCODE" );
 
 	$ast_version14 = version_compare($ast_vversion, "1.4", "ge");
@@ -139,6 +140,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("insert_user: user: $user, device: $device",8);
 		global $agi;
 		global $astspooldir;
+		global $fm_devstate;
+		global $dnd_devstate;
 
 		set_device_user($device, $user);
 		$previous_devices = get_devices($user);
@@ -146,6 +149,16 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("insert_user: Setting user $user to devices $new_devices",5);
 		set_user_devices($user, $new_devices);
 		set_hint($user, $new_devices);
+
+		if ($fm_devstate) {
+			debug("insert_user: Setting FollowMe DEVSTATES for device $device",5);
+			$agi->set_variable('DEVSTATE(Custom:FOLLOWME'.$device.')',get_followme_state($user));
+		}
+		if ($dnd_devstate) {
+			debug("insert_user: Setting DND DEVSTATES for device $device",5);
+			$agi->set_variable('DEVSTATE(Custom:DEVDND'.$device.')',get_dnd_state($user));
+		}
+
 		$vmcontext = get_voicemail_context($user);
 		if ($vmcontext != 'novm') {
 			exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
@@ -162,6 +175,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("remove_user: device: $device",8);
 		global $agi;
 		global $astspooldir;
+		global $fm_devstate;
+		global $dnd_devstate;
 
 		$current_user = get_user($device);
 		if ($current_user != '') {
@@ -171,6 +186,20 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
 			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+
+			debug("Setting device $device states to INVALID before deleting them",5);
+			if ($fm_devstate) {
+				debug("Setting device $device FollowMe state to INVALID before deleting",5);
+				$agi->set_variable('DEVSTATE(Custom:FOLLOWME'.$device.')','INVALID');
+			}
+			if ($dnd_devstate) {
+				debug("Setting device $device DND state to INVALID before deleting",5);
+				$agi->set_variable('DEVSTATE(Custom:DEVDND'.$device.')','INVALID');
+			}
+			// I thought they should then be deleted, but they still end up there probably because setting them to invalid re-creates them
+			//
+			//$agi->database_deltree('CustomDevstate','FOLLOWME'.$device);
+			//$agi->database_deltree('CustomDevstate','DEVDND'.$device);
 			if ($ret) {
 				debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
 			}
@@ -323,6 +352,45 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		}
 		debug("get_user: no user found", 8);
 		return '';
+	}
+
+	function get_followme_state($user) {
+		global $agi;
+
+		$fm_state = $agi->database_get('AMPUSER',$user.'/followme/ddial');
+		if ($fm_state['result'] != 1) {
+			$ret = 'INVALID';
+		} else {
+			switch (trim($fm_state['data'])) {
+				case 'EXTENSION':
+					$ret = 'NOT_INUSE';
+					break;
+				case 'DIRECT':
+					$ret = 'INUSE';
+					break;
+				default:
+					$ret = 'INVALID';
+			}
+		}
+		debug("get_followme_state: user $user got state ".$fm_state['data']." returning $ret",8);
+		return $ret;
+	}
+
+	function get_dnd_state($user) {
+		global $agi;
+
+		$dnd_state = $agi->database_get('DND',$user);
+		if ($dnd_state['result'] != 1) {
+			$ret = 'NOT_INUSE';
+		} else {
+			if (strtoupper(trim($dnd_state['data'])) == 'YES') {
+				$ret = 'INUSE';
+			} else {
+				$ret = 'NOT_INUSE';
+			}
+		}
+		debug("get_dnd_state: user $user got state ".$dnd_state['data']." returning $ret",8);
+		return $ret;
 	}
 
 	// Inserts device info into AMPUSER object for specificed user
