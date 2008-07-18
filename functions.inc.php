@@ -2084,16 +2084,6 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".addslashes($outboundcid)."\"");
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".addslashes($name)."\"");
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
-                        if($privacyman == "0")  {
-                                $astman->database_del("AMPUSER",$extension."/screen");
-                        }
-                        if($privacyman == "2")  {
-                                $astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
-                        }
-                        if($privacyman == "3")  {
-                                $astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
-                        }
-
 		}	
 		return true;
 	} else {
@@ -2581,11 +2571,17 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
-		if($privacyman == "2")  {
-			$astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
-		}
-		if($privacyman == "3")  {
-			$astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
+		switch ($call_screen) {
+			case '0':
+				$astman->database_del("AMPUSER",$extension."/screen");
+				break;
+			case 'nomemory':
+				$astman->database_put("AMPUSER",$extension."/screen","\"nomemory\"");
+				break;
+			case 'memory':
+				$astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
+				break;
+			default:
 		}
 
 		if (!$editmode) {
@@ -2702,6 +2698,9 @@ function core_users_get($extension){
 		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
 		$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
 		$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
+
+		$call_screen=$astman->database_get("AMPUSER",$extension."/screen");
+		$results['call_screen'] = (trim($call_screen) != "")?$call_screen:'0';
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -2726,6 +2725,7 @@ function core_users_del($extension, $editmode=false){
 		$astman->database_del("AMPUSER",$extension."/screen");
 	}
 	if ($astman && !$editmode) {
+		// TODO just change this to delete everything
 		$astman->database_del("AMPUSER",$extension."/password");
 		$astman->database_del("AMPUSER",$extension."/ringtimer");
 		$astman->database_del("AMPUSER",$extension."/noanswer");
@@ -2735,6 +2735,7 @@ function core_users_del($extension, $editmode=false){
 		$astman->database_del("AMPUSER",$extension."/cidnum");
 		$astman->database_del("AMPUSER",$extension."/voicemail");
 		$astman->database_del("AMPUSER",$extension."/device");
+		$astman->database_del("AMPUSER",$extension."/screen");
 	}
 }
 
@@ -3988,6 +3989,11 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
 
+		$currentcomponent->addoptlistitem('call_screen', '0', _("Disable"));
+		$currentcomponent->addoptlistitem('call_screen', 'nomemory', _("Screen Caller: No Memory"));
+		$currentcomponent->addoptlistitem('call_screen', 'memory', _("Screen Caller: Memory"));
+		$currentcomponent->setoptlistopts('call_screen', 'sort', false);
+
 		$currentcomponent->addoptlistitem('ringtime', '0', 'Default');
 		for ($i=1; $i <= 120; $i++) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
@@ -4151,13 +4157,13 @@ function core_users_configpageload() {
 				$callwaiting = 'disabled';
 			}
 		}
-		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, 'Call Waiting', _("Set the initial/current Call Waiting state for this user's extension"), false));
-
+		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that callerid. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerId."), false));
 
 		$section = _("Assigned DID/CID");
 		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, 'DID Description', _("A description for this DID, such as \"Fax\"")), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, 'Add Inbound DID', _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, 'Add Inbound CID', _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
 
 		$dids = core_did_list('extension');
 		$did_count = 0;

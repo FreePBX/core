@@ -238,7 +238,7 @@ if (!isset($privacyman))
 
 		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts. The number of digits and attempts can be defined in privacy.conf. If a user has Call Screening enabled, the incoming caller will be asked to enter their CallerId here if enabled, and then to say their name once determined that the called user requires it.')?></span></a>:</td>
 			<td>
 				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
 					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
