@@ -2529,7 +2529,6 @@ function core_users_add($vars, $editmode=false) {
 		$vmbox = voicemail_mailbox_get($extension);
 		if ( $vmbox == null ) {
 			$voicemail = "novm";
-			$vmx_state = "false";
 		} else {
 			$voicemail = $vmbox['vmcontext'];
 		}
@@ -2596,47 +2595,8 @@ function core_users_add($vars, $editmode=false) {
 			echo "ERROR: this state should not exist<br>";
 		}
 
-		// If voicemail enabled and vmx_state is true, then if it were blocked we set the new
-		// default modes. If it was not blocked, nor anyhting else appropriate set then it must
-		// be the first time so we intialize all the values to the defaults. (TODO: bug on this)
+		// Moved VmX setup to voicemail module since it is part of voicemail
 		//
-		// If the value is set to false (or no voicemail) we make sure it is in a legal mode
-		// meaning it probably exists and if so we set it to blocked, otherwise we can just ignore
-		//
-		if ($vmx_state && $voicemail != "novm") {
-
-			$unavail_mode="enabled";
-			$busy_mode="disabled";
-			$vmx_state=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
-
-			if (trim($vmx_state) == 'blocked') {
-
-				$astman->database_put("AMPUSER", "$extension/vmx/unavail/state", "$unavail_mode");
-				$astman->database_put("AMPUSER", "$extension/vmx/busy/state", "$busy_mode");
-
-			} elseif (trim($vmx_state) != 'enabled' && trim($vmx_state) != 'disabled') {
-
-				$repeat="1";
-				$timeout="2";
-				$vmxopts_timeout="";
-				$loops="1";
-
-				$mode="unavail";
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$unavail_mode");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
-
-				$mode="busy";
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/state", "$busy_mode");
-				$astman->database_put("AMPUSER", "$extension/vmx/$mode/vmxopts/timeout", "$vmxopts_timeout");
-				
-			}
-		} else {
-			$vmx_state=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
-			if (trim($vmx_state) == 'enabled' || trim($vmx_state) == 'disabled' || trim($vmx_state) == 'blocked') {
-				$astman->database_put("AMPUSER", "$extension/vmx/unavail/state", "blocked");
-				$astman->database_put("AMPUSER", "$extension/vmx/busy/state", "blocked");
-			}
-		}
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -2695,7 +2655,6 @@ function core_users_get($extension){
 	if ($astman) {
 		$cw = $astman->database_get("CW",$extension);
 		$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
-		$results['vmx_state']=$astman->database_get("AMPUSER",$extension."/vmx/unavail/state");
 		$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
 		$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
 
@@ -2726,16 +2685,7 @@ function core_users_del($extension, $editmode=false){
 	}
 	if ($astman && !$editmode) {
 		// TODO just change this to delete everything
-		$astman->database_del("AMPUSER",$extension."/password");
-		$astman->database_del("AMPUSER",$extension."/ringtimer");
-		$astman->database_del("AMPUSER",$extension."/noanswer");
-		$astman->database_del("AMPUSER",$extension."/recording");
-		$astman->database_del("AMPUSER",$extension."/outboundcid");
-		$astman->database_del("AMPUSER",$extension."/cidname");
-		$astman->database_del("AMPUSER",$extension."/cidnum");
-		$astman->database_del("AMPUSER",$extension."/voicemail");
-		$astman->database_del("AMPUSER",$extension."/device");
-		$astman->database_del("AMPUSER",$extension."/screen");
+		$astman->database_deltree("AMPUSER/".$extension);
 	}
 }
 
@@ -2755,7 +2705,6 @@ function core_users_cleanastdb($extension) {
 		$astman->database_del("CF",$extension);
 		$astman->database_del("CFB",$extension);
 		$astman->database_del("CFU",$extension);
-		$astman->database_deltree("AMPUSER/".$extension."/vmx");
 
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
