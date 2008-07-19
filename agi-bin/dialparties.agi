@@ -52,6 +52,8 @@ $ast_version = get_var( $AGI, "ASTVERSION" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
+$cfignore    = get_var( $AGI, "CFIGNORE" );
+$cfignore    = strtoupper(trim($cfignore));
 
 $astman = new AGI_AsteriskManager( );	
 if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
@@ -256,10 +258,19 @@ $count = 0;
 foreach ($ext as $k) {
 	$cf = $AGI->database_get('CF',$k);
 	$cf = $cf['data'];
+	//
+	// TODO: If ringgoup tells us to ignore CF then don't do this
+	//
 	if (strlen($cf)) {
-		// append a hash sign so we can send out on chan_local below.
-		$ext[$count] = $cf.'#';  
-		debug("Extension $k has call forward set to $cf", 1);
+		// append a hash sign so we can send out on chan_local below unless cfingore is set
+		if ($cfignore) {
+			unset($ext[$count]);
+			debug("Extension $k has call forward set to $cf", 1);
+			$AGI->set_variable('DIALSTATUS','NOANSWER');
+		} else {
+			$ext[$count] = $cf.'#';  
+			debug("Extension $k has call forward set to $cf", 1);
+		}
 
 		// if this is the primary extension and CF enabled, then cancel mastermode
 		// whether it is or not, no need to check.
@@ -402,7 +413,11 @@ foreach ( $ext as $k ) {
 			if ( ($exthascfu == 1) && ($extstate == 4) ) {
 				// If part of a ring group, then just do what CF does, otherwise needs to
 				// drop back to dialplan with NOANSWER
-				if ($rgmethod != '' && $rgmethod != 'none') {
+
+				//
+				// If cfignore is set, then we don't honor any CF settings
+				//
+				if ($rgmethod != '' && $rgmethod != 'none' && !$cfignore) {
 					debug("Extension $extnum has call forward on no answer set and is unavailable and is part of a Ring Group forwarding to '$extcfu'",1);
 					$extnum = $extcfu . '#';   # same method as the normal cf, i.e. send to Local
 				} else {
@@ -416,7 +431,10 @@ foreach ( $ext as $k ) {
 				if ($extstate > 0 && $extstate != 4) {
 					debug("Extension $extnum is not available to be called", 1);
 					// extension in use
-					if ($exthascfb == 1) {
+
+					// don't honor any CF settings when $cfignore is set
+					//
+					if ($exthascfb == 1 && !$cfignore) {
 						debug("Extension $extnum has call forward on busy set to $extcfb",1);
 						$extnum = $extcfb . '#';   # same method as the normal cf, i.e. send to Local
 					// CW not in use
