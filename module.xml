@@ -3,11 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.4.0.4</version>
+	<version>2.5.0alpha1.0</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.5.0alpa1.0* Added DND and Intercom hints, merged directdid and incoming routes, added links between users and devices, added icons in various places
+		*2.5.0alpa1.0* #2853, #2925, #2391, #2785, #2923, #2671, #2585, #2908, #2909, #2510, #2976, #2845, #1715, #2760, #2926, #2927, #2838, also added misc icons, links between users/devices
 		*2.4.0.4* #2857, #2848, #2791, #2449
 		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
 		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details
@@ -55,7 +55,7 @@
 		*1.2* Core modules code when part of framework
 	</changelog>
 	<depends>
-		<version>2.4.0</version>
+		<version>2.5.0alpha1</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
