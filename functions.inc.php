@@ -791,7 +791,11 @@ function core_get_config($engine) {
 				$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
 				
 				if ($fc_simu_pstn != '') {
-					$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', 's', 'from-pstn'));
+					if (ctype_digit($fc_simu_pstn)) {
+						$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', '${EXTEN}', 'from-pstn'));
+					} else {
+						$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', 's', 'from-pstn'));
+					}
 				}
 
 				if ($fc_simu_fax != '') {
