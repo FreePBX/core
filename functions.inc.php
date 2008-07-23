@@ -4009,7 +4009,7 @@ function core_users_configpageload() {
 				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
 					$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
-					$currentcomponent->addguielem('_top', new gui_link('del', $label.$extdisplay, $delURL, true, false), 0);
+					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
 					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
 					if (!empty($usage_list)) {
@@ -4098,9 +4098,9 @@ function core_users_configpageload() {
 		}
 		
 		$section = _("Extension Options");
-		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, 'Outbound CID', _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
-		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, 'Ring Time', _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
 		if (!isset($callwaiting)) {
 			if ($amp_conf['ENABLECW']) {
 				$callwaiting = 'enabled';
@@ -4112,7 +4112,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that callerid. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerId."), false));
 
 		$section = _("Assigned DID/CID");
-		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, 'DID Description', _("A description for this DID, such as \"Fax\"")), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
 
@@ -4400,24 +4400,24 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display != 'extensions' ) {
-			$section = 'Device Info';
+			$section = _("Device Info");
 			if ( $extdisplay ) { // Editing
 				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
 			} else { // Adding
-				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, 'Device ID', 'Give your device a unique integer ID.  The device will use this ID to authenicate to the system.', '!isInteger()', $msgInvalidDevID, false));
+				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenicate to the system."), '!isInteger()', $msgInvalidDevID, false));
 			}
-			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, 'Description', _("The caller id name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));
-			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, 'Device Type', _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
-			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, 'Default User', _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
+			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The caller id name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));
+			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
+			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
 		} else {
-			$section = 'Extension Options';
+			$section = _("Extension Options");
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, 'Emergency CID', _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));
 		}
 		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
-		$section = 'Device Options';
+		$section = _("Device Options");
 		$currentcomponent->addguielem($section, new gui_label('techlabel', sprintf(_("This device uses %s technology."),$devinfo_tech)),4);
 		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 		foreach ($devopts as $devopt=>$devoptarr) {
