@@ -1920,10 +1920,11 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	// create a voicemail symlink if needed
 	$thisUser = core_users_get($user);
 	if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
-		if(empty($thisUser['voicemail']))
+		if(empty($thisUser['voicemail'])) {
 			$vmcontext = "default";
-		else 
+		} else { 
 			$vmcontext = $thisUser['voicemail'];
+		}
 		
 		//voicemail symlink
 		exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
@@ -2721,6 +2722,8 @@ function core_users_edit($extension,$vars){
 	//I we are editing, we need to remember existing user<->device mapping, so we can delete and re-add
 	if ($astman) {
 		$ud = $astman->database_get("AMPUSER",$extension."/device");
+		$current_vmcontext = $astman->database_get("AMPUSER",$extension."/voicemail");
+		$new_vmcontext = isset($vars['vmcontext']) ? $vars['vmcontext'] : 'novm';
 		$vars['device'] = $ud;
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
@@ -2747,9 +2750,21 @@ function core_users_edit($extension,$vars){
 	if (core_sipname_check($vars['sipname'],$extension)) {
 		core_users_del($extension, true);
 		core_users_add($vars, true);
+
+		// If the vmcontext has changed, we need to change all the links. In extension mode, the link
+		// to the current fixed device will get changed, but none others will
+		//
+		if ($current_vmcontext != $new_vmcontext) {
+			$user_devices = explode('&',$ud);
+			foreach ($user_devices as $user_device) {
+				exec("rm -f /var/spool/asterisk/voicemail/device/".$user_device);
+				if ($new_context != 'novm') {
+					exec("/bin/ln -s /var/spool/asterisk/voicemail/".$new_vmcontext."/".$extension."/ /var/spool/asterisk/voicemail/device/".$user_device);
+				}
+			}
+		}
 	}
 	return true;
-	
 }
 
 function core_directdid_list(){
