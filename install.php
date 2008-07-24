@@ -148,4 +148,37 @@ if(!DB::IsError($check)) {
 } else {
 	out(_("already done"));
 }
+
+// Add callgroup, pickupgroup to zap
+
+outn(_("updating zap callgroup, pickupgroup.."));
+$sql = "SELECT `id` FROM `devices` WHERE `tech` = 'zap'";
+$results = $db->getCol($sql);
+if(DB::IsError($results)) {
+	$results = null;
+}
+$count_pickup = 0;
+$count_callgroup = 0;
+if (isset($results) && !empty($results)) {
+	foreach ($results as $device) {
+		// if the insert fails then it is already there since it will violate the primary key but that is ok
+		//
+		$sql = "INSERT INTO `zap` (`id`, `keyword`, `data`, `flags`) VALUES ('$device', 'callgroup', '', '0')";
+		$try = $db->query($sql);
+		if(!DB::IsError($try)) {
+			$count_pickup++;
+		}
+		$sql = "INSERT INTO `zap` (`id`, `keyword`, `data`, `flags`) VALUES ('$device', 'pickupgroup', '', '0')";
+		$try = $db->query($sql);
+		if(!DB::IsError($try)) {
+			$count_callgroup++;
+		}
+	}
+}
+if ($count_callgroup || $count_pickup) {
+	out(sprintf(_("updated %s callgroups, %s pickupgroups"),$count_callgroup,$count_pickup));
+} else {
+	out(_("not needed"));
+}
+
 ?>

@@ -2297,6 +2297,8 @@ function core_devices_addzap($account) {
 			//array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),	
 			//array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
 			array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
+			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
+			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
 			array($account,'channel',($_REQUEST['channel'])?$_REQUEST['channel']:'')
 		);
 	}
@@ -4256,6 +4258,8 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['callprogress'] = array('value' => 'no', 'level' => 1);
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
+		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
 		unset($tmparr);
