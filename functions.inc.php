@@ -3926,17 +3926,16 @@ function general_generate_indications() {
 		$desc = sprintf(_("Failed to open %s for writing, aborting attempt to write the country indications. The file may be readonly or the permissions may be incorrect."), $filename);
 		$notify->add_error('core','INDICATIONS',_("Failed to write indications.conf"), $desc);
 		return;
-	} else {
-		$notify->delete('core', 'INDICATIONS');
-
-		fwrite($fd, "[general]\ncountry=".$result['value']."\n\n");
-
-		$zonelist = general_get_zonelist();
-		foreach ($zonelist as $zone) {
-			fwrite($fd, "[{$zone['iso']}]\n{$zone['conf']}\n\n");
-		}
-		fclose($fd);
 	}
+	$notify->delete('core', 'INDICATIONS');
+
+	fwrite($fd, "[general]\ncountry=".$result['value']."\n\n");
+
+	$zonelist = general_get_zonelist();
+	foreach ($zonelist as $zone) {
+		fwrite($fd, "[{$zone['iso']}]\n{$zone['conf']}\n\n");
+	}
+	fclose($fd);
 }
 /* end page.routing.php functions */
 
