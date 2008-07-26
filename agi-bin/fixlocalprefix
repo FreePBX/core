@@ -175,12 +175,14 @@ function fixNumber($pattern, $number, &$agi) {
 				"Z",
 				"N",
 				".",
+				"*",
 			),
 			array(
 				"[0-9]",
 				"[1-9]",
 				"[2-9]",
 				"[0-9#*]+",
+				"\*",
 			),
 			// note, we're doing a subpattern match on the static portion so it can be extracted later
 			$drop.'('.$static.')');
