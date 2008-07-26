@@ -50,11 +50,16 @@ foreach ($enums as $enum) {
 		foreach($arr as $key => $row) {
 			$order[$key] = $row["order"];
 			$prio[$key] = $row["prio"];
+			$nextURI[] = $row['URI'];
+			$row['URI'] = count($nextURI) - 1;
+			$arr[$key] = $row;
 		}
-		array_multisort($order, SORT_ASC, $prio, SORT_ASC, $arr);
+		array_multisort($order, SORT_ASC, SORT_NUMERIC, $prio, SORT_ASC, SORT_NUMERIC, $arr);
 		foreach ($arr as $key => $row) {
-			if (eregi('SIP|IAX', $row['tech']))
-				$dialstr .= $row['URI']."|";
+			if (eregi('SIP|IAX', $row['tech'])) {
+				$URI = $row['URI'];
+				$dialstr .= $nextURI[$URI]."|";
+			}
 		}
 	}
 }
