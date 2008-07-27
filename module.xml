@@ -3,11 +3,12 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0alpha1.0</version>
+	<version>2.5.0alpha1.1</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.5.0alpa1.0* #2853, #2925, #2391, #2785, #2923, #2671, #2585, #2908, #2909, #2510, #2976, #2845, #1715, #2760, #2926, #2927, #2838, also added misc icons, links between users/devices
+		*2.5.0alpha1.1* #2930, #2938, #2922, #2939, #1568, #2949, #2779, #2953, #1911, #2807
+		*2.5.0alpha1.0* #2853, #2925, #2391, #2785, #2923, #2671, #2585, #2908, #2909, #2510, #2976, #2845, #1715, #2760, #2926, #2927, #2838, also added misc icons, links between users/devices
 		*2.4.0.4* #2857, #2848, #2791, #2449
 		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
 		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details
@@ -72,6 +73,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.5/core-2.5.0alpha1.0.tgz</location>
-	<md5sum>4209c3b37f895ecd0d9f7cd34e2441d1</md5sum>
+	<location>release/2.5/core-2.5.0alpha1.1.tgz</location>
+	<md5sum>bb246354853aa32daf4f0a0e003167c9</md5sum>
 </module>
