@@ -11,6 +11,7 @@ use Net::SMTP;
 # Default paramaters
 my $to = "xrobau\@gmail.com";
 my $from = "fax\@";
+my $dest = undef;
 my $subject = "Fax received";
 my $ct = "application/x-pdf";
 my $file = undef;
@@ -25,7 +26,7 @@ if ($hostname =~ /localhost/) {
 $from .= $hostname;
 
 # Usage:
-my $usage="Usage: --file filename [--attachment filename] [--to email_address] [--from email_address] [--type content/type] [--subject \"Subject Of Email\"]"; 
+my $usage="Usage: --file filename [--attachment filename] [--to email_address] [--from email_address] [--type content/type] [--subject \"Subject Of Email\"] [--dest DID]"; 
 
 # Parse command line..
 while (my $cmd = shift @ARGV) {
@@ -53,7 +54,7 @@ while (my $cmd = shift @ARGV) {
 		$subject = $tmp;
 	}
   # Convert %2x to proper characters, leave anything else alone.
-  $subject =~ s/\%20/ /g;
+    $subject =~ s/\%20/ /g;
     $subject =~ s/\%21/\!/g;
     $subject =~ s/\%22/\"/g;
     $subject =~ s/\%23/\#/g;
@@ -87,6 +88,24 @@ while (my $cmd = shift @ARGV) {
   } elsif ($cmd eq "--attachment") {
 	my $tmp = shift @ARGV;
 	$attachment = $tmp if (defined $tmp);
+  } elsif ($cmd eq "--dest") {
+       my $tmp = shift @ARGV;
+       if ($tmp =~ /\^(\")|^(\')/) {
+               # It's a quoted string
+               my $delim = $+;   # $+ is 'last match', which is ' or "
+               $tmp =~ s/\Q$delim\E//; # Strip out ' or "
+               $dest = $tmp;
+               while ($tmp = shift @ARGV) {
+                       if ($tmp =~ /\Q$delim\E/) {
+                               $tmp =~ s/\Q$delim\E//;
+                               last;
+                       }
+               $dest .= $tmp;
+               }
+       } else {
+               # It's a single word
+               $dest = $tmp;
+       }
   } else {
 	die "$cmd not understood\n$usage\n";
   }
@@ -102,7 +121,10 @@ open( FILE, $file ) or die "Error opening $file: $!";
 $attachment = $file unless ($attachment);
 
 my $encoded="";
+my $enc_gif="";
 my $buf="";
+my $convert_status=0;
+
 # First, lets find out if it's a TIFF file
 read(FILE, $buf, 4);
 if ($buf eq "MM\x00\x2a" || $buf eq "II\x2a\x00") {
@@ -115,6 +137,16 @@ if ($buf eq "MM\x00\x2a" || $buf eq "II\x2a\x00") {
   		$encoded .= encode_base64($buf);
 	}
 	close PDF;
+
+	open GIF, "convert -resize '50%' -monochrome -delay 300 ${file}[0,1] gif:- |";
+	if (!eof(GIF)) {
+		$convert_status=1;
+		$buf = "";
+		while (read(GIF, $buf, 60*57))  {
+  			$enc_gif .= encode_base64($buf);
+		}
+	}
+	close GIF;
 } else {
 	# It's a PDF already
 	# Go back to the start of the file, and start again
@@ -138,6 +170,7 @@ my @chrs = ('0' .. '9', 'A' .. 'Z', 'a' .. 'z');
 foreach (0..16) { $boundary .= $chrs[rand (scalar @chrs)]; } 
 
 my $len = length $encoded;
+my $len_gif = length $enc_gif;
 # message body..
 my $msg ="Content-Class: urn:content-classes:message
 Content-Transfer-Encoding: 7bit
@@ -156,10 +189,22 @@ This is a multi-part message in MIME format.
 Content-Type: text/plain; charset=\"us-ascii\"
 Content-Transfer-Encoding: quoted-printable
 
-A Fax has been recieved by the fax gateway, and is attached to this message.
+A Fax has been received by the fax gateway and is attached to this message.
+
+The destination number for this fax is ".$dest."
 
 
---$boundary
+";
+if ($convert_status eq 1) {
+$msg=$msg."--$boundary
+Content-Type: image/gif; name=\"thumb-".substr($attachment,0,-4).".gif\"
+Content-Transfer-Encoding: base64
+
+$enc_gif 
+";
+}
+
+$msg=$msg."--$boundary
 Content-Type: $ct; name=\"$attachment\"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=\"$attachment\"
