@@ -3001,6 +3001,14 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	}
 }
 
+//Sort trunks for sqlite
+function sort_trunks($a,$b)  {
+        global $unique_trunks;
+        ereg("OUT_([0-9]+)",$unique_trunks[$a][0],$trunk_num1);
+        ereg("OUT_([0-9]+)",$unique_trunks[$b][0],$trunk_num2);
+        return ($trunk_num1[1] >= $trunk_num2[1]? 1:-1);
+}
+
 //get unique trunks
 function core_trunks_list($assoc = false) {
 	// TODO: $assoc default to true, eventually..
@@ -3008,38 +3016,49 @@ function core_trunks_list($assoc = false) {
 	global $db;
 	global $amp_conf;
 	
-	if ($amp_conf["AMPDBENGINE"] == "sqlite3")
-	{
-		// TODO: sqlite work arround - diego
-		// TODO: WILL NOT WORK, need to remove the usage of SUBSTRING
-		// need to reorder the trunks in PHP code
-		$sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
-		$sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\_%') d ";
-		$sqlstr .= "ON substring(t.variable,5) = substring(d.variable,12) WHERE t.variable LIKE 'OUT\_%' ";
-		$sqlstr .= "UNION ALL ";
-		$sqlstr .= "SELECT v.variable, v.value, concat(substring(v.value,1,0),'off') state  FROM `globals` v ";
-		$sqlstr .= "WHERE v.variable LIKE 'OUT\_%' AND concat('OUTDISABLE_',substring(v.variable,5)) NOT IN ";
-		$sqlstr .= " ( SELECT variable from globals WHERE variable LIKE 'OUTDISABLE\_%' ) ";
-		$sqlstr .= "ORDER BY variable";
+        // sqlite doesn't support the syntax required for the SQL so we have to do it the hard way
+        if ($amp_conf["AMPDBENGINE"] == "sqlite3")
+        {
+                $sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUT_%'";
+                $my_unique_trunks = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
 
-		//$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll"); 
-		$unique_trunks = sql($sqlstr,"getAll"); 
-	}
-	else
-	{
-		// we have to escape _ for mysql: normally a wildcard
-		$sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
-		$sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\\\_%') d ";
-		$sqlstr .= "ON substring(t.variable,5) = substring(d.variable,12) WHERE t.variable LIKE 'OUT\\\_%' ";
-		$sqlstr .= "UNION ALL ";
-		$sqlstr .= "SELECT v.variable, v.value, concat(substring(v.value,1,0),'off') state  FROM `globals` v ";
-		$sqlstr .= "WHERE v.variable LIKE 'OUT\\\_%' AND concat('OUTDISABLE_',substring(v.variable,5)) NOT IN ";
-		$sqlstr .= " ( SELECT variable from globals WHERE variable LIKE 'OUTDISABLE\\\_%' ) ";
-		$sqlstr .= "ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0";
+                $sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUTDISABLE_%'";
+                $disable_states = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
 
-		//$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT\\\_%' ORDER BY RIGHT( variable, LENGTH( variable ) - 4 )+0","getAll"); 
-		$unique_trunks = sql($sqlstr,"getAll"); 
-	}
+                foreach($disable_states as $arr)  {
+                        $disable_states_assoc[$arr['variable']] = $arr['value'];
+                }
+                global $unique_trunks;
+                $unique_trunks = array();
+
+                foreach ($my_unique_trunks as $this_trunk) {
+
+                        $trunk_num = substr($this_trunk['variable'],4);
+			$this_state = (isset($disable_states_assoc['OUTDISABLE_'.$trunk_num]) ? $disable_states_assoc['OUTDISABLE_'.$trunk_num] : 'off');
+                        $unique_trunks[] = array($this_trunk['variable'], $this_trunk['value'], $this_state);
+                }
+                // sort this array using a custom function sort_trunks(), defined above
+                uksort($unique_trunks,"sort_trunks");
+                // re-index the newly sorted array
+                foreach($unique_trunks as $arr) {
+                        $unique_trunks_t[] = array($arr[0],$arr[1],$arr[2]);
+                }
+                $unique_trunks = $unique_trunks_t;
+
+        }
+        else
+        {
+                $sqlstr  = "SELECT t.variable, t.value, d.value state FROM `globals` t ";
+                $sqlstr .= "JOIN (SELECT x.variable, x.value FROM globals x WHERE x.variable LIKE 'OUTDISABLE\_%') d ";
+                $sqlstr .= "ON substring(t.variable,5) = substring(d.variable,12) WHERE t.variable LIKE 'OUT\_%' ";
+                $sqlstr .= "UNION ALL ";
+                $sqlstr .= "SELECT v.variable, v.value, concat(substring(v.value,1,0),'off') state  FROM `globals` v ";
+                $sqlstr .= "WHERE v.variable LIKE 'OUT\_%' AND concat('OUTDISABLE_',substring(v.variable,5)) NOT IN ";
+                $sqlstr .= " ( SELECT variable from globals WHERE variable LIKE 'OUTDISABLE\_%' ) ";
+                $sqlstr .= "ORDER BY variable";
+                //$unique_trunks = sql("SELECT * FROM globals WHERE variable LIKE 'OUT_%' ORDER BY variable","getAll");
+                $unique_trunks = sql($sqlstr,"getAll");
+        }
 
 	//if no trunks have ever been defined, then create the proper variables with the default zap trunk
 	if (count($unique_trunks) == 0) 
@@ -3080,8 +3099,14 @@ function core_trunks_list($assoc = false) {
 
 //write the OUTIDS global variable (used in dialparties.agi)
 function core_trunks_writeoutids() {
-	// we have to escape _ for mysql: normally a wildcard
-	$unique_trunks = sql("SELECT variable FROM globals WHERE variable LIKE 'OUT\\\_%'","getAll"); 
+	// we have to escape _ for mysql: normally a wildcard (but not for sqlite3, it breaks!)
+	if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
+		$sql = "SELECT variable FROM globals WHERE variable LIKE 'OUT_%'";
+	}
+	else  {
+		$sql = "SELECT variable FROM globals WHERE variable LIKE 'OUT\\\_%'";
+	}
+	$unique_trunks = sql($sql,"getAll"); 
 
 	$outids = null; // Start off with nothing
 	foreach ($unique_trunks as $unique_trunk) {
@@ -3333,7 +3358,13 @@ function core_routing_getroutenames()
 	//
 	if (count($results) == 0) {
 		// see if they're still using the old dialprefix method
-		$results = sql("SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\\\_OUT\\\_%'","getAll");
+		if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
+			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL_OUT_%'";
+		}
+		else  {
+			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\\\_OUT\\\_%'";
+		}
+		$results = sql($sql,"getAll");
 		// we SUBSTRING() to remove "outrt-"
 		
 		if (count($results) > 0) {
@@ -3388,7 +3419,13 @@ function core_routing_getroutenames()
 			
 			
 			// delete old values
-			sql("DELETE FROM globals WHERE (variable LIKE 'DIAL\\\_OUT\\\_%') OR (variable = 'OUT') ");
+			if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
+				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL_OUT_%') OR (variable = 'OUT') ";
+			}
+			else  {
+				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL\\\_OUT\\\_%') OR (variable = 'OUT') ";
+			}
+			sql($sql);
 
 			// we need to re-generate extensions_additional.conf
 			// i'm not sure how to do this from here
