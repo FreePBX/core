@@ -1344,6 +1344,11 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting CANCEL - giving up'));
 			$ext->add($context, $exten, '', new ext_playtones('congestion'));
 			$ext->add($context, $exten, '', new ext_congestion(20));
+
+			$exten = 's-CHANUNAVAIL';
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTFAIL_${ARG1}}" = "x"]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} (hangupcause: ${HANGUPCAUSE}) - failing through to other trunks'));
 		
 			$exten = '_s-.';
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTFAIL_${ARG1}}" = "x"]', 'noreport'));
