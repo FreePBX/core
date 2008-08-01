@@ -233,7 +233,7 @@ foreach ($ext as $k) {
 				// TODO: why are we no using php unlink for this?, less overhead
 				//
 				if (ctype_digit($cidnum)) {
-					exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
+					unlink("$astvarlibdir/sounds/priv-callerintros/$cidnum.*");
 				}
 			}
 			$screen = true;
