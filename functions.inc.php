@@ -917,13 +917,15 @@ function core_get_config($engine) {
 				// If there's not a catchall, make one with an error message
 				if (!$catchall) {
 					$ext->add($catchall_context, 's', '', new ext_noop("No DID or CID Match"));
-					$ext->add($catchall_context, 's', '', new ext_answer(''));
+					$ext->add($catchall_context, 's', 'a2', new ext_answer(''));
 					$ext->add($catchall_context, 's', '', new ext_wait('2'));
 					$ext->add($catchall_context, 's', '', new ext_playback('ss-noservice'));
 					$ext->add($catchall_context, 's', '', new ext_sayalpha('${FROM_DID}'));
-					$ext->add($catchall_context, '_[*#X].', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
-					$ext->add($catchall_context, '_[*#X].', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
-					$ext->add($catchall_context, '_[*#X].', '', new ext_goto('1','s','ext-did'));
+					$ext->add($catchall_context, 's', '', new ext_hangup(''));
+					$ext->add($catchall_context, '_.', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
+					$ext->add($catchall_context, '_.', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
+					$ext->add($catchall_context, '_.', '', new ext_goto('a2','s'));
+					$ext->add($catchall_context, 'h', '', new ext_hangup(''));
 				}
 					
 			}
