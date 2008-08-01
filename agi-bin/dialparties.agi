@@ -230,10 +230,8 @@ foreach ($ext as $k) {
 			if($screen_call == "nomemory" && trim($cidum) != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
 				// Do a security check, we only numeric callerid numbers, otherwise code could be incjected in a cidnum field
 				// that could result in an arbitrary command being executed in this remove operation.
-				// TODO: why are we no using php unlink for this?, less overhead
-				//
 				if (ctype_digit($cidnum)) {
-					unlink("$astvarlibdir/sounds/priv-callerintros/$cidnum.*");
+					exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
 				}
 			}
 			$screen = true;
