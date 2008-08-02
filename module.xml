@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0alpha1.1</version>
+	<version>2.5.0alpha1.2</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.0alpha1.2* #2976, #2778, #2413, #2974, #2962, #2894, #2073
 		*2.5.0alpha1.1* #2930, #2938, #2922, #2939, #1568, #2949, #2779, #2953, #1911, #2807
 		*2.5.0alpha1.0* #2853, #2925, #2391, #2785, #2923, #2671, #2585, #2908, #2909, #2510, #2976, #2845, #1715, #2760, #2926, #2927, #2838, also added misc icons, links between users/devices
 		*2.4.0.4* #2857, #2848, #2791, #2449

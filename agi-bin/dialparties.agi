@@ -67,6 +67,18 @@ $cidnum = $AGI->request['agi_callerid'];
 $cidname = $AGI->request['agi_calleridname'];
 debug("Caller ID name is '$cidname' number is '$cidnum'", 1);
 
+$queue_wait = get_var( $AGI, "QUEUEWAIT" );
+if ($queue_wait != '') {
+	$saved_cidname = get_var( $AGI, "SAVEDCIDNAME" );
+	$elapsed = round((time() - $queue_wait)/60,0);
+	if ($saved_cidname == '') {
+		$AGI->set_variable('__SAVEDCIDNAME',$cidname);
+		$AGI->set_variable('CALLERID(name)',"M$elapsed:$cidname");
+	} else {
+		$AGI->set_variable('CALLERID(name)',"M$elapsed:$saved_cidname");
+	}
+}
+
 // From this point forward, Set KEEPCID in the channel so subsequent calls, CF, etc. retain the incoming
 // CID that get sent down channel local.
 $AGI->set_variable('__KEEPCID','TRUE');
