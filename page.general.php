@@ -134,7 +134,7 @@ foreach ($globals as $global) {
   <option value="ulaw"<?php if ($MIXMON_FORMAT == "ulaw") echo " SELECTED"; ?>><?php echo _("ulaw"); ?></option>
   <option value="alaw"<?php if ($MIXMON_FORMAT == "alaw") echo " SELECTED"; ?>><?php echo _("alaw"); ?></option>
   <option value="sln"<?php if ($MIXMON_FORMAT == "sln") echo " SELECTED"; ?>><?php echo _("sln"); ?></option>
-  <option value="gms"<?php if ($MIXMON_FORMAT == "gsm") echo " SELECTED"; ?>><?php echo _("gsm"); ?></option>
+  <option value="gsm"<?php if ($MIXMON_FORMAT == "gsm") echo " SELECTED"; ?>><?php echo _("gsm"); ?></option>
   <option value="g729"<?php if ($MIXMON_FORMAT == "g729") echo " SELECTED"; ?>><?php echo _("g729"); ?></option>
   </select>
   <br><br>  
