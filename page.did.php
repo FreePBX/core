@@ -143,7 +143,8 @@ if (isset($inroutes)) {
 				$editURL = $_SERVER['PHP_SELF'].'?display=extensions&extdisplay='.$did_dest[1];
 				$EXTorUSER = _("Extension");
 			}
-			$label = '<span><img width="16" height="16" border="0" title="'.sprintf(_("Edit %s"),$EXTorUSER).'" alt="" src="images/user_edit.png"/>&nbsp;'.sprintf(_("Edit %s %s"),$EXTorUSER, $did_dest[1]).'</span>';
+				$result = core_users_get($did_dest[1]);
+				$label = '<span><img width="16" height="16" border="0" title="'.sprintf(_("Edit %s"),$EXTorUSER).'" alt="" src="images/user_edit.png"/>&nbsp;'.sprintf(_("Edit %s %s (%s)"),$EXTorUSER, $did_dest[1],$result['name']).'</span>';
 			echo "<p><a href=".$editURL.">".$label."</a></p>";
 		}
 ?>
