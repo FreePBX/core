@@ -220,7 +220,7 @@ if (!$tech && !$extdisplay) {
 	);
 	foreach ($trunks as $trunk) {
 		$label = '<span><img width="16" height="16" border="0" title="'.$trunk['tlabel'].'" alt="" src="images/core_add.png"/>&nbsp;'.$trunk['tlabel'].'</span>';
-		echo "<a href=".$trunk['url'].">".$label."</a><br /><br /";
+		echo "<a href=".$trunk['url'].">".$label."</a><br /><br />";
 	}
 } else {
 	if ($extdisplay) {
