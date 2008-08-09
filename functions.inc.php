@@ -4467,7 +4467,7 @@ function core_devices_configpageload() {
 			if ( $extdisplay ) { // Editing
 				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
 			} else { // Adding
-				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenicate to the system."), '!isInteger()', $msgInvalidDevID, false));
+				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenticate to the system."), '!isInteger()', $msgInvalidDevID, false));
 			}
 			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The caller id name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This caller id will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other caller id settings."), '!isCallerID()', $msgInvalidEmergCID));

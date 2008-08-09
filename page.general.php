@@ -140,7 +140,7 @@ foreach ($globals as $global) {
   <br><br>  
   <a href=# class="info"><?php echo _("Recording Location:")?><span><br>
   <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Remember to make certain that the user 
-  asterisk is running as (if other than root) has permisions to wirte to the selected directory")?><br>
+  asterisk is running as (if other than root) has permisions to write to the selected directory")?><br>
   </span></a>
   <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
@@ -233,7 +233,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Direct VM Option")?><span>
-			<?php echo _("If a user defined option is to go to voicmail (using the 'dovm' extension) this is the default option if not specified by the user's settings."); ?></span></a>
+			<?php echo _("If a user defined option is to go to voicemail (using the 'dovm' extension) this is the default option if not specified by the user's settings."); ?></span></a>
 			</td>
 			<td align=right>
 			<select name="VMX_OPTS_DOVM" tabindex="<?php echo ++$tabindex;?>">
@@ -377,7 +377,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Check for Updates")?><span>
-			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resuling infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will trasmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is trasmitted."); ?></span></a>
+			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resulting infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will trasmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is trasmitted."); ?></span></a>
 			</td>
 			<td align=right>
 			<select name="online_updates" tabindex="<?php echo ++$tabindex;?>">
@@ -389,7 +389,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Update Email")?><span>
-			<?php echo _("Email address where online udpates will be sent. Leaving blank will result in no udpates being sent."); ?></span></a>
+			<?php echo _("Email address where online updates will be sent. Leaving blank will result in no updates being sent."); ?></span></a>
 			</td>
 			<td>
 				<input type="text" size="40" name="update_email" value="<?php  echo htmlspecialchars($update_email)?>" tabindex="<?php echo ++$tabindex;?>"/>
@@ -421,7 +421,7 @@ function warnConfirm (theField, s) {
 function general_onsubmit() {
 	var msgInvalidSeconds = "<?php echo _('Please enter a valid Number of Seconds'); ?>";
 	var msgInvalidDefaultFaxEmail = "<?php echo _('Please enter a valid Fax Email'); ?>";
-	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signalling. Asterisk will generate a ringing tone until the signalling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
+	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signaling. Asterisk will generate a ringing tone until the signalling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
 
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.RINGTIMER.value))

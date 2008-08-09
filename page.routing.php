@@ -615,7 +615,7 @@ function showDisable(key) {
 
 function routeEdit_onsubmit(act) {
 	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
-	var msgInvalidRoutePwd = "<?php echo _('Route password must be numberic or leave blank to disable'); ?>";
+	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
 	var msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
 	
