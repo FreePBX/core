@@ -73,8 +73,14 @@ $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'pickup');
-$fcc->setDescription('Call Pickup (Can be used with GXP-2000)');
+$fcc->setDescription('Directed Call Pickup');
 $fcc->setDefault('**');
+$fcc->update();
+unset($fcc);
+
+$fcc = new featurecode('core', 'pickupexten');
+$fcc->setDescription('Asterisk General Call Pickup');
+$fcc->setDefault('*8');
 $fcc->update();
 unset($fcc);
 
@@ -93,6 +99,12 @@ unset($fcc);
 $fcc = new featurecode('core', 'automon');
 $fcc->setDescription('In-Call Asterisk Toggle Call Recording');
 $fcc->setDefault('*1');
+$fcc->update();
+unset($fcc);
+
+$fcc = new featurecode('core', 'disconnect');
+$fcc->setDescription('In Call Disconnect Code');
+$fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
