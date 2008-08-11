@@ -19,6 +19,16 @@ $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
 $description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
+$privacyman = isset($_REQUEST['privacyman'])?$_REQUEST['privacyman']:'0';
+$faxexten = isset($_REQUEST['faxexten'])?$_REQUEST['faxexten']:null;
+$faxemail = isset($_REQUEST['faxemail'])?$_REQUEST['faxemail']:null;
+$answer = isset($_REQUEST['answer'])?$_REQUEST['answer']:'0';
+$alertinfo = isset($_REQUEST['alertinfo'])?$_REQUEST['alertinfo']:'';
+$mohclass = isset($_REQUEST['mohclass'])?$_REQUEST['mohclass']:'default';
+$grppre = isset($_REQUEST['grppre'])?$_REQUEST['grppre']:'';
+$wait = isset($_REQUEST['wait'])&&$_REQUEST['wait']?$_REQUEST['wait']:'';
+$delay_answer = isset($_REQUEST['delay_answer'])&&$_REQUEST['delay_answer']?$_REQUEST['delay_answer']:'';
+
 if (isset($_REQUEST['submitclear'])) {
 	$_REQUEST[$goto0.'0'] = '';
 }
@@ -173,28 +183,64 @@ if (isset($inroutes)) {
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info.')?></span></a>:</td>
 			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
+
+		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
+			<td><input type="text" name="alertinfo" size="10" value="<?php echo $alertinfo ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("CID name prefix")?><span><?php echo _('You can optionally prefix the Caller ID name. ie: If you prefix with "Sales:", a call from John Doe would display as "Sales:John Doe" on the extensions that ring.')?></span></a>:</td>
+			<td><input type="text" name="grppre" size="10" value="<?php echo $grppre ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+		</tr>
+<?php   if (function_exists('music_list')) { ?>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Music On Hold")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a>:</td>
+			<td>
+				<select name="mohclass" tabindex="<?php echo ++$tabindex;?>">
+				<?php
+					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
+					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
+					echo '<option value="none">'._("No Music")."</option>";
+					if (isset($tresults[0])) {
+						foreach ($tresults as $tresult) {
+							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+						}
+					}
+				?>		
+				</select>		
+			</td>
+		</tr>
+<?php } ?>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
+			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Pause Before Answer")?><span><?php echo _("An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.")?></span></a>:</td>
+			<td><input type="text" name="delay_answer" size="3" value="<?php echo ($delay_answer != '0')?$delay_answer:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+		</tr>
+
+		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
+
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts. The number of digits and attempts can be defined in privacy.conf. If a user has Call Screening enabled, the incoming caller will be asked to enter their CallerId here if enabled, and then to say their name once determined that the called user requires it.')?></span></a>:</td>
+			<td>
+				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
+					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
+					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
+				</select>
+			</td>
+		</tr>
+
 		<tr><td colspan="2"><h5><?php echo _("Fax Handling")?><hr></h5></td></tr>
+
 		<tr>
 			<td>
 				<a class="info" href="#"><?php echo _("Fax Extension")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br><br>The FreePBX default is defined in General Settings.")?></span></a>:
 			</td>
 			<td>
 				<select name="faxexten" tabindex="<?php echo ++$tabindex;?>">
-<?php 
-// Cleaning up warnings. I should do this a better way.
-if (!isset($faxexten))
-	$faxexten = null;
-if (!isset($faxemail))
-	$faxemail = null;
-if (!isset($answer))
-	$answer = '0';
-if (!isset($alertinfo))
-	$alertinfo = 0;
-if (!isset($mohclass))
-	$mohclass = 'default';
-if (!isset($grppre))
-	$grppre = "";
-?>
 					<option value="default" <?php  echo ($faxexten == 'default' ? 'SELECTED' : '')?>><?php echo _("FreePBX default")?>
 					<option value="disabled" <?php  echo ($faxexten == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
 					<option value="system" <?php  echo ($faxexten == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
@@ -230,56 +276,9 @@ if (!isset($grppre))
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Pause After Answer")?><span><?php echo _('The number of seconds we should wait after performing an Immediate Answer. The primary purpose of this is to pause and listen for a fax tone before allowing the call to proceed.')?></span></a>:</td>
-			<td><input type="text" name="wait" size="3" value="<?php echo isset($wait)?$wait:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
-		</tr>
-<?php
-if (!isset($privacyman))
-	$privacyman = '0';
-?>
-
-		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID is sent, Privacy Manager will asks the caller to enter their 10 digit phone number. The caller is given 3 attempts. The number of digits and attempts can be defined in privacy.conf. If a user has Call Screening enabled, the incoming caller will be asked to enter their CallerId here if enabled, and then to say their name once determined that the called user requires it.')?></span></a>:</td>
-			<td>
-				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
-					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
-					<option value="1" <?php  echo ($privacyman == '1' ? 'SELECTED' : '')?>><?php echo _("Yes")?>
-				</select>
-			</td>
+			<td><input type="text" name="wait" size="3" value="<?php echo ($wait != '0')?$wait:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		
-		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Alert Info")?><span><?php echo _('ALERT_INFO can be used for distinctive ring with SIP devices.')?></span></a>:</td>
-			<td><input type="text" name="alertinfo" size="10" value="<?php echo ($alertinfo)?$alertinfo:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
-		</tr>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("CID name prefix")?>:<span><?php echo _('You can optionally prefix the Caller ID name. ie: If you prefix with "Sales:", a call from John Doe would display as "Sales:John Doe" on the extensions that ring.')?></span></a>:</td>
-			<td><input type="text" name="grppre" size="10" value="<?php echo ($grppre)?$grppre:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
-		</tr>
-<?php   if (function_exists('music_list')) { ?>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.")?></span></a></td>
-			<td>
-				<select name="mohclass" tabindex="<?php echo ++$tabindex;?>">
-				<?php
-					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
-					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
-					echo '<option value="none">'._("No Music")."</option>";
-					if (isset($tresults[0])) {
-						foreach ($tresults as $tresult) {
-							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
-						}
-					}
-				?>		
-				</select>		
-			</td>
-		</tr>
-<?php } ?>
-		<tr>
-			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
-			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
-		</tr>
 <?php
 	// implementation of module hook
 	// object was initialized in config.php
@@ -315,6 +314,7 @@ function editGRP_onsubmit() {
 	var msgInvalidCIDNum = "<?php echo _('Please enter a valid Caller ID Number'); ?>";
 	var msgInvalidFaxEmail = "<?php echo _('Please enter a valid Fax Email or leave it empty to use the default'); ?>";
 	var msgInvalidPause = "<?php echo _('Please enter a valid number for Pause after answer'); ?>";
+	var msgInvalidPauseBefore = "<?php echo _('Please enter a valid number for Pause Before Answer field'); ?>";
 	var msgConfirmDIDCIDBlank = "<?php echo _('Leaving the DID Number AND the Caller ID Number empty will match all incoming calls received not routed using any other defined Incoming Route.\n\nAre you sure?'); ?>";
 	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number or for advanced users, a valid Asterisk Dial Pattern\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
 	var msgConfirmDIDNoSlash = "<?php echo _('A Slash (\'/\') is never a valid DID. Please remove it and try again'); ?>";
@@ -340,7 +340,10 @@ function editGRP_onsubmit() {
 		return warnInvalid(theForm.faxemail, msgInvalidFaxEmail);
 	
 	if (!isInteger(theForm.wait.value))
-		return warnInvalid(theForm.wait, msgInvalidPause);
+		return warnInvalid(theForm.wait, msgInvalidPauseBefore);
+
+	if (!isInteger(theForm.delay_answer.value))
+		return warnInvalid(theForm.delay_answer, msgInvalidPauseBefore);
 	
 	if (!validateDestinations(theForm,1,true))
 		return false;

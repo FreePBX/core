@@ -193,4 +193,22 @@ if ($count_callgroup || $count_pickup) {
 	out(_("not needed"));
 }
 
+// 2.5 new field
+//
+outn(_("checking for delay_answer field .."));
+$sql = "SELECT `delay_answer` FROM `incoming`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `incoming` ADD `delay_answer` INT(2) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error"));
+		die_freepbx($result->getDebugInfo()); 	
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}
+
 ?>

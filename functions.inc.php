@@ -861,6 +861,9 @@ function core_get_config($engine) {
 					if ($item['ringing'] === "CHECKED") {
 						$ext->add($context, $exten, '', new ext_ringing(''));
 					}
+					if ($item['delay_answer']) {
+						$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
+					}
 
 					if ($exten == "s" && $context == "ext-did") {  
 						//if the exten is s, then also make a catchall for undefined DIDs
@@ -1775,7 +1778,7 @@ function core_did_add($incoming,$target=false){
 
 	if (empty($existing)) {
 		$destination= ($target) ? $target : ${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer')";
 		sql($sql);
 		return true;
 	} else {
@@ -2636,6 +2639,7 @@ function core_users_add($vars, $editmode=false) {
 		$did_vars['mohclass']    = 'default';
 		$did_vars['description'] = $newdid_name;
 		$did_vars['grppre']      = '';
+		$did_vars['delay_answer']= '0';
 		core_did_add($did_vars, $did_dest);
 	}
 
