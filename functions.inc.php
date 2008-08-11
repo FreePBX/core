@@ -4074,7 +4074,7 @@ function core_users_configpageload() {
 	
 		if ( is_string($extdisplay) ) {	
 
-			if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
+			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				$extenInfo=core_users_get($extdisplay);
 				extract($extenInfo);
 			}
@@ -4083,7 +4083,7 @@ function core_users_configpageload() {
 	
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
-				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
+				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 					$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
@@ -4095,7 +4095,7 @@ function core_users_configpageload() {
 				}
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
-				if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
+				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 					$tlabel = sprintf(_("Delete User %s"),$extdisplay);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
@@ -4240,7 +4240,7 @@ function core_users_configprocess() {
 	//check if the extension is within range for this user
 	if (isset($extension) && !checkRange($extension)){
 		echo "<script>javascript:alert('". _("Warning! Extension")." ".$extension." "._("is not allowed for your account").".');</script>";
-		$_GLOBALS['abort'] = true;
+		$GLOBALS['abort'] = true;
 	} else {
 		//if submitting form, update database
 		if (!isset($action)) $action = null;
@@ -4249,13 +4249,18 @@ function core_users_configprocess() {
 				$conflict_url = array();
 				$usage_arr = framework_check_extension_usage($_REQUEST['extension']);
 				if (!empty($usage_arr)) {
-					$_GLOBALS['abort'] = true;
+					$GLOBALS['abort'] = true;
 					$conflict_url = framework_display_extension_usage_alert($usage_arr,true);
 					global $currentcomponent;
 					$id=0;
+					$currentcomponent->addguielem('_top', new gui_link_label('conflict', _("Conflicting Extensions"), _("The following extension numbers are in conflict, you can click on the item(s) below to edit the conflicting entity."), true));
 					foreach ($conflict_url as $edit_link) {
 						$currentcomponent->addguielem('_top', new gui_link('conflict'.$i++, $edit_link['label'], $edit_link['url']));
 					}
+					$msg = ($_REQUEST['display'] == 'users') ? _("Configure user again:") : _("Configure extension again:");
+					$currentcomponent->addguielem('_top', new gui_subheading('conflict_end', $msg, false));
+					unset($_REQUEST['action']);
+					redirect_standard_continue();
 				} elseif (core_users_add($_REQUEST)) {
 					needreload();
 					redirect_standard_continue();
@@ -4264,7 +4269,7 @@ function core_users_configprocess() {
 					// Comment, this does not help everywhere. Other hooks functions can hook before
 					// this like voicemail!
 					//
-					$_GLOBALS['abort'] = true;
+					$GLOBALS['abort'] = true;
 				}
 			break;
 			case "del":
@@ -4282,7 +4287,7 @@ function core_users_configprocess() {
 					redirect_standard_continue('extdisplay');
 				} else {
 					// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
-					$_GLOBALS['abort'] = true;
+					$GLOBALS['abort'] = true;
 				}
 			break;
 		}
@@ -4542,7 +4547,7 @@ function core_devices_configprocess() {
 	switch ($action) {
 		case "add":
 		// really bad hack - but if core_users_add fails, want to stop core_devices_add
-		if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
+		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 				needreload();
 				if ($deviceuser != 'new') {
@@ -4558,7 +4563,7 @@ function core_devices_configprocess() {
 		break;
 		case "edit":  //just delete and re-add
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
-			if (!isset($_GLOBALS['abort']) || $_GLOBALS['abort'] !== true) {
+			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				core_devices_del($extdisplay,true);
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
