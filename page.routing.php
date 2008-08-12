@@ -79,6 +79,7 @@ if (isset($_REQUEST["trunkpriority"])) {
 	}
 	unset($temptrunk);
 	$trunkpriority = array_values($trunkpriority); // resequence our numbers
+	$trunkpriority = array_unique($trunkpriority); // resequence our numbers
 }
 
 $routename = isset($_REQUEST["routename"]) ? $_REQUEST["routename"] : "";
