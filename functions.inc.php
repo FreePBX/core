@@ -2875,10 +2875,23 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 	
 	// find the next available ID
 	$trunknum = 1;
+
+	// This is pretty ugle, will fix when we redo trunks and routes with proper uniqueids.
+	// get the list, sort them, then look for a hole and use it, or overflow to the end if
+	// not and use that
+	//
+	$trunk_hash = array();
 	foreach(core_trunks_list() as $trunk) {
-		if ($trunknum == ltrim($trunk[0],"OUT_")) { 
-			$trunknum++;
+		$trunknum = ltrim($trunk[0],"OUT_");
+		$trunk_hash[] = $trunknum;
+	}
+	sort($trunk_hash);
+	$trunknum = 1;
+	foreach ($trunk_hash as $trunk_id) {
+		if ($trunk_id != $trunknum) {
+			break;
 		}
+		$trunknum++;
 	}
 	
 	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk);
