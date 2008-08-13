@@ -2514,8 +2514,20 @@ function core_users_add($vars, $editmode=false) {
 	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
 	$newdid = isset($newdid) ? $newdid : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
+
 	$newdidcid = isset($newdidcid) ? $newdidcid : '';
-	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
+	$newdidcid = trim($newdidcid);
+	switch ($newdidcid) {
+		case 'Unknown':
+		case 'Private':
+		case 'Blocked':
+		case 'Restricted':
+		case 'Unavailable':
+			break;
+		default:
+			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
+			break;
+	}
 
 	// Well more ugliness since the javascripts are already in here
 	if ($newdid != '' || $newdidcid != '') {
@@ -2750,8 +2762,20 @@ function core_users_edit($extension,$vars){
 	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
 	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
+
 	$newdidcid = isset($vars['newdidcid']) ? $vars['newdidcid'] : '';
-	$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdidcid));
+	$newdidcid = trim($newdidcid);
+	switch ($newdidcid) {
+		case 'Unknown':
+		case 'Private':
+		case 'Blocked':
+		case 'Restricted':
+		case 'Unavailable':
+			break;
+		default:
+			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
+			break;
+	}
 
 	// Well more ugliness since the javascripts are already in here
 	if ($newdid != '' || $newdidcid != '') {
@@ -4041,6 +4065,11 @@ function core_users_configpageinit($dispnum) {
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
 
+		// Special CID handling to deal with Private, etc.
+		//
+		$js = 'if (isDialpattern(mycid) || mycid == "Private" || mycid == "Blocked" || mycid == "Unknown" || mycid == "Restricted" || mycid == "Unavailable") { return true } else { return false };';
+		$currentcomponent->addjsfunc('isValidCID(mycid)', $js);
+
 		// Add the 'proces' functions
 		$currentcomponent->addguifunc('core_users_configpageload');
 		// Ensure users is called in middle order ($sortorder = 5), this is to allow
@@ -4134,7 +4163,7 @@ function core_users_configpageload() {
 		$msgInvalidDispName = _("Please enter a valid Display Name");
 		$msgInvalidOutboundCID = _("Please enter a valid Outbound CID");
 		$msgInvalidPause = _("Please enter a valid pause time in seconds, using digits only");
-		$msgInvalidDIDNum = _("You have entered a non-standard dialpattern for your DID. You can only enter standard dialpatterns. You must use the inbound routing form  to enter non-standard patterns");
+		$msgInvalidDIDNum = _("You have entered a non-standard dialpattern for your DID. You can only enter standard dialpatterns. You must use the inbound routing form to enter non-standard patterns");
 		$msgInvalidCIDNum = _("Please enter a valid Caller ID Number or leave it blank for your Assigned DID/CID pair");
 
 		// This is the actual gui stuff
@@ -4204,7 +4233,8 @@ function core_users_configpageload() {
 		$section = _("Assigned DID/CID");
 		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
+		//$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),'!isDialpattern()',$msgInvalidCIDNum,true), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A CID must be specified in the above Add DID box"),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4);
 
 		$dids = core_did_list('extension');
 		$did_count = 0;

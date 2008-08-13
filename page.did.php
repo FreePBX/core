@@ -333,7 +333,7 @@ function editGRP_onsubmit() {
 		warnInvalid(theForm.extension, msgConfirmDIDNoSlash);
 		return false;
 	}
-	if (!isDialpattern(theForm.cidnum.value))
+	if (!isDialpattern(theForm.cidnum.value) && theForm.cidnum.value != "Private" && theForm.cidnum.value != "Blocked" && theForm.cidnum.value != "Unknown" && theForm.cidnum.value != "Restricted" && theForm.cidnum.value != "Unavailable")
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
 	if (!isEmail(theForm.faxemail.value))
