@@ -139,8 +139,7 @@ foreach ($globals as $global) {
   </select>
   <br><br>  
   <a href=# class="info"><?php echo _("Recording Location:")?><span><br>
-  <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Remember to make certain that the user 
-  asterisk is running as (if other than root) has permisions to write to the selected directory")?><br>
+  <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Be sure to set proper permissions on the directory for the asterisk user.")?><br>
   </span></a>
   <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
