@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0rc1.0</version>
+	<version>2.5.0rc1.1</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.0rc1.1* #3060, #3072, #3078 mixmonitor recording dir typo, move disallow=all to top of all sip, iax sections, file call screening nomemory
 		*2.5.0rc1.0* #3053 allow routing in CIDs like Private, Blocked, Restricted, etc. and bump to rc1
 		*2.5.0beta1.4* #3046, #3019, #3047, #3040
 		*2.5.0beta1.3* #2530 typo _GLOBALS should be GLOBALS, clean up conflicts when creating users/extensions
@@ -79,6 +80,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.5/core-2.5.0rc1.0.tgz</location>
-	<md5sum>def9b6d0e82bfb2ba602daee10595d9c</md5sum>
+	<location>release/2.5/core-2.5.0rc1.1.tgz</location>
+	<md5sum>6378469a0321d01414874df8492dd81a</md5sum>
 </module>
