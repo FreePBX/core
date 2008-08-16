@@ -239,7 +239,7 @@ foreach ($ext as $k) {
 		$screen_call = $AGI->database_get('AMPUSER', $k."/screen");
 		$screen_call = $screen_call['data'];
 		if (strlen($screen_call)) {
-			if($screen_call == "nomemory" && trim($cidum) != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
+			if($screen_call == 'nomemory' && $cidnum != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
 				// Do a security check, we only numeric callerid numbers, otherwise code could be incjected in a cidnum field
 				// that could result in an arbitrary command being executed in this remove operation.
 				if (ctype_digit($cidnum)) {
