@@ -195,35 +195,50 @@ class core_conf {
 			$output .= "[$account]\n";
 	
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
-			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results2)) {
+			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2_pre)) {
    			die($results2->getMessage());
 			}
-			foreach ($results2 as $result2) {
-				$options = explode("&", $result2['data']);
-				if ($ver12) {
-					foreach ($options as $option) {
-						$output .= $result2['keyword']."=$option\n";
+
+			// Move all 'disallow=all' to the top to avoid errors
+			//
+			$results2 = array();
+			foreach ($results2_pre as $element) {
+				$options = explode("&", $element['data']);
+				foreach ($options as $option) {
+					if ($element['keyword'] == 'disallow' && $option == 'all') {
+						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
+					} else {
+						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
 					}
+				}
+			}
+			unset($results2_pre);
+
+			foreach ($results2 as $result2) {
+				$option = $result2['data'];
+				if ($ver12) {
+					$output .= $result2['keyword']."=$option\n";
 				} else {
-					foreach ($options as $option) {
-						switch (strtolower($result2['keyword'])) {
-							case 'insecure':
-								if ($option == 'very')
-									$output .= "insecure=port,invite\n";
-								else if ($option == 'yes')
-									$output .= "insecure=port\n";
-								else
-									$output .= $result2['keyword']."=$option\n";
-								break;
-							case 'allow':
-							case 'disallow':
-								if ($option != '')
-									$output .= $result2['keyword']."=$option\n";
-								break;
-							default:
+					switch (strtolower($result2['keyword'])) {
+						case 'insecure':
+							if ($option == 'very')
+								$output .= "insecure=port,invite\n";
+							else if ($option == 'yes')
+								$output .= "insecure=port\n";
+							else
 								$output .= $result2['keyword']."=$option\n";
-						}
+							break;
+						case 'allow':
+						case 'disallow':
+							if ($option != '')
+								$output .= $result2['keyword']."=$option\n";
+							break;
+						case 'record_in':
+						case 'record_out':
+							break;
+						default:
+							$output .= $result2['keyword']."=$option\n";
 					}
 				}
 			}
@@ -311,38 +326,53 @@ class core_conf {
 			$output .= "[$account]\n";
 	
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
-			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
-   			die($results2->getMessage());
+   			die($results2_pre->getMessage());
 			}	
-			foreach ($results2 as $result2) {
-				$options = explode("&", $result2['data']);
-				if ($ver12) {
-					foreach ($options as $option) {
-						$output .= $result2['keyword']."=$option\n";
+
+			// Move all 'disallow=all' to the top to avoid errors
+			//
+			$results2 = array();
+			foreach ($results2_pre as $element) {
+				$options = explode("&", $element['data']);
+				foreach ($options as $option) {
+					if ($element['keyword'] == 'disallow' && $option == 'all') {
+						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
+					} else {
+						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
 					}
+				}
+			}
+			unset($results2_pre);
+
+			foreach ($results2 as $result2) {
+				$option = $result2['data'];
+				if ($ver12) {
+					$output .= $result2['keyword']."=$option\n";
 				} else {
-					foreach ($options as $option) {
-						switch ($result2['keyword']) {
-							case 'notransfer':
-								if (strtolower($option) == 'yes') {
-									$output .= "transfer=no\n";
-								} else if (strtolower($option) == 'no') {
-									$output .= "transfer=yes\n";
-								} else if (strtolower($option) == 'mediaonly') {
-									$output .= "transfer=mediaonly\n";
-								} else {
-									$output .= $result2['keyword']."=$option\n";
-								}
-								break;
-							case 'allow':
-							case 'disallow':
-								if ($option != '')
-									$output .= $result2['keyword']."=$option\n";
-								break;
-							default:
+					switch ($result2['keyword']) {
+						case 'notransfer':
+							if (strtolower($option) == 'yes') {
+								$output .= "transfer=no\n";
+							} else if (strtolower($option) == 'no') {
+								$output .= "transfer=yes\n";
+							} else if (strtolower($option) == 'mediaonly') {
+								$output .= "transfer=mediaonly\n";
+							} else {
 								$output .= $result2['keyword']."=$option\n";
-						}
+							}
+							break;
+						case 'allow':
+						case 'disallow':
+							if ($option != '')
+								$output .= $result2['keyword']."=$option\n";
+							break;
+						case 'record_in':
+						case 'record_out':
+							break;
+						default:
+							$output .= $result2['keyword']."=$option\n";
 					}
 				}
 			}
