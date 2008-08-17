@@ -144,7 +144,7 @@ foreach ($globals as $global) {
   <input type="text" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
   <a href=# class="info"><?php echo _("Run after record:")?><span><br>
-  <?php echo _("An optional script to be run after the call is hungup.")?><br>
+  <?php echo _("An optional script to be run after the call is hungup. You can include channel and MixMon variables like \${CALLFILENAME}, \${MIXMON_FORMAT} and \${MIXMON_DIR}. To ensure that you variables are properly escaped, use the following notation: ^{MY_VAR}")?><br>
   </span></a>
   <input type="text" name="MIXMON_POST" value="<?php  echo htmlspecialchars($MIXMON_POST)?>" tabindex="<?php echo ++$tabindex;?>"/>
   <br><br>
