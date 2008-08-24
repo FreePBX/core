@@ -39,6 +39,7 @@ $dialopts = "";		// options for dialing
 $rc       = "";		// Catch return code
 $priority = "";		// Next priority 
 $rgmethod = "";		// If Ring Group what ringing method was chosen
+$screen   = false;		// initialize screen variable
 $dsarray  = array();	// This will hold all the dial strings, used to check for duplicate extensions
 
 $AGI = new AGI();
