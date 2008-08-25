@@ -1023,17 +1023,21 @@ function core_get_config($engine) {
 						$ext->add('ext-local', $exten['extension'], '', new ext_setvar('__RINGTIMER',$exten['ringtimer']));
 					
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
-					$ext->add('ext-local', $exten['extension'], '', new ext_hangup(''));
 					
 					if($vm != "novm") {
-						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',"$vm,DIRECTDIAL"));
-						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_hangup(''));
-						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_macro('vm',"$vm,BUSY"));
-						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_hangup(''));
-						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_macro('vm',"$vm,NOANSWER"));
-						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_hangup(''));
-						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_macro('vm',"$vm,NOMESSAGE"));
-						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_hangup(''));
+						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','vmret'));
+						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
+						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_goto('1','vmret'));
+						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_macro('vm',$vm.',BUSY,${IVR_RETVM}'));
+						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_goto('1','vmret'));
+						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_macro('vm',$vm.',NOANSWER,${IVR_RETVM}'));
+						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_goto('1','vmret'));
+						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_macro('vm',$vm.',NOMESSAGE,${IVR_RETVM}'));
+						$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_goto('1','vmret'));
+					} else {
+						// If we return from teh macro, it means we are suppose to return to the IVR
+						//
+						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','return','${IVR_CONTEXT}'));
 					}
 						
 					// Create the hints if running in normal mode
@@ -1067,10 +1071,16 @@ function core_get_config($engine) {
 					if($vm != "novm") {
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_setvar('__NODEST', ''));
-						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',"$vm,DIRECTDIAL"));
+						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
+						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','ext-local,vmret,playret'));
 					}
 				}
+				$ext->add('ext-local', 'vmret', '', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','playret'));
+				$ext->add('ext-local', 'vmret', '', new ext_hangup(''));
+				$ext->add('ext-local', 'vmret', 'playret', new ext_playback('exited-vm-will-be-transfered&silence/1'));
+				$ext->add('ext-local', 'vmret', '', new ext_goto('1','return','${IVR_CONTEXT}'));
 			}
+
 
 			// create from-trunk context for each trunk that adds counts to channels
 			//
