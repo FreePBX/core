@@ -848,6 +848,11 @@ function core_get_config($engine) {
 			}
 			
 			/* Always have Fax detection in ext-did, no matter what */
+
+			$ext->addInclude('ext-did', 'ext-did-0001'); // Add the include from from-internal
+			$ext->addInclude('ext-did', 'ext-did-0002'); // Add the include from from-internal
+			$ext->add('ext-did-0001', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
+			$ext->add('ext-did-0002', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 			$ext->add('ext-did', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 
 			/* inbound routing extensions */
@@ -859,22 +864,26 @@ function core_get_config($engine) {
 					if (trim($item['destination']) == '') {
 						continue;
 					}
-					$exten = $item['extension'];
-					$cidnum = $item['cidnum'];
+					$exten = trim($item['extension']);
+					$cidnum = trim($item['cidnum']);
 
 					// If the user put in just a cid number for routing, we add _. pattern to catch
 					// all DIDs with that CID number. Asterisk will complain about _. being dangerous
 					// but we don't want to limit this to just numberic as someone may be trying to
 					// route a non-numeric did
 					//
-					if (trim($cidnum) != '' && trim($exten) == '') {
+					if ($cidnum != '' && $exten == '') {
 						$exten = '_.';
+						$pricid = ($item['pricid']) ? true:false;
+					} else if (($cidnum != '' && $exten != '') || ($cidnum == '' && $exten == '')) {
+						$pricid = true;
+					} else {
+						$pricid = false;
 					}
+					$context = ($pricid) ? "ext-did-0001":"ext-did-0002";
 
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
-
-					$context = "ext-did";
 
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					// always set callerID name
@@ -895,7 +904,7 @@ function core_get_config($engine) {
 						$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
 					}
 
-					if ($exten == "s" && $context == "ext-did") {  
+					if ($exten == "s") {  
 						//if the exten is s, then also make a catchall for undefined DIDs
 						$catchaccount = "_.".(empty($cidnum)?"":"/".$cidnum);
 						if ($catchaccount =="_." && ! $catchall) {
@@ -1818,7 +1827,7 @@ function core_did_add($incoming,$target=false){
 
 	if (empty($existing)) {
 		$destination= ($target) ? $target : ${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 		sql($sql);
 		return true;
 	} else {
@@ -2692,6 +2701,7 @@ function core_users_add($vars, $editmode=false) {
 		$did_vars['description'] = $newdid_name;
 		$did_vars['grppre']      = '';
 		$did_vars['delay_answer']= '0';
+		$did_vars['pricid']= '';
 		core_did_add($did_vars, $did_dest);
 	}
 

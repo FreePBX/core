@@ -211,4 +211,20 @@ if(DB::IsError($check)) {
 	out(_("already exists"));
 }
 
+outn(_("checking for pricid field .."));
+$sql = "SELECT `pricid` FROM `incoming`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `incoming` ADD `pricid` VARCHAR(20) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error"));
+		die_freepbx($result->getDebugInfo()); 	
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}
+
 ?>

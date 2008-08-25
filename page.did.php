@@ -28,6 +28,7 @@ $mohclass = isset($_REQUEST['mohclass'])?$_REQUEST['mohclass']:'default';
 $grppre = isset($_REQUEST['grppre'])?$_REQUEST['grppre']:'';
 $wait = isset($_REQUEST['wait'])&&$_REQUEST['wait']?$_REQUEST['wait']:'';
 $delay_answer = isset($_REQUEST['delay_answer'])&&$_REQUEST['delay_answer']?$_REQUEST['delay_answer']:'';
+$pricid = isset($_REQUEST['pricid'])?$_REQUEST['pricid']:'';
 
 if (isset($_REQUEST['submitclear'])) {
 	$_REQUEST[$goto0.'0'] = '';
@@ -182,6 +183,11 @@ if (isset($inroutes)) {
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted and Unavailable in order to catch these special cases if the Telco transmits them.')?></span></a>:</td>
 			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+		</tr>
+
+		<tr>
+			<td><a href="#" class="info"><?php echo _("CID Priority Route")?><span><?php echo _('This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.')?></span></a>:</td>
+			<td><input type="checkbox" name="pricid" value="CHECKED" <?php echo $pricid ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 
 		<tr><td colspan="2"><h5><?php echo _("Options")?><hr></h5></td></tr>
