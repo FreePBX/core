@@ -927,7 +927,7 @@ function core_get_config($engine) {
 					if ($item['answer'] == "2") { // NVFaxDetect
 						$ext->add($context, $exten, '', new ext_answer(''));
 						$ext->add($context, $exten, '', new ext_playtones('ring'));
-						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']));
+						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']."|t"));
 					}
 					if ($item['privacyman'] == "1") {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
