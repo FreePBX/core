@@ -4596,16 +4596,18 @@ function core_devices_configpageload() {
 		$section = _("Device Options");
 		$currentcomponent->addguielem($section, new gui_label('techlabel', sprintf(_("This device uses %s technology."),$devinfo_tech)),4);
 		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
-		foreach ($devopts as $devopt=>$devoptarr) {
-			$devopname = 'devinfo_'.$devopt;
-			$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
-			$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
-			$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
-			
-			if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
-				$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
-			} else { // add so only basic
-				$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+		if (is_array($devopts)) {
+			foreach ($devopts as $devopt=>$devoptarr) {
+				$devopname = 'devinfo_'.$devopt;
+				$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
+				$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
+				$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+
+				if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
+					$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+				} else { // add so only basic
+					$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+				}
 			}
 		}
 	}
