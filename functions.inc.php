@@ -614,6 +614,7 @@ function core_getdestinfo($dest) {
 function core_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
 	global $version;  // this is not the best way to pass this, this should be passetd together with $engine
+	global $engineinfo;
 	global $amp_conf;
 	global $core_conf;
 
@@ -747,7 +748,7 @@ function core_get_config($engine) {
 			if ($fc_pickup != '') {
 				$ext->addInclude('from-internal-additional', 'app-pickup');
 				$fclen = strlen($fc_pickup);
-				$ext_pickup = (strstr($version, 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
+				$ext_pickup = (strstr($engineinfo['raw'], 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
 
 				$fcc = new featurecode('paging', 'intercom-prefix');
 				$intercom_code = $fcc->getCodeActive();
