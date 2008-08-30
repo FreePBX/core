@@ -1185,6 +1185,18 @@ function core_get_config($engine) {
 				$ext->addGlobal('CALLINGPRES_67', 'unavailable');
 			}
 
+			// Let's create globals for each trunk to determine which one's have fixlocalprefix settings.
+			// this allows us to skip calling the agi script if there are no rules to process saving
+			// on performance
+			//
+			$conf = core_trunks_readDialRulesFile();
+			if (is_array($conf)) {
+				foreach ($conf as $trunknum => $entries) {
+					$trunkname = substr($trunknum,6);
+					$ext->addGlobal("PREFIX_TRUNK_$trunkname",count($entries));
+				}
+			}
+
 			/* outbound routes */
 			// modules should use their own table for storage (and module_get_config() to add dialplan)
 			// modules should NOT use the extension table to store anything!
@@ -1368,7 +1380,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
-			$ext->add($context, $exten, 'skipoutcid', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, 'skipoutcid', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 			$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
 		
@@ -1447,7 +1459,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
-			$ext->add($context, $exten, 'skipoutcid', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, 'skipoutcid', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
 			// Back to normal processing, whether intracompany or not.
@@ -1554,7 +1566,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} >= ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
 			$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-			$ext->add($context, $exten, '', new ext_agi('fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, '', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			//  Replacement for asterisk's ENUMLOOKUP function
 			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
 			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
