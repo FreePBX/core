@@ -1139,6 +1139,8 @@ function core_get_config($engine) {
 				"AMPMGRPASS"
 			);
 
+			$disable_recording = false;
+
 			$sql = "SELECT * FROM globals";
 			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			foreach($globals as $global) {
@@ -1153,6 +1155,9 @@ function core_get_config($engine) {
 					foreach ($rm_keys as $index) {
 						unset($amp_conf_globals[$index]);
 					}
+				}
+				if (($global['variable'] == 'RECORDING_STATE') && (strtoupper($global['value']) == 'DISABLED')) {
+					$disable_recording = true;
 				}
 			}
 			foreach ($amp_conf_globals as $global) {
@@ -1195,6 +1200,23 @@ function core_get_config($engine) {
 					$trunkname = substr($trunknum,6);
 					$ext->addGlobal("PREFIX_TRUNK_$trunkname",count($entries));
 				}
+			}
+
+			// Generate macro-record-enable, if recording is disabled then we just make it a stub
+			// Otherwise we make it right
+			//
+			$context = 'macro-record-enable';
+			$exten = 's';
+			if ($disable_recording) {
+				$ext->add($context, $exten, '', new ext_macroexit());
+			} else {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
+				$ext->add($context, $exten, '', new ext_resetcdr('w'));
+				$ext->add($context, $exten, '', new ext_stopmonitor());
+				$ext->add($context, $exten, 'check', new ext_agi('recordingcheck,${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)},${UNIQUEID}'));
+				$ext->add($context, $exten, '', new ext_macroexit());
+				// keep this 999 in case people have issues updating their recording script
+				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'),'1',998);
 			}
 
 			/* outbound routes */

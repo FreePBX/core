@@ -64,7 +64,7 @@ switch($type['data']) {
 					$agi->verbose("Recording enable for ".$exten);
 					$agi->verbose("CALLFILENAME=g{$exten}-{$timestamp}-{$uniqueid}");
 					$agi->set_variable("CALLFILENAME","g{$exten}-{$timestamp}-{$uniqueid}");
-					$agi->set_priority(999);
+					$agi->set_priority('record');
 					exit(0);
 				}
 			}
@@ -93,7 +93,7 @@ switch($type['data']) {
 			$agi->verbose("Outbound recording enabled.");
 			$agi->verbose("CALLFILENAME=OUT{$exten['data']}-{$timestamp}-{$uniqueid}");
 			$agi->set_variable("CALLFILENAME","OUT{$exten['data']}-{$timestamp}-{$uniqueid}");
-			$agi->set_priority(999);
+			$agi->set_priority('record');
 			exit(0);
 		} else {
 			$agi->verbose("Outbound recording not enabled");
@@ -117,7 +117,7 @@ switch($type['data']) {
 			$agi->verbose("Inbound recording enabled.");
 			$agi->verbose("CALLFILENAME={$timestamp}-{$uniqueid}");
 			$agi->set_variable("CALLFILENAME","{$timestamp}-{$uniqueid}");
-			$agi->set_priority(999);
+			$agi->set_priority('record');
 			exit(0);	
 		} else {
 			$agi->verbose("Inbound recording not enabled");

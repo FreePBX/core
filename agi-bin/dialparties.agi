@@ -233,29 +233,25 @@ $already_screened = get_var( $AGI, "SCREEN" ); // If this is the second pass thr
 $from_outside     = get_var( $AGI, "FROM_DID" );
 $astvarlibdir     = get_var( $AGI, "ASTVARLIBDIR" );
 // If this isn't a ring group, check to see if the user has call screening on
-$count = 0;
-foreach ($ext as $k) {
-	// Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
-	if(($count == 0) && ($from_outside != '') && ($rgmethod == "none" || $fmgrp == $k) && !$already_screened) {
-		$screen_call = $AGI->database_get('AMPUSER', $k."/screen");
-		$screen_call = $screen_call['data'];
-		if (strlen($screen_call)) {
-			if($screen_call == 'nomemory' && $cidnum != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
-				// Do a security check, we only numeric callerid numbers, otherwise code could be incjected in a cidnum field
-				// that could result in an arbitrary command being executed in this remove operation.
-				if (ctype_digit($cidnum)) {
-					exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
-				}
+// Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
+if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && !$already_screened) {
+	$screen_call = $AGI->database_get('AMPUSER', $ext[0]."/screen");
+	$screen_call = $screen_call['data'];
+	if (strlen($screen_call)) {
+		if($screen_call == 'nomemory' && $cidnum != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
+			// Do a security check, we only numeric callerid numbers, otherwise code could be incjected in a cidnum field
+			// that could result in an arbitrary command being executed in this remove operation.
+			if (ctype_digit($cidnum)) {
+				exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
 			}
-			$screen = true;
-			$AGI->set_variable('__SCREEN',$screen_call);
-			$AGI->set_variable('__SCREEN_EXTEN',$k);
-			debug("Extension $k has call screening on", 4);
-		} else {
-			debug("Extension $k has call screening off", 4);
 		}
+		$screen = true;
+		$AGI->set_variable('__SCREEN',$screen_call);
+		$AGI->set_variable('__SCREEN_EXTEN',$ext[0]);
+		debug("Extension $k has call screening on", 4);
+	} else {
+		debug("Extension $k has call screening off", 4);
 	}
-	$count++;
 }
 // IF THE FIRST EXTENSION IS CALL FORWARD ENABLED (put in logic) then we don't do master mode
 // which means we reset the flag here after detecting that and just say we are not in master
@@ -308,7 +304,7 @@ $count = 0;
 $dndprimary = 0;
 // Now check for DND
 foreach ( $ext as $k ) {
-	if ( (strpos($k,"#")==0) ) {
+	if ( (substr($k,-1)=='#') ) {
 		// no point in doing if cf is enabled
 		$dnd = $AGI->database_get('DND',$k);
 		$dnd = $dnd['data'];
@@ -413,7 +409,7 @@ foreach ( $ext as $k ) {
 
 	// if CF is not in use and $dndprimary is not set otherwise $extnum has been cleared and nothing to do
 	//
-	if ( (strpos($k,"#")==0) && $dndprimary == 0) {
+	if ( (substr($k,-1)=='#') && $dndprimary == 0) {
 		// CW is not in use or CFB is in use on this extension, then we need to check!
 		if ( ($exthascw == 0) || ($exthascfb == 1) || ($exthascfu == 1) ) {
 			// get ExtensionState: 0-idle; 1-busy; 4-unavail; 8-ringing <--- these are unconfirmed
@@ -496,7 +492,7 @@ foreach ( $ext as $k ) {
 			 	$ds .= $extds . '&';
 			}
 			// Update Caller ID for calltrace application
-			if ((strpos($k,"#")==0) && (($rgmethod != "hunt") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) {
+			if ((substr($k,-1)=='#') && (($rgmethod != "hunt") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) {
 				if ( isset($cidnum) && is_numeric($cidnum) ) {
 					$rc = $AGI->database_put('CALLTRACE', $k, $cidnum);
 					if ($rc['result'] == 1) {

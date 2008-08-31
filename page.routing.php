@@ -551,7 +551,7 @@ $num_new_boxes = ($extdisplay ? 1 : ((count($trunks) > 3) ? 3 : count($trunks)))
 for ($i=0; $i < $num_new_boxes; $i++) {
 ?>
 		<tr>
-			<td> &nbsp </td>
+			<td>&nbsp;</td>
 			<td>
 				<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]">
 				<option value="" SELECTED></option>

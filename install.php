@@ -227,4 +227,17 @@ if(DB::IsError($check)) {
 	out(_("already exists"));
 }
 
+// Add variable RECORDING_STATE use to globally disable recording
+// TODO: move this to the upgrade script so it only has to be done
+//       once in a major upgrade when we move to next major release
+//
+outn("Checking for Global var RECORDING_STATE..");
+$nrows = $db->getOne("SELECT count(*) from globals where variable='RECORDING_STATE'");
+if (!$nrows) {
+	$db->query("insert into globals values ('RECORDING_STATE', 'ENABLED')");
+	out("Created");
+} else {
+	out("Already exists!");
+}
+
 ?>
