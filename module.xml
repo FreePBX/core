@@ -7,7 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.5.0rc2.4* #3140 fixed typo introduced in dialparties.agi
+		*2.5.0rc2.4* #3128, #3140 sqlite3 fix and fixed typo introduced in dialparties.agi
 		*2.5.0rc2.3* #3130, #2750, #3128, #3131 (requires r6519) added master recording disable (can be performance booster)
 		*2.5.0rc2.2* lots of changed to be updated
 		*2.5.0rc2.1* #3115, #3116 remove warning and add t option to nv_faxdetect
@@ -45,6 +45,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.5/core-2.5.0rc2.3.tgz</location>
-	<md5sum>3224cbf2923072322264daf036421c5a</md5sum>
+	<location>release/2.5/core-2.5.0rc2.4.tgz</location>
+	<md5sum>de7bd2d828f4caa516ab81c88765f8cf</md5sum>
 </module>
