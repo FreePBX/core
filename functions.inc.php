@@ -3473,7 +3473,7 @@ function core_routing_getroutenames()
 	if (count($results) == 0) {
 		// see if they're still using the old dialprefix method
 		if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
-			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL_OUT_%'";
+			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\_OUT\_%' ESCAPE '\'";
 		}
 		else  {
 			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\\\_OUT\\\_%'";
@@ -3534,7 +3534,7 @@ function core_routing_getroutenames()
 			
 			// delete old values
 			if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
-				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL_OUT_%') OR (variable = 'OUT') ";
+				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL\_OUT\_%') ESCAPE '\' OR (variable = 'OUT') ";
 			}
 			else  {
 				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL\\\_OUT\\\_%') OR (variable = 'OUT') ";
@@ -3654,7 +3654,12 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	$trunktech=array();
 
 	//Retrieve each trunk tech for later lookup
-	$sql="select * from globals WHERE variable LIKE 'OUT\\_%'";
+        if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
+		$sql="select * from globals WHERE variable LIKE 'OUT\_%' ESCAPE '\'";
+	}
+	else  {
+		$sql="select * from globals WHERE variable LIKE 'OUT\\_%'";
+	}
         $result = $db->getAll($sql);
         if(DB::IsError($result)) {
 		die_freepbx($result->getMessage());
