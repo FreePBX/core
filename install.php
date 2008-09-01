@@ -16,7 +16,7 @@ function did_migrate($incoming){
 	global $db;
 
 	foreach ($incoming as $key => $val) { 
-		${$key} = addslashes($val); 
+		${$key} = $db->escapeSimple($val); 
 	} 
 
 	// Check to make sure the did is not being used elsewhere

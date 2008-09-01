@@ -1827,15 +1827,16 @@ function core_did_del($extension,$cidnum){
 }
 
 function core_did_edit($old_extension,$old_cidnum, $incoming){
+	global $db;
 
-	$old_extension = addslashes(trim($old_extension));
-	$old_cidnum = addslashes(trim($old_cidnum));
+	$old_extension = $db->escapeSimple(trim($old_extension));
+	$old_cidnum = $db->escapeSimple(trim($old_cidnum));
 
 	$incoming['extension'] = trim($incoming['extension']);
 	$incoming['cidnum'] = trim($incoming['cidnum']);
 
-	$extension = addslashes($incoming['extension']);
-	$cidnum = addslashes($incoming['cidnum']);
+	$extension = $db->escapeSimple($incoming['extension']);
+	$cidnum = $db->escapeSimple($incoming['cidnum']);
 
 	// if did or cid changed, then check to make sure that this pair is not already being used.
 	//
@@ -1854,7 +1855,8 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 }
 
 function core_did_add($incoming,$target=false){
-	foreach ($incoming as $key => $val) { ${$key} = addslashes($val); } // create variables from request
+	global $db;
+	foreach ($incoming as $key => $val) { ${$key} = $db->escapeSimple($val); } // create variables from request
 
 	// Check to make sure the did is not being used elsewhere
 	//
@@ -1927,6 +1929,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	global $amp_conf;
 	global $currentFile;
 	global $astman;
+	global $db;
 
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 
@@ -1966,9 +1969,9 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	
 	if(!get_magic_quotes_gpc()) {
 		if(!empty($emergency_cid))
-			$emergency_cid = addslashes($emergency_cid);
+			$emergency_cid = $db->escapeSimple($emergency_cid);
 		if(!empty($description))
-			$description = addslashes($description);
+			$description = $db->escapeSimple($description);
 	}
 	
 	//insert into devices table
@@ -2169,6 +2172,7 @@ function core_devices2astdb(){
 function core_users2astdb(){
 	global $amp_conf;
 	global $astman;
+	global $db;
 
 	$sql = "SELECT * FROM users";
 	$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
@@ -2181,8 +2185,8 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
 			$astman->database_put("AMPUSER",$extension."/noanswer",$noanswer);
 			$astman->database_put("AMPUSER",$extension."/recording",$recording);
-			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".addslashes($outboundcid)."\"");
-			$astman->database_put("AMPUSER",$extension."/cidname","\"".addslashes($name)."\"");
+			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$db->escapeSimple($outboundcid)."\"");
+			$astman->database_put("AMPUSER",$extension."/cidname","\"".$db->escapeSimple($name)."\"");
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
 		}	
 		return true;
@@ -2595,7 +2599,7 @@ function core_users_add($vars, $editmode=false) {
 		}
 	}
 
-	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
+	$newdid_name = isset($newdid_name) ? $db->escapeSimple($newdid_name) : '';
 	$newdid = isset($newdid) ? $newdid : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 
@@ -2633,8 +2637,8 @@ function core_users_add($vars, $editmode=false) {
 	
 	//escape quotes and any other bad chars:
 	if(!get_magic_quotes_gpc()) {
-		$outboundcid = addslashes($outboundcid);
-		$name = addslashes($name);
+		$outboundcid = $db->escapeSimple($outboundcid);
+		$name = $db->escapeSimple($name);
 	}
 
 	//if voicemail is enabled, set the box@context to use
@@ -2844,7 +2848,7 @@ function core_users_edit($extension,$vars){
 	
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
-	$newdid_name = isset($newdid_name) ? addslashes($newdid_name) : '';
+	$newdid_name = isset($newdid_name) ? $db->escapeSimple($newdid_name) : '';
 	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 
