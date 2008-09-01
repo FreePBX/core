@@ -3168,10 +3168,10 @@ function core_trunks_list($assoc = false) {
         // sqlite doesn't support the syntax required for the SQL so we have to do it the hard way
         if ($amp_conf["AMPDBENGINE"] == "sqlite3")
         {
-                $sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUT_%'";
+		$sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUT\_%' ESCAPE '\'";
                 $my_unique_trunks = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
 
-                $sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUTDISABLE_%'";
+		$sqlstr = "SELECT variable, value FROM globals WHERE variable LIKE 'OUTDISABLE\_%' ESCAPE '\'";
                 $disable_states = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
 
                 foreach($disable_states as $arr)  {
