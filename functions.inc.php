@@ -3020,11 +3020,8 @@ function core_trunks_del($trunknum, $tech = null) {
 	}
 
 	//delete from globals table
-	sql("DELETE FROM globals WHERE variable LIKE '%OUT_$trunknum' OR variable IN ('OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum','OUTKEEPCID_$trunknum','OUTFAIL_$trunknum','OUTDISABLE_$trunknum')");
+	sql("DELETE FROM globals WHERE variable IN ('OUT_$trunknum','OUTCID_$trunknum','OUTMAXCHANS_$trunknum','OUTPREFIX_$trunknum','OUTKEEPCID_$trunknum','OUTFAIL_$trunknum','OUTDISABLE_$trunknum')");
 	
-	//write outids
-	core_trunks_writeoutids();
-
 	// conditionally, delete from iax or sip
 	switch (strtolower($tech)) {
 		case "iax":
@@ -3075,8 +3072,6 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 		die_freepbx($result->getMessage()."<br><br>".$sql);
 	}
 	
-	core_trunks_writeoutids();
-
 	$disable_flag = ($disabletrunk == "on")?1:0;
 	
 	switch (strtolower($tech)) {
@@ -3210,20 +3205,11 @@ function core_trunks_list($assoc = false) {
         }
 
 	//if no trunks have ever been defined, then create the proper variables with the default zap trunk
+	// TODO: this looks dumb, updated to remove deprecated values but why can't there be no trunks?
+	//
 	if (count($unique_trunks) == 0) 
 	{
-		//If all trunks have been deleted from admin, dialoutids might still exist
-		sql("DELETE FROM globals WHERE variable = 'DIALOUTIDS'");
-	
-		$glofields = array(array('OUT_1','ZAP/g0'),
-							array('DIAL_OUT_1','9'),
-							array('DIALOUTIDS','1'));
-		$compiled = $db->prepare('INSERT INTO globals (variable, value) values (?,?)');
-		$result = $db->executeMultiple($compiled,$glofields);
-		if(DB::IsError($result))
-		{
-			die_freepbx($result->getMessage()."<br><br>".$sql);	
-		}
+		sql("INSERT INTO globals (variable, value) values ('OUT_1','ZAP/g0')");
 		$unique_trunks[] = array('OUT_1','ZAP/g0');
 	}
 	// asort($unique_trunks);
@@ -3244,27 +3230,6 @@ function core_trunks_list($assoc = false) {
 	} else {
 		return $unique_trunks;
 	}
-}
-
-//write the OUTIDS global variable (used in dialparties.agi)
-function core_trunks_writeoutids() {
-	// we have to escape _ for mysql: normally a wildcard (but not for sqlite3, it breaks!)
-	if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
-		$sql = "SELECT variable FROM globals WHERE variable LIKE 'OUT_%'";
-	}
-	else  {
-		$sql = "SELECT variable FROM globals WHERE variable LIKE 'OUT\\\_%'";
-	}
-	$unique_trunks = sql($sql,"getAll"); 
-
-	$outids = null; // Start off with nothing
-	foreach ($unique_trunks as $unique_trunk) {
-		$outid = strtok($unique_trunk[0],"_");
-		$outid = strtok("_");
-		$outids .= $outid ."/";
-	}
-	
-	sql("UPDATE globals SET value = '$outids' WHERE variable = 'DIALOUTIDS'");
 }
 
 function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
