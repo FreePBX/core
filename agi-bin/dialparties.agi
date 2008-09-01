@@ -304,7 +304,7 @@ $count = 0;
 $dndprimary = 0;
 // Now check for DND
 foreach ( $ext as $k ) {
-	if ( (substr($k,-1)=='#') ) {
+	if ( (substr($k,-1)!='#') ) {
 		// no point in doing if cf is enabled
 		$dnd = $AGI->database_get('DND',$k);
 		$dnd = $dnd['data'];
@@ -409,7 +409,7 @@ foreach ( $ext as $k ) {
 
 	// if CF is not in use and $dndprimary is not set otherwise $extnum has been cleared and nothing to do
 	//
-	if ( (substr($k,-1)=='#') && $dndprimary == 0) {
+	if ( (substr($k,-1)!='#') && $dndprimary == 0) {
 		// CW is not in use or CFB is in use on this extension, then we need to check!
 		if ( ($exthascw == 0) || ($exthascfb == 1) || ($exthascfu == 1) ) {
 			// get ExtensionState: 0-idle; 1-busy; 4-unavail; 8-ringing <--- these are unconfirmed
@@ -492,7 +492,7 @@ foreach ( $ext as $k ) {
 			 	$ds .= $extds . '&';
 			}
 			// Update Caller ID for calltrace application
-			if ((substr($k,-1)=='#') && (($rgmethod != "hunt") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) {
+			if ((substr($k,-1)!='#') && (($rgmethod != "hunt") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) {
 				if ( isset($cidnum) && is_numeric($cidnum) ) {
 					$rc = $AGI->database_put('CALLTRACE', $k, $cidnum);
 					if ($rc['result'] == 1) {

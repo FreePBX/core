@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0rc2.3</version>
+	<version>2.5.0rc2.4</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.0rc2.4* #3140 fixed typo introduced in dialparties.agi
 		*2.5.0rc2.3* #3130, #2750, #3128, #3131 (requires r6519) added master recording disable (can be performance booster)
 		*2.5.0rc2.2* lots of changed to be updated
 		*2.5.0rc2.1* #3115, #3116 remove warning and add t option to nv_faxdetect
