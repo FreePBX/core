@@ -2603,18 +2603,9 @@ function core_users_add($vars, $editmode=false) {
 	$newdid = isset($newdid) ? $newdid : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 
-	$newdidcid = isset($newdidcid) ? $newdidcid : '';
-	$newdidcid = trim($newdidcid);
-	switch ($newdidcid) {
-		case 'Unknown':
-		case 'Private':
-		case 'Blocked':
-		case 'Restricted':
-		case 'Unavailable':
-			break;
-		default:
-			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
-			break;
+	$newdidcid = isset($newdidcid) ? trim($newdidcid) : '';
+	if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym/',strtolower($newdidcid))) {
+		$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
 	}
 
 	// Well more ugliness since the javascripts are already in here
@@ -2852,18 +2843,9 @@ function core_users_edit($extension,$vars){
 	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
 	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($newdid));
 
-	$newdidcid = isset($vars['newdidcid']) ? $vars['newdidcid'] : '';
-	$newdidcid = trim($newdidcid);
-	switch ($newdidcid) {
-		case 'Unknown':
-		case 'Private':
-		case 'Blocked':
-		case 'Restricted':
-		case 'Unavailable':
-			break;
-		default:
-			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
-			break;
+	$newdidcid = isset($vars['newdidcid']) ? trim($vars['newdidcid']) : '';
+	if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym/',strtolower($newdidcid))) {
+		$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
 	}
 
 	// Well more ugliness since the javascripts are already in here
@@ -4126,8 +4108,11 @@ function core_users_configpageinit($dispnum) {
 
 		// Special CID handling to deal with Private, etc.
 		//
-		$js = 'if (isDialpattern(mycid) || mycid == "Private" || mycid == "Blocked" || mycid == "Unknown" || mycid == "Restricted" || mycid == "Unavailable") { return true } else { return false };';
-		$currentcomponent->addjsfunc('isValidCID(mycid)', $js);
+		$js = 
+		'var mycid = thiscid.toLowerCase();
+		if (isDialpattern(thiscid) || mycid.substring(0,4) == "priv" || mycid.substring(0,5) == "block" || mycid == "unknown" || mycid.substring(0,8) == "restrict" || mycid.substring(0,7) == "unavail" || mycid.substring(0,6) == "anonym") { return true } else { return false };
+		';
+		$currentcomponent->addjsfunc('isValidCID(thiscid)', $js);
 
 		// Add the 'proces' functions
 		$currentcomponent->addguifunc('core_users_configpageload');
@@ -4292,7 +4277,7 @@ function core_users_configpageload() {
 		$section = _("Assigned DID/CID");
 		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4);
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
-		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted and Unavailable in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4);
+		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4);
 
 		$dids = core_did_list('extension');
 		$did_count = 0;

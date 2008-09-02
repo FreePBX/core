@@ -181,7 +181,7 @@ if (isset($inroutes)) {
 			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted and Unavailable in order to catch these special cases if the Telco transmits them.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them.')?></span></a>:</td>
 			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 
@@ -339,7 +339,9 @@ function editGRP_onsubmit() {
 		warnInvalid(theForm.extension, msgConfirmDIDNoSlash);
 		return false;
 	}
-	if (!isDialpattern(theForm.cidnum.value) && theForm.cidnum.value != "Private" && theForm.cidnum.value != "Blocked" && theForm.cidnum.value != "Unknown" && theForm.cidnum.value != "Restricted" && theForm.cidnum.value != "Unavailable")
+
+	var mycid = theForm.cidnum.value.toLowerCase();
+	if (!isDialpattern(mycid) && mycid.substring(0,4) != "priv" && mycid.substring(0,5) != "block" && mycid != "unknown" && mycid.substring(0,8) != "restrict" && mycid.substring(0,7) != "unavail" && mycid.substring(0,6) != "anonym")
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
 	if (!isEmail(theForm.faxemail.value))
