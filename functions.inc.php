@@ -1408,8 +1408,7 @@ function core_get_config($engine) {
 		
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
-			$ext->add($context, $exten, '', new ext_gotoif('$[$["${MOHCLASS}" = "default"] | $["foo${MOHCLASS}" = "foo"]]', 'gocall'));  // Set to YES if we should pump silence
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', 'M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));  // set MoH or off
+			$ext->add($context, $exten, '', new ext_execif('$[$["${MOHCLASS}" != "default"] & $["${MOHCLASS}" != ""]]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -1486,8 +1485,7 @@ function core_get_config($engine) {
 
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
-			$ext->add($context, $exten, '', new ext_gotoif('$[$["${MOHCLASS}" = "default"] | $["foo${MOHCLASS}" = "foo"]]', 'gocall'));  // Set to YES if we should pump silence
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', 'M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));  // set MoH or off
+			$ext->add($context, $exten, '', new ext_execif('$[$["${MOHCLASS}" != "default"] & $["${MOHCLASS}" != ""]]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -1630,16 +1628,12 @@ function core_get_config($engine) {
 			}
 
 			// Keep the original CallerID number, for failover to the next trunk.
-			$ext->add($context, $exten, '', new ext_gotoif('$["${REALCALLERIDNUM:1:2}" != ""]', 'start'));
-			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${CALLERID(number)}'));
-			$ext->add($context, $exten, 'start', new ext_noop('REALCALLERIDNUM is ${REALCALLERIDNUM}'));
 
+			$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
 			// If this came through a ringgroup or CF, then we want to retain original CID unless
 			// OUTKEEPCID_${trunknum} is set.
 			// Save then CIDNAME while it is still intact in case we end up sending out this same CID
-			$ext->add($context, $exten, '', new ext_gotoif('$["${KEEPCID}" != "TRUE"]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTKEEPCID_${ARG1}}" = "xon"]', 'normcid'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["foo${REALCALLERIDNUM}" = "foo"]', 'normcid'));  // if not set to anything, go through normal processing
+			$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 			$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 			//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
@@ -1650,24 +1644,27 @@ function core_get_config($engine) {
 			// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 			// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 			// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-			$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass', 'normcid'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass'));
 
 			$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${REALCALLERIDNUM}/outboundcid)}'));
 			$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 			$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
-			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // empty EMERGENCY CID, so default back to trunk
+			$ext->add($context, $exten, '', new ext_gotoif('$[ $["${EMERGENCYROUTE:1:2}" = ""] | $["${EMERGENCYCID:1:2}" = ""] ]', 'trunkcid'));  // check EMERGENCY ROUTE
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
-			$ext->add($context, $exten, '', new ext_goto('report'));
-			$ext->add($context, $exten, 'trunkcid', new ext_gotoif('$["${TRUNKOUTCID:1:2}" = ""]', 'usercid'));  // check for CID override for trunk (global var)
-			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${TRUNKOUTCID}'));
-			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'report'));  // check CID override for extension
+			$ext->add($context, $exten, 'exit', new ext_macroexit());
+
+
+			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID:1:2}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
+
+			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'exit'));  // check CID override for extension
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${USEROUTCID}'));
 			//$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'report', 'hidecid'));  // check CID blocking for extension
-			$ext->add($context, $exten, 'hidecid', new ext_setcallerpres('prohib_passed_screen'));  // Only works with ISDN (T1/E1/BRI)
+			if (version_compare($version, "1.6", "lt")) { 
+				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'SetCallerPres', 'prohib_passed_screen'));
+			} else {
+				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES()=prohib_passed_screen'));
+			}
 			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
-			$ext->add($context, $exten, 'report', new ext_noop('CallerID set to ${CALLERID(all)}'));			
 
 			
 			/*
