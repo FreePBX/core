@@ -4135,7 +4135,7 @@ function core_users_configpageload() {
 	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
-	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = null;
+	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
