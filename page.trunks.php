@@ -458,15 +458,14 @@ if ($helptext != '') {
 			}
 
 			function disable_verify(field) {
-			    if (field.checked) {
-				var answer=confirm("Are you sure you want to disable this trunk in all routes it is used?");
-				if (!answer) {
-				    field.checked = false;
+				if (field.checked) {
+					var answer=confirm("<?php echo _("Are you sure you want to disable this trunk in all routes it is used?") ?>");
+					if (!answer) {
+						field.checked = false;
+					}
+				} else {
+					alert("<?php echo _("You have enabled this trunk in all routes it is used") ?>");
 				}
-			    }
-			    else {
-				alert("You have enabled this trunk in all routes it is used");
-			    }
 			}
 
 			function populateLookup(digits) {
