@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0rc2.4</version>
+	<version>2.5.0rc2.5</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.0rc2.5* #3129, #3144, #3146 and some streamling of dialout-trunk and outbound-callerid
 		*2.5.0rc2.4* #3128, #3140 sqlite3 fix and fixed typo introduced in dialparties.agi
 		*2.5.0rc2.3* #3130, #2750, #3128, #3131 (requires r6519) added master recording disable (can be performance booster)
 		*2.5.0rc2.2* lots of changed to be updated
@@ -45,6 +46,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.5/core-2.5.0rc2.4.tgz</location>
-	<md5sum>de7bd2d828f4caa516ab81c88765f8cf</md5sum>
+	<location>release/2.5/core-2.5.0rc2.5.tgz</location>
+	<md5sum>7a4d6093205968bac89c4bf6ae9dbbfb</md5sum>
 </module>
