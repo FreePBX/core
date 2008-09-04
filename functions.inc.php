@@ -1724,6 +1724,10 @@ function core_get_config($engine) {
 			
 			$exten = 'dorecord';
 			
+			// Delete all versions of the current sound file (does not consider languages though
+			// otherwise you might have some versions that are not re-recorded
+			//
+			$ext->add($context, $exten, '', new ext_system('rm ${ASTVARLIBDIR}/sounds/${RECFILE}.*'));
 			$ext->add($context, $exten, '', new ext_record('${RECFILE}:wav'));
 			$ext->add($context, $exten, '', new ext_wait(1));
 			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
