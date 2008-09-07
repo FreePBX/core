@@ -8,18 +8,26 @@ class core_conf {
 	var $_applicationmap = array();
 	// return an array of filenames to write
 	function get_filename() {
+		global $chan_dahdi;
+		
 		$files = array(
 			'sip_additional.conf',
 			'sip_registrations.conf',
 			'iax_additional.conf',
 			'iax_registrations.conf',
-			'zapata_additional.conf',
 			'sip_general_additional.conf',
 			'iax_general_additional.conf',
 			'features_general_additional.conf',
 			'features_applicationmap_additional.conf',
 			'features_featuremap_additional.conf',
-			);
+		);
+
+		if ($chan_dahdi) {
+			$files[] = 	'chan_dahdi_additional.conf';
+		} else {
+			$files[] = 	'zapata_additional.conf';
+		}
+
 		return $files;
 	}
 	
@@ -45,6 +53,9 @@ class core_conf {
 				break;
 			case 'iax_registrations.conf':
 				return $this->generate_iax_registrations($version);
+				break;
+			case 'chan_dahdi_additional.conf':
+				return $this->generate_zapata_additional($version);
 				break;
 			case 'zapata_additional.conf':
 				return $this->generate_zapata_additional($version);
@@ -617,6 +628,7 @@ function core_get_config($engine) {
 	global $engineinfo;
 	global $amp_conf;
 	global $core_conf;
+	global $chan_dahdi;
 
 	$modulename = "core";
 	
@@ -1144,7 +1156,11 @@ function core_get_config($engine) {
 			$sql = "SELECT * FROM globals";
 			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			foreach($globals as $global) {
-				$ext->addGlobal($global['variable'],$global['value']);
+				$value = $global['value'];
+				if ($chan_dahdi && substr($value, 0, 4) === 'ZAP/') {
+					$value = 'DAHDI/' . substr($value, 4);
+				}
+				$ext->addGlobal($global['variable'],$value);
 
 				// now if for some reason we have a variable in the global table
 				// that is in our $amp_conf_globals list, then remove it so we
@@ -1172,7 +1188,9 @@ function core_get_config($engine) {
 			}
 			// Put the asterisk version in a global for agi etc.
 			$ext->addGlobal('ASTVERSION', $version);
-
+			// Put the use of chan_dahdi in a global for dialparties
+			$ext->addGlobal('ASTCHANDAHDI', $chan_dahdi ? '1' : '0');
+			
 			// Create CallingPresTable to deal with difference that ${CALINGPRES} returns vs. what
 			// SetCallerPres() accepts. This is a workaround that gets resolved in 1.6 where
 			// function CALLINGPRES() is consistent.
@@ -1764,7 +1782,42 @@ function core_get_config($engine) {
 			$ext->add($context, 'i', '', new ext_goto(1, 'confmenu'));
 
 			$ext->add($context, 'h', '', new ext_hangup());
+
 			
+			$context = 'from-zaptel';
+			$exten = '_X.';
+			
+			$ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
+			$ext->add($context, $exten, '', new ext_goto(1, 's'));
+
+			$exten = 's';
+			$ext->add($context, $exten, '', new ext_noop('Entering from-zaptel with DID == ${DID}'));
+			// Some trunks _require_ a RINGING be sent before an Answer. 
+			$ext->add($context, $exten, '', new ext_ringing());
+			// If ($did == "") { $did = "s"; }
+			$ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
+			$ext->add($context, $exten, '', new ext_noop('DID is now ${DID}'));
+			if ($chan_dahdi) {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="DAHDI"]', 'zapok', 'notzap'));
+			} else { 
+				$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:3}"="Zap"]', 'zapok', 'notzap'));
+			}
+			$ext->add($context, $exten, 'notzap', new ext_goto('1', '${DID}', 'from-pstn'));
+			// If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
+			$ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
+			$ext->add($context, $exten, 'zapok', new ext_noop('Is a Zaptel Channel'));
+			if ($chan_dahdi) {
+				$ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
+			} else { 
+				$ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:4}'));
+			}				
+			$ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
+			$ext->add($context, $exten, '', new ext_macro('from-zaptel-${CHAN}', '${DID},1'));
+			// If nothing there, then treat it as a DID
+			$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-zaptel-${CHAN}'));
+			$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
+			$ext->add($context, 'fax', '', new ext_goto(1, 'in_fax', 'ext-fax'));
+									
 		break;
 	}
 }
@@ -1931,7 +1984,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	global $currentFile;
 	global $astman;
 	global $db;
-
+	
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 
 	if (trim($id) == '' ) {
@@ -2366,7 +2419,7 @@ function core_devices_getiax2($account) {
 function core_devices_addzap($account) {
 	global $db;
 	global $currentFile;
-	
+		
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
@@ -2448,6 +2501,7 @@ function core_devices_getzap($account) {
 function core_hint_get($account){
 	global $astman;
 
+	$chan_dahdi = ast_with_dahdi();
 	// We should always check the AMPUSER in case they logged into a device
 	// but we will fall back to the old methond if $astman not open although
 	// I'm pretty sure everything else will puke anyhow if not running
@@ -2464,7 +2518,11 @@ function core_hint_get($account){
 	//create an array of strings
 	if (is_array($results)){
 		foreach ($results as $result) {
-			$dial[] = $result['dial'];
+			if ($chan_dahdi) {
+				$dial[] = str_replace('ZAP', 'DAHDI', $result['dial']);
+			} else {
+				$dial[] = $result['dial'];
+			}
 		}
 	}
 	
@@ -3036,6 +3094,7 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 	// change iax to "iax2" (only spot we actually store iax2, since its used by Dial()..)
 	$techtemp = ((strtolower($tech) == "iax") ? "iax2" : $tech);
 	$outval = (($techtemp == "custom") ? "AMP:".$channelid : strtoupper($techtemp).'/'.$channelid);
+	
 	
 	$glofields = array(
 			array('OUT_'.$trunknum, $outval),

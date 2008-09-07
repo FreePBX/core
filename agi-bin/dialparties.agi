@@ -50,6 +50,7 @@ $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
 $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
 $cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
 $ast_version = get_var( $AGI, "ASTVERSION" );
+$chan_dahdi  = get_var( $AGI, "ASTCHANDAHDI" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
@@ -705,6 +706,7 @@ function get_var( $agi, $value) {
 }
 
 function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
+	global $chan_dahdi;
 	$dialstring = '';
 	
 	if (strpos($extnum,'#') != 0) {
@@ -732,7 +734,11 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 		foreach ($device_array as $adevice) {
 			if (trim($use_confirmation) == "FALSE") {
 				$dds = $agi->database_get('DEVICE',$adevice.'/dial');
-				$dialstring .= $dds['data'];
+				if ($chan_dahdi) {
+					$dialstring .= str_replace('ZAP', 'DAHDI', $dds['data']);
+				} else {
+					$dialstring .= $dds['data'];
+				}				
 				$dialstring .= '&';
 			} else {
 				$dialstring .= 'Local/LC-'.$adevice.'@from-internal&';
