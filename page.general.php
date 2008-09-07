@@ -106,7 +106,7 @@ foreach ($globals as $global) {
 <h5><?php echo _("Dialing Options")?></h5>
 <table>
 	<tr><td>
-	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span><br>
+	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span>
 <?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
 <?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
 <?php echo _("r: Generate a ringing tone for the calling party")?><br>
@@ -117,7 +117,7 @@ foreach ($globals as $global) {
 	<input type="text" size="10" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span><br>
+	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span>
 <?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
 <?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
 <?php echo _("w: Allow the called user to start recording after pressing *1 (Asterisk v1.2)")?><br>
@@ -141,8 +141,8 @@ foreach ($globals as $global) {
 	</select>
 	</td></tr>
 	<tr><td>
-  <a href=# class="info"><?php echo _("Call recording format:")?><span><br>
-  <?php echo _("Pick the format in which to save recorded calls")?><br>
+  <a href=# class="info"><?php echo _("Call recording format:")?><span>
+  <?php echo _("Pick the format in which to save recorded calls")?>
   </span></a>
 	</td><td align="right">
   <select name="MIXMON_FORMAT" tabindex="<?php echo ++$tabindex;?>">
@@ -156,14 +156,14 @@ foreach ($globals as $global) {
   </select>
 	</td></tr>
 	<tr><td>
-  <a href=# class="info"><?php echo _("Recording Location:")?><span><br>
+  <a href=# class="info"><?php echo _("Recording Location:")?><span>
   <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Be sure to set proper permissions on the directory for the asterisk user.")?><br>
   </span></a>
 	</td><td align="right">
   <input type="text" size="30" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-  <a href=# class="info"><?php echo _("Run after record:")?><span><br>
+  <a href=# class="info"><?php echo _("Run after record:")?><span>
   <?php echo _("An optional script to be run after the call is hungup. You can include channel and MixMon variables like \${CALLFILENAME}, \${MIXMON_FORMAT} and \${MIXMON_DIR}. To ensure that you variables are properly escaped, use the following notation: ^{MY_VAR}")?><br>
   </span></a>
 	</td><td align="right">
@@ -174,21 +174,23 @@ foreach ($globals as $global) {
 <h5><?php echo _("Voicemail")?></h5>
 <table>
 	<tr><td>
-  <a href=# class="info"><?php echo _("Ringtime Default:")?><span><br>
+  <a href=# class="info"><?php echo _("Ringtime Default:")?><span>
   <?php echo _("Default number of seconds to ring phones before sending callers to voicemail. This can be set per extension/user and will have no effect on phones with no voicemail.")?><br>
   </span></a>
 	</td><td align="right">
 	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-  <a href=# class="info"><?php echo _("Direct Dial Voicemail Prefix:")?><span><br>
+  <a href=# class="info"><?php echo _("Direct Dial Voicemail Prefix:")?><span>
   <?php echo _("Prefix used to dial directly to someone's voicemail. Caution should be taken in choosing this prefix to avoid conflicts with featurecodes.")?><br>
   </span></a>
 	</td><td align="right">
 	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-	<?php echo _("Direct Dial to Voicemail message type:")?>
+	<a href=# class="info"><?php echo _("Direct Dial to Voicemail message type:")?><span>
+	<?php echo _("Default message type to use when dialing direct to an extensions voicemail")?><br>
+  </span></a>
 	</td><td align="right">
 	<select name="VM_DDTYPE" tabindex="<?php echo ++$tabindex;?>">
 	<option value=""><?php echo _("Default"); ?></option>
@@ -205,7 +207,7 @@ foreach ($globals as $global) {
 	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-	<a href=# class="info"><?php echo _("Do Not Play")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a> <?php echo _("\"please leave message after tone to caller\"")?>
+	<a href=# class="info"><?php echo _("Do Not Play \"please leave message after tone to caller\"")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a>
 	</td><td align="right">
 	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo (($VM_OPTS || $VM_DDTYPE == "su" || $VM_DDTYPE == "bu") ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> 
 	</td></tr>
@@ -359,7 +361,7 @@ foreach ($globals as $global) {
 <h5><?php echo _("Fax Machine")?></h5>
 <table>
 	<tr><td>
-	<?php echo _("Extension of")?> <a class="info" href="#"><?php echo _("fax machine")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br>Selecting 'disabled' will result in incoming calls being answered more quickly.")?></span></a> <?php echo _("for receiving faxes:")?>
+	<a class="info" href="#"><?php echo _("Extension of fax machine for receiving faxes:")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br>Selecting 'disabled' will result in incoming calls being answered more quickly.")?></span></a>
 	<!--<input type="text" size="8" name="FAX_RX" value="<?php  echo $FAX_RX?>"/>-->
 	</td><td align="right">
 	<select name="FAX_RX" tabindex="<?php echo ++$tabindex;?>">
@@ -377,12 +379,12 @@ foreach ($globals as $global) {
 	</select>
 	</td></tr>
 	<tr><td>
-	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("to have faxes emailed to:")?>
+	<a class="info" href="#"><?php echo _("Email address to have faxes emailed to:")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a>
 	</td><td align="right">
 	<input type="text" size="30" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-	<a class="info" href="#"><?php echo _("Email address")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a> <?php echo _("that faxes appear to come from:")?>
+	<a class="info" href="#"><?php echo _("Email address that faxes appear to come from:")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a>
 	</td><td align="right">
 	<input type="text" size="30" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
@@ -390,7 +392,7 @@ foreach ($globals as $global) {
 <h5><?php echo _("International Settings")?></h5>
 <table>
 	<tr><td>
-	<?php echo _("Country")?> <a class="info" href="#"><?php echo _("Indications")?><span><?php echo _("Select which country you are in")?></span></a>:
+	<a class="info" href="#"><?php echo _("Country Indications")?><span><?php echo _("Select which country you are in")?></span></a>:
 	</td><td align="right">
 	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
 		general_display_zones($TONEZONE); 
@@ -410,7 +412,7 @@ foreach ($globals as $global) {
 <h5><?php echo _("Security Settings")?></h5>
 <table>
 	<tr><td>
-	<a href=# class="info"><?php echo _("Allow Anonymous Inbound SIP Calls?")?><span><br>
+	<a href=# class="info"><?php echo _("Allow Anonymous Inbound SIP Calls?")?><span>
 <?php echo _("** WARNING **")?><br><br>
 <?php echo _("Setting this to 'yes' will potentially allow ANYBODY to call into your Asterisk server using the SIP protocol")?><br><br>
 <?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
