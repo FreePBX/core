@@ -207,7 +207,7 @@ foreach ($globals as $global) {
 	<input type="text" size="2" name="VM_GAIN" value="<?php  echo htmlspecialchars($VM_GAIN)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
-	<a href=# class="info"><?php echo _("Do Not Play \"please leave message after tone to caller\"")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a>
+	<a href=# class="info"><?php echo _("Do Not Play \"please leave message after tone\" to caller")?><span><?php echo _("Check this to remove the default message \"Please leave your message after the tone. When done, hang-up, or press the pound key.\" That is played after the voicemail greeting (the s option). This applies globally to all vm boxes.")?></span></a>
 	</td><td align="right">
 	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo (($VM_OPTS || $VM_DDTYPE == "su" || $VM_DDTYPE == "bu") ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> 
 	</td></tr>
