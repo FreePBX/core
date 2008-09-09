@@ -103,7 +103,7 @@ $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'disconnect');
-$fcc->setDescription('In Call Disconnect Code');
+$fcc->setDescription('In-Call Asterisk Disconnect Code');
 $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);

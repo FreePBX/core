@@ -1395,10 +1395,38 @@ function core_get_config($engine) {
 			$exten = 'h';
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 
-
-
-			$context = 'macro-dialout-trunk';
+			/*
+			;------------------------------------------------------------------------
+			; [macro-auto-confirm]
+			;------------------------------------------------------------------------
+			; This macro is called from ext-local-confirm to auto-confirm a call so that other extensions
+			; are aware that the call has been answered.
+			;
+			;------------------------------------------------------------------------
+			*/
+			$context = 'macro-auto-confirm';
 			$exten = 's';
+			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, '', new ext_setvar('__CWIGNORE',''));
+			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
+			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG1}/${UNIQCHAN}'));
+
+
+			/*
+			;------------------------------------------------------------------------
+			; [macro-auto-blkvm]
+			;------------------------------------------------------------------------
+			; This macro is called for any extension dialed form a queue, ringgroup
+			; or followme, so that the answering extension can clear the voicemail block
+			; override allow subsequent transfers to properly operate.
+			;
+			;------------------------------------------------------------------------
+			*/
+			$context = 'macro-auto-blkvm';
+			$exten = 's';
+			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, '', new ext_setvar('__CWIGNORE',''));
+			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
 			
 			/*
 			 * dialout using a trunk, using pattern matching (don't strip any prefix)
@@ -1409,6 +1437,10 @@ function core_get_config($engine) {
 			 * Modified both Dial() commands to include the new TRUNK_OPTIONS from the general
 			 * screen of AMP
 			 */
+
+			$context = 'macro-dialout-trunk';
+			$exten = 's';
+
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
@@ -4648,7 +4680,9 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
 		$section = _("Device Options");
-		$currentcomponent->addguielem($section, new gui_label('techlabel', sprintf(_("This device uses %s technology."),$devinfo_tech)),4);
+
+		$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDI compatibility mode").")":"");
+		$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
 		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 		if (is_array($devopts)) {
 			foreach ($devopts as $devopt=>$devoptarr) {

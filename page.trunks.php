@@ -211,7 +211,7 @@ if (!$tech && !$extdisplay) {
 <?php
 	$baseURL   = $_SERVER['PHP_SELF'].'?display='.urlencode($display).'&';
 	$trunks = array(
-		array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk")),
+		array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" )),
 		array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk")),
 		array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk")),
 		array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk")),
@@ -275,7 +275,9 @@ if (!$tech && !$extdisplay) {
 			unset($temp);
 		}
 
-		echo "<h2>".sprintf(_("Edit %s Trunk"),strtoupper($tech))."</h2>";
+
+		$upper_tech = strtoupper($tech);
+		echo "<h2>".sprintf(_("Edit %s Trunk"),$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility Mode").")":"")."</h2>";
 		$tlabel = sprintf(_("Delete Trunk %s"),substr($channelid,0,20));
 		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
@@ -319,8 +321,8 @@ if (!$tech && !$extdisplay) {
 		$lddialprefix = "1";
 		$areacode = "";
 	
-		echo "<h2>".sprintf("Add %s Trunk",strtoupper($tech))."</h2>";
-
+		$upper_tech = strtoupper($tech);
+		echo "<h2>".sprintf("Add %s Trunk",$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"")."</h2>";
 	} 
 switch ($tech) {
 	case 'dundi':
