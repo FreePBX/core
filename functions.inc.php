@@ -1358,7 +1358,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG3}/${UNIQCHAN}'));
 			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
-			$ext->add($context, $exten, '', new ext_macroexit());
+			$ext->add($context, $exten, 'exitopt1', new ext_macroexit());
 
 			$exten = '2';
 			$ext->add($context, $exten, '', new ext_goto(1, 'noanswer'));
@@ -1384,13 +1384,13 @@ function core_get_config($engine) {
 
 			$exten = 'noanswer';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
-			$ext->add($context, $exten, '', new ext_macroexit());
+			$ext->add($context, $exten, 'exitnoanswer', new ext_macroexit());
 
 			$exten = 'toolate';
 			$ext->add($context, $exten, '', new ext_setvar('MSG2','${IF($["foo${ARG2}" != "foo"]?${ARG2}:"incoming-call-no-longer-avail")}'));
 			$ext->add($context, $exten, '', new ext_playback('${MSG2}'));
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
-			$ext->add($context, $exten, '', new ext_macroexit());
+			$ext->add($context, $exten, 'exittoolate', new ext_macroexit());
 
 			$exten = 'h';
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
