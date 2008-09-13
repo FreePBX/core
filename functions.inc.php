@@ -2703,7 +2703,7 @@ function core_users_add($vars, $editmode=false) {
 	if ($newdid != '' || $newdidcid != '') {
 		$existing = core_did_get($newdid, $newdidcid);
 		if (! empty($existing)) {
-			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>"."<pre>".print_r($existing,true)."</pre>";
+			echo "<script>javascript:alert('".sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum'])."')</script>";
 			return false;
 		}
 	}
@@ -2943,7 +2943,7 @@ function core_users_edit($extension,$vars){
 	if ($newdid != '' || $newdidcid != '') {
 		$existing = core_did_get($newdid, $newdidcid);
 		if (! empty($existing)) {
-			echo "<script>javascript:alert('"._("A route with this DID/CID already exists")."')</script>";
+			echo "<script>javascript:alert('".sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum'])."')</script>";
 			return false;
 		}
 	}
