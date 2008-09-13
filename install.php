@@ -36,74 +36,86 @@ function did_migrate($incoming){
 	}
 }
 
+$userlogon = _('User Logon');
 $fcc = new featurecode('core', 'userlogon');
-$fcc->setDescription('User Logon');
+$fcc->setDescription($userlogon);
 $fcc->setDefault('*11');
 $fcc->update();
 unset($fcc);
 
+$userlogoff = _('User Logoff');
 $fcc = new featurecode('core', 'userlogoff');
-$fcc->setDescription('User Logoff');
+$fcc->setDescription($userlogoff);
 $fcc->setDefault('*12');
 $fcc->update();
 unset($fcc);
 
+$zapbarge = _('ZapBarge');
 $fcc = new featurecode('core', 'zapbarge');
-$fcc->setDescription('ZapBarge');
+$fcc->setDescription($zapbarge);
 $fcc->setDefault('888');
 $fcc->update();
 unset($fcc);
 
+$chanspy = _('ChanSpy');
 $fcc = new featurecode('core', 'chanspy');
-$fcc->setDescription('ChanSpy');
+$fcc->setDescription($chanspy);
 $fcc->setDefault('555');
 $fcc->update();
 unset($fcc);
 
+$siminccall = _('Simulate Incoming Call');
 $fcc = new featurecode('core', 'simu_pstn');
-$fcc->setDescription('Simulate Incoming Call');
+$fcc->setDescription($siminccall);
 $fcc->setDefault('7777');
 $fcc->update();
 unset($fcc);
 
+$dialsystemfax = _('Dial System FAX');
 $fcc = new featurecode('core', 'simu_fax');
-$fcc->setDescription('Dial System FAX');
+$fcc->setDescription($dialsystemfax);
 $fcc->setDefault('666');
 $fcc->update();
 unset($fcc);
 
+$directedcallpickup = _('Directed Call Pickup');
 $fcc = new featurecode('core', 'pickup');
-$fcc->setDescription('Directed Call Pickup');
+$fcc->setDescription($directedcallpickup);
 $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
+$astgencallpickup = _('Asterisk General Call Pickup');
 $fcc = new featurecode('core', 'pickupexten');
-$fcc->setDescription('Asterisk General Call Pickup');
+$fcc->setDescription($astgencallpickup);
 $fcc->setDefault('*8');
 $fcc->update();
 unset($fcc);
 
+$incallasblindtransf = _('In-Call Asterisk Blind Transfer');
 $fcc = new featurecode('core', 'blindxfer');
-$fcc->setDescription('In-Call Asterisk Blind Transfer');
+$fcc->setDescription($incallasblindtransf);
 $fcc->setDefault('##');
 $fcc->update();
 unset($fcc);
 
+$incallastatttransf = _('In-Call Asterisk Attended Transfer');
 $fcc = new featurecode('core', 'atxfer');
-$fcc->setDescription('In-Call Asterisk Attended Transfer');
+$fcc->setDescription($incallastatttransf);
 $fcc->setDefault('*2');
 $fcc->update();
 unset($fcc);
 
+$incallasttoggcallrec = _('In-Call Asterisk Toggle Call Recording');
 $fcc = new featurecode('core', 'automon');
-$fcc->setDescription('In-Call Asterisk Toggle Call Recording');
+$fcc->setDescription($incallasttoggcallrec);
 $fcc->setDefault('*1');
 $fcc->update();
 unset($fcc);
 
+$incallastdisccode = _('In-Call Asterisk Disconnect Code');
 $fcc = new featurecode('core', 'disconnect');
-$fcc->setDescription('In-Call Asterisk Disconnect Code');
+$fcc->setDescription($incallastdisccode);
 $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
@@ -235,9 +247,9 @@ outn("Checking for Global var RECORDING_STATE..");
 $nrows = $db->getOne("SELECT count(*) from globals where variable='RECORDING_STATE'");
 if (!$nrows) {
 	$db->query("insert into globals values ('RECORDING_STATE', 'ENABLED')");
-	out("Created");
+	out(_("Created"));
 } else {
-	out("Already exists!");
+	out(_("Already exists!"));
 }
 
 ?>
