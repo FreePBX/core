@@ -1407,7 +1407,6 @@ function core_get_config($engine) {
 			$context = 'macro-auto-confirm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
-			$ext->add($context, $exten, '', new ext_setvar('__CWIGNORE',''));
 			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG1}/${UNIQCHAN}'));
 
@@ -1425,7 +1424,6 @@ function core_get_config($engine) {
 			$context = 'macro-auto-blkvm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
-			$ext->add($context, $exten, '', new ext_setvar('__CWIGNORE',''));
 			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
 			
 			/*

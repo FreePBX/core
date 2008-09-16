@@ -54,6 +54,12 @@ $chan_dahdi  = get_var( $AGI, "ASTCHANDAHDI" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
+
+// Clear it now so subsequent transfers don't honor it any longer
+//
+if ($cwignore) {
+	$AGI->set_variable('__CWIGNORE',"");
+}
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
