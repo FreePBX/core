@@ -16,7 +16,7 @@
 <?php 
 $extens = core_users_list();
 $description = $_SESSION["AMP_user"]->checkSection('999') ? _("Extension") : false;
-drawListMenu($devices, $skip, $type, $display, $extdisplay, $description);
+drawListMenu($extens, $skip, $type, $display, $extdisplay, $description);
 ?>
 	<br />
 </div>
