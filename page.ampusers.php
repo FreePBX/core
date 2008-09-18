@@ -228,6 +228,11 @@ foreach ($tresults as $tresult) {
 				if (in_array("99", $sections)) echo " SELECTED";
 				echo ">"._("Apply Changes Bar")."</option>\n";
 
+				// Apply Changes Bar
+				echo "<option value=\"999\"";
+				if (in_array("999", $sections)) echo " SELECTED";
+				echo ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
+
 				// All Sections
 				echo "<option value=\"*\"";
 				if (in_array("*", $sections)) echo " SELECTED";

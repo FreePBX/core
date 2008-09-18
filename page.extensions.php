@@ -15,7 +15,8 @@
 <div class="rnav">
 <?php 
 $extens = core_users_list();
-drawListMenu($extens, $skip, $type, $display, $extdisplay, _("Extension"));
+$description = $_SESSION["AMP_user"]->checkSection('999') ? _("Extension") : false;
+drawListMenu($devices, $skip, $type, $display, $extdisplay, $description);
 ?>
 	<br />
 </div>

@@ -4594,13 +4594,21 @@ function core_devices_configpageload() {
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
 
-		if ( $display != 'extensions') {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
+		if ($_SESSION["AMP_user"]->checkSection('999')) {
+			if ( $display != 'extensions') {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
+			} else {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add an Extension")), 0);
+			}
+			$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
+			$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
 		} else {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add an Extension")), 0);
+			if ( $display != 'extensions') {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Edit existing Device")), 0);
+			} else {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Edit existing Extension")), 0);
+			}
 		}
-		$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
-		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
 
 	} else {
 
@@ -4636,7 +4644,6 @@ function core_devices_configpageload() {
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add").' '.strtoupper($deviceInfo['tech']).' '._("Extension")), 0);
 			}
-
 		}
 
 		// Ensure they exist before the extract
@@ -4727,14 +4734,20 @@ function core_devices_configprocess() {
 	switch ($action) {
 		case "add":
 		// really bad hack - but if core_users_add fails, want to stop core_devices_add
-		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+
+		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true || !$_SESSION["AMP_user"]->checkSection('999')) {
 			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 				needreload();
 				if ($deviceuser != 'new') {
 					redirect_standard_continue();
 				}
 			}
-		}
+		} else {
+			// This is a bit messy, because by this time, other modules may have added the device but this tries to block
+			// the user who does not have add permission from adding a new extension.
+			//
+			$GLOBALS['abort'] = true;
+		}	
 		break;
 		case "del":
 			core_devices_del($extdisplay);
