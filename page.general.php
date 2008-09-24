@@ -133,7 +133,7 @@ foreach ($globals as $global) {
 <table>
 	<tr><td>
 	<a href=# class="info"><?php echo _("Extension Recording Override:")?><span>
-	<?php echo _("This will override the recording settings of all extensions/users. If disabled, the system will ignore all Record Always settings of a user and will not turn on recording. This does not effect On Demand recording controlled by the dial options 'w' and 'W' above. It does not effect other recording settings in modules such as Queues and Conferences. If you don't use recordings, setting this is beneficial to system performance as it removes the check that is otherwise done on every single call."); ?></span></a>
+	<?php echo _("This will override the recording settings of all extensions/users. If enabled, the system will ignore all Record Always settings of a user and will not turn on recording. This does not effect On Demand recording controlled by the dial options 'w' and 'W' above. It does not effect other recording settings in modules such as Queues and Conferences. If you don't use recordings, setting this is beneficial to system performance as it removes the check that is otherwise done on every single call."); ?></span></a>
 	</td><td align="right">
 	<select name="RECORDING_STATE" tabindex="<?php echo ++$tabindex;?>">
 		<option value="ENABLED"  <?php  echo ($RECORDING_STATE == 'ENABLED' ? 'SELECTED' : '')?>><?php echo _("Enabled")?>
@@ -280,7 +280,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Msg Timeout:")?><span>
-			<?php echo _("Time ot wait after message has played to timeout and/or repeat the message if no entry pressed."); ?></span></a>
+			<?php echo _("Time to wait after message has played to timeout and/or repeat the message if no entry pressed."); ?></span></a>
 			</td>
 			<td colspan="3" align="right">
 			<select name="VMX_TIMEOUT" tabindex="<?php echo ++$tabindex;?>">
