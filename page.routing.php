@@ -300,7 +300,7 @@ if ($extdisplay) { // editing
 					do {
 						var newname = prompt("<?php echo _("Rename route")?> " + document.getElementById('routename').value + " <?php echo _("to:")?>");
 						if (newname == null) return;
-					} while (!newname.match('^[a-zA-Z0-9][a-zA-Z0-9_]+$') && !alert("<?php echo _("Route name is invalid...please try again")?>"));
+					} while (!newname.match('^[a-zA-Z0-9][a-zA-Z0-9_\-]+$') && !alert("<?php echo _("Route name is invalid...please try again")?>"));
 					
 					document.getElementById('newroutename').value = newname;
 					document.getElementById('routeEdit').action.value = 'renameroute';
@@ -620,8 +620,8 @@ function routeEdit_onsubmit(act) {
 	var msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
 	
-	defaultEmptyOK = false;
-	if (isEmpty(theForm.routename.value))
+	var rname = theForm.routename.value;
+	if (!rname.match('^[a-zA-Z0-9][a-zA-Z0-9_\-]+$'))
 		return warnInvalid(theForm.routename, msgInvalidRouteName);
 	
 	defaultEmptyOK = true;

@@ -3725,6 +3725,10 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 
 	$trunktech=array();
 
+	// Make sure only valid characters are there, javascript should enforce this (and more)
+	//
+	$name = preg_replace("/[^a-zA-Z0-9_\-]/" ,"",$name);
+
 	//Retrieve each trunk tech for later lookup
         if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
 		$sql="select * from globals WHERE variable LIKE 'OUT\_%' ESCAPE '\'";
