@@ -1425,6 +1425,26 @@ function core_get_config($engine) {
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
 			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
+
+			/*
+			;------------------------------------------------------------------------
+			; [sub-pincheck]
+			;------------------------------------------------------------------------
+			; This subroutine checks the pincode and then resets the CDR from that point
+			; if the pincode passes. This way the billsec and duration fields are set
+			; properly for pin dialing.
+			;
+			; ${ARG3} is the pincode if this was called, used by dialout-trunk, dialout-enum
+			; and dialout-dundi
+			;
+			;------------------------------------------------------------------------
+			*/
+			$context = 'sub-pincheck';
+			$exten = 's';
+			$ext->add($context, $exten, '', new ext_authenticate('${ARG3}'));
+			$ext->add($context, $exten, '', new ext_resetcdr(''));
+			$ext->add($context, $exten, '', new ext_return(''));
+
 			
 			/*
 			 * dialout using a trunk, using pattern matching (don't strip any prefix)
@@ -1435,12 +1455,12 @@ function core_get_config($engine) {
 			 * Modified both Dial() commands to include the new TRUNK_OPTIONS from the general
 			 * screen of AMP
 			 */
-
+			 
 			$context = 'macro-dialout-trunk';
 			$exten = 's';
 
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
@@ -1518,7 +1538,7 @@ function core_get_config($engine) {
 			 * Dialout Dundi Trunk
 			 */
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
@@ -1627,7 +1647,7 @@ function core_get_config($engine) {
 			$context = 'macro-dialout-enum';
 			$exten = 's';
 	
-			$ext->add($context, $exten, '', new ext_execif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]', 'Authenticate', '${ARG3}'));
+			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${ARG1}}foo" = "foo"]', 'nomax'));
