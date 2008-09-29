@@ -1,4 +1,20 @@
 <?php
+//for translation only
+if (false) {
+_("Core");
+_("User Logon");
+_("User Logoff");
+_("ZapBarge");
+_("ChanSpy");
+_("Simulate Incoming Call");
+_("Dial System FAX");
+_("Directed Call Pickup");
+_("Asterisk General Call Pickup");
+_("In-Call Asterisk Blind Transfer");
+_("In-Call Asterisk Attended Transfer");
+_("In-Call Asterisk Toggle Call Recording");
+_("In-Call Asterisk Disconnect Code");
+}
 
 if (! function_exists("out")) {
 	function out($text) {
@@ -36,86 +52,74 @@ function did_migrate($incoming){
 	}
 }
 
-$userlogon = _('User Logon');
 $fcc = new featurecode('core', 'userlogon');
-$fcc->setDescription($userlogon);
+$fcc->setDescription('User Logon');
 $fcc->setDefault('*11');
 $fcc->update();
 unset($fcc);
 
-$userlogoff = _('User Logoff');
 $fcc = new featurecode('core', 'userlogoff');
-$fcc->setDescription($userlogoff);
+$fcc->setDescription('User Logoff');
 $fcc->setDefault('*12');
 $fcc->update();
 unset($fcc);
 
-$zapbarge = _('ZapBarge');
 $fcc = new featurecode('core', 'zapbarge');
-$fcc->setDescription($zapbarge);
+$fcc->setDescription('ZapBarge');
 $fcc->setDefault('888');
 $fcc->update();
 unset($fcc);
 
-$chanspy = _('ChanSpy');
 $fcc = new featurecode('core', 'chanspy');
-$fcc->setDescription($chanspy);
+$fcc->setDescription('ChanSpy');
 $fcc->setDefault('555');
 $fcc->update();
 unset($fcc);
 
-$siminccall = _('Simulate Incoming Call');
 $fcc = new featurecode('core', 'simu_pstn');
-$fcc->setDescription($siminccall);
+$fcc->setDescription('Simulate Incoming Call');
 $fcc->setDefault('7777');
 $fcc->update();
 unset($fcc);
 
-$dialsystemfax = _('Dial System FAX');
 $fcc = new featurecode('core', 'simu_fax');
-$fcc->setDescription($dialsystemfax);
+$fcc->setDescription('Dial System FAX');
 $fcc->setDefault('666');
 $fcc->update();
 unset($fcc);
 
-$directedcallpickup = _('Directed Call Pickup');
 $fcc = new featurecode('core', 'pickup');
-$fcc->setDescription($directedcallpickup);
+$fcc->setDescription('Directed Call Pickup');
 $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
-$astgencallpickup = _('Asterisk General Call Pickup');
 $fcc = new featurecode('core', 'pickupexten');
-$fcc->setDescription($astgencallpickup);
+$fcc->setDescription('Asterisk General Call Pickup');
 $fcc->setDefault('*8');
 $fcc->update();
 unset($fcc);
 
-$incallasblindtransf = _('In-Call Asterisk Blind Transfer');
 $fcc = new featurecode('core', 'blindxfer');
-$fcc->setDescription($incallasblindtransf);
+$fcc->setDescription('In-Call Asterisk Blind Transfer');
 $fcc->setDefault('##');
 $fcc->update();
 unset($fcc);
 
-$incallastatttransf = _('In-Call Asterisk Attended Transfer');
 $fcc = new featurecode('core', 'atxfer');
-$fcc->setDescription($incallastatttransf);
+$fcc->setDescription('In-Call Asterisk Attended Transfer');
 $fcc->setDefault('*2');
 $fcc->update();
 unset($fcc);
 
-$incallasttoggcallrec = _('In-Call Asterisk Toggle Call Recording');
 $fcc = new featurecode('core', 'automon');
-$fcc->setDescription($incallasttoggcallrec);
+$fcc->setDescription('In-Call Asterisk Toggle Call Recording');
 $fcc->setDefault('*1');
 $fcc->update();
 unset($fcc);
 
-$incallastdisccode = _('In-Call Asterisk Disconnect Code');
 $fcc = new featurecode('core', 'disconnect');
-$fcc->setDescription($incallastdisccode);
+$fcc->setDescription('In-Call Asterisk Disconnect Code');
 $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
