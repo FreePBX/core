@@ -34,6 +34,7 @@ if(is_array($active_modules)){
 		if (isset($module['items']) && is_array($module['items'])) {
 			foreach($module['items'] as $itemKey => $item) {
 				$listKey = (!empty($item['display']) ? $item['display'] : $itemKey);
+				$item['rawname'] = $module['rawname'];
 				$module_list[ $listKey ] = $item;
 			}
 		}
@@ -219,6 +220,10 @@ foreach ($tresults as $tresult) {
 
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
+					$label = dgettext($row['rawname'],$row['name']);
+					if ($label == $row['name']) {
+						$label = _($label);
+					}
 					echo ">"._($row['name'])."</option>\n";
 				}
 				echo "</optgroup>\n";
