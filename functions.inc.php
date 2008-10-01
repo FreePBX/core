@@ -3666,7 +3666,7 @@ function core_routing_setroutepriority($routepriority, $reporoutedirection, $rep
 			$routepriority[ $counter ] = $temproute;
 		}
 	}
-	unset($temptrunk);
+	unset($temproute);
 	$routepriority = array_values($routepriority); // resequence our numbers
 	$counter=0;
 	foreach ($routepriority as $tresult) {
