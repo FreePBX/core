@@ -2659,7 +2659,7 @@ function core_check_destinations($dest=true) {
 		$thisid   = $result['extension'].'/'.$result['cidnum'];
 		$destlist[] = array(
 			'dest' => $thisdest,
-			'description' => 'Inbound Route: '.$result['description'].' ('.$thisid.')',
+			'description' => sprintf(_("Inbound Route: %s (%s)"),$result['description'],$thisid),
 			'edit_url' => 'config.php?display=did&extdisplay='.urlencode($thisid),
 		);
 	}
