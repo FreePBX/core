@@ -551,7 +551,7 @@ function core_getdestinfo($dest) {
 		} else {
 			//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
 			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-			return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
+			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$thisexten['name']),
 			             'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
 								  );
 		}
