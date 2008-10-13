@@ -220,26 +220,26 @@ foreach ($globals as $global) {
 			<a href=# class="info"><?php echo _("Default Context & Pri:")?><span>
 			<?php echo _("Default to use if only a number/extension are provided."); ?></span></a>
 			</td>
-			<td align="right"><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo _("context")?></small>&nbsp;</td>
-			<td colspan="2" align="right"><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo _("pri")?></small></td>
+			<td align="right"><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
+			<td colspan="2" align="right"><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
 		</tr>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Timeout/#-press default:")?><span>
 			<?php echo _("This is the default location that a caller will be sent if they don't press any key (timeout) or press # which is interpreted as a timeout. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
 			</td>
-			<td align="right"><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo _("context")?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo _("exten")?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo _("pri")?></small></td>
+			<td align="right"><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
+			<td align="right"><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "exten"?></small>&nbsp;</td>
+			<td align="right"><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
 		</tr>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Loop Exceed default:")?><span>
 			<?php echo _("This is the default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
 			</td>
-			<td align="right"><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo _("context")?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo _("exten")?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo _("pri")?></small></td>
+			<td align="right"><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
+			<td align="right"><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "exten"?></small>&nbsp;</td>
+			<td align="right"><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
 		</tr>
 		<tr>
 			<td>
