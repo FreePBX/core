@@ -1867,6 +1867,33 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-zaptel-${CHAN}'));
 			$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
 			$ext->add($context, 'fax', '', new ext_goto(1, 'in_fax', 'ext-fax'));
+
+			/*
+			* vm-callme context plays voicemail over telephone for web click-to-call
+			* MSG and MBOX are channel variables that must be set when originating the call
+			*/
+
+			$context = 'vm-callme';
+
+			$ext->add($context, 's', '', new ext_answer());
+			$ext->add($context, 's', '', new ext_wait(1));
+			$ext->add($context, 's', 'repeat', new ext_background('${MSG}&vm-repeat&vm-starmain'));
+			$ext->add($context, 's', '', new ext_waitexten(15));
+
+			$ext->add($context, '5', '', new ext_goto('repeat', 's'));
+
+			$ext->add($context, '#', '', new ext_playback('vm-goodbye'));
+			$ext->add($context, '#', '', new ext_hangup());
+
+			$ext->add($context, 'i', '', new ext_playback('pm-invalid-option'));
+			$ext->add($context, 'i', '', new ext_goto('repeat', 's'));
+
+			$ext->add($context, 't', '', new ext_playback('vm-goodbye'));
+			$ext->add($context, 't', '', new ext_hangup());
+
+			$ext->add($context, 'h', '', new ext_hangup());
+
+			/* end vm-callme context  */
 									
 		break;
 	}
