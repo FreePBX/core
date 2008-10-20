@@ -293,11 +293,6 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo _("Set Destination")?><hr></h5></td></tr>
 
 <?php 
-	if ($extdisplay) {	
-?>
-		<tr><td colspan="2"><a href="<?php echo $clrdestURL ?>"><?php echo _("Clear Destination")?></a><br /><br /></td></tr>
-<?php 
-	}
 //draw goto selects
 echo drawselects(isset($destination)?$destination:null,0);
 ?>
