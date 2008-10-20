@@ -1877,7 +1877,7 @@ function core_get_config($engine) {
 
 			$ext->add($context, 's', '', new ext_answer());
 			$ext->add($context, 's', '', new ext_wait(1));
-			$ext->add($context, 's', 'repeat', new ext_background('${MSG}&vm-repeat&vm-starmain'));
+			$ext->add($context, 's', 'repeat', new ext_background('${MSG}&silence/2&vm-repeat'));
 			$ext->add($context, 's', '', new ext_waitexten(15));
 
 			$ext->add($context, '5', '', new ext_goto('repeat', 's'));
