@@ -249,6 +249,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 	// to create proper hints)
 	//
 	function get_dial_string($devices) {
+		$dialstring = "";
+
 		debug("get_dial_string: devices: $devices",8);
 		global $agi;
 
