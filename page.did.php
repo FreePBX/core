@@ -30,8 +30,8 @@ $wait = isset($_REQUEST['wait'])&&$_REQUEST['wait']?$_REQUEST['wait']:'';
 $delay_answer = isset($_REQUEST['delay_answer'])&&$_REQUEST['delay_answer']?$_REQUEST['delay_answer']:'';
 $pricid = isset($_REQUEST['pricid'])?$_REQUEST['pricid']:'';
 
-if (isset($_REQUEST['submitclear'])) {
-	$_REQUEST[$goto0.'0'] = '';
+if (isset($_REQUEST['submitclear']) && isset($_REQUEST['goto0'])) {
+	$_REQUEST[$_REQUEST['goto0'].'0'] = '';
 }
 
 if (isset($_REQUEST['extension']) && isset($_REQUEST['cidnum'])) {
