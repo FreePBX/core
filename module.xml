@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.5.0.4</version>
+	<version>2.5.1.0</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.5.1.0* #3304, #3276, #3299
 		*2.5.0.4* #3299
 		*2.5.0.3* #3266, #3267, #3281, #3042 (vm-callme context), localiztion fixes
 		*2.5.0.2* #3219, #3241, #3240, #3251, #3215, localization fixes
@@ -55,6 +56,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.5/core-2.5.0.4.tgz</location>
-	<md5sum>d6a524a079856d7a9206f54acd17179c</md5sum>
+	<location>release/2.5/core-2.5.1.0.tgz</location>
+	<md5sum>7b2d584403f6ee1fa96f1518b021ac6e</md5sum>
 </module>
