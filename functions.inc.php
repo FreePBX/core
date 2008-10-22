@@ -4199,21 +4199,33 @@ function general_generate_indications() {
 	$sql = "SELECT value FROM globals WHERE variable='TONEZONE'";
 	$result = $db->getRow($sql,DB_FETCHMODE_ASSOC);
 
-	$filename = isset($asterisk_conf["astetcdir"]) && $asterisk_conf["astetcdir"] != '' ? rtrim($asterisk_conf["astetcdir"],DIRECTORY_SEPARATOR) : "/etc/asterisk";
-	$filename .= "/indications.conf";
+	$filenamedir = isset($asterisk_conf["astetcdir"]) && $asterisk_conf["astetcdir"] != '' ? rtrim($asterisk_conf["astetcdir"],DIRECTORY_SEPARATOR) : "/etc/asterisk";
+	$filename = $filenamedir."/indications_general_additional.conf";
 
 	if (($fd = fopen($filename, "w")) === false) {
 		$desc = sprintf(_("Failed to open %s for writing, aborting attempt to write the country indications. The file may be readonly or the permissions may be incorrect."), $filename);
-		$notify->add_error('core','INDICATIONS',_("Failed to write indications.conf"), $desc);
+		$notify->add_error('core','INDICATIONS',_("Failed to write indications_general_additional.conf"), $desc);
 		return;
 	}
 	$notify->delete('core', 'INDICATIONS');
 
-	fwrite($fd, "[general]\ncountry=".$result['value']."\n\n");
+	fwrite($fd, "country=".$result['value']."\n\n");
+	fclose($fd);
+
+	$filename = $filenamedir."/indications_additional.conf";
+
+        if (($fd = fopen($filename, "w")) === false) {
+		  $desc = sprintf(_("Failed to open %s for writing, aborting attempt to write the country indications. The file may be readonly or the permissions may be incorrect."), $filename);
+                $notify->add_error('core','INDICATIONS',_("Failed to write indications_additional.conf"), $desc);
+                return;
+        }
+        $notify->delete('core', 'INDICATIONS');
 
 	$zonelist = general_get_zonelist();
 	foreach ($zonelist as $zone) {
+		if ($zone['iso'] == $result['value']){
 		fwrite($fd, "[{$zone['iso']}]\n{$zone['conf']}\n\n");
+		}
 	}
 	fclose($fd);
 }
