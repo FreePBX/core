@@ -4536,8 +4536,7 @@ function core_devices_configpageinit($dispnum) {
 		$msgInvalidChannel = _("Please enter the channel for this device");
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
-		$msgSecretSameAsExtension = _("You have set your secret and device/extension to the same value. This can be a serious security vulnerability resulting in a hacker compromising your system to make free phone calls. There are many known instances where this has already occurred");
-
+		
 		// zap
 		$tmparr = array();
 		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
@@ -4560,7 +4559,7 @@ function core_devices_configpageinit($dispnum) {
 		
 		// iax2
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(' . $_REQUEST['extdisplay'] . ' == theForm.devinfo_secret.value && !confirm("' . $msgSecretSameAsExtension . '")) || isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
 		$tmparr['notransfer'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
@@ -4577,7 +4576,7 @@ function core_devices_configpageinit($dispnum) {
 
 		// sip
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(' . $_REQUEST['extdisplay'] . ' == theForm.devinfo_secret.value && !confirm("' . $msgSecretSameAsExtension . '")) || isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
 		$tmparr['canreinvite'] = array('value' => 'no', 'level' => 1);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
