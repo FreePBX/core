@@ -2840,6 +2840,14 @@ function core_users_add($vars, $editmode=false) {
 			echo "ERROR: this state should not exist<br>";
 		}
 
+		if (trim($pinless) == 'enabled') {
+			$astman->database_put("AMPUSER",$extension."/pinless","\"NOPASSWD\"");
+		} else if (trim($pinless) == 'disabled') {
+			$astman->database_del("AMPUSER",$extension."/pinless");
+		} else {
+			echo "ERROR: this state should not exist<br>";
+		}
+
 		// Moved VmX setup to voicemail module since it is part of voicemail
 		//
 	} else {
@@ -2907,6 +2915,9 @@ function core_users_get($extension){
 
 		$call_screen=$astman->database_get("AMPUSER",$extension."/screen");
 		$results['call_screen'] = (trim($call_screen) != "")?$call_screen:'0';
+
+		$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
+		$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
 	} else {
 		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -4237,6 +4248,10 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
 
+		$currentcomponent->addoptlistitem('pinless', 'disabled', _("Disable"));
+		$currentcomponent->addoptlistitem('pinless', 'enabled', _("Enable"));
+		$currentcomponent->setoptlistopts('pinless', 'sort', false);
+
 		$currentcomponent->addoptlistitem('call_screen', '0', _("Disable"));
 		$currentcomponent->addoptlistitem('call_screen', 'nomemory', _("Screen Caller: No Memory"));
 		$currentcomponent->addoptlistitem('call_screen', 'memory', _("Screen Caller: Memory"));
@@ -4415,6 +4430,7 @@ function core_users_configpageload() {
 		}
 		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that callerid. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerId."), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false));
 
 		$section = _("Assigned DID/CID");
 		$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4);
