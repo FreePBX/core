@@ -29,6 +29,8 @@ $grppre = isset($_REQUEST['grppre'])?$_REQUEST['grppre']:'';
 $wait = isset($_REQUEST['wait'])&&$_REQUEST['wait']?$_REQUEST['wait']:'';
 $delay_answer = isset($_REQUEST['delay_answer'])&&$_REQUEST['delay_answer']?$_REQUEST['delay_answer']:'';
 $pricid = isset($_REQUEST['pricid'])?$_REQUEST['pricid']:'';
+$rnavsort = isset($_REQUEST['rnavsort'])?$_REQUEST['rnavsort']:'description';
+$didfilter = isset($_REQUEST['didfilter'])?$_REQUEST['didfilter']:'';
 
 if (isset($_REQUEST['submitclear']) && isset($_REQUEST['goto0'])) {
 	$_REQUEST[$_REQUEST['goto0'].'0'] = '';
@@ -38,7 +40,6 @@ if (isset($_REQUEST['extension']) && isset($_REQUEST['cidnum'])) {
 	$extdisplay = $_REQUEST['extension']."/".$_REQUEST['cidnum'];
 }
 
-$didfilter = isset($_REQUEST['didfilter'])?$_REQUEST['didfilter']:'';
 
 //update db if submiting form
 switch ($action) {
@@ -48,20 +49,20 @@ switch ($action) {
 		//add details to the 'incoming' table
 		if (core_did_add($_REQUEST)) {
 			needreload();
-			redirect_standard('extdisplay', 'extension', 'cidnum');
+			redirect_standard('extdisplay', 'extension', 'cidnum', 'didfilter', 'rnavsort');
 		}
 	break;
 	case 'delIncoming':
 		$extarray=explode('/',$extdisplay,2);
 		core_did_del($extarray[0],$extarray[1]);
 		needreload();
-		redirect_standard();
+		redirect_standard('didfilter', 'rnavsort');
 	break;
 	case 'edtIncoming':
 		$extarray=explode('/',$old_extdisplay,2);
 		if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 			needreload();
-			redirect_standard('extdisplay', 'extension', 'cidnum');
+			redirect_standard('extdisplay', 'extension', 'cidnum', 'didfilter', 'rnavsort');
 		}
 	break;
 }
@@ -70,18 +71,25 @@ switch ($action) {
 </div>
 
 <?php
-$display_link = isset($extdisplay) && $extdisplay != '' ? "&amp;extdisplay=".$extdisplay : '';
+$display_link = "config.php?display=$dispnum";
+$display_add = $display_link;
+$display_link .= (isset($extdisplay) && $extdisplay != '') ? "&extdisplay=".$extdisplay : '';
+$display_link_current = $display_link.(($rnavsort == "description") ? "&rnavsort=extension" : "&rnavsort=description");
+$rnav_add = ($rnavsort == "extension") ? "&rnavsort=extension" : "&rnavsort=description";
+$display_link .= $rnav_add;
+$display_add .= $rnav_add."&didfilter=$didfilter";
+$toggle_sort = _(" (toggle sort)");
 ?>
 <div class="rnav">
 <ul>
-	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum)?>"><?php echo _("Add Incoming Route")?></a></li>
-	<li><a <?php echo ($didfilter=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).$display_link?>"><?php echo _("View All DIDs")?></a></li>
-	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=directdid'.$display_link?>"><?php echo _("View User DIDs")?></a></li>
-	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=incoming'.$display_link?>"><?php echo _("View General DIDs")?></a></li>
-	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($dispnum).'&amp;didfilter=unassigned'.$display_link?>"><?php echo _("View Unused DIDs")?></a></li><hr>
+	<li><a <?php echo ($extdisplay=='' ? 'class="current"':'') ?> href="<?php echo $display_add?>"><?php echo _("Add Incoming Route")?></a></li>
+	<li><a <?php echo ($didfilter=='' ? 'class="current"':'') ?> href="<?php echo ($didfilter==''?$display_link_current:$display_link)?>"><?php echo _("All DIDs").($didfilter==''?$toggle_sort:"")?></a></li>
+	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='directdid'?$display_link_current:$display_link).'&didfilter=directdid'?>"><?php echo _("User DIDs").($didfilter=='directdid'?$toggle_sort:"")?></a></li>
+	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='incoming'?$display_link_current:$display_link).'&didfilter=incoming'?>"><?php echo _("General DIDs").($didfilter=='incoming'?$toggle_sort:"")?></a></li>
+	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='unassigned'?$display_link_current:$display_link).'&didfilter=unassigned'?>"><?php echo _("Unused DIDs").($didfilter=='unassigned'?$toggle_sort:"")?></a></li><hr>
 <?php 
 //get unique incoming routes
-$inroutes = core_did_list('description');
+$inroutes = core_did_list($rnavsort);
 switch ($didfilter) {
 	case 'directdid':
 		foreach ($inroutes as $key => $did_items) {
@@ -113,7 +121,7 @@ if (isset($inroutes)) {
 		$displaydid = ( empty($inroute['extension'])? _("any DID") : $inroute['extension'] );
  		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
 		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
-		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($dispnum)."&amp;didfilter=$didfilter&amp;extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
+		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=$dispnum&didfilter=$didfilter&rnavsort=$rnavsort&extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
 }
 ?>
@@ -137,7 +145,7 @@ if (isset($inroutes)) {
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
 <?php
-		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=delIncoming';
+		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
 		$tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
 		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 		echo "<p><a href=".$delURL.">".$label."</a></p>";
@@ -170,6 +178,8 @@ if (isset($inroutes)) {
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
+		<input type="hidden" name="didfilter" value="<?php echo $didfilter ?>">
+		<input type="hidden" name="rnavsort" value="<?php echo $rnavsort ?>">
 		<table>
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
