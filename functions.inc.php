@@ -885,9 +885,11 @@ function core_get_config($engine) {
 					// but we don't want to limit this to just numberic as someone may be trying to
 					// route a non-numeric did
 					//
+					$cidroute = false;
 					if ($cidnum != '' && $exten == '') {
 						$exten = '_.';
 						$pricid = ($item['pricid']) ? true:false;
+						$cidroute = true;
 					} else if (($cidnum != '' && $exten != '') || ($cidnum == '' && $exten == '')) {
 						$pricid = true;
 					} else {
@@ -898,11 +900,16 @@ function core_get_config($engine) {
 					$exten = (empty($exten)?"s":$exten);
 					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
 
-					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
+					if ($cidroute) {
+						$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
+						$ext->add($context, $exten, '', new ext_goto('1','s'));
+						$exten = "s/$cidnum";
+						$ext->add($context, $exten, '', new ext_execif('$["${FROM_DID}" = ""]','Set','__FROM_DID=${EXTEN}'));
+					} else {
+						$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
+					}
 					// always set callerID name
-					$ext->add($context, $exten, '', new ext_gotoif('$[ "${CALLERID(name)}" != "" ] ','cidok'));
-					$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${CALLERID(num)}'));
-					$ext->add($context, $exten, 'cidok', new ext_noop('CallerID is ${CALLERID(all)}'));
+					$ext->add($context, $exten, '', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
 						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
@@ -1877,13 +1884,16 @@ function core_get_config($engine) {
 
 			$ext->add($context, 's', '', new ext_answer());
 			$ext->add($context, 's', '', new ext_wait(1));
-			$ext->add($context, 's', 'repeat', new ext_background('${MSG}&silence/2&vm-repeat'));
+			$ext->add($context, 's', 'repeat', new ext_background('${MSG}&silence/2&vm-repeat&vm-starmain'));
 			$ext->add($context, 's', '', new ext_waitexten(15));
 
 			$ext->add($context, '5', '', new ext_goto('repeat', 's'));
 
 			$ext->add($context, '#', '', new ext_playback('vm-goodbye'));
 			$ext->add($context, '#', '', new ext_hangup());
+
+			$ext->add($context, '*', '', new ext_macro('get-vmcontext', '${MBOX}'));
+			$ext->add($context, '*', '', new ext_vmmain('${MBOX}@${VMCONTEXT},s'));
 
 			$ext->add($context, 'i', '', new ext_playback('pm-invalid-option'));
 			$ext->add($context, 'i', '', new ext_goto('repeat', 's'));
