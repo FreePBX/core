@@ -3044,11 +3044,11 @@ function core_zapchandids_add($description, $channel, $did) {
 
 
 	if (!ctype_digit(trim($channel)) || trim($channel) == '') {
-		echo "<script>javascript:alert('"._('Invalid Channel Number, must be numeric and not blank')."')</script>";
+		echo "<script>javascript:alert('"._("Invalid Channel Number, must be numeric and not blank")."')</script>";
 		return false;
 	}
 	if (trim($did) == '') {
-		echo "<script>javascript:alert('"._('Invalid DID, must be a non-blank DID')."')</script>";
+		echo "<script>javascript:alert('"._("Invalid DID, must be a non-blank DID")."')</script>";
 		return false;
 	}
 
@@ -4267,7 +4267,7 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('call_screen', 'memory', _("Screen Caller: Memory"));
 		$currentcomponent->setoptlistopts('call_screen', 'sort', false);
 
-		$currentcomponent->addoptlistitem('ringtime', '0', 'Default');
+		$currentcomponent->addoptlistitem('ringtime', '0', _("Default"));
 		for ($i=1; $i <= 120; $i++) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
 		}
@@ -4415,7 +4415,7 @@ function core_users_configpageload() {
 					$editURL = $_SERVER['PHP_SELF'].'?type=setup&display=devices&skip=0&extdisplay='.$device_item['id'];
 					$device_icon = ($device_item['devicetype'] == 'fixed') ? 'images/telephone_key.png' : 'images/telephone_edit.png';
 					$device_label  = '&nbsp;';
-					$device_label .=  _('Edit:');
+					$device_label .=  _("Edit:");
 					$device_label .= '&nbsp;'.$device_item['id'].'&nbsp;'.$device_item['description'];
 
 					$device_label = '<span>
@@ -4705,7 +4705,7 @@ function core_devices_configpageload() {
 
 				if ($deviceInfo['device_user'] != 'none') {
 					$editURL = $_SERVER['PHP_SELF'].'?type=setup&display=users&skip=0&extdisplay='.$deviceInfo['user'];
-					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_('Edit Default User: %s'),$deviceInfo['user']) : sprintf(_('Edit Fixed User: %s'),$deviceInfo['user']);
+					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);
 				}
