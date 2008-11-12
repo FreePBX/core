@@ -196,7 +196,7 @@ foreach ($globals as $global) {
 	<option value=""><?php echo _("Default"); ?></option>
 	<option value="u"<?php if ($VM_DDTYPE == "u" || $VM_DDTYPE == "su") echo " SELECTED"; ?>><?php echo _("Unavailable"); ?></option>
 	<option value="b"<?php if ($VM_DDTYPE == "b" || $VM_DDTYPE == "sb") echo " SELECTED"; ?>><?php echo _("Busy"); ?></option>
-	<option value="s"<?php if ($VM_DDTYPE == "s") echo " SELECTED"; ?>><?php echo ("No Message"); ?></option>
+	<option value="s"<?php if ($VM_DDTYPE == "s") echo " SELECTED"; ?>><?php echo _("No Message"); ?></option>
 	</select>
 	</td></tr>
 	<tr><td>
