@@ -475,12 +475,12 @@ function core_destinations() {
 	//static destinations
 	$extens = array();
 	$category = 'Terminate Call';
-	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => 'Hangup', 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => 'Congestion', 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => 'Busy', 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => 'Play SIT Tone (Zapateller)', 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => 'Put caller on hold forever', 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => 'Play ringtones to caller until they hangup', 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category);
+	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category);
 	
 	//get the list of meetmes
 	$results = core_users_list();
@@ -4457,7 +4457,7 @@ function core_users_configpageload() {
 
 				$addURL = $_SERVER['PHP_SELF'].'?type=setup&display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
 				$did_icon = 'images/email_edit.png';
-				$did_label = trim($did['extension']) == '' ? ' Any DID' : ' '.$did['extension'];
+				$did_label = trim($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
 				if (trim($did['cidnum']) != '') {
 					$did_label .= ' / '.$did['cidnum'];
 				}

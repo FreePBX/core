@@ -217,10 +217,12 @@ if (isset($inroutes)) {
 				<?php
 					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
-					echo '<option value="none">'._("No Music")."</option>";
+//					echo '<option value="none">'._("No Music")."</option>";
 					if (isset($tresults[0])) {
 						foreach ($tresults as $tresult) {
-							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+							($tresult == 'none' ? $ttext = _("No Music") : $ttext = $tresult); 
+	    						($tresult == 'default' ? $ttext = _("Default") : $ttext = $tresult);
+							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'._($ttext)."</option>\n";
 						}
 					}
 				?>		
