@@ -474,7 +474,7 @@ class core_conf {
 function core_destinations() {
 	//static destinations
 	$extens = array();
-	$category = 'Terminate Call';
+	$category = _("Terminate Call");
 	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category);
 	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category);
 	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category);
