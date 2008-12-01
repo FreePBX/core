@@ -211,13 +211,13 @@ class core_conf {
    			die($results2->getMessage());
 			}
 
-			// Move all 'disallow=all' to the top to avoid errors
+			// Move all 'disallow=all' and 'deny' to the top to avoid errors
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
 				$options = explode("&", $element['data']);
 				foreach ($options as $option) {
-					if ($element['keyword'] == 'disallow' && $option == 'all') {
+					if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
 						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
 					} else {
 						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
@@ -2390,6 +2390,8 @@ function core_devices_addsip($account) {
 			array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),
 			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
 			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
+			array($account,'deny',(isset($_REQUEST['deny']))?$_REQUEST['deny']:''),
+			array($account,'permit',(isset($_REQUEST['permit']))?$_REQUEST['permit']:''),			
 			array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),
 			array($account,'allow',(isset($_REQUEST['allow']))?$_REQUEST['allow']:'')
 			//array($account,'record_in',(isset($_REQUEST['record_in']))?$_REQUEST['record_in']:'On-Demand'),
@@ -2466,6 +2468,8 @@ function core_devices_addiax2($account) {
 			array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account),
 			array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569'),
 			array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'yes'),
+			array($account,'deny',(isset($_REQUEST['deny']))?$_REQUEST['deny']:''),
+			array($account,'permit',(isset($_REQUEST['permit']))?$_REQUEST['permit']:''),			
 			array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:''),
 			array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:''),
 			array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:'')
@@ -4612,6 +4616,8 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['deny'] = array('value' => '', 'level' => 1);
+		$tmparr['permit'] = array('value' => '', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
 		unset($tmparr);
 
@@ -4633,6 +4639,8 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['deny'] = array('value' => '', 'level' => 1);
+    		$tmparr['permit'] = array('value' => '', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
 		unset($tmparr);
 
