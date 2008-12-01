@@ -4616,8 +4616,8 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
-		$tmparr['deny'] = array('value' => '', 'level' => 1);
-		$tmparr['permit'] = array('value' => '', 'level' => 1);
+		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
 		unset($tmparr);
 
@@ -4639,8 +4639,8 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
-		$tmparr['deny'] = array('value' => '', 'level' => 1);
-    		$tmparr['permit'] = array('value' => '', 'level' => 1);
+		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+    		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
 		unset($tmparr);
 
