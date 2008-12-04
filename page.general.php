@@ -136,8 +136,8 @@ foreach ($globals as $global) {
 	<?php echo _("This will override the recording settings of all extensions/users. If enabled, the system will ignore all Record Always settings of a user and will not turn on recording. This does not effect On Demand recording controlled by the dial options 'w' and 'W' above. It does not effect other recording settings in modules such as Queues and Conferences. If you don't use recordings, setting this is beneficial to system performance as it removes the check that is otherwise done on every single call."); ?></span></a>
 	</td><td align="right">
 	<select name="RECORDING_STATE" tabindex="<?php echo ++$tabindex;?>">
-		<option value="ENABLED"  <?php  echo ($RECORDING_STATE == 'ENABLED' ? 'SELECTED' : '')?>><?php echo _("Enabled")?>
-		<option value="DISABLED"   <?php  echo ($RECORDING_STATE == 'DISABLED'  ? 'SELECTED' : '')?>><?php echo _("Disabled")?>
+		<option value="DISABLED"  <?php  echo ($RECORDING_STATE == 'DISABLED' ? 'SELECTED' : '')?>><?php echo _("Enabled")?>
+		<option value="ENABLED"   <?php  echo ($RECORDING_STATE == 'ENABLED'  ? 'SELECTED' : '')?>><?php echo _("Disabled")?>
 	</select>
 	</td></tr>
 	<tr><td>
