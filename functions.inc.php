@@ -1919,6 +1919,464 @@ function core_get_config($engine) {
 			$ext->add($context, 'h', '', new ext_hangup());
 
 			/* end vm-callme context  */
+
+			/*
+			* macro-vm 
+			*/
+			
+			/*
+                        ;------------------------------------------------------------------------
+                        ; [macro-vm]
+                        ;------------------------------------------------------------------------
+                        ; CONTEXT:      macro-vm
+                        ; PURPOSE:      call voicemail system and extend with personal ivr
+                        ;
+                        ; Under normal use, this macro will call the voicemail system with the extension and
+                        ; desired greeting mode of busy, unavailable or as specified with direct voicemail
+                        ; calls (usually unavailable) when entered from destinations.
+                        ;
+                        ; The voicemail system's two greetings have been 'hijacked' as follows to extend the
+                        ; system by giving the option of a private 'ivr' for each voicemail user. The following
+                        ; applies to both the busy and unavailable modes of voicemail and can be applied to one
+                        ; or both, and differently.
+                        ;
+                        ; Global Defaults:
+                        ;
+                        ; The following are default values, used in both busy and unavail modes if no specific
+                        ; values are specified.
+                        ;
+                        ; VMX_REPEAT
+                        ;                                       The number of times to repeat the users message if no option is pressed.
+                        ; VMX_TIMEOUT
+                        ;                                       The timeout to wait after playing message before repeating or giving up.
+                        ; VMX_LOOPS
+                        ;                                       The number of times it should replay the message and check for an option when
+                        ;                                       an invalid option is pressed.
+                        ;
+                        ; VMX_OPTS_DOVM
+                        ;                                       Default voicemail option to use if vm is chosen as an option. No options will
+                        ;                                       cause Allison's generic message, 's' will go straight to beep.
+                        ; VMX_OPTS_TIMEOUT
+                        ;                                       Default voicemail option to use if it times out with no options. No options will
+                        ;                                       cause Allison's generic message, 's' will go straight to beep.
+                        ;                                       IF THE USER PRESSES # - it will look like a timeout as well since no option will
+                        ;                                       be presented. If the user wishes to enable a mode where a caller can press #
+                        ;                                       during their message and it goes straight to voicemail with only a 'beep' then
+                        ;                                       this should be set to 's'.
+                        ; VMX_OPTS_LOOPS
+                        ;                                       Default voicemail option to use if to many wrong options occur. No options will
+                        ;                                       cause Allison's generic message, 's' will go straight to beep.
+                        ;
+                        ; VMX_CONTEXT
+                        ;                                       Default context for user destinations if not supplied in the user's settings
+                        ; VMX_PRI
+                        ;                                       Default priority for user destinations if not supplied in the user's settings
+                        ;
+                        ; VMX_TIMEDEST_CONTEXT
+                        ;                                       Default context for timeout destination if not supplied in the user's settings
+                        ; VMX_TIMEDEST_EXT
+                        ;                                       Default extension for timeout destination if not supplied in the user's settings
+                        ; VMX_TIMEDEST_PRI
+                        ;                                       Default priority for timeout destination if not supplied in the user's settings
+                        ;
+                        ; VMX_LOOPDEST_CONTEXT
+                        ;                                       Default context for loops  destination if not supplied in the user's settings
+                        ; VMX_LOOPDEST_EXT
+                        ;                                       Default extension for loops  destination if not supplied in the user's settings
+                        ; VMX_LOOPDEST_PRI
+                        ;                                       Default priority for loops  destination if not supplied in the user's settings
+                        ;
+                        ;
+                        ; The AMPUSER database variable has been extended with a 'vmx' tree (vm-extension). A
+                        ; duplicate set is included for both unavail and busy. You could choose for to have an
+                        ; ivr when unavail is taken, but not with busy - or a different once with busy.
+                        ; The full list is below, each specific entry is futher described:
+                        ;
+                        ; state:                Whether teh current mode is enabled or disabled. Anything but 'enabled' is
+                        ;                                               treated as disabled.
+                        ; repeat:               This is the number of times that the users message should be played after the
+                        ;                                               timeout if the user has not entered anything. It is just a variable to the
+                        ;                                               Read() function which will do the repeating.
+                        ; timeout:      This is how long to wait after the message has been read for a response from
+                        ;                                               the user. A caller can enter a digit any time during the playback.
+                        ; loops:                This is the number of loops that the system will allow a caller to retry if
+                        ;                                               they enter a bad menu choice, before going to the loop failover destination
+                        ; vmxopts:      This is the vm options to send to the voicemail command used when a specific
+                        ;                                               voicemail destination is chosen (inidcated by 'dovm' in the ext field). This is
+                        ;                                               typically either set to 's' or left blank. When set to 's' there will be no
+                        ;                                               message played when entering the voicemail, just a beep. When blank, you will
+                        ;                                               have Allison's generic message played. It is not typical to play the greetings
+                        ;                                               since they have been 'hijacked' for these IVR's and from a caller's perspecitive
+                        ;                                               this system appears interconnected with the voicemail so instructions can be
+                        ;                                               left there.
+                        ; timedest: The three variables: ext, context and pri are the goto destination if the caller
+                        ;                                               enters no options and it timesout. None have to be set and a system default
+                        ;                                               will be used. If just ext is set, then defaults will be used for context and
+                        ;                                               pri, etc.
+                        ; loopdest:     This is identical to timedest but used if the caller exceeds the maximum invalid
+                        ;                                               menu choices.
+                        ; [0-9*]:               The user can specify up to 11 ivr options, all as single digits from 0-9 or *. The
+                        ;                                               # key can not be used since it is used as a terminator key for the Read command
+                        ;                                               and will never be returned. A minimum of the ext must be specified for each valid
+                        ;                                               option and as above, the context and priority can also be specified if the default
+                        ;                                               is not to be used.
+                        ;                                               Option '0' takes on a special meaning. Since a user is able to break out of the
+                        ;                                               voicemail command once entering it with a 0, if specified, the 0 destination will
+                        ;                                               be used.
+                        ;                                               Option '*' can also be used to breakout. It is undecided at this point whether
+                        ;                                               providing that option will be used as well. (probably should).
+                        ;
+                        ;
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/state:                                                              enabled|disabled
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/repeat:                                                             n (times to repeat message)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/timeout:                                                    n (timeout to wait for digit)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/loops:                                                              n (loop returies for invalid entries)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/vmxopts/dovm:                                       vmoptions (if ext is dovm)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/vmxopts/timeout:                    vmoptions (if timeout)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/vmxopts/loops:                              vmoptions (if loops)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/timedest/ext:                                       extension (if timeout)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/timedest/context:                   context (if timeout)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/timedest/pri:                                       priority (if timeout)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/loopdest/ext:                                       extension (if too many failures)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/loopdest/context:                   context (if too many failures)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/loopdest/pri:                                       priority (if too many failures)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/[0-9*]/ext:                                         extension (dovm for vm access)
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/[0-9*]/context:                             context
+                        ; /AMPUSER/<ext>/vmx/[busy|unavail]/[0-9*]/pri:                                         priority
+                        ;------------------------------------------------------------------------
+
+			*/
+			// ARG1 - extension
+			// ARG2 - DIRECTDIAL/BUSY
+			// ARG3 - RETURN makes macro return, otherwise hangup
+			//exten => s,1,Macro(user-callerid,SKIPTTL)
+			$ext->add('macro-vm', 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
+			//exten => s,n,Set(VMGAIN=${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})":"")})
+			$ext->add('macro-vm','s', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})":"")}'));
+			// If BLKVM_OVERRIDE is set, then someone told us to block calls from going to
+			// voicemail. This variable is reset by the answering channel so subsequent
+			// transfers will properly function.
+			
+			//exten => s,n,GotoIf($["foo${DB(${BLKVM_OVERRIDE})}" != "fooTRUE"]?vmx,1)
+			$ext->add('macro-vm','s', '', new ext_gotoif('$["foo${DB(${BLKVM_OVERRIDE})}" != "fooTRUE"]','vmx,1'));
+
+			// we didn't branch so block this from voicemail
+
+			//exten => s,n,Noop(CAME FROM: ${NODEST} - Blocking VM cause of key: ${DB(BLKVM_OVERRIDE)})
+			$ext->add('macro-vm','s', '', new ext_NoOp('CAME FROM: ${NODEST} - Blocking VM cause of key: ${DB(BLKVM_OVERRIDE)}')); 
+			//exten => s,n,Hangup
+			$ext->add('macro-vm','s', '', new ext_hangup(''));
+			// If vmx not enabled for the current mode,then jump to normal voicemail behavior
+			// also - if not message (no-msg) is requested, straight to voicemail
+
+			//exten => vmx,1,GotoIf($["${ARG2}"="NOMESSAGE"]?s-${ARG2},1)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ARG2}"="NOMESSAGE"]','s-${ARG2},1'));
+			//exten => vmx,n,Set(MODE=${IF($["${ARG2}"="BUSY"]?busy:unavail)})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${ARG2}"="BUSY"]?busy:unavail)}'));
+			//exten => vmx,n,GotoIf($["${ARG2}" != "DIRECTDIAL"]?notdirect)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ARG2}" != "DIRECTDIAL"]','notdirect'));
+			//exten => vmx,n,Set(MODE=${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
+			//exten => vmx,n(notdirect),Noop(Checking if ext ${ARG1} is enabled: ${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)})
+			$ext->add('macro-vm','vmx', 'notdirect', new ext_NoOp('Checking if ext ${ARG1} is enabled: ${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)}'));
+			//exten => vmx,n,GotoIf($["${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)}" != "enabled"]?s-${ARG2},1)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)}" != "enabled"]','s-${ARG2},1'));
+			// If the required voicemail file does not exist, then abort and go to normal voicemail behavior
+			//
+			// TODO: there have been errors using System() with jump to 101 where asterisk works fine at the begining and
+			//       then starts to jump to 101 even on success. This new mode is being tried with the SYSTEM Status which
+			//       returns SUCCESS when the command returned succcessfully with a 0 app return code.
+			//
+			//exten => vmx,n,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${ARG1}'));			
+			//;exten => vmx,n,TrySystem(/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.[wW][aA][vV])
+			//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.[wW][aA][vV]'));
+			//exten => vmx,n,AGI(checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp)
+			$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp'));
+			//exten => vmx,n,GotoIf($["${SYSTEMSTATUS}" = "SUCCESS"]?tmpgreet)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
+			//exten => vmx,n,AGI(checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE})
+			$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}'));
+			//exten => vmx,n,GotoIf($["${SYSTEMSTATUS}" != "SUCCESS"]?nofile)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
+			// Get the repeat, timeout and loop times to use if they are overriden form the global settings
+
+			//exten => vmx,n,Set(LOOPCOUNT=0)
+			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));			
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/repeat)}" = "0"]?vmxtime)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
+			//exten => vmx,n,Set(VMX_REPEAT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_REPEAT", '${DB_RESULT}'));
+			//exten => vmx,n(vmxtime),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timeout)}" = "0"]?vmxloops)
+			$ext->add('macro-vm','vmx', 'vmxtime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timeout)}" = "0"]','vmxloops'));
+			//exten => vmx,n,Set(VMX_TIMEOUT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEOUT", '${DB_RESULT}'));
+			//exten => vmx,n(vmxloops),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loops)}" = "0"]?vmxanswer)
+			$ext->add('macro-vm','vmx', 'vmxloops', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loops)}" = "0"]','vmxanswer'));
+			//exten => vmx,n,Set(VMX_LOOPS=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPS", '${DB_RESULT}'));
+			//exten => vmx,n(vmxanswer),Answer()
+			$ext->add('macro-vm','vmx','vmxanswer',new ext_answer(''));
+
+			// Now play the users voicemail recording as the basis for their ivr, the Read command will repeat as needed and if it timesout
+			// then we go to the timeout. Otherwise handle invalid options by looping until the limit until a valid option is played.
+
+			//exten => vmx,n(loopstart),Read(ACTION,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE},1,skip,${VMX_REPEAT},${VMX_TIMEOUT})
+			$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
+			//exten => vmx,n,GotoIf($["${EXISTS(${ACTION})}" = "1"]?checkopt)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
+			// If we are here we timed out, go to the required destination
+
+			//exten => vmx,n(noopt),Noop(Timeout: going to timeout dest)
+			$ext->add('macro-vm','vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));			
+			//exten => vmx,n,Set(VMX_OPTS=${VMX_OPTS_TIMEOUT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS", '${VMX_OPTS_TIMEOUT}'));
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/timeout)}" = "0"]?chktime)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/timeout)}" = "0"]','chktime'));
+			//exten => vmx,n,Set(VMX_OPTS=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS", '${DB_RESULT}'));
+			//exten => vmx,n(chktime),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/ext)}" = "0"]?dotime)
+			$ext->add('macro-vm','vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
+			//exten => vmx,n,Set(VMX_TIMEDEST_EXT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));	
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/context)}" = "0"]?timepri)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/context)}" = "0"]','timepri'));
+			//exten => vmx,n,Set(VMX_TIMEDEST_CONTEXT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_CONTEXT",'${DB_RESULT}'));
+			//exten => vmx,n(timepri),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/pri)}" = "0"]?dotime)
+			$ext->add('macro-vm','vmx', 'timepri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/pri)}" = "0"]','dotime'));
+			//exten => vmx,n,Set(VMX_TIMEDEST_PRI=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_PRI",'${DB_RESULT}'));
+			//exten => vmx,n(dotime),Goto(${VMX_TIMEDEST_CONTEXT},${VMX_TIMEDEST_EXT},${VMX_TIMEDEST_PRI})
+			$ext->add('macro-vm','vmx','dotime',new ext_goto('${VMX_TIMEDEST_PRI}', '${VMX_TIMEDEST_EXT}', '${VMX_TIMEDEST_CONTEXT}'));
+			// We got an option, check if the option is defined, or one of the system defaults
+
+			//exten => vmx,n(checkopt),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/ext)}" = "1"]?doopt)
+			$ext->add('macro-vm','vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
+			//exten => vmx,n,GotoIf($["${ACTION}" = "0"]?o,1)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "0"]','o,1'));
+			//exten => vmx,n,GotoIf($["${ACTION}" = "*"]?adef,1)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "*"]','adef,1'));
+			// Got invalid option loop until the max
+
+			//exten => vmx,n,Set(LOOPCOUNT=$[${LOOPCOUNT} + 1])
+			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
+			//exten => vmx,n,GotoIf($[${LOOPCOUNT} > ${VMX_LOOPS}]?toomany)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$[${LOOPCOUNT} > ${VMX_LOOPS}]','toomany'));
+			//exten => vmx,n,Playback(pm-invalid-option&please-try-again)
+			$ext->add('macro-vm','vmx','',new ext_playback('pm-invalid-option&please-try-again'));			
+			//exten => vmx,n,Goto(loopstart)
+			$ext->add('macro-vm','vmx','',new ext_goto('loopstart'));
+			// tomany: to many invalid options, go to the specified destination
+
+			//exten => vmx,n(toomany),Noop(Too Many invalid entries, got to invalid dest)
+			$ext->add('macro-vm','vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));			
+			//exten => vmx,n,Set(VMX_OPTS=${VMX_OPTS_LOOPS})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOPS}'));
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/loops)}" = "0"]?chkloop)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/loops)}" = "0"]','chkloop'));
+			//exten => vmx,n,Set(VMX_OPTS=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${DB_RESULT}'));
+			//exten => vmx,n(chkloop),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/ext)}" = "0"]?doloop)
+			$ext->add('macro-vm','vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
+			//exten => vmx,n,Set(VMX_LOOPDEST_EXT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_EXT",'${DB_RESULT}'));
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/context)}" = "0"]?looppri)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/context)}" = "0"]','looppri'));
+			//exten => vmx,n,Set(VMX_LOOPDEST_CONTEXT=${DB_RESULT}) ;TODO make configurable per above
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_CONTEXT",'${DB_RESULT}'));
+			//exten => vmx,n(looppri),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/pri)}" = "0"]?doloop)
+			$ext->add('macro-vm','vmx', 'looppri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/pri)}" = "0"]','doloop'));
+			//exten => vmx,n,Set(VMX_LOOPDEST_PRI=${DB_RESULT}) ;TODO make configurable per above
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_PRI",'${DB_RESULT}'));
+			//exten => vmx,n(doloop),Goto(${VMX_LOOPDEST_CONTEXT},${VMX_LOOPDEST_EXT},${VMX_LOOPDEST_PRI})
+			$ext->add('macro-vm','vmx','doloop',new ext_goto('${VMX_LOOPDEST_PRI}','${VMX_LOOPDEST_EXT}','${VMX_LOOPDEST_CONTEXT}'));
+			// doopt: execute the valid option that was chosen
+
+			//exten => vmx,n(doopt),Noop(Got a valid option: ${DB_RESULT})
+			$ext->add('macro-vm','vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));			
+			//exten => vmx,n,Set(VMX_EXT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_EXT",'${DB_RESULT}'));
+
+			// Special case, if this option was to go to voicemail, set options and go
+
+			//exten => vmx,n,GotoIf($["${VMX_EXT}" != "dovm"]?getdest)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${VMX_EXT}" != "dovm"]','getdest'));
+			//exten => vmx,n(vmxopts),Set(VMX_OPTS=${VMX_OPTS_DOVM})
+			$ext->add('macro-vm','vmx', 'vmxopts', new ext_setvar("VMX_OPTS",'${VMX_OPTS_DOVM}'));
+			//exten => vmx,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/dovm)}" = "0"]?vmxdovm)
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/dovm)}" = "0"]','vmxdovm'));
+			//exten => vmx,n(vmxopts),Set(VMX_OPTS=${DB_RESULT})
+			$ext->add('macro-vm','vmx', 'vmxopts', new ext_setvar("VMX_OPTS",'${DB_RESULT}'));
+			//exten => vmx,n(vmxdovm),goto(dovm,1)
+			$ext->add('macro-vm','vmx','vmxdovm',new ext_goto('1','dovm'));			
+
+			// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
+			// reasonable values
+
+			//exten => vmx,n(getdest),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/context)}" = "0"]?vmxpri)
+			$ext->add('macro-vm','vmx', 'getdest', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/context)}" = "0"]','vmxpri'));
+			//exten => vmx,n,Set(VMX_CONTEXT=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_CONTEXT",'${DB_RESULT}'));
+			//exten => vmx,n(vmxpri),GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/pri)}" = "0"]?vmxgoto)
+			$ext->add('macro-vm','vmx', 'vmxpri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/pri)}" = "0"]','vmxgoto'));
+			//exten => vmx,n,Set(VMX_PRI=${DB_RESULT})
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_PRI",'${DB_RESULT}'));
+			//exten => vmx,n(vmxgoto),Goto(${VMX_CONTEXT},${VMX_EXT},${VMX_PRI})
+			$ext->add('macro-vm','vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
+			// If the required voicemail file is not present, then revert to normal voicemail
+			// behavior treating as if it was not set
+
+			//exten => vmx,n(nofile),Noop(File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail)
+			$ext->add('macro-vm','vmx', 'nofile', new ext_NoOp('File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail'));
+			//exten => vmx,n,Goto(s-${ARG2},1)
+			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${ARG2}'));
+			//exten => vmx,n(tmpgreet),Noop(Temporary Greeting Detected, going to normal voicemail)
+			$ext->add('macro-vm','vmx', 'tmpgreet', new ext_NoOp('Temporary Greeting Detected, going to normal voicemail'));
+			//exten => vmx,n,Goto(s-${ARG2},1)
+			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${ARG2}'));
+
+			// Drop into voicemail either as a direct destination (in which case VMX_OPTS might be set to something) or
+			// if the user timed out or broke out of the loop then VMX_OPTS is always cleared such that an Allison
+			// message is played and the caller know's what is going on.
+
+			//exten => dovm,1,Noop(VMX Timeout - go to voicemail)
+			$ext->add('macro-vm','dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
+			//exten => dovm,n,Voicemail(${ARG1}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}) ; no flags, so allison plays please leave ...
+			$ext->add('macro-vm','dovm', '',new ext_vm('${ARG1}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}')); 
+			//exten => dovm,n,Goto(exit-${VMSTATUS},1)
+			$ext->add('macro-vm','dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
+
+			//exten => s-BUSY,1,NoOp(BUSY voicemail)
+			$ext->add('macro-vm','s-BUSY','',new ext_NoOp('BUSY voicemail'));
+			//exten => s-BUSY,n,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm','s-BUSY','',new ext_macro('get-vmcontext','${ARG1}'));
+			//exten => s-BUSY,n,Voicemail(${ARG1}@${VMCONTEXT},${VM_OPTS}b${VMGAIN})   ; Voicemail Busy message
+			$ext->add('macro-vm','s-BUSY', '',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
+			//exten => s-BUSY,n,Goto(exit-${VMSTATUS},1)
+			 $ext->add('macro-vm','s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
+
+			//exten => s-NOMESSAGE,1,NoOp(NOMESSAGE (beeb only) voicemail)
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
+			//exten => s-NOMESSAGE,n,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${ARG1}'));
+			//exten => s-NOMESSAGE,n,Voicemail(${ARG1}@${VMCONTEXT},s${VM_OPTS}${VMGAIN})
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${ARG1}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
+			//exten => s-NOMESSAGE,n,Goto(exit-${VMSTATUS},1)
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
+
+			//exten => s-DIRECTDIAL,1,NoOp(DIRECTDIAL voicemail)
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
+			//exten => s-DIRECTDIAL,n,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_macro('get-vmcontext','${ARG1}'));
+			//exten => s-DIRECTDIAL,n,Voicemail(${ARG1}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN})
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
+			//exten => s-DIRECTDIAL,n,Goto(exit-${VMSTATUS},1)
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_goto('1','exit-${VMSTATUS}'));
+
+			//exten => _s-.,1,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm','_s-.','',new ext_macro('get-vmcontext','${ARG1}'));
+			//exten => _s-.,n,Voicemail(${ARG1}@${VMCONTEXT},${VM_OPTS}u${VMGAIN})     ; Voicemail Unavailable message
+			$ext->add('macro-vm','_s-.','',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
+			//exten => _s-.,n,Goto(exit-${VMSTATUS},1)
+			$ext->add('macro-vm','_s-.','',new ext_goto('1','exit-${VMSTATUS}'));
+			// If the user has a 0 option defined, use that for operator zero-out from within voicemail
+			// as well to keep it consistant with the menu structure
+
+			//exten => o,1,Background(one-moment-please)      ; 0 during vm message will hangup
+			$ext->add('macro-vm','o','',new ext_background('one-moment-please'));
+			//exten => o,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/ext)}" = "0"]?doopdef)
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
+			//exten => o,n,Set(VMX_OPDEST_EXT=${DB_RESULT})
+			$ext->add('macro-vm','o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
+			//exten => o,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/context)}" = "1"]?opcontext)
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/context)}" = "1"]','opcontext'));
+			//exten => o,n,Set(DB_RESULT=${VMX_CONTEXT})
+			$ext->add('macro-vm','o','',new ext_setvar("DB_RESULT",'${VMX_CONTEXT}'));
+			//exten => o,n(opcontext),Set(VMX_OPDEST_CONTEXT=${DB_RESULT})
+			$ext->add('macro-vm','o','opcontext',new ext_setvar("VMX_OPDEST_CONTEXT",'${DB_RESULT}'));
+			//exten => o,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/pri)}" = "1"]?oppri)
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/pri)}" = "1"]','oppri'));
+			//exten => o,n,Set(DB_RESULT=${VMX_PRI})
+			$ext->add('macro-vm','o','',new ext_setvar("DB_RESULT",'${VMX_PRI}'));
+			//exten => o,n(oppri),Set(VMX_OPDEST_PRI=${DB_RESULT})
+			$ext->add('macro-vm','o','oppri',new ext_setvar("VMX_OPDEST_PRI",'${DB_RESULT}'));
+			//exten => o,n,Goto(${VMX_OPDEST_CONTEXT},${VMX_OPDEST_EXT},${VMX_OPDEST_PRI})
+			$ext->add('macro-vm','o','',new ext_goto('${VMX_OPDEST_PRI}','${VMX_OPDEST_EXT}','${VMX_OPDEST_CONTEXT}'));
+			//exten => o,n(doopdef),GotoIf($["x${OPERATOR_XTN}"="x"]?nooper:from-internal,${OPERATOR_XTN},1)
+			$ext->add('macro-vm','o','doopdef',new ext_gotoif('$["x${OPERATOR_XTN}"="x"]','nooper','from-internal,${OPERATOR_XTN},1'));
+			//exten => o,n(nooper),GotoIf($["x${FROM_DID}"="x"]?nodid)
+			$ext->add('macro-vm','o','nooper',new ext_gotoif('$["x${FROM_DID}"="x"]','nodid'));
+			//exten => o,n,Dial(Local/${FROM_DID}@from-pstn)
+			$ext->add('macro-vm','o','',new ext_dial('Local/${FROM_DID}@from-pstn',''));
+			//exten => o,n,Macro(hangup)
+			$ext->add('macro-vm','o','',new ext_macro('hangup'));
+			//exten => o,n(nodid),Dial(Local/s@from-pstn)
+			$ext->add('macro-vm','o','nodid',new ext_dial('Local/s@from-pstn',''));
+			//exten => o,n,Macro(hangup)
+			$ext->add('macro-vm','o','',new ext_macro('hangup'));
+
+			// If the user has a * option defined, use that for the * out from within voicemail
+			// as well to keep it consistant with the menu structure
+
+			//exten => a,1,Macro(get-vmcontext,${ARG1})
+			$ext->add('macro-vm','a','',new ext_macro('get-vmcontext','${ARG1}'));
+			//exten => a,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/ext)}" = "0"]?adef,1)
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
+			/**/
+			//exten => a,n,Set(VMX_ADEST_EXT=${DB_RESULT})
+			$ext->add('macro-vm','a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
+			//exten => a,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/context)}" = "1"]?acontext)
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/context)}" = "1"]','acontext'));
+			/**/
+			//exten => a,n,Set(DB_RESULT=${VMX_CONTEXT})
+			$ext->add('macro-vm','a','',new ext_setvar("DB_RESULT",'${VMX_CONTEXT}'));
+			//exten => a,n(acontext),Set(VMX_ADEST_CONTEXT=${DB_RESULT})
+			$ext->add('macro-vm','a','acontext',new ext_setvar("VMX_ADEST_CONTEXT",'${DB_RESULT}'));
+
+			//exten => a,n,GotoIf($["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/pri)}" = "1"]?apri)
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/pri)}" = "1"]','apri'));
+			/**/
+			//exten => a,n,Set(DB_RESULT=${VMX_PRI})
+			$ext->add('macro-vm','a','',new ext_setvar("DB_RESULT",'${VMX_PRI}'));
+			//exten => a,n(apri),Set(VMX_ADEST_PRI=${DB_RESULT})
+			$ext->add('macro-vm','a','apri',new ext_setvar("VMX_ADEST_PRI",'${DB_RESULT}'));
+			//exten => a,n,Goto(${VMX_ADEST_CONTEXT},${VMX_ADEST_EXT},${VMX_ADEST_PRI})
+			$ext->add('macro-vm','a','',new ext_goto('${VMX_ADEST_PRI}','${VMX_ADEST_EXT}','${VMX_ADEST_CONTEXT}'));
+			//exten => adef,1,VoiceMailMain(${ARG1}@${VMCONTEXT})
+			$ext->add('macro-vm','adef','',new ext_vmmain('${ARG1}@${VMCONTEXT}'));
+			//exten => adef,n,GotoIf($["${ARG3}" = "RETURN"]?exit-RETURN,1)
+			$ext->add('macro-vm','adef','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			//exten => adef,n,Hangup
+			$ext->add('macro-vm','adef','',new ext_hangup(''));
+
+			//exten => exit-FAILED,1,Playback(im-sorry&an-error-has-occured)
+			$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occured'));
+			//exten => exit-FAILED,n,GotoIf($["${ARG3}" = "RETURN"]?exit-RETURN,1)
+			$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			//exten => exit-FAILED,n,Hangup()
+			$ext->add('macro-vm','exit-FAILED','',new ext_hangup(''));
+
+			//exten => exit-SUCCESS,1,GotoIf($["${ARG3}" = "RETURN"]?exit-RETURN,1)
+			$ext->add('macro-vm','exit-SUCCESS','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			//exten => exit-SUCCESS,n,Playback(goodbye)
+			$ext->add('macro-vm','exit-SUCCESS','',new ext_playback('goodbye'));
+			//exten => exit-SUCCESS,n,Hangup()
+			$ext->add('macro-vm','exit-SUCCESS','',new ext_hangup(''));
+
+			//exten => exit-USEREXIT,1,GotoIf($["${ARG3}" = "RETURN"]?exit-RETURN,1)
+			$ext->add('macro-vm','exit-USEREXIT','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			//exten => exit-USEREXIT,n,Playback(goodbye)
+			$ext->add('macro-vm','exit-USEREXIT','',new ext_playback('goodbye'));
+			//exten => exit-USEREXIT,n,Hangup()
+			$ext->add('macro-vm','exit-USEREXIT','',new ext_hangup(''));
+
+			//exten => exit-RETURN,1,Noop(Returning From Voicemail because macro)
+			$ext->add('macro-vm','exit-RETURN','',new ext_noop('Returning From Voicemail because macro'));
+			//exten => t,1,Hangup()
+			$ext->add('macro-vm','t','',new ext_hangup(''));
+
+			/* end macro-vm  */
 									
 		break;
 	}
