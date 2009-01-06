@@ -912,8 +912,8 @@ function core_get_config($engine) {
 					}
 					$context = ($pricid) ? "ext-did-0001":"ext-did-0002";
 
-					$exten = (empty($exten)?"s":$exten);
-					$exten = $exten.(empty($cidnum)?"":"/".$cidnum); //if a CID num is defined, add it
+					$exten = (($exten == "")?"s":$exten);
+					$exten = $exten.(($cidnum == "")?"":"/".$cidnum); //if a CID num is defined, add it
 
 					if ($cidroute) {
 						$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));

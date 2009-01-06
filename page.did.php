@@ -118,8 +118,8 @@ switch ($didfilter) {
 }
 if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
-		$displaydid = ( empty($inroute['extension'])? _("any DID") : $inroute['extension'] );
- 		$displaycid = ( empty($inroute['cidnum'])? _("any CID") : $inroute['cidnum'] );
+		$displaydid = ( (trim($inroute['extension']) == "") ? _("any DID") : $inroute['extension'] );
+ 		$displaycid = ( (trim($inroute['cidnum']) == "") ? _("any CID") : $inroute['cidnum'] );
 		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
 		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=$dispnum&didfilter=$didfilter&rnavsort=$rnavsort&extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
