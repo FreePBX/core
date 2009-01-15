@@ -322,7 +322,7 @@ if (!$tech && !$extdisplay) {
 		$areacode = "";
 	
 		$upper_tech = strtoupper($tech);
-		echo "<h2>".sprintf("Add %s Trunk",$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"")."</h2>";
+		echo "<h2>".sprintf(_("Add %s Trunk"),$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"")."</h2>";
 	} 
 switch ($tech) {
 	case 'dundi':
