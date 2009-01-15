@@ -342,13 +342,13 @@ class core_conf {
    			die($results2_pre->getMessage());
 			}	
 
-			// Move all 'disallow=all' to the top to avoid errors
+			// Move all 'disallow=all' and 'deny=' to the top to avoid errors
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
 				$options = explode("&", $element['data']);
 				foreach ($options as $option) {
-					if ($element['keyword'] == 'disallow' && $option == 'all') {
+					if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
 						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
 					} else {
 						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
