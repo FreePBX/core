@@ -1746,9 +1746,7 @@ function core_get_config($engine) {
 
 			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID:1:2}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
 
-			$ext->add($context, $exten, 'usercid', new ext_gotoif('$["${USEROUTCID:1:2}" = ""]', 'exit'));  // check CID override for extension
-			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${USEROUTCID}'));
-			//$ext->add($context, $exten, '', new ext_gotoif('$["x${CALLERID(name)}"!="xhidden"]', 'checkname', 'hidecid'));  // check CID blocking for extension
+			$ext->add($context, $exten, 'usercid', new ext_execif('$["${USEROUTCID:1:2}" != ""]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
 			if (version_compare($version, "1.6", "lt")) { 
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'SetCallerPres', 'prohib_passed_screen'));
 			} else {
