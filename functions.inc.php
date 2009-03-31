@@ -1290,6 +1290,8 @@ function core_get_config($engine) {
 							//
 							// Then do one call to user-callerid and record-enable instead of each time as in the past
 							//
+							$pieces = explode("-", $outrt['application']);
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar('__TRUNKNAME', $pieces[2]));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
