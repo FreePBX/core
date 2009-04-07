@@ -159,7 +159,7 @@ foreach ($tresults as $tresult) {
 					<h4><?php echo _("General Settings")?></h4>
 				</td>
 			</tr>
-<?php if (($amp_conf["AUTHTYPE"] != "database") || ($amp_conf["AUTHTYPE"] != "webserver")) { ?>			
+<?php if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { ?>			
 			<tr>
 				<td colspan="2">
 	<?php echo '<b>'._("NOTE:").'</b>'._("AUTHTYPE is not set to 'database' in /etc/amportal.conf - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless AUTHTYPE is set to 'database'.") ?><br /><br />
