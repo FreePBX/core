@@ -1290,8 +1290,8 @@ function core_get_config($engine) {
 							//
 							// Then do one call to user-callerid and record-enable instead of each time as in the past
 							//
-							$pieces = explode("-", $outrt['application']);
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar('__ROUTENAME', $pieces[2]));
+							$rn = substr($outrt['application'],10);
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar('__ROUTENAME', $rn));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
