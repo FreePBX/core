@@ -5109,10 +5109,15 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 		
 		// Devices list
+		if ($_SESSION["AMP_user"]->checkSection('999')) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
+		}
+		if ( $dispnum != 'devices' ) {
+			$currentcomponent->addoptlistitem('devicelist', 'virtual', _("None (virtual exten)"));
+		}
 		$currentcomponent->setoptlistopts('devicelist', 'sort', false);
 
 
@@ -5140,11 +5145,15 @@ function core_devices_configpageinit($dispnum) {
 function core_devices_configpageload() {
 	global $currentcomponent;
 
+	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
+	if ($devinfo_tech == 'virtual') {
+		return true;
+	}
+
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 	
 	if ( $action == 'del' ) { // Deleted
 
@@ -5153,7 +5162,6 @@ function core_devices_configpageload() {
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
 
-		if ($_SESSION["AMP_user"]->checkSection('999')) {
 			if ( $display != 'extensions') {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
 			} else {
@@ -5161,13 +5169,6 @@ function core_devices_configpageload() {
 			}
 			$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
 			$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
-		} else {
-			if ( $display != 'extensions') {
-				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Edit existing Device")), 0);
-			} else {
-				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Edit existing Extension")), 0);
-			}
-		}
 
 	} else {
 
@@ -5277,6 +5278,9 @@ function core_devices_configprocess() {
 	//create vars from the request
 	extract($_REQUEST);
 
+	if ($tech == "virtual") {
+		return true;
+	}
 	$extension = isset($extension)?$extension:null;
 	$deviceid = isset($deviceid)?$deviceid:null;
 	$name = isset($name)?$name:null;
