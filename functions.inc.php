@@ -745,17 +745,17 @@ function core_get_config($engine) {
 				
 				if ($fc_userlogoff != '') {
 					$ext->add('app-userlogonoff', $fc_userlogoff, '', new ext_macro('user-logoff'));
-					$ext->add('app-userlogonoff', $fc_userlogoff, '', new ext_hangup(''));
+					$ext->add('app-userlogonoff', $fc_userlogoff, 'hook_off', new ext_hangup(''));
 				}
 	
 				if ($fc_userlogon != '') {
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon'));
-					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
+					$ext->add('app-userlogonoff', $fc_userlogon, 'hook_on_1', new ext_hangup(''));
 					
 					$clen = strlen($fc_userlogon);
 					$fc_userlogon = "_$fc_userlogon.";
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon,${EXTEN:'.$clen.'}'));
-					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_hangup(''));
+					$ext->add('app-userlogonoff', $fc_userlogon, 'hook_on_2', new ext_hangup(''));
 				}
 			}
 
