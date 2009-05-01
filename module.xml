@@ -3,11 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0alpha1.1</version>
+	<version>2.6.0alpha1.2</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.6.0alpha1.2* #3451, $932, #3426, #3474
+		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
 		*2.6.0alpha1.1* #3380, #3358, #3387, localizations
 		*2.6.0alpha1.0* #3321, #3328, #3345 inbound CID routing fix, adds vm-callme voicemail access option
 		*2.5.1.1* #3311, revert #3266 (r7001)
@@ -60,6 +60,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.6/core-2.6.0alpha1.0.tgz</location>
-	<md5sum>899a4c27d6b6fd9837bca63e572a7b26</md5sum>
+	<location>release/2.6/core-2.6.0alpha1.2.tgz</location>
+	<md5sum>bf3469c0ea6af2075bfbcba8c4617aa2</md5sum>
 </module>
