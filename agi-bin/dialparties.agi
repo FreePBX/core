@@ -54,11 +54,6 @@ $chan_dahdi  = get_var( $AGI, "ASTCHANDAHDI" );
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
 
-// Clear it now so subsequent transfers don't honor it any longer
-//
-if ($cwignore) {
-	$AGI->set_variable('__CWIGNORE',"");
-}
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
@@ -116,9 +111,6 @@ $pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
 
 $fmgrp  = get_var( $AGI, "FMGRP" );
 $nodest	= get_var( $AGI, "NODEST" );
-if (empty($nodest)) {
-	$nodest	= '';
-}
 
 $ringgroup_index	= get_var( $AGI, "RINGGROUP_INDEX" );
 $use_confirmation	= get_var( $AGI, "USE_CONFIRMATION" );
@@ -165,6 +157,14 @@ switch ($rgmethod) {
 	default:
 		$mastermode	= 0;
 		$pr_dialstatus = ""; // not relevant if not mastermode, clear it so dnd doesn't propagate, and other
+}
+
+// Clear it now so subsequent transfers don't honor it any longer
+// unless it's a ringallv2 in which case it is going to got though
+// another level of local channels
+//
+if ($cwignore && $rgmethod != "ringallv2") {
+	$AGI->set_variable('__CWIGNORE',"");
 }
 
 // call confirmation only works with ringall and ringall-prim. The javascripts in ringgroups

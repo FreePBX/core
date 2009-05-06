@@ -7,7 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
+		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, #3517 moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
 		*2.6.0alpha1.1* #3380, #3358, #3387, localizations
 		*2.6.0alpha1.0* #3321, #3328, #3345 inbound CID routing fix, adds vm-callme voicemail access option
 		*2.5.1.1* #3311, revert #3266 (r7001)
