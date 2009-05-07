@@ -229,24 +229,21 @@ if (!$tech && !$extdisplay) {
 	}
 } else {
 	if ($extdisplay) {
-		//list($trunk_tech, $trunk_name) = explode("/",$tname);
-		//if ($trunk_tech == "IAX2") $trunk_tech = "IAX"; // same thing
-		$tech = core_trunks_getTrunkTech($trunknum);
 
-		$outcid = ${"OUTCID_".$trunknum};
-		$maxchans = ${"OUTMAXCHANS_".$trunknum};
-		$dialoutprefix = ${"OUTPREFIX_".$trunknum};
-		$keepcid = isset(${"OUTKEEPCID_".$trunknum})?${"OUTKEEPCID_".$trunknum}:'';
-		$failtrunk = isset(${"OUTFAIL_".$trunknum})?${"OUTFAIL_".$trunknum}:'';
+		$trunk_details = core_trunks_getDetails($trunknum);
+
+		$tech = htmlentities($trunk_details['tech']);
+		$outcid = htmlentities($trunk_details['outcid']);
+		$maxchans = htmlentities($trunk_details['maxchans']);
+		$dialoutprefix = htmlentities($trunk_details['dialoutprefix']);
+		$keepcid = htmlentities($trunk_details['keepcid']);
+		$failtrunk = htmlentities($trunk_details['failscript']);
 		$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
-		$disabletrunk = isset(${"OUTDISABLE_".$trunknum})?${"OUTDISABLE_".$trunknum}:'';
-
+		$disabletrunk = htmlentities($trunk_details['disabled']);
 		
 		if ($tech!="enum") {
 	
-			if (!isset($channelid)) {
-				$channelid = core_trunks_getTrunkTrunkName($trunknum); 
-			}
+			$channelid = htmlentities($trunk_details['channelid']);
 
 			if ($tech!="custom" && $tech!="dundi") {  // custom trunks will not have user/peer details in database table
 				// load from db
@@ -255,7 +252,7 @@ if (!$tech && !$extdisplay) {
 				}
 	
 				if (!isset($usercontext)) {	
-					$usercontext = core_trunks_getTrunkUserContext($trunknum); 
+					$usercontext = htmlentities($trunk_details['usercontext']);
 				}
 	
 				if (!isset($userconfig)) {	

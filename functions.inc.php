@@ -3900,6 +3900,25 @@ function sort_trunks($a,$b)  {
 }
 
 //get unique trunks
+function core_trunks_getDetails($trunkid) {
+	global $db;
+	global $amp_conf;
+
+	$sql = "SELECT * FROM `trunks` WHERE `trunkid` = '$trunkid'";
+	$trunk = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+
+	$tech = strtolower($trunk['tech']);
+	switch ($tech) {
+		case 'iax2':
+			$trunk['tech'] = 'iax';
+			break;
+		default:
+			$trunk['tech'] = $tech;
+			break;
+	}
+	return $trunk;
+}
+
 function core_trunks_list($assoc = false) {
 	// TODO: $assoc default to true, eventually..
 
@@ -4046,7 +4065,6 @@ function core_trunks_getTrunkTrunkName($trunknum) {
 	return $name;
 }
 
-//get and print peer details (prefixed with 4 9's)
 function core_trunks_getTrunkPeerDetails($trunknum) {
 	global $db;
 	
@@ -4067,22 +4085,11 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	return $confdetail;
 }
 
-//get trunk user context (prefixed with 5 9's)
 function core_trunks_getTrunkUserContext($trunknum) {
-	$tech = core_trunks_getTrunkTech($trunknum);
-	if ($tech == "zap") return ""; // zap has no account
-	
-	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum'","getAll");
-
-	foreach ($results as $result) {
-		if ($result[0] == 'account') {
-			$account = $result[1];
-		}
-	}
-	return isset($account)?$account:null;
+	$usercontext = sql("SELECT `usercontext` FROM `trunks` WHERE `trunkid` = $trunknum", "getOne");
+	return ((isset($usercontext)) ? $usercontext : '');
 }
 
-//get and print user config (prefixed with 5 9's)
 function core_trunks_getTrunkUserConfig($trunknum) {
 	global $db;
 	

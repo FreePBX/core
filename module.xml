@@ -3,10 +3,11 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0alpha1.3</version>
+	<version>2.6.0alpha1.4</version>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.6.0alpha1.4* fixes re #3649
 		*2.6.0alpha1.3* #3653, #3591, #3650
 		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, #3517 moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
 		*2.6.0alpha1.1* #3380, #3358, #3387, localizations
