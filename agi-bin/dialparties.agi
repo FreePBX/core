@@ -29,16 +29,16 @@
 require_once "phpagi.php";
 require_once "phpagi-asmanager.php";
 
-$ext      = array();		// Hash that will contain our list of extensions to call
-$ext_hunt = array();		// Hash that will contain our list of extensions to call used by huntgroup
+$ext      = array();	// Hash that will contain our list of extensions to call
+$ext_hunt = array();	// Hash that will contain our list of extensions to call used by huntgroup
 $cidnum   = "";		// Caller ID Number for this call
 $cidname  = "";		// Caller ID Name for this call
 $timer    = "";		// Call timer for Dial command
-$dialopts = "";		// options for dialing
+$dialopts = "";		// Options for dialing
 $rc       = "";		// Catch return code
 $priority = "";		// Next priority 
 $rgmethod = "";		// If Ring Group what ringing method was chosen
-$screen   = false;		// initialize screen variable
+$screen   = false;	// Initialize screen variable
 $dsarray  = array();	// This will hold all the dial strings, used to check for duplicate extensions
 
 $AGI = new AGI();
@@ -160,7 +160,7 @@ switch ($rgmethod) {
 }
 
 // Clear it now so subsequent transfers don't honor it any longer
-// unless it's a ringallv2 in which case it is going to got though
+// unless it's a ringallv2 in which case it is going to get through
 // another level of local channels
 //
 if ($cwignore && $rgmethod != "ringallv2") {
@@ -229,7 +229,7 @@ if ($rgmethod == "ringallv2" && $fmgrp != "") {
 			array_unshift($ext,$fmgrp);
 		}
 	}	else {
-		debug("extension not in group list, ringging only during prering time",4);
+		debug("extension not in group list, ringing only during prering time",4);
 		$fmgrp_realprering = $fmgrp_prering;
 		array_unshift($ext,$fmgrp);
 	}
@@ -245,7 +245,7 @@ if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == 
 	$screen_call = $screen_call['data'];
 	if (strlen($screen_call)) {
 		if($screen_call == 'nomemory' && $cidnum != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
-			// Do a security check, we only numeric callerid numbers, otherwise code could be incjected in a cidnum field
+			// Do a security check, we only numeric callerid numbers, otherwise code could be injected in a cidnum field
 			// that could result in an arbitrary command being executed in this remove operation.
 			if (ctype_digit($cidnum)) {
 				exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
@@ -259,7 +259,7 @@ if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == 
 		debug("Extension $k has call screening off", 4);
 	}
 }
-// IF THE FIRST EXTENSION IS CALL FORWARD ENABLED (put in logic) then we don't do master mode
+// IF THE FIRST EXTENSION HAVE CALL FORWARD ENABLED (put in logic) then we don't do master mode
 // which means we reset the flag here after detecting that and just say we are not in master
 // mode and all is well. That means the loop below needs to be modified to detect the first
 // extension and do this if the case.
@@ -343,7 +343,7 @@ foreach ( $ext as $k ) {
 	// mastermode description:
 	//
 	// if mastermode is set then the first extension will be examined and mastermode will be reset so that the others
-	// are left alone. If the remaining extensions are not to be tried, skpremaining will be set to 1 which will
+	// are left alone. If the remaining extensions are not to be tried, skipremaining will be set to 1 which will
 	// result in dndprimary being set to 1 thus diabling the remaining list.
 	//
 	// if cf unconditional was already detected on the primary, then mastermode will have been reset at this point
@@ -715,7 +715,7 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 	$dialstring = '';
 	
 	if (strpos($extnum,'#') != 0) {
-		// "#" used to identify external numbers in forwards and callgourps
+		// "#" used to identify external numbers in forwards and callgroups
 		// If using call confirmation, need to put the # back into the new dialstring
 		// we then place all external calls (denoted with a # at the end) through
 		// the [grps] extension for the RINGGROUP_INDEX that was called. This
