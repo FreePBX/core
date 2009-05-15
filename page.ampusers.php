@@ -85,7 +85,7 @@ switch ($action) {
 		redirect_standard();
 	break;
 	case "editampuser":
-		// Check to make sure the hidden var is sane, and that they haven't change the password field
+		// Check to make sure the hidden var is sane, and that they haven't changed the password field
 		if (strlen($form_password_sha256)==64 && $password == "******") {
 			// Password unchanged
 			core_ampusers_del($userdisplay);
@@ -194,7 +194,7 @@ foreach ($tresults as $tresult) {
 				<td>
 					<a href=# class="info"><?php echo _("Password<span>Create a password for this new user</span>")?></a>: 
 				</td><td>
-					<input type="password" size="20" name="password" value="<? echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
+					<input type="password" size="20" name="password" value="<?php echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
