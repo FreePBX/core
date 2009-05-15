@@ -2503,9 +2503,15 @@ function core_get_config($engine) {
 /* begin page.ampusers.php functions */
 
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
-	$sql = "INSERT INTO ampusers (username, password, extension_low, extension_high, deptname, sections) VALUES (";
+	$sql = "INSERT INTO ampusers (username, password_sha256, extension_low, extension_high, deptname, sections) VALUES (";
 	$sql .= "'".$username."',";
-	$sql .= "'".$password."',";
+	if (strlen($password) == 64) {
+		// It's already a hash
+		$sql .= "'".$password."'";
+	} else {
+		// Hash it.
+		$sql .= "'".hash("sha256", $password)."',";
+	}
 	$sql .= "'".$extension_low."',";
 	$sql .= "'".$extension_high."',";
 	$sql .= "'".$deptname."',";

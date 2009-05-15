@@ -22,6 +22,7 @@ $userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
 
+$tabindex = 0;
 // populate some global variables from the request string
 $set_globals = array("username","password","extension_high","extension_low","deptname");
 foreach ($set_globals as $var) {
@@ -29,6 +30,7 @@ foreach ($set_globals as $var) {
 		$$var = stripslashes( $_REQUEST[$var] );
 	}
 }
+$form_password_sha256 = stripslashes(isset($_REQUEST['password_sha256'])?$_REQUEST['password_sha256']:'');
 
 //Search ALL active modules while generating admin access list
 $active_modules = module_getinfo(false, MODULE_STATUS_ENABLED);
@@ -83,8 +85,16 @@ switch ($action) {
 		redirect_standard();
 	break;
 	case "editampuser":
-		core_ampusers_del($userdisplay);
-		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
+		// Check to make sure the hidden var is sane, and that they haven't change the password field
+		if (strlen($form_password_sha256)==64 && $password == "******") {
+			// Password unchanged
+			core_ampusers_del($userdisplay);
+			core_ampusers_add($username, $form_password_sha256, $extension_low, $extension_high, $deptname, $sections);
+		} elseif ($password != "******") {
+			// Password has been changed
+			core_ampusers_del($userdisplay);
+			core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
+		}
 		//indicate 'need reload' link in footer.php 
 		needreload();
 		redirect_standard('userdisplay');
@@ -125,7 +135,8 @@ foreach ($tresults as $tresult) {
 		$user = getAmpUser($userdisplay);
 		
 		$username = $user["username"];
-		$password = $user["password"];
+		$password = "******";
+		$password_sha256 = $user["password_sha256"];
 		$extension_high = $user["extension_high"];
 		$extension_low = $user["extension_low"];
 		$deptname = $user["deptname"];
@@ -158,6 +169,7 @@ foreach ($tresults as $tresult) {
 			<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+			<input type="hidden" name="password_sha256" value="<?php echo $password_sha256 ?>"/>
 			<table>
 			<tr>
 				<td colspan="2">
@@ -182,7 +194,7 @@ foreach ($tresults as $tresult) {
 				<td>
 					<a href=# class="info"><?php echo _("Password<span>Create a password for this new user</span>")?></a>: 
 				</td><td>
-					<input type="password" size="20" name="password" value="<?php echo $password;?>" tabindex="<?php echo ++$tabindex;?>"/>
+					<input type="password" size="20" name="password" value="<? echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
