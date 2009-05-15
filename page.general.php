@@ -18,6 +18,7 @@
 //
 
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+$tabindex = 0;
 
 $cm =& cronmanager::create($db);
 

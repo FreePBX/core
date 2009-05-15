@@ -23,6 +23,8 @@ $display='routing';
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
+$tabindex = 0;
+
 $repotrunkdirection = isset($_REQUEST['repotrunkdirection'])?$_REQUEST['repotrunkdirection']:'';
 $repotrunkkey = isset($_REQUEST['repotrunkkey'])?$_REQUEST['repotrunkkey']:'';
 

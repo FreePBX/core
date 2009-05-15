@@ -37,6 +37,8 @@ $pricid = isset($_REQUEST['pricid'])?$_REQUEST['pricid']:'';
 $rnavsort = isset($_REQUEST['rnavsort'])?$_REQUEST['rnavsort']:'description';
 $didfilter = isset($_REQUEST['didfilter'])?$_REQUEST['didfilter']:'';
 
+$tabindex = 0;
+
 if (isset($_REQUEST['submitclear']) && isset($_REQUEST['goto0'])) {
 	$_REQUEST[$_REQUEST['goto0'].'0'] = '';
 }
