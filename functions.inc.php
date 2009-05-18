@@ -5346,22 +5346,24 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
-		$section = _("Device Options");
+		if ($devinfo_tech != "virtual") {
+			$section = _("Device Options");
 
-		$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDI compatibility mode").")":"");
-		$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
-		$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
-		if (is_array($devopts)) {
-			foreach ($devopts as $devopt=>$devoptarr) {
-				$devopname = 'devinfo_'.$devopt;
-				$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
-				$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
-				$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
-
-				if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
-					$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
-				} else { // add so only basic
-					$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+			$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDI compatibility mode").")":"");
+			$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
+			$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
+			if (is_array($devopts)) {
+				foreach ($devopts as $devopt=>$devoptarr) {
+					$devopname = 'devinfo_'.$devopt;
+					$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
+					$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
+					$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+	
+					if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
+						$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+					} else { // add so only basic
+						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+					}
 				}
 			}
 		}
