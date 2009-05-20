@@ -1875,53 +1875,6 @@ function core_get_config($engine) {
 			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
 
 			
-			/*
-			 * Adds a dynamic agent/member to a Queue
-			 * Prompts for call-back number - in not entered, uses CIDNum
-			 */
-
-			$context = 'macro-agent-add';
-			$exten = 's';
-			
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
-			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-login'));  // get callback number from user
-			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" != ""]', 'a7'));  // if user just pressed # or timed out, use cidnum
-			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a3'));  // if still no number, start over
-			$ext->add($context, $exten, 'a7', new ext_gotoif('$["${CALLBACKNUM}" = "${ARG1}"]', 'invalid'));  // Error, they put in the queue number
-			$ext->add($context, $exten, '', new ext_execif('$["${QREGEX}" != ""]', 'GotoIf', '$["${REGEX("${QREGEX}" ${CALLBACKNUM})}" = "0"]?invalid'));
-			$ext->add($context, $exten, '', new ext_execif('$["${ARG2}" != ""]', 'Authenticate', '${ARG2}'));
-			$ext->add($context, $exten, 'a9', new ext_addqueuemember('${ARG1}', 'Local/${CALLBACKNUM}@from-internal/n'));  // using chan_local allows us to have agents over trunks
-			$ext->add($context, $exten, '', new ext_userevent('Agentlogin', 'Agent: ${CALLBACKNUM}'));
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_playback('agent-loginok&with&extension'));
-			$ext->add($context, $exten, '', new ext_saydigits('${CALLBACKNUM}'));
-			$ext->add($context, $exten, '', new ext_hangup());
-			$ext->add($context, $exten, '', new ext_macroexit());
-			$ext->add($context, $exten, 'invalid', new ext_playback('pbx-invalid'));
-			$ext->add($context, $exten, '', new ext_goto('a3'));
-
-			/*
-			 * Removes a dynamic agent/member from a Queue
-			 * Prompts for call-back number - in not entered, uses CIDNum 
-			 */
-
-			$context = 'macro-agent-del';
-			
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_macro('user-callerid', 'SKIPTTL'));
-			$ext->add($context, $exten, 'a3', new ext_read('CALLBACKNUM', 'agent-logoff'));  // get callback number from user
-			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a5', 'a7'));  // if user just pressed # or timed out, use cidnum
-			$ext->add($context, $exten, 'a5', new ext_set('CALLBACKNUM', '${AMPUSER}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${CALLBACKNUM}" = ""]', 'Set', 'CALLBACKNUM=${CALLERID(number)}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${CALLBACKNUM}" = ""]', 'a3'));  // if still no number, start over
-			$ext->add($context, $exten, 'a7', new ext_removequeuemember('${ARG1}', 'Local/${CALLBACKNUM}@from-internal/n'));
-			$ext->add($context, $exten, '', new ext_userevent('RefreshQueue'));
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_playback('agent-loggedoff'));
-			$ext->add($context, $exten, '', new ext_hangup());
 
 			$context = 'macro-systemrecording';
 			
