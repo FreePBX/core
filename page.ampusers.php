@@ -30,7 +30,7 @@ foreach ($set_globals as $var) {
 		$$var = stripslashes( $_REQUEST[$var] );
 	}
 }
-$form_password_sha256 = stripslashes(isset($_REQUEST['password_sha256'])?$_REQUEST['password_sha256']:'');
+$form_password_sha1 = stripslashes(isset($_REQUEST['password_sha1'])?$_REQUEST['password_sha1']:'');
 
 //Search ALL active modules while generating admin access list
 $active_modules = module_getinfo(false, MODULE_STATUS_ENABLED);
@@ -86,10 +86,10 @@ switch ($action) {
 	break;
 	case "editampuser":
 		// Check to make sure the hidden var is sane, and that they haven't changed the password field
-		if (strlen($form_password_sha256)==64 && $password == "******") {
+		if (strlen($form_password_sha1)==40 && $password == "******") {
 			// Password unchanged
 			core_ampusers_del($userdisplay);
-			core_ampusers_add($username, $form_password_sha256, $extension_low, $extension_high, $deptname, $sections);
+			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, $deptname, $sections);
 		} elseif ($password != "******") {
 			// Password has been changed
 			core_ampusers_del($userdisplay);
@@ -136,7 +136,7 @@ foreach ($tresults as $tresult) {
 		
 		$username = $user["username"];
 		$password = "******";
-		$password_sha256 = $user["password_sha256"];
+		$password_sha1 = $user["password_sha1"];
 		$extension_high = $user["extension_high"];
 		$extension_low = $user["extension_low"];
 		$deptname = $user["deptname"];
@@ -169,7 +169,7 @@ foreach ($tresults as $tresult) {
 			<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-			<input type="hidden" name="password_sha256" value="<?php echo $password_sha256 ?>"/>
+			<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
 			<table>
 			<tr>
 				<td colspan="2">
