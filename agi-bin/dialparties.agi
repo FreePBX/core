@@ -57,9 +57,15 @@ $cwignore    = strtoupper(trim($cwignore));
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
-$astman = new AGI_AsteriskManager( );	
-if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
-	exit (1);
+$ast_ge_16   = version_compare($ast_version, "1.6", "ge");
+$has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
+// If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
+//
+if (!$has_extension_state) {
+	$astman = new AGI_AsteriskManager( );	
+	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
+		exit (1);
+	}
 }
 
 $priority = get_var( $AGI, "priority" ) + 1;
@@ -644,7 +650,7 @@ if (!strlen($ds)) {
 } else {
 	// Asterisk 1.6 uses , instead of | and 1.4 can't recieve a , in the ds.
 	//
-	if (version_compare($ast_version, "1.6", "ge")) { 
+	if ($ast_ge_16) {
 		$ds_seperator = ',';
 	} else {
 		$ds_seperator = '|';
@@ -694,7 +700,9 @@ if (! $ds) {
 	}
 }
 
-$astman->disconnect();
+if (!$has_extension_state) {
+	$astman->disconnect();
+}
 
 // EOF dialparties.agi
 exit( 0 );
@@ -766,11 +774,46 @@ function mycallback( $rc ) {
 
 function is_ext_avail( $extnum ) {
 	global $astman;
-	
-	$status = $astman->ExtensionState( $extnum, 'from-internal' );
-		
-	$status = $status['Status'];
-	debug("ExtensionState: $status", 4);
+	global $AGI;
+	global $has_extension_state;
+
+	if ($has_extension_state) {
+		$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
+		switch ($extstate_result) {
+			case "NOT_INUSE":
+				$status = 0;
+				break;
+			case "INUSE":
+				$status = 1;
+				break;
+			case "BUSY":
+				$status = 2;
+				break;
+			case "UNAVAILABLE":
+				$status = 4;
+				break;
+			case "RINGING":
+				$status = 8;
+				break;
+			case "RINGINUSE":
+				$status = 9;
+				break;
+			case "HOLDINUSE":
+				$status = 17;
+				break;
+			case "ONHOLD":
+				$status = 16;
+				break;
+			case "UNKNOWN":
+			default:
+				$status = 4;
+		}
+		debug("EXTENSION_STATE: $status ($extstate_result)", 1);
+	} else {
+		$status = $astman->ExtensionState( $extnum, 'from-internal' );
+		$status = $status['Status'];
+		debug("ExtensionState: $status", 1);
+	}
 	return $status;
 }
 

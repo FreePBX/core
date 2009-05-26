@@ -657,6 +657,7 @@ function core_get_config($engine) {
 	global $amp_conf;
 	global $core_conf;
 	global $chan_dahdi;
+	global $astman;;
 
 	$modulename = "core";
 	
@@ -1320,6 +1321,17 @@ function core_get_config($engine) {
 				$ext->addGlobal('CALLINGPRES_34', 'prohib_failed_screen');
 				$ext->addGlobal('CALLINGPRES_35', 'prohib');
 				$ext->addGlobal('CALLINGPRES_67', 'unavailable');
+			}
+
+			// This checks if we have func_extstate loaded, if so we set the global which dialparties
+			// can use (and any other AGI script) to determine that this function exists and not connect
+			// to the manager to get the information
+			//
+			if (version_compare($version, '1.4', 'ge') && version_compare($version, '1.6', 'lt')) {
+				$response = $astman->send_request('Command', array('Command' => 'module show like func_extstate'));
+				if (preg_match('/1 modules loaded/', $response['data'])) {
+					$ext->addGlobal('HAS_EXTENSION_STATE', 'TRUE');
+				}
 			}
 
 			// Let's create globals for each trunk to determine which one's have fixlocalprefix settings.
