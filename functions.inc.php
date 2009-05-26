@@ -2162,16 +2162,20 @@ function core_get_config($engine) {
 
 			// If the required voicemail file does not exist, then abort and go to normal voicemail behavior
 			//
-			// TODO: there have been errors using System() with jump to 101 where asterisk works fine at the begining and
-			//       then starts to jump to 101 even on success. This new mode is being tried with the SYSTEM Status which
-			//       returns SUCCESS when the command returned succcessfully with a 0 app return code.
+			// If 1.4 or above, use the STAT function to check for the file. Prior to 1.4, use the AGI script since the System() command tried
+			// in the past had errors.
 			//
 			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${ARG1}'));			
 			//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.[wW][aA][vV]'));
-			$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
-			$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
+			if ($ast_ge_14) {
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp.WAV)} = 1)]','tmpgreet'));
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.WAV)} = 0)]','nofile'));
+			} else {
+				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp'));
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
+				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}'));
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
+			}
 
 			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));			
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
