@@ -7,6 +7,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.6.0beta1.1* #3696 (needs framework updated)
 		*2.6.0beta1.0* #3478, #3423, #3648, #3685, #3686
 		*2.6.0alpha1.4* fixes re #3649
 		*2.6.0alpha1.3* #3653, #3591, #3650

@@ -1386,7 +1386,13 @@ function core_get_config($engine) {
 			} else {
 				$ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
 				$ext->add($context, $exten, '', new ext_resetcdr('w'));
-				$ext->add($context, $exten, '', new ext_stopmonitor());
+
+				if ($ast_ge_14) {
+					$ext->add($context, $exten, '', new ext_stopmixmonitor());
+				} else {
+					$ext->add($context, $exten, '', new ext_stopmonitor());
+				}
+
 				$ext->add($context, $exten, 'check', new ext_agi('recordingcheck,${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)},${UNIQUEID}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
 				// keep this 999 in case people have issues updating their recording script
