@@ -1275,9 +1275,6 @@ function core_get_config($engine) {
 			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			foreach($globals as $global) {
 				$value = $global['value'];
-				if ($chan_dahdi && substr($value, 0, 4) === 'ZAP/') {
-					$value = 'DAHDI/' . substr($value, 4);
-				}
 				$ext->addGlobal($global['variable'],$value);
 
 				// now if for some reason we have a variable in the global table
@@ -1363,6 +1360,8 @@ function core_get_config($engine) {
 				$tech = strtoupper($trunk['tech']);
 				if ($tech == 'IAX') {
 					$tech = 'IAX2';
+				} elseif ($tech == 'ZAP' && $chan_dahdi) {
+					$tech = 'DAHDI';
 				}
 				if ($tech == 'CUSTOM') {
 					$ext->addGlobal('OUT_'.$tid, 'AMP:'.$trunk['channelid']);
