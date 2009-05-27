@@ -8,7 +8,7 @@
 	<canuninstall>no</canuninstall>
 	<changelog>
 		*2.6.0beta1.1* #3696 (needs framework updated)
-		*2.6.0beta1.0* #3478, #3423, #3648, #3685, #3686
+		*2.6.0beta1.0* #3478, #3423, #3648, #3685, #3686, #1380
 		*2.6.0alpha1.4* fixes re #3649
 		*2.6.0alpha1.3* #3653, #3591, #3650
 		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, #3517 moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
