@@ -48,6 +48,7 @@
 	$ast_version  = get_var("ASTVERSION");
 	$dnd_devstate = get_var( "DNDDEVSTATE" ) == "TRUE" ? true : false;
 	$fm_devstate  = get_var( "FMDEVSTATE" ) == "TRUE" ? true : false;
+	$que_devstate = get_var( "QUEDEVSTATE" ) == "TRUE" ? true : false;
 	$intercom_code = get_var( "INTERCOMCODE" );
 
 	$ast_version14 = version_compare($ast_version, "1.4", "ge");
@@ -160,6 +161,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $astspooldir;
 		global $fm_devstate;
 		global $dnd_devstate;
+		global $que_devstate;
 		global $DEVSTATE;
 
 		set_device_user($device, $user);
@@ -173,6 +175,10 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		if ($fm_devstate) {
 			debug("insert_user: Setting FollowMe DEVSTATES for device $device",5);
 			$agi->set_variable($DEVSTATE.'(Custom:FOLLOWME'.$device.')',get_followme_state($user));
+		}
+		if ($que_devstate) {
+			debug("insert_user: Setting queue DEVSTATES for device $device and user $user",5);
+			set_queue_states($user,$device,'on');
 		}
 		if ($dnd_devstate) {
 			debug("insert_user: Setting DND DEVSTATES for device $device",5);
@@ -197,6 +203,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $astspooldir;
 		global $fm_devstate;
 		global $dnd_devstate;
+		global $que_devstate;
 		global $DEVSTATE;
 
 		$current_user = get_user($device);
@@ -214,6 +221,10 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 				debug("Setting device $device FollowMe state to INVALID before deleting",5);
 				$agi->set_variable($DEVSTATE.'(Custom:FOLLOWME'.$device.')','INVALID');
 			}
+			if ($que_devstate) {
+                        	debug("remove_user: Setting queue DEVSTATES for device $device and user $user",5);
+				set_queue_states($user,$device,'off');
+                	}
 			if ($dnd_devstate) {
 				debug("Setting device $device DND state to INVALID before deleting",5);
 				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','INVALID');
@@ -456,3 +467,70 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $agi;
 		$agi->verbose($string, $level);
 	}
+	
+	// Set States for queues
+	function set_queue_states($user,$device,$onoroff='on') {
+		global $agi;
+		global $astman;
+		$response = $astman->send_request('Command',array('Command'=>"queue show"));
+		$response1=explode("\n",trim($response['data']));
+		// Lets try and process our results here.
+		$inqueue='false';
+		debug("User is $user");
+		foreach ($response1 as $item) {
+			$item1=trim($item);
+			if ($inqueue == 'false') {
+				if (ereg('(\\d+)',$item1)) {
+					preg_match_all ("/(\\d+)/is", $item1,$matches);
+					if ($matches[1][0] != '') {
+						$queues[]=$matches[1][0];
+						$inqueue=$matches[1][0];
+						$logged_agents_array[$inqueue][]='';
+					}
+				}
+			} else {
+				// We should test to see if the item is an Agent description
+				if (ereg('Local',$item1)) {
+					preg_match_all ("/(Local).*?(\\d+)/is", $item1, $matches);
+					$loggedagent=$matches[2][0];
+					$item1='ADD';
+				}
+
+				switch ($item1) {
+					case '':
+						break;
+					case '\n':
+						break;
+
+					case 'No Members':
+						debug("Queue $inqueue has noone logged in");
+						$inqueue='false';
+						break;
+
+					case 'No Callers':
+					case 'Callers':
+						debug("Finished processing members for $inqueue");
+						$inqueue='false';
+						break;
+					case 'ADD':
+						$logged_agents_array[$inqueue][]=$loggedagent;
+						debug("Agent $loggedagent in queue $inqueue");
+					break;
+					default:
+						debug("No Matches");
+
+				}
+			}
+		}
+		debug("Finished sorting");
+		foreach ($queues as $queueno) {
+			debug("Agent is $user");
+			if ($onoroff=='on'){
+				$queuestat=(array_search(trim($user),$logged_agents_array[$queueno]))?'INUSE':'NOT_INUSE';
+			} else {
+				$queuestat=(array_search(trim($user),$logged_agents_array[$queueno]))?'INUSE':'NOT_INUSE';
+			}
+			$agi->set_variable('DEVSTATE(Custom:QUEUE'.$device.'*'.$queueno.')',$queuestat);
+		}
+	}
+		
