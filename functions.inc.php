@@ -246,10 +246,17 @@ class core_conf {
 			}
 			unset($results2_pre);
 
+			$context='';
 			foreach ($results2 as $result2) {
-				$option = $result2['data'];
+				$option = strtolower($result2['data']);
 				if ($ver12) {
-					$output .= $result2['keyword']."=$option\n";
+					switch (strtolower($result2['keyword'])) {
+						case 'context':
+							$context = $option;
+							//fall-through
+						default:
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+					}
 				} else {
 					switch (strtolower($result2['keyword'])) {
 						case 'insecure':
@@ -258,23 +265,46 @@ class core_conf {
 							else if ($option == 'yes')
 								$output .= "insecure=port\n";
 							else
-								$output .= $result2['keyword']."=$option\n";
+								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
 						case 'allow':
 						case 'disallow':
 							if ($option != '')
-								$output .= $result2['keyword']."=$option\n";
+								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
 						case 'record_in':
 						case 'record_out':
 							break;
+						case 'context':
+							$context = $result2['data'];
+							//fall-through
 						default:
-							$output .= $result2['keyword']."=$option\n";
+							$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
 				}
 			}
-			if ($call_limit && (!preg_match('/^tr-peer-*|^tr-user-*|^tr-reg-*/',$id))) {
-				$output .= $call_limit;
+			switch (substr($id,0,8)) {
+				case 'tr-peer-':
+					if ($context == '') {
+						$output .= "context=from-trunk-sip-$account\n";
+					}
+					break;
+				case 'tr-user-':
+					if ($context == '') {
+						$tn = substr($id, 8);
+						// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
+						// trunk so we can set the context appropriately for the group count
+						//
+						$td = core_trunks_getDetails($tn);
+						if (isset($td['channelid'])) {
+							$output .= "context=from-trunk-sip-".$td['channelid']."\n";
+						}
+					}
+					break;
+				default:
+					if ($call_limit) {
+						$output .= $call_limit;
+					}
 			}
 			$output .= $additional."\n";
 		}
@@ -374,10 +404,17 @@ class core_conf {
 			}
 			unset($results2_pre);
 
+			$context='';
 			foreach ($results2 as $result2) {
-				$option = $result2['data'];
+				$option = strtolower($result2['data']);
 				if ($ver12) {
-					$output .= $result2['keyword']."=$option\n";
+					switch (strtolower($result2['keyword'])) {
+						case 'context':
+							$context = $result2['data'];
+							//fall-through
+						default:
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+					}
 				} else {
 					switch ($result2['keyword']) {
 						case 'notransfer':
@@ -388,21 +425,47 @@ class core_conf {
 							} else if (strtolower($option) == 'mediaonly') {
 								$output .= "transfer=mediaonly\n";
 							} else {
-								$output .= $result2['keyword']."=$option\n";
+								$output .= $result2['keyword']."=".$result2['data']."\n";
 							}
 							break;
 						case 'allow':
 						case 'disallow':
 							if ($option != '')
-								$output .= $result2['keyword']."=$option\n";
+								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
 						case 'record_in':
 						case 'record_out':
 							break;
+						case 'context':
+							$context = $option;
+							//fall-through
 						default:
-							$output .= $result2['keyword']."=$option\n";
+							$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
 				}
+			}
+			switch (substr($id,0,8)) {
+				case 'tr-peer-':
+					if ($context == '') {
+						$output .= "context=from-trunk-iax2-$account\n";
+					}
+					break;
+				case 'tr-user-':
+					if ($context == '') {
+						$tn = substr($id, 8);
+						// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
+						// trunk so we can set the context appropriately for the group count
+						//
+						$td = core_trunks_getDetails($tn);
+						if (isset($td['channelid'])) {
+							$output .= "context=from-trunk-iax2-".$td['channelid']."\n";
+						}
+					}
+					break;
+				default:
+					if ($call_limit) {
+						$output .= $call_limit;
+					}
 			}
 			$output .= $additional."\n";
 		}
