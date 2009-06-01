@@ -235,13 +235,17 @@ class core_conf {
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
-				$options = explode("&", $element['data']);
-				foreach ($options as $option) {
-					if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
-						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
-					} else {
-						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
+				if (strtolower(trim($element['keyword'])) != 'secret') {
+					$options = explode("&", $element['data']);
+					foreach ($options as $option) {
+						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
+							array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
+						} else {
+							$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
+						}
 					}
+				} else {
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>$element['data']);
 				}
 			}
 			unset($results2_pre);
@@ -393,13 +397,17 @@ class core_conf {
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
-				$options = explode("&", $element['data']);
-				foreach ($options as $option) {
-					if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
-						array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
-					} else {
-						$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
+				if (strtolower(trim($element['keyword'])) != 'secret') {
+					$options = explode("&", $element['data']);
+					foreach ($options as $option) {
+						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
+							array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
+						} else {
+							$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
+						}
 					}
+				} else {
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>$element['data']);
 				}
 			}
 			unset($results2_pre);
@@ -3823,21 +3831,26 @@ function sort_trunks($a,$b)  {
 }
 
 //get unique trunks
-function core_trunks_getDetails($trunkid) {
+function core_trunks_getDetails($trunkid='') {
 	global $db;
 	global $amp_conf;
 
-	$sql = "SELECT * FROM `trunks` WHERE `trunkid` = '$trunkid'";
-	$trunk = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+	if ($trunkid != '') {
+		$sql = "SELECT * FROM `trunks` WHERE `trunkid` = '$trunkid'";
+		$trunk = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 
-	$tech = strtolower($trunk['tech']);
-	switch ($tech) {
-		case 'iax2':
-			$trunk['tech'] = 'iax';
-			break;
-		default:
-			$trunk['tech'] = $tech;
-			break;
+		$tech = strtolower($trunk['tech']);
+		switch ($tech) {
+			case 'iax2':
+				$trunk['tech'] = 'iax';
+				break;
+			default:
+				$trunk['tech'] = $tech;
+				break;
+		} 
+	} else {
+		$sql = "SELECT * FROM `trunks` ORDER BY tech, name";
+		$trunk = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 	}
 	return $trunk;
 }
