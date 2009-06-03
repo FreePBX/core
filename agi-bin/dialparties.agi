@@ -313,7 +313,7 @@ foreach ($ext as $k) {
 
 // Hacky.
 $count = 0;
-$dndprimary = 0;
+$skipremaining = 0;
 // Now check for DND
 foreach ( $ext as $k ) {
 	if ( (substr($k,-1)!='#') ) {
@@ -324,10 +324,10 @@ foreach ( $ext as $k ) {
 			debug("Extension $k has do not disturb enabled, or followme pre-ring returned busy", 2);
 			unset($ext[$count]);
 			$AGI->set_variable('DIALSTATUS','BUSY');						
-			// if this is primary set dndprimary and figure out if needed below
+			// if this is primary set skipremaining and figure out if needed below
 			//
 			if ($count == 0 && $mastermode) {
-				$dndprimary = 1;
+				$skipremaining = 1;
 				debug("Primary extension is DND, so if mastermode, all should be dnd", 4);
 			}
 			if ($count == 0) {
@@ -343,27 +343,21 @@ foreach ( $ext as $k ) {
 
 // Main calling loop
 //
-$skipremaining = 0; // used to allow primary to ring but skip the rest
 $ds = '';
 foreach ( $ext as $k ) {
 	// mastermode description:
 	//
 	// if mastermode is set then the first extension will be examined and mastermode will be reset so that the others
-	// are left alone. If the remaining extensions are not to be tried, skipremaining will be set to 1 which will
-	// result in dndprimary being set to 1 thus diabling the remaining list.
+	// are left alone. If the remaining extensions are not to be tried, skipremaining will be set to 1 thus skipping them
 	//
 	// if cf unconditional was already detected on the primary, then mastermode will have been reset at this point
 	// since that will negate the mastermode concpet.
 	//
-	// if dnd was set on the primary then dndprimary will already be set resulting in a completly blanked out list
-	// since dnd on the primary means don't bother me on any.
+	// if dnd was set on the primary then skipremaining will already be set resulting in a completly blanked out list
+	// since dnd on the primary means don't bother me on any. It will only have been set if in mastermode
 
 	// Don't bother checking these if we will be blanking the extnum anyhow
-	if ($skipremaining == 1) {
-		$dndprimary = 1;
-	}
-	if ($dndprimary == 0) {
-		// TODO what are these comments...? do we need to remove them...?
+	if ($skipremaining == 0) {
 		$extnum    = $k;
 
 		// CWIGNORE is sent down the channel when all extensions should be treated as if they do not have
@@ -411,17 +405,17 @@ foreach ( $ext as $k ) {
 			// All other cases should act like normal. Unavailable, not busy, ringing, etc.
 			// should not be effected
 		}
-	} // end if ($dndprimary == 0)
-	// $dndprimary == 1 so clear the extension
+	} // end if ($skipremaining == 0)
+	// $skipremaining == 1 so clear the extension
 	else {
-		// clear the current extension if dndprimary has been set. This will only be the case if in mastermode so no need to check
-		// that. Use this to skip remaining extensions also if just ringing the primary.
-		$extnum = '';
+		// skip this loop since $skipremaining = 1 which is only the case in mastermode meaning the remaining code below will skip
+		// this and remaining extensions
+		continue;
 	}
 
-	// if CF is not in use and $dndprimary is not set otherwise $extnum has been cleared and nothing to do
+	// if CF is not in use and $skipremaining is not set otherwise $extnum has been cleared and nothing to do
 	//
-	if ( (substr($k,-1)!='#') && $dndprimary == 0) {
+	if ( (substr($k,-1)!='#')) {
 		// CW is not in use or CFB is in use on this extension, then we need to check!
 		if ( ($exthascw == 0) || ($exthascfb == 1) || ($exthascfu == 1) ) {
 			// get ExtensionState: 0-idle; 1-busy; 4-unavail; 8-ringing <--- these are unconfirmed
