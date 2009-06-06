@@ -872,9 +872,12 @@ function core_get_config($engine) {
 				$picklist = '${EXTEN:'.$fclen.'}';
 				$picklist .= '&${EXTEN:'.$fclen.'}@ext-local';
 				$picklist .= '&${EXTEN:'.$fclen.'}@from-internal';
+				$picklist .= '&${EXTEN:'.$fclen.'}@from-internal-xfer';
 				$picklist .= '&${EXTEN:'.$fclen.'}@from-did-direct';
 				$picklist .= '&LC-${EXTEN:'.$fclen.'}@from-internal';
+				$picklist .= '&LC-${EXTEN:'.$fclen.'}@from-internal-xfer';
 				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-internal';
+				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-internal-xfer';
 				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-did-direct';
 
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup($picklist));
@@ -885,9 +888,12 @@ function core_get_config($engine) {
 					$picklist  = '${EXTEN:'.$len.'}';
 					$picklist .= '&${EXTEN:'.$len.'}@ext-local';
 					$picklist .= '&${EXTEN:'.$len.'}@from-internal';
+					$picklist .= '&${EXTEN:'.$len.'}@from-internal-xfer';
 					$picklist .= '&${EXTEN:'.$len.'}@from-did-direct';
 					$picklist .= '&LC-${EXTEN:'.$len.'}@from-internal';
+					$picklist .= '&LC-${EXTEN:'.$len.'}@from-internal-xfer';
 					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-internal';
+					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-internal-xfer';
 					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-did-direct';
 
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup($picklist));
@@ -918,13 +924,17 @@ function core_get_config($engine) {
 					$picklist  = $exten;
 					$picklist .= '&'.$exten.'@ext-local'; 
 					$picklist .= '&'.$exten.'@from-internal'; 
+					$picklist .= '&'.$exten.'@from-internal-xfer'; 
 					$picklist .= '&'.$exten.'@from-did-direct'; 
 					$picklist .= '&LC-'.$exten.'@from-internal'; 
+					$picklist .= '&LC-'.$exten.'@from-internal-xfer'; 
 					$picklist .= '&FMPR-'.$exten.'@from-internal'; 
+					$picklist .= '&FMPR-'.$exten.'@from-internal-xfer'; 
 					$picklist .= '&FMPR-'.$exten.'@from-did-direct'; 
 
 					foreach ($grps as $grp) {
 						$picklist .= '&'.$grp.'@from-internal'; 
+						$picklist .= '&'.$grp.'@from-internal-xfer'; 
 						$picklist .= '&'.$grp.'@ext-group'; 
 					}
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($picklist));
@@ -948,17 +958,22 @@ function core_get_config($engine) {
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@ext-local'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@from-internal'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@from-internal-xfer'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('${EXTEN:'.$fclen.'}@from-did-direct'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('FMPR-${EXTEN:'.$fclen.'}'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('LC-${EXTEN:'.$fclen.'}@from-internal'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('LC-${EXTEN:'.$fclen.'}@from-internal-xfer'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('FMPR-${EXTEN:'.$fclen.'}@from-internal'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('FMPR-${EXTEN:'.$fclen.'}@from-internal-xfer'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup('FMPR-${EXTEN:'.$fclen.'}@from-did-direct'));
 				if ($intercom_code != '') {
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('${EXTEN:'.strlen($fc_pickup.$intercom_code).'}'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-internal'));
+					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-internal-xfer'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-did-direct'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('FMPR-${EXTEN:'.strlen($fc_pickup.$intercom_code).'}'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('FMPR-${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-internal'));
+					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('FMPR-${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-internal-xfer'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup('FMPR-${EXTEN:'.strlen($fc_pickup.$intercom_code).'}@from-did-direct'));
 				}
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_hangup(''));
@@ -987,13 +1002,17 @@ function core_get_config($engine) {
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@ext-local'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-internal'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-internal-xfer'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($exten.'@from-did-direct'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('LC-'.$exten.'@from-internal'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('LC-'.$exten.'@from-internal-xfer'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-internal'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-internal-xfer'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup('FMPR-'.$exten.'@from-did-direct'));
 					foreach ($grps as $grp) {
 						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@from-internal'));
+						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@from-internal-xfer'));
 						$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($grp.'@ext-group'));
 					}
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
