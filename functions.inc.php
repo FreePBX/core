@@ -1356,7 +1356,16 @@ function core_get_config($engine) {
 				"ASTLOGDIR",
 				"CWINUSEBUSY",
 				"AMPMGRUSER",
-				"AMPMGRPASS"
+				"AMPMGRPASS",
+				// Before you get upset about these being exposed to the dialplan,
+				// they are ALREADY readable from /etc/amportal.conf - adding them
+				// here means that AGI's and Dialplan can connect to the database
+				// without resorting to re-parsing amportal.conf.
+				"AMPDBENGINE",
+				"AMPDBHOST",
+				"AMPDBNAME",
+				"AMPDBUSER",
+				"AMPDBPASS"
 			);
 
 			$disable_recording = false;
