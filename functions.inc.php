@@ -1365,7 +1365,8 @@ function core_get_config($engine) {
 				"AMPDBHOST",
 				"AMPDBNAME",
 				"AMPDBUSER",
-				"AMPDBPASS"
+				"AMPDBPASS",
+				"AMPDBFILE"
 			);
 
 			$disable_recording = false;
