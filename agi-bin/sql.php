@@ -1,4 +1,4 @@
-<?php	/* $Id:$ */
+<?php	/* $Id$ */
 
 // SQL Abstraction Layer for AGI Applications
 // Original Release by Rob Thomas (xrobau@gmail.com)
@@ -34,11 +34,34 @@
 //  $AGI = new AGI();
 //  $db = new AGIDB($AGI);
 //
-//  $result = $db->sql(...raw sql command...)
-//	Returns the result of the SQL command.  This will die noisily if you 
+//  $result = $db->sql($sql, $type)
+//	Returns the result of the SQL command $sql.  This will die noisily if you 
 //	try to do something that isn't portable between databases (eg ALTER TABLE 
 //	or use CREATE with 'auto_increment') - use the alternate commands below, 
 //	or design your database to be portable.
+//	$type specifies the return type - 
+//		ASSOC for an Associative array 
+//		NUM for a numeric array. 
+//		BOTH for both in the same result
+//
+//	Note this returns the ENTIRE result. So for example taken from routepermissions:
+//
+//	$res = $db->sql("SELECT allowed,faildest FROM routepermissions WHERE exten='$cidnum' and routename='$routename'", "BOTH");
+//
+//	if allowed and faildest return 'NO' and 'ext-vm,300', the result would look like this:
+//	$result = {
+//			[0] =>  {  
+//					[0] = 'NO',		// Only these with 'NUM' type
+//					[1] = 'ext-vm,300',
+//					'allowed' => 'NO',	// Only these with 'ASSOC' type
+//					'faildest => 'ext-vm,300',
+//				}
+//		  }
+//	
+//	if ($res[0]['allowed'] == 'NO') {
+//		$agi->goto($res[0]['faildest']);
+//	}
+//
 //
 //  $result = $db->rename_table($from, $to)
 //	Renames a table. Result is not null if an error occured, and the errorstr
@@ -72,6 +95,12 @@ class AGIDB {
   private $agi; // A copy of the AGI class already running
   private $db;  // 'mysql', 'sqlite' or 'sqlite3'. Set in sql_database_connect, so we
 		// know which commands to use. 
+
+  // Public things that you might need to access
+
+  public $errstr; 	// Holder for error string
+  public $numrows; 	// Number of rows returned in the query
+
   // Just in case someone REALLY wants to work around all the sanity checks here, these
   // two variables are public, so you can use them if you REALLY must.
   public $dbtype;
@@ -99,16 +128,19 @@ class AGIDB {
 	if ($this->dbtype == 'mysql') {
 		$dbhandle = mysql_connect($this->dbhost, $this->dbuser, $this->dbpass);
 		if (!$dbhandle) {
-			$this->debug('SEVERE: AGI could not connect to MySQL Database. '.mysql_error(), 0);
+			$this->errstr = 'SEVERE: AGI could not connect to MySQL Database. '.mysql_error();
+			debug ($this->errstr, 1);
 			return null;
 		}
 		$this->debug("Connected to MySQL database OK.", 4);
 		$selected = mysql_select_db($this->dbname, $dbhandle);
 		if (!$selected) {
-			$this->debug('SEVERE: AGI could not select MySQL Database "'.$this->dbname.'" - '.mysql_error(), 0);
+			$this->errstr = 'SEVERE: AGI could not select MySQL Database "'.$this->dbname.'" - '.mysql_error();
+			$this->debug($this->errstr, 1);
 			return null;
 		}
 		$this->debug("Selected database OK.", 4);
+		$this->errstr = null;
 		$this->db = "mysql";
 		return $dbhandle;
 	} elseif ($this->dbtype == 'sqlite3') {
@@ -117,38 +149,129 @@ class AGIDB {
 		if (function_exists('sqlite_open')) {
 			$dbhandle = sqlite_open($this->dbfile, 0666, $sqlerr);
 			if (!$dbhandle) {
-				$this->debug('SEVERE: AGI could not connect to (native) SQLite Database "'.$this->dbfile.'" - '.$sqlerr, 0);
+				$this->errstr = 'SEVERE: AGI could not connect to (native) SQLite Database "'.
+					$this->dbfile.'" - '.$sqlerr;
+				$this->debug($this->errstr, 1);
 				return null;
 			}
 			$this->debug("Connected to SQLite database OK (native sqlite).", 4);
+			$this->errstr = null;
 			$this->db = "sqlite";
 			return $dbhandle;
 		// Bugger. OK, We'll have to use php-sqlite3 then. If the module is already loaded, or is
 		// compiled in, we'll already have sqlite3_ commands. 
 		} elseif (!function_exists('sqlite3_open')) {
+			$this->debug('Loading sqlite3.so', 4);
 			// It's not loaded. Load it.
 			dl('sqlite3.so');
+			$this->debug('Loaded', 4);
 		}
 		// We now have sqlite3_ functions. Use them!
 		$dbhandle = sqlite3_open($this->dbfile);
 		if (!$dbhandle) {
-			$this->debug('SEVERE: AGI could not connect to (module) SQLite3 Database "'.$this->dbfile.'" - '.sqlite3_error($dbhandle), 0);
+			$this->errstr='SEVERE: AGI could not connect to (module) SQLite3 Database "'.
+				$this->dbfile.'" - '.sqlite3_error($dbhandle);
+			$this->debug($this->errstr, 1);
 			return null;
 		}
 		$this->debug("Connected to SQLite3 database OK (module sqlite3).", 4);
+		$this->errstr = null;
+		$this->db = "sqlite3";
 		return $dbhandle;
-		$this->db = "sqlite";
 	} else {
-		$this->debug('SEVERE: Unknown database type: "'.$this->dbtype.'"', 0);
+		$this->errstr = 'SEVERE: Unknown database type: "'.$this->dbtype.'"';
+		$this->debug($this->errstr, 1);
 		return null;
 	}
   }
 
-  function sql($command, $override=false) {
+  function sql($command, $type = "BLANK", $override=false) {
+
+	// Ensure we're connected to the database.
 	if ($this->dbhandle == null) {
-		$this->sql_database_connect();
+		$this->dbhandle = $this->sql_database_connect();
 	}
-	// Check for 'ALTER' and die if found
+	if ($this->dbhandle == null) {
+		// We didn't get a valid handle after the connect, so fail.
+		$this->debug('SEVERE: Unable to connect to database.', 1);
+		return false;
+	}
+	// Check for non-portable stuff. 
+	if ($override != true) {
+		$result = $this->sql_check($command);
+		// sql_check returns a sanitized SQL command, or false if error.
+		if ($result == false) {
+			return false;
+		}
+	} else {
+		$result = $command;
+	}
+
+	// Check the TYPE
+	switch ($type) {
+		case "BLANK":
+			$this->debug("WARNING: Please provide the type of the query for SQL command '$result'. Defaulting to BOTH", 2);
+			$type = "BOTH";
+			break;
+		case "ASSOC":
+		case "NUM":
+		case "BOTH":
+			break;
+		default:
+			$this->errstr = "SEVERE: Uknown Query type '$type' for query '$result'";
+			$this->debug($this->errstr, 1);
+			return false;
+	}
+
+	// Actually do the SQL
+
+	var $sqlresult;
+
+	switch ($this->db) {
+		case "mysql":
+			$res = mysql_query($result, $this->dbhandle);
+			if (!$res) {
+				$this->errstr = "MySQL Error: ".mysql_error()." with query $result";
+				$this->debug($this->errstr, 1);
+				return false;
+			}
+			// Loop through the returned result set, loading it into the array to return
+			// to the caller.
+			$this->numrows = mysql_num_rows($res);
+			// Return the correct type.
+			for ($i = 0; $i <= $this->numrows; $i++) {
+				if ($type = "NUM") {
+					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_NUM);
+				} elseif ($type = "ASSOC") {
+					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_ASSOC);
+				} else {
+					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_BOTH);
+				}
+			}
+			return $sqlresult;
+		case "sqlite":
+			$res = sqlite_query($this->dbhandle, $result, SQLITE_BOTH, $errmsg);
+			if (!$res) {
+				$this->errstr = "SQLite Error: '$errmsg' with query '$result'";
+				$this->debug($this->errstr, 1);
+				return false;
+			}
+			// Loop through the returned result set, loading it into the array to return
+			// to the caller.
+			$this->numrows = sqlite_num_rows($res);
+			// Return the correct type.
+			if ($type = "NUM") {
+				$sqlresult = sqlite_fetch_all($res, SQLITE_NUM);
+			} elseif ($type = "ASSOC") {
+				$sqlresult = sqlite_fetch_all($res, SQLITE_ASSOC);
+			} else {
+				$sqlresult = sqlite_fetch_all($res, SQLITE_BOTH);
+			}
+			return $sqlresult;
+		case "sqlite3":
+				
+
+
 	//
 	// else
 	//
