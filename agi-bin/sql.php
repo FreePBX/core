@@ -91,7 +91,14 @@ class AGIDB {
   private $dbpass;
   private $dbfile;
   private $dbname;
-  
+
+  // sqlite3 needs some global variables to handle returns. They aren't needed
+  // to be defined here, but be aware that they are used by this module.
+
+  /* global $sql3holderAssoc;	*/
+  /* global $sql3holderNum; 	*/
+  /* global $sql3holderRowNbr;	*/
+
   private $agi; // A copy of the AGI class already running
   private $db;  // 'mysql', 'sqlite' or 'sqlite3'. Set in sql_database_connect, so we
 		// know which commands to use. 
@@ -106,7 +113,9 @@ class AGIDB {
   public $dbtype;
   public $dbhandle; 
 
-  function AGIDB($AGI) { // This gets called when 'new AGIDB(..)' is run.
+  function AGIDB($AGI) { 
+	// This gets called when 'new AGIDB(..)' is run.
+	
 	$this->agi = $AGI; // Grab a copy of the AGI class.
 	// Load up the variables we'll need later.
 	$this->dbtype = $this->get_var("AMPDBENGINE");
@@ -187,6 +196,7 @@ class AGIDB {
 
   function sql($command, $type = "BLANK", $override=false) {
 
+	$this->debug("Running SQL Command $command", 4);
 	// Ensure we're connected to the database.
 	if ($this->dbhandle == null) {
 		$this->dbhandle = $this->sql_database_connect();
@@ -225,7 +235,7 @@ class AGIDB {
 
 	// Actually do the SQL
 
-	var $sqlresult;
+	$sqlresult = null;
 
 	switch ($this->db) {
 		case "mysql":
@@ -240,7 +250,7 @@ class AGIDB {
 			$this->numrows = mysql_num_rows($res);
 			// Return the correct type.
 			for ($i = 0; $i <= $this->numrows; $i++) {
-				if ($type = "NUM") {
+				if ($type == "NUM") {
 					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_NUM);
 				} elseif ($type = "ASSOC") {
 					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_ASSOC);
@@ -260,25 +270,43 @@ class AGIDB {
 			// to the caller.
 			$this->numrows = sqlite_num_rows($res);
 			// Return the correct type.
-			if ($type = "NUM") {
+			if ($type == "NUM") {
 				$sqlresult = sqlite_fetch_all($res, SQLITE_NUM);
-			} elseif ($type = "ASSOC") {
+			} elseif ($type == "ASSOC") {
 				$sqlresult = sqlite_fetch_all($res, SQLITE_ASSOC);
 			} else {
 				$sqlresult = sqlite_fetch_all($res, SQLITE_BOTH);
 			}
 			return $sqlresult;
 		case "sqlite3":
-				
+			// Init the sqlite3 hack variables. 
+			global $sql3holderAssoc;
+			global $sql3holderNum;
+			global $sql3holderRowNbr;
 
+			$sql3holderAssoc = null;
+			$sql3holderNum = null;
+			$sql3holderRowNbr = 0;
 
-	//
-	// else
-	//
-	// Connect to DB
-	$handle = $this->sql_database_connect();
-	//
-	return true;
+			// This next line uses the sqlite3_hack function, below, to load
+			// up the $sql3holder variables.
+			$res = sqlite3_exec($this->dbhandle, $result, "sqlite3_hack");
+			$this->numrows = $sql3holderRowNbr;
+			$this->debug("SQL returned $sql3holderRowNbr Rows", 4);
+			if ($sql3holderRowNbr == 0) {
+				return null;
+			}
+			if ($type == "NUM") {
+				return $sql3holderNum;
+			} elseif ($type == "ASSOC")  {
+				return $sql3holderAssoc;
+			} else {
+				return $sql3holderNum + $sql3holderAssoc;
+			}
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED", 0);
+			return false;
+	}
   }
 
   function get_var($value) {
@@ -295,8 +323,35 @@ class AGIDB {
         $this->agi->verbose($string, $level);
   }
 
+  function sql_check($sql) {
+	return $sql;
+  }
+
 }
 
+// sqlite3_hack to let us return both an assocative and numeric array.  This
+// function gets called by sqlite3_exec, above, and is run once for each row
+// returned. There's no 'rewind' of a pointer in the sqlite3_ routines, so
+// I had to figure out another way of doing it. This is nasty, but there
+// doesn't seem to be another way. 
 
+function sqlite3_hack($data, $column) {
+	global $sql3holderRowNbr;
+	global $sql3holderNum;
+	global $sql3holderAssoc;
+
+	// Don't uncomment this unless you don't care about anything that
+	// happens after this - phpagi WILL get confused.
+
+	// print "VERBOSE sqlite3_hack called 4\n";
+	$i = 0;
+	foreach ($data as $x) {
+		$sql3holderNum[$sql3holderRowNbr][] = $column[$i];
+		$sql3holderAssoc[$sql3holderRowNbr][$data[$i]] = $column[$i];
+		$i++;
+	}
+	$sql3holderRowNbr++;
+	return 0;
+}
 
 ?>
