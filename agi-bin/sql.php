@@ -89,12 +89,10 @@
 if (!class_exists('AGI')) {
 	print "WARNING: AGI Class does not exist. You've probably done something wrong.\n";
 	print "Running in debug mode..\n";
+	if (class_exists('SQLite3')) { print "SQLite3 Class exists\n"; }
 	$db = new AGIDB(null);
 	// Using sqlite_master crashes php-sqlite3
-	// $res = $db->sql("select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='trunks'", "BOTH", true);
-	// print_r($res);
-	$res = $db->sql("select * from `globals`", "BOTH", true);
-	print_r($res);
+	$db->drop_col('trunks', 'failscript');
 } 
 
 class AGIDB {
@@ -224,13 +222,12 @@ class AGIDB {
 	$this->debug("Running SQL Command $command", 4);
 	// Ensure we're connected to the database.
 	if ($this->dbhandle == null) {
-		$this->dbhandle = $this->sql_database_connect();
+		if (!$this->dbhandle = $this->sql_database_connect()) {
+			$this->debug('SEVERE: Unable to connect to database.', 1);
+			return false;
+		}
 	}
-	if ($this->dbhandle == null) {
-		// We didn't get a valid handle after the connect, so fail.
-		$this->debug('SEVERE: Unable to connect to database.', 1);
-		return false;
-	}
+
 	// Check for non-portable stuff. 
 	if ($override != true) {
 		$result = $this->sql_check($command);
@@ -328,7 +325,7 @@ class AGIDB {
 					return false;
 				} else {
 					$this->errstr = null;
-					return true;
+					return $res;
 				}
 			}
 			// This next line uses the sqlite3_hack function, below, to load
@@ -371,12 +368,21 @@ class AGIDB {
 		case "sqlite3":
 			return $this->sql("ALTER TABLE `$tablename` ADD COLUMN `$colname`", "NONE", true);
 		default:
-			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (rename_table)", 0);
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (add_col)", 0);
 			return false;
 	}
   }
 
   function drop_col($tablename, $colname) {
+
+	// Ensure we're connected to the database.
+	if ($this->dbhandle == null) {
+		if (!$this->dbhandle = $this->sql_database_connect()) {
+			$this->debug('SEVERE: Unable to connect to database.', 1);
+			return false;
+		}
+	}
+
 	switch ($this->db) {
 		case "mysql":
 			return $this->sql("ALTER TABLE `$tablename` DROP COLUMN `$colname`");
@@ -386,7 +392,20 @@ class AGIDB {
 		// We need to rename the table, create a new one without the col that they want deleted,
 		// copy everything from the old table, then delete the old table.
 		// We use the magic 'sqlite_master' table to get the information about the table.
-			$res = $this->sql("select `tbl_name`,`sql` from sqlite_master where `tbl_name`='trunks'");
+		// Note we CAN'T use $this->sql (aka, sqlite3_exec) because it segvs when using the
+		// sqlite_master table. I don't know enough about sqlite to be able to fix it. This 
+		// works though.
+			$res = sqlite3_query($this->dbhandle, 
+				"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
+			$sqlarr = sqlite3_fetch_array($res);
+			print_r($sqlarr);
+			$sqlCreate = $sqlarr['sql'];
+			$sqlStripped = preg_replace("/^\s+`$colname`.+$/m", "", $sqlCreate);
+			print "The col $colname should not be in this: $sqlStripped\n";
+			break;
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (drop_col)", 0);
+			return false;
 	}
   }
 
@@ -423,15 +442,15 @@ class AGIDB {
 
   // Escape magic characters that are important to databases
   function escape($str) {
+
 	// Ensure we're connected to the database.
 	if ($this->dbhandle == null) {
-		$this->dbhandle = $this->sql_database_connect();
+		if (!$this->dbhandle = $this->sql_database_connect()) {
+			$this->debug('SEVERE: Unable to connect to database.', 1);
+			return false;
+		}
 	}
-	if ($this->dbhandle == null) {
-		// We didn't get a valid handle after the connect, so fail.
-		$this->debug('SEVERE: Unable to connect to database.', 1);
-		return false;
-	}
+
 	switch ($this->db) {
 		case "mysql":
 			return mysql_real_escape_string($str, $this->dbhandle);
