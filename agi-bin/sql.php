@@ -1,4 +1,6 @@
-<?php	/* $Id$ */
+<?php	
+
+/* $Id$ */
 
 // SQL Abstraction Layer for AGI Applications
 // Original Release by Rob Thomas (xrobau@gmail.com)
@@ -34,6 +36,10 @@
 //  $AGI = new AGI();
 //  $db = new AGIDB($AGI);
 //
+//  $result = $db->escape($sql)
+//	Escapes any characters that could confuse the database and lead to SQL injection problems.
+//	You should use this on ANY browser-supplied or user-supplied input.
+//	
 //  $result = $db->sql($sql, $type)
 //	Returns the result of the SQL command $sql.  This will die noisily if you 
 //	try to do something that isn't portable between databases (eg ALTER TABLE 
@@ -81,7 +87,14 @@
 //
 
 if (!class_exists('AGI')) {
-	print "WARNING: AGI Class does not exist. You've probably done something wrong. Read the documentation.\n";
+	print "WARNING: AGI Class does not exist. You've probably done something wrong.\n";
+	print "Running in debug mode..\n";
+	$db = new AGIDB(null);
+	// Using sqlite_master crashes php-sqlite3
+	// $res = $db->sql("select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='trunks'", "BOTH", true);
+	// print_r($res);
+	$res = $db->sql("select * from `globals`", "BOTH", true);
+	print_r($res);
 } 
 
 class AGIDB {
@@ -113,17 +126,29 @@ class AGIDB {
   public $dbtype;
   public $dbhandle; 
 
-  function AGIDB($AGI) { 
+  function AGIDB($AGI=null) { 
 	// This gets called when 'new AGIDB(..)' is run.
-	
-	$this->agi = $AGI; // Grab a copy of the AGI class.
-	// Load up the variables we'll need later.
-	$this->dbtype = $this->get_var("AMPDBENGINE");
-	$this->dbhost = $this->get_var("AMPDBHOST");
-	$this->dbuser = $this->get_var("AMPDBUSER");
-	$this->dbpass = $this->get_var("AMPDBPASS");
-	$this->dbfile = $this->get_var("AMPDBFILE");
-	$this->dbname = $this->get_var("AMPDBNAME");
+
+	if (!class_exists('AGI')) {
+		// Running from the command line.. Hardcode everything, don't
+		// use AGI
+		$this->dbtype = 'sqlite3';
+		$this->dbfile = '/var/lib/asterisk/freepbx.db';
+		$this->dbhost = 'localhost';
+		$this->dbuser = 'asterisk';
+		$this->dbpass = 'asterisk';
+		$this->dbname = 'asterisk';
+		$this->agi = null;
+	} else {
+		$this->agi = $AGI; // Grab a copy of the AGI class.
+		// Load up the variables we'll need later.
+		$this->dbtype = $this->get_var("AMPDBENGINE");
+		$this->dbhost = $this->get_var("AMPDBHOST");
+		$this->dbuser = $this->get_var("AMPDBUSER");
+		$this->dbpass = $this->get_var("AMPDBPASS");
+		$this->dbfile = $this->get_var("AMPDBFILE");
+		$this->dbname = $this->get_var("AMPDBNAME");
+	}
 	// Don't connect to the database on startup, as you want the AGI
 	// to be up and running as fast as possible. Connect on the first
 	// SQL command.
@@ -226,6 +251,7 @@ class AGIDB {
 		case "ASSOC":
 		case "NUM":
 		case "BOTH":
+		case "NONE":
 			break;
 		default:
 			$this->errstr = "SEVERE: Uknown Query type '$type' for query '$result'";
@@ -249,6 +275,9 @@ class AGIDB {
 			// to the caller.
 			$this->numrows = mysql_num_rows($res);
 			// Return the correct type.
+			if ($type == "NONE") {
+				return true;
+			}
 			for ($i = 0; $i <= $this->numrows; $i++) {
 				if ($type == "NUM") {
 					$sqlresult[$i] = mysql_fetch_array($res, MYSQL_NUM);
@@ -270,6 +299,9 @@ class AGIDB {
 			// to the caller.
 			$this->numrows = sqlite_num_rows($res);
 			// Return the correct type.
+			if ($type == "NONE") {
+				return true;
+			}
 			if ($type == "NUM") {
 				$sqlresult = sqlite_fetch_all($res, SQLITE_NUM);
 			} elseif ($type == "ASSOC") {
@@ -288,13 +320,24 @@ class AGIDB {
 			$sql3holderNum = null;
 			$sql3holderRowNbr = 0;
 
+			// If no result is required, just run the query and return the status.
+			if ($type == "NONE") {
+				$res = sqlite3_exec($this->dbhandle, $result);
+				if (!$res) {
+					$this->errstr = $result;
+					return false;
+				} else {
+					$this->errstr = null;
+					return true;
+				}
+			}
 			// This next line uses the sqlite3_hack function, below, to load
 			// up the $sql3holder variables.
 			$res = sqlite3_exec($this->dbhandle, $result, "sqlite3_hack");
 			$this->numrows = $sql3holderRowNbr;
 			$this->debug("SQL returned $sql3holderRowNbr Rows", 4);
 			if ($sql3holderRowNbr == 0) {
-				return null;
+				return true;
 			}
 			if ($type == "NUM") {
 				return $sql3holderNum;
@@ -304,11 +347,51 @@ class AGIDB {
 				return $sql3holderNum + $sql3holderAssoc;
 			}
 		default:
-			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED", 0);
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (sql)", 0);
 			return false;
 	}
   }
 
+  function rename_table($from, $to) {
+	switch ($this->db) {
+		case "mysql":
+		case "sqlite":
+		case "sqlite3":
+			return $this->sql("ALTER TABLE `$from` RENAME TO `$to`", "NONE", true);
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (rename_table)", 0);
+			return false;
+	}
+  }
+
+  function add_col($tablename, $colname, $type) {
+	switch ($this->db) {
+		case "mysql":
+		case "sqlite":
+		case "sqlite3":
+			return $this->sql("ALTER TABLE `$tablename` ADD COLUMN `$colname`", "NONE", true);
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (rename_table)", 0);
+			return false;
+	}
+  }
+
+  function drop_col($tablename, $colname) {
+	switch ($this->db) {
+		case "mysql":
+			return $this->sql("ALTER TABLE `$tablename` DROP COLUMN `$colname`");
+		case "sqlite":
+		case "sqlite3":
+		// As SQLite doesn't support much in the way of 'alter table', we need to do some fiddling.
+		// We need to rename the table, create a new one without the col that they want deleted,
+		// copy everything from the old table, then delete the old table.
+		// We use the magic 'sqlite_master' table to get the information about the table.
+			$res = $this->sql("select `tbl_name`,`sql` from sqlite_master where `tbl_name`='trunks'");
+	}
+  }
+
+			
+	
   function get_var($value) {
         $r = $this->agi->get_variable( $value );
 
@@ -319,13 +402,60 @@ class AGIDB {
         return '';
   }
 
-  function debug($string, $level=3) {
-        $this->agi->verbose($string, $level);
-  }
-
   function sql_check($sql) {
+	// Anything starting with ALTER is right out. 
+	if (preg_match('/^ALTER/', $sql)) {
+		$this->debug("SEVERE PROGRAMMING ERROR: Do not use ALTER in SQL Queries. ".
+			"Use SQL Class functions. ABORTING.", 0);
+		exit;
+	}
+	// Make sure that at least one pair of backticks has been found.
+	if (!preg_match('/\`.+\`/', $sql)) {
+		$this->debug("SEVERE PROGRAMMING ERROR: For portability, COLUMNS must be ".
+			"surrounded by BACK TICKS (`), yet none were found. Continuing.", 0);
+	}
+	if (!preg_match('/\'.+\'/', $sql)) {
+		$this->debug("SEVERE PROGRAMMING ERROR: For portability, FIELDS must be ".
+			"surrounded by SINGLE QUOTES ('), yet none were found. Continuing.", 0);
+	}
 	return $sql;
   }
+
+  // Escape magic characters that are important to databases
+  function escape($str) {
+	// Ensure we're connected to the database.
+	if ($this->dbhandle == null) {
+		$this->dbhandle = $this->sql_database_connect();
+	}
+	if ($this->dbhandle == null) {
+		// We didn't get a valid handle after the connect, so fail.
+		$this->debug('SEVERE: Unable to connect to database.', 1);
+		return false;
+	}
+	switch ($this->db) {
+		case "mysql":
+			return mysql_real_escape_string($str, $this->dbhandle);
+		case "sqlite":
+			return sqlite_escape_string($str);
+		case "sqlite3":
+			// SQLite only needs to care about single ticks - "'". Escape
+			// that with another tick.
+			return str_replace("'", "''", $str);
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (escape)", 0);
+			return false;
+	}
+  }
+	
+  function debug($string, $level=3) {
+	if (class_exists('AGI')) {
+        	$this->agi->verbose($string, $level);
+	} else {
+		print "$string\n";
+	}
+  }
+
+		
 
 }
 
@@ -342,8 +472,8 @@ function sqlite3_hack($data, $column) {
 
 	// Don't uncomment this unless you don't care about anything that
 	// happens after this - phpagi WILL get confused.
-
 	// print "VERBOSE sqlite3_hack called 4\n";
+
 	$i = 0;
 	foreach ($data as $x) {
 		$sql3holderNum[$sql3holderRowNbr][] = $column[$i];
