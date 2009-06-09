@@ -92,7 +92,7 @@ if (!class_exists('AGI')) {
 	if (class_exists('SQLite3')) { print "SQLite3 Class exists\n"; }
 	$db = new AGIDB(null);
 	// Using sqlite_master crashes php-sqlite3
-	$db->drop_col('trunks', 'failscript');
+	$db->alter_col('trunks', 'failscript', 'VARCHAR (20)');
 } 
 
 class AGIDB {
@@ -442,7 +442,8 @@ class AGIDB {
 			// Split the CREATE command into col names and types
 			preg_match_all('/\n\s+(`.+`)\s(.+)/', $sqlStripped, $arrNewTableInfo);
 
-			// Join the table names together, stripping off the last comma if there is one
+			// Join the table names back together, so we can use them in the query
+			// below.
 			$strAllCols = implode(",", $arrNewTableInfo[1]);
 
 			// Copy everything from the old table to the new
@@ -454,11 +455,88 @@ class AGIDB {
 			// Delete the old table
 			$sql = "DROP TABLE ${tablename}_temp";
 			if (!$this->sql($sql, "NONE", true)) {
-				$this->debug("SQL Command Failed: $sqlStripped\n".$this->errstr."\n");
+				$this->debug("SQL Command Failed: $sql\n".$this->errstr."\n");
 			}
 			break;
 		default:
 			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (drop_col)", 0);
+			return false;
+	}
+  }
+
+
+  function alter_col($tablename, $colname, $type) {
+
+	// Ensure we're connected to the database.
+	if ($this->dbhandle == null) {
+		if (!$this->dbhandle = $this->sql_database_connect()) {
+			$this->debug('SEVERE: Unable to connect to database.', 1);
+			return false;
+		}
+	}
+
+	switch ($this->db) {
+		case "mysql":
+			return $this->sql("ALTER TABLE `$tablename` CHANGE `$colname` `$colname` $type");
+		case "sqlite":
+		case "sqlite3":
+		// As per remove_col - SQLite doesn't support ALTER TABLE properly. We have to work 
+		// around it's limitations.
+			if ($this->db == "sqlite3") {
+				$res = sqlite3_query($this->dbhandle, 
+					"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
+				$sqlarr = sqlite3_fetch_array($res);
+				sqlite3_query_close($res);
+			} else {
+				// We're using the SQLite3 class, which works normally.
+				$res = $this->sql("select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'"
+					, "ASSOC", true);
+				$sqlarr = $res[0];
+			}
+
+			$sqlCreate = $sqlarr['sql'];
+
+			// Extract the col types for all the cols in the $sqlCreate string
+			preg_match_all('/\n\s+`(.+)`\s(.+)[,?$]/', $sqlCreate, $arrNewTableInfo);
+
+			// Which loads the col NAMES into $arr[1] and col TYPES into $arr[2]
+			// For ease of use, we'll just make it assocative. 
+			$i = 0;
+			foreach ($arrNewTableInfo[1] as $name) {
+				$arrAssocTypes[$name] = $arrNewTableInfo[2][$i++];
+			}
+
+				print_r($arrAssocTypes);
+			// and NOW we know what the types are for each name.  Lets make sure
+			// that the col you want to change actually exists.
+			if (defined($arrAssocTypes[$colname])) {
+				$this->debug("SQL Error - Tried to change col $colname, but it doesn't exist", 2);
+				print_r($arrAssocTypes);
+				return false;
+			}
+
+			// Now we need to replace the type of the col in $sqlCreate with the correct one.
+			$strOld = "`$colname` ".$arrAssocTypes[$colname];
+			$strNew = "`$colname` ".$type;
+			$sqlNewCreate = str_replace($strOld, $strNew, $sqlCreate);
+
+			// Right. So we've got the new table definition in $sqlNewCreate, now all we need
+			// to do is move the old table out of the way, create the new table, and copy 
+			// everything across.
+			$this->rename_table($tablename, "${tablename}_temp");
+			$this->sql($sqlNewCreate, "NONE", true);
+
+			// Create the list of cols to use on the import.
+			$strAllCols = implode(",", $arrNewTableInfo[1]);
+
+			// Copy everything from the old table to the new
+			$sql = "INSERT INTO `$tablename` SELECT $strAllCols FROM ${tablename}_temp";
+			if (!$this->sql($sql, "NONE", true)) {
+				$this->debug("SQL Command Failed: $sql\n".$this->errstr."\n");
+			}
+			break;
+		default:
+			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (escape)", 0);
 			return false;
 	}
   }
