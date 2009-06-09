@@ -176,13 +176,13 @@ class AGIDB {
 		$this->db = "mysql";
 		return $dbhandle;
 	} elseif ($this->dbtype == 'sqlite3') {
-		// Database is SQLite. It's preferrable to use the inbuilt sqlite_ commands, so
-		// check if they exist first.
-		if (function_exists('sqlite_open')) {
-			$dbhandle = sqlite_open($this->dbfile, 0666, $sqlerr);
+		// Database is SQLite. It's preferrable to use the inbuilt PHP5 sqlite3 class, so
+		// check if that exist first. Requires PHP 5.3.0
+		if (class_exists('SQLite3')) {
+			$dbhandle = new SQLite3($this->dbfile, SQLITE3_OPEN_READWRITE);
 			if (!$dbhandle) {
 				$this->errstr = 'SEVERE: AGI could not connect to (native) SQLite Database "'.
-					$this->dbfile.'" - '.$sqlerr;
+					$this->dbfile.'" - '.$dbhandle->lastErrorMsg;
 				$this->debug($this->errstr, 1);
 				return null;
 			}
@@ -196,8 +196,10 @@ class AGIDB {
 			$this->debug('Loading sqlite3.so', 4);
 			// It's not loaded. Load it.
 			dl('sqlite3.so');
+			// That would have crashed PHP if it couldn't load it, so we know it's loaded if
+			// it got to here.
 			$this->debug('Loaded', 4);
-		}
+		} 
 		// We now have sqlite3_ functions. Use them!
 		$dbhandle = sqlite3_open($this->dbfile);
 		if (!$dbhandle) {
@@ -286,26 +288,28 @@ class AGIDB {
 			}
 			return $sqlresult;
 		case "sqlite":
-			$res = sqlite_query($this->dbhandle, $result, SQLITE_BOTH, $errmsg);
+			$res = $this->dbhandle->query($result);
 			if (!$res) {
-				$this->errstr = "SQLite Error: '$errmsg' with query '$result'";
+				$this->errstr = "SQLite3 Error: '".$this->dbhandle->lastErrorMsg."' with query '$result'";
 				$this->debug($this->errstr, 1);
 				return false;
 			}
 			// Loop through the returned result set, loading it into the array to return
 			// to the caller.
-			$this->numrows = sqlite_num_rows($res);
 			// Return the correct type.
 			if ($type == "NONE") {
 				return true;
 			}
+			$i = 0;
 			if ($type == "NUM") {
-				$sqlresult = sqlite_fetch_all($res, SQLITE_NUM);
-			} elseif ($type == "ASSOC") {
-				$sqlresult = sqlite_fetch_all($res, SQLITE_ASSOC);
+				while ($sqlresult[$i++] = $res->fetchArray(SQLITE3_NUM));
+			} elseif ($type = "ASSOC") {
+				while ($sqlresult[$i++] = $res->fetchArray(SQLITE3_ASSOC));
 			} else {
-				$sqlresult = sqlite_fetch_all($res, SQLITE_BOTH);
+				while ($sqlresult[$i++] = $res->fetchArray(SQLITE3_BOTH));
 			}
+			$res->finalize();
+			$this->numrows = $i;
 			return $sqlresult;
 		case "sqlite3":
 			// Init the sqlite3 hack variables. 
@@ -321,7 +325,7 @@ class AGIDB {
 			if ($type == "NONE") {
 				$res = sqlite3_exec($this->dbhandle, $result);
 				if (!$res) {
-					$this->errstr = $result;
+					$this->errstr = sqlite3_error($this->dbhandle);
 					return false;
 				} else {
 					$this->errstr = null;
@@ -354,7 +358,14 @@ class AGIDB {
 		case "mysql":
 		case "sqlite":
 		case "sqlite3":
-			return $this->sql("ALTER TABLE `$from` RENAME TO `$to`", "NONE", true);
+			$this->sql("DROP TABLE `$to`", "NONE", true);
+			$sql = "ALTER TABLE `$from` RENAME TO `$to`";
+			if(!$res = $this->sql($sql, "NONE", true)) {
+				print "Error in sql `$sql` - ".$this->errstr."\n";
+				return false;
+			} else {
+				return true;
+			}
 		default:
 			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (rename_table)", 0);
 			return false;
@@ -395,13 +406,56 @@ class AGIDB {
 		// Note we CAN'T use $this->sql (aka, sqlite3_exec) because it segvs when using the
 		// sqlite_master table. I don't know enough about sqlite to be able to fix it. This 
 		// works though.
-			$res = sqlite3_query($this->dbhandle, 
-				"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
-			$sqlarr = sqlite3_fetch_array($res);
-			print_r($sqlarr);
+
+			if ($this->db == "sqlite3") {
+				$res = sqlite3_query($this->dbhandle, 
+					"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
+				$sqlarr = sqlite3_fetch_array($res);
+				sqlite3_query_close($res);
+			} else {
+				// We're using the SQLite3 class, which works normally.
+				$res = $this->sql("select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'"
+					, "ASSOC", true);
+				$sqlarr = $res[0];
+			}
+
 			$sqlCreate = $sqlarr['sql'];
-			$sqlStripped = preg_replace("/^\s+`$colname`.+$/m", "", $sqlCreate);
-			print "The col $colname should not be in this: $sqlStripped\n";
+			// This deletes any line that starts with any number of space characters
+			// (^\s+), then has a back tick (`), the name ($colname), another tick
+			// (`) and anything else (.+) until the end of the line ($) including the
+			// new line character (\n), and it needs to be multiline aware (m)
+			$sqlStripped = preg_replace("/^\s+`$colname`.+$\n/m", "", $sqlCreate);
+			if ($sqlStripped == $sqlCreate) {
+				// Nothing to remove.
+				$this->debug("Column $colname doesn't exist in table $tablename", 4);
+				return true;
+			}
+
+			// Rename table
+			$this->rename_table($tablename, "${tablename}_temp");
+
+			// Create new table without $colname
+			if (!$this->sql($sqlStripped, "NONE", true)) {
+				$this->debug("SQL Command Failed: $sqlStripped\n".$this->errstr."\n");
+			}
+
+			// Split the CREATE command into col names and types
+			preg_match_all('/\n\s+(`.+`)\s(.+)/', $sqlStripped, $arrNewTableInfo);
+
+			// Join the table names together, stripping off the last comma if there is one
+			$strAllCols = implode(",", $arrNewTableInfo[1]);
+
+			// Copy everything from the old table to the new
+			$sql = "INSERT INTO `$tablename` SELECT $strAllCols FROM ${tablename}_temp";
+			if (!$this->sql($sql, "NONE", true)) {
+				$this->debug("SQL Command Failed: $sqlStripped\n".$this->errstr."\n");
+			}
+
+			// Delete the old table
+			$sql = "DROP TABLE ${tablename}_temp";
+			if (!$this->sql($sql, "NONE", true)) {
+				$this->debug("SQL Command Failed: $sqlStripped\n".$this->errstr."\n");
+			}
 			break;
 		default:
 			$this->debug("SEVERE: Database type '".$this->db."' NOT SUPPORTED (drop_col)", 0);
@@ -455,7 +509,6 @@ class AGIDB {
 		case "mysql":
 			return mysql_real_escape_string($str, $this->dbhandle);
 		case "sqlite":
-			return sqlite_escape_string($str);
 		case "sqlite3":
 			// SQLite only needs to care about single ticks - "'". Escape
 			// that with another tick.
