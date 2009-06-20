@@ -753,6 +753,7 @@ function core_get_config($engine) {
 					$core_conf->addSipGeneral('tos_sip','cs3');    // Recommended setting from doc/ip-tos.txt
 					$core_conf->addSipGeneral('tos_audio','ef');   // Recommended setting from doc/ip-tos.txt
 					$core_conf->addSipGeneral('tos_video','af41'); // Recommended setting from doc/ip-tos.txt
+					$core_conf->addSipGeneral('alwaysauthreject','yes');
 				} else {
 					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
