@@ -2547,6 +2547,76 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 	return false;
 }
 
+/* Create a new did with values passed into $did_vars and defaults used otherwise
+*/
+function core_did_create_update($did_vars) {
+  $did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
+  $did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
+
+  if (count(core_did_get($did_create['extension'], $did_create['$cidnum']))) {
+    return core_did_edit_properties($did_vars); //already exists so just edit properties
+  } else {
+	  $did_create['faxexten']    = isset($did_vars['faxexten'])    ? $did_vars['faxexten']    : '';
+	  $did_create['faxemail']    = isset($did_vars['faxemail'])    ? $did_vars['faxemail']    : '';
+	  $did_create['answer']      = isset($did_vars['answer'])      ? $did_vars['answer']      : '0';
+	  $did_create['wait']        = isset($did_vars['wait'])        ? $did_vars['wait']        : '0';
+	  $did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
+	  $did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
+	  $did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
+	  $did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
+	  $did_create['description'] = isset($did_vars['description']) ? $did_vars['description'] : '';
+	  $did_create['grppre']      = isset($did_vars['grppre'])      ? $did_vars['grppre']      : '';
+	  $did_create['delay_answer']= isset($did_vars['delay_answer'])? $did_vars['delay_answer']: '0';
+	  $did_create['pricid']      = isset($did_vars['pricid'])      ? $did_vars['pricid']      : '';
+
+	  $did_dest                  = isset($did_vars['destination']) ? $did_vars['destination'] : '';
+	  return core_did_add($did_vars, $did_dest);
+ }
+}
+
+
+/* Edits the poperties of a did, but not the did or cid nums since those could of course be
+   in conflict
+*/
+function core_did_edit_properties($did_vars) {
+  global $db;
+
+  if (!is_array($did_vars)) {
+    return false;
+  }
+
+  $extension = $db->escapeSimple(isset($did_vars['extension']) ? $did_vars['extension'] : '');
+  $cidnum    = $db->escapeSimple(isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '');
+  $sql = "";
+  foreach ($did_vars as $key => $value) {
+    switch ($key) {
+      case 'faxexten':
+      case 'faxemail':
+      case 'answer':
+      case 'wait':
+      case 'privacyman':
+      case 'alertinfo':
+      case 'ringing':
+      case 'mohclass':
+      case 'description':
+      case 'grppre':
+      case 'delay_answer':
+      case 'pricid':
+      case 'destination':
+        $sql_value = $db->escapeSimple($value);
+        $sql .= " `$key` = '$sql_value',";
+      break;
+    default:
+    }
+  }
+  if ($sql == '') {
+    return false;
+  }
+  $sql = substr($sql,0,(strlen($sql)-1)); //strip off tailing ','
+  $sql_update = "UPDATE `incoming` SET"."$sql WHERE `extension` = '$extension' AND `cidnum` = '$cidnum'";
+  return sql($sql_update);
+}
+
 function core_did_add($incoming,$target=false){
 	global $db;
 	foreach ($incoming as $key => $val) { ${$key} = $db->escapeSimple($val); } // create variables from request
