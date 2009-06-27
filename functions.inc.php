@@ -3789,12 +3789,12 @@ function core_trunks_del($trunknum, $tech = null) {
 
 	// conditionally, delete from iax or sip
 	switch (strtolower($tech)) {
-		case "iax":
 		case "iax2":
-			sql("DELETE FROM `iax` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
-		break;
+      $tech = "iax";
+      // fall through
+		case "iax":
 		case "sip": 
-			sql("DELETE FROM `sip` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
+			sql("DELETE FROM `$tech` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
 		break;
 	}
 	sql("DELETE FROM `trunks` WHERE `trunkid` = '$trunknum'");
@@ -3805,6 +3805,9 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 	$name = trim($name) == "" ? $channelid : $name;
 
 	$tech = core_trunks_getTrunkTech($trunknum);
+  if ($tech == "") {
+    return false;
+  }
 	core_trunks_del($trunknum, $tech);
 	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider);
 }
@@ -4106,7 +4109,7 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap") return ""; // zap has no details
+	if ($tech == "zap" || $tech == "") return ""; // zap has no details
 	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
 	
@@ -4131,7 +4134,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap") return ""; // zap has no details
+	if ($tech == "zap" || $tech == "") return ""; // zap has no details
 	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
@@ -4150,7 +4153,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 function core_trunks_getTrunkRegister($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap") return ""; // zap has no register
+	if ($tech == "zap" || $tech == "") return ""; // zap has no register
 	
 	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
