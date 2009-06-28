@@ -142,20 +142,32 @@ if (isset($inroutes)) {
 	} else {
 ?>
 <?php 
-		if ($extdisplay) {	
-		//create variables for the selected route's settings
-		$extarray=explode('/',$extdisplay,2);
-		$ininfo=core_did_get($extarray[0],$extarray[1]);
-		if (is_array($ininfo)) {
-	 		extract($ininfo);
-		}
+    if ($extdisplay) {	
+      //create variables for the selected route's settings
+      $extarray=explode('/',$extdisplay,2);
+      $ininfo=core_did_get($extarray[0],$extarray[1]);
+      if (is_array($ininfo) && !empty($ininfo)) {
+        extract($ininfo);
+        $delete_url = true;
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
 <?php
-		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
-		$tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
-		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
-		echo "<p><a href=".$delURL.">".$label."</a></p>";
+      } else {
+        $extension = $extarray[0];
+        $cidnum    = $extarray[1];
+        $delete_url = false;
+        $extdisplay = '';
+?>
+    <h2><?php echo _("Add Incoming Route")?></h2>
+<?php
+      }
+
+    if ($delete_url) {
+		  $delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
+		  $tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
+		  $label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
+		  echo "<p><a href=".$delURL.">".$label."</a></p>";
+    }
 		// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
 		//
 		$did_dest = split(',',$destination);
@@ -175,9 +187,9 @@ if (isset($inroutes)) {
 		}
 ?>
 <?php 
-	} else { 
+	} else {
 ?>
-			<h2><?php echo _("Add Incoming Route")?></h2>
+    <h2><?php echo _("Add Incoming Route")?></h2>
 <?php 
 	} 
 ?>
