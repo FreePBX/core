@@ -99,6 +99,7 @@ switch ($action) {
 	case "deltrunk":
 	
 		core_trunks_del($trunknum);
+    core_routing_trunk_del($trunknum);
 		
 		/* //DIALRULES
 		deleteTrunkRules($channelid);

@@ -4612,6 +4612,15 @@ function core_routing_del($name) {
 	return $result;
 }
 
+/* Delete all occurences of the specified trunk from all routes that may use it
+ */
+function core_routing_trunk_del($trunknum) {
+	global $db;
+
+  $sql = "DELETE FROM `extensions` WHERE `application` = 'Macro' AND `context` LIKE 'outrt-%' AND `args` LIKE 'dialout-%,$trunknum,%'";
+	$result = $db->query($sql);
+}
+
 function core_routing_rename($oldname, $newname) {
 	global $db;
 
