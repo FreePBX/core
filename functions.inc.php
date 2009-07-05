@@ -4190,7 +4190,7 @@ function core_trunks_gettrunkroutes($trunknum) {
 
 		$t = ($amp_conf["AMPDBENGINE"] == "sqlite3") ? substr( $row[0], 7 ) : $row[0];
 		$r = $row[1];
-		$routes[ $r ] = $t;
+		$routes[ $t ] = $r;
 
 	}
 	// array(routename=>priority)
