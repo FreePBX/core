@@ -4173,28 +4173,22 @@ function core_trunks_getDialRules($trunknum) {
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
-	global $amp_conf;
-
-	if ($amp_conf["AMPDBENGINE"] == "sqlite3")
-		$sql_code = "SELECT DISTINCT context, priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%' OR args LIKE 'dialout-dundi,".$trunknum.",%') ORDER BY context";
-	else
-		$sql_code = "SELECT DISTINCT SUBSTRING(context,7), priority FROM extensions WHERE context LIKE 'outrt-%' AND (args LIKE 'dialout-trunk,".$trunknum.",%' OR args LIKE 'dialout-enum,".$trunknum.",%' OR args LIKE 'dialout-dundi,".$trunknum.",%') ORDER BY context";
-
-	$results = sql( $sql_code, "getAll" );
-
-	foreach ($results as $row) {
-		// original code was:
-		// 	$routes[$row[0]] = $row[1];
-		// but substring is not supported in sqlite3.
-		// how about we remove the 2nd part of the "if"? and use the same code on all DB's?
-
-		$t = ($amp_conf["AMPDBENGINE"] == "sqlite3") ? substr( $row[0], 7 ) : $row[0];
-		$r = $row[1];
-		$routes[ $t ] = $r;
-
-	}
-	// array(routename=>priority)
-	return isset($routes)?$routes:null;
+  $sql_code = "SELECT DISTINCT SUBSTRING(context,7) route ,args trunk FROM extensions WHERE context LIKE 'outrt-%' AND 
+    (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY context,priority";
+  $results = sql( $sql_code, "getAll" ,DB_FETCHMODE_ASSOC);
+  $routeseq = array();
+  foreach ($results as $entry) {
+    $pos1 = strpos($entry['trunk'],',')+1;
+    $routeseq[$entry['route']][] = substr($entry['trunk'],$pos1,strpos($entry['trunk'],',',$pos1)-$pos1);
+  }
+  $routes = array();
+  foreach ($routeseq as $key => $value) {
+    $pos = array_search($trunknum, array_values(array_unique($value)));
+    if ($pos !== false) {
+      $routes[$key] = $pos+1; // start at 1, not 0
+    }
+  }
+  return $routes;
 }
 
 function core_trunks_deleteDialRules($trunknum) {
