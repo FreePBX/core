@@ -62,7 +62,7 @@ $has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
 // If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
 //
 if (!$has_extension_state) {
-	$astman = new AGI_AsteriskManager( );	
+  $astman = $AGI->new_AsteriskManager();
 	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
 		exit (1);
 	}
