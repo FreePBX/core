@@ -1884,7 +1884,6 @@ function core_get_config($engine) {
 			// during outbound calls.
 			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
-			$ext->add($context, $exten, '', new ext_set('REALCALLERIDNUM', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
 			/*
 			 * This is where to splice in things like setting the language based on a user's astdb setting,
 			 * or where you might set the CID account code based on a user instead of the device settings.
@@ -1977,7 +1976,7 @@ function core_get_config($engine) {
 			// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
 			$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass'));
 
-			$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${REALCALLERIDNUM}/outboundcid)}'));
+			$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 			$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 			$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ $["${EMERGENCYROUTE:1:2}" = ""] | $["${EMERGENCYCID:1:2}" = ""] ]', 'trunkcid'));  // check EMERGENCY ROUTE
