@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0beta1.1</version>
+	<version>2.6.0beta1.2</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.6.0beta1.2* added more sql escape in devices
 		*2.6.0beta1.1* #3696, (needs framework updated), #3702, #3706, #3712, #3691, #3693, #3705, #3644, #3739, #3741, #3744, #3790 
 		*2.6.0beta1.0* #3478, #3423, #3648, #3685, #3686, #1380
 		*2.6.0alpha1.4* fixes re #3649
@@ -66,6 +67,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.6/core-2.6.0beta1.1.tgz</location>
-	<md5sum>6a284000a74eff131b17e7c9d78bad09</md5sum>
+	<location>release/2.6/core-2.6.0beta1.2.tgz</location>
+	<md5sum>d706f2570f5b092f6dd329101d53e5d9</md5sum>
 </module>
