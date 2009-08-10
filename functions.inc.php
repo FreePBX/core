@@ -2982,38 +2982,34 @@ function core_devices_addsip($account) {
 	
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
 		$sipfields = array(
-			//array($account,'account',$account),
-			array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'',$flag++),
-			array($account,'secret',(isset($_REQUEST['secret']))?$_REQUEST['secret']:'',$flag++),
-			array($account,'canreinvite',(isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no',$flag++),
-			array($account,'context',(isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal',$flag++),
-			array($account,'dtmfmode',(isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:'',$flag++),
-			array($account,'host',(isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic',$flag++),
-			array($account,'type',(isset($_REQUEST['type']))?$_REQUEST['type']:'friend',$flag++),
-			array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device',$flag++),
-			array($account,'username',(isset($_REQUEST['username']))?$_REQUEST['username']:$account,$flag++),
-			array($account,'nat',(isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes',$flag++),
-			array($account,'port',(isset($_REQUEST['port']))?$_REQUEST['port']:'5060',$flag++),
-			array($account,'qualify',(isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes',$flag++),
-			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:'',$flag++),
-			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:'',$flag++),
-			array($account,'deny',(isset($_REQUEST['deny']))?$_REQUEST['deny']:'',$flag++),
-			array($account,'permit',(isset($_REQUEST['permit']))?$_REQUEST['permit']:'',$flag++),			
-			array($account,'disallow',(isset($_REQUEST['disallow']))?$_REQUEST['disallow']:'',$flag++),
-			array($account,'allow',(isset($_REQUEST['allow']))?$_REQUEST['allow']:'',$flag++)
-			//array($account,'record_in',(isset($_REQUEST['record_in']))?$_REQUEST['record_in']:'On-Demand'),
-			//array($account,'record_out',(isset($_REQUEST['record_out']))?$_REQUEST['record_out']:'On-Demand'),
-			//array($account,'callerid',(isset($_REQUEST['description']))?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>')
+			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++),
+			array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++),
+			array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),$flag++),
+			array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++),
+			array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++),
+			array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++),
+			array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++),
+			array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++),
+			array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++),
+			array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes'),$flag++),
+			array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++),
+			array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),$flag++),
+			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),$flag++),
+			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),$flag++),
+			array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
+			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
+			array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),$flag++),
+			array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:''),$flag++)
 		);
 	}
 
 	// Very bad
-	$sipfields[] = array($account,'account',$account,$flag++);	
-	$sipfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>',$flag++);
+	$sipfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
+	$sipfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
 	
 	// Where is this in the interface ??????
-	$sipfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand',$flag++);
-	$sipfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand',$flag++);
+	$sipfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),$flag++);
+	$sipfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),$flag++);
 
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
@@ -3066,39 +3062,35 @@ function core_devices_addiax2($account) {
 	if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
 		$flag = 2;
 		$iaxfields = array(
-			//array($account,'account',$account),
-			array($account,'secret',($_REQUEST['secret'])?$_REQUEST['secret']:'',$flag++),
-			array($account,'notransfer',($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes',$flag++),
-			array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal',$flag++),
-			array($account,'host',($_REQUEST['host'])?$_REQUEST['host']:'dynamic',$flag++),
-			array($account,'type',($_REQUEST['type'])?$_REQUEST['type']:'friend',$flag++),
-			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device',$flag++),
-			array($account,'username',($_REQUEST['username'])?$_REQUEST['username']:$account,$flag++),
-			array($account,'port',($_REQUEST['port'])?$_REQUEST['port']:'4569',$flag++),
-			array($account,'qualify',($_REQUEST['qualify'])?$_REQUEST['qualify']:'yes',$flag++),
-			array($account,'deny',(isset($_REQUEST['deny']))?$_REQUEST['deny']:'',$flag++),
-			array($account,'permit',(isset($_REQUEST['permit']))?$_REQUEST['permit']:'',$flag++),			
-			array($account,'disallow',($_REQUEST['disallow'])?$_REQUEST['disallow']:'',$flag++),
-			array($account,'allow',($_REQUEST['allow'])?$_REQUEST['allow']:'',$flag++),
-			array($account,'accountcode',($_REQUEST['accountcode'])?$_REQUEST['accountcode']:'',$flag++)
-			//array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),
-			//array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
-			//array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>')
+			array($account,'secret',$db->escapeSimple(($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++),
+			array($account,'notransfer',$db->escapeSimple(($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),$flag++),
+			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),$flag++),
+			array($account,'host',$db->escapeSimple(($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),$flag++),
+			array($account,'type',$db->escapeSimple(($_REQUEST['type'])?$_REQUEST['type']:'friend'),$flag++),
+			array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),$flag++),
+			array($account,'username',$db->escapeSimple(($_REQUEST['username'])?$_REQUEST['username']:$account),$flag++),
+			array($account,'port',$db->escapeSimple(($_REQUEST['port'])?$_REQUEST['port']:'4569'),$flag++),
+			array($account,'qualify',$db->escapeSimple(($_REQUEST['qualify'])?$_REQUEST['qualify']:'yes'),$flag++),
+			array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
+			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
+			array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:''),$flag++),
+			array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:''),$flag++),
+			array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++)
 		);
 	}
 
 	// Very bad
-	$iaxfields[] = array($account,'account',$account,$flag++);	
-	$iaxfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>',$flag++);
+	$iaxfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
+	$iaxfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
 	// Asterisk treats no caller ID from an IAX device as 'hide callerid', and ignores the caller ID
 	// set in iax.conf. As we rely on this for pretty much everything, we need to specify the 
 	// callerid as a variable which gets picked up in macro-callerid.
 	// Ref - http://bugs.digium.com/view.php?id=456
-	$iaxfields[] = array($account,'setvar',"REALCALLERIDNUM=$account",$flag++);
+	$iaxfields[] = array($account,'setvar',$db->escapeSimple("REALCALLERIDNUM=$account"),$flag++);
 	
 	// Where is this in the interface ??????
-	$iaxfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand',$flag++);
-	$iaxfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand',$flag++);
+	$iaxfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),$flag++);
+	$iaxfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),$flag++);
 	
 	$compiled = $db->prepare('INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$iaxfields);
@@ -3150,35 +3142,31 @@ function core_devices_addzap($account) {
 	
 	if ( !is_array($zapfields) ) { // left for compatibilty....lord knows why !
 		$zapfields = array(
-			//array($account,'account',$account),
-			array($account,'context',($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),
-			array($account,'mailbox',($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),
-			//array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),
-			array($account,'immediate',($_REQUEST['immediate'])?$_REQUEST['immediate']:'no'),
-			array($account,'signalling',($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks'),
-			array($account,'echocancel',($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes'),
-			array($account,'echocancelwhenbridged',($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no'),
-			array($account,'immediate',($_REQUEST['immediate'])?$_REQUEST['immediate']:'no'),	
-			array($account,'echotraining',($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800'),
-			array($account,'busydetect',($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no'),
-			array($account,'busycount',($_REQUEST['busycount'])?$_REQUEST['busycount']:'7'),
-			array($account,'callprogress',($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no'),
-			//array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),	
-			//array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),
-			array($account,'accountcode',(isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),
-			array($account,'callgroup',(isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),
-			array($account,'pickupgroup',(isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),
-			array($account,'channel',($_REQUEST['channel'])?$_REQUEST['channel']:'')
+			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
+			array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device')),
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
+			array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
+			array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
+			array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),	
+			array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
+			array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
+			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
+			array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
+			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
+			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:'')),
+			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:'')),
+			array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
 		);
 	}
 
 	// Very bad
-	$zapfields[] = array($account,'account',$account);	
-	$zapfields[] = array($account,'callerid',($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>');
+	$zapfields[] = array($account,'account',$db->escapeSimple($account));	
+	$zapfields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
 	
 	// Where is this in the interface ??????
-	$zapfields[] = array($account,'record_in',($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand');
-	$zapfields[] = array($account,'record_out',($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand');
+	$zapfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'));
+	$zapfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'));
 
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zapfields);
@@ -3915,7 +3903,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	$seq = 1;
 	foreach($confitem as $k=>$v) {
 		$seq = ($disable_flag == 1) ? 1 : $seq+1;
-		$dbconfitem[]=array($k,$v,$seq);
+		$dbconfitem[]=array($db->escapeSimple($k),$db->escapeSimple($v),$seq);
 	}
 	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
 	$result = $db->executeMultiple($compiled,$dbconfitem);
