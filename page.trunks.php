@@ -20,36 +20,28 @@
 
 $display='trunks'; 
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
-$tech = strtolower(isset($_REQUEST['tech'])?$_REQUEST['tech']:'');
-
 $trunknum = ltrim($extdisplay,'OUT_');
 
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
-// populate some global variables from the request string
-$set_globals = array("outcid","maxchans","dialoutprefix","channelid","peerdetails","usercontext","userconfig","register","keepcid","failtrunk","disabletrunk");
-foreach ($set_globals as $var) {
-	if (isset($_REQUEST[$var])) {
-		$$var = stripslashes( $_REQUEST[$var] );
-	}
-}
+$tech         = strtolower(isset($_REQUEST['tech'])?$_REQUEST['tech']:'');
+$outcid       = isset($_REQUEST['outcid'])?$_REQUEST['outcid']:'';
+$maxchans     = isset($_REQUEST['maxchans'])?$_REQUEST['maxchans']:'';
+$dialoutprefix= isset($_REQUEST['dialoutprefix'])?$_REQUEST['dialoutprefix']:'';
+$channelid    = isset($_REQUEST['channelid'])?$_REQUEST['channelid']:'';
+$peerdetails  = isset($_REQUEST['peerdetails'])?$_REQUEST['peerdetails']:'';
+$usercontext  = isset($_REQUEST['usercontext'])?$_REQUEST['usercontext']:'';
+$userconfig   = isset($_REQUEST['userconfig'])?$_REQUEST['userconfig']:'';
+$register     = isset($_REQUEST['register'])?$_REQUEST['register']:'';
+$keepcid      = isset($_REQUEST['keepcid'])?$_REQUEST['keepcid']:'off';
+$disabletrunk = isset($_REQUEST['disabletrunk'])?$_REQUEST['disabletrunk']:'off';
+$provider     = isset($_REQUEST['provider'])?$_REQUEST['provider']:'';
+$trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
 
-// ensure that keepcid is set to something:
-if (!isset($keepcid)) {
-	$keepcid = "off";
-}
-// ensure that failtrunk is set to something:
-if (!isset($failtrunk)) {
-	$failtrunk = "";
-}
+$failtrunk    = isset($_REQUEST['failtrunk'])?$_REQUEST['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
-if (!isset($disabletrunk)) {
-	$disabletrunk = "off";
-}
-
 if (isset($_REQUEST["dialrules"])) {
-	//$dialpattern = $_REQUEST["dialpattern"];
 	$dialrules = explode("\n",$_REQUEST["dialrules"]);
 
 	if (is_array($dialrules))
@@ -73,23 +65,14 @@ if (isset($_REQUEST["dialrules"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addtrunk":
-		if (!isset($failtrunk))
-		    $failtrunk="";
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk),$disabletrunk);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
 		
 		core_trunks_addDialRules($trunknum, $dialrules);
 		needreload();
 		redirect_standard();
 	break;
 	case "edittrunk":
-		if (!isset($failtrunk))
-		    $failtrunk="";
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk);
-		
-		/* //DIALRULES
-		deleteTrunkRules($channelid);
-		addTrunkRules($channelid, $dialrules);
-		*/
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
 		
 		// this can rewrite too, so edit is the same
 		core_trunks_addDialRules($trunknum, $dialrules);
@@ -99,12 +82,8 @@ switch ($action) {
 	case "deltrunk":
 	
 		core_trunks_del($trunknum);
-    core_routing_trunk_del($trunknum);
-		
-		/* //DIALRULES
-		deleteTrunkRules($channelid);
-		*/
 		core_trunks_deleteDialRules($trunknum);
+    core_routing_trunk_del($trunknum);
 		needreload();
 		redirect_standard();
 	break;
@@ -177,18 +156,6 @@ switch ($action) {
 	break;
 }
 	
-//get all rows from globals
-$sql = "SELECT * FROM globals";
-$globals = $db->getAll($sql);
-if(DB::IsError($globals)) {
-	die_freepbx($globals->getMessage());
-}
-
-//create a set of variables that match the items in global[0]
-foreach ($globals as $global) {
-	${trim($global[0])} = htmlentities($global[1]);
-}
-
 ?>
 </div>
 
@@ -197,11 +164,30 @@ foreach ($globals as $global) {
 	<li><a <?php  echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Trunk")?></a></li>
 <?php 
 //get existing trunk info
-$tresults = core_trunks_list();
+$tresults = core_trunks_getDetails();
+//$tresults = core_trunks_list();
 
 foreach ($tresults as $tresult) {
-	$background = ($tresult[2] == 'on')?'#DDD':'';
-	echo "\t<li><a ".($extdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=".urlencode($tresult[0])."\" title=\"".urlencode($tresult[1])."\" style=\"background: $background;\" >"._("Trunk")." ".substr(str_replace('AMP:', '', $tresult[1]),0,15)."</a></li>\n";
+	$background = ($tresult['disabled'] == 'on')?'#DDD':'';
+	switch ($tresult['tech']) {
+		case 'enum':
+			$label = substr($tresult['name'],0,15)." ENUM";
+			break;
+		case 'dundi':
+			$label = substr($tresult['name'],0,15)." (DUNDi)";
+			break;
+		case 'iax2':
+			$tresult['tech'] = 'iax';
+		case 'zap':
+		case 'dahdi':
+		case 'sip':
+		case 'iax':
+		case 'custom':
+		default:
+			$label = substr($tresult['name'],0,15)." (".$tresult['tech'].")";
+			break;
+	}
+	echo "\t<li><a ".($trunknum==$tresult['trunkid'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=OUT_".urlencode($tresult['trunkid'])."\" title=\"".urlencode($tresult['name'])."\" style=\"background: $background;\" >".$label."</a></li>\n";
 }
 
 ?>
@@ -218,8 +204,8 @@ if (!$tech && !$extdisplay) {
 	$baseURL   = $_SERVER['PHP_SELF'].'?display='.urlencode($display).'&';
 	$trunks = array(
 		array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" )),
-		array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk")),
 		array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk")),
+		array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk")),
 		array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk")),
 		array('url'=> $baseURL.'tech=DUNDI', 'tlabel' =>  _("Add DUNDi Trunk")),
 		array('url'=> $baseURL.'tech=CUSTOM', 'tlabel' =>  _("Add Custom Trunk")),
@@ -241,6 +227,8 @@ if (!$tech && !$extdisplay) {
 		$failtrunk = htmlentities($trunk_details['failscript']);
 		$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 		$disabletrunk = htmlentities($trunk_details['disabled']);
+		$provider = $trunk_details['provider'];
+		$trunk_name = htmlentities($trunk_details['name']);
 		
 		if ($tech!="enum") {
 	
@@ -248,24 +236,22 @@ if (!$tech && !$extdisplay) {
 
 			if ($tech!="custom" && $tech!="dundi") {  // custom trunks will not have user/peer details in database table
 				// load from db
-				if (!isset($peerdetails)) {	
+				if (empty($peerdetails)) {	
 					$peerdetails = core_trunks_getTrunkPeerDetails($trunknum);
 				}
-	
-				if (!isset($usercontext)) {	
+				if (empty($usercontext)) {	
 					$usercontext = htmlentities($trunk_details['usercontext']);
 				}
 	
-				if (!isset($userconfig)) {	
+				if (empty($userconfig)) {	
 					$userconfig = core_trunks_getTrunkUserConfig($trunknum);
 				}
 					
-				if (!isset($register)) {	
+				if (empty($register)) {	
 					$register = core_trunks_getTrunkRegister($trunknum);
 				}
 			}
 		}
-		
 		if (count($dialrules) == 0) {
 			if ($temp = core_trunks_getDialRules($trunknum)) {
 				foreach ($temp as $key=>$val) {
@@ -278,10 +264,10 @@ if (!$tech && !$extdisplay) {
 			unset($temp);
 		}
 
-
 		$upper_tech = strtoupper($tech);
 		echo "<h2>".sprintf(_("Edit %s Trunk"),$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility Mode").")":"")."</h2>";
-		$tlabel = sprintf(_("Delete Trunk %s"),substr($channelid,0,20));
+		$tname = $trunk_name != '' ? $trunk_name : $channelid;
+		$tlabel = sprintf(_("Delete Trunk %s"),substr($tname,0,20));
 		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
 		<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=deltrunk"><?php echo $label ?></a></p>
@@ -331,6 +317,8 @@ switch ($tech) {
 	case 'dundi':
 		$helptext = _('FreePBX offers limited support for DUNDi trunks and additional manual configuration is required. The trunk name should correspond to the [mappings] section of the remote dundi.conf systems. For example, you may have a mapping on the remote system, and corresponding configurations in dundi.conf locally, that looks as follows:<br /><br />[mappings]<br />priv => dundi-extens,0,IAX2,priv:${SECRET}@218.23.42.26/${NUMBER},noparital<br /><br />In this example, you would create this trunk and name it priv. You would then create the corresponding IAX2 trunk with proper settings to work with DUNDi. This can be done by making an IAX2 trunk in FreePBX or by using the iax_custom.conf file.<br />The dundi-extens context in this example must be created in extensions_custom.conf. This can simply include contexts such as ext-local, ext-intercom-users, ext-paging and so forth to provide access to the corresponding extensions and features provided by these various contexts and generated by FreePBX.');
 		break;
+	case 'sip':
+		break;
 	default:
 		$helptext = '';
 }
@@ -348,6 +336,7 @@ if ($helptext != '') {
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+			<input type="hidden" name="provider" value="<?php echo $provider?>"/>
 			<table>
 			<tr>
 				<td colspan="2">
@@ -356,14 +345,21 @@ if ($helptext != '') {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b>. You can also use the magic string 'hidden' to hide the CallerID sent out over Digital lines ONLY (E1/T1/J1/BRI/SIP/IAX)")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Trunk Description")?><span><br><?php echo _("Descriptive Name for this Trunk")?><br><br></span></a>: 
 				</td><td>
-					<input type="text" size="20" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
+					<input type="text" size="30" name="trunk_name" value="<?php echo $trunk_name;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href="#" class="info"><?php echo _("Never Override CallerID")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk. You must define an Outbound Caller ID on the this trunk when checking this.");?><br /><br /></span></a>:
+					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?><br><br></span></a>: 
+				</td><td>
+					<input type="text" size="30" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a href="#" class="info"><?php echo _("Block Foreign CallerIDs")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk. You must define an Outbound Caller ID on the this trunk when checking this.");?><br /><br /></span></a>:
 				</td><td>
 					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?> tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -393,7 +389,6 @@ if ($helptext != '') {
 				<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><small><?php echo _("Disable")?></small>
 			    </td>
 			</tr>
-
 			<tr>
 			    <td><a class="info" href="#"><?php echo _("Monitor Trunk Failures")?><span><?php echo _("If checked, supply the name of a custom AGI Script that will be called to report, log, email or otherwise take some action on trunk failures that are not caused by either NOANSWER or CANCEL.")?></span></a>:
 			    </td>
