@@ -110,10 +110,6 @@ function parse_voicemailconf($filename, &$vmconf, &$section) {
 						$vmconf[$section][ $matches[1] ]["options"][$key] = $value;
 					}
 				}
-			} else if (preg_match("/^\s*(\d+)\s*=>\s*dup,(.*)\s*([;#].*)?/",$line,$matches)) {
-				// "mailbox=>dup,name"
-				// duplace name line
-				$vmconf[$section][ $matches[1] ]["dups"][] = $matches[2];
 			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
 				// include another file
 				
