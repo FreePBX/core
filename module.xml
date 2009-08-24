@@ -3,13 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0beta1.3</version>
+	<version>2.6.0beta1.4</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.6.0beta1.4* #3075, #3501
+		*2.6.0beta1.4* #3075, #3501, #3636
 		*2.6.0beta1.3* trunk tab improvements
 		*2.6.0beta1.2* added more sql escape in devices
 		*2.6.0beta1.1* #3696, (needs framework updated), #3702, #3706, #3712, #3691, #3693, #3705, #3644, #3739, #3741, #3744, #3790 

@@ -2904,12 +2904,19 @@ function core_devices2astdb(){
 			}
 			// If a user is selected, add this device to the user
 			if ($user != "none") {
-					$existingdevices = $astman->database_get("AMPUSER",$user."/device");
-					if (!empty($existingdevices)) {
-							$existingdevices .= "&";
-					}
-					$astman->database_put("AMPUSER",$user."/device",$existingdevices.$id);
-			}
+    			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
+    			if (empty($existingdevices)) {
+    				$astman->database_put("AMPUSER",$user."/device",$id);
+    			} else {
+    				$existingdevices_array = explode('&',$existingdevices);
+    				if (!in_array($id, $existingdevices_array)) {
+    					$existingdevices_array[]=$id;
+    					$existingdevices = implode('&',$existingdevices_array);
+    					$astman->database_put("AMPUSER",$user."/device",$existingdevices);
+    				}
+    			}
+    		}
+
 			
 			// create a voicemail symlink if needed
 			$thisUser = core_users_get($user);
