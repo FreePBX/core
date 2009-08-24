@@ -5204,6 +5204,7 @@ function core_devices_configpageinit($dispnum) {
 		// iax2
 		$tmparr = array();
 		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
 		$tmparr['notransfer'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
@@ -5222,7 +5223,7 @@ function core_devices_configpageinit($dispnum) {
 
 		// sip
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
 		$tmparr['canreinvite'] = array('value' => 'no', 'level' => 1);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
@@ -5397,6 +5398,11 @@ function core_devices_configpageload() {
 					$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
 					$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
 					$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+
+          // We compare the existing secret against what might be in the put to detect changes when validating
+          if ($devopt == "secret") {
+            $currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
+          }
 	
 					if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
 						$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
