@@ -391,12 +391,12 @@ foreach ( $ext as $k ) {
 			$extstate = is_ext_avail($extnum);
 			debug("Extension $extnum has ExtensionState: $extstate",1);
 
-			if ( ($exthascw == 1) && ($extstate == 1) ) {
+			if ( ($exthascw == 1) && ($extstate != 0) && ($extstate != 4)) {
 				// process this one extension but the remaining should be skipped since there is cw and
 				// the extension is occupied. This will try this extension but not the others.
 				$skipremaining = 1;
 				debug("In mastermode with cw enabled so $extnum will be tried and others skipped",4);
-			} elseif ( ($exthascw == 0) && ($extstate == 1) ) {
+			} elseif ( ($exthascw == 0) && ($extstate != 0) && ($extstate != 4)) {
 				// no cw, ext is busy. So if cfb is set, it will forward there and if not, it will be
 				// ignored as normal behavior. In either case, we skip the remaining numbers.
 				$skipremaining = 1;
@@ -467,7 +467,7 @@ foreach ( $ext as $k ) {
 			}
 		} elseif ($rgmethod == "none" && $exthascw == 1 && $cwinusebusy) {
 			$extstate = is_ext_avail($extnum);
-			if ($extstate == 1) {
+			if ($extstate > 0 && $extstate != 4) {
 				$AGI->set_variable('DIALSTATUS_CW','BUSY');						
 				debug("Extension $extnum has call waiting enabled with state: $extstate",1);
 			}
@@ -476,11 +476,21 @@ foreach ( $ext as $k ) {
 			$extstate = is_ext_avail($extnum);
 			debug("Extension $extnum has ExtensionState: $extstate",1);
 			// CW in use - but blocked for hunt
-			if ($extstate == 1) {
-				debug("Extension $extnum has call waiting enabled but blocked for hunt",1);
-				$extnum = '';
-				$AGI->set_variable('DIALSTATUS','BUSY');	
-			}
+      // treat as on phone if already ringing, on hold, etc.
+      if ($extstate != 0) {
+			  debug("Extension $extnum has call waiting enabled but blocked for hunt",1);
+			  $extnum = '';
+			  $AGI->set_variable('DIALSTATUS','BUSY');	
+      }
+		} elseif ($rgmethod == 'firstavailable') {
+			$extstate = is_ext_avail($extnum);
+			debug("Extension $extnum has ExtensionState: $extstate",1);
+      // if phone is not available don't bother putting it in hunt group or it will fail since not busy
+      if ($extstate == 4) {
+			  debug("Extension $extnum is unavailable so don't include in firstavailable hunt",1);
+			  $extnum = '';
+			  $AGI->set_variable('DIALSTATUS','BUSY');	
+      }
 		}
 	}
 	
