@@ -2258,62 +2258,67 @@ function core_get_config($engine) {
 			// If vmx not enabled for the current mode,then jump to normal voicemail behavior
 			// also - if not message (no-msg) is requested, straight to voicemail
 			//
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ARG2}"="NOMESSAGE"]','s-${ARG2},1'));
-			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${ARG2}"="BUSY"]?busy:unavail)}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ARG2}" != "DIRECTDIAL"]','notdirect'));
+
+			$ext->add('macro-vm','vmx', '', new ext_setvar("MEXTEN", '${ARG1}'));
+			$ext->add('macro-vm','vmx', '', new ext_setvar("MMODE", '${ARG2}'));
+			$ext->add('macro-vm','vmx', '', new ext_setvar("RETVM", '${ARG3}'));
+
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
+			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
-			$ext->add('macro-vm','vmx', 'notdirect', new ext_NoOp('Checking if ext ${ARG1} is enabled: ${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${ARG1}/vmx/${MODE}/state)}" != "enabled"]','s-${ARG2},1'));
+			$ext->add('macro-vm','vmx', 'notdirect', new ext_NoOp('Checking if ext ${MEXTEN} is enabled: ${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','s-${MMODE},1'));
 
 			// If the required voicemail file does not exist, then abort and go to normal voicemail behavior
 			//
 			// If 1.4 or above, use the STAT function to check for the file. Prior to 1.4, use the AGI script since the System() command tried
 			// in the past had errors.
 			//
-			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${ARG1}'));			
-			//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.[wW][aA][vV]'));
+			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));			
+			//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.[wW][aA][vV]'));
 			if ($ast_ge_14) {
-				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp.WAV)} = 1)]','tmpgreet'));
-				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}.WAV)} = 0)]','nofile'));
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
 			} else {
-				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/temp'));
+				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp'));
 				$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
-				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}'));
+				$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}'));
 				$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
 			}
 
 			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));			
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_REPEAT", '${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'vmxtime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timeout)}" = "0"]','vmxloops'));
+			$ext->add('macro-vm','vmx', 'vmxtime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timeout)}" = "0"]','vmxloops'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEOUT", '${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'vmxloops', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loops)}" = "0"]','vmxanswer'));
+			$ext->add('macro-vm','vmx', 'vmxloops', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loops)}" = "0"]','vmxanswer'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPS", '${DB_RESULT}'));
 			$ext->add('macro-vm','vmx','vmxanswer',new ext_answer(''));
 
 			// Now play the users voicemail recording as the basis for their ivr, the Read command will repeat as needed and if it timesout
 			// then we go to the timeout. Otherwise handle invalid options by looping until the limit until a valid option is played.
 			//
-			$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${ARG1}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
+			$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
 
 			// If we are here we timed out, go to the required destination
 			//
 			$ext->add('macro-vm','vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));			
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS", '${VMX_OPTS_TIMEOUT}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/timeout)}" = "0"]','chktime'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "0"]','chktime'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS", '${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
+			$ext->add('macro-vm','vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));	
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/context)}" = "0"]','timepri'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/context)}" = "0"]','timepri'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_CONTEXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'timepri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/timedest/pri)}" = "0"]','dotime'));
+			$ext->add('macro-vm','vmx', 'timepri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/pri)}" = "0"]','dotime'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_PRI",'${DB_RESULT}'));
 			$ext->add('macro-vm','vmx','dotime',new ext_goto('${VMX_TIMEDEST_PRI}', '${VMX_TIMEDEST_EXT}', '${VMX_TIMEDEST_CONTEXT}'));
 
 			// We got an option, check if the option is defined, or one of the system defaults
 			//
-			$ext->add('macro-vm','vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
+			$ext->add('macro-vm','vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "0"]','o,1'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "*"]','adef,1'));
 
@@ -2328,13 +2333,13 @@ function core_get_config($engine) {
 			//
 			$ext->add('macro-vm','vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));			
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOPS}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/loops)}" = "0"]','chkloop'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/loops)}" = "0"]','chkloop'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
+			$ext->add('macro-vm','vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_EXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/context)}" = "0"]','looppri'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/context)}" = "0"]','looppri'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_CONTEXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'looppri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/loopdest/pri)}" = "0"]','doloop'));
+			$ext->add('macro-vm','vmx', 'looppri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/pri)}" = "0"]','doloop'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_PRI",'${DB_RESULT}'));
 			$ext->add('macro-vm','vmx','doloop',new ext_goto('${VMX_LOOPDEST_PRI}','${VMX_LOOPDEST_EXT}','${VMX_LOOPDEST_CONTEXT}'));
 
@@ -2347,16 +2352,16 @@ function core_get_config($engine) {
 			//
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${VMX_EXT}" != "dovm"]','getdest'));
 			$ext->add('macro-vm','vmx', 'vmxopts', new ext_setvar("VMX_OPTS",'${VMX_OPTS_DOVM}'));
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/vmxopts/dovm)}" = "0"]','vmxdovm'));
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/dovm)}" = "0"]','vmxdovm'));
 			$ext->add('macro-vm','vmx', 'vmxopts', new ext_setvar("VMX_OPTS",'${DB_RESULT}'));
 			$ext->add('macro-vm','vmx','vmxdovm',new ext_goto('1','dovm'));			
 
 			// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
 			// reasonable values
 			//
-			$ext->add('macro-vm','vmx', 'getdest', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/context)}" = "0"]','vmxpri'));
+			$ext->add('macro-vm','vmx', 'getdest', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/context)}" = "0"]','vmxpri'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_CONTEXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','vmx', 'vmxpri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/${ACTION}/pri)}" = "0"]','vmxgoto'));
+			$ext->add('macro-vm','vmx', 'vmxpri', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/pri)}" = "0"]','vmxgoto'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_PRI",'${DB_RESULT}'));
 			$ext->add('macro-vm','vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
 
@@ -2364,47 +2369,47 @@ function core_get_config($engine) {
 			// behavior treating as if it was not set
 			//
 			$ext->add('macro-vm','vmx', 'nofile', new ext_NoOp('File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail'));
-			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${ARG2}'));
+			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${MMODE}'));
 			$ext->add('macro-vm','vmx', 'tmpgreet', new ext_NoOp('Temporary Greeting Detected, going to normal voicemail'));
-			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${ARG2}'));
+			$ext->add('macro-vm','vmx','',new ext_goto('1','s-${MMODE}'));
 
 			// Drop into voicemail either as a direct destination (in which case VMX_OPTS might be set to something) or
 			// if the user timed out or broke out of the loop then VMX_OPTS is always cleared such that an Allison
 			// message is played and the caller know's what is going on.
 			//
 			$ext->add('macro-vm','dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
-			$ext->add('macro-vm','dovm', '',new ext_vm('${ARG1}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}')); 
+			$ext->add('macro-vm','dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}')); 
 			$ext->add('macro-vm','dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
 
 			$ext->add('macro-vm','s-BUSY','',new ext_NoOp('BUSY voicemail'));
-			$ext->add('macro-vm','s-BUSY','',new ext_macro('get-vmcontext','${ARG1}'));
-			$ext->add('macro-vm','s-BUSY', '',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
+			$ext->add('macro-vm','s-BUSY','',new ext_macro('get-vmcontext','${MEXTEN}'));
+			$ext->add('macro-vm','s-BUSY', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
 			$ext->add('macro-vm','s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
 
 			$ext->add('macro-vm','s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
-			$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${ARG1}'));
-			$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${ARG1}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
+			$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
 			$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
 
 			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
-			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_macro('get-vmcontext','${ARG1}'));
-			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_macro('get-vmcontext','${MEXTEN}'));
+			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
 			$ext->add('macro-vm','s-DIRECTDIAL','',new ext_goto('1','exit-${VMSTATUS}'));
 
-			$ext->add('macro-vm','_s-.','',new ext_macro('get-vmcontext','${ARG1}'));
-			$ext->add('macro-vm','_s-.','',new ext_vm('${ARG1}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
+			$ext->add('macro-vm','_s-.','',new ext_macro('get-vmcontext','${MEXTEN}'));
+			$ext->add('macro-vm','_s-.','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
 			$ext->add('macro-vm','_s-.','',new ext_goto('1','exit-${VMSTATUS}'));
 
 			// If the user has a 0 option defined, use that for operator zero-out from within voicemail
 			// as well to keep it consistant with the menu structure
 			//
 			$ext->add('macro-vm','o','',new ext_background('one-moment-please'));
-			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
 			$ext->add('macro-vm','o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/context)}" = "1"]','opcontext'));
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/context)}" = "1"]','opcontext'));
 			$ext->add('macro-vm','o','',new ext_setvar("DB_RESULT",'${VMX_CONTEXT}'));
 			$ext->add('macro-vm','o','opcontext',new ext_setvar("VMX_OPDEST_CONTEXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/0/pri)}" = "1"]','oppri'));
+			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/pri)}" = "1"]','oppri'));
 			$ext->add('macro-vm','o','',new ext_setvar("DB_RESULT",'${VMX_PRI}'));
 			$ext->add('macro-vm','o','oppri',new ext_setvar("VMX_OPDEST_PRI",'${DB_RESULT}'));
 			$ext->add('macro-vm','o','',new ext_goto('${VMX_OPDEST_PRI}','${VMX_OPDEST_EXT}','${VMX_OPDEST_CONTEXT}'));
@@ -2418,30 +2423,30 @@ function core_get_config($engine) {
 			// If the user has a * option defined, use that for the * out from within voicemail
 			// as well to keep it consistant with the menu structure
 			//
-			$ext->add('macro-vm','a','',new ext_macro('get-vmcontext','${ARG1}'));
-			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
+			$ext->add('macro-vm','a','',new ext_macro('get-vmcontext','${MEXTEN}'));
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
 			$ext->add('macro-vm','a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
-			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/context)}" = "1"]','acontext'));
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/context)}" = "1"]','acontext'));
 			$ext->add('macro-vm','a','',new ext_setvar("DB_RESULT",'${VMX_CONTEXT}'));
 			$ext->add('macro-vm','a','acontext',new ext_setvar("VMX_ADEST_CONTEXT",'${DB_RESULT}'));
 
-			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${ARG1}/vmx/${MODE}/*/pri)}" = "1"]','apri'));
+			$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/pri)}" = "1"]','apri'));
 			$ext->add('macro-vm','a','',new ext_setvar("DB_RESULT",'${VMX_PRI}'));
 			$ext->add('macro-vm','a','apri',new ext_setvar("VMX_ADEST_PRI",'${DB_RESULT}'));
 			$ext->add('macro-vm','a','',new ext_goto('${VMX_ADEST_PRI}','${VMX_ADEST_EXT}','${VMX_ADEST_CONTEXT}'));
-			$ext->add('macro-vm','adef','',new ext_vmmain('${ARG1}@${VMCONTEXT}'));
-			$ext->add('macro-vm','adef','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			$ext->add('macro-vm','adef','',new ext_vmmain('${MEXTEN}@${VMCONTEXT}'));
+			$ext->add('macro-vm','adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 			$ext->add('macro-vm','adef','',new ext_hangup(''));
 
 			$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occured'));
-			$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 			$ext->add('macro-vm','exit-FAILED','',new ext_hangup(''));
 
-			$ext->add('macro-vm','exit-SUCCESS','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			$ext->add('macro-vm','exit-SUCCESS','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 			$ext->add('macro-vm','exit-SUCCESS','',new ext_playback('goodbye'));
 			$ext->add('macro-vm','exit-SUCCESS','',new ext_hangup(''));
 
-			$ext->add('macro-vm','exit-USEREXIT','',new ext_gotoif('$["${ARG3}" = "RETURN"]','exit-RETURN,1'));
+			$ext->add('macro-vm','exit-USEREXIT','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 			$ext->add('macro-vm','exit-USEREXIT','',new ext_playback('goodbye'));
 			$ext->add('macro-vm','exit-USEREXIT','',new ext_hangup(''));
 
