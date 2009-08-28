@@ -184,7 +184,11 @@ foreach ($tresults as $tresult) {
 		case 'iax':
 		case 'custom':
 		default:
-			$label = substr($tresult['name'],0,15)." (".$tresult['tech'].")";
+			$label = substr($tresult['name'],0,15);
+      if (trim($label) == '') {
+        $label = substr($tresult['channelid'],0,15);
+      }
+			$label .= " (".$tresult['tech'].")";
 			break;
 	}
 	echo "\t<li><a ".($trunknum==$tresult['trunkid'] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;extdisplay=OUT_".urlencode($tresult['trunkid'])."\" title=\"".urlencode($tresult['name'])."\" style=\"background: $background;\" >".$label."</a></li>\n";

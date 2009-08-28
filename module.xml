@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.6.0beta2.0* #3798, #3609
+		*2.6.0beta2.0* #3798, #3609, #3836
 		*2.6.0beta1.4* #3075, #3501, #3636, #3581, #3266, #3701, #3545, #3430
 		*2.6.0beta1.3* trunk tab improvements
 		*2.6.0beta1.2* added more sql escape in devices
