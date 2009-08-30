@@ -40,11 +40,7 @@ require_once "phpagi.php";
 $AGI = new AGI();
 $lookup = get_var( $AGI, "DIAL_NUMBER" );
 
-$enums = Array(
-	'e164.org', 
-	//'e164.arpa', 
-	//'e164.info',
-);
+$enums = Array('e164.org','e164.arpa','e164.info');
 
 // Go through the ENUM providers and look for the number.
 
@@ -78,7 +74,7 @@ foreach ($enums as $enum) {
 		foreach ($arr as $key => $row) {
 			if (eregi('SIP|IAX', $row['tech'])) {
 				$URI = $row['URI'];
-				$dialstr .= $nextURI[$URI]."|";
+				$dialstr .= $nextURI[$URI]."%";
 			}
 		}
 	}
@@ -90,7 +86,7 @@ $AGI->set_variable("DIALARR", $dialstr);
 function get_dig($lookup, $enum) {
 	global $AGI;
 
-	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);;
+	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);
 	$arpa = "";
 	for ($i = 0; $i < strlen($lookup); $i++) {
 		$arpa = $lookup[$i].".".$arpa;
