@@ -40,11 +40,17 @@ require_once "phpagi.php";
 $AGI = new AGI();
 $lookup = get_var( $AGI, "DIAL_NUMBER" );
 
-$enums = get_enum_providers();
+$enums = Array(
+	'e164.org', 
+	//'e164.arpa', 
+	//'e164.info',
+);
+
+// Go through the ENUM providers and look for the number.
 
 $dialstr = "";
 
-foreach ($enums as $enum) {  // Go through the ENUM providers and look for the number.
+foreach ($enums as $enum) {
 	// Are we using php5 and can use get_dns_record?
 		if (function_exists("dns_get_record")) {
 			$arr = get_php5($lookup, $enum);
@@ -72,8 +78,7 @@ foreach ($enums as $enum) {  // Go through the ENUM providers and look for the n
 		foreach ($arr as $key => $row) {
 			if (eregi('SIP|IAX', $row['tech'])) {
 				$URI = $row['URI'];
-				// string delimiter defined in [macro-dialout-enum]
-				$dialstr .= $nextURI[$URI]."%";
+				$dialstr .= $nextURI[$URI]."|";
 			}
 		}
 	}
@@ -85,7 +90,7 @@ $AGI->set_variable("DIALARR", $dialstr);
 function get_dig($lookup, $enum) {
 	global $AGI;
 
-	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);
+	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);;
 	$arpa = "";
 	for ($i = 0; $i < strlen($lookup); $i++) {
 		$arpa = $lookup[$i].".".$arpa;
@@ -156,70 +161,6 @@ function get_var( $agi, $value)
 		return $result;
 	}
 	else return '';
-}
-
-function get_enum_providers() {
-	// parse enum.conf config file 
-	$localprefix_file = get_var($AGI, "ASTETCDIR")."/enum.conf"; 
-	if (file_exists($localprefix_file)) { 
-		$section="general"; 
-		parse_conf($localprefix_file, $conf, $section); 
-		if (count($conf) == 0) { 
-			$AGI->verbose("Could not parse config file $localprefix_file - using default e164.org", 0); 
-			return Array("e164.org");
-		} 
-	} else { 
-		$AGI->verbose("Could not open config file $localprefix_file - using default e164.org", 0); 
-		return Array("e164.org");
-	} 
-
-	$enums = Array(); 
-	// pickup search org from the conf array 
-	if (isset($conf["general"])) { 
-		foreach ($conf["general"] as $key=>$options) { 
-			if (isset($options["search"])) { 
-				foreach($options as $enumorgs) { 
-					$enums[]=$enumorgs; 
-				} // store each enumorg in array         
-			} // else, diff option  
-		} // else, this isn't the section we want 
-	} // else, no config for this section 
-}
-
-function parse_conf($filename, &$conf, &$section) { 
-	global $AGI; 
-	$AGI->verbose("Parsing config file $filename",3); 
-
-	if (is_null($conf)) { $conf = array(); } 
-
-	if (is_null($section)) { $section = "general"; } 
-
-	if (file_exists($filename)) { 
-		$fd = fopen($filename, "r"); 
-		while ($line = fgets($fd, 1024)) { 
-			if (preg_match("/^\s*([a-zA-Z0-9-_]+)\s*=>\s*(.*?)\s*([;#].*)?$/",$line,$matches)) { 
-				// name => => value 
-				// keep [] to allow for duplicate options like search 
-				// could extend options to include for example: 
-				// skipgateway => slow-sip-gateway.com 
-				// earlyexit => yes (to return only 1 enum from dns lookup)  
-				$conf[$section][][$matches[1]] = $matches[2]; 
-			} else if (preg_match("/^\s*\[(.+)\]/",$line,$matches)) { 
-				// section name 
-				$section = strtolower($matches[1]); 
-			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) { 
-				// include another file 
-				if ($matches[1][0] == "/") { 
-					// absolute path 
-					$filename = $matches[1]; 
-				} else { 
-					// relative path 
-					$filename =  dirname($filename)."/".$matches[1]; 
-				} 
-				parse_conf($filename, $conf, $section); 
-			} 
-		}
-	}
 }
 
 ?>
