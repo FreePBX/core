@@ -2800,6 +2800,12 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		
 	//take care of sip/iax/zap config
 	$funct = "core_devices_add".strtolower($tech);
+  
+  // before calling device specifc funcitions, get rid of any bogus fields in the REQUEST array
+  //
+  if (isset($_REQUEST['devinfo_secret_origional'])) {
+    unset($_REQUEST['devinfo_secret_origional']);
+  }
 	if(function_exists($funct)){
 		$funct($id);
 	}
@@ -3057,22 +3063,22 @@ function core_devices_getsip($account) {
 function core_devices_addiax2($account) {
 	global $db;
 	global $currentFile;
-	
+
+	$flag = 2;
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
 			if ( $keyword == 'dial' && $data == '' ) {
-				$iaxfields[] = array($account, $keyword, 'IAX2/'.$account);
+				$iaxfields[] = array($account, $keyword, 'IAX2/'.$account, $flag++);
 			} elseif ($keyword == 'mailbox' && $data == '') {
-				$iaxfields[] = array($account,'mailbox',$account.'@device');
+				$iaxfields[] = array($account,'mailbox',$account.'@device', $flag++);
 			} else {
-				$iaxfields[] = array($account, $keyword, $data);
+				$iaxfields[] = array($account, $keyword, $data, $flag++);
 			}
 		}
 	}
 	
 	if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
-		$flag = 2;
 		$iaxfields = array(
 			array($account,'secret',$db->escapeSimple(($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++),
 			array($account,'notransfer',$db->escapeSimple(($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),$flag++),
