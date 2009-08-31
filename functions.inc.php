@@ -4862,6 +4862,7 @@ function general_generate_indications() {
 		foreach ($zonelist as $key => $value) {
 			if ($value['iso'] == $country) {
 				
+				fwrite($fd, "description = {$value['name']}\n");
 				fwrite($fd, "{$value['conf']}\n\n");
 			}
 	}
