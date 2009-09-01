@@ -2262,9 +2262,14 @@ function core_get_config($engine) {
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MEXTEN", '${ARG1}'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MMODE", '${ARG2}'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("RETVM", '${ARG3}'));
-
-			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
+
+      // If this use has individual option set for playing standardized message, then override the global option
+      //
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "0"]','chknomsg'));
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VM_OPTS", '${DB_RESULT}'));
+
+			$ext->add('macro-vm','vmx', 'chknomsg', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
 			$ext->add('macro-vm','vmx', 'notdirect', new ext_NoOp('Checking if ext ${MEXTEN} is enabled: ${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}'));
