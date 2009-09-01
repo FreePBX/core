@@ -1994,59 +1994,6 @@ function core_get_config($engine) {
 			}
 			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
 
-			
-
-			$context = 'macro-systemrecording';
-			
-			//exten => s,1,Set(RECFILE=${IF($["${ARG2}" = ""]?/tmp/${AMPUSER}-ivrrecording:${ARG2})})
-			$ext->add($context, 's', '', new ext_setvar('RECFILE','${IF($["${ARG2}" = ""]?/tmp/${AMPUSER}-ivrrecording:${ARG2})}'));
-			$ext->add($context, 's', '', new ext_execif('$["${ARG3}" != ""]','Authenticate','${ARG3}'));
-			$ext->add($context, 's', '', new ext_goto(1, '${ARG1}'));
-			
-			$exten = 'dorecord';
-			
-			// Delete all versions of the current sound file (does not consider languages though
-			// otherwise you might have some versions that are not re-recorded
-			//
-			$ext->add($context, $exten, '', new ext_system('rm ${ASTVARLIBDIR}/sounds/${RECFILE}.*'));
-			$ext->add($context, $exten, '', new ext_record('${RECFILE}:wav'));
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
-
-			$exten = 'docheck';
-			
-			$ext->add($context, $exten, '', new ext_playback('beep'));
-			if ($ast_ge_14) {
-				$ext->add($context, $exten, 'dc_start', new ext_background('${RECFILE},m,${CHANNEL(language)},macro-systemrecording'));
-			} else {
-				$ext->add($context, $exten, 'dc_start', new ext_background('${RECFILE},m,${LANGUAGE},macro-systemrecording'));
-			}
-			$ext->add($context, $exten, '', new ext_wait(1));
-			$ext->add($context, $exten, '', new ext_goto(1, 'confmenu'));
-
-			$exten = 'confmenu';
-			if ($ast_ge_14) {
-				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star&astcc-followed-by-pound,m,${CHANNEL(language)},macro-systemrecording'));
-			} else {
-				$ext->add($context, $exten, '', new ext_background('to-listen-to-it&press-1&to-rerecord-it&press-star&astcc-followed-by-pound,m,${LANGUAGE},macro-systemrecording'));
-			}
-			$ext->add($context, $exten, '', new ext_read('RECRESULT', '', 1, '', '', 4));
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x*"]', 'dorecord,1'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["x${RECRESULT}"="x1"]', 'docheck,2'));
-			$ext->add($context, $exten, '', new ext_goto(1));
-			
-			$ext->add($context, '1', '', new ext_goto('dc_start', 'docheck'));
-			$ext->add($context, '*', '', new ext_goto(1, 'dorecord'));
-			
-			$ext->add($context, 't', '', new ext_playback('goodbye'));
-			$ext->add($context, 't', '', new ext_hangup());
-			
-			$ext->add($context, 'i', '', new ext_playback('pm-invalid-option'));
-			$ext->add($context, 'i', '', new ext_goto(1, 'confmenu'));
-
-			$ext->add($context, 'h', '', new ext_hangup());
-
-			
 			$context = 'from-zaptel';
 			$exten = '_X.';
 			
