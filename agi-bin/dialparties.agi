@@ -246,7 +246,7 @@ $from_outside     = get_var( $AGI, "FROM_DID" );
 $astvarlibdir     = get_var( $AGI, "ASTVARLIBDIR" );
 // If this isn't a ring group, check to see if the user has call screening on
 // Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
-if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && !$already_screened) {
+if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && !$already_screened && !($nodest != '' && $fmgrp != $nodest)) {
 	$screen_call = $AGI->database_get('AMPUSER', $ext[0]."/screen");
 	$screen_call = $screen_call['data'];
 	if (strlen($screen_call)) {
