@@ -5252,7 +5252,7 @@ function core_devices_configpageload() {
 	global $currentcomponent;
 
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
-	if ($devinfo_tech == 'virtual') {
+	if (isset($devinfo_tech) && $devinfo_tech == 'virtual') {
 		return true;
 	}
 
@@ -5391,7 +5391,7 @@ function core_devices_configprocess() {
 	//create vars from the request
 	extract($_REQUEST);
 
-	if ($tech == "virtual") {
+	if (isset($tech) && $tech == "virtual") {
 		return true;
 	}
 	$extension = isset($extension)?$extension:null;
