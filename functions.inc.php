@@ -5391,9 +5391,8 @@ function core_devices_configprocess() {
 	//create vars from the request
 	extract($_REQUEST);
 
-	if (isset($tech) && $tech == "virtual") {
-		return true;
-	}
+	if (!$_REQUEST['tech'] || $tech == "virtual"){return true;}
+	
 	$extension = isset($extension)?$extension:null;
 	$deviceid = isset($deviceid)?$deviceid:null;
 	$name = isset($name)?$name:null;
