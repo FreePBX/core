@@ -2733,7 +2733,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		}
 
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
 	// create a voicemail symlink if needed
@@ -2817,7 +2817,7 @@ function core_devices_del($account,$editmode=false){
 		//voicemail symlink
 		exec("rm -f /var/spool/asterisk/voicemail/device/".$account);
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
 	//take care of sip/iax/zap config
@@ -3446,7 +3446,7 @@ function core_users_add($vars, $editmode=false) {
 		// Moved VmX setup to voicemail module since it is part of voicemail
 		//
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 
 	// OK - got this far, if they entered a new inbound DID/CID let's deal with it now
@@ -3514,7 +3514,7 @@ function core_users_get($extension){
 		$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
 		$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 
 	return $results;
@@ -3560,7 +3560,7 @@ function core_users_cleanastdb($extension) {
 		$astman->database_del("CFU",$extension);
 
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 }
 
@@ -3576,7 +3576,7 @@ function core_users_edit($extension,$vars){
 		$new_vmcontext = isset($vars['vmcontext']) ? $vars['vmcontext'] : 'novm';
 		$vars['device'] = $ud;
 	} else {
-		fatal("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
+		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
 	
 	// clean and check the did to make sure it is not being used by another extension or in did routing
