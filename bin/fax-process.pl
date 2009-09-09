@@ -23,7 +23,7 @@ use MIME::Base64;
 use Net::SMTP;
 
 # Default paramaters
-my $to = "xrobau\@gmail.com";
+my $to = "noreply\@mydomain.tld";
 my $from = "fax\@";
 my $dest = undef;
 my $subject = "Fax received";
