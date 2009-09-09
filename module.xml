@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0RC1.1</version>
+	<version>2.6.0RC2.0</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.6.0RC2.0* #3854
 		*2.6.0RC1.1* #3751
 		*2.6.0RC1.0* #3529, #3864, #3538
 		*2.6.0beta2.2* #3722, #3848, #3841, #3700

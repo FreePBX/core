@@ -324,6 +324,10 @@ function __parse_DialRulesFile($filename, &$conf, &$section) {
 	}
 }
 
+function __order_DialRules($a, $b) {
+  return substr($a,4) > substr($b,4);
+}
+
 function __migrate_trunks_to_table() {
 
 	global $db;
@@ -546,7 +550,7 @@ if(DB::IsError($check) && $check->getCode() != DB_ERROR_ALREADY_EXISTS) {
 	$rules_arr = array();
 	foreach ($conf as $tname => $rules) {
 		$tid = ltrim($tname,'trunk-');
-		ksort($rules); //make sure they are in order
+		uksort($rules,'__order_DialRules'); //make sure they are in order
 		$seq = 1;
 		foreach ($rules as $rule) {
 			$rules_arr[] = array($tid,$rule,$seq);
