@@ -5252,7 +5252,7 @@ function core_devices_configpageload() {
 	global $currentcomponent;
 
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
-	if (isset($devinfo_tech) && $devinfo_tech == 'virtual') {
+	if ($tech_hardware == 'virtual') {
 		return true;
 	}
 
@@ -5315,6 +5315,7 @@ function core_devices_configpageload() {
 		// Ensure they exist before the extract
 		$devinfo_description = $devinfo_emergency_cid = null;
 		$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
+		$devinfo_tech = null;
 		if ( is_array($deviceInfo) ) {
 			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
 		}
