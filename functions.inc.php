@@ -2649,6 +2649,10 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	global $currentFile;
 	global $astman;
 	global $db;
+
+  if ($tech == '' || trim($tech) == 'virtual') {
+    return true;
+  }
 	
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 
@@ -2777,10 +2781,13 @@ function core_devices_del($account,$editmode=false){
 	global $amp_conf;
 	global $currentFile;
 	global $astman;
-	
+
 	//get all info about device
 	$devinfo = core_devices_get($account);
-	
+  if (empty($devinfo)) {
+    return true;
+  }
+
 	//delete details to astdb
 	if ($astman) {
 		// If a user was selected, remove this device from the user
@@ -5390,10 +5397,12 @@ function core_devices_configprocess() {
 	}
 	
 	//create vars from the request
+  $tech = $action = null;
 	extract($_REQUEST);
 
-	if (!$_REQUEST['tech'] || $tech == "virtual"){return true;}
-	
+	if ($tech == "virtual" || $action == "edit" && $tech == '') {
+		return true;
+	}
 	$extension = isset($extension)?$extension:null;
 	$deviceid = isset($deviceid)?$deviceid:null;
 	$name = isset($name)?$name:null;
