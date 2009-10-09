@@ -2418,7 +2418,7 @@ function core_ampusers_add($username, $password, $extension_low, $extension_high
 	$sql .= "'".$username."',";
 	if (strlen($password) == 40) {
 		// It's already a hash
-		$sql .= "'".$password."'";
+		$sql .= "'".$password."',";
 	} else {
 		// Hash it.
 		$sql .= "'".sha1($password)."',";
