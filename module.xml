@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.6.0.0* #3919
+		*2.6.0.0* #3889, #3919
 		*2.6.0RC2.1* #3886, #3885, #3875 revisited
 		*2.6.0RC2.0* #3854, #3872, #3871, #3877
 		*2.6.0RC1.1* #3751
@@ -76,6 +76,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.6/core-2.6.0RC2.1.tgz</location>
-	<md5sum>6220bf3c36992550ab7321f6bac5c207</md5sum>
+	<location>release/2.6/core-2.6.0.0.tgz</location>
+	<md5sum>7a60093b3bfe749b77ee7511e21cf5b7</md5sum>
 </module>
