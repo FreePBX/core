@@ -52,6 +52,7 @@
 	$intercom_code = get_var( "INTERCOMCODE" );
 
 	$ast_version14 = version_compare($ast_version, "1.4", "ge");
+	var_dump($ast_version14);
 
 	$DEVSTATE = version_compare($ast_version, "1.6", "ge") ? "DEVICE_STATE" : "DEVSTATE";
 
@@ -170,7 +171,15 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("insert_user: Setting user $user to devices $new_devices",5);
 		set_user_devices($user, $new_devices);
 		set_hint($user, $new_devices);
-		$agi->exec("UserEvent", "\"UserDeviceAdded|Data: {$user},{$device}\"");
+		if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
+ 			$user_event_body = "\"UserDeviceAdded|Data: {$user}\\,{$device}\"";
+ 		} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
+ 			$user_event_body = "UserDeviceAdded,\"Data: {$user}\\\\,{$device}\"";
+ 		} else {
+ 			$user_event_body = "\"UserDeviceAdded|Data: {$user},{$device}\"";
+ 		}
+ 
+    $agi->exec("UserEvent", $user_event_body);
 
 		if ($fm_devstate) {
 			debug("insert_user: Setting FollowMe DEVSTATES for device $device",5);
@@ -213,7 +222,17 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			debug("remove_user: Setting user $current_user to devices $new_devices",5);
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
-			$agi->exec("UserEvent", "\"UserDeviceRemoved|Data: {$current_user},{$device}\"");
+			
+			if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
+				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user}\\,{$device}\"";
+ 			} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
+ 				$user_event_body = "UserDeviceRemoved,\"Data: {$current_user}\\\\,{$device}\"";
+ 			} else {
+ 				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user},{$device}\"";
+ 			}
+ 
+     	$agi->exec("UserEvent", $user_event_body);
+     	
 			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
 
 			debug("Setting device $device states to INVALID before deleting them",5);
