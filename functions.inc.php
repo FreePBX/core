@@ -1529,9 +1529,6 @@ function core_get_config($engine) {
 							// clear so a subsequent transfer to an internal extension works and goes to voicmail or other
 							// destinations.
 							//
-							// Then do one call to user-callerid and record-enable instead of each time as in the past
-							//
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
 							$lastexten = $exten['extension'];
