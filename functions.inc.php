@@ -1506,7 +1506,7 @@ function core_get_config($engine) {
 			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes' ORDER BY application";
 			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
-			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
+			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
 				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
