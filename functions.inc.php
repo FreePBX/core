@@ -1296,11 +1296,19 @@ function core_get_config($engine) {
 					// works.
 					//
 					$ivr_context = 'from-did-direct-ivr';
-					$ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+			    if ($ast_lt_16) {
+					  $ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+          } else {
+					  $ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','Noop','Deleting: ${BLKVM_OVERRIDE}: ${DB_DELETE(${BLKVM_OVERRIDE})}'));
+          }
 					$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
 					if($vm != "novm") {
-						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+			      if ($ast_lt_16) {
+						  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
+            } else {
+						  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','Noop','Deleting: ${BLKVM_OVERRIDE}: ${DB_DELETE(${BLKVM_OVERRIDE})}'));
+            }
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_setvar('__NODEST', ''));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','ext-local,vmret,playret'));
