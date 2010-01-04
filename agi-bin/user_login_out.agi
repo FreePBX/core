@@ -52,7 +52,6 @@
 	$intercom_code = get_var( "INTERCOMCODE" );
 
 	$ast_version14 = version_compare($ast_version, "1.4", "ge");
-	var_dump($ast_version14);
 
 	$DEVSTATE = version_compare($ast_version, "1.6", "ge") ? "DEVICE_STATE" : "DEVSTATE";
 
