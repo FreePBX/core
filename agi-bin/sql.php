@@ -65,7 +65,7 @@
 //		  }
 //	
 //	if ($res[0]['allowed'] == 'NO') {
-//		$agi->goto_dest($res[0]['faildest']);
+//		$agi->goto($res[0]['faildest']);
 //	}
 //
 //
