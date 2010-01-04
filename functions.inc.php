@@ -1514,7 +1514,7 @@ function core_get_config($engine) {
 			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes' ORDER BY application";
 			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
-			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
+			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
 				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
@@ -1537,6 +1537,9 @@ function core_get_config($engine) {
 							// clear so a subsequent transfer to an internal extension works and goes to voicmail or other
 							// destinations.
 							//
+							// Then do one call to user-callerid and record-enable instead of each time as in the past
+							//
+							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
 							$lastexten = $exten['extension'];
