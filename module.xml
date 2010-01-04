@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.6.0.0</version>
+	<version>2.6.0.1</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.6.0.1* #3889 reverted, #3900, #3962, #2787, #3793, #3377, #3386, #3717
 		*2.6.0.0* #3889, #3919
 		*2.6.0RC2.1* #3886, #3885, #3875 revisited
 		*2.6.0RC2.0* #3854, #3872, #3871, #3877
@@ -76,6 +77,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.6/core-2.6.0.0.tgz</location>
-	<md5sum>7a60093b3bfe749b77ee7511e21cf5b7</md5sum>
+	<location>release/2.6/core-2.6.0.1.tgz</location>
+	<md5sum>60de7a356738078abc0d72692cb3ab68</md5sum>
 </module>
