@@ -370,6 +370,10 @@ class core_conf {
 						if ($option != '')
 							$additional .= $result['keyword']."=$option\n";
 						break;
+					case 'requirecalltoken':
+                                               if ($option != '')
+                                                       $additional .= $result['keyword']."=$option\n";
+                                               break;
 					default:
 						$additional .= $result['keyword']."=$option\n";
 				}
@@ -441,6 +445,10 @@ class core_conf {
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
+						case 'requirecalltoken':
+                                                       if ($option != '')
+                                                               $output .= $result2['keyword']."=".$result2['data']."\n";
+                                                       break;
 						case 'record_in':
 						case 'record_out':
 							break;
@@ -3060,7 +3068,8 @@ function core_devices_addiax2($account) {
 			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
 			array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:''),$flag++),
 			array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:''),$flag++),
-			array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++)
+			array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++),
+			array($account,'requirecalltoken',$db->escapeSimple(($_REQUEST['requirecalltoken'])?$_REQUEST['requirecalltoken']:''),$flag++)
 		);
 	}
 
@@ -5209,6 +5218,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+		$tmparr['requirecalltoken'] = array('value' => '', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
 		unset($tmparr);
 
