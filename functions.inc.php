@@ -1064,6 +1064,7 @@ function core_get_config($engine) {
 			
 			$ext->addInclude('ext-did', 'ext-did-0001'); // Add the include from from-internal
 			$ext->addInclude('ext-did', 'ext-did-0002'); // Add the include from from-internal
+			$ext->add('ext-did', 'foo','', new ext_noop('bar'));
 
 			/* inbound routing extensions */
 			$didlist = core_did_list();
@@ -1130,7 +1131,7 @@ function core_get_config($engine) {
 							$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 						}
 					}
-					
+					$ext->add($context, $exten, 'nofax', new ext_NoOp('No fax detection required, moving right along'));
 					if ($item['privacyman'] == "1") {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
 					} else {
