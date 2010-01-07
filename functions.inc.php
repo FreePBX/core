@@ -831,10 +831,6 @@ function core_get_config($engine) {
 			$fc_simu_pstn = $fcc->getCodeActive();
 			unset($fcc);
 
-			$fcc = new featurecode($modulename, 'simu_fax');
-			$fc_simu_fax = $fcc->getCodeActive();
-			unset($fcc);
-
 			$fcc = new featurecode($modulename, 'pickup');
 			$fc_pickup = $fcc->getCodeActive();
 			unset($fcc);
@@ -1052,7 +1048,7 @@ function core_get_config($engine) {
 			}
 			
 			// Simulate options (ext-test)
-			if ($fc_simu_pstn != '' || $fc_simu_fax != '') {
+			if ($fc_simu_pstn != '') {
 				$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
 				
 				if ($fc_simu_pstn != '') {
@@ -1063,20 +1059,11 @@ function core_get_config($engine) {
 					}
 				}
 
-				if ($fc_simu_fax != '') {
-					$ext->add('ext-test', $fc_simu_fax, '', new ext_goto('1', 'in_fax', 'ext-fax'));
-				}
-
 				$ext->add('ext-test', 'h', '', new ext_macro('hangupcall'));
 			}
 			
-			/* Always have Fax detection in ext-did, no matter what */
-
 			$ext->addInclude('ext-did', 'ext-did-0001'); // Add the include from from-internal
 			$ext->addInclude('ext-did', 'ext-did-0002'); // Add the include from from-internal
-			$ext->add('ext-did-0001', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
-			$ext->add('ext-did-0002', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
-			$ext->add('ext-did', 'fax', '', new ext_goto('1','in_fax','ext-fax'));
 
 			/* inbound routing extensions */
 			$didlist = core_did_list();
@@ -1144,21 +1131,6 @@ function core_get_config($engine) {
 						}
 					}
 					
-					if ($item['faxexten'] != "default") {
-						$ext->add($context, $exten, '', new ext_setvar('FAX_RX',$item['faxexten']));
-					}
-					if (!empty($item['faxemail'])) {
-						$ext->add($context, $exten, '', new ext_setvar('FAX_RX_EMAIL',$item['faxemail']));
-					}
-					if ($item['answer'] == "1") {
-						$ext->add($context, $exten, '', new ext_answer(''));
-						$ext->add($context, $exten, '', new ext_wait($item['wait']));
-					}
-					if ($item['answer'] == "2") { // NVFaxDetect
-						$ext->add($context, $exten, '', new ext_answer(''));
-						$ext->add($context, $exten, '', new ext_playtones('ring'));
-						$ext->add($context, $exten, '', new ext_nvfaxdetect($item['wait']."|t"));
-					}
 					if ($item['privacyman'] == "1") {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
 					} else {
@@ -2042,7 +2014,6 @@ function core_get_config($engine) {
 			// If nothing there, then treat it as a DID
 			$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-zaptel-${CHAN}'));
 			$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
-			$ext->add($context, 'fax', '', new ext_goto(1, 'in_fax', 'ext-fax'));
 
 			/*
 			* vm-callme context plays voicemail over telephone for web click-to-call
@@ -2528,10 +2499,6 @@ function core_did_create_update($did_vars) {
   if (count(core_did_get($did_create['extension'], $did_create['$cidnum']))) {
     return core_did_edit_properties($did_vars); //already exists so just edit properties
   } else {
-	  $did_create['faxexten']    = isset($did_vars['faxexten'])    ? $did_vars['faxexten']    : '';
-	  $did_create['faxemail']    = isset($did_vars['faxemail'])    ? $did_vars['faxemail']    : '';
-	  $did_create['answer']      = isset($did_vars['answer'])      ? $did_vars['answer']      : '0';
-	  $did_create['wait']        = isset($did_vars['wait'])        ? $did_vars['wait']        : '0';
 	  $did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
 	  $did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
 	  $did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
@@ -2562,10 +2529,6 @@ function core_did_edit_properties($did_vars) {
   $sql = "";
   foreach ($did_vars as $key => $value) {
     switch ($key) {
-      case 'faxexten':
-      case 'faxemail':
-      case 'answer':
-      case 'wait':
       case 'privacyman':
       case 'alertinfo':
       case 'ringing':
@@ -2599,7 +2562,7 @@ function core_did_add($incoming,$target=false){
 
 	if (empty($existing)) {
 		$destination= ($target) ? $target : ${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 		sql($sql);
 		return true;
 	} else {
@@ -3483,10 +3446,6 @@ function core_users_add($vars, $editmode=false) {
 		$did_dest                = 'from-did-direct,'.$extension.',1';
 		$did_vars['extension']   = $newdid;
 		$did_vars['cidnum']      = $newdidcid;
-		$did_vars['faxexten']    = '';
-		$did_vars['faxemail']    = '';
-		$did_vars['answer']      = '0';
-		$did_vars['wait']        = '0';
 		$did_vars['privacyman']  = '';
 		$did_vars['alertinfo']   = '';
 		$did_vars['ringing']     = '';

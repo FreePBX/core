@@ -31,9 +31,6 @@ if ($action == 'editglobals') {
 						array($_REQUEST['MIXMON_DIR'],'MIXMON_DIR'),
 						array($_REQUEST['MIXMON_POST'],'MIXMON_POST'),
             array($_REQUEST['RINGTIMER'],'RINGTIMER'),
-						array($_REQUEST['FAX_RX'],'FAX_RX'),
-						array($_REQUEST['FAX_RX_EMAIL'],'FAX_RX_EMAIL'),
-						array($_REQUEST['FAX_RX_FROM'],'FAX_RX_FROM'),
 						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['VM_DDTYPE'],'VM_DDTYPE'),
@@ -365,37 +362,6 @@ foreach ($globals as $global) {
 	</td></tr>
 </table>
 
-<h5><?php echo _("Fax Machine")?></h5>
-<table>
-	<tr><td>
-	<a class="info" href="#"><?php echo _("Extension of fax machine for receiving faxes:")?><span><?php echo _("Select 'system' to have the system receive and email faxes.<br>Selecting 'disabled' will result in incoming calls being answered more quickly.")?></span></a>
-	<!--<input type="text" size="8" name="FAX_RX" value="<?php  echo $FAX_RX?>"/>-->
-	</td><td align="right">
-	<select name="FAX_RX" tabindex="<?php echo ++$tabindex;?>">
-		<option value="disabled" <?php  echo ($FAX_RX == 'disabled' ? 'SELECTED' : '')?>><?php echo _("disabled")?>
-		<option value="system" <?php  echo ($FAX_RX == 'system' ? 'SELECTED' : '')?>><?php echo _("system")?>
-<?php 
-	//get unique devices
-	$devices = core_devices_list();
-	if (isset($devices)) {
-		foreach ($devices as $device) {
-			echo '<option value="'.$device[0].'" '.($FAX_RX == $device[0] ? 'SELECTED' : '').'>'.$device[1].' &lt;'.$device[0].'&gt;';
-		}
-	}
-?>	
-	</select>
-	</td></tr>
-	<tr><td>
-	<a class="info" href="#"><?php echo _("Email address to have faxes emailed to:")?><span><?php echo _("Email address used if 'system' has been chosen for the fax extension above.")?></span></a>
-	</td><td align="right">
-	<input type="text" size="30" name="FAX_RX_EMAIL" value="<?php  echo htmlspecialchars($FAX_RX_EMAIL)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-	<tr><td>
-	<a class="info" href="#"><?php echo _("Email address that faxes appear to come from:")?><span><?php echo _("Email address that faxes appear to come from if 'system' has been chosen for the fax extension above.")?></span></a>
-	</td><td align="right">
-	<input type="text" size="30" name="FAX_RX_FROM" value="<?php  echo htmlspecialchars($FAX_RX_FROM)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-</table>
 <h5><?php echo _("International Settings")?></h5>
 <table>
 	<tr><td>
