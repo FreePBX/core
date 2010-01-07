@@ -566,5 +566,12 @@ if(DB::IsError($check) && $check->getCode() != DB_ERROR_ALREADY_EXISTS) {
 }
 
 // END of trunks migration code
-
+outn(_("Checking if privacy manager options exists.."));
+$check = $db->query('SELECT pmmaxretries FROM incoming');
+if(DB::IsError($check)){
+	$db->query('alter table incoming add pmmaxretries varchar(2), add pmminlength varchar(2);');
+	outn(_("Adding privacy manager options.."));
+}else{
+	out(_("already exists"));
+}
 ?>
