@@ -25,9 +25,8 @@ $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
 $description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
 $privacyman = isset($_REQUEST['privacyman'])?$_REQUEST['privacyman']:'0';
-$faxexten = isset($_REQUEST['faxexten'])?$_REQUEST['faxexten']:null;
-$faxemail = isset($_REQUEST['faxemail'])?$_REQUEST['faxemail']:null;
-$answer = isset($_REQUEST['answer'])?$_REQUEST['answer']:'0';
+$pmmaxretries = isset($_REQUEST['pmmaxretries'])?$_REQUEST['pmmaxretries']:'';
+$pmminlength = isset($_REQUEST['pmminlength'])?$_REQUEST['pmminlength']:'';
 $alertinfo = isset($_REQUEST['alertinfo'])?$_REQUEST['alertinfo']:'';
 $mohclass = isset($_REQUEST['mohclass'])?$_REQUEST['mohclass']:'default';
 $grppre = isset($_REQUEST['grppre'])?$_REQUEST['grppre']:'';
@@ -269,7 +268,32 @@ if (isset($inroutes)) {
 				</select>
 			</td>
 		</tr>
-		
+		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
+			<td><a href="#" class="info"><?php echo _("Max attempts")?><span><?php echo _('This sets the amount of atempts the caller has to enter a valid callerID')?></span></a>:</td>
+			<td>
+				<select name="pmmaxretries" tabindex="<?php echo ++$tabindex;?>">
+					<?php
+						for($i=1;$i<11;$i++){
+							if(!isset($pmmaxretries)||$pmmaxretries==''){$pmmaxretries=3;}//set defualts
+							echo '<option value="'.$i.'"'.($pmmaxretries == $i ? 'SELECTED' : '').' >'.$i.'</option>';
+						}
+					?>
+				</select> 
+			</td>
+		</tr>	
+		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
+			<td><a href="#" class="info"><?php echo _("Min Length")?><span><?php echo _('This sets the minimum amount of digits a callerID needs to contain in order to be valid')?></span></a>:</td>
+			<td>
+				<select name="pmminlength" tabindex="<?php echo ++$tabindex;?>">
+					<?php
+						if(!isset($pmminlength)||$pmminlength==''){$pmminlength=10;}//set USA defaults
+						for($i=1;$i<16;$i++){
+							echo '<option value="'.$i.'"'.($pmminlength == $i ? 'SELECTED' : '').' >'.$i.'</option>';
+						}
+					?>
+				</select> 
+			</td>
+		</tr>	
 <?php
 	// implementation of module hook
 	// object was initialized in config.php
@@ -347,6 +371,14 @@ function editGRP_onsubmit() {
 	
 	return true;
 }
+
+$(document).ready(function() {
+	//show/hide privacy manager options
+	$('select[name=privacyman]').change(function(){
+		if($(this).val()==0){$('.pm_opts').fadeOut();}
+		if($(this).val()==1){$('.pm_opts').fadeIn();}
+	});
+});
 
 //-->
 </script>

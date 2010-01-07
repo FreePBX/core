@@ -1133,7 +1133,7 @@ function core_get_config($engine) {
 					}
 					$ext->add($context, $exten, 'nofax', new ext_NoOp('No fax detection required, moving right along'));
 					if ($item['privacyman'] == "1") {
-						$ext->add($context, $exten, '', new ext_macro('privacy-mgr'));
+						$ext->add($context, $exten, '', new ext_macro('privacy-mgr',$item['pmmaxretries'].','.$item['pmminlength']));
 					} else {
 						// if privacymanager is used, this is not necessary as it will not let blocked/anonymous calls through
 						// otherwise, we need to save the caller presence to set it properly if we forward the call back out the pbx
@@ -2501,6 +2501,8 @@ function core_did_create_update($did_vars) {
     return core_did_edit_properties($did_vars); //already exists so just edit properties
   } else {
 	  $did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
+	  $did_create['pmmaxretries']  = isset($did_vars['pmmaxretries'])  ? $did_vars['pmmaxretries']  : '';
+	  $did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
 	  $did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
 	  $did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
 	  $did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
@@ -2531,6 +2533,8 @@ function core_did_edit_properties($did_vars) {
   foreach ($did_vars as $key => $value) {
     switch ($key) {
       case 'privacyman':
+      case 'pmmaxretries':
+      case 'pmminlength':
       case 'alertinfo':
       case 'ringing':
       case 'mohclass':
@@ -2563,7 +2567,7 @@ function core_did_add($incoming,$target=false){
 
 	if (empty($existing)) {
 		$destination= ($target) ? $target : ${$goto0.'0'};
-		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 		sql($sql);
 		return true;
 	} else {
