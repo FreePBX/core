@@ -269,32 +269,7 @@ if (isset($inroutes)) {
 				</select>
 			</td>
 		</tr>
-		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
-			<td><a href="#" class="info"><?php echo _("Max attempts")?><span><?php echo _('This sets the amount of atempts the caller has to enter a valid callerID')?></span></a>:</td>
-			<td>
-				<select name="pmmaxretries" tabindex="<?php echo ++$tabindex;?>">
-					<?php
-						if(!isset($pmmaxretries)){$pmmaxretries=3;}
-						for($i=1;$i<11;$i++){
-							echo '<option value="'.$i.'"'.($pmmaxretries == $i ? 'SELECTED' : '').' >'.$i.'</option>';
-						}
-					?>
-				</select> 
-			</td>
-		</tr>	
-		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
-			<td><a href="#" class="info"><?php echo _("Min Length")?><span><?php echo _('This sets the minimum amount of digits a callerID needs to contain in order to be valid')?></span></a>:</td>
-			<td>
-				<select name="pmminlength" tabindex="<?php echo ++$tabindex;?>">
-					<?php
-						if(!isset($pmminlength)){$pmminlength=10;}
-						for($i=1;$i<16;$i++){
-							echo '<option value="'.$i.'"'.($pmminlength == $i ? 'SELECTED' : '').' >'.$i.'</option>';
-						}
-					?>
-				</select> 
-			</td>
-		</tr>	
+		
 <?php
 	// implementation of module hook
 	// object was initialized in config.php
@@ -372,14 +347,6 @@ function editGRP_onsubmit() {
 	
 	return true;
 }
-
-$(document).ready(function() {
-	//show/hide privacy manager options
-	$('select[name=privacyman]').change(function(){
-		if($(this).val()==0){$('.pm_opts').fadeOut();}
-		if($(this).val()==1){$('.pm_opts').fadeIn();}
-	});
-});
 
 //-->
 </script>
