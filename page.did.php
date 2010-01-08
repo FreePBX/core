@@ -260,7 +260,7 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
 
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID has been recevied, Privacy Manager will asks the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be be promted to say their name when the call reaches the user/extension.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID has been received, Privacy Manager will asks the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be be prompted to say their name when the call reaches the user/extension.')?></span></a>:</td>
 			<td>
 				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
 					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
@@ -269,7 +269,7 @@ if (isset($inroutes)) {
 			</td>
 		</tr>
 		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
-			<td><a href="#" class="info"><?php echo _("Max attempts")?><span><?php echo _('Number of atempts the caller has to enter a valid callerID')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Max attempts")?><span><?php echo _('Number of attempts the caller has to enter a valid callerID')?></span></a>:</td>
 			<td>
 				<select name="pmmaxretries" tabindex="<?php echo ++$tabindex;?>">
 					<?php
