@@ -260,7 +260,7 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo _("Privacy")?><hr></h5></td></tr>
 
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID has been received, Privacy Manager will asks the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be be prompted to say their name when the call reaches the user/extension.')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Privacy Manager")?><span><?php echo _('If no Caller ID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be be prompted to say their name when the call reaches the user/extension.')?></span></a>:</td>
 			<td>
 				<select name="privacyman" tabindex="<?php echo ++$tabindex;?>">
 					<option value="0" <?php  echo ($privacyman == '0' ? 'SELECTED' : '')?>><?php echo _("No")?>
