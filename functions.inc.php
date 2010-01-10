@@ -2063,14 +2063,18 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 			$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 			$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$[ $["${EMERGENCYROUTE:1:2}" = ""] | $["${EMERGENCYCID:1:2}" = ""] ]', 'trunkcid'));  // check EMERGENCY ROUTE
+			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
 			$ext->add($context, $exten, 'exit', new ext_macroexit());
 
 
-			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID:1:2}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
-
-			$ext->add($context, $exten, 'usercid', new ext_execif('$["${USEROUTCID:1:2}" != ""]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
+			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
+			$ext->add($context, $exten, 'usercid', new ext_execif('$["${USEROUTCID}" != ""]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
+      /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of an Emergency CID on an Emergency Route
+         FORCEDOUTCID_trunknum is not yet used. It's purpose will be to force a trunk to always use a specific CID in all conditions except when used in an emergency route.
+         An EMERGENCYCID present on an EMERGENCYROUTE will continue to take prcedence over all else.
+       */
+			$ext->add($context, $exten, '', new ext_execif('$["${TRUNKCIDOVERRIDE}" != "" | "${FORCEDOUTCID_${ARG1}}" != ""]', 'Set', 'CALLERID(all)=${IF($["${FORCEDOUTCID_${ARG1}}"=""]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 			if ($ast_lt_16) { 
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'SetCallerPres', 'prohib_passed_screen'));
 			} else {
