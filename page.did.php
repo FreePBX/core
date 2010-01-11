@@ -17,20 +17,19 @@
 //   Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
 //
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
-$extdisplay= isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
+$extdisplay= htmlspecialchars(isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'');
 $old_extdisplay = $extdisplay;
 $dispnum = 'did'; //used for switch on config.php
 $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
-$description = isset($_REQUEST['description'])?$_REQUEST['description']:'';
+$description = htmlspecialchars(isset($_REQUEST['description'])?$_REQUEST['description']:'');
 $privacyman = isset($_REQUEST['privacyman'])?$_REQUEST['privacyman']:'0';
 $pmmaxretries = isset($_REQUEST['pmmaxretries'])?$_REQUEST['pmmaxretries']:'';
 $pmminlength = isset($_REQUEST['pmminlength'])?$_REQUEST['pmminlength']:'';
-$alertinfo = isset($_REQUEST['alertinfo'])?$_REQUEST['alertinfo']:'';
+$alertinfo = htmlspecialchars(isset($_REQUEST['alertinfo'])?$_REQUEST['alertinfo']:'');
 $mohclass = isset($_REQUEST['mohclass'])?$_REQUEST['mohclass']:'default';
 $grppre = isset($_REQUEST['grppre'])?$_REQUEST['grppre']:'';
-$wait = isset($_REQUEST['wait'])&&$_REQUEST['wait']?$_REQUEST['wait']:'';
 $delay_answer = isset($_REQUEST['delay_answer'])&&$_REQUEST['delay_answer']?$_REQUEST['delay_answer']:'';
 $pricid = isset($_REQUEST['pricid'])?$_REQUEST['pricid']:'';
 $rnavsort = isset($_REQUEST['rnavsort'])?$_REQUEST['rnavsort']:'description';
@@ -126,7 +125,7 @@ if (isset($inroutes)) {
 	foreach ($inroutes as $inroute) {
 		$displaydid = ( (trim($inroute['extension']) == "") ? _("any DID") : $inroute['extension'] );
  		$displaycid = ( (trim($inroute['cidnum']) == "") ? _("any CID") : $inroute['cidnum'] );
-		$desc = ( empty($inroute['description'])? "" : $inroute['description']."<br />" );
+		$desc = ( empty($inroute['description'])? "" : htmlspecialchars($inroute['description'])."<br />" );
 		echo "\t<li><a ".($extdisplay==$inroute['extension']."/".$inroute['cidnum'] ? 'class="current"':'')." href=\"config.php?display=$dispnum&didfilter=$didfilter&rnavsort=$rnavsort&extdisplay=".urlencode($inroute['extension'])."/".urlencode($inroute['cidnum'])."\">{$desc} {$displaydid} / {$displaycid} </a></li>\n";
 	}
 }
@@ -147,6 +146,12 @@ if (isset($inroutes)) {
       $ininfo=core_did_get($extarray[0],$extarray[1]);
       if (is_array($ininfo) && !empty($ininfo)) {
         extract($ininfo);
+        $description = htmlspecialchars($description);
+        $extension   = htmlspecialchars($extension);
+        $cidnum      = htmlspecialchars($cidnum);
+        $alertinfo   = htmlspecialchars($alertinfo);
+        $grppre      = htmlspecialchars($grppre);
+
         $delete_url = true;
 ?>
 		<h2><?php echo _("Route")?>: <?php echo !empty($description)?$description:$extdisplay; ?></h2>
@@ -202,15 +207,15 @@ if (isset($inroutes)) {
 		<tr><td colspan="2"><h5><?php echo ($extdisplay ? _('Edit Incoming Route') : _('Add Incoming Route')) ?><hr></h5></td></tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Description")?><span><?php echo _('Provide a meaningful description of what this incoming route is')?></span></a>:</td>
-			<td><input type="text" name="description" value="<?php echo htmlspecialchars(isset($description)?$description:''); ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+			<td><input type="text" name="description" value="<?php echo isset($description)?$description:''; ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("DID Number")?><span><?php echo _('Define the expected DID Number if your trunk passes DID on incoming calls. <br><br>Leave this blank to match calls with any or no DID info.<br><br>You can also use a pattern match (eg _2[345]X) to match a range of numbers')?></span></a>:</td>
-			<td><input type="text" name="extension" value="<?php echo htmlspecialchars(isset($extension)?$extension:''); ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+			<td><input type="text" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Caller ID Number")?><span><?php echo _('Define the Caller ID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them.')?></span></a>:</td>
-			<td><input type="text" name="cidnum" value="<?php echo htmlspecialchars(isset($cidnum)?$cidnum:'') ?>" tabindex="<?php echo ++$tabindex;?>"></td>
+			<td><input type="text" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 		</tr>
 
 		<tr>
@@ -348,12 +353,6 @@ function editGRP_onsubmit() {
 	if (!isDialpattern(mycid) && mycid.substring(0,4) != "priv" && mycid.substring(0,5) != "block" && mycid != "unknown" && mycid.substring(0,8) != "restrict" && mycid.substring(0,7) != "unavail" && mycid.substring(0,6) != "anonym")
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
-	if (!isEmail(theForm.faxemail.value))
-		return warnInvalid(theForm.faxemail, msgInvalidFaxEmail);
-	
-	if (!isInteger(theForm.wait.value))
-		return warnInvalid(theForm.wait, msgInvalidPauseBefore);
-
 	if (!isInteger(theForm.delay_answer.value))
 		return warnInvalid(theForm.delay_answer, msgInvalidPauseBefore);
 	
