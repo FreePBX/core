@@ -1131,7 +1131,6 @@ function core_get_config($engine) {
 							$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 						}
 					}
-					$ext->add($context, $exten, 'nofax', new ext_NoOp('No fax detection required, moving right along'));
 					if ($item['privacyman'] == "1") {
 						$ext->add($context, $exten, '', new ext_macro('privacy-mgr',$item['pmmaxretries'].','.$item['pmminlength']));
 					} else {
@@ -1168,7 +1167,7 @@ function core_get_config($engine) {
 					$goto_context = strtok($item['destination'],',');
 					$goto_exten = strtok(',');
 					$goto_pri = strtok(',');
-					$ext->add($context, $exten, '', new ext_goto($goto_pri,$goto_exten,$goto_context));
+					$ext->add($context, $exten, 'dest-ext', new ext_goto($goto_pri,$goto_exten,$goto_context));
 					
 				}
 				// If there's not a catchall, make one with an error message
