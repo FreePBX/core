@@ -2552,11 +2552,13 @@ function core_did_list($order='extension'){
 }
 
 function core_did_get($extension="",$cidnum=""){
+	$cidnum = $db->escapeSimple($cidnum);
 	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
 	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 }
 
 function core_did_del($extension,$cidnum){
+	$cidnum = $db->escapeSimple($cidnum);
 	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
 	sql($sql);
 }
