@@ -1709,6 +1709,7 @@ function core_get_config($engine) {
 			 
 			$context = 'macro-dialout-trunk';
 			$exten = 's';
+			$trunkreportmsg_ids = outroutemsg_get();
 
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
@@ -1759,45 +1760,123 @@ function core_get_config($engine) {
 			$exten = 's-NOANSWER';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
-			$ext->add($context, $exten, '', new ext_playback('number-not-answering,noanswer'));
-			$ext->add($context, $exten, '', new ext_playtones('congestion'));
-			$ext->add($context, $exten, '', new ext_congestion(20));
-		
-			$exten = 's-CANCEL';
-			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting CANCEL - giving up'));
-			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			switch ($trunkreportmsg_ids['no_answer_msg_id']) {
+                    	    case DEFAULT_MSG:
+                    		$ext->add($context, $exten, '', new ext_playback('number-not-answering,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['no_answer_msg_id']);
+                                $message = ($message != "") ? $message : "number-not-answering";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_congestion(20));
 
-			$exten = "s-UNALLOC";
+			$exten = 's-UNALLOC';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Unallocated/Unassigned number - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
-			$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+			switch ($trunkreportmsg_ids['unalloc_msg_id']) {
+                    	    case DEFAULT_MSG:
+                    		$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['unalloc_msg_id']);
+                                $message = ($message != "") ? $message : "ss-noservice";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
-			$exten = "s-NONET";
+			$exten = 's-NONET';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting No route to specified transit network - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
-			$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+			switch ($trunkreportmsg_ids['no_transit_msg_id']) {
+                    	    case DEFAULT_MSG:
+                    		$ext->add($context, $exten, '', new ext_playback('cannot-complete-network-error,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['no_transit_msg_id']);
+                                $message = ($message != "") ? $message : "cannot-complete-network-error";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
-			$exten = "s-NOROUTE";
+			$exten = 's-NOROUTE';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting No route to destination - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
-			$ext->add($context, $exten, '', new ext_playback('no-route-exists-to-dest,noanswer'));
+			switch ($trunkreportmsg_ids['no_route_msg_id']) {
+                    	    case DEFAULT_MSG:
+				$ext->add($context, $exten, '', new ext_playback('no-route-exists-to-dest,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['no_route_msg_id']);
+                                $message = ($message != "") ? $message : "no-route-exists-to-dest";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
-			$exten = "s-CHANUNACCEPT";
+			$exten = 's-CHANUNACCEPT';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Channel unacceptable - giving up'));
+			$ext->add($context, $exten, '', new ext_progress());
+			switch ($trunkreportmsg_ids['ch_unaccept_msg_id']) {
+                    	    case DEFAULT_MSG:
+				$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['ch_unaccept_msg_id']);
+                                $message = ($message != "") ? $message : "ss-noservice";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
 			$exten = "s-REJECT";
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Call Rejected - giving up'));
+			$ext->add($context, $exten, '', new ext_progress());
+			switch ($trunkreportmsg_ids['call_reject_msg_id']) {
+                    	    case DEFAULT_MSG:
+				$ext->add($context, $exten, '', new ext_playback('call-terminated,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['call_reject_msg_id']);
+                                $message = ($message != "") ? $message : "call-termiated";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
 			$exten = "s-CHANGED";
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
+			$ext->add($context, $exten, '', new ext_progress());
+			switch ($trunkreportmsg_ids['nmbr_chngd_msg_id']) {
+                    	    case DEFAULT_MSG:
+				$ext->add($context, $exten, '', new ext_playback('that-number&has-been-disconnected,noanswer'));
+                                break;
+                    	    case CONGESTION_TONE:
+                    		$ext->add($context, $exten, '', new ext_playtones('congestion'));
+                                break;
+                    	    default:
+                                $message = recordings_get_file($trunkreportmsg_ids['nmbr_chngd_msg_id']);
+                                $message = ($message != "") ? $message : "that-number&has-been-disconnected";
+                                $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+            		}
+
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
 			
@@ -1807,6 +1886,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "2"]', 's-NONET,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "3"]', 's-NOROUTE,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "6"]', 's-CHANUNACCEPT,1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "16"]', 's-CANCEL,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "17"]', 's-BUSY,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "18"]', 's-NOANSWER,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "19"]', 's-NOANSWER,1'));
