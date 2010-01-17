@@ -1774,6 +1774,11 @@ function core_get_config($engine) {
             		}
 			$ext->add($context, $exten, '', new ext_congestion(20));
 
+			$exten = 's-CANCEL'; 
+                        $ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting CANCEL - giving up')); 
+                        $ext->add($context, $exten, '', new ext_playtones('congestion')); 
+                        $ext->add($context, $exten, '', new ext_congestion(20)); 
+
 			$exten = 's-UNALLOC';
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Unallocated/Unassigned number - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
