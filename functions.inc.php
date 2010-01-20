@@ -1807,7 +1807,7 @@ function core_get_config($engine) {
 			*/
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Address Incomplete - giving up'));
 			$ext->add($context, $exten, '', new ext_progress());
-			switch ($trunkreportmsg_ids['unalloc_msg_id']) {
+			switch ($trunkreportmsg_ids['invalidnmbr_msg_id']) {
                     	    case DEFAULT_MSG:
                     		$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
                                 break;
@@ -1815,7 +1815,7 @@ function core_get_config($engine) {
                     		$ext->add($context, $exten, '', new ext_playtones('congestion'));
                                 break;
                     	    default:
-                                $message = recordings_get_file($trunkreportmsg_ids['unalloc_msg_id']);
+                                $message = recordings_get_file($trunkreportmsg_ids['invalidnmbr_msg_id']);
                                 $message = ($message != "") ? $message : "ss-noservice";
                                 $ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
             		}
