@@ -1709,7 +1709,12 @@ function core_get_config($engine) {
 			 
 			$context = 'macro-dialout-trunk';
 			$exten = 's';
-			$trunkreportmsg_ids = outroutemsg_get();
+			if (function_exists('outroutemsg_get')) {
+			    $trunkreportmsg_ids = outroutemsg_get();
+			    }
+			else {
+			    $trunkreportmsg_ids = array('no_answer_msg_id' => -1, 'invalidnmbr_msg_id' => -1, 'unalloc_msg_id' => -1);
+			    }
 
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
