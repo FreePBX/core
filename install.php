@@ -565,12 +565,15 @@ if(DB::IsError($check) && $check->getCode() != DB_ERROR_ALREADY_EXISTS) {
 	out(_("loaded"));
 }
 
-// END of trunks migration code
 outn(_("Checking if privacy manager options exists.."));
 $check = $db->query('SELECT pmmaxretries FROM incoming');
 if(DB::IsError($check)){
-	$db->query('alter table incoming add pmmaxretries varchar(2), add pmminlength varchar(2);');
-	outn(_("Adding privacy manager options.."));
+	$result = $db->query('alter table incoming add pmmaxretries varchar(2), add pmminlength varchar(2);');
+	if(DB::IsError($result)) {
+		die_freepbx($result->getDebugInfo().'fatal error adding fields to incoming table');	
+	} else {
+	  out(_("Added pmmaxretries and pmminlength"));
+  }
 }else{
 	out(_("already exists"));
 }
