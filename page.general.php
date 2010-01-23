@@ -403,7 +403,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Check for Updates")?><span>
-			<?php echo _("Choosing Yes will result in the system automatically checking for updates nighly. The resulting infomation will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will transmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is transmitted."); ?></span></a>
+			<?php echo _("Choosing Yes will result in the system automatically checking for updates nightly. The resulting information will be displayed in the dashboard and will be optionally emailed to the address below if provided.<br />This will transmit your FreePBX and Asterisk version numbers along with a unique but random identifier. This is used to provide proper update information and to track version usage to focus development and maintenance efforts. No private information is transmitted."); ?></span></a>
 			</td>
 			<td align=right>
 			<select name="online_updates" tabindex="<?php echo ++$tabindex;?>">
@@ -447,7 +447,7 @@ function warnConfirm (theField, s) {
 function general_onsubmit() {
 	var msgInvalidSeconds = "<?php echo _('Please enter a valid Number of Seconds'); ?>";
 	var msgInvalidDefaultFaxEmail = "<?php echo _('Please enter a valid Fax Email'); ?>";
-	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signaling. Asterisk will generate a ringing tone until the signalling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
+	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signaling. Asterisk will generate a ringing tone until the signaling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
 
 	defaultEmptyOK = false;
 	if (!isInteger(theForm.RINGTIMER.value))
