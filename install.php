@@ -24,7 +24,6 @@ _("User Logoff");
 _("ZapBarge");
 _("ChanSpy");
 _("Simulate Incoming Call");
-_("Dial System FAX");
 _("Directed Call Pickup");
 _("Asterisk General Call Pickup");
 _("In-Call Asterisk Blind Transfer");
@@ -96,12 +95,6 @@ unset($fcc);
 $fcc = new featurecode('core', 'simu_pstn');
 $fcc->setDescription('Simulate Incoming Call');
 $fcc->setDefault('7777');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'simu_fax');
-$fcc->setDescription('Dial System FAX');
-$fcc->setDefault('666');
 $fcc->update();
 unset($fcc);
 
