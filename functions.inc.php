@@ -645,6 +645,7 @@ function core_getdest($exten) {
 }
 
 function core_getdestinfo($dest) {
+  global $amp_conf;
 	global $active_modules;
 
 	// Check for Extension Number Destinations
