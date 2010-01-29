@@ -4500,6 +4500,13 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 	foreach ($patterns as $pattern) {
 		if (false !== ($pos = strpos($pattern,"|"))) {
+
+      // ticket #3998: the $pos above is incorrect if a range is included such as
+      // 9[0-3]|NXX.
+      // in this case we end up with EXTEN:6 instead of the correct EXTEN:2
+      //
+      $pos = strpos(preg_replace('/(\[[^\]]*\])/','X',$pattern),"|");
+
 			// we have a | meaning to not pass the digits on
 			// (ie, 9|NXXXXXX should use the pattern _9NXXXXXX but only pass NXXXXXX, not the leading 9)
 			
