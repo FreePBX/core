@@ -251,9 +251,9 @@ if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == 
 	$screen_call = $screen_call['data'];
 	if (strlen($screen_call)) {
 		if($screen_call == 'nomemory' && $cidnum != '')  { // This can't go in the dialplan because macro-dial can get called multiple times
-			// Do a security check, we only numeric callerid numbers, otherwise code could be injected in a cidnum field
+			// Do a security check, allow only alphanumeric callerid numbers, otherwise code could be injected in a cidnum field
 			// that could result in an arbitrary command being executed in this remove operation.
-			if (ctype_digit($cidnum)) {
+      if (!preg_match('/[^ a-zA-Z\d]/',$cidnum)) {
 				exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
 			}
 		}
