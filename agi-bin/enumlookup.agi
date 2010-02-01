@@ -19,6 +19,8 @@
 //    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
 //
 //    Copyright 2009 Rob Thomas
+//    Portions Copyright 2010 Mikael Carlsson
+//    Modified to use Google DNS
 //    Additional patch to support enum.conf by matka
 //
 //    Originally based on e164.org's enum.php script, available from
@@ -38,30 +40,35 @@
 require_once "phpagi.php";
 
 $AGI = new AGI();
+$enums = Array('e164.org','e164.arpa','e164.info');
+$dialstr = "";
 $lookup = get_var( $AGI, "DIAL_NUMBER" );
 
-$enums = Array('e164.org','e164.arpa','e164.info');
+@exec('dig -h > /dev/null 2>&1 ', $res, $var);
+if ($var != 127) { 
+    $diginstalled = 'true';
+    }
+// Are we going to use Google's DNS for ENUM? If not use standard DNS.
+// Note, for this to work you need to set USEGOOGLEDNSFORENUM = TRUE in amportal.conf
+$usegdns = get_var( $AGI, "ENUMUSEGOOGLEDNS" );
 
 // Go through the ENUM providers and look for the number.
-
-$dialstr = "";
-
 foreach ($enums as $enum) {
-	// Are we using php5 and can use get_dns_record?
-		if (function_exists("dns_get_record")) {
-			$arr = get_php5($lookup, $enum);
-	// else, do we have Pear Net DNS?
-	// Disabled, as I couldn't easily get it working on my machine
-	//} elseif ((@include 'Net/DNS.php') =='OK') {
-	//	$arr = get_pear($arpa);
-	} else {
-		@exec('dig -h > /dev/null 2>&1 ', $res, $var);
-		if ($var != 127) { 
-			$arr = get_dig($lookup, $enum);
-		} else {
-			$AGI->verbose("ENUM LOOKUPS DISABLED due to php5 not being installed AND no dig command", "0");
-		}
-	}
+// If we are using Google DNS, do not use php dns_get_record
+        if ($usegdns != "TRUE") {
+        // Are we using php5 and can use get_dns_record?
+          if (function_exists("dns_get_record")) {
+                  $arr = get_php5($lookup, $enum);
+                } else {
+                $AGI->verbose("ENUM lookup via php dns_get_record failed due to php5 not being installed", "0");
+                }
+         } else {
+                if($diginstalled) {
+                    $arr = get_dig($lookup, $enum);
+                } else {
+			$AGI->verbose("ENUM LOOKUPS DISABLED due to no dig command", "0");
+                }
+            }
 	if (isset($arr[0])) {
 		foreach($arr as $key => $row) {
 			$order[$key] = $row["order"];
@@ -85,13 +92,19 @@ $AGI->set_variable("DIALARR", $dialstr);
 
 function get_dig($lookup, $enum) {
 	global $AGI;
+        global $usegdns;
 
-	$AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);
-	$arpa = "";
-	for ($i = 0; $i < strlen($lookup); $i++) {
-		$arpa = $lookup[$i].".".$arpa;
-	}
-	$lines = trim(`/usr/bin/dig +short ${arpa}${enum} naptr`);
+        $arpa = "";
+        for ($i = 0; $i < strlen($lookup); $i++) {
+                $arpa = $lookup[$i].".".$arpa;
+        }
+        if ($usegdns == TRUE) {
+                $AGI->verbose("Looking up $lookup on $enum via shell command DIG and use google dns",3);
+                $lines = trim(`/usr/bin/dig @8.8.8.8 +short ${arpa}${enum} naptr`);
+        } else {
+                $AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);
+                $lines = trim(`/usr/bin/dig +short ${arpa}${enum} naptr`);
+        }
 	$lines = explode("\n", $lines);
 	foreach($lines as $line) {
 		$line = trim($line);

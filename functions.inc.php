@@ -2008,6 +2008,13 @@ function core_get_config($engine) {
 			 * 
 			 * Re-written to use enumlookup.agi
 			 */
+
+			// Is this the best place to put it in?
+			// Check if we are using Google DNS for ENUM-lookups,
+			// enable it as a global variable so we can use it in the agi
+			if($amp_conf['USEGOOGLEDNSFORENUM']) {
+			$ext->addGlobal('ENUMUSEGOOGLEDNS', 'TRUE');
+			}
 	
 			$context = 'macro-dialout-enum';
 			$exten = 's';
