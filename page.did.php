@@ -287,7 +287,7 @@ if (isset($inroutes)) {
 			</td>
 		</tr>	
 		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
-			<td><a href="#" class="info"><?php echo _("Min Length")?><span><?php echo _('Minimum amount of digits callerID needs to contain in order to be concidered valid')?></span></a>:</td>
+			<td><a href="#" class="info"><?php echo _("Min Length")?><span><?php echo _('Minimum amount of digits callerID needs to contain in order to be considered valid')?></span></a>:</td>
 			<td>
 				<select name="pmminlength" tabindex="<?php echo ++$tabindex;?>">
 					<?php
