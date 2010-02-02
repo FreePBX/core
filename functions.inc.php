@@ -2119,7 +2119,7 @@ function core_get_config($engine) {
       // $has_keepcid_cnum is checked and set when the globals are being generated above
       //
       if ($has_keepcid_cnum) {
-        $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(all)=${CALLERID(number)}'));
+        $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
       }
 
 
