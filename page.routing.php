@@ -95,16 +95,17 @@ $routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
 $emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
 $intracompany = isset($_REQUEST["intracompany"]) ? $_REQUEST["intracompany"] : "";
 $mohsilence = isset($_REQUEST["mohsilence"]) ? $_REQUEST["mohsilence"] : "";
+$routecid = isset($_REQUEST["routecid"]) ? $_REQUEST["routecid"] : "";
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence, $routecid);
 		needreload();
 		redirect_standard();
 	break;
 	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence, $routecid);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
@@ -267,6 +268,10 @@ if ($extdisplay) {
 	if (!isset($_REQUEST["mohsilence"])) {
 		$mohsilence = core_routing_getroutemohsilence($extdisplay);
 	}
+
+	if (!isset($_REQUEST["routecid"])) {
+		$routecid = core_routing_getroutecid($extdisplay);
+	}
 	
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
@@ -322,6 +327,12 @@ if ($extdisplay) { // editing
 			</td>
 <?php  } ?>
 		</tr>
+
+		<tr>
+			<td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<br />extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route<br />trunk CID if trunk is set to force it's CID<br />Follow-ME DID CIDs that are forced")?></a></td>
+			<td><input type="text" size="30" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/></td>
+		</tr>
+
 		<tr>
 			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>" tabindex="<?php echo ++$tabindex;?>"/></td>
@@ -627,6 +638,7 @@ function routeEdit_onsubmit(act) {
 	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
 	var msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
+	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
 	
 	var rname = theForm.routename.value;
 	if (!rname.match('^[a-zA-Z0-9][a-zA-Z0-9_\-]+$'))
@@ -635,6 +647,8 @@ function routeEdit_onsubmit(act) {
 	defaultEmptyOK = true;
 	if (!isInteger(theForm.routepass.value))
 		return warnInvalid(theForm.routepass, msgInvalidRoutePwd);
+	if (!isCallerID(theForm.routecid.value))
+		return warnInvalid(theForm.routecid, msgInvalidOutboundCID);
 	
 	defaultEmptyOK = false;
 	if (!isDialpattern(theForm.dialpattern.value))

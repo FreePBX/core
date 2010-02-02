@@ -362,11 +362,24 @@ if ($helptext != '') {
 				</td>
 			</tr>
 			<tr>
+
+	    <tr>
 				<td>
-					<a href="#" class="info"><?php echo _("Block Foreign CallerIDs")?><span><br><?php echo _("Some VoIP providers will drop the call if you try to send an invalid CallerID (one you don't 'own.' Use this to never send a CallerID that you haven't explicitly specified in this trunk or in the outbound callerid field of an extension/user. You might notice this problem if you discover that Follow-Me or RingGroups with external numbers don't work properly. Checking this box has the effect of disabling 'foreign' callerids from going out this trunk. You must define an Outbound Caller ID on the this trunk when checking this.");?><br /><br /></span></a>:
+					<a href="#" class="info"><?php echo _("CID Options")?><span><br><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: blocks any CID that is the result of a forwarded call from off the system. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID d efined for the extension/device.");?><br /><br /></span></a>:
 				</td><td>
-					<input type="checkbox" name="keepcid" <?php if ($keepcid=="on") {echo "checked";}?> tabindex="<?php echo ++$tabindex;?>"/>
+
+			    <select name="keepcid" tabindex="<?php echo ++$tabindex;?>">
+			    <?php
+				    $default = (isset($keepcid) ? $keepcid : 'off');
+				    echo '<option value="off"' . ($default == 'off'  ? ' SELECTED' : '').'>'._("Allow Any CID")."\n";
+				    echo '<option value="on"'  . ($default == 'on'   ? ' SELECTED' : '').'>'._("Block Foreign CIDs")."\n";
+				    echo '<option value="cnum"'. ($default == 'cnum' ? ' SELECTED' : '').'>'._("Remove CNAM")."\n";
+				    echo '<option value="all"' . ($default == 'all'  ? ' SELECTED' : '').'>'._("Force Trunk CID")."\n";
+			    ?>
+			    </select>
 				</td>
+      </tr>
+
 			<tr>
 				<td>
 <?php

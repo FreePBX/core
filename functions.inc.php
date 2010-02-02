@@ -1445,6 +1445,11 @@ function core_get_config($engine) {
 				FROM `trunks` ORDER BY `trunkid`
 			";
 			$trunks = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
+ 
+      // $has_keepcid_cnum is used when macro-outbound-callerid is generated to determine if we need to insert the
+      // final execif() statement so it is important to be set before then and here
+      //
+      $has_keepcid_cnum = false;
 			foreach ($trunks as $trunk) {
 				$tid = $trunk['trunkid'];
 				$tech = strtoupper($trunk['tech']);
@@ -1459,11 +1464,15 @@ function core_get_config($engine) {
 					$ext->addGlobal('OUT_'.$tid, $tech."/".$trunk['channelid']);
 				}
 				$ext->addGlobal('OUTCID_'.$tid,      $trunk['outcid']);
-				$ext->addGlobal('OUTKEEPCID_'.$tid,  $trunk['keepcid']);
 				$ext->addGlobal('OUTMAXCHANS_'.$tid, $trunk['maxchans']);
 				$ext->addGlobal('OUTFAIL_'.$tid,     $trunk['failscript']);
 				$ext->addGlobal('OUTPREFIX_'.$tid,   $trunk['dialoutprefix']);
 				$ext->addGlobal('OUTDISABLE_'.$tid,  $trunk['disabled']);
+				$ext->addGlobal('OUTKEEPCID_'.$tid,  $trunk['keepcid']);
+        $ext->addGlobal('FORCEDOUTCID_'.$tid, ($trunk['keepcid'] == 'all' ? $trunk['outcid'] : ""));
+        if ($trunk['keepcid'] == 'cnum') {
+          $has_keepcid_cnum = true;
+        }
 			}
 
 			// Generate macro-record-enable, if recording is disabled then we just make it a stub
@@ -1510,6 +1519,8 @@ function core_get_config($engine) {
 					// Don't set MOHCLASS if already set, threre may be a feature code that overrode it
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
+					if(strpos($exten['args'],"ROUTECID") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("TRUNKCIDOVERRIDE", '${IF($["${TRUNKCIDOVERRIDE}"=""]?'.substr($exten['args'],9).':${TRUNKCIDOVERRIDE})}' ));
 					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false || strpos($exten['args'],"dialout-dundi") !== false) {
 						if ($exten['extension'] !== $lastexten) {
 
@@ -2096,9 +2107,8 @@ function core_get_config($engine) {
 
 			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
 			$ext->add($context, $exten, 'usercid', new ext_execif('$["${USEROUTCID}" != ""]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
-      /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of an Emergency CID on an Emergency Route
-         FORCEDOUTCID_trunknum is not yet used. It's purpose will be to force a trunk to always use a specific CID in all conditions except when used in an emergency route.
-         An EMERGENCYCID present on an EMERGENCYROUTE will continue to take prcedence over all else.
+      /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of 
+       * an Emergency CID on an Emergency Route
        */
 			$ext->add($context, $exten, '', new ext_execif('$["${TRUNKCIDOVERRIDE}" != "" | "${FORCEDOUTCID_${ARG1}}" != ""]', 'Set', 'CALLERID(all)=${IF($["${FORCEDOUTCID_${ARG1}}"=""]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 			if ($ast_lt_16) { 
@@ -2106,7 +2116,12 @@ function core_get_config($engine) {
 			} else {
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES()=prohib_passed_screen'));
 			}
-			//$ext->add($context, $exten, 'checkname', new ext_execif('$[ $[ "${CALLERID(number)}" = "${REALCALLERIDNUM}" ] & $[ "${CALLERID(name)}" = "" ] ]', 'Set', 'CALLERID(name)=${REALCALLERIDNAME}'));
+      // $has_keepcid_cnum is checked and set when the globals are being generated above
+      //
+      if ($has_keepcid_cnum) {
+        $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(all)=${CALLERID(number)}'));
+      }
+
 
 			$context = 'from-zaptel';
 			$exten = '_X.';
@@ -4476,7 +4491,7 @@ function core_routing_setroutepriorityvalue($key)
 }
 
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "") {
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "") {
 
 	global $db;
 
@@ -4580,6 +4595,22 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 					   die_freepbx($result->getMessage());
 				}
 		}
+ 
+		// Next Priority (either first, second or third depending on above)
+		if(!empty($routecid)) {
+			   $startpriority += 1;
+			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
+			   $sql .= "('outrt-".$name."', ";
+			   $sql .= "'".$pattern."', ";
+			   $sql .= "'".$startpriority."', ";
+			   $sql .= "'SetVar', ";
+			   $sql .= "'ROUTECID=".$routecid."', ";
+			   $sql .= "'Force this CID for this Route')";
+			   $result = $db->query($sql);
+				if(DB::IsError($result)) {
+					   die_freepbx($result->getMessage());
+				}
+		}
 
 		$first_trunk = 1;
 		foreach ($trunks as $priority => $trunk) {
@@ -4665,9 +4696,9 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 }
 
-function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="") {
+function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="", $routecid = "") {
 	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence);
+	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence, $routecid);
 }
 
 function core_routing_del($name) {
@@ -4848,6 +4879,23 @@ function core_routing_getroutemohsilence($route) {
                $mohsilence = "";
        }
        return $mohsilence;
+}
+
+//get routecid routing status for this route
+function core_routing_getroutecid($route) {
+
+       global $db;
+       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'ROUTECID%') ";
+       $results = $db->getOne($sql);
+       if(DB::IsError($results)) {
+               die_freepbx($results->getMessage());
+       }
+       if (preg_match('/^.*=(.*)/', $results, $matches)) {
+               $routecid = $matches[1];
+       } else {
+               $routecid = "";
+       }
+       return $routecid;
 }
 
 
