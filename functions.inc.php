@@ -1511,7 +1511,6 @@ function core_get_config($engine) {
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 				$lastexten = false;
         $pri_noop = true;
-        freepbx_debug($thisrt);
 				foreach($thisrt as $exten) {
 					// Then do one call to user-callerid and record-enable instead of each time as in the past
           // macro-user-callerid moved to outbound-allroutes to obtain proper CID info which can be used
