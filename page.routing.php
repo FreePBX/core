@@ -376,7 +376,8 @@ if ($extdisplay) { // editing
    <strong>N</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br>
    <strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br>
    <strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters")?> <br>
-   <strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("separates a dialing prefix from the number (for example, 9|NXXXXXX would match when some dialed \"95551234\" but would only pass \"5551234\" to the trunks)")?>
+   <strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("separates a dialing prefix from the number (for example, 9|NXXXXXX would match when some dialed \"95551234\" but would only pass \"5551234\" to the trunks)")?><br />
+   <strong>/</strong>&nbsp;&nbsp;&nbsp; <?php echo _("appended to a dial pattern, matches a callerid or callerid pattern (for example, NXXXXXX/104 would match only if dialed by extension \"104\")")?>
 				</span></a>
 			</td>
 		</tr>

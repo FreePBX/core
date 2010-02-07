@@ -1504,13 +1504,23 @@ function core_get_config($engine) {
 			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes' ORDER BY application";
 			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
-			$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
+			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
 			foreach($outrts as $outrt) {
 				$ext->addInclude('outbound-allroutes',$outrt['application']);
 				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
 				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 				$lastexten = false;
+        $pri_noop = true;
+        freepbx_debug($thisrt);
 				foreach($thisrt as $exten) {
+					// Then do one call to user-callerid and record-enable instead of each time as in the past
+          // macro-user-callerid moved to outbound-allroutes to obtain proper CID info which can be used
+          // in more advanced routing
+					//
+					if ($pri_noop) {
+            $ext->add($outrt['application'], $exten['extension'], '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
+            $pri_noop = false;
+          }
 					//if emergencyroute, then set channel var
 					if(strpos($exten['args'],"EMERGENCYROUTE") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
@@ -1529,17 +1539,16 @@ function core_get_config($engine) {
 							// clear so a subsequent transfer to an internal extension works and goes to voicmail or other
 							// destinations.
 							//
-							// Then do one call to user-callerid and record-enable instead of each time as in the past
-							//
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('user-callerid,SKIPTTL'));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
 							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
 							$lastexten = $exten['extension'];
 						}
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
 					}
-					if(strpos($exten['args'],"outisbusy") !== false)
+					if(strpos($exten['args'],"outisbusy") !== false) {
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
+            $pri_noop = true;
+          }
 				}
 			}
 
