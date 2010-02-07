@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.7.0beta1.1</version>
+	<version>2.7.0beta1.2</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.7.0beta1.2* #3993 (#3934, #3889)
 		*2.7.0beta1.1* #4020, #2389, #3980, #3992, #3939, #333, #3721, #3185
 		*2.7.0beta1.0* #3882, #4000, #1718, #3927, #3805, #4007, #3998, #3951, sql injections fixes
 		*2.6.0.1* #3889 reverted, #3900, #3962, #2787, #3793, #3377, #3386, #3717
@@ -79,6 +80,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.7/core-2.7.0beta1.1.tgz</location>
-	<md5sum>3c64dbd90e2dab1a14c788fb019c8748</md5sum>
+	<location>release/2.7/core-2.7.0beta1.2.tgz</location>
+	<md5sum>5bc6d8eec1fb2ea73fb7be8637b98214</md5sum>
 </module>
