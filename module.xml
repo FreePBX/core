@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.7.0beta1.2</version>
+	<version>2.7.0beta1.3</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.7.0beta1.3* #4037
 		*2.7.0beta1.2* #3993 (#3934, #3889)
 		*2.7.0beta1.1* #4020, #2389, #3980, #3992, #3939, #333, #3721, #3185
 		*2.7.0beta1.0* #3882, #4000, #1718, #3927, #3805, #4007, #3998, #3951, sql injections fixes
