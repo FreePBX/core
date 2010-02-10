@@ -1853,7 +1853,6 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "1"]', 's-UNALLOC,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "17"]', 's-BUSY,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "18"]', 's-NOANSWER,1'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "19"]', 's-NOANSWER,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${RC}" = "28"]', 's-INVALIDNMBR,1'));
 
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTFAIL_${ARG1}}" = "x"]', 'noreport'));
