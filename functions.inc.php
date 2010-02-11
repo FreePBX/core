@@ -5639,7 +5639,7 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem($section, new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem($section, new gui_hidden('hardware', $devinfo_hardware));
 
-		if ($devinfo_tech != "virtual") {
+		if ($devinfo_tech && $devinfo_tech != "virtual") {
 			$section = _("Device Options");
 
 			$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDI compatibility mode").")":"");
