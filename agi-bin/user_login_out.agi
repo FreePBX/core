@@ -47,6 +47,7 @@
 	$astspooldir  = get_var( "ASTSPOOLDIR" );
 	$ast_version  = get_var("ASTVERSION");
 	$dnd_devstate = get_var( "DNDDEVSTATE" ) == "TRUE" ? true : false;
+	$cf_devstate = get_var( "CFDEVSTATE" ) == "TRUE" ? true : false;
 	$fm_devstate  = get_var( "FMDEVSTATE" ) == "TRUE" ? true : false;
 	$que_devstate = get_var( "QUEDEVSTATE" ) == "TRUE" ? true : false;
 	$intercom_code = get_var( "INTERCOMCODE" );
@@ -161,6 +162,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $astspooldir;
 		global $fm_devstate;
 		global $dnd_devstate;
+		global $cf_devstate;
 		global $que_devstate;
 		global $DEVSTATE;
 
@@ -192,6 +194,10 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			debug("insert_user: Setting DND DEVSTATES for device $device",5);
 			$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')',get_dnd_state($user));
 		}
+		if ($cf_devstate) {
+			debug("insert_user: Setting CF DEVSTATES for device $device",5);
+			$agi->set_variable($DEVSTATE.'(Custom:DEVCF'.$device.')',get_cf_state($user));
+		}
 
 		$vmcontext = get_voicemail_context($user);
 		if ($vmcontext != 'novm') {
@@ -211,6 +217,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $astspooldir;
 		global $fm_devstate;
 		global $dnd_devstate;
+		global $cf_devstate;
 		global $que_devstate;
 		global $DEVSTATE;
 
@@ -245,7 +252,11 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
                 	}
 			if ($dnd_devstate) {
 				debug("Setting device $device DND state to INVALID before deleting",5);
-				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','INVALID');
+				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','UNKNOWN');
+			}
+			if ($cf_devstate) {
+				debug("Setting device $device CF state to INVALID before deleting",5);
+				$agi->set_variable($DEVSTATE.'(Custom:DEVCF'.$device.')','UNKNOWN');
 			}
 			// I thought they should then be deleted, but they still end up there probably because setting them to invalid re-creates them
 			//
@@ -443,6 +454,23 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			}
 		}
 		debug("get_dnd_state: user $user got state ".$dnd_state['data']." returning $ret",8);
+		return $ret;
+	}
+
+	function get_cf_state($user) {
+		global $agi;
+
+		$cf_state = $agi->database_get('CF',$user);
+		if ($cf_state['result'] != 1) {
+			$ret = 'NOT_INUSE';
+		} else {
+			if (trim($cf_state['data']) == '') {
+				$ret = 'NOT_INUSE';
+			} else {
+				$ret = 'INUSE';
+			}
+		}
+		debug("get_cf_state: user $user got state ".$cf_state['data']." returning $ret",8);
 		return $ret;
 	}
 
