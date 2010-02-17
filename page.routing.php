@@ -356,7 +356,7 @@ if ($extdisplay) { // editing
 			<td>
 				<select name="mohsilence" tabindex="<?php echo ++$tabindex;?>">
 				<?php
-					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
+					$tresults = music_list();
 					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
 					if (isset($tresults[0])) {
 						foreach ($tresults as $tresult) {

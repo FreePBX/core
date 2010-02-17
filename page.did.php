@@ -238,7 +238,7 @@ if (isset($inroutes)) {
 			<td>
 				<select name="mohclass" tabindex="<?php echo ++$tabindex;?>">
 				<?php
-					$tresults = music_list($amp_conf['ASTVARLIBDIR']."/mohmp3");
+					$tresults = music_list();
 					$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
 //					echo '<option value="none">'._("No Music")."</option>";
 					if (isset($tresults[0])) {

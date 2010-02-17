@@ -3,12 +3,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.7.0beta1.4</version>
+	<version>2.7.0beta1.5</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.7.0beta1.5* #4051 (requires MoH 2.7.0.0 or above)
 		*2.7.0beta1.4* #4041, #4042, #4047 changes to support CF devstate in deviceanduser mode
 		*2.7.0beta1.3* #4037
 		*2.7.0beta1.2* #3993 (#3934, #3889)
