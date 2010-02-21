@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.7.0RC1.1* #4058
+		*2.7.0RC1.1* #4058, #4065, #4066
 		*2.7.0RC1.0* #4041, #4042, #4047, #4051 (requires MoH 2.7.0.0 or above)
 		*2.7.0beta1.3* #4037
 		*2.7.0beta1.2* #3993 (#3934, #3889)

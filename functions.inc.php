@@ -2637,7 +2637,148 @@ function core_get_config($engine) {
 			$ext->add('macro-vm','t','',new ext_hangup(''));
 
 			/* end macro-vm  */
-									
+
+      $mcontext = 'macro-exten-vm';
+      $exten = 's';
+
+			$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
+			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
+			$ext->add($mcontext,$exten,'', new ext_set("VMBOX", '${ARG1}'));
+			$ext->add($mcontext,$exten,'', new ext_set("EXTTOCALL", '${ARG2}'));
+			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
+			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
+			$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit,return'));
+			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
+			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!="" & "${SCREEN}"=""]','docfu,1'));
+			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
+			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
+			$ext->add($mcontext,$exten,'', new ext_noop('Voicemail is \'${VMBOX}\''));
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"="novm"]','s-${DIALSTATUS},1'));
+			$ext->add($mcontext,$exten,'', new ext_noop('Sending to Voicemail box ${EXTTOCALL}'));
+			$ext->add($mcontext,$exten,'', new ext_macro('vm','${VMBOX},${DIALSTATUS},${IVR_RETVM}'));
+
+      $exten = 'docfu';
+			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RTCFU},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+
+      $exten = 'docfb';
+			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RTCFB},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+
+      $exten = 's-BUSY';
+			$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting BUSY and not passing to Voicemail'));
+			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+			$ext->add($mcontext,$exten, '', new ext_playtones('busy'));
+			$ext->add($mcontext,$exten, '', new ext_busy(20));
+
+      $exten = '_s-.';
+			$ext->add($mcontext,$exten,'', new ext_noop('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}'));
+			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+			$ext->add($mcontext,$exten,'', new ext_playtones('congestion'));
+      $ext->add($mcontext,$exten,'', new ext_congestion('10'));
+
+      $exten = 'exit';
+      $ext->add($mcontext,$exten,'', new ext_playback('beep&line-busy-transfer-menu&silence/1'));
+      $ext->add($mcontext,$exten,'', new ext_macroexit());
+
+			/* macro-exten-vm  */
+
+
+      /*
+      ;------------------------------------------------------------------------
+      ; [macro-simple-dial]
+      ;------------------------------------------------------------------------
+      ; This macro was derived from macro-exten-vm, which is what is normally used to
+      ; ring an extension. It has been simplified and designed to never go to voicemail
+      ; and always return regardless of the DIALSTATUS for any incomplete call.
+      ;
+      ; It's current primary purpose is to allow findmefollow ring an extension prior
+      ; to trying the follow-me ringgroup that is provided.
+      ;
+      ; Ring an extension, if the extension is busy or there is no answer, return
+      ; ARGS: $EXTENSION, $RINGTIME
+      ;------------------------------------------------------------------------
+      */
+      $mcontext = 'macro-simple-dial';
+      $exten = 's';
+			$ext->add($mcontext,$exten,'', new ext_set("EXTTOCALL", '${ARG1}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${ARG2}'));
+			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
+			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
+			$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
+			$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+			$ext->add($mcontext,$exten,'', new ext_set("__CWIGNORE", '${CWI_TMP}'));
+			$ext->add($mcontext,$exten,'', new ext_set("PR_DIALSTATUS", '${DIALSTATUS}'));
+			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${PR_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!=""]','docfu,1'));
+			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${PR_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
+			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${PR_DIALSTATUS}'));
+			$ext->add($mcontext,$exten,'',new ext_goto('1','s-${DIALSTATUS}'));
+
+      /*
+      ; Try the Call Forward on No Answer / Unavailable number.
+      ; We want to try CFU if set, but we want the same ring timer as was set to our call (or do we want the
+      ; system ringtimer? - probably not). Then if no answer there (assuming it doesn't drop into their vm or
+      ; something we return, which will have the net effect of returning to the followme setup.)
+      ;
+      ; want to avoid going to other follow-me settings here. So check if the CFUEXT is a user and if it is
+      ; then direct it straight to ext-local (to avoid getting intercepted by findmefollow) otherwise send it
+      ; to from-internal since it may be an outside line.
+      ;
+      */
+      $exten = 'docfu';
+			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFUEXT}/device)}" = "" ]','chlocal'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+
+      $exten = 'docfb';
+			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFBEXT}/device)}" = "" ]','chlocal'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFBEXT}@${CONTEXT}/n', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_return(''));
+
+      /*
+      ; In all cases of no connection, come here and simply return, since the calling dialplan will
+      ; decide what to do next
+      */
+      $exten = '_s-.';
+			$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting ${EXTEN}'));
+
+			/* macro-simple-dial */
+
+
+      $mcontext = 'macro-hangupcall';
+      $exten = 's';
+      /*
+      ; Cleanup any remaining RG flag
+      */
+			$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]','skiprg'));
+			$ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+			$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+
+      /*
+      ; Cleanup any remaining BLKVM flag
+      */
+			$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]','skipblkvm'));
+			$ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
+			$ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
+
+      /*
+      ; Cleanup any remaining FollowMe DND flags
+      */
+			$ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
+			$ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
+			$ext->add($mcontext,$exten,'theend', new ext_hangup());
+
+			/* macro-hangupcall */
+
 		break;
 	}
 }
