@@ -83,6 +83,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.7/core-2.7.0RC1.0.tgz</location>
-	<md5sum>c83bb3b15a3e1f18924f4685d8452a74</md5sum>
+	<location>release/2.7/core-2.7.0RC1.1.tgz</location>
+	<md5sum>97b80fbfe8b9a256945014d5e0956c2a</md5sum>
 </module>
