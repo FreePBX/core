@@ -96,16 +96,17 @@ $emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
 $intracompany = isset($_REQUEST["intracompany"]) ? $_REQUEST["intracompany"] : "";
 $mohsilence = isset($_REQUEST["mohsilence"]) ? $_REQUEST["mohsilence"] : "";
 $routecid = isset($_REQUEST["routecid"]) ? $_REQUEST["routecid"] : "";
+$routecid_mode = isset($_REQUEST["routecid_mode"]) ? $_REQUEST["routecid_mode"] : "";
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence, $routecid);
+		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
 		needreload();
 		redirect_standard();
 	break;
 	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence, $routecid);
+		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
@@ -270,7 +271,15 @@ if ($extdisplay) {
 	}
 
 	if (!isset($_REQUEST["routecid"])) {
-		$routecid = core_routing_getroutecid($extdisplay);
+		$routecid_array = core_routing_getroutecid($extdisplay);
+    $routecid = $routecid_array['routecid'];
+	}
+
+	if (!isset($_REQUEST["routecid_mode"])) {
+    if (!isset($outecid_array)) {
+		  $routecid_array = core_routing_getroutecid($extdisplay);
+    }
+    $routecid_mode = $routecid_array['routecid_mode'];
 	}
 	
 	echo "<h2>"._("Edit Route")."</h2>";
@@ -329,8 +338,11 @@ if ($extdisplay) { // editing
 		</tr>
 
 		<tr>
-			<td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<br />extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route<br />trunk CID if trunk is set to force it's CID<br />Follow-ME DID CIDs that are forced")?></a></td>
-			<td><input type="text" size="30" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/></td>
+      <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<br />extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route<br />trunk CID if trunk is set to force it's CID<br />Follow-ME DID CIDs that are forced<br />Extension/User CIDs if checked")?></a></td>
+			<td>
+        <input type="text" size="30" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/>
+			  <input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='routecid_mode' id="routecid_mode" value='override_extension' <?php if ($routecid_mode == 'override_extension') { echo 'CHECKED'; }?>><small><?php echo _("Override Extension CID")?></small>
+      </td>
 		</tr>
 
 		<tr>
@@ -615,7 +627,7 @@ var theForm = document.routeEdit;
 if (theForm.routename.value == "") {
 	theForm.routename.focus();
 } else {
-	theForm.routepass.focus();
+	theForm.routecid.focus();
 }
 
 function showDisable(key) {

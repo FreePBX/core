@@ -1529,7 +1529,9 @@ function core_get_config($engine) {
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
 					if(strpos($exten['args'],"ROUTECID") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("TRUNKCIDOVERRIDE", '${IF($["${TRUNKCIDOVERRIDE}"=""]?'.substr($exten['args'],9).':${TRUNKCIDOVERRIDE})}' ));
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${TRUNKCIDOVERRIDE}"=""]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],9)));
+					if(strpos($exten['args'],"EXTEN_ROUTE_CID") !== false)
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/outboundcid)}"="" & "${TRUNKCIDOVERRIDE}"=""]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],16)));
 					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false || strpos($exten['args'],"dialout-dundi") !== false) {
 						if ($exten['extension'] !== $lastexten) {
 
@@ -4735,7 +4737,7 @@ function core_routing_setroutepriorityvalue($key)
 }
 
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "") {
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "", $routecid_mode = "") {
 
 	global $db;
 
@@ -4842,13 +4844,14 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
  
 		// Next Priority (either first, second or third depending on above)
 		if(!empty($routecid)) {
+      $mode = ($routecid_mode == 'override_extension' ? 'ROUTECID':'EXTEN_ROUTE_CID');
 			   $startpriority += 1;
 			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
 			   $sql .= "('outrt-".$name."', ";
 			   $sql .= "'".$pattern."', ";
 			   $sql .= "'".$startpriority."', ";
 			   $sql .= "'SetVar', ";
-			   $sql .= "'ROUTECID=".$routecid."', ";
+			   $sql .= "'$mode=".$routecid."', ";
 			   $sql .= "'Force this CID for this Route')";
 			   $result = $db->query($sql);
 				if(DB::IsError($result)) {
@@ -4940,9 +4943,9 @@ function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency 
 	
 }
 
-function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="", $routecid = "") {
+function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="", $routecid = "", $routecid_mode) {
 	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence, $routecid);
+	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
 }
 
 function core_routing_del($name) {
@@ -5127,19 +5130,21 @@ function core_routing_getroutemohsilence($route) {
 
 //get routecid routing status for this route
 function core_routing_getroutecid($route) {
+  global $db;
 
-       global $db;
-       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'ROUTECID%') ";
-       $results = $db->getOne($sql);
-       if(DB::IsError($results)) {
-               die_freepbx($results->getMessage());
-       }
-       if (preg_match('/^.*=(.*)/', $results, $matches)) {
-               $routecid = $matches[1];
-       } else {
-               $routecid = "";
-       }
-       return $routecid;
+  $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'ROUTECID%' OR args LIKE 'EXTEN_ROUTE_CID%') ";
+  $results = $db->getOne($sql);
+  if(DB::IsError($results)) {
+    die_freepbx($results->getMessage());
+  }
+  if (preg_match('/^(.*)=(.*)/', $results, $matches)) {
+    $routecid = $matches[2];
+    $routecid_mode = $matches[1] == 'ROUTECID' ? 'override_extension':'';
+  } else {
+    $routecid = '';
+    $routecid_mode = '';
+  }
+  return array('routecid' => $routecid, 'routecid_mode' => $routecid_mode);
 }
 
 
