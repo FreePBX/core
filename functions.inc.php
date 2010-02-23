@@ -2651,7 +2651,11 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
-			$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      if ($amp_conf['USEDIALONE']) {
+			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      } else {
+			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      }
 			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit,return'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
 			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!="" & "${SCREEN}"=""]','docfu,1'));
@@ -2664,12 +2668,12 @@ function core_get_config($engine) {
 
       $exten = 'docfu';
 			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RTCFU},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RTCFU},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 'docfb';
 			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RTCFB},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 's-BUSY';
@@ -2713,7 +2717,11 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
-			$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      if ($amp_conf['USEDIALONE']) {
+			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      } else {
+			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+      }
 			$ext->add($mcontext,$exten,'', new ext_set("__CWIGNORE", '${CWI_TMP}'));
 			$ext->add($mcontext,$exten,'', new ext_set("PR_DIALSTATUS", '${DIALSTATUS}'));
 			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${PR_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!=""]','docfu,1'));
@@ -2736,14 +2744,14 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFUEXT}/device)}" = "" ]','chlocal'));
 			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
-			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFUEXT}@${CONTEXT}/n', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RT},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 'docfb';
 			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFBEXT}/device)}" = "" ]','chlocal'));
 			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
-			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFBEXT}@${CONTEXT}/n', '${RT},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'chlocal', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RT},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       /*
@@ -2769,17 +2777,158 @@ function core_get_config($engine) {
       ; Cleanup any remaining BLKVM flag
       */
 			$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]','skipblkvm'));
-			$ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
-			$ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
+        $ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
+        $ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
 
-      /*
-      ; Cleanup any remaining FollowMe DND flags
-      */
-			$ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
-			$ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
-			$ext->add($mcontext,$exten,'theend', new ext_hangup());
+        /*
+        ; Cleanup any remaining FollowMe DND flags
+        */
+        $ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
+        $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
+        $ext->add($mcontext,$exten,'theend', new ext_hangup());
 
-			/* macro-hangupcall */
+        /* macro-hangupcall */
+
+  /*
+  ; macro-dial-one
+  ;
+  TODO: This is still experimental and has not yet been fully tested. Feedback in using/testing it is welcome and we will be reponsive in
+        fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
+        un-documented USEMACRODIALONE = true flag.
+  */
+        $mcontext = 'macro-dial-one';
+        $exten = 's';
+
+        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${ARG3}'));
+        $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS_CW', ''));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${FROM_DID}"!="" & "${SCREEN}"="" & "${DB(AMPUSER/${DEXTEN}/screen)}"!=""]','screen,1'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${DB(CF/${DEXTEN})}"!=""]','cf,1'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"="#" | "${DB(DND/${DEXTEN})}"=""]','skip1'));
+        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', ''));
+        $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'BUSY'));
+        $ext->add($mcontext,$exten,'skip1', new ext_gotoif('$["${DEXTEN}"=""]','nodial'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"="#"]','continue'));
+        $ext->add($mcontext,$exten,'', new ext_set('EXTHASCW', '${IF($["${CWIGNORE}"!=""]?"":${DB(CW/${DEXTEN})})}'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!="" | "${DB(CFU/${DEXTEN})}"!=""]','next1','cwinusebusy'));
+
+        $ext->add($mcontext,$exten,'next1', new ext_gotoif('$["${DB(CFU/${DEXTEN})}"!="" & ("${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN")]','docfu','skip3'));
+        $ext->add($mcontext,$exten,'docfu', new ext_set('DEXTEN', ''));
+        $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'NOANSWER'));
+        $ext->add($mcontext,$exten,'',new ext_goto('nodial'));
+        $ext->add($mcontext,$exten,'skip3', new ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!=""]','next2','continue'));
+        $ext->add($mcontext,$exten,'next2', new ext_gotoif('$["${EXTENSION_STATE(${DEXTEN})"="NOT_INUSE" | "${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN"]','continue'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CFB/${DEXTEN})}"!="" & "${CFIGNORE}"=""]', 'Set', 'DEXTEN=${DEXTEN}#'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${EXTHASCW}"!="" | "${DEXTEN:-1}"="#"]','continue'));
+        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', ''));
+        $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'BUSY'));
+        $ext->add($mcontext,$exten,'', new ext_goto('nodial'));
+        $ext->add($mcontext,$exten,'cwinusebusy', new ext_gotoif('$["${EXTHASCW}"!="" & "${CWINUSEBUSY}"!=""]','next3','continue'));
+        $ext->add($mcontext,$exten,'next3', new ext_execif('$["${EXTENSION_STATE(${DEXTEN})}"!="UNAVAILABLE" & "${EXTENSION_STATE(${DEXTEN})}"!="NOT_INUSE" & "${EXTENSION_STATE(${DEXTEN})}"!="UNKNOWN"]', 'Set', 'DIALSTATUS_CW=BUSY'));
+        $ext->add($mcontext,$exten,'continue', new ext_gotoif('$["${DEXTEN}"=""]','nodial'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${DEXTEN:-1}"!="#"]','dstring,1','dlocal,1'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"!="#"]','skiptrace'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$[${REGEX("^[\+]?[0-9]+$" ${CALLERID(number)})} = 1]','ctset,1','ctclear,1'));
+        //TODO: do we need to check for anything beyond auto-blkvm in this call path?
+        $ext->add($mcontext,$exten,'skiptrace', new ext_set('D_OPTIONS', '${IF($["${NODEST}"!="" & ${REGEX("(M[(]auto-blkvm[)])" ${ARG2})} != 1]?${ARG2}M(auto-blkvm):${ARG2})}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader', 'Alert-Info: ${CUT(ALERT_INFO,:,2-)}'));
+        //TODO: Do I need to  re-propagage anything from ${SIPADDHEADER} ?
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'SetMusicOnHold', '${MOHCLASS}'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${QUEUEWAIT}"!=""]','qwait,1'));
+        $ext->add($mcontext,$exten,'', new ext_set('__CWIGNORE', '${CWIGNORE}'));
+        $ext->add($mcontext,$exten,'', new ext_set('__KEEPCID', 'TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""]','s-${DIALSTATUS},1'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit());
+        $ext->add($mcontext,$exten,'nodial', new ext_execif('$["${DIALSTATUS}" = ""]', 'Set', 'DIALSTATUS=NOANSWER'));
+        $ext->add($mcontext,$exten,'', new ext_noop('Returned from dial-one with nothing to call and DIALSTATUS: ${DIALSTATUS}'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit());
+
+        $exten = 'h';
+        $ext->add($mcontext, $exten, '', new ext_macro('hangupcall'));
+
+        $exten = 'screen';
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${DEXTEN}/screen)}"!="nomemory" | "${CALLERID(number)}"=""]','memory'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$[${REGEX("^[0-9a-zA-Z ]+$" ${CALLERID(number)})} = 1]', 'System', 'rm -f $(ASTVARLIBDIR}/sounds/priv-callerintros/${CALLERID(number)}.*'));
+        $ext->add($mcontext,$exten,'memory', new ext_set('__SCREEN', '${DB(AMPUSER/${DEXTEN}/screen)}'));
+        $ext->add($mcontext,$exten,'', new ext_set('__SCREEN_EXTEN', '${DEXTEN}'));
+        $ext->add($mcontext,$exten,'', new ext_set('ARG2', '${ARG2}p'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'cf';
+        $ext->add($mcontext,$exten,'', new ext_set('CFAMPUSER', '${IF($["${AMPUSER}"=""]?${CALLERID(number)}:${AMPUSER})}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CF/${DEXTEN})}"="${CFAMPUSER}" | "${DB(CF/${DEXTEN})}"="${REALCALLERIDNUM}" | "${CUT(CUT(BLINDTRANSFER,-,1),/,1)}" = "${DB(CF/${DEXTEN})}" | "${DEXTEN}"="${DB(CF/${DEXTEN})}"]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#":"")}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DEXTEN}"!=""]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'NOANSWER'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'qwait';
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${SAVEDCIDNAME}" = ""]', 'Set', '__SAVEDCIDNAME=${CALLERID(name)}'));
+        $ext->add($mcontext,$exten,'', new ext_set('CALLERID(name)', 'M${ELAPSED}:${SAVEDCIDNAME}'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'ctset';
+        $ext->add($mcontext,$exten,'', new ext_set('DB(CALLTRACE/${DEXTEN})', '${CALLERID(number)}'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'ctclear';
+        $ext->add($mcontext,$exten,'', new ext_dbdel('CALLTRACE/${DEXTEN}'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'dstring';
+        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', ''));
+        $ext->add($mcontext,$exten,'', new ext_set('DEVICES', '${DB(AMPUSER/${DEXTEN}/device)}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DEVICES}"="" ]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_set('LOOPCNT', '${FIELDQTY(DEVICES,&)}'));
+        $ext->add($mcontext,$exten,'', new ext_set('ITER', '1'));
+        $ext->add($mcontext,$exten,'begin', new ext_set('THISDIAL', '${DB(DEVICE/${CUT(DEVICES,&,${ITER})}/dial)}'));
+        if ($chan_dahdi) {
+          $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ASTCHANDAHDI}" != ""]','zap2dahdi,1'));
+        }
+        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
+        $ext->add($mcontext,$exten,'', new ext_set('ITER', '$[${ITER}+1]'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]','begin'));
+        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING:0:$[${LEN(${DSTRING})}-1]}'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 'dlocal';
+        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', 'Local/${DEXTEN:0:${MATH(${LEN(${DEXTEN})}-1,int)}}@from-internal/n'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        if ($chan_dahdi) {
+          $exten = 'zap2dahdi';
+          $ext->add($mcontext,$exten,'', new ext_execif('$["${THISDIAL}" = ""]', 'Return'));
+          $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', ''));
+          $ext->add($mcontext,$exten,'', new ext_set('LOOPCNT2', '${FIELDQTY(THISDIAL,&)}'));
+          $ext->add($mcontext,$exten,'', new ext_set('ITER2', '1'));
+          $ext->add($mcontext,$exten,'begin2', new ext_set('THISPART', '${CUT(THISDIAL,&,${ITER})}'));
+          $ext->add($mcontext,$exten,'', new ext_execif('$["${THISPART:0:3}" = "ZAP"]', 'Set','THISPART=DAHDI${THISPART:3}'));
+          $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', '${NEWDIAL}${THISPART}&'));
+          $ext->add($mcontext,$exten,'', new ext_set('ITER2', '$[${ITER2} + 1]'));
+          $ext->add($mcontext,$exten,'', new ext_gotoif('$[${ITER2} <= ${LOOPCNT2}]','begin2'));
+          $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${NEWDIAL:0:$[${LEN(${NEWDIAL})}-1]}'));
+          $ext->add($mcontext,$exten,'', new ext_return(''));
+        }
+
+        $exten = 's-NOANSWER';
+        $ext->add($mcontext,$exten,'', new ext_macro('vm','${SCREEN_EXTEN},BUSY,${IVR_RETVM}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
+        $ext->add($mcontext,$exten,'', new ext_return(''));
+
+        $exten = 's-TORTURE';
+        $ext->add($mcontext,$exten,'', new ext_goto('1','musiconhold','app-blackhole'));
+        $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
+
+        $exten = 's-DONTCALL';
+			  $ext->add($mcontext,$exten,'', new ext_answer(''));
+			  $ext->add($mcontext,$exten,'', new ext_wait('1'));
+			  $ext->add($mcontext,$exten,'', new ext_zapateller(''));
+        $ext->add($mcontext,$exten,'', new ext_playback('ss-noservice'));
+        $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
+
+        /* macro-dial-one */
 
 		break;
 	}
