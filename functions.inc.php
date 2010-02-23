@@ -1532,9 +1532,9 @@ function core_get_config($engine) {
 					if(strpos($exten['args'],"MOHCLASS") !== false)
 						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
 					if(strpos($exten['args'],"ROUTECID") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${TRUNKCIDOVERRIDE}"=""]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],9)));
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],9)));
 					if(strpos($exten['args'],"EXTEN_ROUTE_CID") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/outboundcid)}"="" & "${TRUNKCIDOVERRIDE}"=""]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],16)));
+						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],16)));
 					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false || strpos($exten['args'],"dialout-dundi") !== false) {
 						if ($exten['extension'] !== $lastexten) {
 
