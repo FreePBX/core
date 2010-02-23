@@ -1421,7 +1421,10 @@ function core_get_config($engine) {
 				$response = $astman->send_request('Command', array('Command' => 'module show like func_extstate'));
 				if (preg_match('/1 modules loaded/', $response['data'])) {
 					$ext->addGlobal('HAS_EXTENSION_STATE', 'TRUE');
-				}
+          $has_extension_state = true;
+				} else {
+          $has_extension_state = false;
+        }
 			}
 
 			// Let's create globals for each trunk to determine which one's have fixlocalprefix settings.
@@ -2651,7 +2654,8 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
-      if ($amp_conf['USEDIALONE']) {
+
+      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2717,7 +2721,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
-      if ($amp_conf['USEDIALONE']) {
+      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2777,25 +2781,27 @@ function core_get_config($engine) {
       ; Cleanup any remaining BLKVM flag
       */
 			$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]','skipblkvm'));
-        $ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
-        $ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
+      $ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
+      $ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
 
-        /*
-        ; Cleanup any remaining FollowMe DND flags
-        */
-        $ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
-        $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
-        $ext->add($mcontext,$exten,'theend', new ext_hangup());
+      /*
+      ; Cleanup any remaining FollowMe DND flags
+      */
+      $ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
+      $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
+      $ext->add($mcontext,$exten,'theend', new ext_hangup());
 
-        /* macro-hangupcall */
+      /* macro-hangupcall */
 
-  /*
-  ; macro-dial-one
-  ;
-  TODO: This is still experimental and has not yet been fully tested. Feedback in using/testing it is welcome and we will be reponsive in
-        fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
-        un-documented USEMACRODIALONE = true flag.
-  */
+      /*
+      ; macro-dial-one
+      ;
+      TODO: This is still experimental and has not yet been fully tested. Feedback in using/testing it is welcome and we will be reponsive in
+            fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
+            un-documented USEMACRODIALONE = true flag.
+      */
+      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
+
         $mcontext = 'macro-dial-one';
         $exten = 's';
 
@@ -2850,7 +2856,7 @@ function core_get_config($engine) {
 
         $exten = 'screen';
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${DEXTEN}/screen)}"!="nomemory" | "${CALLERID(number)}"=""]','memory'));
-        $ext->add($mcontext,$exten,'', new ext_execif('$[${REGEX("^[0-9a-zA-Z ]+$" ${CALLERID(number)})} = 1]', 'System', 'rm -f $(ASTVARLIBDIR}/sounds/priv-callerintros/${CALLERID(number)}.*'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$[${REGEX("^[0-9a-zA-Z ]+$" ${CALLERID(number)})} = 1]', 'System', 'rm -f ${ASTVARLIBDIR}/sounds/priv-callerintros/${CALLERID(number)}.*'));
         $ext->add($mcontext,$exten,'memory', new ext_set('__SCREEN', '${DB(AMPUSER/${DEXTEN}/screen)}'));
         $ext->add($mcontext,$exten,'', new ext_set('__SCREEN_EXTEN', '${DEXTEN}'));
         $ext->add($mcontext,$exten,'', new ext_set('ARG2', '${ARG2}p'));
@@ -2929,6 +2935,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
 
         /* macro-dial-one */
+      }
 
 		break;
 	}
