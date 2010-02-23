@@ -180,6 +180,12 @@ foreach ($tresults as $tresult) {
 			$tresult['tech'] = 'iax';
 		case 'zap':
 		case 'dahdi':
+			$label = substr($tresult['name'],0,15);
+      if (trim($label) == '') {
+        $label = sprintf(_('Channel %s'),substr($tresult['channelid'],0,15));
+      }
+			$label .= " (".$tresult['tech'].")";
+			break;
 		case 'sip':
 		case 'iax':
 		case 'custom':
@@ -267,11 +273,12 @@ if (!$tech && !$extdisplay) {
 			}
 			unset($temp);
 		}
-
 		$upper_tech = strtoupper($tech);
+    if (trim($trunk_name) == '') {
+		  $trunk_name = ($upper_tech == 'ZAP'|$upper_tech == 'DAHDI'?sprintf(_('%s Channel %s'),$upper_tech,$channelid):$channelid);
+    }
 		echo "<h2>".sprintf(_("Edit %s Trunk"),$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility Mode").")":"")."</h2>";
-		$tname = $trunk_name != '' ? $trunk_name : $channelid;
-		$tlabel = sprintf(_("Delete Trunk %s"),substr($tname,0,20));
+		$tlabel = sprintf(_("Delete Trunk %s"),substr($trunk_name,0,20));
 		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
 		<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=deltrunk"><?php echo $label ?></a></p>
