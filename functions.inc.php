@@ -2591,7 +2591,7 @@ function core_get_config($engine) {
 			// If the user has a 0 option defined, use that for operator zero-out from within voicemail
 			// as well to keep it consistant with the menu structure
 			//
-			$ext->add('macro-vm','o','',new ext_background('one-moment-please'));
+			$ext->add('macro-vm','o','',new ext_playback('one-moment-please'));
 			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
 			$ext->add('macro-vm','o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
 			$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/context)}" = "1"]','opcontext'));
