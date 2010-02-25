@@ -1483,6 +1483,7 @@ function core_get_config($engine) {
 			//
 			$context = 'macro-record-enable';
 			$exten = 's';
+
 			if ($disable_recording) {
 				$ext->add($context, $exten, '', new ext_macroexit());
 			} else {
@@ -1494,12 +1495,36 @@ function core_get_config($engine) {
 				} else {
 					$ext->add($context, $exten, '', new ext_stopmonitor());
 				}
-
+			  $ext->add($context, $exten, 'check', new ext_execif('$["${ARG1}"=""]','MacorExit'));
+				$ext->add($context, $exten, '', new ext_gotoif('$["${ARG2}"="Group"]', 'Group','OUT'));
+			  $ext->add($context, $exten, 'Group', new ext_set('LOOPCNT','${FIELDQTY(ARG1,-)}'));
+			  $ext->add($context, $exten, '', new ext_set('ITER','1'));
+			  $ext->add($context, $exten, 'begin', new ext_set('RECSET','"${DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording)}"'));
+				$ext->add($context, $exten, '', new ext_gotoif('$["${RECSET}"="" | "${CUT(RECSET,\\\\\|,2):3}" != "Always"]', 'continue'));
+			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})'));
+			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${TEXTEN}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','g${TEXTEN}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+			  $ext->add($context, $exten, '', new ext_goto('record'));
+			  $ext->add($context, $exten, 'continue', new ext_set('ITER','$[${ITER}+1]'));
+				$ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
+				$ext->add($context, $exten, 'OUT', new ext_gotoif('$["${ARG2}"="IN"]', 'IN'));
+			  $ext->add($context, $exten, '', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,1):4}" != "Always"]','MacorExit'));
+			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','OUT${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+			  $ext->add($context, $exten, '', new ext_goto('record'));
+			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacorExit'));
+			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','IN${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
+				$ext->add($context, $exten, '', new ext_macroexit());
+        /*
 				$ext->add($context, $exten, 'check', new ext_agi('recordingcheck,${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)},${UNIQUEID}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
 				// keep this 999 in case people have issues updating their recording script
 				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'),'1',998);
+        */
 			}
+
 
 			/* outbound routes */
 			// modules should use their own table for storage (and module_get_config() to add dialplan)

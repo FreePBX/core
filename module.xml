@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.7.0RC1.5* #4075, #4078
+		*2.7.0RC1.5* #4075, #4078, #4080
 		*2.7.0RC1.4* #4072
 		*2.7.0RC1.3* #4068, (#4069 available but not used)
 		*2.7.0RC1.2* #4067
