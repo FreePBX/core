@@ -216,24 +216,26 @@ $routepriority = core_routing_getroutenames();
 $positions=count($routepriority);
 foreach ($routepriority as $tresult) {
 	$key++;
-		echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult[0] ? 'class="current"':'') .
-			" href=\"config.php?display=" . 
-			urlencode($display)."&amp;extdisplay=" . 
-			urlencode($tresult[0]) . "\">$key " . substr($tresult[0],4)."</a>\n";
+	echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult[0] ? 'class="current"':'') .
+		" href=\"config.php?display=" . 
+		urlencode($display)."&amp;extdisplay=" . 
+		urlencode($tresult[0]) . "\">$key " . substr($tresult[0],4)."</a>\n";
 
-		if ($key > 0)
-			echo "\t\t<img src=\"images/scrollup.gif\" onclick=\"repositionRoute('$key','up')\" alt='" .  _("Move Up") .
-				"' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
-		else
-			echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+	if ($key > 0) {
+		echo "\t\t<img src=\"images/scrollup.gif\" onclick=\"repositionRoute('$key','up')\" alt='" .  _("Move Up") .
+			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+  } else {
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+  }
 
-		// move down
-		if ($key < ($positions-1))
-			echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key>','down')\" alt='" . _("Move Down") .
-				"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
-		else 
-			echo "\t\t<img src='images/blank.gif' style='loat:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
-			echo "\t</li>\n";
+	// move down
+	if ($key < ($positions-1)) {
+		echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key>','down')\" alt='" . _("Move Down") .
+			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+  } else {
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+  }
+		echo "\t</li>\n";
 } // foreach
 ?>
 </ul>
@@ -340,7 +342,7 @@ if ($extdisplay) { // editing
 		<tr>
       <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></a></td>
 			<td>
-        <input type="text" size="30" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/>
+        <input type="text" size="20" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/>
 			  <input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='routecid_mode' id="routecid_mode" value='override_extension' <?php if ($routecid_mode == 'override_extension') { echo 'CHECKED'; }?>><small><?php echo _("Override Extension CID")?></small>
       </td>
 		</tr>
