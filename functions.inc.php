@@ -1417,13 +1417,12 @@ function core_get_config($engine) {
 			// can use (and any other AGI script) to determine that this function exists and not connect
 			// to the manager to get the information
 			//
+      $has_extension_state = !$ast_lt_16;
 			if ($ast_ge_14 && $ast_lt_16) {
 				$response = $astman->send_request('Command', array('Command' => 'module show like func_extstate'));
 				if (preg_match('/1 modules loaded/', $response['data'])) {
 					$ext->addGlobal('HAS_EXTENSION_STATE', 'TRUE');
           $has_extension_state = true;
-				} else {
-          $has_extension_state = false;
         }
 			}
 
@@ -2658,7 +2657,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
-      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
+      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2724,7 +2723,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
-      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
+      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2803,7 +2802,7 @@ function core_get_config($engine) {
             fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
             un-documented USEMACRODIALONE = true flag.
       */
-      if ($amp_conf['USEDIALONE'] && $ast_ge_14 && (!$ast_lt_16 || $has_extension_state)) {
+      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
 
         $mcontext = 'macro-dial-one';
         $exten = 's';
