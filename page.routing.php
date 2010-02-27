@@ -338,7 +338,7 @@ if ($extdisplay) { // editing
 		</tr>
 
 		<tr>
-      <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li<li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></a></td>
+      <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></a></td>
 			<td>
         <input type="text" size="30" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/>
 			  <input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='routecid_mode' id="routecid_mode" value='override_extension' <?php if ($routecid_mode == 'override_extension') { echo 'CHECKED'; }?>><small><?php echo _("Override Extension CID")?></small>
