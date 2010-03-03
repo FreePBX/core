@@ -1513,7 +1513,7 @@ function core_get_config($engine) {
 			  $ext->add($context, $exten, '', new ext_goto('record'));
 			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacroExit'));
 			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${ARG1}'));
-			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','IN${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
 				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
 			}
@@ -1871,12 +1871,14 @@ function core_get_config($engine) {
 			$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+			$ext->add($context, '_X', '', new ext_goto('1','continue'));
 			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
@@ -1992,11 +1994,14 @@ function core_get_config($engine) {
 			$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+			$ext->add($context, '_X', '', new ext_goto('1','continue'));
+			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
@@ -2157,12 +2162,14 @@ function core_get_config($engine) {
 			$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
 			$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+			$ext->add($context, '_X', '', new ext_goto('1','continue'));
 			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));

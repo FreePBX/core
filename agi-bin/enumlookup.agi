@@ -89,6 +89,9 @@ foreach ($enums as $enum) {
 
 $AGI->verbose("Setting DIALARR to $dialstr", 3);
 $AGI->set_variable("DIALARR", $dialstr);
+if ($dialstr == '') {
+  $AGI->set_variable("DIALSTATUS", 'CONGESTION');
+}
 
 function get_dig($lookup, $enum) {
 	global $AGI;

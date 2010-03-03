@@ -3,12 +3,14 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.7.0.0</version>
+	<version>2.7.0.2</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.7.0.2* really fix #4092
+		*2.7.0.1* #4093, #4094, #4095, #4092
 		*2.7.0.0* minor tweaks
 		*2.7.0RC1.5* #4075, #4078, #4080, #4053
 		*2.7.0RC1.4* #4072
@@ -88,6 +90,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.7/core-2.7.0.0.tgz</location>
-	<md5sum>3522f98af640c18c93dfa5408b93e72e</md5sum>
+	<location>release/2.7/core-2.7.0.2.tgz</location>
+	<md5sum>c88b6602cbea40c99bbaa0920bec41b9</md5sum>
 </module>
