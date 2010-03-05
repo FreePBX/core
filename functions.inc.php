@@ -1574,6 +1574,79 @@ function core_get_config($engine) {
 				}
 			}
 
+if (false) { // new outbound routes
+			$ext->addInclude('from-internal-additional','outbound-allroutes');
+			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
+      $routes = core_routing_list();
+      $trunk_table = core_trunks_listbyid();
+      foreach ($routes as $route) {
+        $context = 'outrt-'.$route['route_id'];
+        if (function_exists('timeconditions_timegroups_get_times') && $route['time_group_id'] !== null) {
+          $times = timeconditions_timegroups_get_times($route['time_group_id']);
+          if (is_array($times) && count($times)) {
+            foreach ($times as $time) {
+              $ext->addInclude('outbound-allroutes',$context.'|'.$time[1]);
+            }
+          } else {
+            $ext->addInclude('outbound-allroutes',$context);
+          }
+        } else {
+          $ext->addInclude('outbound-allroutes',$context);
+        }
+
+        $patterns = core_routing_getroutepatternsbyid($route_id);
+        $trunks = core_routing_getroutetrunksbyid($route_id);
+
+        foreach ($patterns as $pattern) {
+          $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+          $ext->add($context, $exten, '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
+          if ($route['emergencyy_route'] != '') {
+						$ext->add($context, $exten, '', new ext_setvar("EMERGENCYROUTE",$route['emergencyy_route']));
+          }
+          if ($route['intra_company_route'] != '') {
+						$ext->add($context, $exten, '', new ext_setvar("INTRACOMPANYROUTE",$route['intra_company_route']));
+          }
+          if ($route['mohclass'] != '') {
+						$ext->add($context, $exten, '', new ext_setvar("MOHCLASS", '${IF($["${MOHCLASS}"=""]?'.$route['mohclass'].':${MOHCLASS})}' ));
+          }
+          if ($route['outcid'] != '') {
+            if ($route['outcid_override_exten'] != '') {
+						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['routecid']));
+            } else {
+						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['routecid']));
+            }
+          }
+          $ext->add($context, $exten, '', new ext_setvar("_NODEST",""));
+          $ext->add($context, $exten, '', new ext_macro('record-enable,${AMPUSER},OUT'));
+
+          // ticket #3998: the $pos is incorrect if a range is included such as
+          // 9[0-3]|NXX.
+          // in this case we end up with EXTEN:6 instead of the correct EXTEN:2
+          //
+          $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$route['match_pattern_prefix']));
+          $pos = $pos == 0 ? '':':'.$pos;
+
+          $password = $route['password'];
+          foreach ($trunks as $trunk_id) {
+            if (isset($trunk_table[$trunk_id])) switch($trunk_table[$trunk_id]) {
+            case 'dundi':
+              $trunk_macro = 'dialout-enum';
+              break;
+            case 'enum':
+              $trunk_macro = 'dialout-dundi';
+              break;
+            default:
+              $trunk_macro = 'dialout-trunk';
+              break;
+            }
+					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$route['prepend_digits'].'${EXTEN'.$pos.'},'.$password));
+            $password = '';
+          }
+          $ext->add($context, $exten, '', new ext_macro("outisbusy"));
+        }
+      }
+} // new outbound routes
+
 			general_generate_indications();
 
 			// "blackhole" destinations
@@ -4458,6 +4531,15 @@ function core_trunks_getDetails($trunkid='') {
 	return $trunk;
 }
 
+function core_trunks_listbyid() {
+  $result = sql('SELECT * from `trunks` ORDER BY `trunkid`');
+  $trunk_list = array();
+  foreach ($result as $trunk) {
+    $trunk_list[$trunk['trunkid']] = $trunk;
+  }
+  return $trunk_list;
+}
+
 function core_trunks_list($assoc = false) {
 	// TODO: $assoc default to true, eventually..
 
@@ -4699,6 +4781,235 @@ function core_trunks_deleteDialRules($trunknum) {
 
 
 /* begin page.routing.php functions */
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+
+// function core_routing_getroutepassword($route)
+// function core_routing_getrouteemergency($route)
+// function core_routing_getrouteintracompany($route)
+// function core_routing_getroutemohsilence($route)
+// function core_routing_getroutecid($route)
+function core_routing_get($route_id) {
+  global $db;
+  $sql = 'SELECT * FROM `outbound_routes` WHERE route_id='.$db->escapeSimple($cidnum);
+  $route = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+  return $route;
+}
+
+// function core_routing_getroutenames() 
+function core_routing_list() {
+  $sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
+  $routes = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+  return $routes;
+}
+
+// function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)
+function core_routing_setrouteorder($route_id, $seq) {
+  global $db;
+
+  $sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
+	$sequence = $db->getCol($sql); 
+	if(DB::IsError($sequence)) {     
+		die_freepbx($sequence->getDebugInfo()); 
+	}
+  echo "route_id: $route_id, seq: $seq\n";
+  print_r($sequence);
+
+  $key = array_search($route_id,$sequence);
+  if ($key === false) {
+    return(false);
+  }
+  switch ("$seq") {
+  case 'up':
+    if (!isset($sequence[$key-1])) break;
+    $previous = $sequence[$key-1];
+    $sequence[$key-1] = $route_id;
+    $sequence[$key] = $previous;
+    break;
+  case 'down':
+    if (!isset($sequence[$key+1])) break;
+    $previous = $sequence[$key+1];
+    $sequence[$key+1] = $route_id;
+    $sequence[$key] = $previous;
+    break;
+  case 'top':
+    unset($sequence[$key]);
+    array_unshift($sequence,$route_id);
+    break;
+  case 'bottom':
+    unset($sequence[$key]);
+    $sequence[]=$route_id;
+    break;
+  case '0':
+    unset($sequence[$key]);
+    array_unshift($sequence,$route_id);
+    break;
+  default:
+    if (!ctype_digit($seq)) {
+      return false;
+    }
+    if ($seq >= count($sequence)) {
+      unset($sequence[$key]);
+      $sequence[] = $route_id;
+      break;
+    }
+    if ($sequence[$seq] == $route_id) {
+      break;
+    }
+    $sequence[$key] = "bookmark";
+    $remainder = array_slice($sequence,$seq);
+    array_unshift($remainder,$route_id);
+    $sequence = array_merge(array_slice($sequence,0,$seq), $remainder);
+    unset($sequence[array_search("bookmark",$sequence)]);
+    break;
+  }
+  $insert_array = array();
+  $seq = 0;
+  foreach($sequence as $rid) {
+    $insert_array[] = array($rid, $seq);
+    $seq++;
+  }
+  sql('DELETE FROM `outbound_route_sequence` WHERE 1');
+	$compiled = $db->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
+	$result = $db->executeMultiple($compiled,$insert_array);
+	if(DB::IsError($result)) {
+		die_freepbx($result->getDebugInfo()."<br><br>".'error reordering outbound_route_sequence');	
+	}
+}
+
+// function core_routing_del($name)
+function core_routing_delbyid($route_id) {
+  global $db;
+  $route_id = $db->escapeSimple($route_id);
+  sql('DELETE FROM `outbound_routes` WHERE `route_id` ='.$route_id);
+  sql('DELETE FROM `outbound_route_patterns` WHERE `route_id` ='.$route_id);
+  sql('DELETE FROM `outbound_route_trunks` WHERE `route_id` ='.$route_id);
+  sql('DELETE FROM `outbound_route_sequence` WHERE `route_id` ='.$route_id);
+}
+
+// function core_routing_trunk_del($trunknum)
+function core_routing_trunk_delbyid($trunk_id) {
+  global $db;
+  $trunk_id = $db->escapeSimple($trunk_id);
+  sql('DELETE FROM `outbound_route_trunks` WHERE `trunk_id` ='.$trunk_id);
+}
+
+// function core_routing_rename($oldname, $newname)
+function core_routing_renamebyid($route_id, $new_name) {
+  $db;
+  $route_id = $db->escapeSimple($route_id);
+  $new_name = $db->escapeSimple($new_name);
+  sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
+}
+
+// function core_routing_getroutepatterns($route)
+function core_routing_getroutepatternsbyid($route_id) {
+  $db;
+  $route_id = $db->escapeSimple($route_id);
+  $sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = $route_id ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
+  $patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+  return $patterns;
+}
+
+// function core_routing_getroutetrunks($route)
+function core_routing_getroutetrunksbyid($route_id) {
+  $db;
+  $route_id = $db->escapeSimple($route_id);
+  $sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = $route_id ORDER BY `seq`";
+	$trunks = $db->getCol($sql); 
+	if(DB::IsError($trunks)) {     
+		die_freepbx($trunks->getDebugInfo()); 
+	}
+  return $trunks;
+}
+
+// function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_override_exten, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks) {
+  global $db;
+
+  $route_id = $db->escapeSimple($route_id);
+  $name = $db->escapeSimple($name);
+  $outcid = $db->escapeSimple($outcid);
+  $outcid_override_exten = $db->escapeSimple($outcid_override_exten);
+  $password = $db->escapeSimple($password);
+  $emergency_route = $db->escapeSimple($emergency_route);
+  $intracompany_route = $db->escapeSimple($intracompany_route);
+  $mohclass = $db->escapeSimple($mohclass);
+  $time_group_id = $db->escapeSimple($time_group_id);
+  $sql = "UPDATE `outbound_routes` SET 
+    `name`='$name', `outcid`='$outcid', `outcid_override_exten`='$outcid_override_exten', `password`='$password', 
+    `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
+    `time_group_id`='$time_group_id' WHERE `route_id` = $route_id";
+  sql($sql);
+
+  core_routing_updatepatterns($route_id, $patterns, true);
+  core_routing_updatetrunks($route_id, $trunks, true);
+}
+
+// function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
+function core_routing_addbyid($name, $outcid, $outcid_override_exten, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks) {
+  global $db;
+
+  $name = $db->escapeSimple($name);
+  $outcid = $db->escapeSimple($outcid);
+  $outcid_override_exten = $db->escapeSimple($outcid_override_exten);
+  $password = $db->escapeSimple($password);
+  $emergency_route = $db->escapeSimple($emergency_route);
+  $intracompany_route = $db->escapeSimple($intracompany_route);
+  $mohclass = $db->escapeSimple($mohclass);
+  $time_group_id = $db->escapeSimple($time_group_id);
+  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_override_exten`, `password`, `emergency_route`, `intra_company_route`, `mohclass`, `time_group_id`)
+    VALUES ('$name', '$outcid', '$outcid_override_exten', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
+  sql($sql);
+  $route_id = mysql_insert_id($db->connection);
+
+  core_routing_updatepatterns($route_id, $patterns);
+  core_routing_updatetrunks($route_id, $trunks);
+
+  return ($route_id);
+}
+
+function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
+  global $db;
+
+  $insert_pattern = array();
+  foreach ($patterns as $pattern) {
+    $insert_pattern[] = array(
+      $db->escapeSimple($pattern['match_pattern_prefix']),
+      $db->escapeSimple($pattern['match_pattern_pass']),
+      $db->escapeSimple($pattern['prepend_digits']),
+    );
+  }
+  if ($delete) {
+    $sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
+  }
+	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`) VALUES (?,?,?)');
+	$result = $db->executeMultiple($compiled,$insert_pattern);
+	if(DB::IsError($result)) {
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');	
+	}
+}
+
+function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
+  global $db;
+
+  $insert_trunk = array();
+  $seq = 0;
+  foreach ($trunks as $trunk) {
+    $insert_trunk[] = array ($db->escapeSimple($trunk), $seq);
+    $seq++;
+  }
+  if ($delete) {
+    $sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.$route_id);
+  }
+	$compiled = $db->prepare("INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES ($route_id,?,?)");
+	$result = $db->executeMultiple($compiled,$insert_trunk);
+	if(DB::IsError($result)) {
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_trunks');	
+	}
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
 
 //get unique outbound route names
 function core_routing_getroutenames() 
