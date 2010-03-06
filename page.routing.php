@@ -230,7 +230,7 @@ foreach ($routepriority as $tresult) {
 
 	// move down
 	if ($key < ($positions-1)) {
-		echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key>','down')\" alt='" . _("Move Down") .
+		echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key','down')\" alt='" . _("Move Down") .
 			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
   } else {
 		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
