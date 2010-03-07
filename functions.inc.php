@@ -1574,7 +1574,7 @@ function core_get_config($engine) {
 				}
 			}
 
-if (false) { // new outbound routes
+if (true) { // new outbound routes
 			$ext->addInclude('from-internal-additional','outbound-allroutes-byid');
 			$ext->add('outbound-allroutes-byid', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
       $routes = core_routing_list();
@@ -1594,8 +1594,8 @@ if (false) { // new outbound routes
           $ext->addInclude('outbound-allroutes-byid',$context);
         }
 
-        $patterns = core_routing_getroutepatternsbyid($route_id);
-        $trunks = core_routing_getroutetrunksbyid($route_id);
+        $patterns = core_routing_getroutepatternsbyid($route['route_id']);
+        $trunks = core_routing_getroutetrunksbyid($route['route_id']);
 
         foreach ($patterns as $pattern) {
           $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
@@ -1607,7 +1607,7 @@ if (false) { // new outbound routes
             // it's not strictly digits, so it must have patterns, so prepend a _
             $exten = "_".$exten;
           }
-          if (!preg_match("/^[0-9*+]+$/",$cid)) { 
+          if ($cid != '' && !preg_match("/^[0-9*+]+$/",$cid)) { 
             // note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
             // it's not strictly digits, so it must have patterns, so prepend a _
             $cid = "_".$cid;
@@ -1640,7 +1640,7 @@ if (false) { // new outbound routes
           // 9[0-3]|NXX.
           // in this case we end up with EXTEN:6 instead of the correct EXTEN:2
           //
-          $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$route['match_pattern_prefix']));
+          $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
           $pos = $pos == 0 ? '':':'.$pos;
 
           $password = $route['password'];
@@ -1656,7 +1656,7 @@ if (false) { // new outbound routes
               $trunk_macro = 'dialout-trunk';
               break;
             }
-					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$route['prepend_digits'].'${EXTEN'.$pos.'},'.$password));
+					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$pos.'},'.$password));
             $password = '';
           }
           $ext->add($context, $exten, '', new ext_macro("outisbusy"));
