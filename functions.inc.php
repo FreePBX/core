@@ -5002,6 +5002,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
   global $db;
 
   $insert_pattern = array();
+  freepbx_debug($patterns);
   foreach ($patterns as $pattern) {
     $insert_pattern[] = array(
       $db->escapeSimple($pattern['match_pattern_prefix']),
@@ -5011,9 +5012,9 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
     );
   }
   if ($delete) {
-    $sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
+    sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
   }
-	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES (?,?,?,?)');
+	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$insert_pattern);
 	if(DB::IsError($result)) {
 		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');	
@@ -5030,7 +5031,7 @@ function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
     $seq++;
   }
   if ($delete) {
-    $sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.$route_id);
+    sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.$route_id);
   }
 	$compiled = $db->prepare("INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES ($route_id,?,?)");
 	$result = $db->executeMultiple($compiled,$insert_trunk);
