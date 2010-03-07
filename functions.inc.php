@@ -1575,8 +1575,8 @@ function core_get_config($engine) {
 			}
 
 if (false) { // new outbound routes
-			$ext->addInclude('from-internal-additional','outbound-allroutes');
-			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
+			$ext->addInclude('from-internal-additional','outbound-allroutes-byid');
+			$ext->add('outbound-allroutes-byid', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
       $routes = core_routing_list();
       $trunk_table = core_trunks_listbyid();
       foreach ($routes as $route) {
@@ -1585,13 +1585,13 @@ if (false) { // new outbound routes
           $times = timeconditions_timegroups_get_times($route['time_group_id']);
           if (is_array($times) && count($times)) {
             foreach ($times as $time) {
-              $ext->addInclude('outbound-allroutes',$context.'|'.$time[1]);
+              $ext->addInclude('outbound-allroutes-byid',$context.'|'.$time[1]);
             }
           } else {
-            $ext->addInclude('outbound-allroutes',$context);
+            $ext->addInclude('outbound-allroutes-byid',$context);
           }
         } else {
-          $ext->addInclude('outbound-allroutes',$context);
+          $ext->addInclude('outbound-allroutes-byid',$context);
         }
 
         $patterns = core_routing_getroutepatternsbyid($route_id);
@@ -1599,6 +1599,23 @@ if (false) { // new outbound routes
 
         foreach ($patterns as $pattern) {
           $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+          $cid = $pattern['match_cid'];
+
+          //TODO: does the plus need to be backslashed?
+          if (!preg_match("/^[0-9*+]+$/",$exten)) { 
+            // note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
+            // it's not strictly digits, so it must have patterns, so prepend a _
+            $exten = "_".$exten;
+          }
+          if (!preg_match("/^[0-9*+]+$/",$cid)) { 
+            // note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
+            // it's not strictly digits, so it must have patterns, so prepend a _
+            $cid = "_".$cid;
+          }
+          if ($cid != '') {
+            $exten .= '/'.$cid;
+          }
+
           $ext->add($context, $exten, '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
           if ($route['emergencyy_route'] != '') {
 						$ext->add($context, $exten, '', new ext_setvar("EMERGENCYROUTE",$route['emergencyy_route']));
@@ -4532,9 +4549,23 @@ function core_trunks_getDetails($trunkid='') {
 }
 
 function core_trunks_listbyid() {
-  $result = sql('SELECT * from `trunks` ORDER BY `trunkid`');
+  $result = sql('SELECT * from `trunks` ORDER BY `trunkid`','getAll',DB_FETCHMODE_ASSOC);
   $trunk_list = array();
   foreach ($result as $trunk) {
+    if ($trunk['name'] == '') {
+		  $tech = strtoupper($trunk['tech']);
+		  switch ($tech) {
+			  case 'IAX':
+				  $trunk['name'] = 'IAX2/'.$trunk['channelid'];
+				  break;
+			  case 'CUSTOM':
+				  $trunk['name'] = 'AMP:'.$trunk['channelid'];
+				  break;
+			  default:
+				  $trunk['name'] = $tech.'/'.$trunk['channelid'];
+				  break;
+		  }
+    }
     $trunk_list[$trunk['trunkid']] = $trunk;
   }
   return $trunk_list;
@@ -4791,7 +4822,7 @@ function core_trunks_deleteDialRules($trunknum) {
 // function core_routing_getroutecid($route)
 function core_routing_get($route_id) {
   global $db;
-  $sql = 'SELECT * FROM `outbound_routes` WHERE route_id='.$db->escapeSimple($cidnum);
+  $sql = 'SELECT * FROM `outbound_routes` WHERE route_id='.$db->escapeSimple($route_id);
   $route = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
   return $route;
 }
@@ -4812,8 +4843,6 @@ function core_routing_setrouteorder($route_id, $seq) {
 	if(DB::IsError($sequence)) {     
 		die_freepbx($sequence->getDebugInfo()); 
 	}
-  echo "route_id: $route_id, seq: $seq\n";
-  print_r($sequence);
 
   $key = array_search($route_id,$sequence);
   if ($key === false) {
@@ -4896,7 +4925,7 @@ function core_routing_trunk_delbyid($trunk_id) {
 
 // function core_routing_rename($oldname, $newname)
 function core_routing_renamebyid($route_id, $new_name) {
-  $db;
+  global $db;
   $route_id = $db->escapeSimple($route_id);
   $new_name = $db->escapeSimple($new_name);
   sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
@@ -4904,7 +4933,7 @@ function core_routing_renamebyid($route_id, $new_name) {
 
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
-  $db;
+  global $db;
   $route_id = $db->escapeSimple($route_id);
   $sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = $route_id ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
   $patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
@@ -4913,7 +4942,7 @@ function core_routing_getroutepatternsbyid($route_id) {
 
 // function core_routing_getroutetrunks($route)
 function core_routing_getroutetrunksbyid($route_id) {
-  $db;
+  global $db;
   $route_id = $db->escapeSimple($route_id);
   $sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = $route_id ORDER BY `seq`";
 	$trunks = $db->getCol($sql); 
@@ -4977,13 +5006,14 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
     $insert_pattern[] = array(
       $db->escapeSimple($pattern['match_pattern_prefix']),
       $db->escapeSimple($pattern['match_pattern_pass']),
+      $db->escapeSimple($pattern['match_cid']),
       $db->escapeSimple($pattern['prepend_digits']),
     );
   }
   if ($delete) {
     $sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
   }
-	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`) VALUES (?,?,?)');
+	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$insert_pattern);
 	if(DB::IsError($result)) {
 		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');	
