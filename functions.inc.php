@@ -1620,8 +1620,8 @@ if (true) { // new outbound routes
           if ($route['emergencyy_route'] != '') {
 						$ext->add($context, $exten, '', new ext_setvar("EMERGENCYROUTE",$route['emergencyy_route']));
           }
-          if ($route['intra_company_route'] != '') {
-						$ext->add($context, $exten, '', new ext_setvar("INTRACOMPANYROUTE",$route['intra_company_route']));
+          if ($route['intracompany_route'] != '') {
+						$ext->add($context, $exten, '', new ext_setvar("INTRACOMPANYROUTE",$route['intracompany_route']));
           }
           if ($route['mohclass'] != '') {
 						$ext->add($context, $exten, '', new ext_setvar("MOHCLASS", '${IF($["${MOHCLASS}"=""]?'.$route['mohclass'].':${MOHCLASS})}' ));
@@ -4994,7 +4994,7 @@ function core_routing_addbyid($name, $outcid, $outcid_override_exten, $password,
   $intracompany_route = $db->escapeSimple($intracompany_route);
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_override_exten`, `password`, `emergency_route`, `intra_company_route`, `mohclass`, `time_group_id`)
+  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_override_exten`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
     VALUES ('$name', '$outcid', '$outcid_override_exten', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
   sql($sql);
   $route_id = mysql_insert_id($db->connection);
@@ -5013,16 +5013,18 @@ function core_routing_addbyid($name, $outcid, $outcid_override_exten, $password,
 function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
   global $db;
 
+  $filter = '/[^0-9\-\.\[\]xXnNzZ]/';
   $insert_pattern = array();
-  freepbx_debug($patterns);
   foreach ($patterns as $pattern) {
-    $insert_pattern[] = array(
-      $db->escapeSimple($pattern['match_pattern_prefix']),
-      $db->escapeSimple($pattern['match_pattern_pass']),
-      $db->escapeSimple($pattern['match_cid']),
-      $db->escapeSimple($pattern['prepend_digits']),
-    );
+    $match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_pattern_prefix'])));
+    $match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_pattern_pass'])));
+    $match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_cid'])));
+    $prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['prepend_digits'])));
+
+    $hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid.$prepend_digits);
+    $insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
   }
+
   if ($delete) {
     sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
   }
