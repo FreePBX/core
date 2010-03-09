@@ -1627,7 +1627,7 @@ if (true) { // new outbound routes
 						$ext->add($context, $exten, '', new ext_setvar("MOHCLASS", '${IF($["${MOHCLASS}"=""]?'.$route['mohclass'].':${MOHCLASS})}' ));
           }
           if ($route['outcid'] != '') {
-            if ($route['outcid_override_exten'] != '') {
+            if ($route['outcid_mode'] != '') {
 						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['routecid']));
             } else {
 						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['routecid']));
@@ -4898,8 +4898,12 @@ function core_routing_setrouteorder($route_id, $seq) {
   }
   $insert_array = array();
   $seq = 0;
+  $final_seq = false;
   foreach($sequence as $rid) {
     $insert_array[] = array($rid, $seq);
+    if ($rid === $route_id) {
+      $final_seq = $seq;
+    }
     $seq++;
   }
   sql('DELETE FROM `outbound_route_sequence` WHERE 1');
@@ -4908,6 +4912,7 @@ function core_routing_setrouteorder($route_id, $seq) {
 	if(DB::IsError($result)) {
 		die_freepbx($result->getDebugInfo()."<br><br>".'error reordering outbound_route_sequence');	
 	}
+  return $final_seq;
 }
 
 // function core_routing_del($name)
@@ -4957,20 +4962,20 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_override_exten, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '') {
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '') {
   global $db;
 
   $route_id = $db->escapeSimple($route_id);
   $name = $db->escapeSimple($name);
   $outcid = $db->escapeSimple($outcid);
-  $outcid_override_exten = $db->escapeSimple($outcid_override_exten);
+  $outcid_mode = $db->escapeSimple($outcid_mode);
   $password = $db->escapeSimple($password);
   $emergency_route = $db->escapeSimple($emergency_route);
   $intracompany_route = $db->escapeSimple($intracompany_route);
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
   $sql = "UPDATE `outbound_routes` SET 
-    `name`='$name', `outcid`='$outcid', `outcid_override_exten`='$outcid_override_exten', `password`='$password', 
+    `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password', 
     `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
     `time_group_id`='$time_group_id' WHERE `route_id` = $route_id";
   sql($sql);
@@ -4983,19 +4988,19 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_override_exten
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_override_exten, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new') {
   global $db;
 
   $name = $db->escapeSimple($name);
   $outcid = $db->escapeSimple($outcid);
-  $outcid_override_exten = $db->escapeSimple($outcid_override_exten);
+  $outcid_mode = $db->escapeSimple($outcid_mode);
   $password = $db->escapeSimple($password);
   $emergency_route = $db->escapeSimple($emergency_route);
   $intracompany_route = $db->escapeSimple($intracompany_route);
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_override_exten`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
-    VALUES ('$name', '$outcid', '$outcid_override_exten', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
+  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
+    VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
   sql($sql);
   $route_id = mysql_insert_id($db->connection);
 
