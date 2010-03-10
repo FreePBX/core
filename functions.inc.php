@@ -4786,20 +4786,12 @@ function core_trunks_getDialRules($trunknum) {
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
-  $sql_code = "SELECT DISTINCT SUBSTRING(context,7) route ,args trunk FROM extensions WHERE context LIKE 'outrt-%' AND 
-    (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY context,priority";
-  $results = sql( $sql_code, "getAll" ,DB_FETCHMODE_ASSOC);
-  $routeseq = array();
-  foreach ($results as $entry) {
-    $pos1 = strpos($entry['trunk'],',')+1;
-    $routeseq[$entry['route']][] = substr($entry['trunk'],$pos1,strpos($entry['trunk'],',',$pos1)-$pos1);
-  }
+  $sql = 'SELECT a.seq, b.name FROM outbound_route_trunks a JOIN outbound_routes b ON a.route_id = b.route_id WHERE trunk_id = '.$trunknum;
+  $results = sql( $sql, "getAll" ,DB_FETCHMODE_ASSOC);
+
   $routes = array();
-  foreach ($routeseq as $key => $value) {
-    $pos = array_search($trunknum, array_values(array_unique($value)));
-    if ($pos !== false) {
-      $routes[$key] = $pos+1; // start at 1, not 0
-    }
+  foreach ($results as $entry) {
+    $routes[$entry['name']] = $entry['seq'];
   }
   return $routes;
 }
@@ -5056,6 +5048,25 @@ function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
 	$result = $db->executeMultiple($compiled,$insert_trunk);
 	if(DB::IsError($result)) {
 		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_trunks');	
+	}
+}
+
+/* callback to Time Groups Module so it can display usage information
+   of specific groups
+ */
+function core_timegroups_usage($group_id) {
+
+	$results = sql("SELECT route_id, name FROM outbound_routes WHERE time_group_id = $group_id","getAll",DB_FETCHMODE_ASSOC);
+	if (empty($results)) {
+		return array();
+	} else {
+		foreach ($results as $result) {
+			$usage_arr[] = array(
+				"url_query" => "display=routing&extdisplay=".$result['route_id'],
+				"description" => sprintf(_("Outbound Route: %s"),$result['name']),
+			);
+		}
+		return $usage_arr;
 	}
 }
 
