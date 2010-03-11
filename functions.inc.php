@@ -1601,20 +1601,12 @@ if (true) { // new outbound routes
           $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
           $cid = $pattern['match_cid'];
 
-          //TODO: does the plus need to be backslashed?
-          if (!preg_match("/^[0-9*+]+$/",$exten)) { 
-            // note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
-            // it's not strictly digits, so it must have patterns, so prepend a _
-            $exten = "_".$exten;
-          }
-          if ($cid != '' && !preg_match("/^[0-9*+]+$/",$cid)) { 
-            // note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
-            // it's not strictly digits, so it must have patterns, so prepend a _
-            $cid = "_".$cid;
-          }
-          if ($cid != '') {
-            $exten .= '/'.$cid;
-          }
+          // returns:
+          // array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
+          //
+          $fpattern = core_routing_formatpattern($pattern);
+          $exten = $fpattern['dial_pattern'];
+          $offset = $fpattern['offset'] == 0 ? '':':'.$fpattern['offset'];
 
           $ext->add($context, $exten, '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
           if ($route['emergencyy_route'] != '') {
@@ -1636,13 +1628,6 @@ if (true) { // new outbound routes
           $ext->add($context, $exten, '', new ext_setvar("_NODEST",""));
           $ext->add($context, $exten, '', new ext_macro('record-enable,${AMPUSER},OUT'));
 
-          // ticket #3998: the $pos is incorrect if a range is included such as
-          // 9[0-3]|NXX.
-          // in this case we end up with EXTEN:6 instead of the correct EXTEN:2
-          //
-          $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
-          $pos = $pos == 0 ? '':':'.$pos;
-
           $password = $route['password'];
           foreach ($trunks as $trunk_id) {
             if (isset($trunk_table[$trunk_id])) switch($trunk_table[$trunk_id]) {
@@ -1656,7 +1641,7 @@ if (true) { // new outbound routes
               $trunk_macro = 'dialout-trunk';
               break;
             }
-					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$pos.'},'.$password));
+					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$offset.'},'.$password));
             $password = '';
           }
           $ext->add($context, $exten, '', new ext_macro("outisbusy"));
@@ -4814,7 +4799,7 @@ function core_trunks_deleteDialRules($trunknum) {
 // function core_routing_getroutecid($route)
 function core_routing_get($route_id) {
   global $db;
-  $sql = 'SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id='.$db->escapeSimple($route_id);
+  $sql = 'SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id='.q($db->escapeSimple($route_id));
   $route = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
   return $route;
 }
@@ -4873,7 +4858,7 @@ function core_routing_setrouteorder($route_id, $seq) {
     if (!ctype_digit($seq)) {
       return false;
     }
-    if ($seq >= count($sequence)) {
+    if ($seq >= count($sequence)-1) {
       unset($sequence[$key]);
       $sequence[] = $route_id;
       break;
@@ -4910,7 +4895,7 @@ function core_routing_setrouteorder($route_id, $seq) {
 // function core_routing_del($name)
 function core_routing_delbyid($route_id) {
   global $db;
-  $route_id = $db->escapeSimple($route_id);
+  $route_id = q($db->escapeSimple($route_id));
   sql('DELETE FROM `outbound_routes` WHERE `route_id` ='.$route_id);
   sql('DELETE FROM `outbound_route_patterns` WHERE `route_id` ='.$route_id);
   sql('DELETE FROM `outbound_route_trunks` WHERE `route_id` ='.$route_id);
@@ -4920,14 +4905,14 @@ function core_routing_delbyid($route_id) {
 // function core_routing_trunk_del($trunknum)
 function core_routing_trunk_delbyid($trunk_id) {
   global $db;
-  $trunk_id = $db->escapeSimple($trunk_id);
+  $trunk_id = q($db->escapeSimple($trunk_id));
   sql('DELETE FROM `outbound_route_trunks` WHERE `trunk_id` ='.$trunk_id);
 }
 
 // function core_routing_rename($oldname, $newname)
 function core_routing_renamebyid($route_id, $new_name) {
   global $db;
-  $route_id = $db->escapeSimple($route_id);
+  $route_id = q($db->escapeSimple($route_id));
   $new_name = $db->escapeSimple($new_name);
   sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
 }
@@ -4935,16 +4920,42 @@ function core_routing_renamebyid($route_id, $new_name) {
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
   global $db;
-  $route_id = $db->escapeSimple($route_id);
+  $route_id = q($db->escapeSimple($route_id));
   $sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = $route_id ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
   $patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
   return $patterns;
 }
 
+/* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
+ * Used when generating the dialplan and can be used by other modules that may be splicing into the
+ * dialplan such as pinsets or others.
+ */
+function core_routing_formatpattern($pattern) {
+  $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+  $cid = $pattern['match_cid'];
+  if (!preg_match("/^[0-9*+]+$/",$exten)) { 
+    // if # is detected above (as not in the list of acceptable patterns) then _ is appended due to Asterisk
+    // particulars in dealing with #
+    $exten = "_".$exten;
+  }
+  if ($cid != '' && !preg_match("/^[0-9*+]+$/",$cid)) { 
+    // same comment as above wrt to #
+    $cid = "_".$cid;
+  }
+  if ($cid != '') {
+    $exten .= '/'.$cid;
+  }
+  // ticket #3998: the $pos is incorrect if a range is included such as 9[0-3]|NXX in the prefix.
+  // in this example we end up with EXTEN:6 instead of the correct EXTEN:2
+  //
+  $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
+  return array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
+}
+
 // function core_routing_getroutetrunks($route)
 function core_routing_getroutetrunksbyid($route_id) {
   global $db;
-  $route_id = $db->escapeSimple($route_id);
+  $route_id = q($db->escapeSimple($route_id));
   $sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = $route_id ORDER BY `seq`";
 	$trunks = $db->getCol($sql); 
 	if(DB::IsError($trunks)) {     
@@ -4965,11 +4976,12 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
   $emergency_route = $db->escapeSimple($emergency_route);
   $intracompany_route = $db->escapeSimple($intracompany_route);
   $mohclass = $db->escapeSimple($mohclass);
+  $seq = $db->escapeSimple($seq);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
   $sql = "UPDATE `outbound_routes` SET 
     `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password', 
     `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
-    `time_group_id`='$time_group_id' WHERE `route_id` = $route_id";
+    `time_group_id`='$time_group_id' WHERE `route_id` = ".q($route_id);
   sql($sql);
 
   core_routing_updatepatterns($route_id, $patterns, true);
@@ -4981,6 +4993,7 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new') {
+  global $amp_conf;
   global $db;
 
   $name = $db->escapeSimple($name);
@@ -4994,7 +5007,10 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
   $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
     VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
   sql($sql);
-  $route_id = mysql_insert_id($db->connection);
+
+  // TODO: sqlite_last_insert_rowid() un-tested and php5 ???
+  //
+  $route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
 
   core_routing_updatepatterns($route_id, $patterns);
   core_routing_updatetrunks($route_id, $trunks);
@@ -5007,9 +5023,14 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
   return ($route_id);
 }
 
+/* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
+         by hashing without the prepend (since a blank prepend is similar to no prepend) at a minimum and decide if we want to catch
+         this and throw an error...
+ */
 function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
   global $db;
 
+  $route_id =  $db->escapeSimple($route_id);
   $filter = '/[^0-9\-\.\[\]xXnNzZ]/';
   $insert_pattern = array();
   foreach ($patterns as $pattern) {
@@ -5018,12 +5039,12 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
     $match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_cid'])));
     $prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['prepend_digits'])));
 
-    $hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid.$prepend_digits);
+    $hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
     $insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
   }
 
   if ($delete) {
-    sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.$route_id);
+    sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
   }
 	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$insert_pattern);
@@ -5035,6 +5056,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
   global $db;
 
+  $route_id = $db->escapeSimple($route_id);
   $insert_trunk = array();
   $seq = 0;
   foreach ($trunks as $trunk) {
@@ -5042,7 +5064,7 @@ function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
     $seq++;
   }
   if ($delete) {
-    sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.$route_id);
+    sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.q($route_id));
   }
 	$compiled = $db->prepare("INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES ($route_id,?,?)");
 	$result = $db->executeMultiple($compiled,$insert_trunk);
@@ -5056,6 +5078,7 @@ function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
  */
 function core_timegroups_usage($group_id) {
 
+  $group_id = q($group_id);
 	$results = sql("SELECT route_id, name FROM outbound_routes WHERE time_group_id = $group_id","getAll",DB_FETCHMODE_ASSOC);
 	if (empty($results)) {
 		return array();
