@@ -18,7 +18,6 @@
 //    Copyright (C) 2005 Ron Hartmann (rhartmann@vercomsystems.com)
 //    Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
 //
-
 $display='routing'; 
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
@@ -26,36 +25,37 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tabindex = 0;
 
 $repotrunkdirection = isset($_REQUEST['repotrunkdirection'])?$_REQUEST['repotrunkdirection']:'';
+
+//this was effectively the sequence, now it becomes the route_id and the value past will have to change
 $repotrunkkey = isset($_REQUEST['repotrunkkey'])?$_REQUEST['repotrunkkey']:'';
 
+//
+// Use a hash of the value inserted to get rid of duplicates
+$dialpattern_insert = array();
+$p_idx = 0;
+$n_idx = 0;
 
-$dialpattern = array();
-if (isset($_REQUEST["dialpattern"])) {
-	//$dialpattern = $_REQUEST["dialpattern"];
-	$dialpattern = explode("\n",$_REQUEST["dialpattern"]);
+if (isset($_POST["prepend_digit"])) {
+  $prepend_digit = $_POST["prepend_digit"];
+  $pattern_prefix = $_POST["pattern_prefix"];
+  $pattern_pass = $_POST["pattern_pass"];
+  $match_cid = $_POST["match_cid"];
 
-	if (!$dialpattern) {
-		$dialpattern = array();
-	}
-	
-	foreach (array_keys($dialpattern) as $key) {
-		//trim it
-		$dialpattern[$key] = trim($dialpattern[$key]);
-		
-		// remove blanks
-		if ($dialpattern[$key] == "") unset($dialpattern[$key]);
-		
-		// remove leading underscores (we do that on backend)
-		if ($dialpattern[$key][0] == "_") $dialpattern[$key] = substr($dialpattern[$key],1);
-	}
-	
-	// check for duplicates, and re-sequence
-	$dialpattern = array_values(array_unique($dialpattern));
+  foreach (array_keys($prepend_digit) as $key) {
+    if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
+
+      $dialpattern_insert[] = array(
+        'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
+        'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
+        'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
+        'match_cid' => htmlspecialchars(trim($match_cid[$key])),
+      );
+    }
+  }
 }
-	
-if ( (isset($_REQUEST['reporoutedirection'])) && (isset($_REQUEST['reporoutekey']))) {
-	$routepriority = core_routing_getroutenames();
-	$routepriority = core_routing_setroutepriority($routepriority, $_REQUEST['reporoutedirection'], $_REQUEST['reporoutekey']);
+
+if ( isset($_REQUEST['reporoutedirection']) && $_REQUEST['reporoutedirection'] != '' && isset($_REQUEST['reporoutekey']) && $_REQUEST['reporoutekey'] != '') {
+  $_REQUEST['route_seq'] = core_routing_setrouteorder($_REQUEST['reporoutekey'], $_REQUEST['reporoutedirection']);
 }
 
 $trunkpriority = array();
@@ -68,7 +68,7 @@ if (isset($_REQUEST["trunkpriority"])) {
 	
 	// delete blank entries and reorder
 	foreach (array_keys($trunkpriority) as $key) {
-		if (empty($trunkpriority[$key])) {
+		if ($trunkpriority[$key] == '') {
 			// delete this empty
 			unset($trunkpriority[$key]);
 			
@@ -86,50 +86,48 @@ if (isset($_REQUEST["trunkpriority"])) {
 		}
 	}
 	unset($temptrunk);
-	$trunkpriority = array_values($trunkpriority); // resequence our numbers
-	$trunkpriority = array_unique($trunkpriority); // resequence our numbers
+	$trunkpriority = array_unique(array_values($trunkpriority)); // resequence our numbers
+  if ($action == '') {
+    $action = "updatetrunks";
+  }
+
 }
 
-$routename = isset($_REQUEST["routename"]) ? $_REQUEST["routename"] : "";
-$routepass = isset($_REQUEST["routepass"]) ? $_REQUEST["routepass"] : "";
-$emergency = isset($_REQUEST["emergency"]) ? $_REQUEST["emergency"] : "";
-$intracompany = isset($_REQUEST["intracompany"]) ? $_REQUEST["intracompany"] : "";
-$mohsilence = isset($_REQUEST["mohsilence"]) ? $_REQUEST["mohsilence"] : "";
-$routecid = isset($_REQUEST["routecid"]) ? $_REQUEST["routecid"] : "";
-$routecid_mode = isset($_REQUEST["routecid_mode"]) ? $_REQUEST["routecid_mode"] : "";
+$routename = isset($_REQUEST['routename']) ? $_REQUEST['routename'] : '';
+$routepass = isset($_REQUEST['routepass']) ? $_REQUEST['routepass'] : '';
+$emergency = isset($_REQUEST['emergency']) ? $_REQUEST['emergency'] : '';
+$intracompany = isset($_REQUEST['intracompany']) ? $_REQUEST['intracompany'] : '';
+$mohsilence = isset($_REQUEST['mohsilence']) ? $_REQUEST['mohsilence'] : '';
+$outcid = isset($_REQUEST['outcid']) ? $_REQUEST['outcid'] : '';
+$outcid_mode = isset($_REQUEST['outcid_mode']) ? $_REQUEST['outcid_mode'] : '';
+$time_group_id = isset($_REQUEST['time_group_id']) ? $_REQUEST['time_group_id'] : '';
+$route_seq = isset($_REQUEST['route_seq']) ? $_REQUEST['route_seq'] : '';
 
 //if submitting form, update database
 switch ($action) {
 	case "addroute":
-		core_routing_add($routename, $dialpattern, $trunkpriority,"new", $routepass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
-		needreload();
-		redirect_standard();
-	break;
-	case "editroute":
-		core_routing_edit($routename, $dialpattern, $trunkpriority, $routepass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
+    $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
+    $_REQUEST['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
 		needreload();
 		redirect_standard('extdisplay');
 	break;
+	case "editroute":
+		core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
+		needreload();
+		redirect_standard('extdisplay');
+	break;
+	case "updatetrunks":
+    core_routing_updatetrunks($extdisplay, $trunkpriority, true);
+		needreload();
+	break;
 	case "delroute":
-		core_routing_del($extdisplay);
+		core_routing_delbyid($extdisplay);
 		// re-order the routes to make sure that there are no skipped numbers.
 		// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
 		// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
 		// so we are left with 001-test1, 002-test3
-		$routepriority = core_routing_getroutenames();
-		$routepriority = core_routing_setroutepriority($routepriority, '','');
 		needreload();
 		redirect_standard();
-	break;
-	case 'renameroute':
-		if (core_routing_rename($routename, $_REQUEST["newroutename"])) {
-			needreload();
-		} else {
-			echo "<script language=\"javascript\">alert('"._("Error renaming route: duplicate name")."');</script>";
-		}
-		$route_prefix=substr($routename,0,4);
-		$extdisplay=$route_prefix.$_REQUEST["newroutename"];
-
 	break;
 	case 'prioritizeroute':
 		needreload();
@@ -152,24 +150,53 @@ switch ($action) {
 			$xml->unserialize($str);
 			$xmldata = $xml->getUnserializedData();
 
+      $hash_filter = array(); //avoid duplicates
 			if (isset($xmldata['lca-data']['prefix'])) {
 				// we do the loops separately so patterns are grouped together
 				
 				// match 1+NPA+NXX (dropping 1)
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-					$dialpattern[] = '1|'.$prefix['npa'].$prefix['nxx'].'XXXX';
+          if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
+            continue;
+          } else {
+            $hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
+          }
+          $dialpattern_array[] = array(
+            'prepend_digits' => '',
+            'match_pattern_prefix' => '1',
+            'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+            'match_cid' => '',
+          );
 				}
 				// match NPA+NXX
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-					$dialpattern[] = $prefix['npa'].$prefix['nxx'].'XXXX';
+          if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
+            continue;
+          } else {
+            $hash_filter[$prefix['npa'].$prefix['nxx']] = true;
+          }
+          $dialpattern_array[] = array(
+            'prepend_digits' => '',
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+            'match_cid' => '',
+          );
 				}
 				// match 7-digits
 				foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-					$dialpattern[] = $prefix['nxx'].'XXXX';
+          if (isset($hash_filter[$prefix['nxx']])) {
+            continue;
+          } else {
+            $hash_filter[$prefix['nxx']] = true;
+          }
+          $dialpattern_array[] = array(
+            'prepend_digits' => '',
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
+            'match_cid' => '',
+          );
 				}
-
-				// check for duplicates, and re-sequence
-				$dialpattern = array_values(array_unique($dialpattern));
+        unset($hash_filter);
 			} else {
 				$errormsg = _("Error fetching prefix list for: "). $_REQUEST["npanxx"];
 			}
@@ -185,25 +212,9 @@ switch ($action) {
 		}
 	break;
 }
-	
-
-	
-//get all rows from globals
-$sql = "SELECT * FROM globals";
-$globals = $db->getAll($sql);
-if(DB::IsError($globals)) {
-die_freepbx($globals->getMessage());
-}
-
-//create a set of variables that match the items in global[0]
-foreach ($globals as $global) {
-	${trim($global[0])} = htmlentities($global[1]);	
-}
 
 ?>
 </div>
-
-
 
 <div class="rnav">
 <ul>
@@ -211,29 +222,44 @@ foreach ($globals as $global) {
 <?php 
 $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
 $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
-$key = -1;
-$routepriority = core_routing_getroutenames();
+$routepriority = core_routing_list();
 $positions=count($routepriority);
-foreach ($routepriority as $tresult) {
-	$key++;
-	echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult[0] ? 'class="current"':'') .
+foreach ($routepriority as $key => $tresult) {
+	echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult['route_id'] ? 'class="current"':'') .
 		" href=\"config.php?display=" . 
 		urlencode($display)."&amp;extdisplay=" . 
-		urlencode($tresult[0]) . "\">$key " . substr($tresult[0],4)."</a>\n";
+		urlencode($tresult['route_id']) . "\">$key " . $tresult['name']."</a>\n";
 
+	// move up
 	if ($key > 0) {
-		echo "\t\t<img src=\"images/scrollup.gif\" onclick=\"repositionRoute('$key','up')\" alt='" .  _("Move Up") .
-			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		echo "\t\t<img src=\"images/resultset_up.png\" onclick=\"repositionRoute('{$tresult['route_id']}','up')\" alt='" .  _("Move Up") .
+			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
 
 	// move down
 	if ($key < ($positions-1)) {
-		echo "\t\t<img src='images/scrolldown.gif' onclick=\"repositionRoute('$key','down')\" alt='" . _("Move Down") .
-			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		echo "\t\t<img src='images/resultset_down.png' onclick=\"repositionRoute('{$tresult['route_id']}','down')\" alt='" . _("Move Down") .
+			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='9' height='11'>\n";
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+  }
+
+	// move top
+	if ($key > 0) {
+		echo "\t\t<img src=\"images/resultset_top.png\" onclick=\"repositionRoute('{$tresult['route_id']}','top')\" alt='" .  _("First") .
+			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+  } else {
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+  }
+
+	// move bottom
+	if ($key < ($positions-1)) {
+		echo "\t\t<img src='images/resultset_bottom.png' onclick=\"repositionRoute('{$tresult['route_id']}','bottom')\" alt='" . _("Last") .
+			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+  } else {
+		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
 		echo "\t</li>\n";
 } // foreach
@@ -244,193 +270,220 @@ foreach ($routepriority as $tresult) {
 <div class="content">
 
 <?php 
-if ($extdisplay) {
+$last_seq = count($routepriority)-1;
+if ($extdisplay != '') {
 	
 	// load from db
+  $route_info = core_routing_get($extdisplay);
+  $dialpattern_array = core_routing_getroutepatternsbyid($extdisplay);
+  $trunkpriority = core_routing_getroutetrunksbyid($extdisplay);
 	
-	if (!isset($_REQUEST["dialpattern"])) {
-		$dialpattern = core_routing_getroutepatterns($extdisplay);
-	}
-	
-	if (!isset($_REQUEST["trunkpriority"])) {
-		$trunkpriority = core_routing_getroutetrunks($extdisplay);
-	}
-	
-	if (!isset($_REQUEST["routepass"])) {
-		$routepass = core_routing_getroutepassword($extdisplay);
-	}
-	
-	if (!isset($_REQUEST["emergency"])) {
-		$emergency = core_routing_getrouteemergency($extdisplay);
-	}
-	
-	if (!isset($_REQUEST["intracompany"])) {
-		$intracompany = core_routing_getrouteintracompany($extdisplay);
-	}
-
-	if (!isset($_REQUEST["mohsilence"])) {
-		$mohsilence = core_routing_getroutemohsilence($extdisplay);
-	}
-
-	if (!isset($_REQUEST["routecid"])) {
-		$routecid_array = core_routing_getroutecid($extdisplay);
-    $routecid = $routecid_array['routecid'];
-	}
-
-	if (!isset($_REQUEST["routecid_mode"])) {
-    if (!isset($outecid_array)) {
-		  $routecid_array = core_routing_getroutecid($extdisplay);
-    }
-    $routecid_mode = $routecid_array['routecid_mode'];
-	}
-	
+  $routepass = $route_info['password'];
+  $emergency = $route_info['emergency_route'];
+  $intracompany = $route_info['intracompany_route'];
+  $mohsilence = $route_info['mohclass'];
+  $outcid = $route_info['outcid'];
+  $outcid_mode = $route_info['outcid_mode'];
+  $time_group_id = $route_info['time_group_id'];
+  $route_seq = $route_info['seq'];
+  $routename = $route_info['name'];
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
+  $route_seq = $last_seq+1;
+  $routename = '';
+  if (!isset($dialpattern_array)) {
+    $dialpattern_array = array();
+  }
 	echo "<h2>"._("Add Route")."</h2>";
 }
-
+//
 // build trunks associative array
-foreach (core_trunks_list() as $temp) {
-	$trunks[$temp[0]] = $temp[1];
-	$trunkstate[$temp[0]] = $temp[2];
+foreach (core_trunks_listbyid() as $temp) {
+	$trunks[$temp['trunkid']] = $temp['name'];
+	$trunkstate[$temp['trunkid']] = $temp['disabled'];
 }
 
 if ($extdisplay) { // editing
-	$tlabel = sprintf(_("Delete Route %s"),substr($extdisplay,4));
+	$tlabel = sprintf(_("Delete Route %s"),$route_info['name']);
 	$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
 	<p><a href="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute"><?php echo $label ?></a></p>
 <?php  
 } 
 ?>
-
-	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay ? "editroute" : "addroute") ?>');">
+	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay != '' ? "editroute" : "addroute") ?>');">
 		<input type="hidden" name="display" value="<?php echo $display?>"/>
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 		<input type="hidden" id="action" name="action" value=""/>
 		<table>
+    <tr>
+      <td colspan="2"><h5><?php echo _("Route Settings") ?><hr></h5></td>
+    </tr>
+
 		<tr>
 			<td>
-				<a href=# class="info"><?php echo _("Route Name")?><span><br><?php echo _("Name of this route. Should be used to describe what type of calls this route matches (for example, 'local' or 'longdistance').")?><br><br></span></a>: 
+				<a href=# class="info"><?php echo _("Route Name")?><span><br><?php echo _("Name of this route. Should be used to describe what type of calls this route matches (for example, 'local' or 'longdistance').")?><br></span></a>: 
 			</td>
-<?php  if ($extdisplay) { // editing?>
-			<td>
-				<?php echo substr($extdisplay,4);?>
-				<input type="hidden" id="routename" name="routename" value="<?php echo $extdisplay;?>"/>
-				<input type="button" onClick="renameRoute();" value="<?php echo _("Rename")?>" style="font-size:10px;"  />
-				<input type="hidden" id="newroutename" name="newroutename" value=""/>
-				<script language="javascript">
-				function renameRoute() {
-					do {
-						var newname = prompt("<?php echo _("Rename route")?> " + document.getElementById('routename').value + " <?php echo _("to:")?>");
-						if (newname == null) return;
-					} while (!newname.match('^[a-zA-Z0-9][a-zA-Z0-9_\-]+$') && !alert("<?php echo _("Route name is invalid...please try again")?>"));
-					
-					document.getElementById('newroutename').value = newname;
-					document.getElementById('routeEdit').action.value = 'renameroute';
-					document.getElementById('routeEdit').submit();
-				}
-				</script>
-			</td>
-<?php  } else { // new ?>
 			<td>
 				<input type="text" size="20" name="routename" value="<?php echo htmlspecialchars($routename);?>" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
-<?php  } ?>
 		</tr>
 
 		<tr>
-      <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></a></td>
+      <td><a href=# class="info"><?php echo _("Route CID")?>:<span><?php echo _("Optional Route CID to be used for this route. If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></span></a></td>
 			<td>
-        <input type="text" size="20" name="routecid" value="<?php echo htmlspecialchars($routecid)?>" tabindex="<?php echo ++$tabindex;?>"/>
-			  <input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='routecid_mode' id="routecid_mode" value='override_extension' <?php if ($routecid_mode == 'override_extension') { echo 'CHECKED'; }?>><small><?php echo _("Override Extension CID")?></small>
+        <input type="text" size="20" name="outcid" value="<?php echo htmlspecialchars($outcid)?>" tabindex="<?php echo ++$tabindex;?>"/>
+        <input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='outcid_mode' id="outcid_mode" value='override_extension' <?php if ($outcid_mode == 'override_extension') { echo 'CHECKED'; }?>><a href=# class="info"><small><?php echo _("Override Extension")?></small><span><?php echo _("If checked the extension's Outbound CID will be ignored in favor of this CID. The extension's Emergency CID will still be used if the route is an Emergency Route and the Extension has a defined Emergency CID.")?></span></a>
       </td>
 		</tr>
 
 		<tr>
-			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.</span>")?></a></td>
+			<td><a href=# class="info"><?php echo _("Route Password")?>:<span><?php echo _("Optional: A route can prompt users for a password before allowing calls to progress.  This is useful for restricting calls to international destinations or 1-900 numbers.<br><br>A numerical password, or the path to an Authenticate password file can be used.<br><br>Leave this field blank to not prompt for password.")?></span></a></td>
 			<td><input type="text" size="20" name="routepass" value="<?php echo $routepass;?>" tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
-<?php
-	// implementation of module hook
-	// object was initialized in config.php
-	echo $module_hook->hookHtml;
-?>
+
 		<tr>
-			<td><a href=# class="info"><?php echo _("Emergency Dialing")?><span><?php echo _("Optional: Selecting this option will enforce the use of a device's Emergency CID setting (if set).  Select this option if this set of routes is used for emergency dialing (ie: 911).</span>")?></a>:</td>
-			<td><input type="checkbox" name="emergency" value="yes" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
+      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Comapny will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></a></td></span></a></td>
+      <td>
+        <input type="checkbox" name="emergency" value="YES" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Emergency") ?></small>
+        <input type="checkbox" name="intracompany" value="YES" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Intra-Company") ?></small>
+      </td>
 		</tr>
-		<tr>
-			<td><a href=# class="info"><?php echo _("Intra Company Route")?><span><?php echo _("Optional: Selecting this option will treat this route as a intra-company connection, preserving the internal Caller ID information and not use the outbound CID of either the extension or trunk.</span>")?></a>:</td>
-			<td><input type="checkbox" name="intracompany" value="yes" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
-		</tr>
+
 <?php   if (function_exists('music_list')) { ?>
+    <tr>
+      <td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
+      <td>
+        <select name="mohsilence" tabindex="<?php echo ++$tabindex;?>">
+        <?php
+          $tresults = music_list();
+          $cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
+          if (isset($tresults[0])) {
+            foreach ($tresults as $tresult) {
+              echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+            }
+          }
+        ?>		
+        </select>		
+      </td>
+    </tr>
+<?php } ?>
+
+<?php if (function_exists('timeconditions_timegroups_drawgroupselect')) { ?>
+    <tr>
+      <td><a href="#" class="info"><?php echo _("Time Group:")?><span><?php echo _("If this route should only be available during certain times then Select a Time Group created under Time Groups. The route will be ignored outside of times specified in that Time Group. If left as default of Permanent Route then it will always be available.")?></span></a></td>
+      <td><?php echo timeconditions_timegroups_drawgroupselect('time_group_id', $time_group_id, true, '', _('---Permanent Route---')); ?></td>
+    </tr>
 		<tr>
-			<td><a href="#" class="info"><?php echo _("Music On Hold?")?><span><?php echo _("You can choose which music category to use. For example, choose a type appropriate for a destination country which may have announcements in the appropriate language.")?></span></a></td>
+<?php } ?>
+
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Route Position")?><span><?php echo _("Where to insert this route or relocate it relative to the other routes.")?></span></a></td>
 			<td>
-				<select name="mohsilence" tabindex="<?php echo ++$tabindex;?>">
+				<select name="route_seq" tabindex="<?php echo ++$tabindex;?>">
 				<?php
-					$tresults = music_list();
-					$cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
-					if (isset($tresults[0])) {
-						foreach ($tresults as $tresult) {
-							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
-						}
-					}
+          if ($route_seq != 0) {
+            echo '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s %s'),0,$routepriority[0]['name'])."</option>\n";
+          }
+          foreach ($routepriority as $key => $route) {
+            if ($key == 0 && $route_seq != 0) continue;
+            if ($key == ($route_seq+1)) continue;
+            if ($route_seq == $key) {
+              echo '<option value="'.$key.'" SELECTED>'._('---No Change---')."</option>\n";
+            } else {
+              echo '<option value="'.$key.'">'.sprintf(_('Before %s %s'),$key,$route['name'])."</option>\n";
+            }
+          }
+          if ($extdisplay == '' | $route_seq != $last_seq) {
+            echo '<option value="'.$last_seq.'"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s %s'),$last_seq,$routepriority[$last_seq]['name'])."</option>\n";
+          }
 				?>		
 				</select>		
 			</td>
 		</tr>
-<?php } ?>
-		<tr>
-			<td colspan="2">
-				<a href=# class="info"><?php echo _("Dial Patterns")?><span><?php echo _("A Dial Pattern is a unique set of digits that will select this trunk. Enter one dial pattern per line.")?><br><br><b><?php echo _("Rules:")?></b><br>
-   <strong>X</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br>
-   <strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br>
-   <strong>N</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br>
-   <strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br>
-   <strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters")?> <br>
-   <strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("separates a dialing prefix from the number (for example, 9|NXXXXXX would match when some dialed \"95551234\" but would only pass \"5551234\" to the trunks)")?><br />
-   <strong>/</strong>&nbsp;&nbsp;&nbsp; <?php echo _("appended to a dial pattern, matches a callerid or callerid pattern (for example, NXXXXXX/104 would match only if dialed by extension \"104\")")?>
-				</span></a>
-			</td>
-		</tr>
-<?php  /* old code for using textboxes -- replaced by textarea code
-$key = -1;
-foreach ($dialpattern as $key=>$pattern) {
+<?php
+	if (!empty($module_hook->hookHtml)) {
 ?>
-		<tr>
-			<td><?php echo $key ?>
-			</td><td>
-				<input type="text" size="20" name="dialpattern[<?php echo $key ?>]" value="<?php echo $dialpattern[$key] ?>" tabindex="<?php echo ++$tabindex;?>"/>
-			</td>
-		</tr>
-<?php 
-} // foreach
+    <tr>
+      <td colspan="2"><h5><?php echo _("Additional Settings") ?><hr></h5></td>
+    </tr>
+<?php
+	  echo $module_hook->hookHtml;
+  }
+?>
+    <tr>
+      <td colspan="2"><h5>
+      <a href=# class="info"><?php echo _("Dial Patterns that will use this Route")?><span>
+      <?php echo _("A Dial Pattern is a unique set of digits that will select this route and send the call to the designated trunks. If a dialed pattern matches this route, no subsequent routes will be tried. If Time Groups are enabled, subsequent routes will be checked for matches outside of the designated time(s).")?><br /><br /><b><?php echo _("Rules:")?></b><br />
+      <b>X</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
+      <b>Z</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
+      <b>N</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
+      <b>[1237-9]</b>&nbsp;   <?php echo _("matches any digit in the brackets (example: 1,2,3,7,8,9)")?><br />
+      <b>.</b>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more dialed digits")?> <br />
+      <b><?php echo _("prepend")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Digits to prepend to a successful match. If the dialed number matches the patterns specified by the subsequent columns, then thise will be prepended before sending to the trunks.")?><br />
+      <b><?php echo _("prefix")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Prefix to remove on a successful match. The dialed number is compared to this and the subsequent columns for a match. Upon a match, this prefix is removed from the dialed number before sending it to the trunks.")?><br />
+      <b><?php echo _("match pattern")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("The dialed number will be compared against the  prefix + this match pattern. Upon a match, the match pattern portion of the dialed number will be sent to the trunks")?><br />
+      <b><?php echo _("CallerID")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("If CallerID is supplied, the dialed number will only match the prefix + match pattern if the CallerID being transmitted matches this. When extensions make outbound calls, the CallerID will be their extension number and NOT their Outbound CID. The above special matching sequences can be used for CallerID matching similar to other number matches.")?><br />
+      </span></a>
+      <hr></h5></td>
+    </tr>
 
-$key += 1; // this will be the next key value
+    <tr><td colspan="2">
+      <input type="button" id="dial-pattern-add"  value="<?php echo _("Add More Dial Pattern Fields")?>" />
+    </td></tr>
+
+    <tr><td colspan="2"><div class="dialpatterns"><table>
+<?php
+  $pp_tit = _("prepend");
+  $pf_tit = _("prefix");
+  $mp_tit = _("match pattern");
+  $ci_tit = _("CallerId");
+  foreach ($dialpattern_array as $idx => $pattern) {
+    $tabindex++;
+    $dpt_class = $pattern['prepend_digits'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+    <tr>
+      <td colspan="2">
+        (<input title="$pp_tit" type="text" size="5" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
+END;
+    $tabindex++;
+    $dpt_class = $pattern['match_pattern_prefix'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+        <input title="$pf_tit" type="text" size="4" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="$dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
+END;
+    $tabindex++;
+    $dpt_class = $pattern['match_pattern_pass'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+        [<input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="$dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex"> /
+END;
+    $tabindex++;
+    $dpt_class = $pattern['match_cid'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+        <input title="$ci_tit" type="text" size="14" id="match_cid_$idx" name="match_cid[$idx]" class="$dpt_class" value="{$pattern['match_cid']}" tabindex="$tabindex">]
+END;
 ?>
-		<tr>
-			<td><?php echo $key ?>
-			</td><td>
-				<input type="text" size="20" name="dialpattern[<?php echo $key ?>]" value="<?php echo $dialpattern[$key] ?>"/>
-			</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<br><input type="submit" value="<?php echo _("Add"); ?>">
-			</td>
-		</tr>
-<?php  */ ?>
-		<tr>
-			<td>
-			</td><td>
-				<textarea cols="20" rows="<?php  $rows = count($dialpattern)+1; echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) ); ?>" id="dialpattern" name="dialpattern"><?php echo  implode("\n",$dialpattern);?></textarea><br>
-				
-				<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>" />
-			</td>
-		</tr>
+        <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo _("$idx") ?>)">
+      </td>
+    </tr>
+<?php
+  }
+  $next_idx = count($dialpattern_array);
+?>
+    <tr>
+      <td colspan="2">
+        (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dial-pattern dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">) +
+        <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
+        [<input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> /
+        <input title="<?php echo $ci_tit?>" type="text" size="14" id="match_cid_<?php echo $next_idx?>" name="match_cid[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">]
+        <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
+
+      </td>
+    </tr>
+    <tr id="last_row"></tr> 
+    </table></div></tr></td>
+<?php
+  $tabindex += 2000; // make room for dynamic insertion of new fields
+?>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Dial patterns wizards")?><span>
@@ -461,51 +514,43 @@ $key += 1; // this will be the next key value
 	}
 ?>
 			}
-			
-						
+
 			function insertCode() {
 				code = document.getElementById('inscode').value;
 				insert = '';
 				switch(code) {
 					case "local":
-						insert = 'NXXXXXX\n';
+            insert = '<?php echo _("NXXXXXX") ?>';
 					break;
 					case "local10":
-						insert = 'NXXXXXX\n'+
-							'NXXNXXXXXX\n';
+            insert = '<?php echo _("NXXXXXX,NXXNXXXXXX") ?>';
 					break;
 					case 'tollfree':
-						insert = '1800NXXXXXX\n'+
-							'1888NXXXXXX\n'+
-							'1877NXXXXXX\n'+
-							'1866NXXXXXX\n';
+            insert = '<?php echo _("1800NXXXXXX,1888NXXXXXX,1877NXXXXXX,1866NXXXXXX") ?>';
 					break;
 					case "ld":
-						insert = '1NXXNXXXXXX\n';
+            insert = '<?php echo _("1NXXNXXXXXX") ?>';
 					break;
 					case "int":
-						insert = '011.\n';
+            insert = '<?php echo _("011.") ?>';
 					break;
 					case 'info':
-						insert = '411\n'+
-							'311\n';
+            insert = '<?php echo _("411,311") ?>';
 					break;
 					case 'emerg':
-						insert = '911\n';
+            insert = '<?php echo _("911") ?>';
 					break;
 					case 'lookup':
 						populateLookup();
 						insert = '';
 					break;
-					
 				}
-				dialPattern=document.getElementById('dialpattern');
-				if (dialPattern.value[ dialPattern.value.length - 1 ] == "\n") {
-					dialPattern.value = dialPattern.value + insert;
-				} else {
-					dialPattern.value = dialPattern.value + '\n' + insert;
-				}
-				
+
+        patterns = insert.split(',')
+        for (var i in patterns) {
+          addCustomField("","",patterns[i],"");
+        }
+
 				// reset element
 				document.getElementById('inscode').value = '';
 			}
@@ -525,11 +570,10 @@ $key += 1; // this will be the next key value
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td colspan="2">
-				<a href=# class="info"><?php echo _("Trunk Sequence")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a>
-			</td>
-		</tr>
+
+    <tr>
+      <td colspan="2"><h5><a href=# class="info"><?php echo _("Trunk Sequence for Matched Routes")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a><hr></h5></td>
+    </tr>
 		<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
 		<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
 		<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
@@ -540,10 +584,8 @@ $positions=count($trunkpriority);
 foreach ($trunkpriority as $key=>$trunk) {
 ?>
 		<tr>
-			<td align="right"><?php echo $key; ?>&nbsp;&nbsp;
-			</td>
-			<td>
-		<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]" style="background: <?php echo $trunkstate[$trunk]=="off"?"#FFF":"#DDD" ?> ;" onChange="showDisable(<?php echo $key ?>); return true;">
+			<td><?php echo $key; ?>&nbsp;&nbsp;
+		    <select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]" style="background: <?php echo $trunkstate[$trunk]=="off"?"#FFF":"#DDD" ?> ;" onChange="showDisable(<?php echo $key ?>); return true;">
 				<option value="" style="background: #FFF;"></option>
 				<?php 
 				foreach ($trunks as $name=>$display_description) {
@@ -556,10 +598,10 @@ foreach ($trunkpriority as $key=>$trunk) {
 				?>
 				</select>
 				
-				<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:0px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
+				<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
 			<?php   // move up
 			if ($key > 0) {?>
-				<img src="images/scrollup.gif" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
+				<img src="images/resultset_up.png" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  }
@@ -567,7 +609,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 			// move down
 			
 			if ($key < ($positions-1)) {?>
-				<img src="images/scrolldown.gif" onclick="repositionTrunk('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
+				<img src="images/resultset_down.png" onclick="repositionTrunk('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } ?>
@@ -585,8 +627,7 @@ $num_new_boxes = ($extdisplay ? 1 : ((count($trunks) > 3) ? 3 : count($trunks)))
 for ($i=0; $i < $num_new_boxes; $i++) {
 ?>
 		<tr>
-			<td>&nbsp;</td>
-			<td>
+			<td><?php echo $key; ?>&nbsp;&nbsp;
 				<select id='trunkpri<?php echo $key ?>' name="trunkpriority[<?php echo $key ?>]">
 				<option value="" SELECTED></option>
 				<?php 
@@ -605,14 +646,14 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	$key++;
 } //for 0..$num_new_boxes ?>
 
-<?php if ($extdisplay): // editing ?>
+<?php if ($extdisplay != ''): // editing ?>
 		<tr>
-			<td></td>
-			<td>
-				<input type="submit" value="<?php echo _("Add")?>">
+			<td colspan="2">
+				<input type="submit" value="<?php echo _("Add Trunk")?>">
 			</td>
 		</tr>
 <?php endif; // if $extdisplay ?>
+
 		<tr>
 			<td colspan="2">
 				<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
@@ -624,12 +665,82 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 <script language="javascript">
 <!--
 
+$(document).ready(function(){
+  /* Add a Custom Var / Val textbox */
+  $("#dial-pattern-add").click(function(){
+    addCustomField('','','','');
+  });
+  $(".dpt-title").toggleVal({
+    populateFrom: "title",
+    changedClass: "text-normal",
+    focusClass: "text-normal"
+  });
+  $(".dpt-value").toggleVal({
+    changedClass: "text-red"
+  });
+  /*TODO: call clearPattern() here, or move this to routeEdit_onsubmit()?
+  */
+  $("form").submit(function() {
+    $(this).find(".dpt-title").each(function() {
+      if($(this).val() == $(this).data("defText")) {
+        $(this).val("");
+      }
+    });
+  });
+}); 
+
+function patternsRemove(idx) {
+  $("#prepend_digit_"+idx+",#pattern_prefix_"+idx+",#pattern_pass_"+idx+",#match_cid_"+idx).each(function(){
+    this.value = '';
+  }).parent().parent().hide();
+}
+
+/* Insert a sip_setting/sip_value pair of text boxes */
+function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) {
+  var idx = $(".dial-pattern").size();
+  var idxp = idx - 1;
+  var tabindex = parseInt($("#match_cid_"+idxp).attr('tabindex')) + 1;
+  var tabindex1 = tabindex + 2;
+  var tabindex2 = tabindex + 3;
+  var tabindex3 = tabindex + 4;
+  var dpt_prepend_digit = prepend_digit == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_pattern_prefix = pattern_prefix == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_pattern_pass = pattern_pass == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_match_cid = match_cid == '' ? 'dpt-title' : 'dpt-value';
+
+  $("#last_row").before('\
+  <tr>\
+    <td colspan="2">\
+    (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
+    <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="'+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
+    [<input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="'+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'"> /\
+    <input title="<?php echo $ci_tit?>" type="text" size="14" id="match_cid_'+idx+'" name="match_cid['+idx+']" class="'+dpt_match_cid+'" value="'+match_cid+'" tabindex="'+tabindex3+'">]\
+      <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
+    </td>\
+  </tr>\
+  ');
+  // There's almost always one blank field so make sure these are done
+  $(".dpt-title").toggleVal({
+    populateFrom: "title",
+    changedClass: "text-normal",
+    focusClass: "text-normal"
+  });
+  // If any value were put in, handled those also
+  if (pattern_pass != '' || pattern_prefix != '' || prepend_digit != '' || match_cid != '') {
+    $(".dpt-value").toggleVal({
+      changedClass: "text-red"
+    });
+  }
+
+  return idx;
+}
+
 var theForm = document.routeEdit;
 
 if (theForm.routename.value == "") {
 	theForm.routename.focus();
 } else {
-	theForm.routecid.focus();
+	theForm.outcid.focus();
 }
 
 function showDisable(key) {
@@ -662,12 +773,14 @@ function routeEdit_onsubmit(act) {
 	defaultEmptyOK = true;
 	if (!isInteger(theForm.routepass.value))
 		return warnInvalid(theForm.routepass, msgInvalidRoutePwd);
-	if (!isCallerID(theForm.routecid.value))
-		return warnInvalid(theForm.routecid, msgInvalidOutboundCID);
+	if (!isCallerID(theForm.outcid.value))
+		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
 	
 	defaultEmptyOK = false;
+  /* TODO: get some sort of check in for dialpatterns
 	if (!isDialpattern(theForm.dialpattern.value))
 		return warnInvalid(theForm.dialpattern, msgInvalidDialPattern);
+    */
 		
 	if (theForm.trunkpri0.value == "") { // should they all be checked ?
 		theForm.trunkpri0.focus();
@@ -679,36 +792,48 @@ function routeEdit_onsubmit(act) {
 	return true;
 }
 
+function clearPatterns() {
+  $(".dpt-title").each(function() {
+    if($(this).val() == $(this).data("defText")) {
+      $(this).val("");
+    }
+  });
+}
+
+//TODO: maybe add action vs. it being blank and assumed above?
 function repositionTrunk(key,direction) {
-	if(direction == "up"){
-		document.getElementById('repotrunkdirection').value=direction;
-		document.getElementById('repotrunkkey').value=key;
-	}else if(direction == "down" ){
-		document.getElementById('repotrunkdirection').value=direction;
-		document.getElementById('repotrunkkey').value=key;
-	}
-	document.getElementById('routeEdit').submit();
+  switch (direction) {
+  case 'up':
+  case 'down':
+    document.getElementById('repotrunkdirection').value=direction;
+    document.getElementById('repotrunkkey').value=key;
+    clearPatterns();
+    document.getElementById('routeEdit').submit();
+    break;
+  }
 }
 
 function deleteTrunk(key) {
 	document.getElementById('trunkpri'+key).value = '';
+  clearPatterns();
 	document.getElementById('routeEdit').submit();
 }
 
 function repositionRoute(key,direction){
-	if(direction == "up"){
-		document.getElementById('reporoutedirection').value=direction;
-		document.getElementById('reporoutekey').value=key;
-	}else if(direction == "down" ){
-		document.getElementById('reporoutedirection').value=direction;
-		document.getElementById('reporoutekey').value=key;
-	}
-	document.getElementById('action').value='prioritizeroute';
-	document.getElementById('routeEdit').submit();
+  switch (direction) {
+  case 'up':
+  case 'down':
+  case 'top':
+  case 'bottom':
+    document.getElementById('reporoutedirection').value=direction;
+    document.getElementById('reporoutekey').value=key;
+    document.getElementById('action').value='prioritizeroute';
+    document.getElementById('routeEdit').submit();
+    break;
+  }
 }
 
 //-->
 </script>
 
 </form>
-

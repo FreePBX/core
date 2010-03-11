@@ -1,0 +1,19 @@
+.text-watermark {
+	color: #CCCCCC;
+}
+.dpt-title {
+	color: #CCCCCC;
+}
+.text-normal {
+	color: inherit;
+}
+.text-red {
+	color: red;
+}
+div.dialpatterns {
+	max-height: 15em; 
+	max-width: 100%; 
+	overflow: auto; 
+	border: 1px solid #CCCCCC;
+}
+

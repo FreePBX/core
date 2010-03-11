@@ -1518,89 +1518,34 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_macroexit());
 			}
 
-
 			/* outbound routes */
-			// modules should use their own table for storage (and module_get_config() to add dialplan)
-			// modules should NOT use the extension table to store anything!
-			$sql = "SELECT application FROM extensions where context = 'outbound-allroutes' ORDER BY application";
-			$outrts = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
 			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
-			foreach($outrts as $outrt) {
-				$ext->addInclude('outbound-allroutes',$outrt['application']);
-				$sql = "SELECT * FROM extensions where context = '".$outrt['application']."' ORDER BY extension, CAST(priority AS UNSIGNED) ASC";
-				$thisrt = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-				$lastexten = false;
-        $pri_noop = true;
-				foreach($thisrt as $exten) {
-					// Then do one call to user-callerid and record-enable instead of each time as in the past
-          // macro-user-callerid moved to outbound-allroutes to obtain proper CID info which can be used
-          // in more advanced routing
-					//
-					if ($pri_noop) {
-            $ext->add($outrt['application'], $exten['extension'], '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
-            $pri_noop = false;
-          }
-					//if emergencyroute, then set channel var
-					if(strpos($exten['args'],"EMERGENCYROUTE") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("EMERGENCYROUTE",substr($exten['args'],15)));
-					if(strpos($exten['args'],"INTRACOMPANYROUTE") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("INTRACOMPANYROUTE",substr($exten['args'],18)));
-					// Don't set MOHCLASS if already set, threre may be a feature code that overrode it
-					if(strpos($exten['args'],"MOHCLASS") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("MOHCLASS", '${IF($["x${MOHCLASS}"="x"]?'.substr($exten['args'],9).':${MOHCLASS})}' ));
-					if(strpos($exten['args'],"ROUTECID") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],9)));
-					if(strpos($exten['args'],"EXTEN_ROUTE_CID") !== false)
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.substr($exten['args'],16)));
-					if(strpos($exten['args'],"dialout-trunk") !== false || strpos($exten['args'],"dialout-enum") !== false || strpos($exten['args'],"dialout-dundi") !== false) {
-						if ($exten['extension'] !== $lastexten) {
-
-							// If NODEST is set, clear it. No point in remembering since dialout-trunk will just end in the
-							// bit bucket. But if answered by an outside line with transfer capability, we want NODEST to be
-							// clear so a subsequent transfer to an internal extension works and goes to voicmail or other
-							// destinations.
-							//
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_setvar("_NODEST",""));
-							$ext->add($outrt['application'], $exten['extension'], '', new ext_macro('record-enable,${AMPUSER},OUT'));
-							$lastexten = $exten['extension'];
-						}
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro($exten['args']));
-					}
-					if(strpos($exten['args'],"outisbusy") !== false) {
-						$ext->add($outrt['application'], $exten['extension'], '', new ext_macro("outisbusy"));
-            $pri_noop = true;
-          }
-				}
-			}
-
-if (true) { // new outbound routes
-			$ext->addInclude('from-internal-additional','outbound-allroutes-byid');
-			$ext->add('outbound-allroutes-byid', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
       $routes = core_routing_list();
       $trunk_table = core_trunks_listbyid();
       foreach ($routes as $route) {
         $context = 'outrt-'.$route['route_id'];
+        $comment = $route['name'];
+        $ext->addSectionComment($context, $comment);
+
         if (function_exists('timeconditions_timegroups_get_times') && $route['time_group_id'] !== null) {
           $times = timeconditions_timegroups_get_times($route['time_group_id']);
           if (is_array($times) && count($times)) {
             foreach ($times as $time) {
-              $ext->addInclude('outbound-allroutes-byid',$context.'|'.$time[1]);
+              $ext->addInclude('outbound-allroutes',$context.'|'.$time[1],$comment);
             }
           } else {
-            $ext->addInclude('outbound-allroutes-byid',$context);
+            $ext->addInclude('outbound-allroutes',$context,$comment);
           }
         } else {
-          $ext->addInclude('outbound-allroutes-byid',$context);
+          $ext->addInclude('outbound-allroutes',$context,$comment);
         }
 
         $patterns = core_routing_getroutepatternsbyid($route['route_id']);
         $trunks = core_routing_getroutetrunksbyid($route['route_id']);
 
         foreach ($patterns as $pattern) {
-          $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
-          $cid = $pattern['match_cid'];
-
           // returns:
           // array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
           //
@@ -1609,14 +1554,14 @@ if (true) { // new outbound routes
           $offset = $fpattern['offset'] == 0 ? '':':'.$fpattern['offset'];
 
           $ext->add($context, $exten, '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
-          if ($route['emergencyy_route'] != '') {
-						$ext->add($context, $exten, '', new ext_setvar("EMERGENCYROUTE",$route['emergencyy_route']));
+          if ($route['emergency_route'] != '') {
+						$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
           }
           if ($route['intracompany_route'] != '') {
-						$ext->add($context, $exten, '', new ext_setvar("INTRACOMPANYROUTE",$route['intracompany_route']));
+						$ext->add($context, $exten, '', new ext_set("INTRACOMPANYROUTE",$route['intracompany_route']));
           }
           if ($route['mohclass'] != '') {
-						$ext->add($context, $exten, '', new ext_setvar("MOHCLASS", '${IF($["${MOHCLASS}"=""]?'.$route['mohclass'].':${MOHCLASS})}' ));
+						$ext->add($context, $exten, '', new ext_set("MOHCLASS", '${IF($["${MOHCLASS}"=""]?'.$route['mohclass'].':${MOHCLASS})}' ));
           }
           if ($route['outcid'] != '') {
             if ($route['outcid_mode'] != '') {
@@ -1625,17 +1570,17 @@ if (true) { // new outbound routes
 						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['routecid']));
             }
           }
-          $ext->add($context, $exten, '', new ext_setvar("_NODEST",""));
+          $ext->add($context, $exten, '', new ext_set("_NODEST",""));
           $ext->add($context, $exten, '', new ext_macro('record-enable,${AMPUSER},OUT'));
 
           $password = $route['password'];
           foreach ($trunks as $trunk_id) {
-            if (isset($trunk_table[$trunk_id])) switch($trunk_table[$trunk_id]) {
+            if (isset($trunk_table[$trunk_id])) switch(strtolower($trunk_table[$trunk_id]['tech'])) {
             case 'dundi':
-              $trunk_macro = 'dialout-enum';
+              $trunk_macro = 'dialout-dundi';
               break;
             case 'enum':
-              $trunk_macro = 'dialout-dundi';
+              $trunk_macro = 'dialout-enum';
               break;
             default:
               $trunk_macro = 'dialout-trunk';
@@ -1647,7 +1592,6 @@ if (true) { // new outbound routes
           $ext->add($context, $exten, '', new ext_macro("outisbusy"));
         }
       }
-} // new outbound routes
 
 			general_generate_indications();
 
@@ -4844,9 +4788,9 @@ function core_routing_setrouteorder($route_id, $seq) {
     unset($sequence[$key]);
     array_unshift($sequence,$route_id);
     break;
-  case 'new':
-    unset($sequence[$key]);
   case 'bottom':
+    unset($sequence[$key]);
+  case 'new':
     // fallthrough, no break
     $sequence[]=$route_id;
     break;
@@ -4971,10 +4915,10 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
   $route_id = $db->escapeSimple($route_id);
   $name = $db->escapeSimple($name);
   $outcid = $db->escapeSimple($outcid);
-  $outcid_mode = $db->escapeSimple($outcid_mode);
+  $outcid_mode = trim($outcid) == '' ? '' : $db->escapeSimple($outcid_mode);
   $password = $db->escapeSimple($password);
-  $emergency_route = $db->escapeSimple($emergency_route);
-  $intracompany_route = $db->escapeSimple($intracompany_route);
+  $emergency_route = strtoupper($db->escapeSimple($emergency_route));
+  $intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
   $mohclass = $db->escapeSimple($mohclass);
   $seq = $db->escapeSimple($seq);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
@@ -5000,8 +4944,8 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
   $outcid = $db->escapeSimple($outcid);
   $outcid_mode = $db->escapeSimple($outcid_mode);
   $password = $db->escapeSimple($password);
-  $emergency_route = $db->escapeSimple($emergency_route);
-  $intracompany_route = $db->escapeSimple($intracompany_route);
+  $emergency_route = strtoupper($db->escapeSimple($emergency_route));
+  $intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
   $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
@@ -5094,619 +5038,86 @@ function core_timegroups_usage($group_id) {
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
+// The following APIs have all been removed and will result in crashes with traceback to obtain calling tree information
 
-//get unique outbound route names
-function core_routing_getroutenames() 
-{
-	global $amp_conf;
-	
-	if ($amp_conf["AMPDBENGINE"] == "sqlite3") 
-	{
-		// SUBSTRING is not supported under sqlite3, we need to filter
-		// this in php. I am not sure why "6" and not "7"
-		// but I don't really care -> it works :)
-		$results = sql("SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
-		foreach( array_keys($results) as $idx )
-		{
-			 $results[$idx][0] = substr( $results[$idx][0], 6);
-		}
-	}
-	else
-	{
-		// we SUBSTRING() to remove "outrt-"
-		$results = sql("SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
-	}
-
-
-	//TODO: This needs to be yanked, should be in the upgrade script somewhere not here
-	//
-	if (count($results) == 0) {
-		// see if they're still using the old dialprefix method
-		if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
-			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\_OUT\_%' ESCAPE '\'";
-		}
-		else  {
-			$sql ="SELECT variable,value FROM globals WHERE variable LIKE 'DIAL\\\_OUT\\\_%'";
-		}
-		$results = sql($sql,"getAll");
-		// we SUBSTRING() to remove "outrt-"
-		
-		if (count($results) > 0) {
-			// yes, they are using old method, let's update
-			
-			// get the default trunk
-			$results_def = sql("SELECT value FROM globals WHERE variable = 'OUT'","getAll");
-			
-			if (preg_match("/{OUT_(\d+)}/", $results_def[0][0], $matches)) {
-				$def_trunk = $matches[1];
-			} else {
-				$def_trunk = "";
-			}
-			
-			$default_patterns = array(	// default patterns that used to be in extensions.conf
-						"NXXXXXX",
-						"NXXNXXXXXX",
-						"1800NXXXXXX",
-						"1888NXXXXXX",
-						"1877NXXXXXX",
-						"1866NXXXXXX",
-						"1NXXNXXXXXX",
-						"011.",
-						"911",
-						"411",
-						"311",
-						);
-			
-			foreach ($results as $temp) {
-				// temp[0] is "DIAL_OUT_1"
-				// temp[1] is the dial prefix
-				
-				$trunknum = substr($temp[0],9);
-				
-				$name = "route".$trunknum;
-				
-				$trunks = array(1=>"OUT_".$trunknum); // only one trunk to use
-				
-				$patterns = array();
-				foreach ($default_patterns as $pattern) {
-					$patterns[] = $temp[1]."|".$pattern;
-				}
-				
-				if ($trunknum == $def_trunk) {
-					// this is the default trunk, add the patterns with no prefix
-					$patterns = array_merge($patterns, $default_patterns);
-				}
-				
-				// add this as a new route
-				core_routing_add($name, $patterns, $trunks,"new");
-			}
-			
-			
-			// delete old values
-			if ($amp_conf["AMPDBENGINE"] == "sqlite3")  {
-				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL\_OUT\_%') ESCAPE '\' OR (variable = 'OUT') ";
-			}
-			else  {
-				$sql = "DELETE FROM globals WHERE (variable LIKE 'DIAL\\\_OUT\\\_%') OR (variable = 'OUT') ";
-			}
-			sql($sql);
-
-			// we need to re-generate extensions_additional.conf
-			// i'm not sure how to do this from here
-			
-			// re-run our query
-			$results = sql("SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ","getAll");
-			// we SUBSTRING() to remove "outrt-"
-		}
-		
-	} // else, it just means they have no routes.
-	
-	return $results;
+function core_routing_getroutenames() {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)
-{
-	global $db, $amp_conf;
-	$counter=-1;
-	foreach ($routepriority as $tresult) 
-	{
-		$counter++;
-		if (($counter==($reporoutekey-1)) && ($reporoutedirection=="up")) {
-			// swap this one with the one before (move up)
-			$temproute = $routepriority[$counter];
-			$routepriority[ $counter ] = $routepriority[ $counter+1 ];
-			$routepriority[ $counter+1 ] = $temproute;
-			
-		} else if (($counter==($reporoutekey)) && ($reporoutedirection=="down")) {
-			// swap this one with the one after (move down)
-			$temproute = $routepriority[ $counter+1 ];
-			$routepriority[ $counter+1 ] = $routepriority[ $counter ];
-			$routepriority[ $counter ] = $temproute;
-		}
-	}
-	unset($temproute);
-	$routepriority = array_values($routepriority); // resequence our numbers
-	$counter=0;
-	foreach ($routepriority as $tresult) {
-		$order=core_routing_setroutepriorityvalue($counter++);
-		$sql = sprintf("Update extensions set context='outrt-%s-%s' WHERE context='outrt-%s'",$order,substr($tresult[0],4), $tresult[0]);
-		$result = $db->query($sql); 
-		if(DB::IsError($result)) {     
-			die_freepbx($result->getMessage()); 
-		}
-	}
-	
-	// Delete and readd the outbound-allroutes entries
-	$sql = "delete from  extensions WHERE context='outbound-allroutes'";
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-        	die_freepbx($result->getMessage().$sql);
-	}
-	
-	$sql = "SELECT DISTINCT context FROM extensions WHERE context like 'outrt-%' ORDER BY context";
-	$results = $db->getAll($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-
-	$priority_loops=1;	
-	foreach ($results as $row) {
-		$sql = "INSERT INTO extensions (context, extension, priority, application, args, descr, flags) VALUES ";
-		$sql .= "('outbound-allroutes', ";
-		$sql .= "'include', ";
-		$sql .= "'".$priority_loops++."', ";
-		$sql .= "'".$row[0]."', ";
-		$sql .= "'', ";
-		$sql .= "'', ";
-		$sql .= "'2')";
-	
-		//$sql = sprintf("Update extensions set application='outrt-%s-%s' WHERE context='outbound-allroutes' and  application='outrt-%s'",$order,substr($tresult[0],4), $tresult[0]);
-		$result = $db->query($sql); 
-		if(DB::IsError($result)) {     
-			die_freepbx($result->getMessage(). $sql); 
- 		}
-	}
-	
-	if ( $amp_conf["AMPDBENGINE"] == "sqlite3")
-		$sql = "SELECT DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
-	else
-		$sql = "SELECT DISTINCT SUBSTRING(context,7) FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context ";
-
-        // we SUBSTRING() to remove "outrt-"
-        $routepriority = $db->getAll($sql);
-        if(DB::IsError($routepriority)) {
-                die_freepbx($routepriority->getMessage());
-        }
-
-	// TODO: strip the context on the sqlite3 backend
-	// not sure where does it effects, since this is working on my setup...
-	// welcome to funky town
-        return ($routepriority);
+function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey) {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
 function core_routing_setroutepriorityvalue($key)
 {
-	$key=$key+1;
-	if ($key<10)
-		$prefix = sprintf("00%d",$key);
-	else if ((9<$key)&&($key<100))
-		$prefix = sprintf("0%d",$key);
-	else if ($key>100)
-		$prefix = sprintf("%d",$key);
-	return ($prefix);
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-
 function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "", $routecid_mode = "") {
-
-	global $db;
-
-	$trunktech=array();
-
-	// Make sure only valid characters are there, javascript should enforce this (and more)
-	//
-	$name = preg_replace("/[^a-zA-Z0-9_\-]/" ,"",$name);
-
-	//Retrieve each trunk tech for later lookup
-	//
-	$result = core_trunks_list(true);
-	foreach($result as $tr) {
-		$trunktech[$tr['globalvar']] = $tr['tech'];
-	}
-	
- 	if ($method=="new") {	
-		$sql="select DISTINCT context FROM extensions WHERE context LIKE 'outrt-%' ORDER BY context";
-		$routepriority = $db->getAll($sql);
-		if(DB::IsError($routepriority)) {
-			die_freepbx($routepriority->getMessage());
-		}
-		$order=core_routing_setroutepriorityvalue(count($routepriority));
-		$name = sprintf ("%s-%s",$order,$name);
-	}
-	$trunks = array_values($trunks); // probably already done, but it's important for our dialplan
-
-	
-	foreach ($patterns as $pattern) {
-		if (false !== ($pos = strpos($pattern,"|"))) {
-
-      // ticket #3998: the $pos above is incorrect if a range is included such as
-      // 9[0-3]|NXX.
-      // in this case we end up with EXTEN:6 instead of the correct EXTEN:2
-      //
-      $pos = strpos(preg_replace('/(\[[^\]]*\])/','X',$pattern),"|");
-
-			// we have a | meaning to not pass the digits on
-			// (ie, 9|NXXXXXX should use the pattern _9NXXXXXX but only pass NXXXXXX, not the leading 9)
-			
-			$pattern = str_replace("|","",$pattern); // remove all |'s
-			$exten = "EXTEN:".$pos; // chop off leading digit
-		} else {
-			// we pass the full dialed number as-is
-			$exten = "EXTEN"; 
-		}
-		
-		if (!preg_match("/^[0-9*]+$/",$pattern)) { 
-			// note # is not here, as asterisk doesn't recoginize it as a normal digit, thus it requires _ pattern matching
-			
-			// it's not strictly digits, so it must have patterns, so prepend a _
-			$pattern = "_".$pattern;
-		}
-		
-		// 1st priority is emergency dialing variable (if set)
-		if(!empty($emergency)) {
-			$startpriority = 1;
-			$sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-			$sql .= "('outrt-".$name."', ";
-			$sql .= "'".$pattern."', ";
-			$sql .= "'".$startpriority."', ";
-			$sql .= "'SetVar', ";
-			$sql .= "'EMERGENCYROUTE=YES', ";
-			$sql .= "'Use Emergency CID for device')";
-			$result = $db->query($sql);
-			if(DB::IsError($result)) {
-				die_freepbx($result->getMessage());
-			}
-		} else {
-			$startpriority = 0;
-		}
-
-		// Next Priority (either first or second depending on above)
-		if(!empty($intracompany)) {
-			   $startpriority += 1;
-			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-			   $sql .= "('outrt-".$name."', ";
-			   $sql .= "'".$pattern."', ";
-			   $sql .= "'".$startpriority."', ";
-			   $sql .= "'SetVar', ";
-			   $sql .= "'INTRACOMPANYROUTE=YES', ";
-			   $sql .= "'Preserve Intenal CID Info')";
-			   $result = $db->query($sql);
-				if(DB::IsError($result)) {
-					   die_freepbx($result->getMessage());
-				}
-		}
-
-		// Next Priority (either first, second or third depending on above)
-		if(!empty($mohsilence) && trim($mohsilence) != 'default') {
-			   $startpriority += 1;
-			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-			   $sql .= "('outrt-".$name."', ";
-			   $sql .= "'".$pattern."', ";
-			   $sql .= "'".$startpriority."', ";
-			   $sql .= "'SetVar', ";
-			   $sql .= "'MOHCLASS=".$mohsilence."', ";
-			   $sql .= "'Do not play moh on this route')";
-			   $result = $db->query($sql);
-				if(DB::IsError($result)) {
-					   die_freepbx($result->getMessage());
-				}
-		}
- 
-		// Next Priority (either first, second or third depending on above)
-		if(!empty($routecid)) {
-      $mode = ($routecid_mode == 'override_extension' ? 'ROUTECID':'EXTEN_ROUTE_CID');
-			   $startpriority += 1;
-			   $sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-			   $sql .= "('outrt-".$name."', ";
-			   $sql .= "'".$pattern."', ";
-			   $sql .= "'".$startpriority."', ";
-			   $sql .= "'SetVar', ";
-			   $sql .= "'$mode=".$routecid."', ";
-			   $sql .= "'Force this CID for this Route')";
-			   $result = $db->query($sql);
-				if(DB::IsError($result)) {
-					   die_freepbx($result->getMessage());
-				}
-		}
-
-		$first_trunk = 1;
-		foreach ($trunks as $priority => $trunk) {
-			$priority += $startpriority;
-			$priority += 1; // since arrays are 0-based, but we want priorities to start at 1
-			
-			$sql = "INSERT INTO extensions (context, extension, priority, application, args) VALUES ";
-			$sql .= "('outrt-".$name."', ";
-			$sql .= "'".$pattern."', ";
-			$sql .= "'".$priority."', ";
-			$sql .= "'Macro', ";
-			if ($first_trunk)
-				$pass_str = $pass;
-			else
-				$pass_str = "";
-
-			if ($trunktech[$trunk] == "ENUM") {
-				$sql .= "'dialout-enum,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
-			} else if ($trunktech[$trunk] == "DUNDI") {
-				$sql .= "'dialout-dundi,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
-			} else {
-				$sql .= "'dialout-trunk,".substr($trunk,4).",\${".$exten."},".$pass_str."'"; // cut off OUT_ from $trunk
-			}
-			$sql .= ")";
-			
-			$result = $db->query($sql);
-			if(DB::IsError($result)) {
-				die_freepbx($result->getMessage());
-			}
-			//To identify the first trunk in a pattern
-			//so that passwords are in the first trunk in
-			//each pattern
-			$first_trunk = 0;
-		}
-		
-		$priority += 1;
-		$sql = "INSERT INTO extensions (context, extension, priority, application, args, descr) VALUES ";
-		$sql .= "('outrt-".$name."', ";
-		$sql .= "'".$pattern."', ";
-		$sql .= "'".$priority."', ";
-		$sql .= "'Macro', ";
-		$sql .= "'outisbusy', ";
-		$sql .= "'No available circuits')";
-		
-		$result = $db->query($sql);
-		if(DB::IsError($result)) {
-			die_freepbx($result->getMessage());
-		}
-	}
-
-	
-	// add an include=>outrt-$name  to [outbound-allroutes]:
-	
-	// we have to find the first available priority.. priority doesn't really matter for the include, but
-	// there is a unique index on (context,extension,priority) so if we don't do this we can't put more than
-	// one route in the outbound-allroutes context.
-	$sql = "SELECT priority FROM extensions WHERE context = 'outbound-allroutes' AND extension = 'include'";
-	$results = $db->getAll($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-	$priorities = array();
-	foreach ($results as $row) {
-		$priorities[] = $row[0];
-	}
-	for ($priority = 1; in_array($priority, $priorities); $priority++);
-	
-	// $priority should now be the lowest available number
-	
-	$sql = "INSERT INTO extensions (context, extension, priority, application, args, descr, flags) VALUES ";
-	$sql .= "('outbound-allroutes', ";
-	$sql .= "'include', ";
-	$sql .= "'".$priority."', ";
-	$sql .= "'outrt-".$name."', ";
-	$sql .= "'', ";
-	$sql .= "'', ";
-	$sql .= "'2')";
-	
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-		die_freepbx($priority.$result->getMessage());
-	}
-	
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
 function core_routing_edit($name, $patterns, $trunks, $pass, $emergency="", $intracompany = "", $mohsilence="", $routecid = "", $routecid_mode) {
-	core_routing_del($name);
-	core_routing_add($name, $patterns, $trunks,"edit", $pass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
 function core_routing_del($name) {
-	global $db;
-	$sql = "DELETE FROM extensions WHERE context = 'outrt-".$name."'";
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage());
-	}
-	
-	$sql = "DELETE FROM extensions WHERE context = 'outbound-allroutes' AND application = 'outrt-".$name."' ";
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage());
-	}
-	
-	return $result;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-/* Delete all occurences of the specified trunk from all routes that may use it
- */
 function core_routing_trunk_del($trunknum) {
-	global $db;
-
-  $sql = "DELETE FROM `extensions` WHERE `application` = 'Macro' AND `context` LIKE 'outrt-%' AND `args` LIKE 'dialout-%,$trunknum,%'";
-	$result = $db->query($sql);
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
 function core_routing_rename($oldname, $newname) {
-	global $db;
-
-	$route_prefix=substr($oldname,0,4);
-	$newname=$route_prefix.$newname;
-	$sql = "SELECT context FROM extensions WHERE context = 'outrt-".$newname."'";
-	$results = $db->getAll($sql);
-	if (count($results) > 0) {
-		// there's already a route with this name
-		return false;
-	}
-	
-	$sql = "UPDATE extensions SET context = 'outrt-".$newname."' WHERE context = 'outrt-".$oldname."'";
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage());
-	}
-        $mypriority=sprintf("%d",$route_prefix);	
-	$sql = "UPDATE extensions SET application = 'outrt-".$newname."', priority = '$mypriority' WHERE context = 'outbound-allroutes' AND application = 'outrt-".$oldname."' ";
-	$result = $db->query($sql);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage());
-	}
-	
-	return true;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get unique outbound route patterns for a given context
 function core_routing_getroutepatterns($route) {
-	global $db;
-	$sql = "SELECT extension, args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk%' OR args LIKE 'dialout-enum%' OR args LIKE 'dialout-dundi%') ORDER BY extension ";
-	$results = $db->getAll($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-	
-	$patterns = array();
-	foreach ($results as $row) {
-		if ($row[0][0] == "_") {
-			// remove leading _
-			$pattern = substr($row[0],1);
-		} else {
-			$pattern = $row[0];
-		}
-		
-		if (preg_match("/{EXTEN:(\d+)}/", $row[1], $matches)) {
-			// this has a digit offset, we need to insert a |
-			$pattern = substr($pattern,0,$matches[1])."|".substr($pattern,$matches[1]);
-		}
-		
-		$patterns[] = $pattern;
-	}
-	return array_unique($patterns);
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get unique outbound route trunks for a given context
 function core_routing_getroutetrunks($route) {
-	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY CAST(priority as UNSIGNED) ";
-	$results = $db->getAll($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-	
-	$trunks = array();
-	foreach ($results as $row) {
-		if (preg_match('/^dialout-trunk,(\d+)/', $row[0], $matches)) {
-			// check in_array -- even though we did distinct
-			// we still might get ${EXTEN} and ${EXTEN:1} if they used | to split a pattern
-			if (!in_array("OUT_".$matches[1], $trunks)) {
-				$trunks[] = "OUT_".$matches[1];
-			}
-		} else if (preg_match('/^dialout-enum,(\d+)/', $row[0], $matches)) {
-			if (!in_array("OUT_".$matches[1], $trunks)) {
-				$trunks[] = "OUT_".$matches[1];
-			}
-		} else if (preg_match('/^dialout-dundi,(\d+)/', $row[0], $matches)) {
-			if (!in_array("OUT_".$matches[1], $trunks)) {
-				$trunks[] = "OUT_".$matches[1];
-			}
-		}
-	}
-	return $trunks;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-
-//get password for this route
 function core_routing_getroutepassword($route) {
-	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'dialout-trunk,%' OR args LIKE 'dialout-enum,%' OR args LIKE 'dialout-dundi,%') ORDER BY CAST(priority as UNSIGNED) ";
-	$results = $db->getOne($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-	if (preg_match('/^.*,.*,.*,(\d+|\/\S+)/', $results, $matches)) {
-		$password = $matches[1];
-	} else {
-		$password = "";
-	}
-	
-	return $password;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get emergency state for this route
 function core_routing_getrouteemergency($route) {
-	global $db;
-	$sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'EMERGENCYROUTE%') ";
-	$results = $db->getOne($sql);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage());
-	}
-	if (preg_match('/^.*=(.*)/', $results, $matches)) {
-		$emergency = $matches[1];
-	} else {
-		$emergency = "";
-	}
-	
-	return $emergency;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get intracompany routing status for this route
 function core_routing_getrouteintracompany($route) {
-
-       global $db;
-       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'INTRACOMPANYROUTE%') ";
-       $results = $db->getOne($sql);
-       if(DB::IsError($results)) {
-               die_freepbx($results->getMessage());
-       }
-       if (preg_match('/^.*=(.*)/', $results, $matches)) {
-               $intracompany = $matches[1];
-       } else {
-               $intracompany = "";
-       }
-       return $intracompany;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get mohsilence routing status for this route
 function core_routing_getroutemohsilence($route) {
-
-       global $db;
-       $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'MOHCLASS%') ";
-       $results = $db->getOne($sql);
-       if(DB::IsError($results)) {
-               die_freepbx($results->getMessage());
-       }
-       if (preg_match('/^.*=(.*)/', $results, $matches)) {
-               $mohsilence = $matches[1];
-       } else {
-               $mohsilence = "";
-       }
-       return $mohsilence;
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
-
-//get routecid routing status for this route
 function core_routing_getroutecid($route) {
-  global $db;
-
-  $sql = "SELECT DISTINCT args FROM extensions WHERE context = 'outrt-".$route."' AND (args LIKE 'ROUTECID%' OR args LIKE 'EXTEN_ROUTE_CID%') ";
-  $results = $db->getOne($sql);
-  if(DB::IsError($results)) {
-    die_freepbx($results->getMessage());
-  }
-  if (preg_match('/^(.*)=(.*)/', $results, $matches)) {
-    $routecid = $matches[2];
-    $routecid_mode = $matches[1] == 'ROUTECID' ? 'override_extension':'';
-  } else {
-    $routecid = '';
-    $routecid_mode = '';
-  }
-  return array('routecid' => $routecid, 'routecid_mode' => $routecid_mode);
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
 }
 
+/* end of outbound routes */
 
 function general_get_zonelist() {
         return array(
