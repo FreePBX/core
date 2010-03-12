@@ -183,6 +183,13 @@ class core_conf {
 			$call_limit = "";
 			$ver12 = true;
 		}
+		if (version_compare($ast_version, "1.6", "ge")) { 
+			$faxdetect = "faxdetect=no\n";
+			$ver16 = true;
+		} else {
+			$faxdetect = "";
+			$ver16 = false;
+		}
 
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
@@ -309,6 +316,9 @@ class core_conf {
 					if ($call_limit) {
 						$output .= $call_limit;
 					}
+					if ($faxdetect) {
+						$output .= $faxdetect;
+					}
 			}
 			$output .= $additional."\n";
 		}
@@ -371,9 +381,9 @@ class core_conf {
 							$additional .= $result['keyword']."=$option\n";
 						break;
 					case 'requirecalltoken':
-                                               if ($option != '')
-                                                       $additional .= $result['keyword']."=$option\n";
-                                               break;
+            if ($option != '')
+              $additional .= $result['keyword']."=$option\n";
+            break;
 					default:
 						$additional .= $result['keyword']."=$option\n";
 				}
@@ -446,9 +456,9 @@ class core_conf {
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
 						case 'requirecalltoken':
-                                                       if ($option != '')
-                                                               $output .= $result2['keyword']."=".$result2['data']."\n";
-                                                       break;
+              if ($option != '')
+                $output .= $result2['keyword']."=".$result2['data']."\n";
+              break;
 						case 'record_in':
 						case 'record_out':
 							break;
@@ -479,9 +489,6 @@ class core_conf {
 					}
 					break;
 				default:
-					if ($call_limit) {
-						$output .= $call_limit;
-					}
 			}
 			$output .= $additional."\n";
 		}
@@ -1498,9 +1505,8 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_gotoif('$["${ARG2}"="Group"]', 'Group','OUT'));
 			  $ext->add($context, $exten, 'Group', new ext_set('LOOPCNT','${FIELDQTY(ARG1,-)}'));
 			  $ext->add($context, $exten, '', new ext_set('ITER','1'));
-			  $ext->add($context, $exten, 'begin', new ext_set('RECSET','"${DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording)}"'));
-				$ext->add($context, $exten, '', new ext_gotoif('$["${RECSET}"="" | "${CUT(RECSET,\\\\\|,2):3}" != "Always"]', 'continue'));
-			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})'));
+				$ext->add($context, $exten, 'begin', new ext_gotoif('$["${CUT(DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording),=,3)}" != "Always"]', 'continue'));
+			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})}'));
 			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${TEXTEN}'));
 			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','g${TEXTEN}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
 			  $ext->add($context, $exten, '', new ext_goto('record'));

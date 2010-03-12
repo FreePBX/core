@@ -569,7 +569,7 @@ if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "first
 	}
 	foreach ($extarray as $k ) {
 		// we loop through the original array to get the extensions in order of importance
-		if ($ext_hunt[$k]) {
+		if (isset($ext_hunt[$k]) && $ext_hunt[$k]) {
 			//If the original array is included in the extension hash then set variables
 			$myhuntmember="HuntMember"."$loops";
 			if (($rgmethod == "hunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
