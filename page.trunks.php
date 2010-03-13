@@ -298,6 +298,13 @@ if (!$tech && !$extdisplay) {
 			echo _("This trunk will not be able to be used for outbound calls until a route is setup that uses it. Click on <b>Outbound Routes</b> to setup routing.");
 			echo "</span></a>";
 		}
+		$usage_list = framework_display_destination_usage(core_getdest(ltrim($extdisplay,'OUT_')));
+		if (!empty($usage_list)) {
+		?>
+			<a href="#" class="info"><?php echo $usage_list['text']?><span><?php echo $usage_list['tooltip']?></span></a>
+		<?php
+		}
+
 
 	} else {
 		// set defaults

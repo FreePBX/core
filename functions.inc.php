@@ -628,6 +628,17 @@ function core_destinations() {
 			}
 		}
 	}
+
+  $trunklist = core_trunks_listbyid();
+  if (is_array($trunklist)) foreach ($trunklist as $trunk) {
+    switch($trunk['tech']) {
+      case 'enum':
+        break;
+      default:
+				$extens[] = array('destination' => 'ext-trunk,'.$trunk['trunkid'].',1', 'description' => $trunk['name'].' ('.$trunk['tech'].')', 'category' => 'Trunks');
+        break;
+    }
+  }
 	
 	if (isset($extens))
 		return $extens;
@@ -637,6 +648,7 @@ function core_destinations() {
 
 function core_getdest($exten) {
 	$dests[] = 'from-did-direct,'.$exten.',1';
+	$dests[] = 'ext-trunk,'.$exten.',1';
 	if (!function_exists('voicemail_mailbox_get')) {
 		return $dests;
 	}
@@ -669,6 +681,21 @@ function core_getdestinfo($dest) {
 			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$thisexten['name']),
 			             'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
 								  );
+		}
+
+
+  } else if (substr(trim($dest),0,10) == 'ext-trunk,') {
+		$exten = explode(',',$dest);
+		$exten = $exten[1];
+		$thisexten = core_trunks_getDetails($exten);
+		if (empty($thisexten)) {
+			return array();
+		} else {
+		  $display = 'trunks';
+		  return array('description' => sprintf(_('Trunk: %s (%s)'),$thisexten['name'],$thisexten['tech']),
+		              'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten),
+							    );
+
 		}
 
 	// Check for voicemail box destinations
@@ -1308,34 +1335,112 @@ function core_get_config($engine) {
 				$ext->add('ext-local', 'vmret', '', new ext_goto('1','return','${IVR_CONTEXT}'));
 			}
 
+      /* Create the from-trunk-tech-chanelid context that can be used for inbound group counting
+       * Create the DUNDI macros for DUNDI trunks
+       * Create the ext-trunk context for direct trunk dialing TODO: should this be its own module?
+       */
+			$trunklist = core_trunks_listbyid();
+			if (is_array($trunklist) && count($trunklist)) {
 
-			// create from-trunk context for each trunk that adds counts to channels
-			//
-			$trunklist = core_trunks_list(true);
-			if (is_array($trunklist)) {
+        $tcontext = 'ext-trunk';
+        $texten = 'tdial';
+        $tcustom = 'tcustom';
+        $generate_texten = false;
+        $generate_tcustom = false;
+
 				foreach ($trunklist as $trunkprops) {
-					if (trim($trunkprops['value']) == 'on') {
-						// value of on is disabled and for zap we don't create a context
+					if (trim($trunkprops['disabled']) == 'on') {
 						continue;
 					}
 					switch ($trunkprops['tech']) {
-						case 'DUNDI':
-							$macro_name = 'macro-dundi-'.substr($trunkprops['globalvar'],4);
-							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['name']);
+						case 'dundi':
+							$macro_name = 'macro-dundi-'.$trunkprops['trunkid'];
+							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['channelid']);
 							$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
-						case 'IAX':
-						case 'IAX2':
-						case 'SIP':
-							$trunkgroup = $trunkprops['globalvar'];
-							$trunkcontext  = "from-trunk-".strtolower($trunkprops['tech'])."-".$trunkprops['name'];
-							$ext->add($trunkcontext, '_.', '', new ext_setvar('GROUP()',$trunkgroup));
+
+							$trunkgroup = 'OUT_'.$trunkprops['trunkid'];
+							$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
+							$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
+
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
+              if ($ast_lt_16) { 
+                $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
+              } else {
+                $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
+              }
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+              $ext->add($tcontext, $trunkprops['trunkid'], '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'hangit',new ext_hangup());
+							break;
+
+						case 'iax':
+              $trukprops['tech'] = 'iax2';
+              // fall-through
+						case 'iax2':
+						case 'sip':
+							$trunkgroup = 'OUT_'.$trunkprops['trunkid'];
+							$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
+							$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
+							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
+              // fall-through
+						case 'zap':
+						case 'dahdi':
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',strtoupper($trunkprops['tech']).'/'.$trunkprops['channelid']));
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('DIAL_TRUNK',$trunkprops['trunkid'] ));
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_goto('1',$texten,'ext-trunk'));
+              $generate_texten = true;
+							break;
+
+            // TODO we don't have the OUTNUM until later so fix this...
+						case 'custom':
+              $dial_string = str_replace('$OUTNUM$','\\\\$\\\\{OUTNUM\\\\}',$trunkprops['channelid']);
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',$dial_string));
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('DIAL_TRUNK',$trunkprops['trunkid'] ));
+							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_goto('1',$tcustom,'ext-trunk'));
+              $generate_tcustom = true;
+							break;
+
+						case 'enum':
+              // Not Supported
 							break;
 						default:
 					}
 				}
-			}
 
+        if ($generate_tcustom) {
+          $ext->add($tcontext,$tcustom,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
+          $ext->add($tcontext,$tcustom,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
+          $ext->add($tcontext,$tcustom,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
+          if ($ast_lt_16) { 
+            $ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
+          } else {
+            $ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
+          }
+          $ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
+          $ext->add($tcontext,$tcustom,'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+          $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}','300,${DIAL_TRUNK_OPTIONS}'));
+          $ext->add($tcontext,$tcustom,'hangit',new ext_hangup());
+        }
+
+        if ($generate_texten) {
+          $ext->add($tcontext,$texten,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
+          $ext->add($tcontext,$texten,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
+          $ext->add($tcontext,$texten,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
+          if ($ast_lt_16) { 
+            $ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
+          } else {
+            $ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
+          }
+          $ext->add($tcontext,$texten,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
+          $ext->add($tcontext,$texten,'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+          $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}','300,${DIAL_TRUNK_OPTIONS}'));
+          $ext->add($tcontext,$texten,'hangit',new ext_hangup());
+        }
+			}
 			/* dialplan globals */
 			// modules should NOT use the globals table to store anything!
 			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
@@ -1941,8 +2046,6 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 		
-			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
-
 			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
 			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
 			
