@@ -395,7 +395,7 @@ if ($extdisplay) { // editing
             }
           }
           if ($extdisplay == '' | $route_seq != $last_seq) {
-            echo '<option value="'.$last_seq.'"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s %s'),$last_seq,$routepriority[$last_seq]['name'])."</option>\n";
+            echo '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s %s'),$last_seq,$routepriority[$last_seq]['name'])."</option>\n";
           }
 				?>		
 				</select>		
