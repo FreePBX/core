@@ -212,14 +212,15 @@ if (!$tech && !$extdisplay) {
 	<h2><?php echo _("Add a Trunk")?></h2>
 <?php
 	$baseURL   = $_SERVER['PHP_SELF'].'?display='.urlencode($display).'&';
-	$trunks = array(
-		array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" )),
-		array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk")),
-		array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk")),
-		array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk")),
-		array('url'=> $baseURL.'tech=DUNDI', 'tlabel' =>  _("Add DUNDi Trunk")),
-		array('url'=> $baseURL.'tech=CUSTOM', 'tlabel' =>  _("Add Custom Trunk")),
-	);
+  $trunks[] = array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk"));
+  if (!ast_with_dahdi()) {
+    $trunks[] = array('url'=> $baseURL.'tech=DAHDI', 'tlabel' =>  _("Add DAHDI Trunk"));
+  }
+  $trunks[] = array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" ));
+  $trunks[] = array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk"));
+  $trunks[] = array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk"));
+  $trunks[] = array('url'=> $baseURL.'tech=DUNDI', 'tlabel' =>  _("Add DUNDi Trunk"));
+  $trunks[] = array('url'=> $baseURL.'tech=CUSTOM', 'tlabel' =>  _("Add Custom Trunk"));
 	foreach ($trunks as $trunk) {
 		$label = '<span><img width="16" height="16" border="0" title="'.$trunk['tlabel'].'" alt="" src="images/core_add.png"/>&nbsp;'.$trunk['tlabel'].'</span>';
 		echo "<a href=".$trunk['url'].">".$label."</a><br /><br />";
@@ -312,10 +313,10 @@ if (!$tech && !$extdisplay) {
 		$maxchans = "";
 		$dialoutprefix = "";
 		
-		if ($tech == "zap") {
-			$channelid = "g0";
+		if ($tech == 'zap' || $tech == 'dahdi') {
+			$channelid = 'g0';
 		} else {
-			$channelid = "";
+			$channelid = '';
 		}
 		
 		// only for iax2/sip
@@ -363,7 +364,7 @@ if ($helptext != '') {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Trunk Description")?><span><br><?php echo _("Descriptive Name for this Trunk")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Trunk Name")?><span><br><?php echo _("Descriptive Name for this Trunk")?><br><br></span></a>: 
 				</td><td>
 					<input type="text" size="30" name="trunk_name" value="<?php echo $trunk_name;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -462,7 +463,7 @@ if ($helptext != '') {
 				<td>
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
 					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
-					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
+					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP and DAHDI trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+area code for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
 				</td><td valign="top"><select id="autopop"  tabindex="<?php echo ++$tabindex;?>" name="autopop" onChange="changeAutoPop(); ">
@@ -694,7 +695,19 @@ if ($helptext != '') {
 	?>
 				<tr>
 					<td>
-						<a href=# class="info"><?php echo _("Zap Identifier (trunk name)")?><span><br><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("Zap Identifier")?><span><br><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
+					</td><td>
+						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
+						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
+					</td>
+				</tr>
+	<?php 
+		break;
+		case "dahdi":
+	?>
+				<tr>
+					<td>
+						<a href=# class="info"><?php echo _("DAHDI Identifier")?><span><br><?php echo _("DAHDI channels are referenced either by a group number or channel number (which is defined in chan_dahdi.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
 					</td><td>
 						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>

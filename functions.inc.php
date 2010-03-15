@@ -72,7 +72,11 @@ class core_conf {
 				return $this->generate_iax_registrations($version);
 				break;
 			case 'chan_dahdi_additional.conf':
-				return $this->generate_zapata_additional($version);
+        if (ast_with_dahdi()) {
+				  return $this->generate_zapata_additional($version);
+        } else {
+				  return $this->generate_zapata_additional($version, 'dahdi');
+        }
 				break;
 			case 'zapata_additional.conf':
 				return $this->generate_zapata_additional($version);
@@ -514,10 +518,8 @@ class core_conf {
 		return $output;
 	}
 
-	function generate_zapata_additional($ast_version) {
+	function generate_zapata_additional($ast_version, $table_name = 'zap') {
 		global $db;
-
-		$table_name = "zap";
 
 		$additional = "";
 		$output = '';
@@ -771,7 +773,8 @@ function core_get_config($engine) {
 	global $amp_conf;
 	global $core_conf;
 	global $chan_dahdi;
-	global $astman;;
+  global $chan_dahdi_loaded;
+	global $astman;
 
 	$modulename = "core";
 	
@@ -1221,15 +1224,26 @@ function core_get_config($engine) {
 					
 			}
 
-			// Now create macro-from-zaptel-nnn for each defined channel to route it to the DID routing
+			// Now create macro-from-zaptel-nnn or macro-from-dahdi-nnn for each defined channel to route it to the DID routing
 			// Send it to from-trunk so it is handled as other dids would be handled.
 			//
+      // to this point we have both zap and dahdi configuration options. At generation though they can't co-exists. If compatibility
+      // mode then it's still from-zaptel, otherwise it is which ever is present. We cant use ast_with_dahdi() (chan_dadi) because
+      // it is for detection with compatibility mode. We need to actually determine if chan_dahdi is present or not at this point
+      //
+      if (!isset($chan_dahdi_loaded) {
+        if ($ast_ge_14 && isset($astman) && $astman->connected() {
+          $response = $astman->send_request('Command', array('Command' => 'module show like chan_dahdi'));
+          $chan_dahdi_loaded = (preg_match('/1 modules loaded/', $response['data']) > 0);
+        }
+			}
+      $context_type = $chan_dahdi_loaded ? 'dahdi' : 'zaptel';
 			foreach (core_zapchandids_list() as $row) {
 				$channel = $row['channel'];
 				$did     = $row['did'];
 
-				$zap_context = "macro-from-zaptel-{$channel}";
-				$ext->add($zap_context, 's', '', new ext_noop('Entering '.$zap_context.' with DID = ${DID} and setting to: '.$did));
+				$this_context = "macro-from-$context_type-$channel";
+				$ext->add($zap_context, 's', '', new ext_noop('Entering '.$this_context.' with DID = ${DID} and setting to: '.$did));
 				$ext->add($zap_context, 's', '', new ext_setvar('__FROM_DID',$did));
 				$ext->add($zap_context, 's', '', new ext_goto('1',$did,'from-trunk'));
 			}
@@ -2401,6 +2415,34 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-zaptel-${CHAN}'));
 			$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
 
+
+			if (!$chan_dahdi) {
+			  $context = 'from-dahdi';
+			  $exten = '_X.';
+			
+			  $ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
+			  $ext->add($context, $exten, '', new ext_goto(1, 's'));
+
+			  $exten = 's';
+			  $ext->add($context, $exten, '', new ext_noop('Entering from-dahdi with DID == ${DID}'));
+			  // Some trunks _require_ a RINGING be sent before an Answer. 
+			  $ext->add($context, $exten, '', new ext_ringing());
+			  // If ($did == "") { $did = "s"; }
+			  $ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
+			  $ext->add($context, $exten, '', new ext_noop('DID is now ${DID}'));
+			  $ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="DAHDI"]', 'dahdiok', 'notdahdi'));
+			  $ext->add($context, $exten, 'notdahdi', new ext_goto('1', '${DID}', 'from-pstn'));
+			  // If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
+			  $ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
+			  $ext->add($context, $exten, 'dahdiok', new ext_noop('Is a Zaptel Channel'));
+			  $ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
+			  $ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
+			  $ext->add($context, $exten, '', new ext_macro('from-dahdi-${CHAN}', '${DID},1'));
+			  // If nothing there, then treat it as a DID
+			  $ext->add($context, $exten, '', new ext_noop('Returned from Macro from-dahdi-${CHAN}'));
+			  $ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
+      }
+
 			/*
 			* vm-callme context plays voicemail over telephone for web click-to-call
 			* MSG and MBOX are channel variables that must be set when originating the call
@@ -2792,7 +2834,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
-      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
+      if ($has_extension_state) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2858,7 +2900,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
-      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
+      if ($has_extension_state) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
@@ -2937,7 +2979,7 @@ function core_get_config($engine) {
             fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
             un-documented USEMACRODIALONE = true flag.
       */
-      if ($amp_conf['USEDIALONE'] && $has_extension_state) {
+      if ($has_extension_state) {
 
         $mcontext = 'macro-dial-one';
         $exten = 's';
@@ -3278,6 +3320,7 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 		case "IAX2":
 		case "SIP":
 		case "ZAP":
+		case "DAHDI":
 			$sql .= " WHERE tech = '".strtolower($tech)."'";
 			break;
 		case "ALL":
@@ -3341,11 +3384,11 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		}
 	}
 	//unless defined, $dial is TECH/id
-	if ( $dial == '' ) {
-		//zap is an exception
-		if ( strtolower($tech) == "zap" ) {
-			$zapchan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
-			$dial = 'ZAP/'.$zapchan;
+	if ($dial == '') {
+		//zap, dahdi are exceptions
+		if (strtolower($tech) == "zap" || strtolower($tech) == 'dahdi') {
+			$thischan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
+			$dial = strtoupper($tech).'/'.$thischan;
 		} else {
 			$dial = strtoupper($tech)."/".$id;
 		}
@@ -3820,6 +3863,59 @@ function core_devices_addzap($account) {
 	}
 }
 
+function core_devices_adddahdi($account) {
+	global $db;
+	global $currentFile;
+		
+	foreach ($_REQUEST as $req=>$data) {
+		if ( substr($req, 0, 8) == 'devinfo_' ) {
+			$keyword = substr($req, 8);
+			if ( $keyword == 'dial' && $data == '' ) {
+				$dahdichan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
+				$dahdifields[] = array($account, $keyword, 'DAHDI/'.$dahdichan);
+			} elseif ($keyword == 'mailbox' && $data == '') {
+				$dahdifields[] = array($account,'mailbox',$account.'@device');
+			} else {
+				$dahdifields[] = array($account, $keyword, $data);
+			}
+		}
+	}
+	
+	if ( !is_array($dahdifields) ) { // left for compatibilty....lord knows why !
+		$dahdifields = array(
+			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
+			array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device')),
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
+			array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
+			array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
+			array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),	
+			array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
+			array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
+			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
+			array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
+			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
+			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:'')),
+			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:'')),
+			array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
+		);
+	}
+
+	// Very bad
+	$dahdifields[] = array($account,'account',$db->escapeSimple($account));	
+	$dahdifields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
+	
+	// Where is this in the interface ??????
+	$dahdifields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'));
+	$dahdifields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'));
+
+	$compiled = $db->prepare('INSERT INTO dahdi (id, keyword, data) values (?,?,?)');
+	$result = $db->executeMultiple($compiled,$dahdifields);
+	if(DB::IsError($result)) {
+		die_freepbx($result->getMessage()."<br><br>error adding to DAHDI table");	
+	}
+}
+
 function core_devices_delzap($account) {
 	global $db;
 	global $currentFile;
@@ -3831,9 +3927,30 @@ function core_devices_delzap($account) {
 	}
 }
 
+function core_devices_deldahdi($account) {
+	global $db;
+	global $currentFile;
+	
+	$sql = "DELETE FROM dahdi WHERE id = '$account'";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		die_freepbx($result->getMessage().$sql);
+	}
+}
+
 function core_devices_getzap($account) {
 	global $db;
 	$sql = "SELECT keyword,data FROM zap WHERE id = '$account'";
+	$results = $db->getAssoc($sql);
+	if(DB::IsError($results)) {
+		$results = null;
+	}
+	return $results;
+}
+
+function core_devices_getdahdi($account) {
+	global $db;
+	$sql = "SELECT keyword,data FROM dahdi WHERE id = '$account'";
 	$results = $db->getAssoc($sql);
 	if(DB::IsError($results)) {
 		$results = null;
@@ -4664,14 +4781,12 @@ function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
 function core_trunks_addDialRules($trunknum, $dialrules) {
 	global $db;
 
-	$values = array();
 	$rules_arr = array();
 	$i = 1;
 	foreach ($dialrules as $rule) {
 		$rules_arr[] = array($db->escapeSimple($rule),$i);
-		$values["rule".$i++] = $rule;
+		$i++;
 	}
-	
 	sql("DELETE FROM `trunks_dialpatterns` WHERE `trunkid` = $trunknum");
 	$compiled = $db->prepare("INSERT INTO `trunks_dialpatterns` (trunkid, rule, seq) VALUES ($trunknum,?,?)");
 	$result = $db->executeMultiple($compiled,$rules_arr);
@@ -4692,27 +4807,8 @@ function core_trunks_readDialRulesFile() {
 		}
 	  $rule_hash['trunk-'.$pattern['trunkid']]['rule'.$rule_num++] = $pattern['rule'];
 	}
-	
 	return $rule_hash;
 }
-
-/* DEPRECATED - SHOULD NO LONGER BE USED, generated from core_conf in retrieve_conf
- *
-function core_trunks_writeDialRulesFile($conf) {
-	global $amp_conf;
-	$localPrefixFile = $amp_conf['ASTETCDIR']."/localprefixes.conf";
-	
-	$fd = fopen($localPrefixFile,"w");
-	foreach ($conf as $section=>$values) {
-		fwrite($fd, "[".$section."]\n");
-		foreach ($values as $key=>$value) {
-			fwrite($fd, $key."=".$value."\n");
-		}
-		fwrite($fd, "\n");
-	}
-	fclose($fd);
-}
-*/
 
 /* THIS HAS BEEN DEPRECATED BUT WILL REMAIN IN FOR A FEW RELEASES */
 function core_trunks_parse_conf($filename, &$conf, &$section) {
@@ -4760,7 +4856,7 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap" || $tech == "") return ""; // zap has no details
+	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
 	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
 	
@@ -4785,7 +4881,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap" || $tech == "") return ""; // zap has no details
+	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
 	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
@@ -4804,7 +4900,7 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 function core_trunks_getTrunkRegister($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap" || $tech == "") return ""; // zap has no register
+	if ($tech == "zap" || $tech == "dahdi" || $tech == "") return ""; // zap has no register
 	
 	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
@@ -5677,6 +5773,26 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
 		unset($tmparr);
+
+		// dahdi
+		$tmparr = array();
+		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
+		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['immediate'] = array('value' => 'no', 'level' => 1);
+		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
+		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'level' => 1);
+		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
+		$tmparr['busydetect'] = array('value' => 'no', 'level' => 1);
+		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
+		$tmparr['callprogress'] = array('value' => 'no', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
+		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$currentcomponent->addgeneralarrayitem('devtechs', 'dahdi', $tmparr);
+		unset($tmparr);
 		
 		// iax2
 		$tmparr = array();
@@ -5733,6 +5849,9 @@ function core_devices_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
+    if (!ast_with_dahdi()) {
+		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDI Device"));
+    }
 		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
 		}
 		if ( $dispnum != 'devices' ) {
