@@ -678,15 +678,6 @@ $(document).ready(function(){
   $(".dpt-value").toggleVal({
     changedClass: "text-red"
   });
-  /*TODO: call clearPattern() here, or move this to routeEdit_onsubmit()?
-  */
-  $("form").submit(function() {
-    $(this).find(".dpt-title").each(function() {
-      if($(this).val() == $(this).data("defText")) {
-        $(this).val("");
-      }
-    });
-  });
 }); 
 
 function patternsRemove(idx) {
@@ -762,7 +753,6 @@ function showDisable(key) {
 function routeEdit_onsubmit(act) {
 	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
 	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
-	var msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
 	
@@ -789,7 +779,9 @@ function routeEdit_onsubmit(act) {
 	}
 	
 	theForm.action.value = act;
-	return true;
+
+  clearPatterns();
+  return validatePatterns();
 }
 
 function clearPatterns() {
@@ -798,6 +790,47 @@ function clearPatterns() {
       $(this).val("");
     }
   });
+  return true;
+}
+
+function validatePatterns() {
+  var one_good = false;
+  var culprit;
+  var msgInvalidDialPattern;
+  defaultEmptyOK = false;
+
+  $(".toggleval").each(function() {
+    if ($.trim($(this).val()) == '') {
+    } else if (!isDialpattern($(this).val())) {
+      culprit = this;
+      return false;
+    } else {
+      one_good = true;
+    }
+  });
+
+  if (culprit == undefined && !one_good) {
+    culprit = $('.toggleval:visible').get(0);
+	  msgInvalidDialPattern = "<?php echo _('No dial pattern, there must be at least one'); ?>";
+  } else {
+	  msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
+  }
+  if (culprit != undefined) {
+    // now we have to put it back...
+    // do I have to turn it off first though?
+    $(".dpt-title").each(function() {
+      if ($.trim($(this).val()) == '') {
+        $(this).toggleVal({
+          populateFrom: "title",
+          changedClass: "text-normal",
+          focusClass: "text-normal"
+        });
+      }
+    });
+    return warnInvalid(culprit, msgInvalidDialPattern);
+  } else {
+    return true;
+  }
 }
 
 //TODO: maybe add action vs. it being blank and assumed above?
@@ -828,6 +861,7 @@ function repositionRoute(key,direction){
     document.getElementById('reporoutedirection').value=direction;
     document.getElementById('reporoutekey').value=key;
     document.getElementById('action').value='prioritizeroute';
+    clearPatterns();
     document.getElementById('routeEdit').submit();
     break;
   }
