@@ -1231,8 +1231,8 @@ function core_get_config($engine) {
       // mode then it's still from-zaptel, otherwise it is which ever is present. We cant use ast_with_dahdi() (chan_dadi) because
       // it is for detection with compatibility mode. We need to actually determine if chan_dahdi is present or not at this point
       //
-      if (!isset($chan_dahdi_loaded) {
-        if ($ast_ge_14 && isset($astman) && $astman->connected() {
+      if (!isset($chan_dahdi_loaded)) {
+        if ($ast_ge_14 && isset($astman) && $astman->connected()) {
           $response = $astman->send_request('Command', array('Command' => 'module show like chan_dahdi'));
           $chan_dahdi_loaded = (preg_match('/1 modules loaded/', $response['data']) > 0);
         }
