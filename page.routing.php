@@ -428,10 +428,6 @@ if ($extdisplay) { // editing
       <hr></h5></td>
     </tr>
 
-    <tr><td colspan="2">
-      <input type="button" id="dial-pattern-add"  value="<?php echo _("Add More Dial Pattern Fields")?>" />
-    </td></tr>
-
     <tr><td colspan="2"><div class="dialpatterns"><table>
 <?php
   $pp_tit = _("prepend");
@@ -481,6 +477,9 @@ END;
     </tr>
     <tr id="last_row"></tr> 
     </table></div></tr></td>
+    <tr><td colspan="2">
+      <input type="button" id="dial-pattern-add"  value="<?php echo _("+ Add More Dial Pattern Fields")?>" />
+    </td></tr>
 <?php
   $tabindex += 2000; // make room for dynamic insertion of new fields
 ?>
