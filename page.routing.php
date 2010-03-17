@@ -486,7 +486,7 @@ END;
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Dial patterns wizards")?><span>
-					<strong><?php echo _("These options provide a quick way to add outbound dialing rules. Follow the prompts for each.")?><br>
+					<?php echo _("These options provide a quick way to add outbound dialing rules. Follow the prompts for each.")?><br>
 					<strong><?php echo _("Lookup local prefixes")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7, 10 or 11 digits (5551234, 6135551234, 16135551234) to access this route.")?><br>
 					</span></a>:
 			<input id="npanxx" name="npanxx" type="hidden" />
