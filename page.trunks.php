@@ -41,33 +41,36 @@ $trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
 $failtrunk    = isset($_REQUEST['failtrunk'])?$_REQUEST['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
-if (isset($_REQUEST["dialrules"])) {
-	$dialrules = explode("\n",$_REQUEST["dialrules"]);
+//
+// Use a hash of the value inserted to get rid of duplicates
+$dialpattern_insert = array();
+$p_idx = 0;
+$n_idx = 0;
 
-	if (is_array($dialrules))
-		foreach (array_keys($dialrules) as $key) {
-			//trim it
-			$dialrules[$key] = trim($dialrules[$key]);
-			
-			// remove blanks
-			if ($dialrules[$key] == "") unset($dialrules[$key]);
-			
-			// remove leading underscores (we do that on backend)
-			if ($dialrules[$key][0] == "_") $dialrules[$key] = substr($dialrules[$key],1);
-		}
-	
-	// check for duplicates, and re-sequence
-	$dialrules = array_values(array_unique($dialrules));
-} else {
-	$dialrules = array();
+if (isset($_POST["prepend_digit"])) {
+  $prepend_digit = $_POST["prepend_digit"];
+  $pattern_prefix = $_POST["pattern_prefix"];
+  $pattern_pass = $_POST["pattern_pass"];
+
+  foreach (array_keys($prepend_digit) as $key) {
+    if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='') {
+
+      $dialpattern_insert[] = array(
+        'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
+        'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
+        'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
+      );
+    }
+  }
 }
+
 
 //if submitting form, update database
 switch ($action) {
 	case "addtrunk":
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
 		
-		core_trunks_addDialRules($trunknum, $dialrules);
+    core_trunks_update_dialrules($trunknum, $dialpattern_insert);
 		needreload();
 		redirect_standard();
 	break;
@@ -75,14 +78,14 @@ switch ($action) {
 		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
 		
 		// this can rewrite too, so edit is the same
-		core_trunks_addDialRules($trunknum, $dialrules);
+    core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
 	case "deltrunk":
 	
 		core_trunks_del($trunknum);
-		core_trunks_deleteDialRules($trunknum);
+    core_trunks_delete_dialrules($trunknum);
     core_routing_trunk_del($trunknum);
 		needreload();
 		redirect_standard();
@@ -107,39 +110,91 @@ switch ($action) {
 			$xmldata = $xml->getUnserializedData();
 
 			if (isset($xmldata['lca-data']['prefix'])) {
-				
+        $hash_filter = array(); //avoid duplicates
 				if ($action == 'populatenpanxx10') {
 					// 10 digit dialing
 					// - add area code to 7 digits
 					// - match local 10 digits
 					// - add 1 to anything else
-					$dialrules[] = $matches[1].'NXXXXXX';
+          $dialpattern_array[] = array(
+            'prepend_digits' => '',
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => htmlspecialchars($matches[1].'NXXXXXX'),
+          );
 					// add NPA to 7-digits
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-						$dialrules[] = $prefix['npa'].'+'.$prefix['nxx'].'XXXX';
+            if (isset($hash_filter[$prefix['npa'].'+'.$prefix['nxx']])) {
+              continue;
+            } else {
+              $hash_filter[$prefix['npa'].'+'.$prefix['nxx']] = true;
+            }
+            $dialpattern_array[] = array(
+              'prepend_digits' =>  htmlspecialchars($prefix['npa']),
+              'match_pattern_prefix' => '',
+              'match_pattern_pass' => htmlspecialchars($prefix['nxx'].'XXXX'),
+            );
 					}
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-						$dialrules[] = $prefix['npa'].$prefix['nxx'].'XXXX';
+            if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
+              continue;
+            } else {
+              $hash_filter[$prefix['npa'].$prefix['nxx']] = true;
+            }
+            $dialpattern_array[] = array(
+              'prepend_digits' =>  '',
+              'match_pattern_prefix' => '',
+              'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx'].'XXXX'),
+            );
 					}
 					// if a number was not matched as local, dial it with '1' prefix
-					$dialrules[] = '1+NXXNXXXXXX';
+          $dialpattern_array[] = array(
+            'prepend_digits' =>  '',
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => '1+NXXNXXXXXX',
+          );
 				} else {
 					// 7 digit dialing
 					// - drop area code from local numbers
 					// - match local 7 digit numbers
 					// - add 1 to everything else
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-						$dialrules[] = $prefix['npa'].'|'.$prefix['nxx'].'XXXX';
+            if (isset($hash_filter[$prefix['npa'].'|'.$prefix['nxx']])) {
+              continue;
+            } else {
+              $hash_filter[$prefix['npa'].'|'.$prefix['nxx']] = true;
+            }
+            $dialpattern_array[] = array(
+              'prepend_digits' =>  '',
+              'match_pattern_prefix' => htmlspecialchars( $prefix['npa']),
+              'match_pattern_pass' => htmlspecialchars($prefix['nxx'].'XXXX'),
+            );
 					}
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-						$dialrules[] = $prefix['nxx'].'XXXX';
+            if (isset($hash_filter[$prefix['nxx']])) {
+              continue;
+            } else {
+              $hash_filter[$prefix['nxx']] = true;
+            }
+            $dialpattern_array[] = array(
+              'prepend_digits' =>  '',
+              'match_pattern_prefix' => '',
+              'match_pattern_pass' => htmlspecialchars($prefix['nxx'].'XXXX'),
+            );
 					}
-					$dialrules[] = '1+NXXNXXXXXX';
-					$dialrules[] = '1'.$matches[1].'+NXXXXXX';
+          $dialpattern_array[] = array(
+            'prepend_digits' =>  '1',
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => 'NXXNXXXXXX',
+          );
+          $dialpattern_array[] = array(
+            'prepend_digits' => htmlspecialchars('1'.$matches[1]),
+            'match_pattern_prefix' => '',
+            'match_pattern_pass' => 'NXXXXXX',
+          );
 				}
 
 				// check for duplicates, and re-sequence
-				$dialrules = array_values(array_unique($dialrules));
+        unset($hash_filter);
 			} else {
 				$errormsg = _("Error fetching prefix list for: "). $_REQUEST["npanxx"];
 			}
@@ -240,7 +295,7 @@ if (!$tech && !$extdisplay) {
 		$disabletrunk = htmlentities($trunk_details['disabled']);
 		$provider = $trunk_details['provider'];
 		$trunk_name = htmlentities($trunk_details['name']);
-		
+
 		if ($tech!="enum") {
 	
 			$channelid = htmlentities($trunk_details['channelid']);
@@ -263,17 +318,9 @@ if (!$tech && !$extdisplay) {
 				}
 			}
 		}
-		if (count($dialrules) == 0) {
-			if ($temp = core_trunks_getDialRules($trunknum)) {
-				foreach ($temp as $key=>$val) {
-					// extract all ruleXX keys
-					if (preg_match("/^rule\d+$/",$key)) {
-						$dialrules[] = $val;
-					}
-				}
-			}
-			unset($temp);
-		}
+    if (count($dialpattern_array) == 0) {
+      $dialpattern_array = core_trunks_get_dialrules($trunknum);
+    }
 		$upper_tech = strtoupper($tech);
     if (trim($trunk_name) == '') {
 		  $trunk_name = ($upper_tech == 'ZAP'|$upper_tech == 'DAHDI'?sprintf(_('%s Channel %s'),$upper_tech,$channelid):$channelid);
@@ -332,6 +379,10 @@ if (!$tech && !$extdisplay) {
 		$upper_tech = strtoupper($tech);
 		echo "<h2>".sprintf(_("Add %s Trunk"),$upper_tech).($upper_tech == 'ZAP' && ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"")."</h2>";
 	} 
+  if (!isset($dialpattern_array)) {
+    $dialpattern_array = array();
+  }
+		
 switch ($tech) {
 	case 'dundi':
 		$helptext = _('FreePBX offers limited support for DUNDi trunks and additional manual configuration is required. The trunk name should correspond to the [mappings] section of the remote dundi.conf systems. For example, you may have a mapping on the remote system, and corresponding configurations in dundi.conf locally, that looks as follows:<br /><br />[mappings]<br />priv => dundi-extens,0,IAX2,priv:${SECRET}@218.23.42.26/${NUMBER},noparital<br /><br />In this example, you would create this trunk and name it priv. You would then create the corresponding IAX2 trunk with proper settings to work with DUNDi. This can be done by making an IAX2 trunk in FreePBX or by using the iax_custom.conf file.<br />The dundi-extens context in this example must be created in extensions_custom.conf. This can simply include contexts such as ext-local, ext-intercom-users, ext-paging and so forth to provide access to the corresponding extensions and features provided by these various contexts and generated by FreePBX.');
@@ -359,7 +410,7 @@ if ($helptext != '') {
 			<table>
 			<tr>
 				<td colspan="2">
-					<h4><?php echo _("General Settings")?></h4>
+					<h4><?php echo _("General Settings")?><hr></h4>
 				</td>
 			</tr>
 			<tr>
@@ -430,35 +481,72 @@ if ($helptext != '') {
 			    </td>
 			</tr>
 
-			<tr>
-				<td colspan="2">
-					<h4><?php echo _("Outgoing Dial Rules")?></h4>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top">
-					<a href=# class="info"><?php echo _("Dial Rules")?><span><?php echo _("A Dial Rule controls how calls will be dialed on this trunk. It can be used to add or remove prefixes. Numbers that don't match any patterns defined here will be dialed as-is. Note that a pattern without a + or | (to add or remove a prefix) will not make any changes but will create a match. Only the first matched rule will be executed and the remaining rules will not be acted on.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
-	<strong>X</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
-	<strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
-	<strong>N</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
-	<strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br />
-	<strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters (not allowed before a | or +)")?><br />
-	<strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("removes a dialing prefix from the number (for example, 613|NXXXXXX would match when some dialed \"6135551234\" but would only pass \"5551234\" to the trunk)")?>
-	<strong>+</strong>&nbsp;&nbsp;&nbsp; <?php echo _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)")?><br /><br />
-	<?php echo _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing."); ?>
-					</span></a>:
-				</td><td valign="top">
-					<textarea id="dialrules" cols="20"  tabindex="<?php echo ++$tabindex;?>" rows="<?php  
-						if (is_array($dialrules)) {
-							$rows = count($dialrules)+1; 
-							echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) );
-						} else {
-							echo "5";
-						} ?>" name="dialrules"><?php if(is_array($dialrules)) { echo implode("\n",$dialrules); } ?></textarea><br>
-					
-					<input type="submit" style="font-size:10px;" value="<?php echo _("Clean & Remove duplicates")?>"  tabindex="<?php echo ++$tabindex;?>"/>
-				</td>
-			</tr>
+    <tr>
+      <td colspan="2"><h4>
+      <a href=# class="info"><?php echo _("Dialed Number Manipulation Rules")?><span>
+      <?php echo _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occured. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<b /> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
+      <b>X</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
+      <b>Z</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
+      <b>N</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
+      <b>[1237-9]</b>&nbsp;   <?php echo _("matches any digit in the brackets (example: 1,2,3,7,8,9)")?><br />
+      <b>.</b>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more dialed digits")?> <br />
+      <b><?php echo _("prepend:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Digits to prepend upon a successful match. If the dialed number matches the patterns in the <b>prefix</b> and <b>match pattern</b> boxes, this will be prepended before sending to the trunk.")?><br />
+      <b><?php echo _("prefix:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Prefix to remove upon a successful match. If the dialed number matches this plus the <b>match pattern</b> box, this prefix is removed before adding the optional <b>prepend</b> box and sending the results to the trunk.")?><br />
+      <b><?php echo _("match pattern:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("The dialed number will be compared against the <b>prefix</b> plus this pattern. Upon a match, this portion of the number will be sent to the trunks after removing the <b>prefix</b> and appending the <b>prepend</b> digits")?><br />
+	    <?php echo _("You can completely replace a number by matching on the <b>prefix</b> only, replacing it with a <b>prepend</b> and leaving the <b>match pattern</b> blank."); ?>
+      </span></a>
+      <hr></h4></td>
+    </tr>
+
+    <tr><td colspan="2">
+      <input type="button" id="dial-pattern-add"  value="<?php echo _("Add More Dial Pattern Fields")?>" />
+      <input type="button" id="dial-pattern-clear"  value="<?php echo _("Clear all Fields")?>" />
+    </td></tr>
+    <tr><td colspan="2"><div class="dialpatterns"><table>
+<?php
+  $pp_tit = _("prepend");
+  $pf_tit = _("prefix");
+  $mp_tit = _("match pattern");
+  foreach ($dialpattern_array as $idx => $pattern) {
+    $tabindex++;
+    $dpt_class = $pattern['prepend_digits'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+    <tr>
+      <td colspan="2">
+        (<input title="$pp_tit" type="text" size="5" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern dp-prepend $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
+END;
+    $tabindex++;
+    $dpt_class = $pattern['match_pattern_prefix'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+        <input title="$pf_tit" type="text" size="4" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="dp-prefix $dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
+END;
+    $tabindex++;
+    $dpt_class = $pattern['match_pattern_pass'] == '' ? 'dpt-title' : 'dpt-value';
+    echo <<< END
+        <input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="dp-match $dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex">
+END;
+?>
+        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo _("$idx") ?>)">
+      </td>
+    </tr>
+<?php
+  }
+  $next_idx = count($dialpattern_array);
+?>
+    <tr>
+      <td colspan="2">
+        (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">) +
+        <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
+        <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dp-match dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">
+        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
+
+      </td>
+    </tr>
+    <tr id="last_row"></tr> 
+    </table></div></tr></td>
+<?php
+  $tabindex += 2000; // make room for dynamic insertion of new fields
+?>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
@@ -528,7 +616,7 @@ if ($helptext != '') {
 			
 			function populateAlwaysAdd() {
 				do {
-					var localpattern = <?php echo 'prompt("'._("What is the local dialing pattern?\\n\\n(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"NXXXXXX");
+          var localpattern = <?php echo 'prompt("'._("What is the local dialing pattern?\\n\\n(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,<?php echo _("NXXXXXX")?>);
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
 				
@@ -537,11 +625,7 @@ if ($helptext != '') {
 					if (localprefix == null) return;
 				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid prefix. Only dialable characters (0-9, #, and *) are allowed.").'")'?>);
 
-				dialrules = document.getElementById('dialrules');
-				if (dialrules.value[dialrules.value.length-1] != '\n') {
-					dialrules.value = dialrules.value + '\n';
-				}
-				dialrules.value = dialrules.value + localprefix + '+' + localpattern + '\n';
+        addCustomField(localprefix,'',localpattern);
 			}
 			
 			function populateRemove() {
@@ -551,15 +635,11 @@ if ($helptext != '') {
 				} while (!localprefix.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._('Invalid prefix. Only 0-9, #, *, Z, N, and X are allowed.').'")'?>);
 				
 				do {
-					var localpattern = <?php echo 'prompt("'._("What is the dialing pattern for local numbers after")?> "+localprefix+"? \n\n<?php echo _("(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"NXXXXXX");
+          var localpattern = <?php echo 'prompt("'._("What is the dialing pattern for local numbers after")?> "+localprefix+"? \n\n<?php echo _("(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,<?php echo _("NXXXXXX")?>);
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
 				
-				dialrules = document.getElementById('dialrules');
-				if (dialrules.value[dialrules.value.length-1] != '\n') {
-					dialrules.value = dialrules.value + '\n';
-				}
-				dialrules.value = dialrules.value + localprefix + '|' + localpattern + '\n';
+        addCustomField('',localprefix,localpattern);
 			}
 			
 			function changeAutoPop() {
@@ -580,100 +660,7 @@ if ($helptext != '') {
 				document.getElementById('autopop').value = '';
 			}
 			</script>
-<?php /* //DIALRULES
-			<tr>
-				<td>
-					<a href=# class="info">Dial rules<span>The area code this trunk is in.</span></a>: 
-				</td><td>&nbsp;
-					<select id="dialrulestype" name="dialrulestype" onChange="changeRulesType();">
-<?php 
-					$rules = array( "asis" => "Don't change number",
-							"always" => "Always dial prefix+areacode",
-							"local" => "Local 7-digit dialing",
-							"local10" => "Local 10-digit dialing");
 
-					foreach ($rules as $value=>$display) {
-						echo "<option value=\"".$value."\" ".(($value == $dialrulestype) ? "SELECTED" : "").">".$display."</option>";
-					}
-?>
-					</select>
-					
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Local dialing pattern<span>The dialing pattern to make a 'local' call.</span>")</a>: 
-				</td><td>
-					<input id="localpattern" type="text" size="10" maxlength="20" name="localpattern" value="<?php echo $localpattern ?>"/>
-					
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Long-distance dial prefix<span>The prefix for dialing long-distance numbers. In north america, this should be \"1\".</span>")?></a>: 
-				</td><td>
-					<input id="lddialprefix" type="text" size="3" maxlength="6" name="lddialprefix" value="<?php echo $lddialprefix ?>"/>
-					
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Local LD prefix<span>The area code this trunk is in. Any 7-digit numbers that don't match a number in the below list will have dialprefix+areacode added to them. </span>")?></a>: 
-				</td><td>
-					<input id="areacode" type="text" size="3" maxlength="6" name="areacode" value="<?php echo $areacode ?>"/>
-					
-				</td>
-			</tr>
-			<tr>
-				<td valign="top">
-					<a href=# class="info"><?php echo _("Local prefixes<span>This should be a list of local areacodes + prefixes to use for local dialing.</span>")?></a>: 
-				</td><td valign="top">&nbsp;
-					<textarea id="localprefixes" cols="8" rows="<?php  $rows = count($localprefixes)+1; echo (($rows < 5) ? 5 : (($rows > 20) ? 20 : $rows) ); ?>" name="localprefixes"><?php echo  implode("\n",$localprefixes);?></textarea><br>
-					 
-					<input id="npanxx" name="npanxx" type="hidden" /><br>
-					<a href=# class="info"><?php echo _("Populate with local rules<span>Do a lookup from http://members.dandy.net/~czg/search.html to find all local-reachable area codes and phone numbers.</span>")?></a>: <input type="button" value="Go" onClick="checkPopulate();" />
-					<br><br>
-				</td>
-			</tr>
-			<script language="javascript">
-			
-			function checkPopulate() {
-				//var npanxx = prompt("What is your areacode + prefix (NPA-NXX)?", document.getElementById('areacode').value);
-				var npanxx = <?php echo 'prompt("'._("What is your areacode + prefix (NPA-NXX)?").'")'?>;
-				
-				if (npanxx.match("^[2-9][0-9][0-9][-]?[2-9][0-9][0-9]$")) {
-					document.getElementById('npanxx').value = npanxx;
-					trunkEdit.action.value = "populatenpanxx";
-					trunkEdit.submit();
-				} else if (npanxx != null) {
-					<?php echo 'alert("'._("Invalid format for NPA-NXX code (must be format: NXXNXX)").'")'?>;
-				}
-			}
-			
-			function changeRulesType() {
-				switch(document.getElementById('dialrulestype').value) {
-					case "always":
-						document.getElementById('lddialprefix').disabled = false;
-						document.getElementById('areacode').disabled = false;
-						document.getElementById('localprefixes').disabled = true;
-					break;
-					case "local":
-					case "local10":
-						document.getElementById('lddialprefix').disabled = false;
-						document.getElementById('areacode').disabled = false;
-						document.getElementById('localprefixes').disabled = false;
-					break;
-					case "asis":
-					default:
-						document.getElementById('lddialprefix').disabled = true;
-						document.getElementById('areacode').disabled = true;
-						document.getElementById('localprefixes').disabled = true;
-					break;
-				}
-			}
-			changeRulesType();
-			</script>
-*/?>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dial tone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>: 
@@ -684,7 +671,7 @@ if ($helptext != '') {
 			<?php if ($tech != "enum") { ?>
 			<tr>
 				<td colspan="2">
-					<h4><?php echo _("Outgoing Settings")?></h4>
+        <h4><?php echo _("Outgoing Settings")?><hr></h4>
 				</td>
 			</tr>
 			<?php } ?>
@@ -813,6 +800,148 @@ if ($helptext != '') {
 <script language="javascript">
 <!--
 
+$(document).ready(function(){
+  /* Add a Custom Var / Val textbox */
+  $("#dial-pattern-add").click(function(){
+    addCustomField('','','','');
+  });
+  $("#dial-pattern-clear").click(function(){
+    clearAllPatterns();
+  });
+  $(".dpt-title").toggleVal({
+    populateFrom: "title",
+    changedClass: "text-normal",
+    focusClass: "text-normal"
+  });
+  $(".dpt-value").toggleVal({
+    changedClass: "text-red"
+  });
+}); 
+
+function patternsRemove(idx) {
+  $("#prepend_digit_"+idx).parent().parent().remove();
+}
+
+function addCustomField(prepend_digit, pattern_prefix, pattern_pass) {
+  var idx = $(".dial-pattern").size();
+  var idxp = idx - 1;
+  var tabindex = parseInt($("#pattern_pass_"+idxp).attr('tabindex')) + 1;
+  var tabindex1 = tabindex + 2;
+  var tabindex2 = tabindex + 3;
+  var dpt_prepend_digit = prepend_digit == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_pattern_prefix = pattern_prefix == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_pattern_pass = pattern_pass == '' ? 'dpt-title' : 'dpt-value';
+
+  var new_insert = $("#last_row").before('\
+  <tr>\
+    <td colspan="2">\
+    (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
+    <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
+    <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="dp-match '+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'">\
+      <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
+    </td>\
+  </tr>\
+  ').prev();
+
+  new_insert.find(".dpt-title").toggleVal({
+    populateFrom: "title",
+    changedClass: "text-normal",
+    focusClass: "text-normal"
+  });
+  if (pattern_pass != '' || pattern_prefix != '' || prepend_digit != '') {
+    new_insert.find(".dpt-value").toggleVal({
+      changedClass: "text-red"
+    });
+  }
+
+  return idx;
+}
+
+function clearPatterns() {
+  $(".dpt-title").each(function() {
+    if($(this).val() == $(this).data("defText")) {
+      $(this).val("");
+    }
+  });
+  return true;
+}
+
+function clearAllPatterns() {
+  $(".dpt-value").addClass('dpt-title').removeClass('dpt-value');
+  $(".toggleval").each(function() {
+    $(this).val("");
+  });
+  $(".dpt-title").toggleVal({
+    populateFrom: "title",
+    changedClass: "text-normal",
+    focusClass: "text-normal"
+  });
+  return true;
+}
+
+// all blanks are ok
+function validatePatterns() {
+  var culprit;
+  var msgInvalidDialPattern;
+  defaultEmptyOK = true;
+
+  // TODO: need to validate differently for prepend, prefix and match fields. The prepend
+  //      must be a dialable digit. The prefix can be any pattern but not contain "." and
+  //      the pattern can contain a "." also
+  //$filter_prepend = '/[^0-9\+\*\#/';
+  //$filter_match = '/[^0-9\-\+\*\#\.\[\]xXnNzZ]/';
+  //$filter_prefix = '/[^0-9\-\+\*\#\[\]xXnNzZ]/';
+	//defaultEmptyOK = false;
+  /* TODO: get some sort of check in for dialpatterns
+	if (!isDialpattern(theForm.dialpattern.value))
+		return warnInvalid(theForm.dialpattern, msgInvalidDialPattern);
+    */
+
+  $(".dp-prepend").each(function() {
+    if ($.trim(this.value) == '') {
+    } else if (this.value.search('[^0-9*#+\s]+') >= 0) {
+      culprit = this;
+      return false;
+    }
+  });
+  if (!culprit) {
+    $(".dp-prefix").each(function() {
+      if ($.trim($(this).val()) == '') {
+      } else if (!isDialpattern(this.value) || this.value.search('[._]+') >= 0) {
+        culprit = this;
+        return false;
+      }
+    });
+  }
+  if (!culprit) {
+    $(".dp-match").each(function() {
+      if ($.trim(this.value) == '') {
+      } else if (!isDialpattern(this.value) || this.value.search('[_]+') >= 0) {
+        culprit = this;
+        return false;
+      }
+    });
+  }
+
+  if (culprit != undefined) {
+	  msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
+    // now we have to put it back...
+    // do I have to turn it off first though?
+    $(".dpt-title").each(function() {
+      if ($.trim($(this).val()) == '') {
+        $(this).toggleVal({
+          populateFrom: "title",
+          changedClass: "text-normal",
+          focusClass: "text-normal"
+        });
+      }
+    });
+    return warnInvalid(culprit, msgInvalidDialPattern);
+  } else {
+    return true;
+  }
+}
+
 var theForm = document.trunkEdit;
 
 theForm.outcid.focus();
@@ -838,9 +967,6 @@ function trunkEdit_onsubmit(act) {
 	
 	if (!isInteger(theForm.maxchans.value))
 		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
-	
-	if (!isDialrule(theForm.dialrules.value))
-		return warnInvalid(theForm.dialrules, msgInvalidDialRules);
 	
 	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
 		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
@@ -869,8 +995,13 @@ function trunkEdit_onsubmit(act) {
 			}
 	<?php } ?>
 
-	theForm.action.value = act;
-	return true;
+  clearPatterns();
+  if (validatePatterns()) {
+	  theForm.action.value = act;
+	  return true;
+  } else {
+    return false;
+  }
 }
 
 function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)

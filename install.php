@@ -266,7 +266,6 @@ if (!$nrows) {
 	out(_("Already exists!"));
 }
 
-
 // This next set of functions and code are used to migrate from the old
 // global variable storage of trunk data to the new trunk table and trunk
 // pattern table for localprefixes.conf
@@ -278,47 +277,6 @@ function __sort_trunks($a,$b)  {
         ereg("OUT_([0-9]+)",$unique_trunks[$a][0],$trunk_num1);
         ereg("OUT_([0-9]+)",$unique_trunks[$b][0],$trunk_num2);
         return ($trunk_num1[1] >= $trunk_num2[1]? 1:-1);
-}
-
-// Get values from localprefix configuration file where values are stored
-// for fixlocalprefix macro
-//
-function __parse_DialRulesFile($filename, &$conf, &$section) {
-	if (is_null($conf)) {
-		$conf = array();
-	}
-	if (is_null($section)) {
-		$section = "general";
-	}
-	
-	if (file_exists($filename)) {
-		$fd = fopen($filename, "r");
-		while ($line = fgets($fd, 1024)) {
-			if (preg_match("/^\s*([a-zA-Z0-9-_]+)\s*=\s*(.*?)\s*([;#].*)?$/",$line,$matches)) {
-				// name = value
-				// option line
-				$conf[$section][ $matches[1] ] = $matches[2];
-			} else if (preg_match("/^\s*\[(.+)\]/",$line,$matches)) {
-				// section name
-				$section = strtolower($matches[1]);
-			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
-				// include another file
-				
-				if ($matches[1][0] == "/") {
-					// absolute path
-					$filename = $matches[1];
-				} else {
-					// relative path
-					$filename =  dirname($filename)."/".$matches[1];
-				}
-				__parse_DialRulesFile($filename, $conf, $section);
-			}
-		}
-	}
-}
-
-function __order_DialRules($a, $b) {
-  return substr($a,4) > substr($b,4);
 }
 
 function __migrate_trunks_to_table() {
@@ -516,46 +474,6 @@ if ($trunks !== false) {
 	out(_("done"));
 } else {
 	out(_("not needed"));
-}
-
-$sql = "
-CREATE TABLE `trunks_dialpatterns` 
-( 
-	`trunkid` INTEGER,
-	`rule` VARCHAR( 255 ) NOT NULL, 
-	`seq` INTEGER,
-	PRIMARY KEY  (`trunkid`, `rule`, `seq`) 
-) 
-";
-outn(_("Checking if trunks_dialpatterns table exists.."));
-$check = $db->query($sql);
-if(DB::IsError($check) && $check->getCode() != DB_ERROR_ALREADY_EXISTS) {
-	die_freepbx("Can not create trunks_dialpatterns table");
-} else if(DB::IsError($check) && $check->getCode() == DB_ERROR_ALREADY_EXISTS) {
-	out(_("already exists"));
-} else {
-	out(_("created"));
-	outn(_("loading table from localprefixes.conf.."));
-	$localPrefixFile = $amp_conf['ASTETCDIR']."/localprefixes.conf";
-	$conf == array();
-	__parse_DialRulesFile($localPrefixFile, $conf, $section);
-
-	$rules_arr = array();
-	foreach ($conf as $tname => $rules) {
-		$tid = ltrim($tname,'trunk-');
-		uksort($rules,'__order_DialRules'); //make sure they are in order
-		$seq = 1;
-		foreach ($rules as $rule) {
-			$rules_arr[] = array($tid,$rule,$seq);
-			$seq++;
-		}
-	}
-	$compiled = $db->prepare("INSERT INTO `trunks_dialpatterns` (trunkid, rule, seq) VALUES (?,?,?)");
-	$result = $db->executeMultiple($compiled,$rules_arr);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo().'error populating trunks_dialpatterns table');	
-	}
-	out(_("loaded"));
 }
 
 outn(_("Checking if privacy manager options exists.."));

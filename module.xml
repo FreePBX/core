@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.8.0.0beta1.1* #4132, #2833
+		*2.8.0.0beta1.1* #4132, #2833, #4068, #4135, #4143, #4144
 		*2.8.0.0beta1.0* #4100, #4102, #4110 New Outbound Routing Schema and features
 		*2.7.0.2* really fix #4092
 		*2.7.0.1* #4093, #4094, #4095, #4092

@@ -233,7 +233,7 @@ foreach ($routepriority as $key => $tresult) {
 	// move up
 	if ($key > 0) {
 		echo "\t\t<img src=\"images/resultset_up.png\" onclick=\"repositionRoute('{$tresult['route_id']}','up')\" alt='" .  _("Move Up") .
-			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+			"' style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
 		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
@@ -241,7 +241,7 @@ foreach ($routepriority as $key => $tresult) {
 	// move down
 	if ($key < ($positions-1)) {
 		echo "\t\t<img src='images/resultset_down.png' onclick=\"repositionRoute('{$tresult['route_id']}','down')\" alt='" . _("Move Down") .
-			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+			"'  style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
 		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
@@ -249,7 +249,7 @@ foreach ($routepriority as $key => $tresult) {
 	// move top
 	if ($key > 0) {
 		echo "\t\t<img src=\"images/resultset_top.png\" onclick=\"repositionRoute('{$tresult['route_id']}','top')\" alt='" .  _("First") .
-			"' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+			"' style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
 		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
@@ -257,7 +257,7 @@ foreach ($routepriority as $key => $tresult) {
 	// move bottom
 	if ($key < ($positions-1)) {
 		echo "\t\t<img src='images/resultset_bottom.png' onclick=\"repositionRoute('{$tresult['route_id']}','bottom')\" alt='" . _("Last") .
-			"'  style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
+			"'  style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   } else {
 		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
   }
@@ -420,10 +420,10 @@ if ($extdisplay) { // editing
       <b>N</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
       <b>[1237-9]</b>&nbsp;   <?php echo _("matches any digit in the brackets (example: 1,2,3,7,8,9)")?><br />
       <b>.</b>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more dialed digits")?> <br />
-      <b><?php echo _("prepend")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Digits to prepend to a successful match. If the dialed number matches the patterns specified by the subsequent columns, then thise will be prepended before sending to the trunks.")?><br />
-      <b><?php echo _("prefix")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Prefix to remove on a successful match. The dialed number is compared to this and the subsequent columns for a match. Upon a match, this prefix is removed from the dialed number before sending it to the trunks.")?><br />
-      <b><?php echo _("match pattern")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("The dialed number will be compared against the  prefix + this match pattern. Upon a match, the match pattern portion of the dialed number will be sent to the trunks")?><br />
-      <b><?php echo _("CallerID")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("If CallerID is supplied, the dialed number will only match the prefix + match pattern if the CallerID being transmitted matches this. When extensions make outbound calls, the CallerID will be their extension number and NOT their Outbound CID. The above special matching sequences can be used for CallerID matching similar to other number matches.")?><br />
+      <b><?php echo _("prepend:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Digits to prepend to a successful match. If the dialed number matches the patterns specified by the subsequent columns, then this will be prepended before sending to the trunks.")?><br />
+      <b><?php echo _("prefix:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Prefix to remove on a successful match. The dialed number is compared to this and the subsequent columns for a match. Upon a match, this prefix is removed from the dialed number before sending it to the trunks.")?><br />
+      <b><?php echo _("match pattern:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("The dialed number will be compared against the  prefix + this match pattern. Upon a match, the match pattern portion of the dialed number will be sent to the trunks")?><br />
+      <b><?php echo _("CallerID:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("If CallerID is supplied, the dialed number will only match the prefix + match pattern if the CallerID being transmitted matches this. When extensions make outbound calls, the CallerID will be their extension number and NOT their Outbound CID. The above special matching sequences can be used for CallerID matching similar to other number matches.")?><br />
       </span></a>
       <hr></h5></td>
     </tr>
@@ -597,7 +597,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 				?>
 				</select>
 				
-				<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
+				<img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
 			<?php   // move up
 			if ($key > 0) {?>
 				<img src="images/resultset_up.png" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
@@ -608,7 +608,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 			// move down
 			
 			if ($key < ($positions-1)) {?>
-				<img src="images/resultset_down.png" onclick="repositionTrunk('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
+				<img src="images/resultset_down.png" onclick="repositionTrunk('<?php echo $key ?>','down')" alt="<?php echo _("Move Down")?>"  style="cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  } ?>
@@ -680,12 +680,9 @@ $(document).ready(function(){
 }); 
 
 function patternsRemove(idx) {
-  $("#prepend_digit_"+idx+",#pattern_prefix_"+idx+",#pattern_pass_"+idx+",#match_cid_"+idx).each(function(){
-    this.value = '';
-  }).parent().parent().hide();
+  $("#prepend_digit_"+idx).parent().parent().remove();
 }
 
-/* Insert a sip_setting/sip_value pair of text boxes */
 function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) {
   var idx = $(".dial-pattern").size();
   var idxp = idx - 1;
@@ -698,26 +695,25 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) 
   var dpt_pattern_pass = pattern_pass == '' ? 'dpt-title' : 'dpt-value';
   var dpt_match_cid = match_cid == '' ? 'dpt-title' : 'dpt-value';
 
-  $("#last_row").before('\
+  var new_insert = $("#last_row").before('\
   <tr>\
     <td colspan="2">\
     (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
     <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="'+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
     [<input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="'+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'"> /\
     <input title="<?php echo $ci_tit?>" type="text" size="14" id="match_cid_'+idx+'" name="match_cid['+idx+']" class="'+dpt_match_cid+'" value="'+match_cid+'" tabindex="'+tabindex3+'">]\
-      <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
+      <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
     </td>\
   </tr>\
-  ');
-  // There's almost always one blank field so make sure these are done
-  $(".dpt-title").toggleVal({
+  ').prev();
+
+  new_insert.find(".dpt-title").toggleVal({
     populateFrom: "title",
     changedClass: "text-normal",
     focusClass: "text-normal"
   });
-  // If any value were put in, handled those also
   if (pattern_pass != '' || pattern_prefix != '' || prepend_digit != '' || match_cid != '') {
-    $(".dpt-value").toggleVal({
+    new_insert.find(".dpt-value").toggleVal({
       changedClass: "text-red"
     });
   }

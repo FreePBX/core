@@ -90,9 +90,6 @@ class core_conf {
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
 				break;
-			case 'localprefixes.conf':
-				return $this->generate_localprefixes($version);
-				break;
 		}
 	}
 
@@ -567,19 +564,6 @@ class core_conf {
 			}
 			$output .= "channel=>$zapchannel\n";
 			$output .= $additional."\n";
-		}
-		return $output;
-	}
-	function generate_localprefixes($ast_version) {
-		$output = "";
-
-		$conf =  core_trunks_readDialRulesFile();
-		foreach ($conf as $section=>$values) {
-			$output .=  "[".$section."]\n";
-			foreach ($values as $key=>$value) {
-				$output .= $key."=".$value."\n";
-			}
-			$output .= "\n";
 		}
 		return $output;
 	}
@@ -1366,27 +1350,27 @@ function core_get_config($engine) {
 					if (trim($trunkprops['disabled']) == 'on') {
 						continue;
 					}
+          $trunkgroup = 'OUT_'.$trunkprops['trunkid'];
 					switch ($trunkprops['tech']) {
 						case 'dundi':
 							$macro_name = 'macro-dundi-'.$trunkprops['trunkid'];
 							$ext->addSwitch($macro_name,'DUNDI/'.$trunkprops['channelid']);
 							$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
 
-							$trunkgroup = 'OUT_'.$trunkprops['trunkid'];
 							$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
 							$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
 
-              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
-              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
-              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', $trunkgroup));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_'.$trunkprops['trunkid'].'}" = ""]', 'nomax'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT('.$trunkgroup.')} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
               if ($ast_lt_16) { 
                 $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
               } else {
                 $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
               }
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
-              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gosubif('$["${PREFIX_TRUNK_'.$trunkprops['trunkid'].'}" != ""]','sub-flp-'.$trunkprops['trunkid'].',s,1'));
               $ext->add($tcontext, $trunkprops['trunkid'], '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
               $ext->add($tcontext,$trunkprops['trunkid'],'hangit',new ext_hangup());
 							break;
@@ -1396,7 +1380,6 @@ function core_get_config($engine) {
               // fall-through
 						case 'iax2':
 						case 'sip':
-							$trunkgroup = 'OUT_'.$trunkprops['trunkid'];
 							$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
 							$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
 							$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
@@ -1435,7 +1418,7 @@ function core_get_config($engine) {
             $ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
           }
           $ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
-          $ext->add($tcontext,$tcustom,'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+          $ext->add($tcontext,$tcustom,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
           $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}','300,${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$tcustom,'hangit',new ext_hangup());
         }
@@ -1450,11 +1433,69 @@ function core_get_config($engine) {
             $ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
           }
           $ext->add($tcontext,$texten,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
-          $ext->add($tcontext,$texten,'',new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));
+          $ext->add($tcontext,$texten,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
+
           $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}','300,${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$texten,'hangit',new ext_hangup());
         }
 			}
+
+      $trunk_hash = core_trunks_list_dialrules();
+      if (is_array($trunk_hash) && count($trunk_hash)) {
+        foreach ($trunk_hash as $trunkid => $patterns) {
+          // First, generate the global referencing how many there are
+					$ext->addGlobal("PREFIX_TRUNK_$trunkid",count($patterns));
+
+          $context = 'sub-flp-'.$trunkid;
+          $target = 'TARGET_FLP4'.$trunkid;
+          $exten = 's';
+          foreach ($patterns as $pattern) {
+            $prepend = $pattern['prepend_digits'];
+            $offset =  strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
+
+            $regex_base = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+
+	          // convert asterisk pattern matching into perl regular expression
+            //  - two steps, use $ in place of +
+            //  - next replace $ with +
+            // if you don't do this, the str_replace() walks over itself
+	          $regex_intermediate = str_replace(
+			        array(
+				        "X",
+				        "Z",
+				        "N",
+				        ".",
+				        "*",
+				        "+",
+			        ),
+			        array(
+				        "[0-9]",
+				        "[1-9]",
+				        "[2-9]",
+				        "[0-9#*\$]$",
+				        "\*",
+				        "\+",
+			        ),
+              $pattern['match_pattern_prefix'].$pattern['match_pattern_pass']
+            );
+            $regex = strtr($regex_intermediate,"$","+");
+
+            if ($pattern['prepend_digits'] == '' && $offset == 0) {
+              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Return'));
+            } else {
+              $offset = $offset?':'.$offset:'';
+              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Set',$target.'='.$pattern['prepend_digits'].'${DIAL_NUMBER'.$offset.'}'));
+              $ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${'.$target.'})} != 0]', 'match'));
+            }
+
+          }
+          $ext->add($context, $exten, '', new ext_return(''));
+          $ext->add($context, $exten, 'match', new ext_set('DIAL_NUMBER','${'.$target.'}'));
+          $ext->add($context, $exten, '', new ext_return(''));
+        }
+      }
+
+
 			/* dialplan globals */
 			// modules should NOT use the globals table to store anything!
 			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
@@ -1550,18 +1591,6 @@ function core_get_config($engine) {
 					$ext->addGlobal('HAS_EXTENSION_STATE', 'TRUE');
           $has_extension_state = true;
         }
-			}
-
-			// Let's create globals for each trunk to determine which one's have fixlocalprefix settings.
-			// this allows us to skip calling the agi script if there are no rules to process saving
-			// on performance
-			//
-			$conf = core_trunks_readDialRulesFile();
-			if (is_array($conf)) {
-				foreach ($conf as $trunknum => $entries) {
-					$trunkname = substr($trunknum,6);
-					$ext->addGlobal("PREFIX_TRUNK_$trunkname",count($entries));
-				}
 			}
 
 			// Now let's create the required globals for the trunks so outbound routes work. These used to
@@ -1914,7 +1943,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
-			$ext->add($context, $exten, 'skipoutcid', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 			$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
 		
@@ -2047,7 +2076,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
-			$ext->add($context, $exten, 'skipoutcid', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manipulate DIAL_NUMBER
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
 			// Back to normal processing, whether intracompany or not.
@@ -2217,7 +2246,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} >= ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
 			$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','AGI','fixlocalprefix'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+			$ext->add($context, $exten, '', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
 			//  Replacement for asterisk's ENUMLOOKUP function
 			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
 			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
@@ -4490,8 +4519,6 @@ function core_zapchandids_get($channel) {
 
 
 
-
-
 /* begin page.trunks.php functions */
 
 // we're adding ,don't require a $trunknum
@@ -4778,34 +4805,48 @@ function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
 }
 
 
-function core_trunks_addDialRules($trunknum, $dialrules) {
-	global $db;
+function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
+  global $db;
 
-	$rules_arr = array();
-	$i = 1;
-	foreach ($dialrules as $rule) {
-		$rules_arr[] = array($db->escapeSimple($rule),$i);
-		$i++;
-	}
-	sql("DELETE FROM `trunks_dialpatterns` WHERE `trunkid` = $trunknum");
-	$compiled = $db->prepare("INSERT INTO `trunks_dialpatterns` (trunkid, rule, seq) VALUES ($trunknum,?,?)");
-	$result = $db->executeMultiple($compiled,$rules_arr);
+  $trunknum =  $db->escapeSimple($trunknum);
+  $filter_prepend = '/[^0-9+*#]/';
+  $filter_prefix = '/[^0-9.*#+xnzXNZ\-\[\]]/';
+  $filter_match =  '/[^0-9*#+xnzXNZ\-\[\]]/';
+
+  $insert_pattern = array();
+  $seq = 0;
+  foreach ($patterns as $pattern) {
+    $match_pattern_prefix = $db->escapeSimple(preg_replace($filter_prefix,'',strtoupper(trim($pattern['match_pattern_prefix']))));
+    $match_pattern_pass = $db->escapeSimple(preg_replace($filter_match,'',strtoupper(trim($pattern['match_pattern_pass']))));
+    $prepend_digits = $db->escapeSimple(preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits']))));
+    if ($match_pattern_prefix.$match_pattern_pass == '') {
+      continue;
+    }
+    // if duplicate prepend, get rid of subsequent since they will never be checked
+    $hash_index = md5($match_pattern_prefix.$match_pattern_pass);
+    if (!isset($insert_pattern[$hash_index])) {
+      $insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $prepend_digits, $seq);
+      $seq++;
+    }
+  }
+
+  if ($delete) {
+    sql('DELETE FROM `trunk_dialpatterns` WHERE `trunkid`='.q($trunknum));
+  }
+	$compiled = $db->prepare('INSERT INTO `trunk_dialpatterns` (`trunkid`, `match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`, `seq`) VALUES ('.$trunknum.',?,?,?,?)');
+	$result = $db->executeMultiple($compiled,$insert_pattern);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error adding to trunks_dialpatterns table');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating trunk_dialpatterns');	
 	}
 }
 
-function core_trunks_readDialRulesFile() {
-	$rule_hash = array();
-	$sqlstr = "SELECT `trunkid`, `rule` FROM `trunks_dialpatterns` ORDER BY `trunkid`, `seq`";
-	$patterns = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
-	$trunk_num = false;
+function core_trunks_list_dialrules() {
+  $rule_hash = array();
+
+  $patterns = core_trunks_get_dialrules();
 	foreach ($patterns as $pattern) {
-		if ($pattern['trunkid'] != $trunk_num) {
-			$rule_num = 1;
-			$trunk_num = $pattern['trunkid'];
-		}
-	  $rule_hash['trunk-'.$pattern['trunkid']]['rule'.$rule_num++] = $pattern['rule'];
+	  //$rule_hash[$pattern['trunkid']][] = $pattern['prepend_digits'].'^'.$pattern['match_pattern_prefix'].'|'.$pattern['match_pattern_pass'];
+	  $rule_hash[$pattern['trunkid']][] = $pattern;
 	}
 	return $rule_hash;
 }
@@ -4910,13 +4951,18 @@ function core_trunks_getTrunkRegister($trunknum) {
 	return isset($register)?$register:null;
 }
 
-function core_trunks_getDialRules($trunknum) {
-	$conf = core_trunks_readDialRulesFile();
-	if (isset($conf["trunk-".$trunknum])) {
-		return $conf["trunk-".$trunknum];
-	}
-	return false;
+function core_trunks_get_dialrules($trunknum = false) {
+  global $db;
+  if ($trunknum === false) {
+    $sql = "SELECT * FROM `trunk_dialpatterns` ORDER BY `trunkid`, `seq`";
+  } else {
+    $trunknum = q($db->escapeSimple($trunknum));
+    $sql = "SELECT * FROM `trunk_dialpatterns` WHERE `trunkid` = $trunknum  ORDER BY `seq`";
+  }
+  $patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+  return $patterns;
 }
+
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
@@ -4930,9 +4976,40 @@ function core_trunks_gettrunkroutes($trunknum) {
   return $routes;
 }
 
-function core_trunks_deleteDialRules($trunknum) {
-	sql("DELETE FROM `trunks_dialpatterns` WHERE `trunkid` = $trunknum");
+function core_trunks_delete_dialrules($trunknum) {
+  global $db;
+  $trunknum = q($db->escapeSimple($trunknum));
+	sql("DELETE FROM `trunk_dialpatterns` WHERE `trunkid` = $trunknum");
 }
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// The following APIs have all been removed and will result in crashes with traceback to obtain calling tree information
+
+function core_trunks_addDialRules($trunknum, $dialrules) {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
+}
+
+function core_trunks_deleteDialRules($trunknum) {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
+}
+
+function core_trunks_getDialRules($trunknum) {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
+}
+
+function core_trunks_readDialRulesFile() {
+  $trace = debug_backtrace();
+  $function = $trace[0]['function'];
+  die_freepbx("function: $function has been deprecated and removed");
+}
+
 
 /* end page.trunks.php functions */
 
@@ -5180,16 +5257,22 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
   global $db;
 
   $route_id =  $db->escapeSimple($route_id);
-  $filter = '/[^0-9\-\.\[\]xXnNzZ]/';
+  $filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
   $insert_pattern = array();
   foreach ($patterns as $pattern) {
-    $match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_pattern_prefix'])));
-    $match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_pattern_pass'])));
-    $match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['match_cid'])));
-    $prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper($pattern['prepend_digits'])));
+    $match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix']))));
+    $match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass']))));
+    $match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_cid']))));
+    $prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits']))));
+
+    if ($match_pattern_pass.$match_pattern_pass.$match_cid == '') {
+      continue;
+    }
 
     $hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
-    $insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
+    if (!isset($insert_pattern[$hash_index])) {
+      $insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
+    }
   }
 
   if ($delete) {
