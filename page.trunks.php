@@ -513,12 +513,12 @@ if ($helptext != '') {
     echo <<< END
     <tr>
       <td colspan="2">
-        (<input title="$pp_tit" type="text" size="5" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern dp-prepend $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
+        (<input title="$pp_tit" type="text" size="10" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern dp-prepend $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
 END;
     $tabindex++;
     $dpt_class = $pattern['match_pattern_prefix'] == '' ? 'dpt-title' : 'dpt-value';
     echo <<< END
-        <input title="$pf_tit" type="text" size="4" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="dp-prefix $dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
+        <input title="$pf_tit" type="text" size="6" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="dp-prefix $dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
 END;
     $tabindex++;
     $dpt_class = $pattern['match_pattern_pass'] == '' ? 'dpt-title' : 'dpt-value';
@@ -535,8 +535,8 @@ END;
 ?>
     <tr>
       <td colspan="2">
-        (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">) +
-        <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
+        (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">) +
+        <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
         <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dp-match dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">
         <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
 
@@ -558,6 +558,7 @@ END;
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always dial with prefix")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
+						<option value="google411"><?php echo _("Setup Google for directory assistance")?></option>
 						<option value="lookup7"><?php echo _("Lookup numbers for local trunk (7-digit dialing)")?></option>
 						<option value="lookup10"><?php echo _("Lookup numbers for local trunk (10-digit dialing)")?></option>
 					</select>
@@ -641,6 +642,20 @@ END;
 				
         addCustomField('',localprefix,localpattern);
 			}
+
+			function populateGoogle411() {
+				do {
+          var localpattern = <?php echo 'prompt("'._("What is the directory assistance number you will dial locally in the format that is passed to this trunk, ie 411").'");'?>
+					if (localpattern == null) return;
+				} while (!localpattern.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *").'")'?>);
+				do {
+
+        var localprepend = <?php echo 'prompt("'._("Google 411 number to dial, or alternative number you want dialed when calling directory assistance on this trunk").'"'?>,<?php echo _('"18004664411"') ?>);
+					if (localprepend == null) return;
+				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
+				
+        addCustomField(localprepend,'',localpattern);
+			}
 			
 			function changeAutoPop() {
 				switch(document.getElementById('autopop').value) {
@@ -649,6 +664,9 @@ END;
 					break;
 					case "remove":
 						populateRemove();
+					break;
+					case "google411":
+						populateGoogle411();
 					break;
 					case "lookup7":
 						populateLookup(7);
@@ -835,8 +853,8 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass) {
   var new_insert = $("#last_row").before('\
   <tr>\
     <td colspan="2">\
-    (<input title="<?php echo $pp_tit?>" type="text" size="5" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
-    <input title="<?php echo $pf_tit?>" type="text" size="4" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
+    (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
+    <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
     <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="dp-match '+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'">\
       <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
     </td>\
