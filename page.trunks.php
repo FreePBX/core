@@ -645,16 +645,16 @@ END;
 
 			function populateGoogle411() {
 				do {
-          var localpattern = <?php echo 'prompt("'._("What is the directory assistance number you will dial locally in the format that is passed to this trunk, ie 411").'");'?>
-					if (localpattern == null) return;
-				} while (!localpattern.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *").'")'?>);
+        var localprefix = <?php echo 'prompt("'._("What is the directory assistance number you will dial locally in the format that is passed to this trunk, ie 411").'"'?>,<?php echo _('"411"')?>);
+					if (localprefix == null) return;
+				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *").'")'?>);
 				do {
 
         var localprepend = <?php echo 'prompt("'._("Google 411 number to dial, or alternative number you want dialed when calling directory assistance on this trunk").'"'?>,<?php echo _('"18004664411"') ?>);
 					if (localprepend == null) return;
 				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
 				
-        addCustomField(localprepend,'',localpattern);
+        addCustomField(localprepend,localprefix,'');
 			}
 			
 			function changeAutoPop() {
