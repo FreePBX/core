@@ -9,8 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.8.0.0beta1.3* #4148, triming local changelog
-		*2.8.0.0beta1.2* #4146
+		*2.8.0.0beta1.2* #4146, #4148, triming local changelog
 		*2.8.0.0beta1.1* #4132, #2833, #4068, #4135, #4143, #4144
 		*2.8.0.0beta1.0* #4100, #4102, #4110 New Outbound Routing Schema and features
 		*2.7.0.2* really fix #4092
@@ -64,6 +63,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.8/core-2.8.0.0beta1.1.tgz</location>
-	<md5sum>34875a67da39847bde872568bb298dbb</md5sum>
+	<location>release/2.8/core-2.8.0.0beta1.2.tgz</location>
+	<md5sum>79bd2fd2756e4ad12680a543c688fc2d</md5sum>
 </module>
