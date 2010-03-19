@@ -498,10 +498,6 @@ if ($helptext != '') {
       <hr></h4></td>
     </tr>
 
-    <tr><td colspan="2">
-      <input type="button" id="dial-pattern-add"  value="<?php echo _("Add More Dial Pattern Fields")?>" />
-      <input type="button" id="dial-pattern-clear"  value="<?php echo _("Clear all Fields")?>" />
-    </td></tr>
     <tr><td colspan="2"><div class="dialpatterns"><table>
 <?php
   $pp_tit = _("prepend");
@@ -547,6 +543,10 @@ END;
 <?php
   $tabindex += 2000; // make room for dynamic insertion of new fields
 ?>
+    <tr><td colspan="2">
+      <input type="button" id="dial-pattern-add"  value="<?php echo _("+ Add More Dial Pattern Fields")?>" />
+      <input type="button" id="dial-pattern-clear"  value="<?php echo _("Clear all Fields")?>" />
+    </td></tr>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
@@ -617,7 +617,7 @@ END;
 			
 			function populateAlwaysAdd() {
 				do {
-          var localpattern = <?php echo 'prompt("'._("What is the local dialing pattern?\\n\\n(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,<?php echo _("NXXXXXX")?>);
+          var localpattern = <?php echo 'prompt("'._("What is the local dialing pattern?\\n\\n(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"<?php echo _("NXXXXXX")?>");
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
 				
@@ -626,7 +626,7 @@ END;
 					if (localprefix == null) return;
 				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid prefix. Only dialable characters (0-9, #, and *) are allowed.").'")'?>);
 
-        addCustomField(localprefix,'',localpattern);
+        return addCustomField(localprefix,'',localpattern);
 			}
 			
 			function populateRemove() {
@@ -636,11 +636,11 @@ END;
 				} while (!localprefix.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._('Invalid prefix. Only 0-9, #, *, Z, N, and X are allowed.').'")'?>);
 				
 				do {
-          var localpattern = <?php echo 'prompt("'._("What is the dialing pattern for local numbers after")?> "+localprefix+"? \n\n<?php echo _("(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,<?php echo _("NXXXXXX")?>);
+          var localpattern = <?php echo 'prompt("'._("What is the dialing pattern for local numbers after")?> "+localprefix+"? \n\n<?php echo _("(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"<?php echo _("NXXXXXX")?>");
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
 				
-        addCustomField('',localprefix,localpattern);
+        return addCustomField('',localprefix,localpattern);
 			}
 
 			function populateGoogle411() {
@@ -650,23 +650,33 @@ END;
 				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *").'")'?>);
 				do {
 
-        var localprepend = <?php echo 'prompt("'._("Google 411 number to dial, or alternative number you want dialed when calling directory assistance on this trunk").'"'?>,<?php echo _('"18004664411"') ?>);
+        var localprepend = <?php echo 'prompt("'._("Google 411 number to dial, or alternative number you want dialed when calling directory assistance on this trunk").'"'?>,"<?php echo _('18004664411') ?>");
 					if (localprepend == null) return;
 				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
 				
-        addCustomField(localprepend,localprefix,'');
+        return addCustomField(localprepend,localprefix,'');
 			}
 			
 			function changeAutoPop() {
+        var idx = false;
 				switch(document.getElementById('autopop').value) {
 					case "always":
-						populateAlwaysAdd();
+						idx = populateAlwaysAdd();
+            if (idx) {
+              $('#pattern_prefix_'+idx).focus();
+            }
 					break;
 					case "remove":
-						populateRemove();
+						idx = populateRemove();
+            if (idx) {
+              $('#prepend_digit_'+idx).focus();
+            }
 					break;
 					case "google411":
-						populateGoogle411();
+						idx = populateGoogle411();
+            if (idx) {
+              $('#pattern_pass_'+idx).focus();
+            }
 					break;
 					case "lookup7":
 						populateLookup(7);
