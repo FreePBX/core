@@ -9,6 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.8.0.0beta1.3* #4148, triming local changelog
 		*2.8.0.0beta1.2* #4146
 		*2.8.0.0beta1.1* #4132, #2833, #4068, #4135, #4143, #4144
 		*2.8.0.0beta1.0* #4100, #4102, #4110 New Outbound Routing Schema and features
@@ -43,37 +44,7 @@
 		*2.6.0alpha1.2* #3451, $932, #3426, #3474, #3439, #3526, #3534, $3648, #3649, #3517 moved macro-vm to auto-generation (WARNING: custom modification of macro-vm in extensions_custom.conf need to be moved to extensions_override_freepbx.conf
 		*2.6.0alpha1.1* #3380, #3358, #3387, localizations
 		*2.6.0alpha1.0* #3321, #3328, #3345 inbound CID routing fix, adds vm-callme voicemail access option
-		*2.5.1.1* #3311, revert #3266 (r7001)
-		*2.5.1.0* #3304, #3276, #3299
-		*2.5.0.4* #3299
-		*2.5.0.3* #3266, #3267, #3281, #3042 (vm-callme context), localiztion fixes
-		*2.5.0.2* #3219, #3241, #3240, #3251, #3215, localization fixes
-		*2.5.0.1* minor bug not showing extensions
-		*2.5.0.0* #3211, and final release
-		*2.5.0rc3.3* #3193, #3200, localization fixes, Swedish
-		*2.5.0rc3.2* #3124, #3180
-		*2.5.0rc3.1* #3173, #3077 auto-blkvm,  auto-confirm to auto generation,  visual feedback to DAHDI compatibility
-		*2.5.0rc3.0* #3150, #3152, #3142, #3167, #3077 (DAHDI Support)
-		*2.5.0rc2.5* #3129, #3144, #3146 and some streamling of dialout-trunk and outbound-callerid
-		*2.5.0rc2.4* #3128, #3140 sqlite3 fix and fixed typo introduced in dialparties.agi
-		*2.5.0rc2.3* #3130, #2750, #3128, #3131 (requires r6519) added master recording disable (can be performance booster)
-		*2.5.0rc2.2* lots of changed to be updated
-		*2.5.0rc2.1* #3115, #3116 remove warning and add t option to nv_faxdetect
-		*2.5.0rc2.0* #3091, #3099, #3100 Added return from voicemail/busy to IVR support, added CID Priority Route Inbound Route option
-		*2.5.0rc1.1* #3060, #3072, #3078 mixmonitor recording dir typo, move disallow=all to top of all sip, iax sections, file call screening nomemory
-		*2.5.0rc1.0* #3053 allow routing in CIDs like Private, Blocked, Restricted, etc. and bump to rc1
-		*2.5.0beta1.4* #3046, #3019, #3047, #3040
-		*2.5.0beta1.3* #2530 typo _GLOBALS should be GLOBALS, clean up conflicts when creating users/extensions
-		*2.5.0beta1.2* #2913 Add pre-answer delay option to incoming routes, rearrange the order of options on incoming screen
-		*2.5.0beta1.1* #2991, #2999, #2993, #3020, #3002, #3041, #2996, #3029, #3031
-		*2.5.0beta1.0* #2976, #2778, #2413, #2974, #2962, #2894, #2073
-		*2.5.0alpha1.1* #2930, #2938, #2922, #2939, #1568, #2949, #2779, #2953, #1911, #2807
-		*2.5.0alpha1.0* #2853, #2925, #2391, #2785, #2923, #2671, #2585, #2908, #2909, #2510, #2976, #2845, #1715, #2760, #2926, #2927, #2838, also added misc icons, links between users/devices
-		*2.4.0.4* #2857, #2848, #2791, #2449
-		*2.4.0.3* #2851 forwarded/followme/ringgroup calls originating from outside fail
-		*2.4.0.2* #2702, #2759, #2763, #2801, #2747, #2828, #2604, #2841, #2835 - review svn log or tickets for details
-		*2.4.0.1* #2693 fix DID editing creating new DID route introduced from #2664 fix
-		*2.4.0.0* CHANGELOG TRUNCATED See SVN Repository
+		*2.5* CHANGELOG TRUNCATED See SVN Repository
 	</changelog>
 	<depends>
 		<version>2.6.0beta1</version>

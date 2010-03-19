@@ -3131,6 +3131,14 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
 
+			  /*
+			  * There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
+        * execution with a status of ANSWER. So we hangup at this point
+			  */
+			  $exten = 's-ANSWER';
+			  $ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
+			  $ext->add($context, $exten, '', new ext_macro('hangupcall'));
+
         $exten = 's-TORTURE';
         $ext->add($mcontext,$exten,'', new ext_goto('1','musiconhold','app-blackhole'));
         $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
