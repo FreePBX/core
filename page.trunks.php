@@ -86,7 +86,7 @@ switch ($action) {
 	
 		core_trunks_del($trunknum);
     core_trunks_delete_dialrules($trunknum);
-    core_routing_trunk_del($trunknum);
+    core_routing_trunk_delbyid($trunknum);
 		needreload();
 		redirect_standard();
 	break;
@@ -415,14 +415,14 @@ if ($helptext != '') {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Trunk Name")?><span><br><?php echo _("Descriptive Name for this Trunk")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("Descriptive Name for this Trunk")?></span></a>: 
 				</td><td>
 					<input type="text" size="30" name="trunk_name" value="<?php echo $trunk_name;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><br><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span></a>: 
 				</td><td>
 					<input type="text" size="30" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -431,7 +431,7 @@ if ($helptext != '') {
 
 	    <tr>
 				<td>
-					<a href="#" class="info"><?php echo _("CID Options")?><span><br><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: blocks any CID that is the result of a forwarded call from off the system. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.");?><br /><br /></span></a>:
+					<a href="#" class="info"><?php echo _("CID Options")?><span><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: blocks any CID that is the result of a forwarded call from off the system. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.");?></span></a>:
 				</td><td>
 
 			    <select name="keepcid" tabindex="<?php echo ++$tabindex;?>">
@@ -552,6 +552,7 @@ END;
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
 					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP and DAHDI trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
+					<strong><?php echo _("Setup Google for directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance (default: 411) to google's toll free directory (default: 18004664411) or any other number of your choosing")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+area code for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
 				</td><td valign="top"><select id="autopop"  tabindex="<?php echo ++$tabindex;?>" name="autopop" onChange="changeAutoPop(); ">
@@ -710,7 +711,7 @@ END;
 	?>
 				<tr>
 					<td>
-						<a href=# class="info"><?php echo _("Zap Identifier")?><span><br><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("Zap Identifier")?><span><?php echo _("ZAP channels are referenced either by a group number or channel number (which is defined in zapata.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?></span></a>: 
 					</td><td>
 						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
@@ -722,7 +723,7 @@ END;
 	?>
 				<tr>
 					<td>
-						<a href=# class="info"><?php echo _("DAHDI Identifier")?><span><br><?php echo _("DAHDI channels are referenced either by a group number or channel number (which is defined in chan_dahdi.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("DAHDI Identifier")?><span><?php echo _("DAHDI channels are referenced either by a group number or channel number (which is defined in chan_dahdi.conf).  <br><br>The default setting is <b>g0</b> (group zero).")?></span></a>: 
 					</td><td>
 						<input type="text" size="8" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 						<input type="hidden" size="14" name="usercontext" value="notneeded"/>
@@ -760,14 +761,14 @@ END;
 	?>
 				<tr>
 					<td>
-						<a href=# class="info"><?php echo _("Trunk Name")?><span><br><?php echo _("Give this trunk a unique name.  Example: myiaxtel")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("Give this trunk a unique name.  Example: myiaxtel")?></span></a>: 
 					</td><td>
 						<input type="text" size="14" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2">
-					<a href=# class="info"><?php echo _("PEER Details")?><span><br><?php echo _("Modify the default PEER connection parameters for your VoIP provider.<br><br>You may need to add to the default lines listed below, depending on your provider.<br /><br />WARNING: Order is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny comes first.")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("PEER Details")?><span><?php echo _("Modify the default PEER connection parameters for your VoIP provider.<br><br>You may need to add to the default lines listed below, depending on your provider.<br /><br />WARNING: Order is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny comes first.")?></span></a>: 
 					</td>
 				</tr>
 				<tr>
@@ -782,15 +783,15 @@ END;
 				</tr>
 				<tr>
 					<td>
-						<a href=# class="info"><?php echo _("USER Context")?><span><br><?php echo _("This is most often the account name or number your provider expects.<br><br>This USER Context will be used to define the below user details.")?></span></a>: 
+						<a href=# class="info"><?php echo _("USER Context")?><span><?php echo _("This is most often the account name or number your provider expects.<br><br>This USER Context will be used to define the below user details.")?></span></a>: 
 					</td><td>
 						<input type="text" size="14" name="usercontext" value="<?php echo htmlspecialchars($usercontext)  ?>" tabindex="<?php echo ++$tabindex;?>"/>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2">
-					<a href=# class="info"><?php echo _("USER Details")?><span><br><?php echo _("Modify the default USER connection parameters for your VoIP provider.")?><br><br><?php echo _("You may need to add to the default lines listed below, depending on your provider..<br /><br />WARNING: Order is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny 
-				comes first.")?><br><br></span></a>: 
+					<a href=# class="info"><?php echo _("USER Details")?><span><?php echo _("Modify the default USER connection parameters for your VoIP provider.")?><br><br><?php echo _("You may need to add to the default lines listed below, depending on your provider..<br /><br />WARNING: Order is important as it will be retained. For example, if you use the \"allow/deny\" directives make sure deny 
+				comes first.")?></span></a>: 
 					</td>
 				</tr>
 				<tr>
@@ -805,7 +806,7 @@ END;
 				</tr>
 				<tr>
 					<td colspan="2">
-						<a href=# class="info"><?php echo _("Register String")?><span><br><?php echo _("Most VoIP providers require your system to REGISTER with theirs. Enter the registration line here.<br><br>example:<br><br>username:password@switch.voipprovider.com.<br><br>Many providers will require you to provide a DID number, ex: username:password@switch.voipprovider.com/didnumber in order for any DID matching to work.")?><br><br></span></a>: 
+						<a href=# class="info"><?php echo _("Register String")?><span><?php echo _("Most VoIP providers require your system to REGISTER with theirs. Enter the registration line here.<br><br>example:<br><br>username:password@switch.voipprovider.com.<br><br>Many providers will require you to provide a DID number, ex: username:password@switch.voipprovider.com/didnumber in order for any DID matching to work.")?></span></a>: 
 					</td>
 				</tr>
 				<tr>
