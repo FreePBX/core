@@ -105,6 +105,10 @@ $route_seq = isset($_REQUEST['route_seq']) ? $_REQUEST['route_seq'] : '';
 
 //if submitting form, update database
 switch ($action) {
+	case 'ajaxroutepos':
+		core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
+		exit;
+	break;
 	case "addroute":
     $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
     $_REQUEST['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
@@ -215,9 +219,23 @@ switch ($action) {
 
 ?>
 </div>
-
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#routelist").sortable({ 
+		items: 'li:gt(0)',
+		update: function(event, ui){
+			var repotrunkkey=+ui.item.attr('id').replace('routelist','');
+			var repotrunkdirection=ui.item.index();repotrunkdirection--
+			$.ajax({
+			  url: location.href,
+			  data: "action=ajaxroutepos&repotrunkkey="+repotrunkkey+"&repotrunkdirection="+repotrunkdirection,
+			})
+		} 
+		}).disableSelection();
+	});
+</script>
 <div class="rnav">
-<ul>
+<ul id="routelist">
 	<li><a <?php  echo ($extdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add Route")?></a></li>
 <?php 
 $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporoutedirection']:'';
@@ -225,42 +243,10 @@ $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
 $routepriority = core_routing_list();
 $positions=count($routepriority);
 foreach ($routepriority as $key => $tresult) {
-	echo "\t<li>\n\t\t<a " . ($extdisplay==$tresult['route_id'] ? 'class="current"':'') .
+	echo "\t<li id=\"routelist".$tresult['route_id'] ."\">\n\t\t<a " . ($extdisplay==$tresult['route_id'] ? 'class="current"':'') .
 		" href=\"config.php?display=" . 
 		urlencode($display)."&amp;extdisplay=" . 
-		urlencode($tresult['route_id']) . "\">$key " . $tresult['name']."</a>\n";
-
-	// move up
-	if ($key > 0) {
-		echo "\t\t<img src=\"images/resultset_up.png\" onclick=\"repositionRoute('{$tresult['route_id']}','up')\" alt='" .  _("Move Up") .
-			"' style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  }
-
-	// move down
-	if ($key < ($positions-1)) {
-		echo "\t\t<img src='images/resultset_down.png' onclick=\"repositionRoute('{$tresult['route_id']}','down')\" alt='" . _("Move Down") .
-			"'  style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  }
-
-	// move top
-	if ($key > 0) {
-		echo "\t\t<img src=\"images/resultset_top.png\" onclick=\"repositionRoute('{$tresult['route_id']}','top')\" alt='" .  _("First") .
-			"' style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  }
-
-	// move bottom
-	if ($key < ($positions-1)) {
-		echo "\t\t<img src='images/resultset_bottom.png' onclick=\"repositionRoute('{$tresult['route_id']}','bottom')\" alt='" . _("Last") .
-			"'  style='cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  } else {
-		echo "\t\t<img src='images/blank.gif' style='float:none; margin-left:0px; margin-bottom:0px;' width='12px' height='12px'>\n";
-  }
+		urlencode($tresult['route_id']) . "\">" . $tresult['name']."</a>\n";
 		echo "\t</li>\n";
 } // foreach
 ?>
