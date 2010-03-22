@@ -814,18 +814,6 @@ function validatePatterns() {
   }
 }
 
-//TODO: maybe add action vs. it being blank and assumed above?
-function repositionTrunk(key,direction) {
-  switch (direction) {
-  case 'up':
-  case 'down':
-    document.getElementById('repotrunkdirection').value=direction;
-    document.getElementById('repotrunkkey').value=key;
-    clearPatterns();
-    document.getElementById('routeEdit').submit();
-    break;
-  }
-}
 
 function deleteTrunk(key) {
 	document.getElementById('trunkpri'+key).value = '';
