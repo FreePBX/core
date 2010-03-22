@@ -223,6 +223,7 @@ switch ($action) {
 $(document).ready(function(){
 	$("#routelist").sortable({ 
 		items: 'li:gt(0)',
+		cursor: 'move',
 		update: function(event, ui){
 			var repotrunkkey=+ui.item.attr('id').replace('routelist','');
 			var repotrunkdirection=ui.item.index();repotrunkdirection--
