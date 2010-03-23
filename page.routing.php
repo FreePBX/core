@@ -243,7 +243,6 @@ $(document).ready(function(){
     update: function(event, ui){
       var repotrunkkey=+ui.item.attr('id').replace('routelist','');
       var repotrunkdirection=ui.item.index();repotrunkdirection--;
-      console.log($('size:','#need_reload_block').size());
       var send_reload = '&send_reload='+($('#need_reload_block').size() == 0 ? 'yes':'no');
       $.ajax({
         type: 'POST',
