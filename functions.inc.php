@@ -4818,8 +4818,8 @@ function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
 
   $trunknum =  $db->escapeSimple($trunknum);
   $filter_prepend = '/[^0-9+*#]/';
-  $filter_prefix = '/[^0-9.*#+xnzXNZ\-\[\]]/';
-  $filter_match =  '/[^0-9*#+xnzXNZ\-\[\]]/';
+  $filter_prefix = '/[^0-9*#+xnzXNZ\-\[\]]/';
+  $filter_match =  '/[^0-9.*#+xnzXNZ\-\[\]]/';
 
   $insert_pattern = array();
   $seq = 0;
