@@ -107,7 +107,26 @@ $route_seq = isset($_REQUEST['route_seq']) ? $_REQUEST['route_seq'] : '';
 switch ($action) {
 	case 'ajaxroutepos':
 		core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
+    needreload();
+    include_once("common/json.inc.php");
+    if ($_POST['send_reload'] == 'yes') {
+      ob_start();
+      if (!@include ('views/freepbx_reloadbar.php')) {
+        @include ('../../views/freepbx_reloadbar.php'); //TODO for debugging
+      }
+      $json_array['reload_bar'] = ob_get_clean();
+      ob_start();
+      if (!@include ('views/freepbx_reload.php')) {
+        @include ('../../views/freepbx_reload.php'); //TODO for debugging
+      }
+      $json_array['reload_header'] = ob_get_clean();
+    }
+    $json_array['show_reload'] = 'yes';
+    $json = new Services_JSON();
+    header("Content-type: application/json"); 
+    echo $json->encode($json_array);
 		exit;
+
 	break;
 	case "addroute":
     $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
@@ -221,19 +240,38 @@ switch ($action) {
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
-	$("#routelist").sortable({ 
-		items: 'li:gt(0)',
-		cursor: 'move',
-		update: function(event, ui){
-			var repotrunkkey=+ui.item.attr('id').replace('routelist','');
-			var repotrunkdirection=ui.item.index();repotrunkdirection--
-			$.ajax({
-			  url: location.href,
-			  data: "action=ajaxroutepos&repotrunkkey="+repotrunkkey+"&repotrunkdirection="+repotrunkdirection,
-			})
-		} 
-		}).disableSelection();
-	});
+  $("#routelist").sortable({ 
+    items: 'li:gt(0)',
+    cursor: 'move',
+    update: function(event, ui){
+      var repotrunkkey=+ui.item.attr('id').replace('routelist','');
+      var repotrunkdirection=ui.item.index();repotrunkdirection--;
+      console.log($('size:','#need_reload_block').size());
+      var send_reload = '&send_reload='+($('#need_reload_block').size() == 0 ? 'yes':'no');
+      $.ajax({
+        type: 'POST',
+        url: location.href,
+        data: "action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey="+repotrunkkey+"&repotrunkdirection="+repotrunkdirection+send_reload,
+        dataType: 'json',
+        success: function(data) {
+          /* if the reload_block is not there, we blindly insert the info we think we got because we told
+             it in the ajax call to send it to use, should wo double check?
+          */
+          if ((data.show_reload == 'yes') && !$('#need_reload_block').fadeIn().size()) {
+            $('#logo').after(data.reload_bar).fadeIn();
+            $('#moduleBox').before(data.reload_header);
+          }
+          if (data.show_reload == 'yes') {
+            $('#need_reload_block').fadeIn();
+          }
+        },
+        error: function(data) {
+          alert("<?php _("An unknown error occured repositioning routes, refresh your browser to see the current correct route positions") ?>");
+        }
+      });
+	  }
+  }).disableSelection();
+});
 </script>
 <div class="rnav">
 <ul id="routelist">
@@ -243,11 +281,12 @@ $reporoutedirection = isset($_REQUEST['reporoutedirection'])?$_REQUEST['reporout
 $reporoutekey = isset($_REQUEST['reporoutekey'])?$_REQUEST['reporoutekey']:'';
 $routepriority = core_routing_list();
 $positions=count($routepriority);
+$drag_title = _("Drag up or down to reposition, click to choose");
 foreach ($routepriority as $key => $tresult) {
 	echo "\t<li id=\"routelist".$tresult['route_id'] ."\">\n\t\t<a " . ($extdisplay==$tresult['route_id'] ? 'class="current"':'') .
 		" href=\"config.php?display=" . 
 		urlencode($display)."&amp;extdisplay=" . 
-		urlencode($tresult['route_id']) . "\">" . $tresult['name']."</a>\n";
+		urlencode($tresult['route_id']) . "\" title=\"$drag_title\">" . $tresult['name']."</a>\n";
 		echo "\t</li>\n";
 } // foreach
 ?>
@@ -370,7 +409,7 @@ if ($extdisplay) { // editing
 				<select name="route_seq" tabindex="<?php echo ++$tabindex;?>">
 				<?php
           if ($route_seq != 0) {
-            echo '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s %s'),0,$routepriority[0]['name'])."</option>\n";
+            echo '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
           }
           foreach ($routepriority as $key => $route) {
             if ($key == 0 && $route_seq != 0) continue;
@@ -378,11 +417,11 @@ if ($extdisplay) { // editing
             if ($route_seq == $key) {
               echo '<option value="'.$key.'" SELECTED>'._('---No Change---')."</option>\n";
             } else {
-              echo '<option value="'.$key.'">'.sprintf(_('Before %s %s'),$key,$route['name'])."</option>\n";
+              echo '<option value="'.$key.'">'.sprintf(_('Before %s'),$route['name'])."</option>\n";
             }
           }
           if ($extdisplay == '' | $route_seq != $last_seq) {
-            echo '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s %s'),$last_seq,$routepriority[$last_seq]['name'])."</option>\n";
+            echo '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
           }
 				?>		
 				</select>		
