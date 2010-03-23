@@ -111,14 +111,11 @@ switch ($action) {
     include_once("common/json.inc.php");
     if ($_POST['send_reload'] == 'yes') {
       ob_start();
-      if (!@include ('views/freepbx_reloadbar.php')) {
-        @include ('../../views/freepbx_reloadbar.php'); //TODO for debugging
-      }
+      include ('views/freepbx_reloadbar.php');
       $json_array['reload_bar'] = ob_get_clean();
+
       ob_start();
-      if (!@include ('views/freepbx_reload.php')) {
-        @include ('../../views/freepbx_reload.php'); //TODO for debugging
-      }
+      include ('views/freepbx_reload.php');
       $json_array['reload_header'] = ob_get_clean();
     }
     $json_array['show_reload'] = 'yes';
