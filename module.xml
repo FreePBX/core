@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.8.0.0beta1.4* #4071, #4152, #4156 (partial)
+		*2.8.0.0beta1.4* #4071, #4152, #4156 (partial), #4159, #4160
 		*2.8.0.0beta1.3* #4151
 		*2.8.0.0beta1.2* #4146, #4148, triming local changelog
 		*2.8.0.0beta1.1* #4132, #2833, #4068, #4135, #4143, #4144
