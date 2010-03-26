@@ -3117,9 +3117,9 @@ function core_get_config($engine) {
           $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', ''));
           $ext->add($mcontext,$exten,'', new ext_set('LOOPCNT2', '${FIELDQTY(THISDIAL,&)}'));
           $ext->add($mcontext,$exten,'', new ext_set('ITER2', '1'));
-          $ext->add($mcontext,$exten,'begin2', new ext_set('THISPART', '${CUT(THISDIAL,&,${ITER})}'));
-          $ext->add($mcontext,$exten,'', new ext_execif('$["${THISPART:0:3}" = "ZAP"]', 'Set','THISPART=DAHDI${THISPART:3}'));
-          $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', '${NEWDIAL}${THISPART}&'));
+          $ext->add($mcontext,$exten,'begin2', new ext_set('THISPART2', '${CUT(THISDIAL,&,${ITER})}'));
+          $ext->add($mcontext,$exten,'', new ext_execif('$["${THISPART2:0:3}" = "ZAP"]', 'Set','THISPART2=DAHDI${THISPART2:3}'));
+          $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', '${NEWDIAL}${THISPART2}&'));
           $ext->add($mcontext,$exten,'', new ext_set('ITER2', '$[${ITER2} + 1]'));
           $ext->add($mcontext,$exten,'', new ext_gotoif('$[${ITER2} <= ${LOOPCNT2}]','begin2'));
           $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${NEWDIAL:0:$[${LEN(${NEWDIAL})}-1]}'));
