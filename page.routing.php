@@ -262,7 +262,7 @@ $(document).ready(function(){
           }
         },
         error: function(data) {
-          alert("<?php _("An unknown error occured repositioning routes, refresh your browser to see the current correct route positions") ?>");
+          alert("<?php _("An unknown error occurred repositioning routes, refresh your browser to see the current correct route positions") ?>");
         }
       });
 	  }
@@ -365,7 +365,7 @@ if ($extdisplay) { // editing
 		</tr>
 
 		<tr>
-      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Comapny will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></a></td></span></a></td>
+      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Company will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></a></td></span></a></td>
       <td>
         <input type="checkbox" name="emergency" value="YES" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Emergency") ?></small>
         <input type="checkbox" name="intracompany" value="YES" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Intra-Company") ?></small>

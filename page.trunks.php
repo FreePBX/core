@@ -484,7 +484,7 @@ if ($helptext != '') {
     <tr>
       <td colspan="2"><h4>
       <a href=# class="info"><?php echo _("Dialed Number Manipulation Rules")?><span>
-      <?php echo _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occured. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
+      <?php echo _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occurred. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
       <b>X</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
       <b>Z</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
       <b>N</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
@@ -552,7 +552,7 @@ END;
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
 					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP and DAHDI trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
-					<strong><?php echo _("Setup Google for directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance (default: 411) to google's toll free directory (default: 18004664411) or any other number of your choosing")?><br>
+					<strong><?php echo _("Setup Google for directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance (default: 411) to Google's toll free directory (default: 18004664411) or any other number of your choosing")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+area code for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					</span></a>:
 				</td><td valign="top"><select id="autopop"  tabindex="<?php echo ++$tabindex;?>" name="autopop" onChange="changeAutoPop(); ">
