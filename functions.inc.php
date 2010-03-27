@@ -1675,7 +1675,8 @@ function core_get_config($engine) {
 			/* outbound routes */
 
 			$ext->addInclude('from-internal-additional','outbound-allroutes');
-			$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
+			//$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
+      $ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
       $routes = core_routing_list();
       $trunk_table = core_trunks_listbyid();
       foreach ($routes as $route) {
@@ -1707,7 +1708,15 @@ function core_get_config($engine) {
           $exten = $fpattern['dial_pattern'];
           $offset = $fpattern['offset'] == 0 ? '':':'.$fpattern['offset'];
 
-          $ext->add($context, $exten, '', new ext_noop('Macro(user-callerid): executed in outbound-allroutes PRI 1')); 
+          // This will not get called, but it fixes some things like custom-context or other possible custom uses of these
+          // generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
+          // CID part of the dialplan will not get executed
+          $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,SKIPTTL')); 
+          if ($fpattern['base_pattern'] != $exten) {
+            $ext->add($context, $exten, '', new ext_macro('user-callerid,SKIPTTL')); 
+          }
+          $ext->add($context, $exten, '', new ext_noop(sprintf(_('Calling Out Route: %s'),$route['name']))); 
+
           if ($route['emergency_route'] != '') {
 						$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
           }
@@ -5176,14 +5185,12 @@ function core_routing_formatpattern($pattern) {
     // same comment as above wrt to #
     $cid = "_".$cid;
   }
-  if ($cid != '') {
-    $exten .= '/'.$cid;
-  }
+  $full_exten = $cid != '' ? $exten.'/'.$cid : $exten;
   // ticket #3998: the $pos is incorrect if a range is included such as 9[0-3]|NXX in the prefix.
   // in this example we end up with EXTEN:6 instead of the correct EXTEN:2
   //
   $pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
-  return array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
+  return array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $full_exten, 'base_pattern' => $exten, 'offset' => $pos);
 }
 
 // function core_routing_getroutetrunks($route)
