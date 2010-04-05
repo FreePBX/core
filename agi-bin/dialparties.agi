@@ -27,17 +27,9 @@
  */
 
 require_once "phpagi.php";
-require_once "phpagi-asmanager.php";
 
 $ext      = array();	// Hash that will contain our list of extensions to call
 $ext_hunt = array();	// Hash that will contain our list of extensions to call used by huntgroup
-$cidnum   = "";		// Caller ID Number for this call
-$cidname  = "";		// Caller ID Name for this call
-$timer    = "";		// Call timer for Dial command
-$dialopts = "";		// Options for dialing
-$rc       = "";		// Catch return code
-$priority = "";		// Next priority 
-$rgmethod = "";		// If Ring Group what ringing method was chosen
 $screen   = false;	// Initialize screen variable
 $dsarray  = array();	// This will hold all the dial strings, used to check for duplicate extensions
 
@@ -45,8 +37,6 @@ $AGI = new AGI();
 debug("Starting New Dialparties.agi", 1);
 
 // Get required channels variables that used to come from amportal.conf
-$ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
-$ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
 $cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
 $ast_version = get_var( $AGI, "ASTVERSION" );
 $chan_dahdi  = get_var( $AGI, "ASTCHANDAHDI" );
@@ -62,13 +52,14 @@ $has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
 // If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
 //
 if (!$has_extension_state) {
+  require_once "phpagi-asmanager.php";
+  $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
+  $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
   $astman = $AGI->new_AsteriskManager();
 	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
 		exit (1);
 	}
 }
-
-$priority = get_var( $AGI, "priority" ) + 1;
 
 // Caller ID info is stored in $request in AGI class, passed from Asterisk
 $cidnum = $AGI->request['agi_callerid'];
@@ -113,9 +104,13 @@ if ($sippheader) {
 	$AGI->exec_sipaddheader($fields[0], $fields[1]);
 }
 
-$pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
-
+// Follow-Me is only one setting PR_DIALSTATUS so don't bother fetching if not a followme
 $fmgrp  = get_var( $AGI, "FMGRP" );
+if ($fmgrp != '') {
+  $pr_dialstatus	= get_var( $AGI, "PR_DIALSTATUS" );
+} else {
+  $pr_dialstatus	= '';
+}
 $nodest	= get_var( $AGI, "NODEST" );
 
 $ringgroup_index	= get_var( $AGI, "RINGGROUP_INDEX" );
@@ -135,7 +130,6 @@ if (empty($dialopts)) {
 if (empty($rgmethod)) {
 	$rgmethod	= "none";
 }
-
 debug("Methodology of ring is  '$rgmethod'", 1);
 
 // reset the ringgroup method to its fundamental algorithm and pull out if
@@ -243,7 +237,6 @@ if ($rgmethod == "ringallv2" && $fmgrp != "") {
 }
 $already_screened = get_var( $AGI, "SCREEN" ); // If this is the second pass through dialparties.agi, we don't want to double-screen the caller
 $from_outside     = get_var( $AGI, "FROM_DID" );
-$astvarlibdir     = get_var( $AGI, "ASTVARLIBDIR" );
 // If this isn't a ring group, check to see if the user has call screening on
 // Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
 if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && !$already_screened && !($nodest != '' && $fmgrp != $nodest)) {
@@ -254,6 +247,7 @@ if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == 
 			// Do a security check, allow only alphanumeric callerid numbers, otherwise code could be injected in a cidnum field
 			// that could result in an arbitrary command being executed in this remove operation.
       if (!preg_match('/[^ a-zA-Z\d]/',$cidnum)) {
+        $astvarlibdir     = get_var( $AGI, "ASTVARLIBDIR" );
 				exec("rm -f $astvarlibdir/sounds/priv-callerintros/$cidnum.*");
 			}
 		}
@@ -278,8 +272,6 @@ foreach ($ext as $k) {
 	// TODO: If ringgoup tells us to ignore CF then don't do this
 	//
 	if (strlen($cf)) {
-
-    
     // Check for call forwarding first
     // If call forward is enabled, we use chan_local
     // Hacky. We should be using an associative array, shouldn't we?
@@ -794,11 +786,6 @@ function debug($string, $level=3) {
 	$AGI->verbose($string, $level);
 }
 
-function mycallback( $rc ) {
-	debug("User hung up. (rc=" . $rc . ")", 1);
-	exit ($rc);
-}
-
 function is_ext_avail( $extnum ) {
 	global $astman;
 	global $AGI;
@@ -843,5 +830,4 @@ function is_ext_avail( $extnum ) {
 	}
 	return $status;
 }
-
 ?>
