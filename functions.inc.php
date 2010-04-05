@@ -1679,16 +1679,17 @@ function core_get_config($engine) {
       $ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
       $routes = core_routing_list();
       $trunk_table = core_trunks_listbyid();
+      $delim = $ast_lt_16 ? '|' : ',';
       foreach ($routes as $route) {
         $context = 'outrt-'.$route['route_id'];
         $comment = $route['name'];
         $ext->addSectionComment($context, $comment);
 
         if (function_exists('timeconditions_timegroups_get_times') && $route['time_group_id'] !== null) {
-          $times = timeconditions_timegroups_get_times($route['time_group_id']);
+          $times = timeconditions_timegroups_get_times($route['time_group_id'],true);
           if (is_array($times) && count($times)) {
             foreach ($times as $time) {
-              $ext->addInclude('outbound-allroutes',$context.'|'.$time[1],$comment);
+              $ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
             }
           } else {
             $ext->addInclude('outbound-allroutes',$context,$comment);
