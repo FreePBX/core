@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.8.0.0beta1.6* #4184
+		*2.8.0.0beta1.6* #4181, #4184
 		*2.8.0.0beta1.5* #4155
 		*2.8.0.0beta1.4* #4071, #4152, #4156, #4159, #4160
 		*2.8.0.0beta1.3* #4151
@@ -67,6 +67,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.8/core-2.8.0.0beta1.5.tgz</location>
-	<md5sum>1ddbd687e98b88fdfb04e7cae663d448</md5sum>
+	<location>release/2.8/core-2.8.0.0beta1.6.tgz</location>
+	<md5sum>9f31844461a84f47f7ed1d792185678b</md5sum>
 </module>
