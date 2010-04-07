@@ -2407,12 +2407,12 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'exit', new ext_macroexit());
 
 
-			$ext->add($context, $exten, 'trunkcid', new ext_execif('$["${TRUNKOUTCID}" != ""]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
-			$ext->add($context, $exten, 'usercid', new ext_execif('$["${USEROUTCID}" != ""]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
+			$ext->add($context, $exten, 'trunkcid', new ext_execif('$[${LEN(${TRUNKOUTCID})} != 0]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
+			$ext->add($context, $exten, 'usercid', new ext_execif('$[${LEN(${USEROUTCID})} != 0]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
       /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of 
        * an Emergency CID on an Emergency Route
        */
-			$ext->add($context, $exten, '', new ext_execif('$["${TRUNKCIDOVERRIDE}" != "" | "${FORCEDOUTCID_${ARG1}}" != ""]', 'Set', 'CALLERID(all)=${IF($["${FORCEDOUTCID_${ARG1}}"=""]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
+			$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 			if ($ast_lt_16) { 
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'SetCallerPres', 'prohib_passed_screen'));
 			} else {
