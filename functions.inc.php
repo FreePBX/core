@@ -213,6 +213,7 @@ class core_conf {
 						break;
 					case 'allow':
 					case 'disallow':
+					case 'accountcode':
 						if ($option != '')
 							$additional .= $result['keyword']."=$option\n";
 						break;
@@ -281,6 +282,7 @@ class core_conf {
 							break;
 						case 'allow':
 						case 'disallow':
+						case 'accountcode':
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
@@ -378,6 +380,7 @@ class core_conf {
 						break;
 					case 'allow':
 					case 'disallow':
+					case 'accountcode':
 						if ($option != '')
 							$additional .= $result['keyword']."=$option\n";
 						break;
@@ -453,6 +456,7 @@ class core_conf {
 							break;
 						case 'allow':
 						case 'disallow':
+						case 'accountcode':
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
