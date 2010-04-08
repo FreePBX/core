@@ -1380,7 +1380,7 @@ function core_get_config($engine) {
 							break;
 
 						case 'iax':
-              $trukprops['tech'] = 'iax2';
+              $trunkprops['tech'] = 'iax2';
               // fall-through
 						case 'iax2':
 						case 'sip':
