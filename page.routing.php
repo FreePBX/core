@@ -622,7 +622,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 				<img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" title="Click here to remove this trunk" onclick="deleteTrunk(<?php echo $key ?>)">
 			<?php   // move up
 			if ($key > 0) {?>
-				<img src="images/resultset_up.png" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
+				<img src="images/resultset_up.png" onclick="repositionTrunk('<?php echo $key ?>','up')" alt="<?php echo _("Move Up")?>" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:0px;" width="12px" height="12px">
 			<?php  } else { ?>
 				<img src="images/blank.gif" style="float:none; margin-left:0px; margin-bottom:0px;" width="9" height="11">
 			<?php  }
@@ -850,6 +850,18 @@ function validatePatterns() {
   }
 }
 
+//TODO: maybe add action vs. it being blank and assumed above?
+function repositionTrunk(key,direction) {
+  switch (direction) {
+  case 'up':
+  case 'down':
+    document.getElementById('repotrunkdirection').value=direction;
+    document.getElementById('repotrunkkey').value=key;
+    clearPatterns();
+    document.getElementById('routeEdit').submit();
+    break;
+  }
+}
 
 function deleteTrunk(key) {
 	document.getElementById('trunkpri'+key).value = '';
