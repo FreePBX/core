@@ -2871,8 +2871,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("VMBOX", '${ARG1}'));
-			$ext->add($mcontext,$exten,'', new ext_set("EXTTOCALL", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("__INTENDEDUSER", '${EXTEN}'));
+			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
@@ -2939,7 +2938,7 @@ function core_get_config($engine) {
       */
       $mcontext = 'macro-simple-dial';
       $exten = 's';
-			$ext->add($mcontext,$exten,'', new ext_set("EXTTOCALL", '${ARG1}'));
+			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG1}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
