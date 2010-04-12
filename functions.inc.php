@@ -1465,20 +1465,20 @@ function core_get_config($engine) {
             // if you don't do this, the str_replace() walks over itself
 	          $regex_intermediate = str_replace(
 			        array(
-				        "X",
-				        "Z",
-				        "N",
-				        ".",
-				        "*",
-				        "+",
+				        'X',
+				        'Z',
+				        'N',
+				        '.',
+				        '*',
+				        '+',
 			        ),
 			        array(
-				        "[0-9]",
-				        "[1-9]",
-				        "[2-9]",
-				        "[0-9#*\$]$",
-				        "\*",
-				        "\+",
+				        '[0-9]',
+				        '[1-9]',
+				        '[2-9]',
+				        '[0-9#*\\\$]$',
+				        '\\\*',
+				        '\\\$',
 			        ),
               $pattern['match_pattern_prefix'].$pattern['match_pattern_pass']
             );
