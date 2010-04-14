@@ -3135,7 +3135,7 @@ function core_get_config($engine) {
           $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', ''));
           $ext->add($mcontext,$exten,'', new ext_set('LOOPCNT2', '${FIELDQTY(THISDIAL,&)}'));
           $ext->add($mcontext,$exten,'', new ext_set('ITER2', '1'));
-          $ext->add($mcontext,$exten,'begin2', new ext_set('THISPART2', '${CUT(THISDIAL,&,${ITER})}'));
+          $ext->add($mcontext,$exten,'begin2', new ext_set('THISPART2', '${CUT(THISDIAL,&,${ITER2})}'));
           $ext->add($mcontext,$exten,'', new ext_execif('$["${THISPART2:0:3}" = "ZAP"]', 'Set','THISPART2=DAHDI${THISPART2:3}'));
           $ext->add($mcontext,$exten,'', new ext_set('NEWDIAL', '${NEWDIAL}${THISPART2}&'));
           $ext->add($mcontext,$exten,'', new ext_set('ITER2', '$[${ITER2} + 1]'));
