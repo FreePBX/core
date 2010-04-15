@@ -3059,6 +3059,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'next3', new ext_execif('$["${EXTENSION_STATE(${DEXTEN})}"!="UNAVAILABLE" & "${EXTENSION_STATE(${DEXTEN})}"!="NOT_INUSE" & "${EXTENSION_STATE(${DEXTEN})}"!="UNKNOWN"]', 'Set', 'DIALSTATUS_CW=BUSY'));
         $ext->add($mcontext,$exten,'continue', new ext_gotoif('$["${DEXTEN}"=""]','nodial'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$["${DEXTEN:-1}"!="#"]','dstring,1','dlocal,1'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$[${LEN(${DSTRING})}=0]','nodial'));
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"!="#"]','skiptrace'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$[${REGEX("^[\+]?[0-9]+$" ${CALLERID(number)})} = 1]','ctset,1','ctclear,1'));
         //TODO: do we need to check for anything beyond auto-blkvm in this call path?
