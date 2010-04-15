@@ -329,7 +329,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			$device_arr = explode('&',$devices);
 			$device_arr[] = $new_device;
 			$device_arr = array_unique($device_arr);
-			return implode('&',$device_arr);
+			return trim(implode('&',$device_arr),'&');
 		} else {
 			return $devices;
 		}
@@ -518,6 +518,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 	function set_queue_states($user,$device,$onoroff='on') {
 		global $agi;
 		global $astman;
+		global $DEVSTATE;
 		$response = $astman->send_request('Command',array('Command'=>"queue show"));
 		$response1=explode("\n",trim($response['data']));
 		// Lets try and process our results here.
@@ -576,7 +577,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			} else {
 				$queuestat=(array_search(trim($user),$logged_agents_array[$queueno]))?'INUSE':'NOT_INUSE';
 			}
-			$agi->set_variable('DEVSTATE(Custom:QUEUE'.$device.'*'.$queueno.')',$queuestat);
+			$agi->set_variable($DEVSTATE.'(Custom:QUEUE'.$device.'*'.$queueno.')',$queuestat);
 		}
 	}
 		
