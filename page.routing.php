@@ -282,7 +282,7 @@ foreach ($routepriority as $key => $tresult) {
 	echo "\t<li id=\"routelist".$tresult['route_id'] ."\">\n\t\t<a " . ($extdisplay==$tresult['route_id'] ? 'class="current"':'') .
 		" href=\"config.php?display=" . 
 		urlencode($display)."&amp;extdisplay=" . 
-		urlencode($tresult['route_id']) . "\" title=\"$drag_title\">" . $tresult['name']."</a>\n";
+		urlencode($tresult['route_id']) . "\" title=\"$drag_title\"><img src=\"images/arrow_up_down.png\" height=\"16\" width=\"16\" border=\"0\" alt=\"move\" style=\"float:none; margin-left:-6px; margin-bottom:-3px;cursor:move\" /> " . $tresult['name']."</a>\n";
 		echo "\t</li>\n";
 } // foreach
 ?>
