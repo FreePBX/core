@@ -2876,7 +2876,6 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("VMBOX", '${ARG1}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("__INTENDEDUSER", '${EXTTOCALL}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
