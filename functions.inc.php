@@ -1739,7 +1739,7 @@ function core_get_config($engine) {
             if ($route['outcid_mode'] != '') {
 						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
             } else {
-						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)}}=0 & ${LEN(${TRUNKCIDOVERRIDE}}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
+						  $ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)})}=0 & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
             }
           }
           $ext->add($context, $exten, '', new ext_set("_NODEST",""));
