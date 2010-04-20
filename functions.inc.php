@@ -1685,7 +1685,7 @@ function core_get_config($engine) {
       $trunk_table = core_trunks_listbyid();
       $delim = $ast_lt_16 ? '|' : ',';
       foreach ($routes as $route) {
-        $add_extra_pri1 = true;
+        $add_extra_pri1 = array();
         $context = 'outrt-'.$route['route_id'];
         $comment = $route['name'];
         $ext->addSectionComment($context, $comment);
@@ -1717,9 +1717,9 @@ function core_get_config($engine) {
           // This will not get called, but it fixes some things like custom-context or other possible custom uses of these
           // generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
           // CID part of the dialplan will not get executed
-          if ($add_extra_pri1) {
+          if (!isset($add_extra_pri1[$fpattern['base_pattern']])) {
             $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,SKIPTTL')); 
-            $add_extra_pri1 = false;
+            $add_extra_pri1[$fpattern['base_pattern']] = true;
           }
           if ($fpattern['base_pattern'] != $exten) {
             $ext->add($context, $exten, '', new ext_macro('user-callerid,SKIPTTL')); 
@@ -1763,6 +1763,7 @@ function core_get_config($engine) {
           }
           $ext->add($context, $exten, '', new ext_macro("outisbusy"));
         }
+        unset($add_extra_pri1);
       }
 
 			general_generate_indications();
