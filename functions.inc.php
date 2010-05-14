@@ -1804,6 +1804,7 @@ function core_get_config($engine) {
 				$exten = '_X.';
 				$ext->add($context, $exten, '', new extension('ResetCDR()'));
 				$ext->add($context, $exten, '', new extension('NoCDR()'));
+				$ext->add($context, $exten, '', new ext_progress());
 				$ext->add($context, $exten, '', new ext_wait('1'));
 				$ext->add($context, $exten, '', new ext_progress());
 				$ext->add($context, $exten, '', new ext_playback('silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
