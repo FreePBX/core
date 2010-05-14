@@ -1225,15 +1225,14 @@ function core_get_config($engine) {
           $chan_dahdi_loaded = (preg_match('/1 modules loaded/', $response['data']) > 0);
         }
 			}
-      $context_type = $chan_dahdi_loaded ? 'dahdi' : 'zaptel';
 			foreach (core_zapchandids_list() as $row) {
 				$channel = $row['channel'];
 				$did     = $row['did'];
 
-				$this_context = "macro-from-$context_type-$channel";
-				$ext->add($zap_context, 's', '', new ext_noop('Entering '.$this_context.' with DID = ${DID} and setting to: '.$did));
-				$ext->add($zap_context, 's', '', new ext_setvar('__FROM_DID',$did));
-				$ext->add($zap_context, 's', '', new ext_goto('1',$did,'from-trunk'));
+				$this_context = "macro-from-dahdi-$channel";
+				$ext->add($this_context, 's', '', new ext_noop('Entering '.$this_context.' with DID = ${DID} and setting to: '.$did));
+				$ext->add($this_context, 's', '', new ext_setvar('__FROM_DID',$did));
+				$ext->add($this_context, 's', '', new ext_goto('1',$did,'from-trunk'));
 			}
 
 			/* user extensions */
@@ -2430,67 +2429,44 @@ function core_get_config($engine) {
         $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
       }
 
+      // Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
+      //
+			$ext->addInclude('from-zaptel', 'from-dahdi'); 
+			$ext->add('from-zaptel', 'foo','', new ext_noop('bar'));
 
-			$context = 'from-zaptel';
-			$exten = '_X.';
+		  $context = 'from-dahdi';
+		  $exten = '_X.';
 			
-			$ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
-			$ext->add($context, $exten, '', new ext_goto(1, 's'));
+		  $ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
+		  $ext->add($context, $exten, '', new ext_goto(1, 's'));
 
-			$exten = 's';
-			$ext->add($context, $exten, '', new ext_noop('Entering from-zaptel with DID == ${DID}'));
-			// Some trunks _require_ a RINGING be sent before an Answer. 
-			$ext->add($context, $exten, '', new ext_ringing());
-			// If ($did == "") { $did = "s"; }
-			$ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
-			$ext->add($context, $exten, '', new ext_noop('DID is now ${DID}'));
-			if ($chan_dahdi) {
-				$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="DAHDI"]', 'zapok', 'notzap'));
-			} else { 
-				$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:3}"="Zap"]', 'zapok', 'notzap'));
-			}
-			$ext->add($context, $exten, 'notzap', new ext_goto('1', '${DID}', 'from-pstn'));
-			// If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
-			$ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
-			$ext->add($context, $exten, 'zapok', new ext_noop('Is a Zaptel Channel'));
-			if ($chan_dahdi) {
-				$ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
-			} else { 
-				$ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:4}'));
-			}				
-			$ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
-			$ext->add($context, $exten, '', new ext_macro('from-zaptel-${CHAN}', '${DID},1'));
-			// If nothing there, then treat it as a DID
-			$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-zaptel-${CHAN}'));
-			$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
+		  $exten = 's';
+		  $ext->add($context, $exten, '', new ext_noop('Entering from-dahdi with DID == ${DID}'));
+		  // Some trunks _require_ a RINGING be sent before an Answer. 
+		  $ext->add($context, $exten, '', new ext_ringing());
+		  // If ($did == "") { $did = "s"; }
+		  $ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
+		  $ext->add($context, $exten, '', new ext_noop('DID is now ${DID}'));
+		  $ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="DAHDI"]', 'dahdiok', 'checkzap'));
+			$ext->add($context, $exten, 'checkzap', new ext_gotoif('$["${CHANNEL:0:3}"="Zap"]', 'zapok', 'neither'));
+		  $ext->add($context, $exten, 'neither', new ext_goto('1', '${DID}', 'from-pstn'));
+		  // If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
+		  $ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
 
+		  $ext->add($context, $exten, 'dahdiok', new ext_noop('Is a DAHDI Channel'));
+		  $ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
+		  $ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
+		  $ext->add($context, $exten, '', new ext_macro('from-dahdi-${CHAN}', '${DID},1'));
+		  // If nothing there, then treat it as a DID
+		  $ext->add($context, $exten, '', new ext_noop('Returned from Macro from-dahdi-${CHAN}'));
+		  $ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
 
-			if (!$chan_dahdi) {
-			  $context = 'from-dahdi';
-			  $exten = '_X.';
-			
-			  $ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
-			  $ext->add($context, $exten, '', new ext_goto(1, 's'));
-
-			  $exten = 's';
-			  $ext->add($context, $exten, '', new ext_noop('Entering from-dahdi with DID == ${DID}'));
-			  // Some trunks _require_ a RINGING be sent before an Answer. 
-			  $ext->add($context, $exten, '', new ext_ringing());
-			  // If ($did == "") { $did = "s"; }
-			  $ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
-			  $ext->add($context, $exten, '', new ext_noop('DID is now ${DID}'));
-			  $ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="DAHDI"]', 'dahdiok', 'notdahdi'));
-			  $ext->add($context, $exten, 'notdahdi', new ext_goto('1', '${DID}', 'from-pstn'));
-			  // If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
-			  $ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
-			  $ext->add($context, $exten, 'dahdiok', new ext_noop('Is a Zaptel Channel'));
-			  $ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
-			  $ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
-			  $ext->add($context, $exten, '', new ext_macro('from-dahdi-${CHAN}', '${DID},1'));
-			  // If nothing there, then treat it as a DID
-			  $ext->add($context, $exten, '', new ext_noop('Returned from Macro from-dahdi-${CHAN}'));
-			  $ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
-      }
+		  $ext->add($context, $exten, 'zapok', new ext_noop('Is a Zaptel Channel'));
+			$ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:4}'));
+		  $ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
+		  $ext->add($context, $exten, '', new ext_macro('from-dahdi-${CHAN}', '${DID},1'));
+		  $ext->add($context, $exten, '', new ext_noop('Returned from Macro from-dahdi-${CHAN}'));
+		  $ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
 
 			/*
 			* vm-callme context plays voicemail over telephone for web click-to-call
