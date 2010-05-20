@@ -842,9 +842,6 @@ $(document).ready(function(){
     changedClass: "text-normal",
     focusClass: "text-normal"
   });
-  $(".dpt-value").toggleVal({
-    changedClass: "text-red"
-  });
 }); 
 
 function patternsRemove(idx) {
@@ -877,11 +874,6 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass) {
     changedClass: "text-normal",
     focusClass: "text-normal"
   });
-  if (pattern_pass != '' || pattern_prefix != '' || prepend_digit != '') {
-    new_insert.find(".dpt-value").toggleVal({
-      changedClass: "text-red"
-    });
-  }
 
   return idx;
 }
@@ -897,7 +889,7 @@ function clearPatterns() {
 
 function clearAllPatterns() {
   $(".dpt-value").addClass('dpt-title').removeClass('dpt-value');
-  $(".toggleval").each(function() {
+  $(".dpt-title").each(function() {
     $(this).val("");
   });
   $(".dpt-title").toggleVal({

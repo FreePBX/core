@@ -550,7 +550,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 						break;
 
 					case 'No Members':
-						debug("Queue $inqueue has noone logged in");
+						debug("Queue $inqueue has no one logged in");
 						$inqueue='false';
 						break;
 

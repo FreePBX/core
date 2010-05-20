@@ -7,9 +7,6 @@
 .text-normal {
 	color: inherit;
 }
-.text-red {
-	color: red;
-}
 div.dialpatterns {
 	max-height: 15em; 
 	max-width: 100%; 

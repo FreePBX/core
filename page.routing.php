@@ -696,9 +696,6 @@ $(document).ready(function(){
     changedClass: "text-normal",
     focusClass: "text-normal"
   });
-  $(".dpt-value").toggleVal({
-    changedClass: "text-red"
-  });
 }); 
 
 function patternsRemove(idx) {
@@ -734,11 +731,6 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) 
     changedClass: "text-normal",
     focusClass: "text-normal"
   });
-  if (pattern_pass != '' || pattern_prefix != '' || prepend_digit != '' || match_cid != '') {
-    new_insert.find(".dpt-value").toggleVal({
-      changedClass: "text-red"
-    });
-  }
 
   return idx;
 }
@@ -816,7 +808,7 @@ function validatePatterns() {
   var msgInvalidDialPattern;
   defaultEmptyOK = false;
 
-  $(".toggleval").each(function() {
+  $(".dpt-title, .dpt-value").each(function() {
     if ($.trim($(this).val()) == '') {
     } else if (!isDialpattern($(this).val())) {
       culprit = this;
