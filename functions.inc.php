@@ -3692,9 +3692,12 @@ function core_devices_addsip($account) {
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
+      $data = $db->escapeSimple(trim($data));
 			if ( $keyword == 'dial' && $data == '' ) {
 				$sipfields[] = array($account, $keyword, 'SIP/'.$account, $flag++);
 			} elseif ($keyword == 'mailbox' && $data == '') {
+				$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
+			} elseif ($keyword == 'vmexten' && $data == '') {
 				$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
 			} else {
 				$sipfields[] = array($account, $keyword, $data, $flag++);
@@ -3723,6 +3726,10 @@ function core_devices_addsip($account) {
 			array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),$flag++),
 			array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:''),$flag++)
 		);
+    $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
+    if ($vmexten != '') {
+      $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
+    }
 	}
 
 	// Very bad
@@ -3750,6 +3757,7 @@ function core_devices_delsip($account) {
 	if(DB::IsError($result)) {
 		die_freepbx($result->getMessage().$sql);
 	}
+  freepbx_debug("deleting all sip stuff: $sql");
 }
 
 function core_devices_getsip($account) {
@@ -5921,6 +5929,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'level' => 1);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['vmexten'] = array('value' => '', 'level' => 1);
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
     		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
