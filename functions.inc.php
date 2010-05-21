@@ -1334,6 +1334,8 @@ function core_get_config($engine) {
 				$ext->add('ext-local', 'vmret', '', new ext_hangup(''));
 				$ext->add('ext-local', 'vmret', 'playret', new ext_playback('exited-vm-will-be-transfered&silence/1'));
 				$ext->add('ext-local', 'vmret', '', new ext_goto('1','return','${IVR_CONTEXT}'));
+
+				$ext->add('ext-local', 'h', '', new ext_macro('hangupcall'));
 			}
 
       /* Create the from-trunk-tech-chanelid context that can be used for inbound group counting
