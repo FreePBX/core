@@ -153,6 +153,7 @@ switch ($action) {
 		needreload();
 	break;
 	case 'populatenpanxx':
+    $dialpattern_array = $dialpattern_insert;
 		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
 			// first thing we do is grab the exch:
 			$ch = curl_init();
@@ -293,7 +294,9 @@ foreach ($routepriority as $key => $tresult) {
 
 <?php 
 $last_seq = count($routepriority)-1;
-if ($extdisplay != '') {
+if ($action == 'populatenpanxx') {
+	echo "<h2>"._("Edit Route")."</h2>";
+} else if ($extdisplay != '') {
 	
 	// load from db
   $route_info = core_routing_get($extdisplay);
@@ -312,7 +315,6 @@ if ($extdisplay != '') {
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
   $route_seq = $last_seq+1;
-  $routename = '';
   if (!isset($dialpattern_array)) {
     $dialpattern_array = array();
   }
@@ -526,6 +528,7 @@ END;
 				
 				document.getElementById('npanxx').value = npanxx;
 				document.getElementById('routeEdit').action.value = "populatenpanxx";
+        clearPatterns();
 				document.getElementById('routeEdit').submit();
 <?php  
 	} else { // curl is not installed

@@ -92,6 +92,7 @@ switch ($action) {
 	break;
 	case "populatenpanxx7": 
 	case "populatenpanxx10": 
+    $dialpattern_array = $dialpattern_insert;
 		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
 			// first thing we do is grab the exch:
 			$ch = curl_init();
@@ -606,6 +607,7 @@ END;
 				} else {
 					document.trunkEdit.action.value = "populatenpanxx7";
 				}
+        clearPatterns();
 				document.trunkEdit.submit();
 <?php  
 	} else { // curl is not installed
