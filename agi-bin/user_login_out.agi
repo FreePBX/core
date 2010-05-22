@@ -252,11 +252,11 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
                 	}
 			if ($dnd_devstate) {
 				debug("Setting device $device DND state to INVALID before deleting",5);
-				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','UNKNOWN');
+				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','NOT_INUSE');
 			}
 			if ($cf_devstate) {
 				debug("Setting device $device CF state to INVALID before deleting",5);
-				$agi->set_variable($DEVSTATE.'(Custom:DEVCF'.$device.')','UNKNOWN');
+				$agi->set_variable($DEVSTATE.'(Custom:DEVCF'.$device.')','NOT_INUSE');
 			}
 			// I thought they should then be deleted, but they still end up there probably because setting them to invalid re-creates them
 			//
