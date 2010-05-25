@@ -3345,6 +3345,13 @@ function core_did_add($incoming,$target=false){
 
 //get the existing devices
 function core_devices_list($tech="all",$detail=false,$get_all=false) {
+  static $extens;
+  static $last_tech, $last_detail, $last_get_all;
+
+  if (isset($extens) && $tech == $last_tech && $detail === $last_detail && $get_all === $last_get_all) {
+    return $extens;
+  }
+
 	if (strtolower($detail) == 'full') {
 		$sql = "SELECT * FROM devices";
 	} else {
