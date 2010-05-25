@@ -978,12 +978,20 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
-	var msgNeverOverrideCIDValue = "<?php echo _('You must define an Outbound Caller ID when Choosing Never Override CallerID'); ?>";
+	var msgCIDValueRequired = "<?php echo _('You must define an Outbound Caller ID when Choosing this CID Options value'); ?>";
+	var msgCIDValueEmpty = "<?php echo _('It is highly recommended that you define an Outbound Caller ID on all trunks, undefined behavior can result when nothing is specified. The CID Options can control when this CID is used. Do you still want to continue?'); ?>";
 
 	defaultEmptyOK = true;
 
-	if (theForm.keepcid.checked && isEmpty($.trim(theForm.outcid.value)))
-		return warnInvalid(theForm.outcid, msgNeverOverrideCIDValue);
+	if (isEmpty($.trim(theForm.outcid.value))) {
+	  if (theForm.keepcid.value == 'on' || theForm.keepcid.value == 'all') {
+		  return warnInvalid(theForm.outcid, msgCIDValueRequired);
+      } else {
+				if (confirm(msgCIDValueEmpty) == false) {
+				  return false;
+      }
+    }
+  }
 
 	if (!isCallerID(theForm.outcid.value))
 		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
