@@ -3707,7 +3707,7 @@ function core_devices_addsip($account) {
 			} elseif ($keyword == 'mailbox' && $data == '') {
 				$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
 			} elseif ($keyword == 'vmexten' && $data == '') {
-				$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
+				// don't add it
 			} else {
 				$sipfields[] = array($account, $keyword, $data, $flag++);
 			}
