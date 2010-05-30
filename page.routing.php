@@ -339,6 +339,11 @@ if ($extdisplay) { // editing
 		<input type="hidden" name="display" value="<?php echo $display?>"/>
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 		<input type="hidden" id="action" name="action" value=""/>
+
+		<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
+		<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
+		<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
+		<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 		<table>
     <tr>
       <td colspan="2"><h5><?php echo _("Route Settings") ?><hr></h5></td>
@@ -367,7 +372,7 @@ if ($extdisplay) { // editing
 		</tr>
 
 		<tr>
-      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Company will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></a></td></span></a></td>
+      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Company will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></span></a></td>
       <td>
         <input type="checkbox" name="emergency" value="YES" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Emergency") ?></small>
         <input type="checkbox" name="intracompany" value="YES" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Intra-Company") ?></small>
@@ -500,7 +505,7 @@ END;
       </td>
     </tr>
     <tr id="last_row"></tr> 
-    </table></div></tr></td>
+    </table></div></tr>
     <tr><td colspan="2">
       <input type="button" id="dial-pattern-add"  value="<?php echo _("+ Add More Dial Pattern Fields")?>" />
     </td></tr>
@@ -598,10 +603,6 @@ END;
     <tr>
       <td colspan="2"><h5><a href=# class="info"><?php echo _("Trunk Sequence for Matched Routes")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a><hr></h5></td>
     </tr>
-		<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
-		<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
-		<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
-		<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 <?php 
 $key = -1;
 $positions=count($trunkpriority);

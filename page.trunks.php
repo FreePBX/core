@@ -408,6 +408,7 @@ if ($helptext != '') {
 			<input type="hidden" name="action" value=""/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
 			<input type="hidden" name="provider" value="<?php echo $provider?>"/>
+			<input id="npanxx" name="npanxx" type="hidden" />
 			<table>
 			<tr>
 				<td colspan="2">
@@ -540,7 +541,7 @@ END;
       </td>
     </tr>
     <tr id="last_row"></tr> 
-    </table></div></tr></td>
+    </table></div></tr>
 <?php
   $tabindex += 2000; // make room for dynamic insertion of new fields
 ?>
@@ -566,7 +567,6 @@ END;
 					</select>
 				</td>
 			</tr>
-			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
 			
 			function disable_field(field, field_enable) {

@@ -224,7 +224,7 @@ foreach ($tresults as $tresult) {
 					<a href=# class="info"><?php echo _("Admin Access<span>Select the Admin Sections this user should have access to.</span>")?></a>: 
 				</td><td>
 					<select multiple name="sections[]" tabindex="<?php echo ++$tabindex;?>">
-					<option />
+            <option></option>
 <?php 
 				$prev_category = NULL;
 				foreach ($module_list as $key => $row) {
