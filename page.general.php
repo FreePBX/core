@@ -31,7 +31,7 @@ if ($action == 'editglobals') {
 						array($_REQUEST['MIXMON_DIR'],'MIXMON_DIR'),
 						array($_REQUEST['MIXMON_POST'],'MIXMON_POST'),
             array($_REQUEST['RINGTIMER'],'RINGTIMER'),
-						array($_REQUEST['DIRECTORY'],'DIRECTORY'),
+						array(isset($_REQUEST['DIRECTORY']) ? $_REQUEST['DIRECTORY'] : 'both','DIRECTORY'),
 						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['VM_DDTYPE'],'VM_DDTYPE'),
 						array($_REQUEST['VM_GAIN'],'VM_GAIN'),
@@ -215,6 +215,12 @@ foreach ($globals as $global) {
 	</td><td align="right">
 	<input type="checkbox" value="s" name="VM_OPTS" <?php  echo (($VM_OPTS || $VM_DDTYPE == "su" || $VM_DDTYPE == "bu") ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> 
 	</td></tr>
+	<tr><td>
+	<a href=# class="info"><?php echo _("Operator Extension:")?><span>
+	<?php echo _("Default number to dial when callers hit '0' from voicemail and the legacy company directory. This does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
+	</td><td align="right">
+	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>" tabindex="<?php echo ++$tabindex;?>"/>
+	</td></tr>
 </table>
 
 <h5><?php echo _("Voicemail VmX Locator")?></h5>
@@ -337,7 +343,12 @@ foreach ($globals as $global) {
 		</tr>
 	</table>
 
-<h5><?php echo _("Company Directory")?></h5>
+<?php
+if (function_exists('ivr_list')) {
+  $count = sql('SELECT COUNT(*) FROM `ivr` WHERE `enable_directory` = "CHECKED"','getOne');
+  if ($count) {
+?>
+<h5><?php echo _("Legacy Company Directory")?></h5>
 <table>
 	<tr><td>
 	<a href=# class="info"><?php echo _("Find users in the Company Directory by:")?><span><?php echo _("The Company Directory allows a caller to spell the user's first name, last name, or both when searching for a user. This will select which of these modes are used.")?></span></a>
@@ -353,14 +364,11 @@ foreach ($globals as $global) {
 	</td><td align="right">
 	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> 
 	</td></tr>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Operator Extension:")?><span>
-	<?php echo _("When users hit '0' in the directory, they are put through to this number. Note that it"); ?>
-	<?php echo _(" does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
-	</td><td align="right">
-	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
 </table>
+<?php
+  }
+}
+?>
 
 <h5><?php echo _("International Settings")?></h5>
 <table>
