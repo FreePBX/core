@@ -217,7 +217,7 @@ foreach ($globals as $global) {
 	</td></tr>
 	<tr><td>
 	<a href=# class="info"><?php echo _("Operator Extension:")?><span>
-	<?php echo _("Default number to dial when callers hit '0' from voicemail or the directory. This does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
+	<?php echo _("Default number to dial when callers hit '0' from voicemail or the built in IVR directory (it has no effect on the Directory Module). This does NOT need to be an extension, it can be a Ring Group, or even an external number."); ?></span></a>
 	</td><td align="right">
 	<input type="text" size="10" name="OPERATOR_XTN" value="<?php  echo htmlspecialchars($OPERATOR_XTN)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
