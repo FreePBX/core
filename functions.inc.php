@@ -5286,7 +5286,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
     $match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_cid']))));
     $prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits']))));
 
-    if ($match_pattern_pass.$match_pattern_pass.$match_cid == '') {
+    if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
       continue;
     }
 
