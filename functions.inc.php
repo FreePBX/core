@@ -3592,6 +3592,9 @@ function core_devices_get($account){
 	//get all the variables for the meetme
 	$sql = "SELECT * FROM devices WHERE id = '$account'";
 	$results = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+  if (empty($results)) {
+    return array();
+  }
 	
 	//take care of sip/iax/zap config
 	$funct = "core_devices_get".strtolower($results['tech']);
