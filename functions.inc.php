@@ -5231,7 +5231,7 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
   $sql = "UPDATE `outbound_routes` SET 
     `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password', 
     `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
-    `time_group_id`='$time_group_id' WHERE `route_id` = ".q($route_id);
+    `time_group_id`=$time_group_id WHERE `route_id` = ".q($route_id);
   sql($sql);
 
   core_routing_updatepatterns($route_id, $patterns, true);
@@ -5255,7 +5255,7 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
   $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
-    VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', '$time_group_id')";
+    VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id)";
   sql($sql);
 
   // TODO: sqlite_last_insert_rowid() un-tested and php5 ???
