@@ -3080,6 +3080,7 @@ function core_get_config($engine) {
 
         $exten = 'qwait';
         $ext->add($mcontext,$exten,'', new ext_execif('$["${SAVEDCIDNAME}" = ""]', 'Set', '__SAVEDCIDNAME=${CALLERID(name)}'));
+        $ext->add($mcontext,$exten,'', new ext_set('ELAPSED', '${MATH($[${EPOCH}+30-${QUEUEWAIT}]/60,int)}'));
         $ext->add($mcontext,$exten,'', new ext_set('CALLERID(name)', 'M${ELAPSED}:${SAVEDCIDNAME}'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
 
