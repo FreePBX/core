@@ -177,7 +177,10 @@ class core_conf {
 
 		// Asterisk 1.4 requires call-limit be set for hints to work properly
 		//
-		if (version_compare($ast_version, "1.4", "ge")) { 
+		if (version_compare($ast_version, "1.6.1", "ge")) { 
+			$call_limit = "callcounter=yes\n";
+			$ver12 = false;
+    } else if (version_compare($ast_version, "1.4", "ge")) { 
 			$call_limit = "call-limit=50\n";
 			$ver12 = false;
 		} else {
@@ -771,6 +774,7 @@ function core_get_config($engine) {
 
 			$ast_ge_14 = version_compare($version, '1.4', 'ge');
 			$ast_lt_16 = version_compare($version, '1.6', 'lt');
+			$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
 
 			// Now add to sip_general_addtional.conf
 			//
@@ -783,11 +787,13 @@ function core_get_config($engine) {
 				$core_conf->addSipGeneral('notifyringing','yes');
 				if ($ast_ge_14) {
 					$core_conf->addSipGeneral('notifyhold','yes');
-					$core_conf->addSipGeneral('limitonpeers','yes');
 					$core_conf->addSipGeneral('tos_sip','cs3');    // Recommended setting from doc/ip-tos.txt
 					$core_conf->addSipGeneral('tos_audio','ef');   // Recommended setting from doc/ip-tos.txt
 					$core_conf->addSipGeneral('tos_video','af41'); // Recommended setting from doc/ip-tos.txt
 					$core_conf->addSipGeneral('alwaysauthreject','yes');
+          if ($ast_lt_161) {
+					  $core_conf->addSipGeneral('limitonpeers','yes');
+          }
 				} else {
 					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
