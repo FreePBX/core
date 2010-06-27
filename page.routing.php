@@ -389,7 +389,10 @@ if ($extdisplay) { // editing
           $cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
           if (isset($tresults[0])) {
             foreach ($tresults as $tresult) {
-              echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$tresult."</option>\n";
+              $ttext = $tresult;
+              if($tresult == 'none') $ttext = _("none");
+              if($tresult == 'default') $ttext = _("default");
+              echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'.$ttext."</option>\n";
             }
           }
         ?>		
