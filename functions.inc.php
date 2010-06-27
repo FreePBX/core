@@ -73,9 +73,9 @@ class core_conf {
 				break;
 			case 'chan_dahdi_additional.conf':
         if (ast_with_dahdi()) {
-				  return $this->generate_zapata_additional($version);
-        } else {
 				  return $this->generate_zapata_additional($version, 'dahdi');
+        } else {
+				  return $this->generate_zapata_additional($version);
         }
 				break;
 			case 'zapata_additional.conf':
@@ -3776,7 +3776,6 @@ function core_devices_delsip($account) {
 	if(DB::IsError($result)) {
 		die_freepbx($result->getMessage().$sql);
 	}
-  freepbx_debug("deleting all sip stuff: $sql");
 }
 
 function core_devices_getsip($account) {
@@ -5965,7 +5964,7 @@ function core_devices_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
-    if (!ast_with_dahdi()) {
+    if (ast_with_dahdi()) {
 		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDI Device"));
     }
 		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
