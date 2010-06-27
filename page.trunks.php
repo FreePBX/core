@@ -269,7 +269,7 @@ if (!$tech && !$extdisplay) {
 <?php
 	$baseURL   = $_SERVER['PHP_SELF'].'?display='.urlencode($display).'&';
   $trunks[] = array('url'=> $baseURL.'tech=SIP', 'tlabel' =>  _("Add SIP Trunk"));
-  if (!ast_with_dahdi()) {
+  if (ast_with_dahdi()) {
     $trunks[] = array('url'=> $baseURL.'tech=DAHDI', 'tlabel' =>  _("Add DAHDI Trunk"));
   }
   $trunks[] = array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" ));
