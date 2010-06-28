@@ -819,8 +819,10 @@ END;
 	<?php 
 		break;
 	}
-	?>
-				
+  // implementation of module hook
+  // object was initialized in config.php
+  echo $module_hook->hookHtml;
+  ?>
 			<tr>
 				<td colspan="2">
 					<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>"></h6>
@@ -965,11 +967,11 @@ function validatePatterns() {
   }
 }
 
-var theForm = document.trunkEdit;
-
-theForm.outcid.focus();
+document.trunkEdit.trunk_name.focus();
 
 function trunkEdit_onsubmit(act) {
+  var theForm = document.trunkEdit;
+
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
