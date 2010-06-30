@@ -3059,7 +3059,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('__KEEPCID', 'TRUE'));
         $ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
-        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""]','s-${DIALSTATUS},1'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
         $ext->add($mcontext,$exten,'', new ext_macroexit());
         $ext->add($mcontext,$exten,'nodial', new ext_execif('$["${DIALSTATUS}" = ""]', 'Set', 'DIALSTATUS=NOANSWER'));
         $ext->add($mcontext,$exten,'', new ext_noop('Returned from dial-one with nothing to call and DIALSTATUS: ${DIALSTATUS}'));
