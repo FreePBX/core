@@ -2899,7 +2899,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten, '', new ext_playtones('busy'));
 			$ext->add($mcontext,$exten, '', new ext_busy(20));
 
-      $exten = '_s-.';
+      $exten = '_s-!';
 			$ext->add($mcontext,$exten,'', new ext_noop('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}'));
 			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
 			$ext->add($mcontext,$exten,'', new ext_playtones('congestion'));
