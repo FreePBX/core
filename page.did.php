@@ -98,7 +98,7 @@ $inroutes = core_did_list($rnavsort);
 switch ($didfilter) {
 	case 'directdid':
 		foreach ($inroutes as $key => $did_items) {
-			$did_dest = split(',',$did_items['destination']);
+			$did_dest = explode(',',$did_items['destination']);
 			if (!isset($did_dest[0]) || $did_dest[0] != 'from-did-direct') {
 				unset($inroutes[$key]);
 			}
@@ -106,7 +106,7 @@ switch ($didfilter) {
 		break;
 	case 'incoming':
 		foreach ($inroutes as $key => $did_items) {
-			$did_dest = split(',',$did_items['destination']);
+			$did_dest = explode(',',$did_items['destination']);
 			if (!isset($did_dest[0]) || $did_dest[0] == 'from-did-direct') {
 				unset($inroutes[$key]);
 			}
@@ -174,7 +174,7 @@ if (isset($inroutes)) {
     }
 		// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
 		//
-		$did_dest = split(',',$destination);
+		$did_dest = explode(',',$destination);
 		if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 
 			if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
