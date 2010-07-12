@@ -82,6 +82,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.8/core-2.8.0.0.tgz</location>
-	<md5sum>53ad3452300c92283f4c317c348d667c</md5sum>
+	<location>release/2.8/core-2.8.0.1.tgz</location>
+	<md5sum>dd8ad051bb010065b32ffd1834d6c868</md5sum>
 </module>
