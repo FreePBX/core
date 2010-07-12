@@ -18,6 +18,7 @@
 //
 class core_conf {
 	var $_sip_general    = array();
+	var $_sip_notify     = array();
 	var $_iax_general    = array();
 	var $_featuregeneral = array();
 	var $_featuremap     = array();
@@ -37,6 +38,7 @@ class core_conf {
 			'features_applicationmap_additional.conf',
 			'features_featuremap_additional.conf',
 			'localprefixes.conf',
+			'sip_notify_additional.conf',
 		);
 
 		if ($chan_dahdi) {
@@ -61,6 +63,9 @@ class core_conf {
 				break;
 			case 'sip_registrations.conf':
 				return $this->generate_sip_registrations($version);
+				break;
+			case 'sip_notify_additional.conf':
+				return $this->generate_sip_notify_additional($version);
 				break;
 			case 'iax_general_additional.conf':
 				return $this->generate_iax_general_additional($version);
@@ -92,6 +97,24 @@ class core_conf {
 				break;
 		}
 	}
+
+  function addSipNotify($section,$entries) {
+    $this->_sip_notify[] = array('section' => $section, 'entries' => $entries);
+  }
+
+  function generate_sip_notify_additional($ast_version) {
+    $output = '';
+    if (isset($this->_sip_notify) && is_array($this->_sip_notify)) {
+      foreach ($this->_sip_notify as $section) {
+        $output .= "[".$section['section']."]\n";
+        foreach ($section['entries'] as $key => $value) {
+          $output .= "$key=>$value\n";
+        }
+        $output .= "\n";
+      }
+    }
+    return $output;
+  }
 
 	function addSipGeneral($key, $value) {
 		$this->_sip_general[] = array('key' => $key, 'value' => $value);
