@@ -41,13 +41,78 @@ $trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
 $failtrunk    = isset($_REQUEST['failtrunk'])?$_REQUEST['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
+// Check if they uploaded a CSV file for their route patterns
+//
+if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
+  $fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
+  if ($fh !== false) {
+    $csv_file = array();
+    $index = array();
+
+    // Check first row, ingoring empty rows and get indices setup
+    //
+    while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+      if (count($row) == 1 && $row[0] == '') {
+        continue;
+      } else {
+        $count = count($row) > 3 ? 3 : count($row);
+        for ($i=0;$i<$count;$i++) {
+          switch (strtolower($row[$i])) {
+          case 'prepend':
+          case 'prefix':
+          case 'match pattern':
+            $index[strtolower($row[$i])] = $i;
+          break;
+          default:
+          break;
+          }
+        }
+        // If no headers then assume standard order
+        if (count($index) == 0) {
+          $index['prepend'] = 0;
+          $index['prefix'] = 1;
+          $index['match pattern'] = 2;
+          if ($count == 3) {
+            $csv_file[] = $row;
+          }
+        }
+        break;
+      }
+    }
+    $row_count = count($index);
+    while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+      if (count($row) == $row_count) {
+        $csv_file[] = $row;
+      }
+    }
+  }
+  freepbx_debug($index);
+  freepbx_debug($csv_file);
+}
+
 //
 // Use a hash of the value inserted to get rid of duplicates
 $dialpattern_insert = array();
 $p_idx = 0;
 $n_idx = 0;
 
-if (isset($_POST["prepend_digit"])) {
+// If we have a CSV file it replaces any existing patterns
+//
+if (!empty($csv_file)) {
+  foreach ($csv_file as $row) {
+    $this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
+    $this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
+    $this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
+
+    if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '') {
+      $dialpattern_insert[] = array(
+        'prepend_digits' => $this_prepend,
+        'match_pattern_prefix' => $this_prefix,
+        'match_pattern_pass' => $this_match_pattern,
+      );
+    }
+  }
+} else if (isset($_POST["prepend_digit"])) {
   $prepend_digit = $_POST["prepend_digit"];
   $pattern_prefix = $_POST["pattern_prefix"];
   $pattern_pass = $_POST["pattern_pass"];
@@ -402,7 +467,7 @@ if ($helptext != '') {
 		
 ?>
 	
-		<form name="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
+		<form enctype="multipart/form-data" name="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>
@@ -556,6 +621,7 @@ END;
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP and DAHDI trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
 					<strong><?php echo _("Setup Google for directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance (default: 411) to Google's toll free directory (default: 18004664411) or any other number of your choosing")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+area code for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
+					<strong><?php echo _("Upload from CSV")?></strong> <?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 3 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s and %s in the first row. If there are less then 3 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>')?><br>
 					</span></a>:
 				</td><td valign="top"><select id="autopop"  tabindex="<?php echo ++$tabindex;?>" name="autopop" onChange="changeAutoPop(); ">
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
@@ -564,7 +630,9 @@ END;
 						<option value="google411"><?php echo _("Setup Google for directory assistance")?></option>
 						<option value="lookup7"><?php echo _("Lookup numbers for local trunk (7-digit dialing)")?></option>
 						<option value="lookup10"><?php echo _("Lookup numbers for local trunk (10-digit dialing)")?></option>
+            <option value="csv"><?php echo _("Upload from CSV")?></option>
 					</select>
+          <input type="file" name="pattern_file" id="pattern_file" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<script language="javascript">
@@ -662,6 +730,10 @@ END;
 			
 			function changeAutoPop() {
         var idx = false;
+        // hide the file box if nothing was set
+        if ($('#pattern_file').val() == '') {
+          $('#pattern_file').hide();
+        }
 				switch(document.getElementById('autopop').value) {
 					case "always":
 						idx = populateAlwaysAdd();
@@ -686,6 +758,10 @@ END;
 					break;
 					case "lookup10":
 						populateLookup(10);
+					break;
+					case 'csv':
+            $('#pattern_file').show().click();
+            return true;
 					break;
 				}
 				document.getElementById('autopop').value = '';

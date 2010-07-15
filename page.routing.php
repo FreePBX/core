@@ -29,13 +29,80 @@ $repotrunkdirection = isset($_REQUEST['repotrunkdirection'])?$_REQUEST['repotrun
 //this was effectively the sequence, now it becomes the route_id and the value past will have to change
 $repotrunkkey = isset($_REQUEST['repotrunkkey'])?$_REQUEST['repotrunkkey']:'';
 
+// Check if they uploaded a CSV file for their route patterns
+//
+if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
+  $fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
+  if ($fh !== false) {
+    $csv_file = array();
+    $index = array();
+
+    // Check first row, ingoring empty rows and get indices setup
+    //
+    while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+      if (count($row) == 1 && $row[0] == '') {
+        continue;
+      } else {
+        $count = count($row) > 4 ? 4 : count($row);
+        for ($i=0;$i<$count;$i++) {
+          switch (strtolower($row[$i])) {
+          case 'prepend':
+          case 'prefix':
+          case 'match pattern':
+          case 'callerid':
+            $index[strtolower($row[$i])] = $i;
+          break;
+          default:
+          break;
+          }
+        }
+        // If no headers then assume standard order
+        if (count($index) == 0) {
+          $index['prepend'] = 0;
+          $index['prefix'] = 1;
+          $index['match pattern'] = 2;
+          $index['callerid'] = 3;
+          if ($count == 4) {
+            $csv_file[] = $row;
+          }
+        }
+        break;
+      }
+    }
+    $row_count = count($index);
+    while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+      if (count($row) == $row_count) {
+        $csv_file[] = $row;
+      }
+    }
+  }
+}
+
 //
 // Use a hash of the value inserted to get rid of duplicates
 $dialpattern_insert = array();
 $p_idx = 0;
 $n_idx = 0;
 
-if (isset($_POST["prepend_digit"])) {
+// If we have a CSV file it replaces any existing patterns
+//
+if (!empty($csv_file)) {
+  foreach ($csv_file as $row) {
+    $this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
+    $this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
+    $this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
+    $this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
+
+    if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
+      $dialpattern_insert[] = array(
+        'prepend_digits' => $this_prepend,
+        'match_pattern_prefix' => $this_prefix,
+        'match_pattern_pass' => $this_match_pattern,
+        'match_cid' => $this_callerid,
+      );
+    }
+  }
+} else if (isset($_POST["prepend_digit"])) {
   $prepend_digit = $_POST["prepend_digit"];
   $pattern_prefix = $_POST["pattern_prefix"];
   $pattern_pass = $_POST["pattern_pass"];
@@ -335,7 +402,7 @@ if ($extdisplay) { // editing
 <?php  
 } 
 ?>
-	<form autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay != '' ? "editroute" : "addroute") ?>');">
+	<form enctype="multipart/form-data" autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" onsubmit="return routeEdit_onsubmit('<?php echo ($extdisplay != '' ? "editroute" : "addroute") ?>');">
 		<input type="hidden" name="display" value="<?php echo $display?>"/>
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 		<input type="hidden" id="action" name="action" value=""/>
@@ -520,6 +587,7 @@ END;
 			<a href=# class="info"><?php echo _("Dial patterns wizards")?><span>
 					<?php echo _("These options provide a quick way to add outbound dialing rules. Follow the prompts for each.")?><br>
 					<strong><?php echo _("Lookup local prefixes")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7, 10 or 11 digits (5551234, 6135551234, 16135551234) to access this route.")?><br>
+					<strong><?php echo _("Upload from CSV")?></strong> <?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 4 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s, %s and %s in the first row. If there are less then 4 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?><br>
 					</span></a>:
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<script language="javascript">
@@ -548,6 +616,10 @@ END;
 			}
 
 			function insertCode() {
+        // hide the file box if nothing was set
+        if ($('#pattern_file').val() == '') {
+          $('#pattern_file').hide();
+        }
 				code = document.getElementById('inscode').value;
 				insert = '';
 				switch(code) {
@@ -576,6 +648,10 @@ END;
 						populateLookup();
 						insert = '';
 					break;
+					case 'csv':
+            $('#pattern_file').show().click();
+            return true;
+					break;
 				}
 
         patterns = insert.split(',')
@@ -599,7 +675,9 @@ END;
 			<option value="info"><?php echo _("Information")?></option>
 			<option value="emerg"><?php echo _("Emergency")?></option>
 			<option value="lookup"><?php echo _("Lookup local prefixes")?></option>
+			<option value="csv"><?php echo _("Upload from CSV")?></option>
 				</select>
+        <input type="file" name="pattern_file" id="pattern_file" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 		</tr>
 

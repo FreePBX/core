@@ -10,7 +10,10 @@
 div.dialpatterns {
 	max-height: 15em; 
 	max-width: 100%; 
+	width: 500px;
 	overflow: auto; 
 	border: 1px solid #CCCCCC;
 }
-
+#pattern_file {
+	display: none;
+}
