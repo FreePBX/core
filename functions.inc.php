@@ -53,6 +53,7 @@ class core_conf {
 	// return the output that goes in each of the files
 	function generateConf($file) {
 		global $version;
+		global $amp_conf;
 
 		switch ($file) {
 			case 'sip_general_additional.conf':
@@ -77,10 +78,10 @@ class core_conf {
 				return $this->generate_iax_registrations($version);
 				break;
 			case 'chan_dahdi_additional.conf':
-        if (ast_with_dahdi()) {
-				  return $this->generate_zapata_additional($version, 'dahdi');
+        if (ast_with_dahdi() && $amp_conf['ZAP2DAHDICOMPAT']) {
+				  return $this->generate_zapata_additional($version, 'dahdi').$this->generate_zapata_additional($version);
         } else {
-				  return $this->generate_zapata_additional($version);
+				  return $this->generate_zapata_additional($version,'dahdi');
         }
 				break;
 			case 'zapata_additional.conf':
@@ -1405,7 +1406,8 @@ function core_get_config($engine) {
               }
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gosubif('$["${PREFIX_TRUNK_'.$trunkprops['trunkid'].'}" != ""]','sub-flp-'.$trunkprops['trunkid'].',s,1'));
-              $ext->add($tcontext, $trunkprops['trunkid'], '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+              $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
               $ext->add($tcontext,$trunkprops['trunkid'],'hangit',new ext_hangup());
 							break;
 
@@ -1453,6 +1455,7 @@ function core_get_config($engine) {
           }
           $ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
           $ext->add($tcontext,$tcustom,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
+          $ext->add($tcontext,$tcustom,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
           $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}','300,${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$tcustom,'hangit',new ext_hangup());
         }
@@ -1468,6 +1471,7 @@ function core_get_config($engine) {
           }
           $ext->add($tcontext,$texten,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
           $ext->add($tcontext,$texten,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
+          $ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
           $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}','300,${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$texten,'hangit',new ext_hangup());
@@ -3073,7 +3077,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_gosubif('$[${REGEX("^[\+]?[0-9]+$" ${CALLERID(number)})} = 1]','ctset,1','ctclear,1'));
         //TODO: do we need to check for anything beyond auto-blkvm in this call path?
         $ext->add($mcontext,$exten,'skiptrace', new ext_set('D_OPTIONS', '${IF($["${NODEST}"!="" & ${REGEX("(M[(]auto-blkvm[)])" ${ARG2})} != 1]?${ARG2}M(auto-blkvm):${ARG2})}'));
-        $ext->add($mcontext,$exten,'', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader', 'Alert-Info: ${CUT(ALERT_INFO,:,2-)}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader', 'Alert-Info: ${ALERT_INFO}'));
         //TODO: Do I need to  re-propagage anything from ${SIPADDHEADER} ?
         $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'SetMusicOnHold', '${MOHCLASS}'));
@@ -5986,7 +5990,9 @@ function core_devices_configpageinit($dispnum) {
 		if ($_SESSION["AMP_user"]->checkSection('999')) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
-		$currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
+    if (!ast_with_dahdi() || $amp_conf['ZAP2DAHDICOMPAT']) {
+      $currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
+    }
     if (ast_with_dahdi()) {
 		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDI Device"));
     }
