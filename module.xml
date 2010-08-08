@@ -81,6 +81,7 @@
 		<routing>Outbound Routes</routing>
 		<trunks>Trunks</trunks>
 		<general>General Settings</general>
+		<advancedsettings hidden="TRUE">Advanced Settings</advancedsettings>
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>

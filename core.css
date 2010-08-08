@@ -17,3 +17,6 @@ div.dialpatterns {
 #pattern_file {
 	display: none;
 }
+#set_table tr:nth-child(even){background-color: #FCE7CE;}
+.save, .adv_set_default{border-style: none;}
+.savetd{display:none;}

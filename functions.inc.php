@@ -3191,6 +3191,24 @@ function core_get_config($engine) {
 	}
 }
 
+function core_advancedsettings_get_keys($level){
+	global $db;
+	$sql = 'SELECT * FROM freepbx_settings WHERE level >= ?';
+	$conf = $db->getAll($sql, array($level), DB_FETCHMODE_ASSOC);
+	return $conf;
+}
+
+function core_advancedsettings_set_keys($key, $value){
+	global $db;
+	$sql = 'UPDATE freepbx_settings set value = ? where `key` = ?';
+	$res = $db->query($sql, array($value, $key));
+	if(DB::IsError($res)){
+		return false;
+	} else {
+		return true;
+	}
+}
+
 /* begin page.ampusers.php functions */
 
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
