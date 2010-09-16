@@ -3453,7 +3453,6 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
 	global $amp_conf;
-	global $currentFile;
 	global $astman;
 	global $db;
 
@@ -3586,7 +3585,6 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 
 function core_devices_del($account,$editmode=false){
 	global $amp_conf;
-	global $currentFile;
 	global $astman;
 
 	//get all info about device
@@ -3751,7 +3749,6 @@ function core_users2astdb(){
 //add to sip table
 function core_devices_addsip($account) {
 	global $db;
-	global $currentFile;
 
 	$flag = 2;
 	foreach ($_REQUEST as $req=>$data) {
@@ -3814,7 +3811,6 @@ function core_devices_addsip($account) {
 
 function core_devices_delsip($account) {
 	global $db;
-	global $currentFile;
 	
 	$sql = "DELETE FROM sip WHERE id = '$account'";
 	$result = $db->query($sql);
@@ -3838,7 +3834,6 @@ function core_devices_getsip($account) {
 //add to iax table
 function core_devices_addiax2($account) {
 	global $db;
-	global $currentFile;
 
 	$flag = 2;
 	foreach ($_REQUEST as $req=>$data) {
@@ -3896,7 +3891,6 @@ function core_devices_addiax2($account) {
 
 function core_devices_deliax2($account) {
 	global $db;
-	global $currentFile;
 	
 	$sql = "DELETE FROM iax WHERE id = '$account'";
 	$result = $db->query($sql);
@@ -3919,7 +3913,6 @@ function core_devices_getiax2($account) {
 
 function core_devices_addzap($account) {
 	global $db;
-	global $currentFile;
 		
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
@@ -3972,7 +3965,6 @@ function core_devices_addzap($account) {
 
 function core_devices_adddahdi($account) {
 	global $db;
-	global $currentFile;
 		
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
@@ -4025,7 +4017,6 @@ function core_devices_adddahdi($account) {
 
 function core_devices_delzap($account) {
 	global $db;
-	global $currentFile;
 	
 	$sql = "DELETE FROM zap WHERE id = '$account'";
 	$result = $db->query($sql);
@@ -4036,7 +4027,6 @@ function core_devices_delzap($account) {
 
 function core_devices_deldahdi($account) {
 	global $db;
-	global $currentFile;
 	
 	$sql = "DELETE FROM dahdi WHERE id = '$account'";
 	$result = $db->query($sql);
