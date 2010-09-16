@@ -1000,7 +1000,7 @@ function validatePatterns() {
 
   $(".dp-prepend").each(function() {
     if ($.trim(this.value) == '') {
-    } else if (this.value.search('[^0-9*#+\s]+') >= 0) {
+    } else if (this.value.search('[^0-9*#+wW\s]+') >= 0) {
       culprit = this;
       return false;
     }

@@ -281,7 +281,7 @@ class core_conf {
 						}
 					}
 				} else {
-					$results2[] = array('keyword'=>$element['keyword'],'data'=>$element['data']);
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
 				}
 			}
 			unset($results2_pre);
@@ -452,7 +452,7 @@ class core_conf {
 						}
 					}
 				} else {
-					$results2[] = array('keyword'=>$element['keyword'],'data'=>$element['data']);
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
 				}
 			}
 			unset($results2_pre);
@@ -3128,7 +3128,8 @@ function core_get_config($engine) {
         $exten = 'dstring';
         $ext->add($mcontext,$exten,'', new ext_set('DSTRING', ''));
         $ext->add($mcontext,$exten,'', new ext_set('DEVICES', '${DB(AMPUSER/${DEXTEN}/device)}'));
-        $ext->add($mcontext,$exten,'', new ext_execif('$["${DEVICES}"="" ]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DEVICES}"=""]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DEVICES:0:1}"="&"]', 'Set', 'DEVICES=${DEVICES:1}'));
         $ext->add($mcontext,$exten,'', new ext_set('LOOPCNT', '${FIELDQTY(DEVICES,&)}'));
         $ext->add($mcontext,$exten,'', new ext_set('ITER', '1'));
         $ext->add($mcontext,$exten,'begin', new ext_set('THISDIAL', '${DB(DEVICE/${CUT(DEVICES,&,${ITER})}/dial)}'));
@@ -4886,7 +4887,7 @@ function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
   global $db;
 
   $trunknum =  $db->escapeSimple($trunknum);
-  $filter_prepend = '/[^0-9+*#]/';
+  $filter_prepend = '/[^0-9+*#wW]/';
   $filter_prefix = '/[^0-9*#+xnzXNZ\-\[\]]/';
   $filter_match =  '/[^0-9.*#+xnzXNZ\-\[\]]/';
 

@@ -185,7 +185,7 @@ while($arg = get_var($AGI,"ARG". $arg_cnt)) {
 		debug("get_variable got a \"noresponse\"!  Exiting",3);
 		exit($arg_cnt);
 	}
-	$extarray = split( '-', $arg );
+	$extarray = preg_split( '/-/', $arg ); 
 	foreach ( $extarray as $k ) {
 		$ext[] = $k;
 		debug("Added extension $k to extension map", 3);
@@ -762,7 +762,7 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 		$device = $device['data'];
 		
 		// a user can be logged into multipe devices, append the dial string for each		
-		$device_array = split( '&', $device );
+		$device_array = preg_split( '/&/', $device );
 		foreach ($device_array as $adevice) {
 			if (trim($use_confirmation) == "FALSE") {
 				$dds = $agi->database_get('DEVICE',$adevice.'/dial');
