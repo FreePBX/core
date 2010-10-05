@@ -5895,7 +5895,7 @@ function core_users_configprocess() {
 
 
 function core_devices_configpageinit($dispnum) {
-	global $currentcomponent;
+	global $currentcomponent, $amp_conf;
 	global $amp_conf;
 
 	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
