@@ -1478,61 +1478,6 @@ function core_get_config($engine) {
         }
 			}
 
-      $trunk_hash = core_trunks_list_dialrules();
-      if (is_array($trunk_hash) && count($trunk_hash)) {
-        foreach ($trunk_hash as $trunkid => $patterns) {
-          // First, generate the global referencing how many there are
-					$ext->addGlobal("PREFIX_TRUNK_$trunkid",count($patterns));
-
-          $context = 'sub-flp-'.$trunkid;
-          $target = 'TARGET_FLP4'.$trunkid;
-          $exten = 's';
-          foreach ($patterns as $pattern) {
-            $prepend = $pattern['prepend_digits'];
-            $offset =  strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
-
-            $regex_base = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
-
-	          // convert asterisk pattern matching into perl regular expression
-            //  - two steps, use $ in place of +
-            //  - next replace $ with +
-            // if you don't do this, the str_replace() walks over itself
-	          $regex_intermediate = str_replace(
-			        array(
-				        'X',
-				        'Z',
-				        'N',
-				        '.',
-				        '*',
-				        '+',
-			        ),
-			        array(
-				        '[0-9]',
-				        '[1-9]',
-				        '[2-9]',
-				        '[0-9#*\\\$]$',
-				        '\\\*',
-				        '\\\$',
-			        ),
-              $pattern['match_pattern_prefix'].$pattern['match_pattern_pass']
-            );
-            $regex = strtr($regex_intermediate,"$","+");
-
-            if ($pattern['prepend_digits'] == '' && $offset == 0) {
-              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Return'));
-            } else {
-              $offset = $offset?':'.$offset:'';
-              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Set',$target.'='.$pattern['prepend_digits'].'${DIAL_NUMBER'.$offset.'}'));
-              $ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${'.$target.'})} != 0]', 'match'));
-            }
-
-          }
-          $ext->add($context, $exten, '', new ext_return(''));
-          $ext->add($context, $exten, 'match', new ext_set('DIAL_NUMBER','${'.$target.'}'));
-          $ext->add($context, $exten, '', new ext_return(''));
-        }
-      }
-
 
 			/* dialplan globals */
 			// modules should NOT use the globals table to store anything!
@@ -1640,6 +1585,7 @@ function core_get_config($engine) {
 				FROM `trunks` ORDER BY `trunkid`
 			";
 			$trunks = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
+      $trunk_hash = core_trunks_list_dialrules();
  
       // $has_keepcid_cnum is used when macro-outbound-callerid is generated to determine if we need to insert the
       // final execif() statement so it is important to be set before then and here
@@ -1667,6 +1613,63 @@ function core_get_config($engine) {
         $ext->addGlobal('FORCEDOUTCID_'.$tid, ($trunk['keepcid'] == 'all' ? $trunk['outcid'] : ""));
         if ($trunk['keepcid'] == 'cnum') {
           $has_keepcid_cnum = true;
+        }
+
+        // Generate PREFIX_TRUNK_$tid even if 0 since globals will persist and cause crashes
+        if (isset($trunk_hash[$tid]) && count($trunk_hash)) {
+          $patterns = $trunk_hash[$tid];
+          // First, generate the global referencing how many there are
+					$ext->addGlobal("PREFIX_TRUNK_$tid",count($patterns));
+
+          $context = 'sub-flp-'.$tid;
+          $target = 'TARGET_FLP4'.$tid;
+          $exten = 's';
+          foreach ($patterns as $pattern) {
+            $prepend = $pattern['prepend_digits'];
+            $offset =  strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
+
+            $regex_base = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+
+	          // convert asterisk pattern matching into perl regular expression
+            //  - two steps, use $ in place of +
+            //  - next replace $ with +
+            // if you don't do this, the str_replace() walks over itself
+	          $regex_intermediate = str_replace(
+			        array(
+				        'X',
+				        'Z',
+				        'N',
+				        '.',
+				        '*',
+				        '+',
+			        ),
+			        array(
+				        '[0-9]',
+				        '[1-9]',
+				        '[2-9]',
+				        '[0-9#*\\\$]$',
+				        '\\\*',
+				        '\\\$',
+			        ),
+              $pattern['match_pattern_prefix'].$pattern['match_pattern_pass']
+            );
+            $regex = strtr($regex_intermediate,"$","+");
+
+            if ($pattern['prepend_digits'] == '' && $offset == 0) {
+              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Return'));
+            } else {
+              $offset = $offset?':'.$offset:'';
+              $ext->add($context, $exten, '', new ext_execif('$[${REGEX("^'.$regex.'$" ${DIAL_NUMBER})} = 1]','Set',$target.'='.$pattern['prepend_digits'].'${DIAL_NUMBER'.$offset.'}'));
+              $ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${'.$target.'})} != 0]', 'match'));
+            }
+
+          }
+          $ext->add($context, $exten, '', new ext_return(''));
+          $ext->add($context, $exten, 'match', new ext_set('DIAL_NUMBER','${'.$target.'}'));
+          $ext->add($context, $exten, '', new ext_return(''));
+
+        } else {
+          $ext->addGlobal("PREFIX_TRUNK_$tid",'');
         }
 			}
 
@@ -2917,7 +2920,7 @@ function core_get_config($engine) {
 
       $exten = 'docfb';
 			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 's-BUSY';
@@ -5646,7 +5649,7 @@ function core_users_configpageload() {
 	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
-	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = null;
+	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -5893,6 +5896,7 @@ function core_users_configprocess() {
 
 function core_devices_configpageinit($dispnum) {
 	global $currentcomponent;
+	global $amp_conf;
 
 	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
 		// Setup arrays for device types
