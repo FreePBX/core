@@ -301,6 +301,10 @@ foreach ($ext as $k) {
 			    $AGI->set_variable('DIALSTATUS','NOANSWER');
 		    } else {
 			    $ext[$count] = $cf.'#';  
+					// This only really needs to be set if we are setting Diversion Headers, but it's not worth the hassle of
+					// checking the amportal.conf settings here and there is no harm done in setting it other than minor overhead
+					//
+					$AGI->set_variable('__DIVERSION_REASON','unconditional');
 			    debug("Extension $k has call forward set to $cf", 1);
 		    }
   

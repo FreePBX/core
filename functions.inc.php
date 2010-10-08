@@ -1763,6 +1763,11 @@ function core_get_config($engine) {
           }
           $ext->add($context, $exten, '', new ext_noop(sprintf(_('Calling Out Route: %s'),$route['name']))); 
 
+					// Conditionally Add Divesion Header if the call was diverted
+					if ($amp_conf['DIVERSIONHEADER']) {
+						$ext->add($context, $exten, '', new ext_gosubif('$[${LEN(${FROM_DID})}>0 & "${FROM_DID}"!="s"','sub-diversion-header,s,1'));
+					}
+
           if ($route['emergency_route'] != '') {
 						$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
           }
@@ -1970,6 +1975,16 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_resetcdr(''));
 			$ext->add($context, $exten, '', new ext_return(''));
 
+			// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
+			// the reason for the diversion (e.g. CFB could set it to busy)
+			//
+			if ($amp_conf['DIVERSIONHEADER']) {
+					$context = 'sub-diversion-header';
+					$exten = 's';
+					$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
+					$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:+${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
+					$ext->add($context, $exten, '', new ext_return(''));
+			}
 			
 			/*
 			 * dialout using a trunk, using pattern matching (don't strip any prefix)
@@ -2915,12 +2930,16 @@ function core_get_config($engine) {
 
       $exten = 'docfu';
 			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'unavailable'));
 			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RTCFU},${DIAL_OPTIONS}'));
+			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 'docfb';
 			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
 			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
+			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 's-BUSY';
@@ -3110,6 +3129,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('CFAMPUSER', '${IF($["${AMPUSER}"=""]?${CALLERID(number)}:${AMPUSER})}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CF/${DEXTEN})}"="${CFAMPUSER}" | "${DB(CF/${DEXTEN})}"="${REALCALLERIDNUM}" | "${CUT(CUT(BLINDTRANSFER,-,1),/,1)}" = "${DB(CF/${DEXTEN})}" | "${DEXTEN}"="${DB(CF/${DEXTEN})}"]', 'Return'));
         $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#":"")}'));
+				if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional":"")}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DEXTEN}"!=""]', 'Return'));
         $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'NOANSWER'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
@@ -5896,7 +5916,6 @@ function core_users_configprocess() {
 
 function core_devices_configpageinit($dispnum) {
 	global $currentcomponent, $amp_conf;
-	global $amp_conf;
 
 	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
 		// Setup arrays for device types

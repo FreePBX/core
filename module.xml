@@ -9,6 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.9.0alpha1.3* #4580
 		*2.9.0alpha1.2* #4401, #4525, #4507, #4499, #4574, #4572, #4575, #4527, #4469
 		*2.9.0alpha1.1* #4443, #4444, #4460, #4414
 		*2.9.0alpha1.0* bump to 2.9
