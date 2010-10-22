@@ -1831,8 +1831,6 @@ function core_get_config($engine) {
 			$ext->add('app-blackhole', 'congestion', '', new ext_hangup());
 
 			$ext->add('app-blackhole', 'busy', '', new ext_noop('Blackhole Dest: Busy'));
-			$ext->add('app-blackhole', 'busy', '', new ext_answer());
-			$ext->add('app-blackhole', 'busy', '', new ext_playtones('busy'));
 			$ext->add('app-blackhole', 'busy', '', new ext_busy());
 			$ext->add('app-blackhole', 'busy', '', new ext_hangup());
 
