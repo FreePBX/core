@@ -619,7 +619,7 @@ END;
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
 					<strong><?php echo _("Always dial with prefix")?></strong> <?php echo _("is useful for VoIP trunks, where if a number is dialed as \"5551234\", it can be converted to \"16135551234\".")?><br>
 					<strong><?php echo _("Remove prefix from local numbers")?></strong> <?php echo _("is useful for ZAP and DAHDI trunks, where if a local number is dialed as \"6135551234\", it can be converted to \"555-1234\".")?><br>
-					<strong><?php echo _("Setup Google for directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance (default: 411) to Google's toll free directory (default: 18004664411) or any other number of your choosing")?><br>
+					<strong><?php echo _("Setup directory assistance")?></strong> <?php echo _("is useful to translate a call to directory assistance")?><br>
 					<strong><?php echo _("Lookup numbers for local trunk")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7 or 10 digits (regardless of what your PSTN is) on a local trunk (where you have to dial 1+area code for long distance, but only 5551234 (7-digit dialing) or 6135551234 (10-digit dialing) for local calls")?><br>
 					<strong><?php echo _("Upload from CSV")?></strong> <?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 3 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s and %s in the first row. If there are less then 3 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>')?><br>
 					</span></a>:
@@ -627,7 +627,7 @@ END;
 						<option value="" SELECTED><?php echo _("(pick one)")?></option>
 						<option value="always"><?php echo _("Always dial with prefix")?></option>
 						<option value="remove"><?php echo _("Remove prefix from local numbers")?></option>
-						<option value="google411"><?php echo _("Setup Google for directory assistance")?></option>
+						<option value="directory"><?php echo _("Setup directory assistance")?></option>
 						<option value="lookup7"><?php echo _("Lookup numbers for local trunk (7-digit dialing)")?></option>
 						<option value="lookup10"><?php echo _("Lookup numbers for local trunk (10-digit dialing)")?></option>
             <option value="csv"><?php echo _("Upload from CSV")?></option>
@@ -714,14 +714,14 @@ END;
         return addCustomField('',localprefix,localpattern);
 			}
 
-			function populateGoogle411() {
+			function populatedirectory() {
 				do {
-        var localprefix = <?php echo 'prompt("'._("What is the directory assistance number you will dial locally in the format that is passed to this trunk, ie 411").'"'?>,<?php echo _('"411"')?>);
+        var localprefix = <?php echo 'prompt("'._("What is the directory assistance number you will dial locally in the format that is passed to this trunk?").'"'?>,"<?php echo ""?>");
 					if (localprefix == null) return;
 				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *").'")'?>);
 				do {
 
-        var localprepend = <?php echo 'prompt("'._("Google 411 number to dial, or alternative number you want dialed when calling directory assistance on this trunk").'"'?>,"<?php echo _('18004664411') ?>");
+        var localprepend = <?php echo 'prompt("'._("Number to dial when calling directory assistance on this trunk").'"'?>,"<?php echo '' ?>");
 					if (localprepend == null) return;
 				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
 				
@@ -747,8 +747,8 @@ END;
               $('#prepend_digit_'+idx).focus();
             }
 					break;
-					case "google411":
-						idx = populateGoogle411();
+					case "directory":
+						idx = populatedirectory();
             if (idx) {
               $('#pattern_pass_'+idx).focus();
             }
