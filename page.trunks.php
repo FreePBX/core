@@ -24,7 +24,7 @@ $trunknum = ltrim($extdisplay,'OUT_');
 
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 
-$tech         = strtolower(isset($_REQUEST['tech'])?$_REQUEST['tech']:'');
+$tech         = strtolower(isset($_REQUEST['tech'])?htmlentities($_REQUEST['tech']):'');
 $outcid       = isset($_REQUEST['outcid'])?$_REQUEST['outcid']:'';
 $maxchans     = isset($_REQUEST['maxchans'])?$_REQUEST['maxchans']:'';
 $dialoutprefix= isset($_REQUEST['dialoutprefix'])?$_REQUEST['dialoutprefix']:'';
