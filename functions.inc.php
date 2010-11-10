@@ -1765,7 +1765,7 @@ function core_get_config($engine) {
 
 					// Conditionally Add Divesion Header if the call was diverted
 					if ($amp_conf['DIVERSIONHEADER']) {
-						$ext->add($context, $exten, '', new ext_gosubif('$[${LEN(${FROM_DID})}>0 & "${FROM_DID}"!="s"','sub-diversion-header,s,1'));
+						$ext->add($context, $exten, '', new ext_gosubif('$[${LEN(${FROM_DID})}>0 & "${FROM_DID}"!="s"]','sub-diversion-header,s,1'));
 					}
 
           if ($route['emergency_route'] != '') {
@@ -1980,7 +1980,7 @@ function core_get_config($engine) {
 					$context = 'sub-diversion-header';
 					$exten = 's';
 					$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
-					$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:+${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
+					$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
 					$ext->add($context, $exten, '', new ext_return(''));
 			}
 			
