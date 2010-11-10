@@ -2916,7 +2916,7 @@ function core_get_config($engine) {
       } else {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       }
-			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit,return'));
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
 			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!="" & "${SCREEN}"=""]','docfu,1'));
 			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
@@ -3083,8 +3083,8 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'',new ext_goto('nodial'));
         $ext->add($mcontext,$exten,'skip3', new ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!=""]','next2','continue'));
         $ext->add($mcontext,$exten,'next2', new ext_gotoif('$["${EXTENSION_STATE(${DEXTEN})}"="NOT_INUSE" | "${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN"]','continue'));
-        $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CFB/${DEXTEN})}"!="" & "${CFIGNORE}"=""]', 'Set', 'DEXTEN=${DEXTEN}#'));
-        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${EXTHASCW}"!="" | "${DEXTEN:-1}"="#"]','continue'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CFB/${DEXTEN})}"!="" & "${CFIGNORE}"=""]', 'Set', 'DIALSTATUS=BUSY'));
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${EXTHASCW}"!="" | "${DEXTEN:-1}"="#"]','cwinusebusy'));
         $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', ''));
         $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'BUSY'));
         $ext->add($mcontext,$exten,'', new ext_goto('nodial'));
