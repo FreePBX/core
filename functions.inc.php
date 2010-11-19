@@ -1299,7 +1299,26 @@ function core_get_config($engine) {
 					if (isset($exten['ringtimer']) && $exten['ringtimer'] != 0)
 						$ext->add('ext-local', $exten['extension'], '', new ext_setvar('__RINGTIMER',$exten['ringtimer']));
 					
-					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension']));
+          $dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
+					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
+          if ($exten['noanswer_dest']) {
+            if ($exten['noanswer_cid'] != '') {
+						  $ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${DIALSTATUS}="NOANSWER"]','Set','CALLERID(name)='.$exten['noanswer_cid'].'${CALLERID(name)}'));
+            }
+					  $ext->add('ext-local', $exten['extension'], '', new ext_gotoif('$["${DIALSTATUS}="NOANSWER"]',$exten['noanswer_dest']));
+          }
+          if ($exten['busy_dest']) {
+            if ($exten['busy_cid'] != '') {
+						  $ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${DIALSTATUS}="BUSY"]','Set','CALLERID(name)='.$exten['busy_cid'].'${CALLERID(name)}'));
+            }
+					  $ext->add('ext-local', $exten['extension'], '', new ext_gotoif('$["${DIALSTATUS}="BUSY"]',$exten['busy_dest']));
+          }
+          if ($exten['chanunavail_dest']) {
+            if ($exten['chanunavail_cid'] != '') {
+						  $ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${DIALSTATUS}="CHANUNAVAIL"]','Set','CALLERID(name)='.$exten['chanunavail_cid'].'${CALLERID(name)}'));
+            }
+					  $ext->add('ext-local', $exten['extension'], '', new ext_gotoif('$["${DIALSTATUS}="CHANUNAVAIL"]',$exten['chanunavail_dest']));
+          }
 					
 					if($vm != "novm") {
 						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','vmret'));
@@ -2266,9 +2285,8 @@ function core_get_config($engine) {
 							
 			// make sure AMPUSER is set if it doesn't get set below			
 			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["foo${AMPUSER}" = "foo"]?${CALLERID(number)}:${AMPUSER})}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}" = "Local"]', 'report'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL:0:5}"="Local" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
 			$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
-			//$ext->add($context, $exten, 'start', new ext_noop('REALCALLERIDNUM is ${REALCALLERIDNUM}'));
 			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
 			$ext->add($context, $exten, '', new ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${AMPUSERCIDNAME:1:2}" = "x"]', 'report'));
@@ -2899,6 +2917,13 @@ function core_get_config($engine) {
 
 			/* end macro-vm  */
 
+      /*
+       * ARG1: VMBOX
+       * ARG2: EXTTOCALL
+       * ARG3: If NOANSWER dest exists 1, otherwise 0
+       * ARG4: If BUSY dest exists 1, otherwise 0
+       * ARG5: If CHANUNAVAIL dest exists 1, otherwise 0
+       */
       $mcontext = 'macro-exten-vm';
       $exten = 's';
 
@@ -2921,6 +2946,9 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!="" & "${SCREEN}"=""]','docfu,1'));
 			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
 			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
+
+			$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&${ARG3})|("${DIALSTATUS}"="BUSY"&${ARG4})|("${DIALSTATUS}"="CHANUNAVAIL"&${ARG5})]','MacroExit'));
+
 			$ext->add($mcontext,$exten,'', new ext_noop('Voicemail is \'${VMBOX}\''));
 			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"="novm"]','s-${DIALSTATUS},1'));
 			$ext->add($mcontext,$exten,'', new ext_noop('Sending to Voicemail box ${EXTTOCALL}'));
@@ -3056,9 +3084,6 @@ function core_get_config($engine) {
       /*
       ; macro-dial-one
       ;
-      TODO: This is still experimental and has not yet been fully tested. Feedback in using/testing it is welcome and we will be reponsive in
-            fixing it but it should be considered as alpha quality until then and is not used anywhere in the dialplan unless forced with the
-            un-documented USEMACRODIALONE = true flag.
       */
       if ($has_extension_state) {
 
@@ -4288,8 +4313,14 @@ function core_users_add($vars, $editmode=false) {
 	//
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
-	//insert into users table
-	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,sipname) values (\"";
+  $noanswer_dest = isset($noanswer_dest) && $vars[$vars[$noanswer_dest].'0'] != '' ? q($vars[$vars[$noanswer_dest].'0']) : "''";
+  $noanswer_cid = isset($noanswer_cid) ? q($noanswer_cid) : "''";
+  $busy_dest = isset($busy_dest) && $vars[$vars[$busy_dest].'1'] != '' ? q($vars[$vars[$busy_dest].'1']) : "''";
+  $busy_cid = isset($busy_cid) ? q($busy_cid) : "''";
+  $chanunavail_dest = isset($chanunavail_dest) && $vars[$vars[$chanunavail_dest].'2'] != '' ? q($vars[$vars[$chanunavail_dest].'2']) : "''";
+  $chanunavail_cid = isset($chanunavail_cid) ? q($chanunavail_cid) : "''";
+
+	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,sipname,noanswer_cid,busy_cid,chanunavail_cid,noanswer_dest,busy_dest,chanunavail_dest) values (\"";
 	$sql.= "$extension\", \"";
 	$sql.= isset($password)?$password:'';
 	$sql.= "\", \"";
@@ -4306,7 +4337,7 @@ function core_users_add($vars, $editmode=false) {
 	$sql.= isset($outboundcid)?$outboundcid:'';
 	$sql.= "\", \"";
 	$sql.= isset($sipname)?$sipname:'';
-	$sql.= "\")";
+  $sql .= "\", $noanswer_cid, $busy_cid, $chanunavail_cid, $noanswer_dest, $busy_dest, $chanunavail_dest)";
 	sql($sql);
 
 	//write to astdb
@@ -5838,6 +5869,38 @@ function core_users_configpageload() {
 		$section = _("Recording Options");
 		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, _("Record Incoming"), _("Record all inbound calls received at this extension."), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, _("Record Outgoing"), _("Record all outbound calls received at this extension."), false));
+
+		$section = _("Optional Destinations");
+    $noanswer_dest = isset($noanswer_dest) ? $noanswer_dest : '';
+    $busy_dest = isset($busy_dest) ? $busy_dest : '';
+    $chanunavail_dest = isset($chanunavail_dest) ? $chanunavail_dest : '';
+
+    $noanswer_cid = isset($noanswer_cid) ? $noanswer_cid : '';
+    $busy_cid = isset($busy_cid) ? $busy_cid : '';
+    $chanunavail_cid = isset($chanunavail_cid) ? $chanunavail_cid : '';
+
+    if ($amp_conf['CWINUSEBUSY']) {
+      $helptext = _('Optional destination call is routed to when the call is not answered on an otherwise idle phone. If the phone is in use and the call is simply ignored, then the busy destination will be used.');
+    } else {
+      $helptext = _('Optional destination call is routed to when the call is not answered.');
+    }
+    $nodest_msg = _('Unavail Voicemail if Enabled');
+    $currentcomponent->addguielem($section, new gui_drawselects('noanswer_dest', '0', $noanswer_dest, _('No Answer'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+		$currentcomponent->addguielem($section, new gui_textbox('noanswer_cid', $noanswer_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this no answer destination.")),5,9);
+
+    if ($amp_conf['CWINUSEBUSY']) {
+      $helptext = _('Optional destination the call is routed to when the phone is busy or the call is rejected by the user. This destination is also used on an unanswered call if the phone is in use and the user chooses not to pickup the second call.');
+    } else {
+      $helptext = _('Optional destination the call is routed to when the phone is busy or the call is rejected by the user.');
+    }
+    $nodest_msg = _('Busy Voicemail if Enabled');
+    $currentcomponent->addguielem($section, new gui_drawselects('busy_dest', '1', $busy_dest, _('Busy'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+		$currentcomponent->addguielem($section, new gui_textbox('busy_cid', $busy_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this busy destination.")),5,9);
+
+    $helptext = _('Optional destination the call is routed to when the phone is offline, such as a softphone currenlty off or a phone unplugged.');
+    $nodest_msg = _('Unavail Voicemail if Enabled');
+    $currentcomponent->addguielem($section, new gui_drawselects('chanunavail_dest', '2', $chanunavail_dest, _('Not Reachable'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+		$currentcomponent->addguielem($section, new gui_textbox('chanunavail_cid', $chanunavail_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this not reachable destination.")),5,9);
 	}
 }
 
