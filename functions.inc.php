@@ -799,6 +799,7 @@ function core_get_config($engine) {
 			$ast_ge_14 = version_compare($version, '1.4', 'ge');
 			$ast_lt_16 = version_compare($version, '1.6', 'lt');
 			$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
+			$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
 
 			// Now add to sip_general_addtional.conf
 			//
@@ -2942,20 +2943,35 @@ function core_get_config($engine) {
 			$intercom_code = $fcc->getCodeActive();
 			unset($fcc);
 
+      // I think it is adequate that if AMPUSER is blank, it's not internal (don't think FROM_DID has to be checked though I don't think it hurts)
+      $macrodial = 'macrodial';
       if ($intercom_code != '') {
         if ($has_extension_state) {
-          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${FROM_DID}|${DB(AMPUSER/${EXTTOCALL}/answermode)}="intercom"|${BLINDTRANSFER}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
+          //TODO: Noop debug code, eventually remove once feature matures
+          $ext->add($mcontext,$exten,'', new ext_noop('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}'));
+          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
         } else {
-          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${FROM_DID}|${DB(AMPUSER/${EXTTOCALL}/answermode)}="intercom"|${BLINDTRANSFER}]','macrodial'));
+          //TODO: Noop debug code, eventually remove once feature matures
+          $ext->add($mcontext,$exten,'', new ext_noop('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}'));
+          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}]','macrodial'));
         }
+        $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", '${DIAL_OPTIONS}'));
         $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", 'TRUE'));
 			  $ext->add($mcontext,$exten,'', new ext_gosub('1',$intercom_code.'${EXTTOCALL}','ext-intercom'));
         $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", ''));
+        $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", ''));
+
+        // If it was a blind transfer and there was a previous auto-answer, then we cleanup all the auto-answer headers left in the channel
+        // It won't be from this call because we don't ever intercom in a blind transfer scenario (hmm unless it was blind transfered to a
+        // specific intercom code but in that case, they won't have been able to subsequently transfered the call
+        //
+        $ext->add($mcontext,$exten,$macrodial, new ext_gosubif('$["${INTERCOM_CALL}"="TRUE" & ${LEN(${BLINDTRANSFER})}]','clrheader,1'));
+        $macrodial = '';
       }
       if ($has_extension_state) {
-			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+			  $ext->add($mcontext,$exten,$macrodial, new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
-			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+			  $ext->add($mcontext,$exten,$macrodial, new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       }
 			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
@@ -2977,12 +2993,39 @@ function core_get_config($engine) {
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
-      $exten = 'docfb';
+      
 			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
 			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
+
+      // If we are here it was determined that there had been intercom sip headers left over in the channel. If 1.6.2+ then we can use
+      // the SIPRemoveHeader() option to remove the specific headers. We are trying to be careful not to remove similar headers that
+      // may be used for 'distinctive ring' type reasons from elsewhere in the dialplan. Thus only if we detected the intercom situation
+      // do we do it here.
+      // 
+      // If we are pre 1.6.2 then some experimentation on 1.4.X has shown that we are able to clear the SIPADDHEADERnn channel variables
+      // that result from setting the headers so we start from 1 (the first) and iterate up until we find one. In some weird situations
+      // if a header had been removed, we could miss out since it is not possible to detect the existence of a blank channel variable
+      //
+      if ($intercom_code != '') {
+        $exten = 'clrheader';
+        $ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPURI})}&"${SIPURI}"="${SIP_URI_OPTIONS}"]', 'Set','SIP_URI_OPTIONS='));
+        if ($ast_ge_162) {
+          $ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
+          $ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
+        } else {
+          $ext->add($mcontext, $exten, '', new ext_set('SP', '0'));
+          $ext->add($mcontext, $exten, '', new ext_set('ITER', '1'));
+          $ext->add($mcontext, $exten, 'begin', new ext_execif('$[${ITER} > 9]', 'Set','SP=' ));
+          $ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPADDHEADER${SP}${ITER}})}=0]', 'Return'));
+          $ext->add($mcontext, $exten, '', new ext_execif('$["${SIPADDHEADER${SP}${ITER}}"="${ALERTINFO}"|"${SIPADDHEADER${SP}${ITER}}"="${CALLINFO}"]', 'Set','SIPADDHEADER${SP}${ITER}='));
+          $ext->add($mcontext, $exten, '', new ext_setvar('ITER', '$[${ITER} + 1]'));
+          $ext->add($mcontext, $exten, '', new ext_gotoif('$[${ITER} < 100]', 'begin'));
+        }
+			  $ext->add($mcontext,$exten,'', new ext_return(''));
+      }
 
       $exten = 's-BUSY';
 			$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting BUSY and not passing to Voicemail'));
@@ -4367,6 +4410,8 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
 		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
+    $astman->database_put("AMPUSER",$extension."/answermode","\"".isset($answermode)?$answermode:'disabled'."\"");
+
 		switch ($call_screen) {
 			case '0':
 				$astman->database_del("AMPUSER",$extension."/screen");
@@ -4456,6 +4501,12 @@ function core_users_get($extension){
 		$results['record_out']='Adhoc';
 	}
 	if ($astman) {
+
+    if (function_exists('paging_get_config')) {
+		  $answermode=$astman->database_get("AMPUSER",$extension."/answermode");
+      $results['answermode'] = (trim($answermode) == '') ? 'disabled' : $answermode;
+    }
+
 		$cw = $astman->database_get("CW",$extension);
 		$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
 		$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
@@ -5667,6 +5718,12 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
 
+    if (function_exists('paging_get_config')) {
+      $currentcomponent->addoptlistitem('answermode', 'disabled', _("Disable"));
+      $currentcomponent->addoptlistitem('answermode', 'intercom', _("Intercom"));
+      $currentcomponent->setoptlistopts('answermode', 'sort', false);
+    }
+
 		$currentcomponent->addoptlistitem('pinless', 'disabled', _("Disable"));
 		$currentcomponent->addoptlistitem('pinless', 'enabled', _("Enable"));
 		$currentcomponent->setoptlistopts('pinless', 'sort', false);
@@ -5848,6 +5905,10 @@ function core_users_configpageload() {
 			}
 		}
 		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false));
+    if (function_exists('paging_get_config')) {
+      $answermode = isset($answermode) ? $answermode : 'normal';
+		  $currentcomponent->addguielem($section, new gui_selectbox('answermode', $currentcomponent->getoptlist('answermode'), $answermode, _("Internal Auto Answer"), _("When set to Intercom, calls to this extension/user from other internal users act as if they were intercom calls meaning they will be auto-answered if the endpoint supports this feature and the system is configured to operate in this mode. All the normal white list and black list settings will be honored if they are set. External calls will still ring as normal, as will certain other circumstances such as blind transfers and when a Follow Me is configured and enabled. If Disabled, the phone rings as a normal phone."), false));
+    }
 		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that callerid. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerId."), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false));
 
