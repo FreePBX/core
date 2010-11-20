@@ -2936,6 +2936,22 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
+      // If paging module is not present, then what happens?
+      // TODO: test with no paging module
+			$fcc = new featurecode('paging', 'intercom-prefix');
+			$intercom_code = $fcc->getCodeActive();
+			unset($fcc);
+
+      if ($intercom_code != '') {
+        if ($has_extension_state) {
+          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${FROM_DID}|${DB(AMPUSER/${EXTTOCALL}/answermode)}="intercom"|${BLINDTRANSFER}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
+        } else {
+          $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${FROM_DID}|${DB(AMPUSER/${EXTTOCALL}/answermode)}="intercom"|${BLINDTRANSFER}]','macrodial'));
+        }
+        $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", 'TRUE'));
+			  $ext->add($mcontext,$exten,'', new ext_gosub('1',$intercom_code.'${EXTTOCALL}','ext-intercom'));
+        $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", ''));
+      }
       if ($has_extension_state) {
 			  $ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       } else {
