@@ -86,8 +86,6 @@ if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '')
       }
     }
   }
-  freepbx_debug($index);
-  freepbx_debug($csv_file);
 }
 
 //
