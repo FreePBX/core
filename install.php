@@ -83,18 +83,21 @@ unset($fcc);
 $fcc = new featurecode('core', 'zapbarge');
 $fcc->setDescription('ZapBarge');
 $fcc->setDefault('888');
+$fcc->setProvideDest();
 $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'chanspy');
 $fcc->setDescription('ChanSpy');
 $fcc->setDefault('555');
+$fcc->setProvideDest();
 $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'simu_pstn');
 $fcc->setDescription('Simulate Incoming Call');
 $fcc->setDefault('7777');
+$fcc->setProvideDest();
 $fcc->update();
 unset($fcc);
 
