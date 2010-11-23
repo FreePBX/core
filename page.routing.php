@@ -781,6 +781,7 @@ $(document).ready(function(){
   $("#dial-pattern-add").click(function(){
     addCustomField('','','','');
   });
+  $('#pattern_file').hide();
   $(".dpt-display").toggleVal({
     populateFrom: "title",
     changedClass: "text-normal",

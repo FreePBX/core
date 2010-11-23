@@ -916,6 +916,7 @@ $(document).ready(function(){
   $("#dial-pattern-add").click(function(){
     addCustomField('','','','');
   });
+  $('#pattern_file').hide();
   $("#dial-pattern-clear").click(function(){
     clearAllPatterns();
   });
