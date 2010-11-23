@@ -533,26 +533,31 @@ if ($extdisplay) { // editing
   $pf_tit = _("prefix");
   $mp_tit = _("match pattern");
   $ci_tit = _("CallerId");
+
+  $dpt_title_class = 'dpt-title dpt-display';
   foreach ($dialpattern_array as $idx => $pattern) {
     $tabindex++;
-    $dpt_class = $pattern['prepend_digits'] == '' ? 'dpt-title' : 'dpt-value';
+    if ($idx == 50) {
+      $dpt_title_class = 'dpt-title dpt-nodisplay';
+    }
+    $dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
     echo <<< END
     <tr>
       <td colspan="2">
         (<input title="$pp_tit" type="text" size="8" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
 END;
     $tabindex++;
-    $dpt_class = $pattern['match_pattern_prefix'] == '' ? 'dpt-title' : 'dpt-value';
+    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
     echo <<< END
         <input title="$pf_tit" type="text" size="6" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="$dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
 END;
     $tabindex++;
-    $dpt_class = $pattern['match_pattern_pass'] == '' ? 'dpt-title' : 'dpt-value';
+    $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
     echo <<< END
         [<input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="$dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex"> /
 END;
     $tabindex++;
-    $dpt_class = $pattern['match_cid'] == '' ? 'dpt-title' : 'dpt-value';
+    $dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
     echo <<< END
         <input title="$ci_tit" type="text" size="10" id="match_cid_$idx" name="match_cid[$idx]" class="$dpt_class" value="{$pattern['match_cid']}" tabindex="$tabindex">]
 END;
@@ -566,10 +571,10 @@ END;
 ?>
     <tr>
       <td colspan="2">
-        (<input title="<?php echo $pp_tit?>" type="text" size="8" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dial-pattern dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">) +
-        <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
-        [<input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> /
-        <input title="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_<?php echo $next_idx?>" name="match_cid[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">]
+        (<input title="<?php echo $pp_tit?>" type="text" size="8" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dial-pattern dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">) +
+        <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>"> |
+        [<input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>"> /
+        <input title="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_<?php echo $next_idx?>" name="match_cid[<?php echo $next_idx?>]" class="dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">]
         <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;cursor:pointer;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
 
       </td>
@@ -776,10 +781,17 @@ $(document).ready(function(){
   $("#dial-pattern-add").click(function(){
     addCustomField('','','','');
   });
-  $(".dpt-title").toggleVal({
+  $(".dpt-display").toggleVal({
     populateFrom: "title",
     changedClass: "text-normal",
     focusClass: "text-normal"
+  });
+  $(".dpt-nodisplay").mouseover(function(){
+    $(this).toggleVal({
+      populateFrom: "title",
+      changedClass: "text-normal",
+      focusClass: "text-normal"
+    }).removeClass('dpt-nodisplay').addClass('dpt-display').unbind('mouseover');
   });
 }); 
 
@@ -794,10 +806,11 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) 
   var tabindex1 = tabindex + 2;
   var tabindex2 = tabindex + 3;
   var tabindex3 = tabindex + 4;
-  var dpt_prepend_digit = prepend_digit == '' ? 'dpt-title' : 'dpt-value';
-  var dpt_pattern_prefix = pattern_prefix == '' ? 'dpt-title' : 'dpt-value';
-  var dpt_pattern_pass = pattern_pass == '' ? 'dpt-title' : 'dpt-value';
-  var dpt_match_cid = match_cid == '' ? 'dpt-title' : 'dpt-value';
+  var dpt_title = 'dpt-title dpt-display';
+  var dpt_prepend_digit = prepend_digit == '' ? dpt_title : 'dpt-value';
+  var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
+  var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
+  var dpt_match_cid = match_cid == '' ? dpt_title : 'dpt-value';
 
   var new_insert = $("#last_row").before('\
   <tr>\
@@ -879,7 +892,7 @@ function routeEdit_onsubmit(act) {
 }
 
 function clearPatterns() {
-  $(".dpt-title").each(function() {
+  $(".dpt-display").each(function() {
     if($(this).val() == $(this).data("defText")) {
       $(this).val("");
     }
@@ -893,7 +906,7 @@ function validatePatterns() {
   var msgInvalidDialPattern;
   defaultEmptyOK = false;
 
-  $(".dpt-title, .dpt-value").each(function() {
+  $(".dpt-display, .dpt-value").each(function() {
     if ($.trim($(this).val()) == '') {
     } else if (!isDialpattern($(this).val())) {
       culprit = this;
@@ -912,7 +925,7 @@ function validatePatterns() {
   if (culprit != undefined) {
     // now we have to put it back...
     // do I have to turn it off first though?
-    $(".dpt-title").each(function() {
+    $(".dpt-display").each(function() {
       if ($.trim($(this).val()) == '') {
         $(this).toggleVal({
           populateFrom: "title",
