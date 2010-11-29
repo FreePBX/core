@@ -1642,7 +1642,7 @@ function core_get_config($engine) {
 					$ext->addGlobal("PREFIX_TRUNK_$tid",count($patterns));
 
           $context = 'sub-flp-'.$tid;
-          $target = 'TARGET_FLP4'.$tid;
+          $target = 'TARGET_FLP_'.$tid;
           $exten = 's';
           foreach ($patterns as $pattern) {
             $prepend = $pattern['prepend_digits'];
