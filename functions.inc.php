@@ -1297,8 +1297,7 @@ function core_get_config($engine) {
 					$exten = core_users_get($item[0]);
 					$vm = ((($exten['voicemail'] == "novm") || ($exten['voicemail'] == "disabled") || ($exten['voicemail'] == "")) ? "novm" : $exten['extension']);
 
-					if (isset($exten['ringtimer']) && $exten['ringtimer'] != 0)
-						$ext->add('ext-local', $exten['extension'], '', new ext_setvar('__RINGTIMER',$exten['ringtimer']));
+					$ext->add('ext-local', $exten['extension'], '', new ext_execif('$[${DB(AMPUSER/'.$exten['extension'].'/ringtimer)} > 0]','Set','__RINGTIMER=${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}'));
 					
           $dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
@@ -2930,11 +2929,8 @@ function core_get_config($engine) {
 
 			$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
-			$ext->add($mcontext,$exten,'', new ext_set("VMBOX", '${ARG1}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
-			$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
-			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($[$["${VMBOX}"!="novm"] | $["${CFUEXT}"!=""]]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!=""]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
       // If paging module is not present, then what happens?
@@ -2973,30 +2969,31 @@ function core_get_config($engine) {
       } else {
 			  $ext->add($mcontext,$exten,$macrodial, new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       }
-			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
-			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!="" & "${SCREEN}"=""]','docfu,1'));
-			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
+
+			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
+			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!=""]','docfb,1'));
 			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
 
 			$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&${ARG3})|("${DIALSTATUS}"="BUSY"&${ARG4})|("${DIALSTATUS}"="CHANUNAVAIL"&${ARG5})]','MacroExit'));
 
-			$ext->add($mcontext,$exten,'', new ext_noop('Voicemail is \'${VMBOX}\''));
-			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${VMBOX}"="novm"]','s-${DIALSTATUS},1'));
+			$ext->add($mcontext,$exten,'', new ext_noop('Voicemail is \'${ARG1}\''));
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"="novm"]','s-${DIALSTATUS},1'));
 			$ext->add($mcontext,$exten,'', new ext_noop('Sending to Voicemail box ${EXTTOCALL}'));
-			$ext->add($mcontext,$exten,'', new ext_macro('vm','${VMBOX},${DIALSTATUS},${IVR_RETVM}'));
+			$ext->add($mcontext,$exten,'', new ext_macro('vm','${ARG1},${DIALSTATUS},${IVR_RETVM}'));
 
       $exten = 'docfu';
-			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${ARG1}"!="novm"]?${RINGTIMER}:"")}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'unavailable'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RTCFU},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFU/${EXTTOCALL})}@from-internal/n', '${RTCFU},${DIAL_OPTIONS}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
-      
-			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${VMBOX}"!="novm"]?${RINGTIMER}:"")}'));
+      $exten = 'docfb';
+			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${ARG1}"!="novm"]?${RINGTIMER}:"")}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFB/${EXTTOCALL})}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
@@ -4561,6 +4558,8 @@ function core_users_get($extension){
 
 		$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
 		$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
+
+		$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
