@@ -4244,11 +4244,11 @@ function core_check_extensions($exten=true) {
 	$sql .= " ORDER BY CAST(extension AS UNSIGNED)";
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
+	$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
 	foreach ($results as $result) {
 		$thisexten = $result['extension'];
 		$extenlist[$thisexten]['description'] = _("User Extension: ").$result['name'];
 		$extenlist[$thisexten]['status'] = 'INUSE';
-		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
 		$extenlist[$thisexten]['edit_url'] = "config.php?type=setup&display=$display&extdisplay=".urlencode($thisexten)."&skip=0";
 	}
 	return $extenlist;
@@ -4256,11 +4256,14 @@ function core_check_extensions($exten=true) {
 
 function core_check_destinations($dest=true) {
 	global $active_modules;
+  global $amp_conf;
 
 	$destlist = array();
 	if (is_array($dest) && empty($dest)) {
 		return $destlist;
 	}
+  // Check Inbound Routes
+  //
 	$sql = "SELECT extension, cidnum, description, destination FROM incoming ";
 	if ($dest !== true) {
 		$sql .= "WHERE destination in ('".implode("','",$dest)."')";
@@ -4279,6 +4282,47 @@ function core_check_destinations($dest=true) {
 			'edit_url' => 'config.php?display=did&extdisplay='.urlencode($thisid),
 		);
 	}
+
+  // Check Extension/User Destinations
+  //
+	$sql = "SELECT extension, name, busy_dest, noanswer_dest, chanunavail_dest FROM users ";
+	if ($dest !== true) {
+		$sql .= "WHERE (busy_dest in ('".implode("','",$dest)."')) OR (noanswer_dest in ('".implode("','",$dest)."')) OR (chanunavail_dest in ('".implode("','",$dest)."'))";
+	}
+	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
+	$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+	$label   = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'User':'Exten';
+	foreach ($results as $result) {
+		$thisdest    = $result['busy_dest'];
+		$thisid      = $result['extension'];
+		$description = sprintf(_("%s: %s (%s)"),$label,$result['name'],$thisid);
+		$thisurl     = 'config.php?display='.$display.'&extdisplay='.urlencode($thisid);
+		if (($dest === true && $thisdest != '') || $dest = $thisdest) {
+			$destlist[] = array(
+				'dest' => $thisdest,
+				'description' => $description,
+				'edit_url' => $thisurl,
+			);
+		}
+		$thisdest = $result['noanswer_dest'];
+		if (($dest === true && $thisdest != '') || $dest = $thisdest) {
+			$destlist[] = array(
+				'dest' => $thisdest,
+				'description' => $description,
+				'edit_url' => $thisurl,
+			);
+		}
+		$thisdest = $result['chanunavail_dest'];
+		if (($dest === true && $thisdest != '') || $dest = $thisdest) {
+			$destlist[] = array(
+				'dest' => $thisdest,
+				'description' => $description,
+				'edit_url' => $thisurl,
+			);
+		}
+	}
+
 	return $destlist;
 }
 
