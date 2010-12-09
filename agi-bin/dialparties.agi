@@ -301,11 +301,26 @@ foreach ($ext as $k) {
 			    $AGI->set_variable('DIALSTATUS','NOANSWER');
 		    } else {
 			    $ext[$count] = $cf.'#';  
+			    debug("Extension $k has call forward set to $cf", 1);
 					// This only really needs to be set if we are setting Diversion Headers, but it's not worth the hassle of
 					// checking the amportal.conf settings here and there is no harm done in setting it other than minor overhead
 					//
-					$AGI->set_variable('__DIVERSION_REASON','unconditional');
-			    debug("Extension $k has call forward set to $cf", 1);
+          // Set DIVERSION_REASON only when rmethod is none, otherwise it's a ringgroup/findmefollow and
+          // if we want to set diversion headers they should be set by the group.
+          // 
+          // For CF timer, we change the timer value if rgmethod is none meaning a single extension is being called.
+          // CFB and CFU are handled in macro-exten-vm for single extensions. (And this script is being phased out in
+          // favor of macro-dial-one for single extensions when function EXTENSION_STATE is available).
+          //
+          if ($rgmethod == "none") {
+            $AGI->set_variable('__DIVERSION_REASON','unconditional');
+            $cfrt = $AGI->database_get('AMPUSER',$k . '/cfringtimer'); 
+            $cfrt = $cfrt['data'];
+            if (!empty($cfrt)) {
+              $timer = $cfrt < 0 ? "" : $cfrt;
+              debug("Ring timer changed to CF ringtimer value of ".($cfrt < 0 ? "Always":"$cfrt sec"), 1);
+            }
+          }
 		    }
   
 		    // if this is the primary extension and CF enabled, then cancel mastermode
@@ -466,9 +481,15 @@ foreach ( $ext as $k ) {
 
 					// don't honor any CF settings when $cfignore is set
 					//
-					if ($exthascfb == 1 && !$cfignore) {
-						debug("Extension $extnum has call forward on busy set to $extcfb",1);
-						$extnum = $extcfb . '#';   # same method as the normal cf, i.e. send to Local
+					if ($exthascfb == 1 && !$cfignore && $exthascw == 0) {
+						if ($rgmethod == 'none') {  // Calling an extension only, let macro-dial deal with cfb
+							debug("Extension $extnum has call forward on busy set to $extcfb, dropping to macro-dial",1);
+							$extnum = '';
+							$AGI->set_variable('DIALSTATUS','BUSY');
+						}else{
+							debug("Extension $extnum has call forward on busy set to $extcfb",1);
+							$extnum = $extcfb . '#';   # same method as the normal cf, i.e. send to Local
+						}
 					// CW not in use
 					} elseif ($exthascw == 0) {
 						debug("Extension $extnum has call waiting disabled",1);

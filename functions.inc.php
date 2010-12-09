@@ -2984,16 +2984,20 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_macro('vm','${ARG1},${DIALSTATUS},${IVR_RETVM}'));
 
       $exten = 'docfu';
-			$ext->add($mcontext,$exten,'docfu', new ext_set("RTCFU", '${IF($["${ARG1}"!="novm"]?${RINGTIMER}:"")}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'unavailable'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFU/${EXTTOCALL})}@from-internal/n', '${RTCFU},${DIAL_OPTIONS}'));
+      $ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&${ARG3})]', 'StackPop'));
+      $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&${ARG3})]', 'from-internal,${DB(CFU/${EXTTOCALL})},1'));
+      $ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFU/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
       $exten = 'docfb';
-			$ext->add($mcontext,$exten,'docfb', new ext_set("RTCFB", '${IF($["${ARG1}"!="novm"]?${RINGTIMER}:"")}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
-			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFB/${EXTTOCALL})}@from-internal/n', '${RTCFB},${DIAL_OPTIONS}'));
+      $ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&${ARG4})]', 'StackPop'));
+      $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&${ARG4})]', 'from-internal,${DB(CFB/${EXTTOCALL})},1'));
+      $ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+			$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFB/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
 			if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 
@@ -3185,6 +3189,10 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_gosubif('$["${QUEUEWAIT}"!=""]','qwait,1'));
         $ext->add($mcontext,$exten,'', new ext_set('__CWIGNORE', '${CWIGNORE}'));
         $ext->add($mcontext,$exten,'', new ext_set('__KEEPCID', 'TRUE'));
+
+        // Use goto if no timelimit set from CF
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$["${USEGOTO}"="1"]','usegoto,1'));
+
         $ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
@@ -3195,6 +3203,10 @@ function core_get_config($engine) {
 
         $exten = 'h';
         $ext->add($mcontext, $exten, '', new ext_macro('hangupcall'));
+        
+        $exten = 'usegoto';
+        $ext->add($mcontext,$exten,'', new ext_set('USEGOTO', ''));
+        $ext->add($mcontext,$exten,'', new ext_goto('1','${DSTRING}','from-internal'));
 
         $exten = 'screen';
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${DEXTEN}/screen)}"!="nomemory" | "${CALLERID(number)}"=""]','memory'));
@@ -3207,6 +3219,7 @@ function core_get_config($engine) {
         $exten = 'cf';
         $ext->add($mcontext,$exten,'', new ext_set('CFAMPUSER', '${IF($["${AMPUSER}"=""]?${CALLERID(number)}:${AMPUSER})}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CF/${DEXTEN})}"="${CFAMPUSER}" | "${DB(CF/${DEXTEN})}"="${REALCALLERIDNUM}" | "${CUT(CUT(BLINDTRANSFER,-,1),/,1)}" = "${DB(CF/${DEXTEN})}" | "${DEXTEN}"="${DB(CF/${DEXTEN})}"]', 'Return'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(AMPUSER/${DEXTEN}/cfringtimer)}" != "0" & "${DB(AMPUSER/${DEXTEN}/cfringtimer)}" != ""]', 'Set', 'ARG1=${IF($["${DB(AMPUSER/${DEXTEN}/cfringtimer)}"="-1"]? : ${DB(AMPUSER/${DEXTEN}/cfringtimer)})}'));
         $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#":"")}'));
 				if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional":"")}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DEXTEN}"!=""]', 'Return'));
@@ -3245,7 +3258,9 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_return(''));
 
         $exten = 'dlocal';
-        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', 'Local/${DEXTEN:0:${MATH(${LEN(${DEXTEN})}-1,int)}}@from-internal/n'));
+        //$ext->add($mcontext,$exten,'', new ext_set('DSTRING', 'Local/${DEXTEN:0:${MATH(${LEN(${DEXTEN})}-1,int)}}@from-internal/n'));
+        $ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${IF($["${ARG1}"=""]?${DEXTEN:0:${MATH(${LEN(${DEXTEN})}-1,int)}}:Local/${DEXTEN:0:${MATH(${LEN(${DEXTEN})}-1,int)}}@from-internal/n)}'));
+        $ext->add($mcontext,$exten,'', new ext_set('USEGOTO', '${IF($["${ARG1}"=""]?1:0)}'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
 
         if ($chan_dahdi) {
@@ -4445,6 +4460,7 @@ function core_users_add($vars, $editmode=false) {
 		$cid_masquerade = (isset($cid_masquerade) && trim($cid_masquerade) != "")?trim($cid_masquerade):$extension;
 		$astman->database_put("AMPUSER",$extension."/password",isset($password)?$password:'');
 		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
+		$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($cfringtimer)?$cfringtimer:0);
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
 		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
@@ -4560,6 +4576,8 @@ function core_users_get($extension){
 		$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
 
 		$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
+	
+		$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -5778,10 +5796,14 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->setoptlistopts('call_screen', 'sort', false);
 
 		$currentcomponent->addoptlistitem('ringtime', '0', _("Default"));
+		$currentcomponent->addoptlistitem('cfringtime', '0', _("Default"));
+		$currentcomponent->addoptlistitem('cfringtime', '-1', _("Always"));
 		for ($i=1; $i <= 120; $i++) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
+			$currentcomponent->addoptlistitem('cfringtime', "$i", "$i");
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
+		$currentcomponent->setoptlistopts('cfringtime', 'sort', false);
 
 		// Special CID handling to deal with Private, etc.
 		//
@@ -5941,6 +5963,15 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
+
+    if (!isset($cfringtimer)) {
+      if ($amp_conf['CFRINGTIMERDEFAULT'] < 0 || ctype_digit($amp_conf['CFRINGTIMERDEFAULT'])) {
+        $cfringtimer = $amp_conf['CFRINGTIMERDEFAULT'] < 0 ? -1 : ($amp_conf['CFRINGTIMERDEFAULT'] > 120 ? 120 : $amp_conf['CFRINGTIMERDEFAULT']);
+      } else {
+        $cfringtimer = 0;
+      }
+    }
+		$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the current Ring Time. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false));
 		if (!isset($callwaiting)) {
 			if ($amp_conf['ENABLECW']) {
 				$callwaiting = 'enabled';
