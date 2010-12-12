@@ -6131,8 +6131,10 @@ function core_devices_configpageinit($dispnum) {
 	global $currentcomponent, $amp_conf;
 
 	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
-		// Setup arrays for device types
-		$currentcomponent->addgeneralarray('devtechs');
+
+    // We don't call: $currentcomponent->addgeneralarray('devtechs') because the first
+    // call to addgeneralarrayitem will initiate the array and this allows other modules
+    // to add a new device type.
 		
 		// Some errors for the validation bits
 		$msgInvalidDTMFMODE = _("Please enter the dtmfmode for this device");
