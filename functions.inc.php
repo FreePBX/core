@@ -2972,7 +2972,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
 
-			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${SV_DIALSTATUS}"="NOANSWER" & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
+			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$[("${SV_DIALSTATUS}"="NOANSWER"|"${SV_DIALSTATUS}"="CHANUNAVAIL") & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
 			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!=""]','docfb,1'));
 			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
 
