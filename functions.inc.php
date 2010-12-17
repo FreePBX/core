@@ -1891,7 +1891,7 @@ function core_get_config($engine) {
 
 			$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','0'));
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
-			$ext->add($context, $exten, '', new ext_setvar('MSG1','${IF($["foo${ARG1}" != "foo"]?${ARG1}:"incoming-call-1-accept-2-decline")}'));
+			$ext->add($context, $exten, '', new ext_setvar('MSG1','${IF($["${ARG1}${ALT_CONFIRM_MSG}"=""]?incoming-call-1-accept-2-decline:${IF($[${LEN(${ALT_CONFIRM_MSG})}>0]?${ALT_CONFIRM_MSG}:${ARG1})})}'));
 			if ($ast_ge_14) {
 				$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
 			} else {
