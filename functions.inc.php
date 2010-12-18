@@ -1901,10 +1901,12 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${INPUT})} > 0]', '${INPUT},1', 't,1'));
 
 			$exten = '1';
+			$ext->add($context, $exten, '', new ext_gotoif('$["${FORCE_CONFIRM}" = "ENABLED"]', 'skip'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}" = "0"]', 'toolate,1'));
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG3}/${UNIQCHAN}'));
 			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
-			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, 'skip', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, '', new ext_execif('$[("${MOHCLASS}"!="default") & ("${MOHCLASS}"!="")]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 			$ext->add($context, $exten, 'exitopt1', new ext_macroexit());
 
 			$exten = '2';
@@ -1912,10 +1914,10 @@ function core_get_config($engine) {
 
 			$exten = '3';
 			$ext->add($context, $exten, '', new ext_saydigits('${CALLCONFIRMCID}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}" = "0"]', 'toolate,1','s,start'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" & "${FORCE_CONFIRM}"!="ENABLED"]', 'toolate,1','s,start'));
 
 			$exten = 't';
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}" = "0"]', 'toolate,1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" & "${FORCE_CONFIRM}"!="ENABLED"]', 'toolate,1'));
 			$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','$[ ${LOOPCOUNT} + 1 ]'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${LOOPCOUNT} < 5 ]', 's,start','noanswer,1'));
 
@@ -1925,7 +1927,7 @@ function core_get_config($engine) {
 			} else {
 				$ext->add($context, $exten, '', new ext_background('invalid,m,${LANGUAGE},macro-confirm'));
 			}
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}" = "0"]', 'toolate,1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" & "${FORCE_CONFIRM}"!="ENABLED"]', 'toolate,1'));
 			$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','$[ ${LOOPCOUNT} + 1 ]'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${LOOPCOUNT} < 5 ]', 's,start','noanswer,1'));
 
@@ -2039,7 +2041,9 @@ function core_get_config($engine) {
 		
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
-			$ext->add($context, $exten, '', new ext_execif('$[$["${MOHCLASS}" != "default"] & $["${MOHCLASS}" != ""]]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+      // if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
+			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"!="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -2171,7 +2175,8 @@ function core_get_config($engine) {
 
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
-			$ext->add($context, $exten, '', new ext_execif('$[$["${MOHCLASS}" != "default"] & $["${MOHCLASS}" != ""]]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"!="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -2329,21 +2334,27 @@ function core_get_config($engine) {
 			$exten = 's';
 	
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
-			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${ARG1}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
 			$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${ARG1}}foo" = "foo"]', 'nomax'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} >= ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
 			$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-			$ext->add($context, $exten, '', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
+			$ext->add($context, $exten, '', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
+			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
 			//  Replacement for asterisk's ENUMLOOKUP function
 			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
 			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
 			// Loop through them trying them in order.
 			$ext->add($context, $exten, 'dialloop', new ext_gotoif('$["foo${DIALARR}"="foo"]', 's-${DIALSTATUS},1'));
+			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"!="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"="ENABLED" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_set('TRYDIAL', '${CUT(DIALARR,%,1)}'));
 			$ext->add($context, $exten, '', new ext_set('DIALARR', '${CUT(DIALARR,%,2-)}'));
-			$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', ''));
+			$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', '${DIAL_TRUNK_OPTIONS}'));
 			// Now, if we're still here, that means the Dial failed for some reason. 
 			// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
 			// different channel. If there's no more left, the dialloop tag will exit.
