@@ -4378,6 +4378,21 @@ function core_check_destinations($dest=true) {
 	return $destlist;
 }
 
+function core_change_destination($old_dest, $new_dest) {
+	$sql = 'UPDATE users SET noanswer_dest = "' . $new_dest . '" WHERE noanswer_dest = "' . $old_dest . '"';
+	sql($sql, "query");
+	
+	$sql = 'UPDATE users SET busy_dest = "' . $new_dest . '" WHERE busy_dest = "' . $old_dest . '"';
+	sql($sql, "query");
+	
+	$sql = 'UPDATE users SET chanunavail_dest = "' . $new_dest . '" WHERE chanunavail_dest = "' . $old_dest . '"';
+	sql($sql, "query");
+	
+	$sql = 'UPDATE incoming SET destination = "' . $new_dest . '" WHERE destination = "' . $old_dest . '"';
+	sql($sql, "query");
+}
+
+
 function core_sipname_check($sipname, $extension) {
 	global $db;
 	if (!isset($sipname) || trim($sipname)=='')
@@ -6512,5 +6527,4 @@ function core_devices_configprocess() {
 	}
 	return true;
 }
-
 ?>
