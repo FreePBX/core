@@ -1717,18 +1717,18 @@ function core_get_config($engine) {
 			  $ext->add($context, $exten, '', new ext_set('ITER','1'));
 				$ext->add($context, $exten, 'begin', new ext_gotoif('$["${CUT(DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording),=,3)}" != "Always"]', 'continue'));
 			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})}'));
-			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${TEXTEN}'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${TEXTEN}',1));
 			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','g${TEXTEN}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
 			  $ext->add($context, $exten, '', new ext_goto('record'));
 			  $ext->add($context, $exten, 'continue', new ext_set('ITER','$[${ITER}+1]'));
 				$ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
 				$ext->add($context, $exten, 'OUT', new ext_gotoif('$["${ARG2}"="IN"]', 'IN'));
 			  $ext->add($context, $exten, '', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,1):4}" != "Always"]','MacroExit'));
-			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
 			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','OUT${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
 			  $ext->add($context, $exten, '', new ext_goto('record'));
 			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacroExit'));
-			  $ext->add($context, $exten, '', new ext_noop('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
 			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
 				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
@@ -1782,7 +1782,7 @@ function core_get_config($engine) {
           if ($fpattern['base_pattern'] != $exten) {
             $ext->add($context, $exten, '', new ext_macro('user-callerid,SKIPTTL')); 
           }
-          $ext->add($context, $exten, '', new ext_noop(sprintf(_('Calling Out Route: %s'),$route['name']))); 
+          $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1)); 
 
 					// Conditionally Add Divesion Header if the call was diverted
 					if ($amp_conf['DIVERSIONHEADER']) {
@@ -2976,12 +2976,10 @@ function core_get_config($engine) {
       $macrodial = 'macrodial';
       if ($intercom_code != '') {
         if ($has_extension_state) {
-          //TODO: Noop debug code, eventually remove once feature matures
-          $ext->add($mcontext,$exten,'', new ext_noop('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}'));
+          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}'));
           $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
         } else {
-          //TODO: Noop debug code, eventually remove once feature matures
-          $ext->add($mcontext,$exten,'', new ext_noop('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}'));
+          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}'));
           $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}]','macrodial'));
         }
         $ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", '${DIAL_OPTIONS}'));
@@ -3011,9 +3009,9 @@ function core_get_config($engine) {
 
 			$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&${ARG3})|("${DIALSTATUS}"="BUSY"&${ARG4})|("${DIALSTATUS}"="CHANUNAVAIL"&${ARG5})]','MacroExit'));
 
-			$ext->add($mcontext,$exten,'', new ext_noop('Voicemail is \'${ARG1}\''));
+			$ext->add($mcontext,$exten,'', new ext_noop_trace('Voicemail is \'${ARG1}\'',1));
 			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"="novm"]','s-${DIALSTATUS},1'));
-			$ext->add($mcontext,$exten,'', new ext_noop('Sending to Voicemail box ${EXTTOCALL}'));
+			$ext->add($mcontext,$exten,'', new ext_noop_trace('Sending to Voicemail box ${EXTTOCALL}',1));
 			$ext->add($mcontext,$exten,'', new ext_macro('vm','${ARG1},${DIALSTATUS},${IVR_RETVM}'));
 
       $exten = 'docfu';
@@ -3062,13 +3060,13 @@ function core_get_config($engine) {
       }
 
       $exten = 's-BUSY';
-			$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting BUSY and not passing to Voicemail'));
+			$ext->add($mcontext,$exten,'', new ext_noop_trace('Extension is reporting BUSY and not passing to Voicemail',1));
 			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
 			$ext->add($mcontext,$exten, '', new ext_playtones('busy'));
 			$ext->add($mcontext,$exten, '', new ext_busy(20));
 
       $exten = '_s-!';
-			$ext->add($mcontext,$exten,'', new ext_noop('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}'));
+			$ext->add($mcontext,$exten,'', new ext_noop_trace('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}',1));
 			$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
 			$ext->add($mcontext,$exten,'', new ext_playtones('congestion'));
       $ext->add($mcontext,$exten,'', new ext_congestion('10'));
@@ -3155,14 +3153,14 @@ function core_get_config($engine) {
       ; Cleanup any remaining RG flag
       */
 			$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]','skiprg'));
-			$ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+			$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 			$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 
       /*
       ; Cleanup any remaining BLKVM flag
       */
 			$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]','skipblkvm'));
-      $ext->add($mcontext,$exten,'', new ext_noop('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
+      $ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
       $ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
 
       /*
