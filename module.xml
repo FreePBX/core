@@ -1,5 +1,6 @@
 <module>
 	<rawname>core</rawname>
+	<repo>standard</repo>
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
