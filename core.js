@@ -3,6 +3,10 @@ $(document).ready(function() {
 	//if(url_pram('display') == 'advancedsettings'){$('#footer').remove().appendTo($('#wrapper'));}
 	//save settings
 	function savebinder(e) {
+		if (can_write_amportalconf != 1 ) {
+			alert(amportalconf_error);
+			return false;
+		}
 		mythis = $(this);
 		mykey = $(this).attr('data-key');
 		$.ajax({

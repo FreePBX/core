@@ -4,7 +4,6 @@
 // TODO: Get rid of undefined in http log. Sigh
 
 $getvars = array('level', 'action', 'key', 'value');
-
 foreach ($getvars as $v){
 	$var[$v] = isset($_REQUEST[$v]) ? $_REQUEST[$v] : 0;
 }
@@ -18,12 +17,23 @@ if($var['action'] === 'setkey') {
 	}
 	exit;
 }
-	echo '<div id="page">';
+	//save all values if amportal.conf isnt writeable
+	if (!$amp_conf['amportal_canwrite']) {
+		foreach($amp_conf as $key => $val) {
+			core_advancedsettings_set_keys($key, $val);
+		}
+	}
+	echo '<script type="text/javascript">';
+	echo 'can_write_amportalconf = "'.$amp_conf['amportal_canwrite'] .'"; ';
+	echo 'amportalconf_error ="' . _('You must run \'amportal restart\' from the cli before you can save setting here.') . '"';
+	echo '</script>';
+	
+	echo '<div id="main_page">';
     echo "<h2>"._("FreePBX Advanced Settings")."</h2>";
     echo "Use extreme caution! Changes here can render your system inoperable. You are urged to backup before making any changes.<br /><br />";
 
 
-	//TODO: build table properly witl all required tags
+	//TODO: build table properly with all required tags
 	$conf = core_advancedsettings_get_keys($var['level']);
 	echo '<input type="image" src="images/spinner.gif" style="display:none">';
 	echo '<table id="set_table">';
@@ -32,13 +42,13 @@ if($var['action'] === 'setkey') {
 		echo '<td>';
 		switch ($c['type']) {
 			case 'text':
-				echo '<input class="valueinput" id="'.$c['key'].'" type="text" value="'.$c['value'].'" data-valueinput-orig="'.$c['value'].'"/>';
+				echo '<input class="valueinput" id="'.$c['key'].'" type="text" value="'.$amp_conf[$c['key']].'" data-valueinput-orig="'.$amp_conf[$c['key']].'"/>';
 				break;
 			case 'select':
-				echo '<select class="valueinput" id="'.$c['key'].'" data-valueinput-orig="'.$c['value'].'">';
+				echo '<select class="valueinput" id="'.$c['key'].'" data-valueinput-orig="'.$amp_conf[$c['key']].'">';
 					$opt = explode(',',$c['options']);
 					foreach($opt as $o) {
-						$selected = ($c['value'] == $o) ? ' selected ' : '';
+						$selected = ($amp_conf[$c['key']] == $o) ? ' selected ' : '';
 						echo '<option value="'.$o.'"'.$selected.'>'.$o.'</option>';
 					}
 				echo '</select>';
@@ -52,7 +62,7 @@ if($var['action'] === 'setkey') {
 		}
 		echo '</tr>';
 	}
-	echo '</table';
+	echo '</table>';
 
 // Ugly, but I need to display the whole help text within the page    
 echo "<br><br><br><br></div>";
