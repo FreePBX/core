@@ -3351,9 +3351,10 @@ function core_advancedsettings_get_keys($level){
 	return $conf;
 }
 
+//TODO probably use class function or if not, probably needs a multiple update
 function core_advancedsettings_set_keys($key, $value){
 	global $db;
-	$sql = 'UPDATE freepbx_settings set value = ? where `key` = ?';
+	$sql = 'UPDATE freepbx_settings set value = ? where `keyword` = ?';
 	$res = $db->query($sql, array($value, $key));
 	if(DB::IsError($res)){
 		return false;
