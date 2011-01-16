@@ -43,10 +43,13 @@ if($var['action'] === 'setkey') {
 		echo '<tr><td><a href="javascript:void(null)" class="info">'.$c['keyword'].'<span>'.$c['description'].'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
-			case 'text':
+			case CONF_TYPE_TEXT:
+			case CONF_TYPE_DIR:
+			case CONF_TYPE_INT:
+			case CONF_TYPE_UINT:
 				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'"/>';
 				break;
-			case 'select':
+			case CONF_TYPE_SELECT:
 				echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
 					$opt = explode(',',$c['options']);
 					foreach($opt as $o) {
@@ -55,6 +58,17 @@ if($var['action'] === 'setkey') {
 					}
 				echo '</select>';
 				break;
+			case CONF_TYPE_BOOL:
+?>
+  <input id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" tabindex="<?php echo ++$tabindex;?>"<?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <label for="<?php echo $c['keyword'] ?>-true"><?php echo _("True") ?></label>
+  <input id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" tabindex="<?php echo ++$tabindex;?>"<?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label>
+<?php
+				break;
+
+
+
 		}
 		echo '</td>';
 		if($c['readonly'] != 'true'){
