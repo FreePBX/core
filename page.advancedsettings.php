@@ -8,12 +8,13 @@ foreach ($getvars as $v){
 	$var[$v] = isset($_REQUEST[$v]) ? $_REQUEST[$v] : 0;
 }
 
-//dbug('$var',$var);
 if($var['action'] === 'setkey') {
   if ($freepbx_conf->conf_setting_exists($var['keyword'])) {
-		if ($freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true)) {
+		$freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true);
+		if ($freepbx_conf->get_conf_setting($var['keyword']) == $var['value']) {
 			echo 'ok';
 		}
+  		dbug($freepbx_conf->db_conf_store[$var['keyword']]);
   }
 	exit;
 }

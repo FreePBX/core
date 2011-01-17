@@ -65,14 +65,14 @@ $(document).ready(function() {
 		//console.log(myel)
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
 			
-			myel.stop(true, true).delay(500).fadeIn();
+			myel.stop(true, true).delay(100).fadeIn();
 			//only bind if not already bound
 			if (myel.children(".save").data("events") == undefined
 				|| typeof(myel.children('.save').data('events')["click"]) == undefined) {
 				myel.children('.save').bind('click', savebinder);
 			}
 		} else {
-			myel.stop(true, true).delay(500).fadeOut();
+			myel.stop(true, true).delay(100).fadeOut();
 			myel.children('.save').unbind('click', savebinder);
 		}
 	})
