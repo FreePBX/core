@@ -1,5 +1,5 @@
 <?php /* $Id */
-
+$tabindex = isset($tabindex) ? $tabindex : 0;
 // TODO: localize if needed
 // TODO: Get rid of undefined in http log. Sigh
 
@@ -8,10 +8,12 @@ foreach ($getvars as $v){
 	$var[$v] = isset($_REQUEST[$v]) ? $_REQUEST[$v] : 0;
 }
 
+//dbug('$var',$var);
 if($var['action'] === 'setkey') {
-	//set value, then return a value
   if ($freepbx_conf->conf_setting_exists($var['keyword'])) {
-		$freepbx_conf->set_conf_values(array($keyword => $value),true);
+		if ($freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true)) {
+			echo 'ok';
+		}
   }
 	exit;
 }
@@ -63,9 +65,9 @@ if($var['action'] === 'setkey') {
 				break;
 			case CONF_TYPE_BOOL:
 ?>
-  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']]?1:0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" tabindex="<?php echo ++$tabindex;?>"<?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" tabindex="<?php echo ++$tabindex;?>"<?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
   <label for="<?php echo $c['keyword'] ?>-true"><?php echo _("True") ?></label>
-  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']]?1:0 ?>" id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" tabindex="<?php echo ++$tabindex;?>"<?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" tabindex="<?php echo ++$tabindex;?>"<?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
   <label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label>
 <?php
 				break;
@@ -76,8 +78,11 @@ if($var['action'] === 'setkey') {
 		echo '</td>';
 		if(!$c['readonly']){
 			echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" name="default" title="'._('Revert to Default').'"></td>';
-			echo '<td class="savetd"><input type="image" class="save" src="images/accept.png" name="save" data-key="'.$c['keyword'].'" title="'._('Save').'"></td>';
-			//echo '<td><input type="image" class="delete"  src="images/trash.png" name="delete" data-key="'.$c['keyword'].'" title="'._('Delete').'"></td>'; 
+			echo '<td class="savetd"><input type="image" class="save" src="images/accept.png" name="save" data-key="'
+				. $c['keyword'] 
+				. '" title="' . _('Save') . '"'
+				. 'data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
+				. '></td>';
 		}
 		echo '</tr>';
 	}
