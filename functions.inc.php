@@ -3352,7 +3352,7 @@ function core_advancedsettings_get_keys($level){
 }
 
 //TODO probably use class function or if not, probably needs a multiple update
-function core_advancedsettings_set_keys($key, $value){
+function core_advancedsettings_set_keys($keyword, $value){
 	global $db;
 	/* disable for now and anyhow change to use proper class function
 	$sql = 'UPDATE freepbx_settings set value = ? where `keyword` = ?';
@@ -3363,7 +3363,14 @@ function core_advancedsettings_set_keys($key, $value){
 		return true;
 	}
 	*/
-	return true;
+	$freepbx_conf =& freepbx_conf::create();
+
+  	if ($freepbx_conf->conf_setting_exists($keyword)) {
+		$freepbx_conf->set_conf_values(array($keyword => $value),false);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function core_advancedsettings_write_amportal(){

@@ -17,7 +17,7 @@ $(document).ready(function() {
 					skip_astman:1,
 					restrictmods: 'core',
 					action: 'setkey',
-					key: mykey,
+					keyword: mykey,
 					value: $('#'+mykey).val()
 					},
 			beforeSend: function(XMLHttpRequest) {
