@@ -60,9 +60,9 @@ if($var['action'] === 'setkey') {
 				break;
 			case CONF_TYPE_BOOL:
 ?>
-  <input id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" tabindex="<?php echo ++$tabindex;?>"<?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']]?1:0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" tabindex="<?php echo ++$tabindex;?>"<?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
   <label for="<?php echo $c['keyword'] ?>-true"><?php echo _("True") ?></label>
-  <input id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" tabindex="<?php echo ++$tabindex;?>"<?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']]?1:0 ?>" id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" tabindex="<?php echo ++$tabindex;?>"<?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
   <label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label>
 <?php
 				break;
