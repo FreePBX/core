@@ -47,7 +47,7 @@ if($var['action'] === 'setkey') {
 			case CONF_TYPE_DIR:
 			case CONF_TYPE_INT:
 			case CONF_TYPE_UINT:
-				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'"/>';
+				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'"/>';
 				break;
 			case CONF_TYPE_SELECT:
 				echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
