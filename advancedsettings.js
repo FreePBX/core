@@ -18,7 +18,7 @@ $(document).ready(function() {
 					restrictmods: 'core',
 					action: 'setkey',
 					keyword: mykey,
-					value: $('#'+mykey).val()
+					value: $('#' + mykey).val()
 					},
 			beforeSend: function(XMLHttpRequest) {
 				mythis.attr({src: 'images/spinner.gif'})
@@ -26,13 +26,13 @@ $(document).ready(function() {
 			success: function(data, textStatus, XMLHttpRequest) {
 				mythis.attr({src: 'images/accept.png'});
 				if (data != 'ok') {
-					alert('ERROR: When saving key '+mykey);
+					alert('ERROR: When saving key ' + mykey);
 				} else {
 					mythis.parent().delay(500).fadeOut();
 				}
 			},
 			error: function(data, textStatus, XMLHttpRequest) {
-				alert('ERROR: When saving key '+mykey+': '+textStatus);
+				alert('ERROR: When saving key ' + mykey + ': ' + textStatus);
 			}
 		
 		})
