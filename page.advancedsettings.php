@@ -73,6 +73,13 @@
     $row++;
     $dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
     $default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
+    if ($c['emptyok'] && $c['type'] != CONF_TYPE_BOOL && $c['type'] != CONF_TYPE_SELECT) {
+      $default_val.= ', '._("field can be left blank");
+    }
+    if ($c['type'] == CONF_TYPE_INT && $c['options']) {
+      $range = explode(',',$c['options']);
+      $default_val .= '<br />'.sprintf(_("Acceptable Values: %s - %s"),$range[0],$range[1]);
+    }
 		echo '<tr><td><a href="javascript:void(null)" class="info">'.$c['keyword'].'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
