@@ -57,7 +57,16 @@ $(document).ready(function() {
 	}
 	//set defualt values
 	$('.adv_set_default').click(function(){
-		$('#'+$(this).attr('data-key')).val($(this).attr('data-default')).trigger('change');
+		switch ($(this).attr('data-type')) {
+		case 'BOOL':
+			$('input[name="' + $(this).attr('data-key')).removeAttr("checked");
+			$('input[name="' + $(this).attr('data-key') + '"]').filter('[value=' + $(this).attr('data-default') + ']').attr("checked","checked").trigger('change');
+			break;
+		default:
+			alert('got default');
+			$('#'+$(this).attr('data-key')).val($(this).attr('data-default')).trigger('change');
+			break;
+		}
 	});
 	//show save button
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
