@@ -29,31 +29,58 @@ if($var['action'] === 'setkey') {
 
 	$conf = $freepbx_conf->get_conf_settings();
 
-  // TODO: Need to:
-  //       (1) filter out ones above the level specified
-  //       (2) create sections where the section headers are:
-  //           (a) category if not blank
-  //           (b) Module Name if not blank (where we look up the proper module name since rawname is provided)
-  //
-  //       We need to track which level they are showing. One way to do it is to simply make that anther setting
-  //       and have a section called 'Advanced Settings Config' where they can set that (and have is sort to the
-  //       top. We could have choices for:
-  //       - Level (0-10)
-  //       - Show Hidden
-  //       - Show Readonly
-  //
+  $display_level = $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
+  $display_hidden = $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
+  $display_readonly = $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
+  $current_category = '';
+  $row = 0;
 
 	echo '<input type="image" src="images/spinner.gif" style="display:none">';
 	echo '<table id="set_table">';
 	foreach ($conf as $c){
-		echo '<tr><td><a href="javascript:void(null)" class="info">'.$c['keyword'].'<span>'.$c['description'].'</span></a></td>';
+
+    // TODO: localization by module here, put in the gettext with the module info and try that first like other places
+    //
+    if ($c['level'] > $display_level || $c['hidden'] && !$display_hidden || $c['readonly'] && !$display_readonly) {
+      continue;
+    }
+    if ($current_category != $c['category']) {
+      $current_category = $c['category'];
+
+      // TODO: Temp fix until someone much better at syling then me can actually properly fix this :)
+      //       it's only purpose is to get the headings so they are not shaded and so the stripped shading
+      //       starts consistent for each section.
+      //
+      if ($row % 2) {
+        //echo '<tr><td colspan="3"><br></td></tr>';
+        echo '<tr></tr>';
+        $row++;
+      }
+      if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
+        bindtextdomain($name,"modules/".$c['module']."/i18n");
+        bind_textdomain_codeset($c['module'], 'utf8');
+        $current_category_loc = dgettext($c['module'],$current_category);
+        if ($current_category_loc == $current_cateogry) {
+          $current_cateogry_loc = _($current_category);
+        }
+      } else {
+        $current_category_loc = _($current_category);
+      }
+      echo '<tr><td colspan="3"><br><h4 class="category">'._("$current_category_loc").'</h4></td></tr>';
+      $row++;
+    }
+    $row++;
+    $dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
+    $default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
+		echo '<tr><td><a href="javascript:void(null)" class="info">'.$c['keyword'].'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
 			case CONF_TYPE_TEXT:
 			case CONF_TYPE_DIR:
 			case CONF_TYPE_INT:
 			case CONF_TYPE_UINT:
-				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'"/>';
+				$readonly = $c['readonly'] ? 'readonly="readonly"' : '';
+				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>';
 				break;
 			case CONF_TYPE_SELECT:
 				echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
