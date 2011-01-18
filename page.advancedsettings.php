@@ -1,21 +1,24 @@
 <?php /* $Id */
-// TODO: Get rid of undefined in http log. Sigh
 
-$getvars = array('level', 'action', 'keyword', 'value');
-foreach ($getvars as $v){
-	$var[$v] = isset($_REQUEST[$v]) ? $_REQUEST[$v] : 0;
-}
-
-if($var['action'] === 'setkey') {
-  if ($freepbx_conf->conf_setting_exists($var['keyword'])) {
-		$freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true);
-		if ($freepbx_conf->get_conf_setting($var['keyword']) == $var['value']) {
-			echo 'ok';
-		}
-  		dbug($freepbx_conf->db_conf_store[$var['keyword']]);
+  $getvars = array('action', 'keyword', 'value');
+  foreach ($getvars as $v){
+	  $var[$v] = isset($_POST[$v]) ? $_POST[$v] : 0;
   }
-	exit;
-}
+
+  // TODO: provide error info if errors were detected
+  //       change to json so we can send back info like what it was updated to
+  //       and other useful stuff
+  //
+  if($var['action'] === 'setkey') {
+    if ($freepbx_conf->conf_setting_exists($var['keyword'])) {
+		  $freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true);
+		  if ($freepbx_conf->get_conf_setting($var['keyword']) == $var['value']) {
+			  echo 'ok';
+		  }
+      dbug($freepbx_conf->get_last_update_status());
+    }
+	  exit;
+  }
 	echo '<script type="text/javascript">';
 	echo 'can_write_amportalconf = "'.$amp_conf['amportal_canwrite'] .'"; ';
 	echo 'amportalconf_error ="' . _('You must run \'amportal restart\' from the cli before you can save setting here.') . '"';
@@ -76,7 +79,6 @@ if($var['action'] === 'setkey') {
 			case CONF_TYPE_TEXT:
 			case CONF_TYPE_DIR:
 			case CONF_TYPE_INT:
-			case CONF_TYPE_UINT:
 				$readonly = $c['readonly'] ? 'readonly="readonly"' : '';
 				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.$amp_conf[$c['keyword']].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>';
 				break;

@@ -34,7 +34,7 @@ $(document).ready(function() {
 			success: function(data, textStatus, XMLHttpRequest) {
 				mythis.attr({src: 'images/accept.png'});
 				if (data != 'ok') {
-					alert('ERROR: When saving key ' + mykey);
+					alert('ERROR: When saving key ' + mykey + 'Error Info:' + data);
 				} else {
 					mythis.parent().delay(500).fadeOut();
 				}
