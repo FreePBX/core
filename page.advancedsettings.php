@@ -10,23 +10,25 @@
   //       and other useful stuff
   //
   if($var['action'] === 'setkey') {
-    if ($freepbx_conf->conf_setting_exists($var['keyword'])) {
-		  $freepbx_conf->set_conf_values(array($var['keyword'] => $var['value']),true);
-		  if ($freepbx_conf->get_conf_setting($var['keyword']) == $var['value']) {
-			  echo 'ok';
-		  }
-      dbug($freepbx_conf->get_last_update_status());
+    header("Content-type: application/json"); 
+    $keyword = $var['keyword'];
+    if ($freepbx_conf->conf_setting_exists($keyword)) {
+		  $freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true);
+      $status = $freepbx_conf->get_last_update_status();
+
+      echo json_encode($status[$keyword]);
     }
 	  exit;
   }
+  $amportal_canwrite = $freepbx_conf->amportal_canwrite() ? 'true' : 'false';
 	echo '<script type="text/javascript">';
-	echo 'can_write_amportalconf = "'.$amp_conf['amportal_canwrite'] .'"; ';
-	echo 'amportalconf_error ="' . _('You must run \'amportal restart\' from the cli before you can save setting here.') . '"';
+	echo 'can_write_amportalconf = ' . $amportal_canwrite . '; ';
+	echo 'amportalconf_error ="' . _("You must run 'amportal restart' from the Linux command line before you can save setting here.") . '"';
 	echo '</script>';
 	
 	echo '<div id="main_page">';
   echo "<h2>"._("FreePBX Advanced Settings")."</h2>";
-  echo "Use extreme caution! Changes here can render your system inoperable. You are urged to backup before making any changes.<br /><br />";
+  echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. There may be more settings available then are currently shown. You can increase the of visible settings by changing the AS_DISPLAY_DETAIL_LEVEL under Advanced Settings Details. The settings shown at higher levels are less commonly use and can be more risky to change. Once you have made a change you must save it by checking the green check box that appears. You can restore to default settings by clicking on the icon to the right of the values.");
 
 	$conf = $freepbx_conf->get_conf_settings();
 
@@ -58,10 +60,10 @@
         $row++;
       }
       if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
-        bindtextdomain($name,"modules/".$c['module']."/i18n");
+        bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
         bind_textdomain_codeset($c['module'], 'utf8');
         $current_category_loc = dgettext($c['module'],$current_category);
-        if ($current_category_loc == $current_cateogry) {
+        if ($current_category_loc == $current_category) {
           $current_cateogry_loc = _($current_category);
         }
       } else {

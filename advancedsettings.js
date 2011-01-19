@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	//save settings
 	function savebinder(e) {
-		if (can_write_amportalconf != 1 ) {
+		if (!can_write_amportalconf) {
 			alert(amportalconf_error);
 			return false;
 		}
@@ -15,7 +15,6 @@ $(document).ready(function() {
 				var myval = $('#' + mykey).val();
 				break;
 		}
-		//console.log('saving ',mykey,'as',myval,'which is a',$(this).attr('type'))
 		$.ajax({
 			type: 'POST',
 			url: location.href,
@@ -28,14 +27,18 @@ $(document).ready(function() {
 					value: myval
 					},
 			beforeSend: function(XMLHttpRequest, set) {
-				//console.log('set',set)
 				mythis.attr({src: 'images/spinner.gif'})
 			},
+      dataType: 'json',
 			success: function(data, textStatus, XMLHttpRequest) {
 				mythis.attr({src: 'images/accept.png'});
-				if (data != 'ok') {
-					alert('ERROR: When saving key ' + mykey + 'Error Info:' + data);
-				} else {
+        if (!data.validated) {
+					alert(data.msg);
+				}
+				if (!data.validated && data.saved) {
+				  $('#' + mykey).val(data.saved_value);
+				}
+				if (data.saved) {
 					mythis.parent().delay(500).fadeOut();
 				}
 				
@@ -50,7 +53,7 @@ $(document).ready(function() {
 				}
 			},
 			error: function(data, textStatus, XMLHttpRequest) {
-				alert('ERROR: When saving key ' + mykey + ': ' + textStatus);
+				alert('Ajax Web ERROR: When saving key ' + mykey + ': ' + textStatus);
 			}
 		
 		})
@@ -63,7 +66,6 @@ $(document).ready(function() {
 			$('input[name="' + $(this).attr('data-key') + '"]').filter('[value=' + $(this).attr('data-default') + ']').attr("checked","checked").trigger('change');
 			break;
 		default:
-			alert('got default');
 			$('#'+$(this).attr('data-key')).val($(this).attr('data-default')).trigger('change');
 			break;
 		}
@@ -71,7 +73,6 @@ $(document).ready(function() {
 	//show save button
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
 		var myel = $(this).parent().next().next();
-		//console.log(myel)
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
 			
 			myel.stop(true, true).delay(100).fadeIn();
