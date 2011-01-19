@@ -15,6 +15,7 @@ $(document).ready(function() {
 				var myval = $('#' + mykey).val();
 				break;
 		}
+    var send_reload = $('#need_reload_block').size() == 0 ? '1':'0';
 		$.ajax({
 			type: 'POST',
 			url: location.href,
@@ -23,6 +24,7 @@ $(document).ready(function() {
 					skip_astman:1,
 					restrictmods: 'core',
 					action: 'setkey',
+					send_reload: send_reload,
 					keyword: mykey,
 					value: myval
 					},
@@ -51,6 +53,14 @@ $(document).ready(function() {
               location.href=location.href;
             } else {
               alert(msgChangesRefresh);
+            }
+          break;
+          default:
+            if (send_reload == '1') {
+              $('#logo').after(data.reload_bar).fadeIn();
+              $('#moduleBox').before(data.reload_header);
+            } else {
+              $('#need_reload_block').fadeIn();
             }
           break;
           }

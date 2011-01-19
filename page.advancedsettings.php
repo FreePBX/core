@@ -1,6 +1,6 @@
 <?php /* $Id */
 
-  $getvars = array('action', 'keyword', 'value');
+  $getvars = array('action', 'keyword', 'value', 'send_reload');
   foreach ($getvars as $v){
 	  $var[$v] = isset($_POST[$v]) ? $_POST[$v] : 0;
   }
@@ -15,7 +15,18 @@
     if ($freepbx_conf->conf_setting_exists($keyword)) {
 		  $freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true);
       $status = $freepbx_conf->get_last_update_status();
+      if ($var['send_reload'] && $status[$keyword]['saved']) {
+        ob_start();
+        include ('views/freepbx_reloadbar.php');
+        $status[$keyword]['reload_bar'] = ob_get_clean();
 
+        ob_start();
+        include ('views/freepbx_reload.php');
+        $status[$keyword]['reload_header'] = ob_get_clean();
+      }
+      if ($status[$keyword]['saved']) {
+        needreload();
+      }
       echo json_encode($status[$keyword]);
     }
 	  exit;
