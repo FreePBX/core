@@ -1477,6 +1477,13 @@ function core_get_config($engine) {
           $ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
           $ext->add($tcontext,$tcustom,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
           $ext->add($tcontext,$tcustom,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+
+          // Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
+          // malicious CID that can cause overflows in the Asterisk code.
+          //
+          $ext->add($tcontext, $tcustom, '', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
+          $ext->add($tcontext, $tcustom, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
+
           $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}','300,${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$tcustom,'hangit',new ext_hangup());
         }
@@ -1495,6 +1502,12 @@ function core_get_config($engine) {
           $ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
           $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}','300,${DIAL_TRUNK_OPTIONS}'));
+          // Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
+          // malicious CID that can cause overflows in the Asterisk code.
+          //
+          $ext->add($tcontext, $texten, '', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
+          $ext->add($tcontext, $texten, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
+
           $ext->add($tcontext,$texten,'hangit',new ext_hangup());
         }
 			}
@@ -2336,7 +2349,14 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 			$ext->add($context, $exten, '', new ext_congestion(20));
-			$ext->add($context, $exten, 'continue', new ext_noop('Using CallerID ${CALLERID(all)}'));
+
+      // Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
+      // malicious CID that can cause overflows in the Asterisk code.
+      //
+      $ext->add($context, $exten, 'continue', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
+      $ext->add($context, $exten, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
+
+			$ext->add($context, $exten, '', new ext_noop('Using CallerID ${CALLERID(all)}'));
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 			
 			/*
