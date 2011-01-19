@@ -40,8 +40,21 @@ $(document).ready(function() {
 				}
 				if (data.saved) {
 					mythis.parent().delay(500).fadeOut();
-				}
-				
+          mythis.unbind('click', savebinder);
+
+          // If they changed the page layout
+          switch (mykey) {
+          case 'AS_DISPLAY_DETAIL_LEVEL':
+          case 'AS_DISPLAY_HIDDEN_SETTINGS':
+          case 'AS_DISPLAY_READONLY_SETTINGS':
+            if (page_reload_check()) {
+              location.href=location.href;
+            } else {
+              alert(msgChangesRefresh);
+            }
+          break;
+          }
+        }
 				//reset data-valueinput-orig to new value
 				switch (mythis.attr('data-type')) {
 					case 'BOOL':
@@ -55,7 +68,6 @@ $(document).ready(function() {
 			error: function(data, textStatus, XMLHttpRequest) {
 				alert('Ajax Web ERROR: When saving key ' + mykey + ': ' + textStatus);
 			}
-		
 		})
 	}
 	//set defualt values
@@ -86,6 +98,23 @@ $(document).ready(function() {
 			myel.children('.save').unbind('click', savebinder);
 		}
 	})
-
+  $("#page_reload").click(function(){
+      if (!page_reload_check()) {
+        if (!confirm(msgUnsavedChanges)) {
+          return false;
+        }
+      }
+      location.href=location.href;
+  });
 });
 
+function page_reload_check(msgUnsavedChanges) {
+  var reload = true;
+  $(".save").each(function() {
+    if ($(this).data("events") != undefined) {
+      reload = false;
+      return false;
+    }
+  });
+  return reload;
+}

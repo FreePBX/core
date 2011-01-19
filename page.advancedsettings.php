@@ -23,7 +23,9 @@
   $amportal_canwrite = $freepbx_conf->amportal_canwrite() ? 'true' : 'false';
 	echo '<script type="text/javascript">';
 	echo 'can_write_amportalconf = ' . $amportal_canwrite . '; ';
-	echo 'amportalconf_error ="' . _("You must run 'amportal restart' from the Linux command line before you can save setting here.") . '"';
+	echo 'amportalconf_error = "' . _("You must run 'amportal restart' from the Linux command line before you can save setting here.") . '";';
+  echo 'msgUnsavedChanges = "' . _("You have un-saved changes, press OK to disregard changes and reload page or Cancel to abort.") . '";';
+  echo 'msgChangesRefresh = "' . _("Your Display settings have been changed, click on 'Refresh Page' to view the affects of your changes once you have saved other outstanding changes that are still un-confirmed.") . '";';
 	echo '</script>';
 	
 	echo '<div id="main_page">';
@@ -126,6 +128,8 @@
 	echo '</table>';
 
 // Ugly, but I need to display the whole help text within the page    
-echo "<br><br><br><br></div>";
-
 ?>
+<br /><br /> <br />
+<input type="button" id="page_reload" value="Refresh Page"/>
+<br /><br /><br /><br /></div>
+
