@@ -5,10 +5,6 @@
 	  $var[$v] = isset($_POST[$v]) ? $_POST[$v] : 0;
   }
 
-  // TODO: provide error info if errors were detected
-  //       change to json so we can send back info like what it was updated to
-  //       and other useful stuff
-  //
   if($var['action'] === 'setkey') {
     header("Content-type: application/json"); 
     $keyword = $var['keyword'];
@@ -41,7 +37,7 @@
 	
 	echo '<div id="main_page">';
   echo "<h2>"._("FreePBX Advanced Settings")."</h2>";
-  echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. There may be more settings available then are currently shown. You can increase the of visible settings by changing the AS_DISPLAY_DETAIL_LEVEL under Advanced Settings Details. The settings shown at higher levels are less commonly use and can be more risky to change. Once you have made a change you must save it by checking the green check box that appears. You can restore to default settings by clicking on the icon to the right of the values.");
+  echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. There may be more settings available then are currently shown. You can increase the of visible settings by changing the 'Display Detail Level under Advanced Settings Details. The settings shown at higher levels are less commonly use and are more risky to change. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values.");
 
 	$conf = $freepbx_conf->get_conf_settings();
 
@@ -55,8 +51,6 @@
 	echo '<table id="set_table">';
 	foreach ($conf as $c){
 
-    // TODO: localization by module here, put in the gettext with the module info and try that first like other places
-    //
     if ($c['level'] > $display_level || $c['hidden'] && !$display_hidden || $c['readonly'] && !$display_readonly) {
       continue;
     }
@@ -138,7 +132,6 @@
 		}
 		echo '</td>';
 		if(!$c['readonly']){
-			//echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" name="default" title="'._('Revert to Default').'"></td>';
 			echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" title="'._('Revert to Default').'"'
 				. 'data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
 				.'"></td>';
@@ -152,7 +145,7 @@
 	}
 	echo '</table>';
 
-// Ugly, but I need to display the whole help text within the page    
+// Provide enough padding at the bottom (<br />) so that the tooltip from the last setting does not get cut off.
 ?>
 <br /><br /> <br />
 <input type="button" id="page_reload" value="Refresh Page"/>
