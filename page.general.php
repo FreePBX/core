@@ -160,20 +160,6 @@ foreach ($globals as $global) {
   <option value="g729"<?php if ($MIXMON_FORMAT == "g729") echo " SELECTED"; ?>><?php echo _("g729"); ?></option>
   </select>
 	</td></tr>
-	<tr><td>
-  <a href=# class="info"><?php echo _("Recording Location:")?><span>
-  <?php echo _("Override the default location where asterisk will store call recordings. Include the trailing /. Be sure to set proper permissions on the directory for the asterisk user.")?><br>
-  </span></a>
-	</td><td align="right">
-  <input type="text" size="30" name="MIXMON_DIR" value="<?php  echo htmlspecialchars($MIXMON_DIR)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-	<tr><td>
-  <a href=# class="info"><?php echo _("Run after record:")?><span>
-  <?php echo _("An optional script to be run after the call is hungup. You can include channel and MixMon variables like \${CALLFILENAME}, \${MIXMON_FORMAT} and \${MIXMON_DIR}. To ensure that you variables are properly escaped, use the following notation: ^{MY_VAR}")?><br>
-  </span></a>
-	</td><td align="right">
-  <input type="text" size="30" name="MIXMON_POST" value="<?php  echo htmlspecialchars($MIXMON_POST)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
 </table>
 
 <h5><?php echo _("Voicemail")?></h5>
@@ -226,32 +212,6 @@ foreach ($globals as $global) {
 
 <h5><?php echo _("Voicemail VmX Locator")?></h5>
 	<table>
-		<tr>
-			<td>
-			<a href=# class="info"><?php echo _("Default Context & Pri:")?><span>
-			<?php echo _("Default to use if only a number/extension are provided."); ?></span></a>
-			</td>
-			<td align="right"><input type="text" size="18" name="VMX_CONTEXT" value="<?php  echo htmlspecialchars($VMX_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
-			<td colspan="2" align="right"><input type="text" size="2" name="VMX_PRI" value="<?php  echo htmlspecialchars($VMX_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
-		</tr>
-		<tr>
-			<td>
-			<a href=# class="info"><?php echo _("Timeout/#-press default:")?><span>
-			<?php echo _("This is the default location that a caller will be sent if they don't press any key (timeout) or press # which is interpreted as a timeout. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
-			</td>
-			<td align="right"><input type="text" size="18" name="VMX_TIMEDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="4" name="VMX_TIMEDEST_EXT" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "exten"?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="2" name="VMX_TIMEDEST_PRI" value="<?php  echo htmlspecialchars($VMX_TIMEDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
-		</tr>
-		<tr>
-			<td>
-			<a href=# class="info"><?php echo _("Loop Exceed default:")?><span>
-			<?php echo _("This is the default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count. Set this to 'dovm' to go to voicemail (default)."); ?></span></a>
-			</td>
-			<td align="right"><input type="text" size="18" name="VMX_LOOPDEST_CONTEXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_CONTEXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "context"?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="4" name="VMX_LOOPDEST_EXT" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_EXT)?>" tabindex="<?php echo ++$tabindex;?>"/>&nbsp;<small><?php echo "exten"?></small>&nbsp;</td>
-			<td align="right"><input type="text" size="2" name="VMX_LOOPDEST_PRI" value="<?php  echo htmlspecialchars($VMX_LOOPDEST_PRI)?>" tabindex="<?php echo ++$tabindex;?>"/></td><td><small><?php echo "pri"?></small></td>
-		</tr>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Timeout VM Msg:")?><span>

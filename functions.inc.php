@@ -1540,7 +1540,18 @@ function core_get_config($engine) {
 				"AMPDBNAME",
 				"AMPDBUSER",
 				"AMPDBPASS",
-				"AMPDBFILE"
+				"AMPDBFILE",
+
+        // Used to be globals migrated to freepbx_conf
+        "VMX_CONTEXT",
+        "VMX_PRI",
+        "VMX_TIMEDEST_CONTEXT",
+        "VMX_TIMEDEST_EXT",
+        "VMX_TIMEDEST_PRI",
+        "VMX_LOOPDEST_CONTEXT",
+        "VMX_LOOPDEST_EXT",
+        "VMX_LOOPDEST_PRI",
+        "MIXMON_POST",
 			);
 
 			$disable_recording = false;
@@ -1575,6 +1586,11 @@ function core_get_config($engine) {
 					out("Added to globals: $global = $value");
 				}
 			}
+
+      // Put the MIXMON_DIR, it needs a trailing / so is special cased here
+			$ext->addGlobal('MIXMON_DIR', $amp_conf['MIXMON_DIR'].'/');
+			out("Added to globals: MIXMON_DIR = ").$amp_conf['MIXMON_DIR'].'/';
+
 			// Put the asterisk version in a global for agi etc.
 			$ext->addGlobal('ASTVERSION', $version);
 			// Put the use of chan_dahdi in a global for dialparties
