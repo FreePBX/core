@@ -85,6 +85,19 @@
       echo '<tr><td colspan="3"><br><h4 class="category">'._("$current_category_loc").'</h4></td></tr>';
       $row++;
     }
+
+    $name_label_raw = $c['name'];
+    if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
+      bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
+      bind_textdomain_codeset($c['module'], 'utf8');
+      $name_label = dgettext($c['module'],$name_label_raw);
+      if ($name_label == $name_label_raw) {
+        $name_label = _($name_label_raw);
+      }
+    } else {
+      $name_label = _($name_label_raw);
+    }
+
     $row++;
     $dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
     $default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
@@ -95,7 +108,8 @@
       $range = explode(',',$c['options']);
       $default_val .= '<br />'.sprintf(_("Acceptable Values: %s - %s"),$range[0],$range[1]);
     }
-		echo '<tr><td><a href="javascript:void(null)" class="info">'.$c['keyword'].'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
+    $default_val .= '<br />'.sprintf(_("Internal Name: %s"),$c['keyword']);
+		echo '<tr><td><a href="javascript:void(null)" class="info">'.$name_label.'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
 			case CONF_TYPE_TEXT:
