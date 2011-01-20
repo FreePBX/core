@@ -1789,11 +1789,11 @@ function core_get_config($engine) {
           // generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
           // CID part of the dialplan will not get executed
           if (!isset($add_extra_pri1[$fpattern['base_pattern']])) {
-            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,SKIPTTL')); 
+            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT')); 
             $add_extra_pri1[$fpattern['base_pattern']] = true;
           }
           if ($fpattern['base_pattern'] != $exten) {
-            $ext->add($context, $exten, '', new ext_macro('user-callerid,SKIPTTL')); 
+            $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT')); 
           }
           $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1)); 
 
@@ -2336,17 +2336,26 @@ function core_get_config($engine) {
 			// during outbound calls.
 			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
+
+			$ext->add($context, $exten, '', new ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
+      $ext->add($context, $exten, '', new ext_gotoif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})} & "${DB(AMPUSER/${AMPUSER}/concurrency_limit)}">"0" & ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}>=${DB(AMPUSER/${AMPUSER}/concurrency_limit)}]', 'limit'));
+			$ext->add($context, $exten, '', new ext_execif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})}]', 'Set', 'GROUP(concurrency_limit)=${AMPUSER}'));
 			/*
 			 * This is where to splice in things like setting the language based on a user's astdb setting,
 			 * or where you might set the CID account code based on a user instead of the device settings.
 			 */
-			$ext->add($context, $exten, 'report', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" ]', 'continue'));
+
+			$ext->add($context, $exten, 'report', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
 			$ext->add($context, $exten, 'report2', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
 			$ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
 			$ext->add($context, $exten, '', new ext_answer());
-			$ext->add($context, $exten, '', new ext_wait('2'));
+			$ext->add($context, $exten, '', new ext_wait('1'));
 			$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+			$ext->add($context, $exten, 'limit', new ext_answer());
+			$ext->add($context, $exten, '', new ext_wait('1'));
+			$ext->add($context, $exten, '', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 			$ext->add($context, $exten, '', new ext_congestion(20));
 
@@ -4533,6 +4542,7 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/password",isset($password)?$password:'');
 		$astman->database_put("AMPUSER",$extension."/ringtimer",isset($ringtimer)?$ringtimer:'');
 		$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($cfringtimer)?$cfringtimer:0);
+		$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($concurrency_limit)?$concurrency_limit:0);
 		$astman->database_put("AMPUSER",$extension."/noanswer",isset($noanswer)?$noanswer:'');
 		$astman->database_put("AMPUSER",$extension."/recording",isset($recording)?$recording:'');
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
@@ -4650,6 +4660,7 @@ function core_users_get($extension){
 		$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
 	
 		$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
+		$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
@@ -5870,12 +5881,15 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('ringtime', '0', _("Default"));
 		$currentcomponent->addoptlistitem('cfringtime', '0', _("Default"));
 		$currentcomponent->addoptlistitem('cfringtime', '-1', _("Always"));
+		$currentcomponent->addoptlistitem('concurrency_limit', '0', _("No Limit"));
 		for ($i=1; $i <= 120; $i++) {
 			$currentcomponent->addoptlistitem('ringtime', "$i", "$i");
 			$currentcomponent->addoptlistitem('cfringtime', "$i", "$i");
+			$currentcomponent->addoptlistitem('concurrency_limit', "$i", "$i");
 		}
 		$currentcomponent->setoptlistopts('ringtime', 'sort', false);
 		$currentcomponent->setoptlistopts('cfringtime', 'sort', false);
+		$currentcomponent->setoptlistopts('concurrency_limit', 'sort', false);
 
 		// Special CID handling to deal with Private, etc.
 		//
@@ -6051,6 +6065,10 @@ function core_users_configpageload() {
 				$callwaiting = 'disabled';
 			}
 		}
+
+    $concurrency_limit = isset($concurrency_limit) ? $concurrency_limit : $amp_conf['CONCURRENCYLIMITDEFAULT'];
+		$currentcomponent->addguielem($section, new gui_selectbox('concurrency_limit', $currentcomponent->getoptlist('concurrency_limit'), $concurrency_limit, _("Outbound Councurrency Limit"), _("Maximum number of outbound simultaneous calls that an extension can make. This is also very useful as a Security Protection against a system that has been compromised. It will limit the number of simultaneous calls that can be made on the compromised extension."), false));
+
 		$currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false));
     if (function_exists('paging_get_config')) {
       $answermode = isset($answermode) ? $answermode : 'normal';
