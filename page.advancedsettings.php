@@ -37,7 +37,7 @@
 	
 	echo '<div id="main_page">';
   echo "<h2>"._("FreePBX Advanced Settings")."</h2>";
-  echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. There may be more settings available then are currently shown. You can increase the of visible settings by changing the 'Display Detail Level' under Advanced Settings Details. The settings shown at higher levels are less commonly use and are more risky to change. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values.");
+  echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. There may be more settings available than currently shown. You can increase the visible settings by changing the 'Display Detail Level' under Advanced Settings Details. The settings shown at higher levels are less commonly use and are more risky to change. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values.");
 
 	$conf = $freepbx_conf->get_conf_settings();
 
@@ -57,7 +57,7 @@
     if ($current_category != $c['category']) {
       $current_category = $c['category'];
 
-      // TODO: Temp fix until someone much better at syling then me can actually properly fix this :)
+      // TODO: Temp fix until someone much better at styling then me can actually properly fix this :)
       //       it's only purpose is to get the headings so they are not shaded and so the stripped shading
       //       starts consistent for each section.
       //
