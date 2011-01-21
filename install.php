@@ -635,7 +635,7 @@ $set['module'] = '';
 $set['category'] = 'VmX Locater';
 $set['emptyok'] = 1;
 $set['name'] = 'VMX Default Loop Exceed Context';
-$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count.";
+$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too many times, as defined by the Maximum Loops count.";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('VMX_LOOPDEST_CONTEXT',$set);
 
@@ -651,7 +651,7 @@ $set['module'] = '';
 $set['category'] = 'VmX Locater';
 $set['emptyok'] = 0;
 $set['name'] = 'VMX Default Loop Exceed Extension';
-$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count.";
+$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too many times, as defined by the Maximum Loops count.";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('VMX_LOOPDEST_EXT',$set);
 
@@ -667,7 +667,7 @@ $set['module'] = '';
 $set['category'] = 'VmX Locater';
 $set['emptyok'] = 0;
 $set['name'] = 'VMX Default Loop Exceed Priority';
-$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too man times, as defined by the Maximum Loops count.";
+$set['description'] = "Used to do extremely advanced and customized changes to the macro-vm VmX locater. Check the dialplan for a thorough understanding of how to use this. The default location that a caller will be sent if they press an invalid options too many times, as defined by the Maximum Loops count.";
 $set['type'] = CONF_TYPE_INT;
 $freepbx_conf->define_conf_setting('VMX_LOOPDEST_PRI',$set);
 
