@@ -2573,9 +2573,14 @@ function core_get_config($engine) {
 			}
       // $has_keepcid_cnum is checked and set when the globals are being generated above
       //
-      if ($has_keepcid_cnum) {
-        $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
+      if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
+        if ($amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
+			    $ext->add($context, $exten, '', new ext_set('CALLERID(name)', ''));
+        } else {
+          $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
+        }
       }
+
 
       // Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
       //
