@@ -179,7 +179,7 @@ foreach ($tresults as $tresult) {
 <?php if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { ?>			
 			<tr>
 				<td colspan="2">
-	<?php echo '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in General Settings/Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ?><br /><br />
+	<?php echo '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ?><br /><br />
 				</td>
 			</tr>
 <?php } ?>
