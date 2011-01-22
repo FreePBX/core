@@ -148,6 +148,6 @@
 // Provide enough padding at the bottom (<br />) so that the tooltip from the last setting does not get cut off.
 ?>
 <br /><br /> <br />
-<input type="button" id="page_reload" value="Refresh Page"/>
+<input type="button" id="page_reload" value="<?php echo _("Refresh Page");?>"/>
 <br /><br /><br /><br /></div>
 
