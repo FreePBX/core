@@ -49,6 +49,7 @@ $(document).ready(function() {
           case 'AS_DISPLAY_DETAIL_LEVEL':
           case 'AS_DISPLAY_HIDDEN_SETTINGS':
           case 'AS_DISPLAY_READONLY_SETTINGS':
+          case 'AS_DISPLAY_FRIENDLY_NAME':
             if (page_reload_check()) {
               location.href=location.href;
             } else {

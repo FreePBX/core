@@ -44,6 +44,8 @@
   $display_level = $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
   $display_hidden = $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
   $display_readonly = $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
+  $display_friendly_name = $conf['AS_DISPLAY_FRIENDLY_NAME']['value'];
+
   $current_category = '';
   $row = 0;
 
@@ -80,16 +82,20 @@
       $row++;
     }
 
-    $name_label_raw = $c['name'];
-    if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
-      bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
-      bind_textdomain_codeset($c['module'], 'utf8');
-      $name_label = dgettext($c['module'],$name_label_raw);
-      if ($name_label == $name_label_raw) {
+    if ($display_friendly_name) {
+      $name_label_raw = $c['name'];
+      if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
+        bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
+        bind_textdomain_codeset($c['module'], 'utf8');
+        $name_label = dgettext($c['module'],$name_label_raw);
+        if ($name_label == $name_label_raw) {
+          $name_label = _($name_label_raw);
+        }
+      } else {
         $name_label = _($name_label_raw);
       }
     } else {
-      $name_label = _($name_label_raw);
+      $name_label = $c['keyword'];
     }
 
     $row++;
@@ -102,7 +108,11 @@
       $range = explode(',',$c['options']);
       $default_val .= '<br />'.sprintf(_("Acceptable Values: %s - %s"),$range[0],$range[1]);
     }
-    $default_val .= '<br />'.sprintf(_("Internal Name: %s"),$c['keyword']);
+    if ($display_friendly_name) {
+      $default_val .= '<br />'.sprintf(_("Internal Name: %s"),$c['keyword']);
+    } else {
+      $default_val .= '<br />'.sprintf(_("Friendly Name: %s"),$c['name']);
+    }
 		echo '<tr><td><a href="javascript:void(null)" class="info">'.$name_label.'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
