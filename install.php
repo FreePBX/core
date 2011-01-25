@@ -731,3 +731,20 @@ if (count($globals)) {
 	  out(_("done"));
   }
 }
+
+// It's possible that SQL, LOG_SQL values could still bein in AMPSYSLOGLEVEL if amportal.conf
+// remained writable. Once changed, this will set it properly next time core is upgraded since
+// Framework upgrade scripts only run based on current version.
+//
+$log_level = strtoupper($amp_conf['AMPSYSLOGLEVEL']);
+if ($log_level == 'SQL' || $log_level == 'LOG_SQL') {
+  outn(sprintf(_("Discontinued logging type %s changing to %s.."),$log_level,'FILE'));
+  $freepbx_conf->set_conf_values(array('AMPSYSLOGLEVEL' => 'FILE'));
+  out(_("ok"));
+}
+// AMPSYSLOGLEVEL
+unset($set);
+$set['value'] = 'FILE';
+$set['options'] = 'FILE, LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG';
+$freepbx_conf->define_conf_setting('AMPSYSLOGLEVEL',$set,true);
+
