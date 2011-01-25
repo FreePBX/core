@@ -32,18 +32,6 @@ _("In-Call Asterisk Toggle Call Recording");
 _("In-Call Asterisk Disconnect Code");
 }
 
-if (! function_exists("out")) {
-	function out($text) {
-		echo $text."<br />";
-	}
-}
-
-if (! function_exists("outn")) {
-	function outn($text) {
-		echo $text;
-	}
-}
-
 function did_migrate($incoming){
 	global $db;
 
