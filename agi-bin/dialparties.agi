@@ -486,6 +486,7 @@ foreach ( $ext as $k ) {
 							debug("Extension $extnum has call forward on busy set to $extcfb, dropping to macro-dial",1);
 							$extnum = '';
 							$AGI->set_variable('DIALSTATUS','BUSY');
+							$AGI->set_variable('__DIVERSION_REASON','user-busy');
 						}else{
 							debug("Extension $extnum has call forward on busy set to $extcfb",1);
 							$extnum = $extcfb . '#';   # same method as the normal cf, i.e. send to Local
@@ -495,6 +496,7 @@ foreach ( $ext as $k ) {
 						debug("Extension $extnum has call waiting disabled",1);
 						$extnum = '';
 						$AGI->set_variable('DIALSTATUS','BUSY');						
+						$AGI->set_variable('__DIVERSION_REASON','user-busy');
 					} else {
 						debug("Extension $extnum has call waiting enabled",1);
 					}
