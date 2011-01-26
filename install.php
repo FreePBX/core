@@ -480,6 +480,10 @@ if(DB::IsError($check)){
 	out(_("already exists"));
 }
 
+// This has already been done in the framework upgrades but is repeated
+// here until confirmed there is no path where that code may not have been
+// executed.
+//
 $new_cols = array('noanswer_cid','busy_cid','chanunavail_cid');
 foreach ($new_cols as $col) {
   outn(sprintf(_("Checking for %s field.."),$col));
