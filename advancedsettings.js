@@ -50,6 +50,7 @@ $(document).ready(function() {
           case 'AS_DISPLAY_HIDDEN_SETTINGS':
           case 'AS_DISPLAY_READONLY_SETTINGS':
           case 'AS_DISPLAY_FRIENDLY_NAME':
+          case 'AS_OVERRIDE_READONLY':
             if (page_reload_check()) {
               location.href=location.href;
             } else {

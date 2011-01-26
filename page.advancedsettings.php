@@ -9,7 +9,7 @@
     header("Content-type: application/json"); 
     $keyword = $var['keyword'];
     if ($freepbx_conf->conf_setting_exists($keyword)) {
-		  $freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true);
+		  $freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true,$amp_conf['AS_OVERRIDE_READONLY']);
       $status = $freepbx_conf->get_last_update_status();
       if ($var['send_reload'] && $status[$keyword]['saved']) {
         ob_start();
@@ -119,7 +119,7 @@
 			case CONF_TYPE_TEXT:
 			case CONF_TYPE_DIR:
 			case CONF_TYPE_INT:
-				$readonly = $c['readonly'] ? 'readonly="readonly"' : '';
+				$readonly = !$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden'] ? '' : 'readonly="readonly"';
 				echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.htmlspecialchars($amp_conf[$c['keyword']]).'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>';
 				break;
 			case CONF_TYPE_SELECT:
@@ -141,7 +141,7 @@
 				break;
 		}
 		echo '</td>';
-		if(!$c['readonly']){
+		if(!$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden']){
 			echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" title="'._('Revert to Default').'"'
 				. 'data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
 				.'"></td>';
