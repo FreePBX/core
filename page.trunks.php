@@ -337,6 +337,12 @@ if (!$tech && !$extdisplay) {
   }
   $trunks[] = array('url'=> $baseURL.'tech=ZAP', 'tlabel' =>  _("Add Zap Trunk").(ast_with_dahdi()?" ("._("DAHDI compatibility mode").")":"" ));
   $trunks[] = array('url'=> $baseURL.'tech=IAX2', 'tlabel' =>  _("Add IAX2 Trunk"));
+  //--------------------------------------------------------------------------------------
+  // Added to enable the unsupported misdn module
+  if (function_exists('misdn_ports_list_trunks') && count(misdn_ports_list_trunks())) {
+    $trunks[] = array('url'=> $baseURL.'tech=MISDN', 'tlabel' =>  _("Add mISDN Trunk"));
+  }
+  //--------------------------------------------------------------------------------------
   $trunks[] = array('url'=> $baseURL.'tech=ENUM', 'tlabel' =>  _("Add ENUM Trunk"));
   $trunks[] = array('url'=> $baseURL.'tech=DUNDI', 'tlabel' =>  _("Add DUNDi Trunk"));
   $trunks[] = array('url'=> $baseURL.'tech=CUSTOM', 'tlabel' =>  _("Add Custom Trunk"));
@@ -813,6 +819,34 @@ END;
 		break;
 		case "enum":
 		break;
+    //--------------------------------------------------------------------------------------
+    // Added to enable the unsupported misdn module
+		case "misdn":
+      if (function_exists('misdn_groups_ports')) {
+  ?> 
+        <tr> 
+          <td> 
+            <a href=# class="info"><?php echo _("mISDN Group/Port")?><span><br><?php echo _("mISDN channels are referenced either by a group name or channel number (use <i>mISDN Port Groups</i> to configure).")?><br><br></span></a>:  
+          </td> 
+          <td> 
+            <select name="channelid"> 
+  <?php 
+        $gps = misdn_groups_ports(); 
+        foreach($gps as $gp) { 
+          echo "<option value='$gp'"; 
+          if ($gp == $channelid) 
+            echo ' selected="1"'; 
+            echo ">$gp</option>\n"; 
+          }
+  ?> 
+            </select> 
+            <input type="hidden" size="14" name="usercontext" value="notneeded"/> 
+          </td> 
+        </tr> 
+  <?php  
+      }
+    break; 
+    //--------------------------------------------------------------------------------------
 		case "custom":
 	?>
 				<tr>

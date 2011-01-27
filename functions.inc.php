@@ -3667,6 +3667,12 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		if (strtolower($tech) == "zap" || strtolower($tech) == 'dahdi') {
 			$thischan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
 			$dial = strtoupper($tech).'/'.$thischan;
+    //-------------------------------------------------------------------------------------------------
+    // Added to enable the unsupported misdn module
+    //
+		} else if (strtolower($tech) == "misdn") {
+			$dial = $_REQUEST['devinfo_port'].'/'.($_REQUEST['devinfo_msn'] ? $_REQUEST['devinfo_msn'] : $id);
+    //-------------------------------------------------------------------------------------------------
 		} else {
 			$dial = strtoupper($tech)."/".$id;
 		}
@@ -6483,7 +6489,12 @@ function core_devices_configpageload() {
           }
 	
 					if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
-						$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+            // Added optional selectbox to enable the unsupported misdn module
+						if (isset($devoptarr['select'])) {
+						  $currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+            } else {
+						  $currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+            }
 					} else { // add so only basic
 						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
 					}
