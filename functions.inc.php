@@ -6257,12 +6257,14 @@ function core_devices_configpageinit($dispnum) {
 
 		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
 
+    unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
 
 		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
 
+    unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
@@ -6296,12 +6298,14 @@ function core_devices_configpageinit($dispnum) {
 
 		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
 
+    unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
 
 		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
 
+    unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
