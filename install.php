@@ -752,3 +752,14 @@ $set['value'] = 'FILE';
 $set['options'] = 'FILE, LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG';
 $freepbx_conf->define_conf_setting('AMPSYSLOGLEVEL',$set,true);
 
+// Convert IAX notransfer to transfer (since 1.4)
+//
+outn(_("Converting IAX notransfer to transfer if needed.."));
+$affected_rows = 0;
+sql("UPDATE iax SET keyword = 'transfer', data = 'yes' WHERE keyword = 'notransfer' AND LOWER(data) = 'no'");
+$affected_rows .= $db->affectedRows();
+sql("UPDATE iax SET keyword = 'transfer', data = 'no' WHERE keyword = 'notransfer' AND LOWER(data) = 'yes'");
+$affected_rows .= $db->affectedRows();
+sql("UPDATE iax SET keyword = 'transfer' WHERE keyword = 'notransfer' AND LOWER(data) = 'mediaonly'");
+$affected_rows .= $db->affectedRows();
+$affected_rows ? sprintf(out_("updated %s records"),$affected_rows) : out(_("not needed"));

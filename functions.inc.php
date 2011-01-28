@@ -4040,7 +4040,7 @@ function core_devices_addiax2($account) {
 	if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
 		$iaxfields = array(
 			array($account,'secret',$db->escapeSimple(($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++),
-			array($account,'notransfer',$db->escapeSimple(($_REQUEST['notransfer'])?$_REQUEST['notransfer']:'yes'),$flag++),
+			array($account,'transfer',$db->escapeSimple(($_REQUEST['transfer'])?$_REQUEST['transfer']:'yes'),$flag++),
 			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),$flag++),
 			array($account,'host',$db->escapeSimple(($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),$flag++),
 			array($account,'type',$db->escapeSimple(($_REQUEST['type'])?$_REQUEST['type']:'friend'),$flag++),
@@ -6241,19 +6241,37 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr = array();
 		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
-		$tmparr['immediate'] = array('value' => 'no', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['immediate'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
 		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
-		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
-		$tmparr['busydetect'] = array('value' => 'no', 'level' => 1);
+
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
-		$tmparr['callprogress'] = array('value' => 'no', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 1);
+
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
+		$tmparr['dial'] = array('value' => '', 'level' => 2);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
 		unset($tmparr);
 
@@ -6261,64 +6279,129 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr = array();
 		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
-		$tmparr['immediate'] = array('value' => 'no', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['immediate'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
 		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
-		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'level' => 1);
+
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
-		$tmparr['busydetect'] = array('value' => 'no', 'level' => 1);
+
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
-		$tmparr['callprogress'] = array('value' => 'no', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 1);
+
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
+		$tmparr['dial'] = array('value' => '', 'level' => 2);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
 		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'dahdi', $tmparr);
 		unset($tmparr);
 		
 		// iax2
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty() && !confirm("'.$msgConfirmSecret.'")', 'failvalidationmsg' => $msgInvalidSecret);
 		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
-		$tmparr['notransfer'] = array('value' => 'yes', 'level' => 1);
+
+
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'mediaonly', 'text' => _('Media Only'));
+		$tmparr['transfer'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
-		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'friend', 'text' => 'friend');
+		$select[] = array('value' => 'peer', 'text' => 'peer');
+		$select[] = array('value' => 'user', 'text' => 'user');
+		$tmparr['type'] = array('value' => 'friend', 'select' => $select, 'level' => 1);
+
 		$tmparr['port'] = array('value' => '4569', 'level' => 1);
 		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['disallow'] = array('value' => '', 'level' => 1);
 		$tmparr['allow'] = array('value' => '', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 2);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
-		$tmparr['requirecalltoken'] = array('value' => '', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'auto', 'text' => _('Auto'));
+		$tmparr['requirecalltoken'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+
 		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
 		unset($tmparr);
 
 		// sip
 		$tmparr = array();
 		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
-		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
-		$tmparr['canreinvite'] = array('value' => 'no', 'level' => 1);
+
+
+    unset($select);
+		$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
+		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
+		$select[] = array('value' => 'auto', 'text' => _('Auto'));
+		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
+		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
+		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
+
+    unset($select);
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'nonat', 'text' => 'nonat');
+		$select[] = array('value' => 'update', 'text' => 'update');
+		$tmparr['canreinvite'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
-		$tmparr['type'] = array('value' => 'friend', 'level' => 1);
-		$tmparr['nat'] = array('value' => 'yes', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'friend', 'text' => 'friend');
+		$select[] = array('value' => 'peer', 'text' => 'peer');
+		$select[] = array('value' => 'user', 'text' => 'user');
+		$tmparr['type'] = array('value' => 'friend', 'select' => $select, 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No - RFC3581'));
+		$select[] = array('value' => 'never', 'text' => _('never - no RFC3581'));
+		$select[] = array('value' => 'route', 'text' => _('route - NAT no rport'));
+		$tmparr['nat'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+
 		$tmparr['port'] = array('value' => '5060', 'level' => 1);
 		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
 		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
 		$tmparr['disallow'] = array('value' => '', 'level' => 1);
 		$tmparr['allow'] = array('value' => '', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 1);
+		$tmparr['dial'] = array('value' => '', 'level' => 2);
 		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 1);
+		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
 		$tmparr['vmexten'] = array('value' => '', 'level' => 1);
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
-    		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+    $tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
 		unset($tmparr);
 
@@ -6369,6 +6452,7 @@ function core_devices_configpageinit($dispnum) {
 
 function core_devices_configpageload() {
 	global $currentcomponent;
+	global $amp_conf;
 
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 	if ($tech_hardware == 'virtual') {
@@ -6488,7 +6572,7 @@ function core_devices_configpageload() {
             $currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
           }
 	
-					if ( $devoptarr['level'] == 0 || ($extdisplay && $devoptarr['level'] == 1) ) { // editing to show advanced as well
+					if ( $devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '') { // editing to show advanced as well
             // Added optional selectbox to enable the unsupported misdn module
 						if (isset($devoptarr['select'])) {
 						  $currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
