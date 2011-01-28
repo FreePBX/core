@@ -41,7 +41,7 @@
 
 	$conf = $freepbx_conf->get_conf_settings();
 
-  $display_level = $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
+  $display_level = 10; // TO confusing with multiple levels $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
   $display_hidden = $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
   $display_readonly = $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
   $display_friendly_name = $conf['AS_DISPLAY_FRIENDLY_NAME']['value'];
