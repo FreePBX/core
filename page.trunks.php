@@ -23,6 +23,11 @@ $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $trunknum = ltrim($extdisplay,'OUT_');
 
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+// Now check if the Copy Trunks submit button was pressed, in which case we duplicate the trunk
+//
+if (isset($_REQUEST['copytrunk'])) {
+  $action = 'copytrunk';
+}
 
 $tech         = strtolower(isset($_REQUEST['tech'])?htmlentities($_REQUEST['tech']):'');
 $outcid       = isset($_REQUEST['outcid'])?$_REQUEST['outcid']:'';
@@ -130,6 +135,13 @@ if (!empty($csv_file)) {
 
 //if submitting form, update database
 switch ($action) {
+  case "copytrunk":
+    $trunk_name .= ($trunk_name == '' ? '' : '_') . "copy_$trunknum";
+    $disabletrunk = 'on';
+    $trunknum = '';
+    $extdisplay='';
+  // Fallthrough to addtrunk now...
+  //
 	case "addtrunk":
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
 		
@@ -937,7 +949,11 @@ END;
   ?>
 			<tr>
 				<td colspan="2">
-					<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>"></h6>
+          <h6>
+            <input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
+            <input name="copytrunk" type="submit" value="<?php echo _("Copy Trunk");?>"/>
+            <!--input type="button" id="page_reload" value="<?php echo _("Refresh Page");?>"/-->
+          </h6>
 				</td>
 			</tr>
 			</table>
