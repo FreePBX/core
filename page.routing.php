@@ -21,6 +21,11 @@
 $display='routing'; 
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+// Now check if the Copy Route submit button was pressed, in which case we duplicate the route
+//
+if (isset($_REQUEST['copyroute'])) {
+  $action = 'copyroute';
+}
 
 $tabindex = 0;
 
@@ -192,6 +197,12 @@ switch ($action) {
 		exit;
 
 	break;
+  case "copyroute":
+    $routename .= "_copy_$extdisplay";
+    $extdisplay='';
+    $route_seq++;
+  // Fallthrough to addtrunk now...
+  //
 	case "addroute":
     $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
     $_REQUEST['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
@@ -767,7 +778,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 
 		<tr>
 			<td colspan="2">
-				<h6><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
+        <h6>
+          <input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
+          <input name="copyroute" type="submit" value="<?php echo _("Copy Route");?>"/>
 				</h6>
 			</td>
 		</tr>
