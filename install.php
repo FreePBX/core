@@ -762,4 +762,4 @@ sql("UPDATE iax SET keyword = 'transfer', data = 'no' WHERE keyword = 'notransfe
 $affected_rows .= $db->affectedRows();
 sql("UPDATE iax SET keyword = 'transfer' WHERE keyword = 'notransfer' AND LOWER(data) = 'mediaonly'");
 $affected_rows .= $db->affectedRows();
-$affected_rows ? sprintf(out_("updated %s records"),$affected_rows) : out(_("not needed"));
+$affected_rows ? out(sprintf(_("updated %s records"),$affected_rows)) : out(_("not needed"));
