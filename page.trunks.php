@@ -951,7 +951,7 @@ END;
 				<td colspan="2">
           <h6>
             <input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
-            <input name="copytrunk" type="submit" value="<?php echo _("Copy Trunk");?>"/>
+            <input name="copytrunk" type="submit" value="<?php echo _("Duplicate Trunk");?>"/>
             <!--input type="button" id="page_reload" value="<?php echo _("Refresh Page");?>"/-->
           </h6>
 				</td>

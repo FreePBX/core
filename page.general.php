@@ -103,7 +103,10 @@ foreach ($globals as $global) {
 
 ?>
 <br />
-<a href="<?php echo $_SERVER['PHP_SELF'] ?>?display=advancedsettings">Click here for Advanced Settings</a>
+<a href="<?php echo $_SERVER['PHP_SELF'] ?>?display=advancedsettings">
+	<img src="images/cog.png" style="border: none">
+	<?php echo _('Advanced Settings') ?>
+</a>
 <form name="general" action="config.php" method="post" onsubmit="return general_onsubmit();">
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>

@@ -780,7 +780,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<td colspan="2">
         <h6>
           <input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>">
-          <input name="copyroute" type="submit" value="<?php echo _("Copy Route");?>"/>
+          <input name="copyroute" type="submit" value="<?php echo _("Duplicate Route");?>"/>
 				</h6>
 			</td>
 		</tr>

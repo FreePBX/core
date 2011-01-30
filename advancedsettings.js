@@ -31,10 +31,10 @@ $(document).ready(function() {
 			beforeSend: function(XMLHttpRequest, set) {
 				mythis.attr({src: 'images/spinner.gif'})
 			},
-      dataType: 'json',
+			dataType: 'json',
 			success: function(data, textStatus, XMLHttpRequest) {
 				mythis.attr({src: 'images/accept.png'});
-        if (!data.validated) {
+				if (!data.validated) {
 					alert(data.msg);
 				}
 				if (!data.validated && data.saved) {
@@ -42,30 +42,30 @@ $(document).ready(function() {
 				}
 				if (data.saved) {
 					mythis.parent().delay(500).fadeOut();
-          mythis.unbind('click', savebinder);
+					mythis.unbind('click', savebinder);
 
-          // If they changed the page layout
-          switch (mykey) {
-          case 'AS_DISPLAY_HIDDEN_SETTINGS':
-          case 'AS_DISPLAY_READONLY_SETTINGS':
-          case 'AS_DISPLAY_FRIENDLY_NAME':
-          case 'AS_OVERRIDE_READONLY':
-            if (page_reload_check()) {
-              location.href=location.href;
-            } else {
-              alert(msgChangesRefresh);
-            }
-          break;
-          default:
-            if (send_reload == '1') {
-              $('#logo').after(data.reload_bar).fadeIn();
-              $('#moduleBox').before(data.reload_header);
-            } else {
-              $('#need_reload_block').fadeIn();
-            }
-          break;
-          }
-        }
+					// If they changed the page layout
+					switch (mykey) {
+						case 'AS_DISPLAY_HIDDEN_SETTINGS':
+						case 'AS_DISPLAY_READONLY_SETTINGS':
+						case 'AS_DISPLAY_FRIENDLY_NAME':
+						case 'AS_OVERRIDE_READONLY':
+							if (page_reload_check()) {
+								location.href=location.href;
+							} else {
+								alert(msgChangesRefresh);
+							}
+							break;
+						default:
+							if (send_reload == '1') {
+								$('#logo').after(data.reload_bar).fadeIn();
+								$('#moduleBox').before(data.reload_header);
+							} else {
+								$('#need_reload_block').fadeIn();
+							}
+							break;
+						}
+					}
 				//reset data-valueinput-orig to new value
 				switch (mythis.attr('data-type')) {
 					case 'BOOL':
@@ -92,40 +92,45 @@ $(document).ready(function() {
 			$('#'+$(this).attr('data-key')).val($(this).attr('data-default')).trigger('change');
 			break;
 		}
+		$(this).hide();
 	});
 	//show save button
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
 		var myel = $(this).parent().next().next();
+		//if the value was changed since the last page refresh
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
-			
 			myel.stop(true, true).delay(100).fadeIn();
 			//only bind if not already bound
 			if (myel.children(".save").data("events") == undefined
-				|| typeof(myel.children('.save').data('events')["click"]) == undefined) {
+				|| typeof(myel.children('.save').data('events')["click"]) == undefined
+			) {
 				myel.children('.save').bind('click', savebinder);
 			}
+			//show 'revert to defualt'
+			$(this).parent().next().find('input').show()
 		} else {
 			myel.stop(true, true).delay(100).fadeOut();
 			myel.children('.save').unbind('click', savebinder);
 		}
+		
 	})
-  $("#page_reload").click(function(){
-      if (!page_reload_check()) {
-        if (!confirm(msgUnsavedChanges)) {
-          return false;
-        }
-      }
-      location.href=location.href;
-  });
+	$("#page_reload").click(function(){
+		if (!page_reload_check()) {
+			if (!confirm(msgUnsavedChanges)) {
+				return false;
+			}
+		}
+		location.href=location.href;
+	});
 });
 
 function page_reload_check(msgUnsavedChanges) {
-  var reload = true;
-  $(".save").each(function() {
-    if ($(this).data("events") != undefined) {
-      reload = false;
-      return false;
-    }
-  });
-  return reload;
+	var reload = true;
+	$(".save").each(function() {
+		if ($(this).data("events") != undefined) {
+			reload = false;
+			return false;
+		}
+	});
+	return reload;
 }
