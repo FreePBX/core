@@ -2791,7 +2791,9 @@ function core_get_config($engine) {
 			$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
 
       // If this use has individual option set for playing standardized message, then override the global option
-      //
+      // but only if the vmx state is 'enabled'
+			//
+			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','chknomsg'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "0"]','chknomsg'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VM_OPTS", '${DB_RESULT}'));
 
