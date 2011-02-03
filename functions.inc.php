@@ -3962,6 +3962,10 @@ function core_devices_addsip($account) {
 			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++),
 			array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++),
 			array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),$flag++),
+
+			array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:'no'),$flag++),
+			array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:'no'),$flag++),
+
 			array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++),
 			array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++),
 			array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++),
@@ -6379,6 +6383,23 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'nonat', 'text' => 'nonat');
 		$select[] = array('value' => 'update', 'text' => 'update');
 		$tmparr['canreinvite'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
+		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$tmparr['trustrpid'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Send Remote-Party-ID header'));
+
+    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+		  $select[] = array('value' => 'pai', 'text' => _('Send P-asserted-Identity header'));
+    }
+		$tmparr['sendrpid'] = array('value' => 'no', 'select' => $select, 'level' => 1);
 
 		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
 		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
