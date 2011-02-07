@@ -133,10 +133,25 @@ if (!empty($csv_file)) {
 }
 
 
+// TODO: remember old name, if new one is different the don't rename
+//
 //if submitting form, update database
 switch ($action) {
   case "copytrunk":
-    $trunk_name .= ($trunk_name == '' ? '' : '_') . "copy_$trunknum";
+
+    $sv_channelid    = isset($_REQUEST['sv_channelid'])?$_REQUEST['sv_channelid']:'';
+    $sv_trunk_name    = isset($_REQUEST['sv_trunk_name'])?$_REQUEST['sv_trunk_name']:'';
+    $sv_usercontext    = isset($_REQUEST['sv_usercontext'])?$_REQUEST['sv_usercontext']:'';
+
+    if ($trunk_name == $sv_trunk_name) {
+      $trunk_name .= ($trunk_name == '' ? '' : '_') . "copy_$trunknum";
+    }
+    if ($channelid == $sv_channelid) {
+      $channelid .= '_copy_' . $trunknum;
+    }
+    if ($usercontext != '' && $usercontext == $sv_usercontext) {
+      $usercontext .= '_copy_' . $trunknum;
+    }
     $disabletrunk = 'on';
     $trunknum = '';
     $extdisplay='';
@@ -489,6 +504,9 @@ if ($helptext != '') {
 			<input type="hidden" name="action" value=""/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
 			<input type="hidden" name="provider" value="<?php echo $provider?>"/>
+			<input type="hidden" name="sv_trunk_name" value="<?php echo $trunkname?>"/>
+			<input type="hidden" name="sv_usercontext" value="<?php echo $usercontext?>"/>
+			<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
 			<input id="npanxx" name="npanxx" type="hidden" />
 			<table>
 			<tr>
