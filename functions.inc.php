@@ -1363,19 +1363,11 @@ function core_get_config($engine) {
 					// works.
 					//
 					$ivr_context = 'from-did-direct-ivr';
-			    if ($ast_lt_16) {
-					  $ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
-          } else {
-					  $ext->add($ivr_context, $exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','Noop','Deleting: ${BLKVM_OVERRIDE}: ${DB_DELETE(${BLKVM_OVERRIDE})}'));
-          }
+					$ext->add($ivr_context, $exten['extension'],'', new ext_macro('blkvm-clr'));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
 					if($vm != "novm") {
-			      if ($ast_lt_16) {
-						  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','dbDel','${BLKVM_OVERRIDE}'));
-            } else {
-						  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_execif('$["${BLKVM_OVERRIDE}" != ""]','Noop','Deleting: ${BLKVM_OVERRIDE}: ${DB_DELETE(${BLKVM_OVERRIDE})}'));
-            }
+					  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('blkvm-clr'));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_setvar('__NODEST', ''));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
 						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','ext-local,vmret,playret'));
@@ -1926,7 +1918,7 @@ function core_get_config($engine) {
 			  $ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0"]', 'toolate,1'));
       }
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG3}/${UNIQCHAN}'));
-			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
+			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
       if ($amp_conf['AST_FUNC_SHARED']) {
         $ext->add($context, $exten, '', new ext_setvar('SHARED(ANSWER_STATUS,${FORCE_CONFIRM})',''));
       }
@@ -1993,9 +1985,13 @@ function core_get_config($engine) {
 			$context = 'macro-auto-confirm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
-			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
+			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG1}/${UNIQCHAN}'));
-
+			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
+      if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
+			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(num))','${DIALEDPEERNUMBER}'));
+			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(name))','${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+      }
 
 			/*
 			;------------------------------------------------------------------------
@@ -2010,7 +2006,12 @@ function core_get_config($engine) {
 			$context = 'macro-auto-blkvm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
-			$ext->add($context, $exten, '', new ext_dbdel('${BLKVM_OVERRIDE}'));
+			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
+			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
+      if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
+			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(num))','${DIALEDPEERNUMBER}'));
+			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(name))','${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+      }
 
 			/*
 			;------------------------------------------------------------------------
@@ -2770,15 +2771,16 @@ function core_get_config($engine) {
 			$ext->add('macro-vm', 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
 			$ext->add('macro-vm','s', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})":"")}'));
 
-			// If BLKVM_OVERRIDE is set, then someone told us to block calls from going to
+			// If blkvm-check is set TRUE, then someone told us to block calls from going to
 			// voicemail. This variable is reset by the answering channel so subsequent
 			// transfers will properly function.
 			//
-			$ext->add('macro-vm','s', '', new ext_gotoif('$["foo${DB(${BLKVM_OVERRIDE})}" != "fooTRUE"]','vmx,1'));
+			$ext->add('macro-vm','s', '', new ext_macro('blkvm-check'));
+			$ext->add('macro-vm','s', '', new ext_gotoif('$["${GOSUB_RETVAL}" != "TRUE"]','vmx,1'));
 
 			// we didn't branch so block this from voicemail
 			//
-			$ext->add('macro-vm','s', '', new ext_NoOp('CAME FROM: ${NODEST} - Blocking VM cause of key: ${DB(BLKVM_OVERRIDE)}')); 
+			$ext->add('macro-vm','s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE')); 
 			$ext->add('macro-vm','s', '', new ext_hangup(''));
 
 			// If vmx not enabled for the current mode,then jump to normal voicemail behavior
@@ -3193,26 +3195,138 @@ function core_get_config($engine) {
 			/* macro-simple-dial */
 
 
+      /* macro-blkvm-setifempty
+       * macro-blkvm-set
+       * macro-blkvm-clr
+       * macro-blkvm-check
+       *
+       * These macros are used to tell the voicemail system if it should answer a call or kill the call.
+       * They are also used by modules like findmefollow and ringgroups to determine if a destination
+       * if noanswer should be pursued, or if they should just end because they were called by a higher
+       * level module who's destination should be honored. (Thus if vm should be blocked, so should
+       * such destinations.
+       *
+       * In the past, it was necessary to create and track unique AstDB variables to track this since
+       * it is necessary for a call that is answered, for example a queue memeber who answers a queue
+       * call, to clr the block so that subsequent transfers to voicemail or user extensions which might
+       * hit voicemail could succeed and the nature of Asterisk inheritable variable did not allow
+       * this. This also meant that these needed to be cleaned up when the master channel who 'started
+       * it all' ended, which is attempted in macro-hangupcall. There are still cases where cleanup
+       * does not happen which can result in an accumulation of these.
+       *
+       * With the advent of the SHARED() channel variable starting in 1.6, we can achieve the same
+       * thing with such a SHARED() channel variable which should be more efficient since it does not
+       * hit the DB, but more importantly, there is no cleanup because the variable will die with the
+       * owner channel.
+       *
+       * We check if the SHARED function is availalbe and if so, we use that in our macro. If not, we
+       * fall back to the shared DB variable and keep our cleanup code in hangupcall.
+       *
+       * Note that we have chosen to use a Macro() in place of a GoSub() because in the legacy DB
+       * mode we must have the owning ${EXTEN} to create our unique key. Since GoSub() does not support
+       * passing arguments until 1.6 this would not be possible in 1.4 which is still mainstream.
+       * We have chosen to use the GOSUB_RETVAL in anticipation of a future point where we move to
+       * a GoSub() call which would be slightly more efficient.
+       */
+
+      if ($amp_conf['AST_FUNC_SHARED']) {
+        $exten = 's';
+
+        // If it BLKVM_CHANNEL exists, return it's value. If not, then set it and return TRUE
+        //
+        $mcontext = 'macro-blkvm-setifempty';
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_CHANNEL})}]', 'init'));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+        $ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_CHANNEL','${CHANNEL}'));
+        $ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // If BLKVM_CHANNEL not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
+        //
+        $mcontext = 'macro-blkvm-set';
+        $ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_CHANNEL})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_CHANNEL=${CHANNEL}'));
+        $ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // if clearing, BLKVM_CHANNEL should already exist (if not, we clear our channel's copy)
+        //
+        $mcontext = 'macro-blkvm-clr';
+        $ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})',''));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL',''));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // if checking, BLKVM_CHANNEL should already exist (if not, we check our channel's copy)
+        //
+        $mcontext = 'macro-blkvm-check';
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+      } else { // NO SHARED()
+        
+        // If it BLKVM_OVERRIDE exists, return it's value. If not, then set it and return TRUE
+        //
+        $mcontext = 'macro-blkvm-setifempty';
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_OVERRIDE})}]', 'init'));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${DB(${BLKVM_OVERRIDE})}'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+        $ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_OVERRIDE','BLKVM/${MACRO_EXTEN}/${CHANNEL}'));
+        $ext->add($mcontext,$exten,'', new ext_set('__BLKVM_BASE','${MACRO_EXTEN}'));
+        $ext->add($mcontext,$exten,'', new ext_set('DB(${BLKVM_OVERRIDE})','TRUE'));
+
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // If BLKVM_OVERRIDE not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
+        //
+        $mcontext = 'macro-blkvm-set';
+        $ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_OVERRIDE})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_BASE=${MACRO_EXTEN}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_OVERRIDE})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_OVERRIDE=BLKVM/${MACRO_EXTEN}/${CHANNEL}'));
+        $ext->add($mcontext,$exten,'', new ext_set('DB(${BLKVM_OVERRIDE})','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // if clearing, BLKVM_OVERRIDE should already exist (if not, it's already cleared anyhow)
+        //
+        $mcontext = 'macro-blkvm-clr';
+        $ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_OVERRIDE})}]', 'ret'));
+        $ext->add($mcontext,$exten,'', new ext_dbdel('${BLKVM_OVERRIDE}'));
+        $ext->add($mcontext,$exten,'ret', new ext_set('GOSUB_RETVAL',''));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+        // if checking, BLKVM_OVERRIDE should already exist (if not, '' will be returned)
+        //
+        $mcontext = 'macro-blkvm-check';
+        $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${DB(${BLKVM_OVERRIDE})}'));
+        $ext->add($mcontext,$exten,'', new ext_macroexit(''));
+      }
+
       $mcontext = 'macro-hangupcall';
       $exten = 's';
       /*
       ; Cleanup any remaining RG flag
       */
-			$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]','skiprg'));
+      $skip_label = 'skiprg';
+			$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]',$skip_label));
 			$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 			$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 
-      /*
-      ; Cleanup any remaining BLKVM flag
-      */
-			$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]','skipblkvm'));
-      $ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
-      $ext->add($mcontext,$exten,'delblkvm', new ext_dbdel('${BLKVM_OVERRIDE}'));
+      if (!$amp_conf['AST_FUNC_SHARED']) {
+        $next_label = 'skipblkvm';
+        // only clr it if we were the originating channel
+        //
+			  $ext->add($mcontext,$exten,$skip_label, new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]',$next_label));
+        $ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
+        $ext->add($mcontext,$exten,'', new ext_macro('blkvm-clr'));
+        $skip_label = $next_label;
+      }
 
       /*
       ; Cleanup any remaining FollowMe DND flags
       */
-      $ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
+      $ext->add($mcontext,$exten,$skip_label, new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
       $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
       $ext->add($mcontext,$exten,'theend', new ext_hangup());
 
@@ -3274,7 +3388,17 @@ function core_get_config($engine) {
         // Use goto if no timelimit set from CF
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${USEGOTO}"="1"]','usegoto,1'));
 
-        $ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+        // Once setting CONNECTEDLINE(), add the I option to Dial() so the device doesn't further update the value with the
+        // "device" <devicenum> data from device CID information
+        //
+        if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
+          $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = ""]','godial'));
+          $ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', '${DB(AMPUSER/${EXTTOCALL}/cidname)}'));
+          $ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
+          $ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
+        }
+        $ext->add($mcontext,$exten,'godial', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
         $ext->add($mcontext,$exten,'', new ext_macroexit());
