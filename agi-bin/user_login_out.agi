@@ -51,6 +51,7 @@
 	$fm_devstate  = get_var( "FMDEVSTATE" ) == "TRUE" ? true : false;
 	$que_devstate = get_var( "QUEDEVSTATE" ) == "TRUE" ? true : false;
 	$intercom_code = get_var( "INTERCOMCODE" );
+	$campon_toggle = get_var( "CAMPONTOGGLE" );
 
 	$ast_version14 = version_compare($ast_version, "1.4", "ge");
 
@@ -277,6 +278,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $agi;
 		global $dnd_devstate;
 		global $intercom_code;
+		global $campon_toggle;
 		global $ast_version14;
 
 		// If Asterisk version >= 1.4, syntax change is 'dialplan add extension ...' vs. 'add extension ...'
@@ -284,6 +286,12 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		if ($devices) {
 			$dial_string = get_dial_string($devices);
+
+			if ($campon_toggle != 'nocampon' && $campon_toggle != '') {
+        $dev_arr = explode('&',$dial_string);
+        $hint_val = 'ccss:'.implode('&ccss:',$dev_arr);
+				$response = $astman->send_request('Command',array('Command'=>$dp_pre."add extension {$campon_toggle}{$user},hint,{$hint_val} into ext-local replace"));
+			}
 			if ($dnd_devstate) {
 				$dial_string .= "&Custom:DND$user";
 			}
@@ -297,6 +305,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$user}@ext-local hint"));
 			if ($intercom_code != 'nointercom' && $intercom_code != '') {
 				$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$intercom_code}{$user}@ext-local hint"));
+			}
+			if ($campon_toggle != 'nocampon' && $campon_toggle != '') {
+				$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$campon_toggle}{$user}@ext-local hint"));
 			}
 		}
 	}

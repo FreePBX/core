@@ -218,6 +218,13 @@ class core_conf {
 			$faxdetect = "";
 			$ver16 = false;
 		}
+    // TODO: Temporary Kludge until CCSS is fixed
+    //
+    if (version_compare($ast_version, "1.8", "ge")) {
+      $cc_monitor_policy = "cc_monitor_policy=generic\n";
+    } else {
+      $cc_monitor_policy = "";
+    }
 
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
@@ -349,6 +356,9 @@ class core_conf {
 					if ($faxdetect) {
 						$output .= $faxdetect;
 					}
+          if ($cc_monitor_policy) {
+            $output .= $cc_monitor_policy;
+          }
 			}
 			$output .= $additional."\n";
 		}
@@ -1281,17 +1291,23 @@ function core_get_config($engine) {
 
 			$intercom_code = ($intercom_code == '') ? 'nointercom' : $intercom_code;
 
+      $fcc = new featurecode('campon', 'toggle');
+			$campon_toggle = $fcc->getCodeActive();
+			unset($fcc);
+
+			$campon_toggle = ($campon_toggle == '') ? 'nocampon' : $campon_toggle;
+
 			// Pass the code so agi scripts like user_login_logout know to generate hints
 			//
 			$ext->addGlobal('INTERCOMCODE',$intercom_code);
 
 			if ($amp_conf['DYNAMICHINTS']) {
 				if ($amp_conf['USEDEVSTATE'] && function_exists('donotdisturb_get_config')) {
-					$add_dnd = ' dnd';
+					$add_dnd = 'dnd';
 				} else {
 					$add_dnd = '';
 				}
-				$ext->addExec('ext-local',$amp_conf['AMPBIN'].'/generate_hints.php '.$intercom_code.$add_dnd);
+				$ext->addExec('ext-local',$amp_conf['AMPBIN'].'/generate_hints.php '.$intercom_code.' '.$campon_toggle .' '.$add_dnd);
 			}
 			$userlist = core_users_list();
 			if (is_array($userlist)) {
