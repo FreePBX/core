@@ -220,7 +220,7 @@ class core_conf {
 		}
     // TODO: Temporary Kludge until CCSS is fixed
     //
-    if (version_compare($ast_version, "1.8", "ge")) {
+    if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
       $cc_monitor_policy = "cc_monitor_policy=generic\n";
     } else {
       $cc_monitor_policy = "";
