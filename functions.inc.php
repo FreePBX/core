@@ -6608,7 +6608,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'yes', 'text' => _('Send Remote-Party-ID header'));
 
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
-		  $select[] = array('value' => 'pai', 'text' => _('Send P-asserted-Identity header'));
+		  $select[] = array('value' => 'pai', 'text' => _('Send P-Asserted-Identity header'));
     }
     $tt = _("Whether Asterisk should send RPID (or PAI) info to the device. Usually should be enabled to the settings used by your device for CONNECTEDLINE() functionality to work if supported by the endpoint.");
 		$tmparr['sendrpid'] = array('value' => $amp_conf['DEVICE_SIP_SENDRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
@@ -6645,7 +6645,7 @@ function core_devices_configpageinit($dispnum) {
 
       unset($select);
 		  $select[] = array('value' => 'no', 'text' => _('No'));
-		  $select[] = array('value' => 'yes', 'text' => _('Yes'));
+		  $select[] = array('value' => 'yes', 'text' => _('Yes (SRTP only)'));
       $tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
 		  $tmparr['encryption'] = array('value' => $amp_conf['DEVICE_SIP_ENCRYPTION'], 'tt' => $tt, 'select' => $select, 'level' => 1);
     }
