@@ -3034,9 +3034,9 @@ function core_get_config($engine) {
         if ($amp_conf['AST_FUNC_EXTENSION_STATE']) {
           $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}'));
           if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
-            $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
+            $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"=""]','macrodial'));
           } else {
-            $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"]','macrodial'));
+            $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"=""]','macrodial'));
           }
         } else {
           $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}'));
@@ -4098,30 +4098,34 @@ function core_devices_addsip($account) {
 	}
 	
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
-		$sipfields = array(
-			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++),
-			array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++),
-			array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),$flag++),
+		$sipfields[] = array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++);
+    $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
+    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),$flag++);
+    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:'no'),$flag++);
+    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:'no'),$flag++);
+    $sipfields[] = array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++);
+    $sipfields[] = array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++);
+    $sipfields[] = array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++);
+    $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
+    $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
+    $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
+    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes'),$flag++);
+    $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
+    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),$flag++);
+    if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
+      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:'60'),$flag++);
+    }
+    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+      $sipfields[] = array($account,'transport',$db->escapeSimple((isset($_REQUEST['transport']))?$_REQUEST['transport']:'udp'),$flag++);
+      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:'no'),$flag++);
+    }
+    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),$flag++);
+    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),$flag++);
+    $sipfields[] = array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++);
+    $sipfields[] = array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++);
+    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),$flag++);
+    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:''),$flag++);
 
-			array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:'no'),$flag++),
-			array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:'no'),$flag++),
-
-			array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++),
-			array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++),
-			array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++),
-			array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++),
-			array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++),
-			array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++),
-			array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes'),$flag++),
-			array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++),
-			array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),$flag++),
-			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),$flag++),
-			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),$flag++),
-			array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
-			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
-			array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),$flag++),
-			array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:''),$flag++)
-		);
     $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
     if ($vmexten != '') {
       $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
@@ -6385,88 +6389,119 @@ function core_devices_configpageinit($dispnum) {
 		
 		// zap
 		$tmparr = array();
-		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
-		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+    $tt = _("The Zap channel number for this port.");
+		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
+    $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
+		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['immediate'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Zap immediate mode setting, see Zap documentation for details.");
+		$tmparr['immediate'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
-		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
-
-    unset($select);
-		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'select' => $select, 'level' => 1);
-
-		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
+    $tt = _("Zap signalling, usually fxo_ks when connected to an analog phone. Some special applications or channel bank connections may require fxs_ks or other valid settings. See Zap and card documentation for details.");
+		$tmparr['signalling'] = array('value' => 'fxo_ks', 'tt' => $tt, 'level' => 1);
+    $tt = _("Zap echocancel setting, see Zap documentation for details.");
+		$tmparr['echocancel'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Whether to turn on echo cancellation when bridging between Zap channels. See Zap documentation for details.");
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
+    $tt = _("Echo training requirements of this card. See Zap documentation for details.");
+		$tmparr['echotraining'] = array('value' => '800', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Experimental and un-reliable setting to try and detect a busy signal. See Zap documentation for details.");
+		$tmparr['busydetect'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['dial'] = array('value' => '', 'level' => 2);
-		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
+    $tt = _("Experimental and un-reliable setting to try and detect a busy signal, number of iterations to conclude busy. See Zap documentation for details.");
+		$tmparr['busycount'] = array('value' => '7', 'tt' => $tt, 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+    $tt = _("Experimental and un-reliable setting to try and detect call progress tones. See Zap documentation for details.");
+		$tmparr['callprogress'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+    $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
+		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+    $tt = _("Accountcode for this device.");
+		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
+		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
+		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
 		unset($tmparr);
 
 		// dahdi
 		$tmparr = array();
-		$tmparr['channel'] = array('value' => '', 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
-		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
+    $tt = _("The DAHDi channel number for this port.");
+		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
+    $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
+		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['immediate'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("DAHDi immediate mode setting, see DAHDi documentation for details.");
+		$tmparr['immediate'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['signalling'] = array('value' => 'fxo_ks', 'level' => 1);
-		$tmparr['echocancel'] = array('value' => 'yes', 'level' => 1);
+    $tt = _("DAHDi signalling, usually fxo_ks when connected to an analog phone. Some special applications or channel bank connections may require fxs_ks or other valid settings. See DAHDi and card documentation for details.");
+		$tmparr['signalling'] = array('value' => 'fxo_ks', 'tt' => $tt, 'level' => 1);
+    $tt = _("DAHDi echocancel setting, see DAHDi documentation for details.");
+		$tmparr['echocancel'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
 
-
-    unset($select);
-		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'select' => $select, 'level' => 1);
-
-		$tmparr['echotraining'] = array('value' => '800', 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['busydetect'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Whether to turn on echo cancellation when bridging between DAHDi channels. See DAHDi documentation for details.");
+		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['busycount'] = array('value' => '7', 'level' => 1);
+    $tt = _("Echo training requirements of this card. See DAHDi documentation for details.");
+		$tmparr['echotraining'] = array('value' => '800', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
-		$tmparr['callprogress'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Experimental and un-reliable setting to try and detect a busy signal. See DAHDi documentation for details.");
+		$tmparr['busydetect'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
+    $tt = _("Experimental and un-reliable setting to try and detect a busy signal, number of iterations to conclude busy. See DAHDi documentation for details.");
+		$tmparr['busycount'] = array('value' => '7', 'tt' => $tt, 'level' => 1);
+
+    unset($select);
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'no', 'text' => _('No'));
+    $tt = _("Experimental and un-reliable setting to try and detect call progress tones. See DAHDi documentation for details.");
+		$tmparr['callprogress'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+    $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('value' => '', 'level' => 2);
-		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
+    $tt = _("Accountcode for this device.");
+		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
+		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
+		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'dahdi', $tmparr);
 		unset($tmparr);
 		
 		// iax2
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
+    $tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
+		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
 
 
 
@@ -6474,39 +6509,54 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'mediaonly', 'text' => _('Media Only'));
-		$tmparr['transfer'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+    $tt = _("IAX transfer capabilities, see the Asterisk documentation for details.");
+		$tmparr['transfer'] = array('value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
-		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+    $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
+		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
+    $tt = _("Host settings for this device, almost always dynamic for endpoints.");
+		$tmparr['host'] = array('value' => 'dynamic', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'friend', 'text' => 'friend');
 		$select[] = array('value' => 'peer', 'text' => 'peer');
 		$select[] = array('value' => 'user', 'text' => 'user');
-		$tmparr['type'] = array('value' => 'friend', 'select' => $select, 'level' => 1);
+    $tt = _("Asterisk connection type, usually friend for endpoints.");
+		$tmparr['type'] = array('value' => 'friend', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['port'] = array('value' => '4569', 'level' => 1);
-		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
-		$tmparr['disallow'] = array('value' => '', 'level' => 1);
-		$tmparr['allow'] = array('value' => '', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 2);
-		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
-		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
-		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+    $tt = _("Endpoint port number to use, usually 4569.");
+		$tmparr['port'] = array('value' => '4569', 'tt' => $tt, 'level' => 1);
+    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
+		$tmparr['qualify'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
+    $tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
+		$tmparr['disallow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
+		$tmparr['allow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
+		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+    $tt = _("Accountcode for this device.");
+		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+    $tt = _("IP Address range to deny access to, in the form of network/netmask.");
+		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
+    $tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
+		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
-		$tmparr['requirecalltoken'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+    $tt = _("IAX security setting. See IAX documentation and device compatibility for details.");
+		$tmparr['requirecalltoken'] = array('value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		$currentcomponent->addgeneralarrayitem('devtechs', 'iax2', $tmparr);
 		unset($tmparr);
 
 		// sip
+    $tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
 
 
     unset($select);
@@ -6515,22 +6565,28 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
-		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
+    $tt = _("The DTMF signalling mode used by this device, usually rfc2833 for most phones.");
+		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
 
     unset($select);
+    $tt = _("Re-Invite policy for this device, see Asterisk documentation for details.");
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'nonat', 'text' => 'nonat');
 		$select[] = array('value' => 'update', 'text' => 'update');
-		$tmparr['canreinvite'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+		$tmparr['canreinvite'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
-		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+    $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
+		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
+
+    $tt = _("Host settings for this device, almost always dynamic for endpoints.");
+		$tmparr['host'] = array('value' => 'dynamic', 'tt' => $tt, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$tmparr['trustrpid'] = array('value' => 'no', 'select' => $select, 'level' => 1);
+    $tt = _("Whether Asterisk should trust the RPID settings from this device. Usually should be yes for CONNECTEDLINE() functionality to work if supported by the endpoint.");
+		$tmparr['trustrpid'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -6539,42 +6595,73 @@ function core_devices_configpageinit($dispnum) {
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
 		  $select[] = array('value' => 'pai', 'text' => _('Send P-asserted-Identity header'));
     }
-		$tmparr['sendrpid'] = array('value' => 'no', 'select' => $select, 'level' => 1);
-
-		$tmparr['context'] = array('value' => 'from-internal', 'level' => 1);
-		$tmparr['host'] = array('value' => 'dynamic', 'level' => 1);
+    $tt = _("Whether Asterisk should send RPID (or PAI) info to the device. Usually should be enabled to the settings used by your device for CONNECTEDLINE() functionality to work if supported by the endpoint.");
+		$tmparr['sendrpid'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'friend', 'text' => 'friend');
 		$select[] = array('value' => 'peer', 'text' => 'peer');
 		$select[] = array('value' => 'user', 'text' => 'user');
-		$tmparr['type'] = array('value' => 'friend', 'select' => $select, 'level' => 1);
+    $tt = _("Asterisk connection type, usually friend for endpoints.");
+		$tmparr['type'] = array('value' => 'friend', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No - RFC3581'));
 		$select[] = array('value' => 'never', 'text' => _('never - no RFC3581'));
 		$select[] = array('value' => 'route', 'text' => _('route - NAT no rport'));
-		$tmparr['nat'] = array('value' => 'yes', 'select' => $select, 'level' => 1);
+    $tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.");
+		$tmparr['nat'] = array('value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-		$tmparr['port'] = array('value' => '5060', 'level' => 1);
-		$tmparr['qualify'] = array('value' => 'yes', 'level' => 1);
-		$tmparr['callgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['pickupgroup'] = array('value' => '', 'level' => 1);
-		$tmparr['disallow'] = array('value' => '', 'level' => 1);
-		$tmparr['allow'] = array('value' => '', 'level' => 1);
-		$tmparr['dial'] = array('value' => '', 'level' => 2);
-		$tmparr['accountcode'] = array('value' => '', 'level' => 1);
-		$tmparr['mailbox'] = array('value' => '', 'level' => 2);
-		$tmparr['vmexten'] = array('value' => '', 'level' => 1);
-		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
-    $tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'level' => 1);
+    $tt = _("Endpoint port number to use, usually 5060. Some 2 ports devices such as ATA may used 5061 for the second port.");
+		$tmparr['port'] = array('value' => '5060', 'tt' => $tt, 'level' => 1);
+    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
+		$tmparr['qualify'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
+    if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
+      $tt = _("Frequency in seconds to send qualify messages to the endpoint.");
+		  $tmparr['qualifyfreq'] = array('value' => '60', 'tt' => $tt, 'level' => 1);
+    }
+    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+      unset($select);
+		  $select[] = array('value' => 'udp', 'text' => _('UDP'));
+		  $select[] = array('value' => 'tcp', 'text' => _('TCP or TLS'));
+      $tt = _("This sets the default transport type for outgoing, and will accept both tcp and udp. The default transport type is only used for outbound messages until a Registration takes place.  During the peer Registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dyanmic setting.");
+		  $tmparr['transport'] = array('value' => 'udp', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+      unset($select);
+		  $select[] = array('value' => 'no', 'text' => _('No'));
+		  $select[] = array('value' => 'yes', 'text' => _('Yes'));
+      $tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
+		  $tmparr['encryption'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+    }
+
+    $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
+		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
+		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
+		$tmparr['disallow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
+		$tmparr['allow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
+		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+    $tt = _("Accountcode for this device.");
+		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+    $tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint.");
+		$tmparr['vmexten'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+    $tt = _("IP Address range to deny access to, in the form of network/netmask.");
+		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
+    $tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
+    $tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
 		unset($tmparr);
 
 		// custom
 		$tmparr = array();
-		$tmparr['dial'] = array('value' => '', 'level' => 0);
+    $tt = _("How to dial this device. This will be device specific. For example, a custom device which is really a remote SIP URI might be configured such as SIP/joe@somedomain.com");
+		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 0);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'custom', $tmparr);
 		unset($tmparr);
 		
@@ -6741,10 +6828,11 @@ function core_devices_configpageload() {
 	
 					if ( $devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '') { // editing to show advanced as well
             // Added optional selectbox to enable the unsupported misdn module
+            $tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 						if (isset($devoptarr['select'])) {
-						  $currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+						  $currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, $tooltip, $devoptjs, $devoptfailmsg), 4);
             } else {
-						  $currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, '', $devoptjs, $devoptfailmsg), 4);
+						  $currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, $tooltip, $devoptjs, $devoptfailmsg), 4);
             }
 					} else { // add so only basic
 						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
