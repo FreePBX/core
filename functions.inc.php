@@ -4110,7 +4110,7 @@ function core_devices_addsip($account) {
     $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
     $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
     $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
-    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:),$flag++);
+    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
     $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
     $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
     if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
