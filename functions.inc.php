@@ -4079,6 +4079,7 @@ function core_users2astdb(){
 //add to sip table
 function core_devices_addsip($account) {
 	global $db;
+	global $amp_conf;
 
 	$flag = 2;
 	foreach ($_REQUEST as $req=>$data) {
@@ -4100,31 +4101,31 @@ function core_devices_addsip($account) {
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
 		$sipfields[] = array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++);
     $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
-    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:'no'),$flag++);
-    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:'no'),$flag++);
-    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:'no'),$flag++);
+    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
+    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
+    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
     $sipfields[] = array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++);
     $sipfields[] = array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++);
     $sipfields[] = array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++);
     $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
     $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
     $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
-    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:'yes'),$flag++);
+    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:),$flag++);
     $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
-    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:'yes'),$flag++);
+    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
     if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
-      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:'60'),$flag++);
+      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
     }
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
       $sipfields[] = array($account,'transport',$db->escapeSimple((isset($_REQUEST['transport']))?$_REQUEST['transport']:'udp'),$flag++);
-      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:'no'),$flag++);
+      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
     }
-    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:''),$flag++);
-    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:''),$flag++);
+    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
+    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
     $sipfields[] = array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++);
     $sipfields[] = array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++);
-    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:''),$flag++);
-    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:''),$flag++);
+    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
+    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
 
     $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
     if ($vmexten != '') {
@@ -4172,6 +4173,7 @@ function core_devices_getsip($account) {
 //add to iax table
 function core_devices_addiax2($account) {
 	global $db;
+	global $amp_conf;
 
 	$flag = 2;
 	foreach ($_REQUEST as $req=>$data) {
@@ -4197,11 +4199,11 @@ function core_devices_addiax2($account) {
 			array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),$flag++),
 			array($account,'username',$db->escapeSimple(($_REQUEST['username'])?$_REQUEST['username']:$account),$flag++),
 			array($account,'port',$db->escapeSimple(($_REQUEST['port'])?$_REQUEST['port']:'4569'),$flag++),
-			array($account,'qualify',$db->escapeSimple(($_REQUEST['qualify'])?$_REQUEST['qualify']:'yes'),$flag++),
+			array($account,'qualify',$db->escapeSimple(($_REQUEST['qualify'])?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++),
 			array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
 			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
-			array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:''),$flag++),
-			array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:''),$flag++),
+			array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++),
+			array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++),
 			array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++),
 			array($account,'requirecalltoken',$db->escapeSimple(($_REQUEST['requirecalltoken'])?$_REQUEST['requirecalltoken']:''),$flag++)
 		);
@@ -4251,6 +4253,7 @@ function core_devices_getiax2($account) {
 
 function core_devices_addzap($account) {
 	global $db;
+	global $amp_conf;
 		
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
@@ -4280,8 +4283,8 @@ function core_devices_addzap($account) {
 			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
 			array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
 			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
-			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:'')),
-			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:'')),
+			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP'])),
+			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP'])),
 			array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
 		);
 	}
@@ -4303,6 +4306,7 @@ function core_devices_addzap($account) {
 
 function core_devices_adddahdi($account) {
 	global $db;
+	global $amp_conf;
 		
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
@@ -4332,8 +4336,8 @@ function core_devices_adddahdi($account) {
 			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
 			array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
 			array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
-			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:'')),
-			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:'')),
+			array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP'])),
+			array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP'])),
 			array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
 		);
 	}
@@ -6434,9 +6438,9 @@ function core_devices_configpageinit($dispnum) {
     $tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['callgroup'] = array('value' => $amp_conf['DEVICE_CALLGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => $amp_conf['DEVICE_PICKUPGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'zap', $tmparr);
@@ -6490,9 +6494,9 @@ function core_devices_configpageinit($dispnum) {
     $tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['callgroup'] = array('value' => $amp_conf['DEVICE_CALLGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => $amp_conf['DEVICE_PICKUPGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'dahdi', $tmparr);
@@ -6527,11 +6531,11 @@ function core_devices_configpageinit($dispnum) {
     $tt = _("Endpoint port number to use, usually 4569.");
 		$tmparr['port'] = array('value' => '4569', 'tt' => $tt, 'level' => 1);
     $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
-		$tmparr['qualify'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
+		$tmparr['qualify'] = array('value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
     $tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
-		$tmparr['disallow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['disallow'] = array('value' => $amp_conf['DEVICE_DISALLOW'], 'tt' => $tt, 'level' => 1);
     $tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
-		$tmparr['allow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['allow'] = array('value' => $amp_conf['DEVICE_ALLOW'], 'tt' => $tt, 'level' => 1);
     $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
     $tt = _("Accountcode for this device.");
@@ -6567,6 +6571,17 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
     $tt = _("The DTMF signalling mode used by this device, usually rfc2833 for most phones.");
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
+  // $amp_conf['DEVICE_SIP_CANREINVITE']
+  // $amp_conf['DEVICE_SIP_TRUSTRPID']
+  // $amp_conf['DEVICE_SIP_SENDRPID']
+  // $amp_conf['DEVICE_SIP_NAT']
+  // $amp_conf['DEVICE_SIP_ENCRYPTION']
+  // $amp_conf['DEVICE_SIP_QUALIFYFREQ']
+  // $amp_conf['DEVICE_QUALIFY']
+  // $amp_conf['DEVICE_DISALLOW']
+  // $amp_conf['DEVICE_ALLOW']
+  // $amp_conf['DEVICE_CALLGROUP']
+  // $amp_conf['DEVICE_PICKUPGROUP']
 
     unset($select);
     $tt = _("Re-Invite policy for this device, see Asterisk documentation for details.");
@@ -6574,7 +6589,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'nonat', 'text' => 'nonat');
 		$select[] = array('value' => 'update', 'text' => 'update');
-		$tmparr['canreinvite'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['canreinvite'] = array('value' => $amp_conf['DEVICE_SIP_CANREINVITE'], 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
 		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
@@ -6586,7 +6601,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
     $tt = _("Whether Asterisk should trust the RPID settings from this device. Usually should be yes for CONNECTEDLINE() functionality to work if supported by the endpoint.");
-		$tmparr['trustrpid'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['trustrpid'] = array('value' => $amp_conf['DEVICE_SIP_TRUSTRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -6596,7 +6611,7 @@ function core_devices_configpageinit($dispnum) {
 		  $select[] = array('value' => 'pai', 'text' => _('Send P-asserted-Identity header'));
     }
     $tt = _("Whether Asterisk should send RPID (or PAI) info to the device. Usually should be enabled to the settings used by your device for CONNECTEDLINE() functionality to work if supported by the endpoint.");
-		$tmparr['sendrpid'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['sendrpid'] = array('value' => $amp_conf['DEVICE_SIP_SENDRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     unset($select);
 		$select[] = array('value' => 'friend', 'text' => 'friend');
@@ -6611,15 +6626,15 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'never', 'text' => _('never - no RFC3581'));
 		$select[] = array('value' => 'route', 'text' => _('route - NAT no rport'));
     $tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.");
-		$tmparr['nat'] = array('value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['nat'] = array('value' => $amp_conf['DEVICE_SIP_NAT'], 'tt' => $tt, 'select' => $select, 'level' => 1);
 
     $tt = _("Endpoint port number to use, usually 5060. Some 2 ports devices such as ATA may used 5061 for the second port.");
 		$tmparr['port'] = array('value' => '5060', 'tt' => $tt, 'level' => 1);
     $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
-		$tmparr['qualify'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
+		$tmparr['qualify'] = array('value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
     if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
       $tt = _("Frequency in seconds to send qualify messages to the endpoint.");
-		  $tmparr['qualifyfreq'] = array('value' => '60', 'tt' => $tt, 'level' => 1);
+		  $tmparr['qualifyfreq'] = array('value' => $amp_conf['DEVICE_SIP_QUALIFYFREQ'], 'tt' => $tt, 'level' => 1);
     }
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
       unset($select);
@@ -6632,17 +6647,17 @@ function core_devices_configpageinit($dispnum) {
 		  $select[] = array('value' => 'no', 'text' => _('No'));
 		  $select[] = array('value' => 'yes', 'text' => _('Yes'));
       $tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
-		  $tmparr['encryption'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		  $tmparr['encryption'] = array('value' => $amp_conf['DEVICE_SIP_ENCRYPTION'], 'tt' => $tt, 'select' => $select, 'level' => 1);
     }
 
     $tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['callgroup'] = array('value' => $amp_conf['DEVICE_CALLGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['pickupgroup'] = array('value' => $amp_conf['DEVICE_PICKUPGROUP'], 'tt' => $tt, 'level' => 1);
     $tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
-		$tmparr['disallow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['disallow'] = array('value' => $amp_conf['DEVICE_DISALLOW'], 'tt' => $tt, 'level' => 1);
     $tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
-		$tmparr['allow'] = array('value' => '', 'tt' => $tt, 'level' => 1);
+		$tmparr['allow'] = array('value' => $amp_conf['DEVICE_ALLOW'], 'tt' => $tt, 'level' => 1);
     $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
     $tt = _("Accountcode for this device.");
