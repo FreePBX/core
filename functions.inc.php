@@ -6380,7 +6380,7 @@ function core_devices_configpageinit($dispnum) {
     $tt = _("Zap immediate mode setting, see Zap documentation for details.");
 		$tmparr['immediate'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-    $tt = _("Zap signalling, usually fxo_ks when connected to an analog phone. Some special applications or channel bank connections may require fxs_ks or other valid settings. See Zap and card documentation for details.");
+    $tt = _("Zap signaling, usually fxo_ks when connected to an analog phone. Some special applications or channel bank connections may require fxs_ks or other valid settings. See Zap and card documentation for details.");
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'tt' => $tt, 'level' => 1);
     $tt = _("Zap echocancel setting, see Zap documentation for details.");
 		$tmparr['echocancel'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
@@ -6506,7 +6506,7 @@ function core_devices_configpageinit($dispnum) {
 
     $tt = _("Endpoint port number to use, usually 4569.");
 		$tmparr['port'] = array('value' => '4569', 'tt' => $tt, 'level' => 1);
-    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
+    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and considered unreachable. Can be set to a value which is the msec threshold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
 		$tmparr['qualify'] = array('value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
     $tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
 		$tmparr['disallow'] = array('value' => $amp_conf['DEVICE_DISALLOW'], 'tt' => $tt, 'level' => 1);
@@ -6545,7 +6545,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
-    $tt = _("The DTMF signalling mode used by this device, usually rfc2833 for most phones.");
+    $tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.");
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
   // $amp_conf['DEVICE_SIP_CANREINVITE']
   // $amp_conf['DEVICE_SIP_TRUSTRPID']
@@ -6640,7 +6640,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
-    $tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only chnage this on devices that may have special needs.");
+    $tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only change this on devices that may have special needs.");
 		$tmparr['vmexten'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("IP Address range to deny access to, in the form of network/netmask.");
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
