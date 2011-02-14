@@ -6336,7 +6336,7 @@ function core_users_configprocess() {
 					$id=0;
 					$currentcomponent->addguielem('_top', new gui_link_label('conflict', _("Conflicting Extensions"), _("The following extension numbers are in conflict, you can click on the item(s) below to edit the conflicting entity."), true));
 					foreach ($conflict_url as $edit_link) {
-						$currentcomponent->addguielem('_top', new gui_link('conflict'.$i++, $edit_link['label'], $edit_link['url']));
+						$currentcomponent->addguielem('_top', new gui_link('conflict'.$id++, $edit_link['label'], $edit_link['url']));
 					}
 					$msg = ($_REQUEST['display'] == 'users') ? _("Configure user again:") : _("Configure extension again:");
 					$currentcomponent->addguielem('_top', new gui_subheading('conflict_end', $msg, false));
