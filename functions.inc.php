@@ -6640,7 +6640,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
-    $tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint.");
+    $tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only chnage this on devices that may have special needs.");
 		$tmparr['vmexten'] = array('value' => '', 'tt' => $tt, 'level' => 1);
     $tt = _("IP Address range to deny access to, in the form of network/netmask.");
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
