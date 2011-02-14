@@ -944,32 +944,14 @@ function core_get_config($engine) {
 				unset($fcc);
 
 				$picklist = '${EXTEN:'.$fclen.'}';
-				$picklist .= '&${EXTEN:'.$fclen.'}@ext-local';
-				$picklist .= '&${EXTEN:'.$fclen.'}@from-internal';
-				$picklist .= '&${EXTEN:'.$fclen.'}@from-internal-xfer';
-				$picklist .= '&${EXTEN:'.$fclen.'}@from-did-direct';
-				$picklist .= '&LC-${EXTEN:'.$fclen.'}@from-internal';
-				$picklist .= '&LC-${EXTEN:'.$fclen.'}@from-internal-xfer';
-				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-internal';
-				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-internal-xfer';
-				$picklist .= '&FMPR-${EXTEN:'.$fclen.'}@from-did-direct';
-
+				$picklist .= '&${EXTEN:'.$fclen.'}@PICKUPMARK';
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup($picklist));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_hangup(''));
 
 				if ($intercom_code != '') {
 					$len = strlen($fc_pickup.$intercom_code);
 					$picklist  = '${EXTEN:'.$len.'}';
-					$picklist .= '&${EXTEN:'.$len.'}@ext-local';
-					$picklist .= '&${EXTEN:'.$len.'}@from-internal';
-					$picklist .= '&${EXTEN:'.$len.'}@from-internal-xfer';
-					$picklist .= '&${EXTEN:'.$len.'}@from-did-direct';
-					$picklist .= '&LC-${EXTEN:'.$len.'}@from-internal';
-					$picklist .= '&LC-${EXTEN:'.$len.'}@from-internal-xfer';
-					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-internal';
-					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-internal-xfer';
-					$picklist .= '&FMPR-${EXTEN:'.$len.'}@from-did-direct';
-
+					$picklist .= '&${EXTEN:'.$len.'}@PICKUPMARK';
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup($picklist));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new ext_hangup(''));
 				}
@@ -996,15 +978,7 @@ function core_get_config($engine) {
 				// to try the ringgoup.
 				foreach ($rg_members as $exten => $grps) {
 					$picklist  = $exten;
-					$picklist .= '&'.$exten.'@ext-local'; 
-					$picklist .= '&'.$exten.'@from-internal'; 
-					$picklist .= '&'.$exten.'@from-internal-xfer'; 
-					$picklist .= '&'.$exten.'@from-did-direct'; 
-					$picklist .= '&LC-'.$exten.'@from-internal'; 
-					$picklist .= '&LC-'.$exten.'@from-internal-xfer'; 
-					$picklist .= '&FMPR-'.$exten.'@from-internal'; 
-					$picklist .= '&FMPR-'.$exten.'@from-internal-xfer'; 
-					$picklist .= '&FMPR-'.$exten.'@from-did-direct'; 
+					$picklist .= '&'.$exten.'@PICKUPMARK'; 
 
 					foreach ($grps as $grp) {
 						$picklist .= '&'.$grp.'@from-internal'; 
@@ -1319,6 +1293,7 @@ function core_get_config($engine) {
 					
           $dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
+					$ext->add('ext-local', $exten['extension'], '', new ext_set('__PICKUPMARK',''));
           if ($exten['noanswer_dest']) {
             if ($exten['noanswer_cid'] != '') {
 						  $ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${DIALSTATUS}"="NOANSWER"]','Set','CALLERID(name)='.$exten['noanswer_cid'].'${CALLERID(name)}'));
@@ -3019,6 +2994,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
+			$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!=""]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
