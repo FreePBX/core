@@ -6366,49 +6366,47 @@ function core_devices_configpageinit($dispnum) {
 		$msgInvalidChannel = _("Please enter the channel for this device");
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
-		
+
+    $secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
+    if ($amp_conf['DEVICE_STRONG_SECRETS']) {
+      $secret_validation .= ' || (!isEmpty() && weakSecret()';
+    }
+    $secret_validation .= ')';
+
 		// zap
 		$tmparr = array();
     $tt = _("The Zap channel number for this port.");
 		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);
     $tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.");
 		$tmparr['context'] = array('value' => 'from-internal', 'tt' => $tt, 'level' => 1);
-
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
     $tt = _("Zap immediate mode setting, see Zap documentation for details.");
 		$tmparr['immediate'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
-
     $tt = _("Zap signaling, usually fxo_ks when connected to an analog phone. Some special applications or channel bank connections may require fxs_ks or other valid settings. See Zap and card documentation for details.");
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'tt' => $tt, 'level' => 1);
     $tt = _("Zap echocancel setting, see Zap documentation for details.");
 		$tmparr['echocancel'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
-
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
     $tt = _("Whether to turn on echo cancellation when bridging between Zap channels. See Zap documentation for details.");
 		$tmparr['echocancelwhenbridged'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
-
     $tt = _("Echo training requirements of this card. See Zap documentation for details.");
 		$tmparr['echotraining'] = array('value' => '800', 'tt' => $tt, 'level' => 1);
-
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
     $tt = _("Experimental and un-reliable setting to try and detect a busy signal. See Zap documentation for details.");
 		$tmparr['busydetect'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
-
     $tt = _("Experimental and un-reliable setting to try and detect a busy signal, number of iterations to conclude busy. See Zap documentation for details.");
 		$tmparr['busycount'] = array('value' => '7', 'tt' => $tt, 'level' => 1);
-
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'no', 'text' => _('No'));
     $tt = _("Experimental and un-reliable setting to try and detect call progress tones. See Zap documentation for details.");
 		$tmparr['callprogress'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
-
     $tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
     $tt = _("Accountcode for this device.");
@@ -6439,7 +6437,6 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['signalling'] = array('value' => 'fxo_ks', 'tt' => $tt, 'level' => 1);
     $tt = _("DAHDi echocancel setting, see DAHDi documentation for details.");
 		$tmparr['echocancel'] = array('value' => 'yes', 'tt' => $tt, 'level' => 1);
-
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -6481,9 +6478,7 @@ function core_devices_configpageinit($dispnum) {
 		// iax2
 		$tmparr = array();
     $tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
-		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
-
-
+		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 
     unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -6536,7 +6531,7 @@ function core_devices_configpageinit($dispnum) {
 		// sip
     $tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
 		$tmparr = array();
-		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => '(isEmpty() && !confirm("'.$msgConfirmSecret.'")) || (!isEmpty() && weakSecret())', 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 
 
     unset($select);
