@@ -931,6 +931,9 @@ function validatePatterns() {
   });
 
   if (culprit == undefined && !one_good) {
+    if ($('#inscode').val() == 'csv') {
+      return true;
+    }
     culprit = $('.toggleval:visible').get(0);
 	  msgInvalidDialPattern = "<?php echo _('No dial pattern, there must be at least one'); ?>";
   } else {
