@@ -627,7 +627,8 @@ END;
         <input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="dp-match $dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex">
 END;
 ?>
-        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo _("$idx") ?>)">
+        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern')?>" onclick="addCustomField('','','',$('#prepend_digit_<?php echo $idx?>').parent().parent())">
+        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo "$idx" ?>)">
       </td>
     </tr>
 <?php
@@ -639,7 +640,8 @@ END;
         (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">) +
         <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>"> |
         <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dp-match dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">
-        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
+        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern')?>" onclick="addCustomField('','','',$('#prepend_digit_<?php echo $idx?>').parent().parent())">
+        <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo "$next_idx" ?>)">
 
       </td>
     </tr>
@@ -735,7 +737,7 @@ END;
 					if (localprefix == null) return;
 				} while (!localprefix.match('^[0-9#*]+$') && <?php echo '!alert("'._("Invalid prefix. Only dialable characters (0-9, #, and *) are allowed.").'")'?>);
 
-        return addCustomField(localprefix,'',localpattern);
+        return addCustomField(localprefix,'',localpattern,$("#last_row"));
 			}
 			
 			function populateRemove() {
@@ -749,7 +751,7 @@ END;
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
 				
-        return addCustomField('',localprefix,localpattern);
+        return addCustomField('',localprefix,localpattern,$("#last_row"));
 			}
 
 			function populatedirectory() {
@@ -763,7 +765,7 @@ END;
 					if (localprepend == null) return;
 				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
 				
-        return addCustomField(localprepend,localprefix,'');
+        return addCustomField(localprepend,localprefix,'',$("#last_row"));
 			}
 			
 			function changeAutoPop() {
@@ -982,7 +984,7 @@ END;
 $(document).ready(function(){
   /* Add a Custom Var / Val textbox */
   $("#dial-pattern-add").click(function(){
-    addCustomField('','','','');
+    addCustomField('','','',$("#last_row"));
   });
   $('#pattern_file').hide();
   $("#dial-pattern-clear").click(function(){
@@ -1006,7 +1008,7 @@ function patternsRemove(idx) {
   $("#prepend_digit_"+idx).parent().parent().remove();
 }
 
-function addCustomField(prepend_digit, pattern_prefix, pattern_pass) {
+function addCustomField(prepend_digit, pattern_prefix, pattern_pass, start_loc) {
   var idx = $(".dial-pattern").size();
   var idxp = idx - 1;
   var tabindex = parseInt($("#pattern_pass_"+idxp).attr('tabindex')) + 1;
@@ -1017,12 +1019,13 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass) {
   var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
   var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
 
-  var new_insert = $("#last_row").before('\
+  var new_insert = start_loc.before('\
   <tr>\
     <td colspan="2">\
     (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
     <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
     <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="dp-match '+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'">\
+      <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _("Click here to insert a new pattern")?>" onclick="addCustomField(\'\',\'\',\'\',$(\'#prepend_digit_'+idx+'\').parent().parent())">\
       <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
     </td>\
   </tr>\
