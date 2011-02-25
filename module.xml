@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.9.0beta1.3* #4821
+		*2.9.0beta1.3* #4821, #4798
 		*2.9.0beta1.2* #4224
 		*2.9.0beta1.1* #778, #4804, #4809, #4812, #4576, #4334, #4815, #3893
 		*2.9.0alpha1.7* #4608, #4790, #4788, #4800

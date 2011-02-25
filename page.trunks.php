@@ -17,6 +17,7 @@
 //    Copyright (C) 2004 Greg MacLellan (greg@mtechsolutions.ca)
 //    Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
 //
+dbug($_REQUEST);
 
 $display='trunks'; 
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
@@ -810,7 +811,7 @@ END;
 				<td>
 					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dial tone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>: 
 				</td><td>
-					<input type="text" size="8" name="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>" tabindex="<?php echo ++$tabindex;?>"/>
+					<input type="text" size="8" name="dialoutprefix" id="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<?php if ($tech != "enum") { ?>
@@ -1132,7 +1133,7 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
-	var msgInvalidOutboundDialPrefix = "<?php echo _('Invalid Outbound Dial Prefix'); ?>";
+	var msgInvalidOutboundDialPrefix = "<?php echo _('The Outbound Dial Prefix contains non-standard characters. If these are intentional the press OK to continue.'); ?>";
 	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
 	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
@@ -1158,8 +1159,12 @@ function trunkEdit_onsubmit(act) {
 	if (!isInteger(theForm.maxchans.value))
 		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
 	
-	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value))
-		return warnInvalid(theForm.dialoutprefix, msgInvalidOutboundDialPrefix);
+	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value)) {
+    if (confirm(msgInvalidOutboundDialPrefix) == false) {
+      $('#dialoutprefix').focus();
+      return false;
+    }
+  }
 	
 	<?php if ($tech != "enum" && $tech != "custom" && $tech != "dundi") { ?>
 	defaultEmptyOK = true;
