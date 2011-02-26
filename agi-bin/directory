@@ -305,7 +305,7 @@ function do_directory($type, &$directory, $dial_context, $say_exten, $operator) 
 		
 		usleep(500); // pause a bit, so digit presses get cleared
 		
-		if ($digits !== "") {
+		if ($digits != "") {
 			// they entered SOMETHING, reset our loop
 			$loop = 0;
 		}
@@ -372,7 +372,7 @@ function do_directory($type, &$directory, $dial_context, $say_exten, $operator) 
 					break;
 				}
 				
-				if ($digit !== 0) {
+				if ($digit != 0) {
 					$loop = 0;
 				}
 				$digit = false;
