@@ -5142,11 +5142,11 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 
 	$confitem['account'] = $channelid;
 	$gimmieabreak = nl2br($config);
-	$lines = split('<br />',$gimmieabreak);
+	$lines = preg_split('/<br />/',$gimmieabreak);
 	foreach ($lines as $line) {
 		$line = trim($line);
-		if (count(split('=',$line)) > 1) {
-			$tmp = split('=',$line,2);
+		if (count(preg_split('/=/',$line)) > 1) {
+			$tmp = preg_split('/=/',$line,2);
 			$key=trim($tmp[0]);
 			$value=trim($tmp[1]);
 			if (isset($confitem[$key]) && !empty($confitem[$key]))
@@ -6225,7 +6225,7 @@ function core_users_configpageload() {
 		$dids = core_did_list('extension');
 		$did_count = 0;
 		foreach ($dids as $did) {
-			$did_dest = split(',',$did['destination']);
+			$did_dest = preg_split('/,/',$did['destination']);
 			if (isset($did_dest[1]) && $did_dest[1] == $extdisplay) {
 
 				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
