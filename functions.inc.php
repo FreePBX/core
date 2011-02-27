@@ -5142,7 +5142,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 
 	$confitem['account'] = $channelid;
 	$gimmieabreak = nl2br($config);
-	$lines = preg_split('/<br />/',$gimmieabreak);
+	$lines = preg_split('#<br />#',$gimmieabreak);
 	foreach ($lines as $line) {
 		$line = trim($line);
 		if (count(preg_split('/=/',$line)) > 1) {
