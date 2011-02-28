@@ -21,6 +21,7 @@
         $status[$keyword]['reload_header'] = ob_get_clean();
       }
       if ($status[$keyword]['saved']) {
+        freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$var['value']));
         needreload();
       }
       echo json_encode($status[$keyword]);
