@@ -98,5 +98,5 @@
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/2.9/core-2.9.0beta1.5.tgz</location>
-	<md5sum>3b8ec85ec4a600ab10c3de67bc63599c</md5sum>
+	<md5sum>9459e31fe95121cdc932a4df402c2f05</md5sum>
 </module>
