@@ -4,12 +4,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.9.0beta1.4</version>
+	<version>2.9.0beta1.5</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.9.0beta1.5* #4888
 		*2.9.0beta1.4* #4880
 		*2.9.0beta1.3* #4656, #4821, #4798, #4872, #4401, #4619
 		*2.9.0beta1.2* #4224

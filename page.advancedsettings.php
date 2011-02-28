@@ -50,7 +50,7 @@
   $row = 0;
 
 	echo '<input type="image" src="images/spinner.gif" style="display:none">';
-	echo '<table id="set_table">';
+	echo '<table class="alt_table">';
 	foreach ($conf as $c){
 
     if ($c['level'] > $display_level || $c['hidden'] && !$display_hidden || $c['readonly'] && !$display_readonly) {
