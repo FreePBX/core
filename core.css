@@ -18,4 +18,4 @@ div.dialpatterns {
 	display: none;
 }
 .save, .adv_set_default{border-style: none;}
-.savetd{display:none;}
+.savetd, .save{display:none;}

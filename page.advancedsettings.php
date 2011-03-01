@@ -144,13 +144,13 @@
 		echo '</td>';
 		if(!$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden']){
 			echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" title="'._('Revert to Default').'"'
-				. 'data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
+				. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
 				. (($amp_conf[$c['keyword']] == $c['defaultval']) ? ' style="display:none" ' : '') 
 				.'"></td>';
 			echo '<td class="savetd"><input type="image" class="save" src="images/accept.png" data-key="'
 				. $c['keyword'] 
 				. '" title="' . _('Save') . '"'
-				. 'data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
+				. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
 				. '></td>';
 		}
 		echo '</tr>';

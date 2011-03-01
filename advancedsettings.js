@@ -15,7 +15,7 @@ $(document).ready(function() {
 				var myval = $('#' + mykey).val();
 				break;
 		}
-    var send_reload = $('#need_reload_block').size() == 0 ? '1':'0';
+		var send_reload = $('#need_reload_block').size() == 0 ? '1':'0';
 		$.ajax({
 			type: 'POST',
 			url: location.href,
@@ -41,9 +41,22 @@ $(document).ready(function() {
 				  $('#' + mykey).val(data.saved_value);
 				}
 				if (data.saved) {
-					mythis.parent().delay(500).fadeOut();
+					//remove save button
 					mythis.unbind('click', savebinder);
-
+					mythis.fadeOut('normal', function(){
+						mythis.closest('tr').find('.savetd').hide();
+					});
+					
+					//hide retor to defualt if its we have reverted to defualt
+					//should not be nesesary -MB
+					/*
+					input = mythis.closest('tr').find('input.valueinput').val() ;
+					defval = mythis.closest('tr').find('input.adv_set_default').attr('data-default')
+					console.log(input, defval)
+					if(input == defval){
+						mythis.closest('tr').find('input.adv_set_default').fadeOut()
+					}
+					*/
 					// If they changed the page layout
 					switch (mykey) {
 						case 'AS_DISPLAY_HIDDEN_SETTINGS':
@@ -96,21 +109,24 @@ $(document).ready(function() {
 	});
 	//show save button
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
-		var myel = $(this).parent().next().next();
+		var save = $(this).closest('tr').find('input.save');
+		//this is hidden seperatly from the td due to some ie issues, hence we show it separately
+		$(this).closest('tr').find('.savetd').show(); 
+
 		//if the value was changed since the last page refresh
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
-			myel.stop(true, true).delay(100).fadeIn();
+			save.stop(true, true).delay(100).fadeIn();
 			//only bind if not already bound
-			if (myel.children(".save").data("events") == undefined
-				|| typeof(myel.children('.save').data('events')["click"]) == undefined
-			) {
-				myel.children('.save').bind('click', savebinder);
+			if (save.data("events") == undefined || typeof(save.data('events')["click"]) == undefined) {
+				save.bind('click', savebinder);
 			}
 			//show 'revert to defualt'
-			$(this).parent().next().find('input').show()
+			$(this).closest('tr').find('input.adv_set_default').show()
 		} else {
-			myel.stop(true, true).delay(100).fadeOut();
-			myel.children('.save').unbind('click', savebinder);
+			save.stop(true, true).delay(100).fadeOut('normal', function(){
+						$(this).closest('tr').find('.savetd').hide();
+						$(this).closest('tr').find('input.adv_set_default').fadeOut()
+				}).unbind('click', savebinder); 
 		}
 		
 	})
