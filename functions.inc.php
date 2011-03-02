@@ -2634,6 +2634,154 @@ function core_get_config($engine) {
 
 			/* end vm-callme context  */
 
+      /*
+        ;------------------------------------------------------------------------
+        ; [ext-local-confirm]
+        ;------------------------------------------------------------------------
+        ; If call confirm is being used in a ringgroup, then calls that do not require confirmation are sent
+        ; to this extension instead of straight to the device.
+        ;
+        ; The sole purpose of sending them here is to make sure we run Macro(auto-confirm) if this
+        ; extension answers the line. This takes care of clearing the database key that is used to inform
+        ; other potential late comers that the extension has been answered by someone else.
+        ;
+        ; ALERT_INFO is deprecated in Asterisk 1.4 but still used throughout the FreePBX dialplan and
+        ; usually set by dialparties.agi. This allows inheritance. Since no dialparties.agi here, set the
+        ; header if it is set.
+        ;
+        ;------------------------------------------------------------------------
+       */
+      $context = 'ext-local-confirm';
+      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
+      $exten = '_LC-.';
+			$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
+		  $ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
+			$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},M(auto-confirm^${RG_IDX})${DIAL_OPTIONS}'));
+
+      /*
+        ;------------------------------------------------------------------------
+        ; [findmefollow-ringallv2]
+        ;------------------------------------------------------------------------
+        ; This context, to be included in from-internal, implements the PreRing part of findmefollow
+        ; as well as the GroupRing part. It also communicates between the two so that if DND is set
+        ; on the primary extension, and mastermode is enabled, then the other extensions will not ring
+        ;
+        ;------------------------------------------------------------------------
+       */
+      $context = 'findmefollow-ringallv2';
+      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
+      $exten = '_FMPR-';
+
+			$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
+			$ext->add($context, $exten, '', new ext_set('RingGroupMethod',''));
+			$ext->add($context, $exten, '', new ext_set('USE_CONFIRMATION',''));
+			$ext->add($context, $exten, '', new ext_set('RINGGROUP_INDEX',''));
+			$ext->add($context, $exten, '', new ext_macro('simple-dial','${EXTEN:5},${FMREALPRERING}'));
+		  $ext->add($context, $exten, '', new ext_execif('$["${DIALSTATUS}" = "BUSY"]', 'Set','DB(FM/DND/${FMGRP}/${FMUNIQUE})=DND'));
+			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMPR ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+
+      $exten = '_FMGL-';
+			$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
+			$ext->add($context, $exten, '', new ext_wait('1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
+			$ext->add($context, $exten, '', new ext_wait('1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
+			$ext->add($context, $exten, '', new ext_wait('${FMPRERING}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
+			$ext->add($context, $exten, '', new ext_dbdel('FM/DND/${FMGRP}/${FMUNIQUE}'));
+			$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
+			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+      // n+10(dodnd):
+			$ext->add($context, $exten, 'dodnd', new ext_dbdel('FM/DND/${FMGRP}/${FMUNIQUE}'), 'n', 10);
+			$ext->add($context, $exten, '', new ext_gotoif('$["${FMPRIME}" = "FALSE"]','dodial'));
+			$ext->add($context, $exten, '', new ext_noop_trace('Got DND in FMGL ${FMGRP} with ${EXTEN:5} in ${RingGroupMethod} mode, aborting'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+
+
+      /*
+        ;------------------------------------------------------------------------
+        ; [macro-dial-confirm]
+        ;------------------------------------------------------------------------
+        ; This has now been incorporated into dialparties. It still only works with ringall
+        ; and ringall-prim strategies. Have not investigated why it doesn't work with
+        ; hunt and memory hunt.
+        ;
+        ;------------------------------------------------------------------------
+        [macro-dial-confirm]
+        ; This was written to make it easy to use macro-dial-confirm instead of macro-dial in generated dialplans.
+        ; This takes the same parameters, with an additional parameter of the ring group Number
+        ; ARG1 is the timeout
+        ; ARG2 is the DIAL_OPTIONS
+        ; ARG3 is a list of xtns to call - 203-222-240-123123123#-211
+        ; ARG4 is the ring group number
+       */
+
+      $mcontext = 'macro-dial-confirm';
+      $exten = 's';
+
+      // set to ringing so confirm macro can keep from passing the channel during confirmation if
+      // someone beat them to it.
+      //
+			$ext->add($mcontext, $exten, '', new ext_set('DB(RG/${ARG4}/${CHANNEL})','RINGING'));
+			$ext->add($mcontext, $exten, '', new ext_set('__UNIQCHAN','${CHANNEL}'));
+
+      // Tell dialparites to place the call through the [grps] context
+      //
+			$ext->add($mcontext, $exten, '', new ext_set('USE_CONFIRMATION','TRUE'));
+			$ext->add($mcontext, $exten, '', new ext_set('RINGGROUP_INDEX','${ARG4}'));
+
+			$ext->add($mcontext, $exten, '', new ext_set('FORCE_CONFIRM',''));
+			$ext->add($mcontext, $exten, '', new ext_set('ARG4',''));
+			$ext->add($mcontext, $exten, '', new ext_macro('dial','${ARG1},${ARG2},${ARG3}'));
+			$ext->add($mcontext, $exten, '', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+			$ext->add($mcontext, $exten, '', new ext_set('USE_CONFIRMATION',''));
+			$ext->add($mcontext, $exten, '', new ext_set('RINGGROUP_INDEX',''));
+
+      /*
+        ;------------------------------------------------------------------------
+        ; [macro-setmusic]
+        ;------------------------------------------------------------------------
+        ; CONTEXT:      macro-setmusic
+        ; PURPOSE:      to turn off moh on routes where it is not desired
+        ;
+        ;------------------------------------------------------------------------
+        [macro-setmusic]
+        exten => s,1,NoOp(Setting Outbound Route MoH To: ${ARG1})
+        exten => s,2,Set(CHANNEL(musicclass)=${ARG1}) ; this won't work in 1.2 anymore, could fix in auto-generate if we wanted...
+        ;------------------------------------------------------------------------
+       */
+      $mcontext = 'macro-setmusic';
+      $exten = 's';
+
+			$ext->add($mcontext, $exten, '', new ext_noop_trace('Setting Outbound Route MoH To: ${ARG1}'));
+			$ext->add($mcontext, $exten, '', new ext_setmusiconhold('${ARG1}'));
+
+
+      /*
+        ;------------------------------------------------------------------------
+        ; [block-cf]
+        ;------------------------------------------------------------------------
+        ; This context is set as a target with FORWARD_CONTEXT when Call Forwarding is set to be
+        ; ignored in a ringgroup or other features that may take advantage of this. Server side
+        ; CF is done in dialparties.agi but if a client device forwards a call, it will be caught
+        ; and blocked here.
+        ;------------------------------------------------------------------------
+        [block-cf]
+        exten => _X.,1,Noop(Blocking callforward to ${EXTEN} because CF is blocked)
+        exten => _X.,n,Hangup()
+        
+        ;------------------------------------------------------------------------
+       */
+      $context = 'macro-setmusic';
+      $exten = '_X.';
+
+			$ext->add($context, $exten, '', new ext_noop_trace('Blocking callforward to ${EXTEN} because CF is blocked'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+
+
 			/*
 			* macro-vm 
 			*/
