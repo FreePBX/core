@@ -4,12 +4,13 @@
 	<type>setup</type>
 	<category>Basic</category>
 	<name>Core</name>
-	<version>2.9.0beta1.5</version>
+	<version>2.9.0beta1.6</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.9.0beta1.6* #4890, #2110
 		*2.9.0beta1.5* #4888
 		*2.9.0beta1.4* #4880
 		*2.9.0beta1.3* #4656, #4821, #4798, #4872, #4401, #4619
@@ -97,6 +98,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.9/core-2.9.0beta1.5.tgz</location>
-	<md5sum>9459e31fe95121cdc932a4df402c2f05</md5sum>
+	<location>release/2.9/core-2.9.0beta1.6.tgz</location>
+	<md5sum>db5b560581531f69ef1c3ef121ac8128</md5sum>
 </module>
