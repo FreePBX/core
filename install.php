@@ -56,6 +56,8 @@ function did_migrate($incoming){
 	}
 }
 
+$freepbx_conf =& freepbx_conf::create();
+
 $fcc = new featurecode('core', 'userlogon');
 $fcc->setDescription('User Logon');
 $fcc->setDefault('*11');
@@ -548,8 +550,6 @@ $globals_convert['VMX_LOOPDEST_EXT'] = 'dovm';
 $globals_convert['VMX_LOOPDEST_PRI'] = '1';
 $globals_convert['MIXMON_DIR'] = '';
 $globals_convert['MIXMON_POST'] = '';
-
-$freepbx_conf =& freepbx_conf::create();
 
 // VMX_CONTEXT
 //
