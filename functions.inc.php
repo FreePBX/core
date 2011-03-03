@@ -2671,32 +2671,41 @@ function core_get_config($engine) {
        */
       $context = 'findmefollow-ringallv2';
       $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
-      $exten = '_FMPR-';
+      $exten = '_FMPR-.';
+
+      $fm_dnd = $amp_conf['AST_FUNC_SHARED'] ? 'SHARED(FM_DND,${FMUNIQUE})' : 'DB(FM/DND/${FMGRP}/${FMUNIQUE})';
 
 			$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
 			$ext->add($context, $exten, '', new ext_set('RingGroupMethod',''));
 			$ext->add($context, $exten, '', new ext_set('USE_CONFIRMATION',''));
 			$ext->add($context, $exten, '', new ext_set('RINGGROUP_INDEX',''));
 			$ext->add($context, $exten, '', new ext_macro('simple-dial','${EXTEN:5},${FMREALPRERING}'));
-		  $ext->add($context, $exten, '', new ext_execif('$["${DIALSTATUS}" = "BUSY"]', 'Set','DB(FM/DND/${FMGRP}/${FMUNIQUE})=DND'));
+		  $ext->add($context, $exten, '', new ext_execif('$["${DIALSTATUS}" = "BUSY"]', 'Set', "$fm_dnd=DND"));
 			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMPR ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
 			$ext->add($context, $exten, '', new ext_hangup(''));
 
-      $exten = '_FMGL-';
+      $exten = '_FMGL-.';
 			$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
+
+			$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
+			$ext->add($context, $exten, 'start', new ext_gotoif('$["${' .$fm_dnd. '}" = "DND"]','dodnd'));
 			$ext->add($context, $exten, '', new ext_wait('1'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
-			$ext->add($context, $exten, '', new ext_wait('1'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
-			$ext->add($context, $exten, '', new ext_wait('${FMPRERING}'));
-			$ext->add($context, $exten, '', new ext_gotoif('$["${DB(FM/DND/${FMGRP}/${FMUNIQUE})}" = "DND"]','dodnd'));
-			$ext->add($context, $exten, '', new ext_dbdel('FM/DND/${FMGRP}/${FMUNIQUE}'));
+			$ext->add($context, $exten, '', new ext_noop_trace('FMGL wait loop: ${EPOCH} / ${ENDLOOP}', 6));
+			$ext->add($context, $exten, '', new ext_gotoif('$[${EPOCH} < ${ENDLOOP}]','start'));
+      if ($amp_conf['AST_FUNC_SHARED']) {
+			  $ext->add($context, $exten, '', new ext_set($fm_dnd, ''));
+      } else {
+			  $ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
+      }
 			$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
 			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
 			$ext->add($context, $exten, '', new ext_hangup(''));
       // n+10(dodnd):
-			$ext->add($context, $exten, 'dodnd', new ext_dbdel('FM/DND/${FMGRP}/${FMUNIQUE}'), 'n', 10);
+      if ($amp_conf['AST_FUNC_SHARED']) {
+			  $ext->add($context, $exten, 'dodnd', new ext_set($fm_dnd, ''), 'n', 10);
+      } else {
+			  $ext->add($context, $exten, 'dodnd', new ext_dbdel($fm_dnd), 'n', 10);
+      }
 			$ext->add($context, $exten, '', new ext_gotoif('$["${FMPRIME}" = "FALSE"]','dodial'));
 			$ext->add($context, $exten, '', new ext_noop_trace('Got DND in FMGL ${FMGRP} with ${EXTEN:5} in ${RingGroupMethod} mode, aborting'));
 			$ext->add($context, $exten, '', new ext_hangup(''));
@@ -3454,26 +3463,26 @@ function core_get_config($engine) {
       /*
       ; Cleanup any remaining RG flag
       */
-      $skip_label = 'skiprg';
+      $skip_label = $amp_conf['AST_FUNC_SHARED'] ? 'theend' : 'skiprg';
 			$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]',$skip_label));
 			$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 			$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 
       if (!$amp_conf['AST_FUNC_SHARED']) {
-        $next_label = 'skipblkvm';
         // only clr it if we were the originating channel
         //
-			  $ext->add($mcontext,$exten,$skip_label, new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]',$next_label));
+			  $ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]', 'skipblkvm'));
         $ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
         $ext->add($mcontext,$exten,'', new ext_macro('blkvm-clr'));
+        /*
+        ; Cleanup any remaining FollowMe DND flags
+        */
+        $ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
+        $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
+
         $skip_label = $next_label;
       }
 
-      /*
-      ; Cleanup any remaining FollowMe DND flags
-      */
-      $ext->add($mcontext,$exten,$skip_label, new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
-      $ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
       $ext->add($mcontext,$exten,'theend', new ext_hangup());
 
       /* macro-hangupcall */
