@@ -860,8 +860,9 @@ function core_get_config($engine) {
 				$fcc = new featurecode($modulename, 'automon');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
+        $automon = $amp_conf['AUTOMIXMON'] && !$ast_lt_16 ? 'automixmon' : 'automon';
 				if ($code != '') {
-					$core_conf->addFeatureMap('automon',$code);
+					$core_conf->addFeatureMap($automon,$code);
 				}
 
 				$fcc = new featurecode($modulename, 'disconnect');

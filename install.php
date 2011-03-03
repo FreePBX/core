@@ -119,6 +119,22 @@ $fcc->setDefault('*1');
 $fcc->update();
 unset($fcc);
 
+// AUTOMIXMON
+//
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Use Automixmon for One-Touch Recording';
+$set['description'] = "Starting with Asterisk 1.6, one-touch-recording can be toggled on and off during a call if the dial options had 'x' and/or 'X' options set. When this is set to true, the 'In-Call Asterisk Toggle Call Recording' will use the asterisk 'automixmon' option instead of the 'automon' option to set this. Only one or the other can be set from the GUI. You need to set the proper options of 'x' and/or 'X' when using this, or 'w' and/or 'W' if using the older 'automon' version. Setting this to true will have no effect on systems running Asterisk 1.4 or earlier.";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('AUTOMIXMON',$set);
+
 $fcc = new featurecode('core', 'disconnect');
 $fcc->setDescription('In-Call Asterisk Disconnect Code');
 $fcc->setDefault('**');
