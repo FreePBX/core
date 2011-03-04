@@ -444,7 +444,7 @@ class core_conf {
 	
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results2)) {
+			if(DB::IsError($results2_pre)) {
    			die($results2_pre->getMessage());
 			}	
 
