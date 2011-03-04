@@ -283,8 +283,8 @@ if (!$nrows) {
 //Sort trunks for sqlite
 function __sort_trunks($a,$b)  {
         global $unique_trunks;
-        ereg("OUT_([0-9]+)",$unique_trunks[$a][0],$trunk_num1);
-        ereg("OUT_([0-9]+)",$unique_trunks[$b][0],$trunk_num2);
+        preg_match("/OUT_([0-9]+)/",$unique_trunks[$a][0],$trunk_num1);
+        preg_match("/OUT_([0-9]+)/",$unique_trunks[$b][0],$trunk_num2);
         return ($trunk_num1[1] >= $trunk_num2[1]? 1:-1);
 }
 

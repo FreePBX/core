@@ -5326,14 +5326,6 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	}
 }
 
-//Sort trunks for sqlite
-function sort_trunks($a,$b)  {
-        global $unique_trunks;
-        ereg("OUT_([0-9]+)",$unique_trunks[$a][0],$trunk_num1);
-        ereg("OUT_([0-9]+)",$unique_trunks[$b][0],$trunk_num2);
-        return ($trunk_num1[1] >= $trunk_num2[1]? 1:-1);
-}
-
 //get unique trunks
 function core_trunks_getDetails($trunkid='') {
 	global $db;

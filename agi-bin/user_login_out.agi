@@ -537,8 +537,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		debug("User is $user");
 		foreach ($response1 as $item) {
 			$item1=trim($item);
-			if ($inqueue == 'false') {
-				if (ereg('(\\d+)',$item1)) {
+			if ($inqueue === 'false') {
+        if (preg_match('/^(\d+)/',$item1)) {
 					preg_match_all ("/(\\d+)/is", $item1,$matches);
 					if ($matches[1][0] != '') {
 						$queues[]=$matches[1][0];
@@ -548,7 +548,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 				}
 			} else {
 				// We should test to see if the item is an Agent description
-				if (ereg('Local',$item1)) {
+        if (strstr($item1,'Local/') !== false) {
 					preg_match_all ("/(Local).*?(\\d+)/is", $item1, $matches);
 					$loggedagent=$matches[2][0];
 					$item1='ADD';
