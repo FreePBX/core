@@ -122,7 +122,7 @@ function get_dig($lookup, $enum) {
 		$line = str_replace(" ", "|", $line);
 		$bits = explode("|", $line);
 		$bit = explode("!", stripslashes($bits[4]));
-		$URI = ereg_replace($bit[1], $bit[2], "+".$lookup);
+		$URI = preg_replace('/' . $bit[1] . '/', $bit[2], "+".$lookup);
 		if($URI[3] == ":")
 			$URI[3] = "/";
 		if($URI[4] == ":")
@@ -149,7 +149,7 @@ function get_php5($lookup, $enum) {
 	foreach ($res as $entry) {
 		if (!isset($arr)) $arr = array();
 		$bit = explode("!", $entry['regex']);
-		$URI = ereg_replace($bit[1], $bit[2], "+".$lookup);
+		$URI = preg_replace('/' . $bit[1] . '/', $bit[2], "+".$lookup);
 		if($URI[3] == ":") $URI[3] = "/";
 		if($URI[4] == ":") $URI[4] = "/";
 		$arr[] = array("order" => $entry['order'], "prio" => $entry['pref'], "tech" => $entry['services'], "URI" => $URI);
