@@ -79,7 +79,7 @@ foreach ($enums as $enum) {
 		}
 		array_multisort($order, SORT_ASC, SORT_NUMERIC, $prio, SORT_ASC, SORT_NUMERIC, $arr);
 		foreach ($arr as $key => $row) {
-			if (eregi('SIP|IAX', $row['tech'])) {
+      if(preg_match('/sip|iax/', strtolower($row['tech']))) {
 				$URI = $row['URI'];
 				$dialstr .= $nextURI[$URI]."%";
 			}

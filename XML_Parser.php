@@ -376,7 +376,7 @@ class XML_Parser extends PEAR
         /**
          * check, if file is a remote file
          */
-        if (eregi('^(http|ftp)://', substr($file, 0, 10))) {
+        if (preg_match('#^(http|ftp)://#', strtolower(substr($file, 0, 10)))) {
             if (!ini_get('allow_url_fopen')) {
             	return $this->raiseError('Remote files cannot be parsed, as safe mode is enabled.', XML_PARSER_ERROR_REMOTE);
             }
@@ -429,7 +429,7 @@ class XML_Parser extends PEAR
             return true;
         }
         // see if it's an absolute URL (has a scheme at the beginning)
-        elseif (eregi('^[a-z]+://', substr($fp, 0, 10))) {
+        elseif (preg_match('#^[a-z]+://#', strtolower(substr($fp, 0, 10)))) {
             return $this->setInputFile($fp);
         }
         // see if it's a local file
