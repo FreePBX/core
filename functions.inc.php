@@ -6764,9 +6764,13 @@ function core_devices_configpageinit($dispnum) {
     }
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
       unset($select);
-		  $select[] = array('value' => 'udp', 'text' => _('UDP'));
-		  $select[] = array('value' => 'tcp', 'text' => _('TCP or TLS'));
-      $tt = _("This sets the default transport type for outgoing, and will accept both tcp and udp. The default transport type is only used for outbound messages until a Registration takes place.  During the peer Registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dyanmic setting.");
+		  $select[] = array('value' => 'udp,tcp,tls', 'text' => _('All - UDP Primary'));
+		  $select[] = array('value' => 'tcp,udp,tls', 'text' => _('All - TCP Primary'));
+		  $select[] = array('value' => 'tls,udp,tcp', 'text' => _('All - TLS Primary'));
+		  $select[] = array('value' => 'udp', 'text' => _('UDP Only'));
+		  $select[] = array('value' => 'tcp', 'text' => _('TCP Only'));
+		  $select[] = array('value' => 'tls', 'text' => _('TLS Only'));
+      $tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dyanmic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured.");
 		  $tmparr['transport'] = array('value' => 'udp', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
       unset($select);
