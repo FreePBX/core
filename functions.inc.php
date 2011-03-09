@@ -1617,7 +1617,7 @@ function core_get_config($engine) {
 			}
 
       // Put the MIXMON_DIR, it needs a trailing / so is special cased here
-			$ext->addGlobal('MIXMON_DIR', $amp_conf['MIXMON_DIR'].'/');
+			$ext->addGlobal('MIXMON_DIR', $amp_conf['MIXMON_DIR'] != '' ? $amp_conf['MIXMON_DIR'].'/' : '');
 			out("Added to globals: MIXMON_DIR = ").$amp_conf['MIXMON_DIR'].'/';
 
 			// Put the asterisk version in a global for agi etc.
