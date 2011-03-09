@@ -23,6 +23,8 @@ class core_conf {
 	var $_featuregeneral = array();
 	var $_featuremap     = array();
 	var $_applicationmap = array();
+	var $_loggergeneral  = array();
+	var $_loggerlogfiles = array();
 	// return an array of filenames to write
 	function get_filename() {
 		global $chan_dahdi;
@@ -39,6 +41,8 @@ class core_conf {
 			'features_featuremap_additional.conf',
 			'localprefixes.conf',
 			'sip_notify_additional.conf',
+			'logger_general_additional.conf',
+			'logger_logfiles_additional.conf',
 		);
 
 		if ($chan_dahdi) {
@@ -95,6 +99,12 @@ class core_conf {
 				break;
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
+				break;
+			case 'logger_general_additional.conf':
+				return $this->generate_loggergeneral_additional($version);
+				break;
+			case 'logger_logfiles_additional.conf':
+				return $this->generate_loggerlogfiles_additional($version);
 				break;
 		}
 	}
@@ -186,6 +196,36 @@ class core_conf {
 
 		if (isset($this->_applicationmap) && is_array($this->_applicationmap)) {
 			foreach ($this->_applicationmap as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addLoggerGeneral($key, $value) {
+		$this->_loggergeneral[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_loggergeneral_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_loggergeneral) && is_array($this->_loggergeneral)) {
+			foreach ($this->_loggergeneral as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addLoggerLogfiles($key, $value) {
+		$this->_loggerlogfiles[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_loggerlogfiles_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_loggerlogfiles) && is_array($this->_loggerlogfiles)) {
+			foreach ($this->_loggerlogfiles as $values) {
 				$output .= $values['key']."=".$values['value']."\n";
 			}
 		}
@@ -842,6 +882,11 @@ function core_get_config($engine) {
 				if ($ast_ge_14) {
 					$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
 				}
+
+        // basic logging:
+        // TODO: probably make filename configurable from full
+        //
+        $core_conf->addLoggerLogfiles('full','notice,warning,error,debug,verbose');
 
 				$fcc = new featurecode($modulename, 'blindxfer');
 				$code = $fcc->getCodeActive();
