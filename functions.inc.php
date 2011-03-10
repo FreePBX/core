@@ -1195,7 +1195,7 @@ function core_get_config($engine) {
 					} else {
 						$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					}
-					// always set callerID name
+					// always set CallerID name
 					$ext->add($context, $exten, '', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
@@ -2352,7 +2352,7 @@ function core_get_config($engine) {
 
 
 			/*
-			 * sets the callerid of the device to that of the logged in user
+			 * sets the CallerID of the device to that of the logged in user
 			 *
 			 * ${AMPUSER} is set upon return to the real user despite any aliasing that may
 			 * have been set as a result of the AMPUSER/<nnn>/cidnum field. This is used by
@@ -2545,7 +2545,7 @@ function core_get_config($engine) {
 
 			
 			/*
-			 * overrides callerid out trunks
+			 * overrides CallerID out trunks
 			 * arg1 is trunk
 			 * macro-user-callerid should be called _before_ using this macro
 			 */
@@ -4396,9 +4396,9 @@ function core_devices_addiax2($account) {
 	// Very bad
 	$iaxfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
 	$iaxfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
-	// Asterisk treats no caller ID from an IAX device as 'hide callerid', and ignores the caller ID
+	// Asterisk treats no caller ID from an IAX device as 'hide CallerID', and ignores the caller ID
 	// set in iax.conf. As we rely on this for pretty much everything, we need to specify the 
-	// callerid as a variable which gets picked up in macro-callerid.
+	// CallerID as a variable which gets picked up in macro-callerid.
 	// Ref - http://bugs.digium.com/view.php?id=456
 	$iaxfields[] = array($account,'setvar',$db->escapeSimple("REALCALLERIDNUM=$account"),$flag++);
 	
@@ -6351,7 +6351,7 @@ function core_users_configpageload() {
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The caller id name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '!isAlphanumeric() || isWhitespace()', $msgInvalidDispName, false));
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
-		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal callerid to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
+		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")));
 
 		// If user mode, list devices associated with this user
@@ -6381,7 +6381,7 @@ function core_users_configpageload() {
 		}
 		
 		$section = _("Extension Options");
-		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound callerid feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the caller id when dialing out a trunk. Any setting here will override the common outbound caller id set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
 
@@ -6409,7 +6409,7 @@ function core_users_configpageload() {
       $answermode = isset($answermode) ? $answermode : $amp_conf['DEFAULT_INTERNAL_AUTO_ANSWER'];
 		  $currentcomponent->addguielem($section, new gui_selectbox('answermode', $currentcomponent->getoptlist('answermode'), $answermode, _("Internal Auto Answer"), _("When set to Intercom, calls to this extension/user from other internal users act as if they were intercom calls meaning they will be auto-answered if the endpoint supports this feature and the system is configured to operate in this mode. All the normal white list and black list settings will be honored if they are set. External calls will still ring as normal, as will certain other circumstances such as blind transfers and when a Follow Me is configured and enabled. If Disabled, the phone rings as a normal phone."), false));
     }
-		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that callerid. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerId."), false));
+		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their caller-id once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that CallerID. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerID."), false));
 		$currentcomponent->addguielem($section, new gui_selectbox('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false));
 
 		$section = _("Assigned DID/CID");
