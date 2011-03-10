@@ -6801,7 +6801,7 @@ function core_devices_configpageinit($dispnum) {
 
     $tt = _("Endpoint port number to use, usually 5060. Some 2 ports devices such as ATA may used 5061 for the second port.");
 		$tmparr['port'] = array('value' => '5060', 'tt' => $tt, 'level' => 1);
-    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and conisdered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
+    $tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and considered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
 		$tmparr['qualify'] = array('value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
     if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
       $tt = _("Frequency in seconds to send qualify messages to the endpoint.");
@@ -6815,7 +6815,7 @@ function core_devices_configpageinit($dispnum) {
 		  $select[] = array('value' => 'udp', 'text' => _('UDP Only'));
 		  $select[] = array('value' => 'tcp', 'text' => _('TCP Only'));
 		  $select[] = array('value' => 'tls', 'text' => _('TLS Only'));
-      $tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dyanmic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured.");
+      $tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured.");
 		  $tmparr['transport'] = array('value' => 'udp', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
       unset($select);
