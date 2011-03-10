@@ -3419,7 +3419,7 @@ function core_get_config($engine) {
        * hit the DB, but more importantly, there is no cleanup because the variable will die with the
        * owner channel.
        *
-       * We check if the SHARED function is availalbe and if so, we use that in our macro. If not, we
+       * We check if the SHARED function is available and if so, we use that in our macro. If not, we
        * fall back to the shared DB variable and keep our cleanup code in hangupcall.
        *
        * Note that we have chosen to use a Macro() in place of a GoSub() because in the legacy DB
