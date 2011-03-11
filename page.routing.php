@@ -543,7 +543,7 @@ if ($extdisplay) { // editing
   $pp_tit = _("prepend");
   $pf_tit = _("prefix");
   $mp_tit = _("match pattern");
-  $ci_tit = _("CallerId");
+  $ci_tit = _("CallerID");
 
   $dpt_title_class = 'dpt-title dpt-display';
   foreach ($dialpattern_array as $idx => $pattern) {
