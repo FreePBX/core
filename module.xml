@@ -104,6 +104,6 @@
 		<ampusers sort="5">Administrators</ampusers>
 		<wiki type="tool" category="Support" sort="5" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.9/core-2.9.0beta2.1.tgz</location>
-	<md5sum>fb0e72b22f9188188ed6e387917a7864</md5sum>
+	<location>release/2.9/core-2.9.0beta2.2.tgz</location>
+	<md5sum>c341087fc4537221f7cac7984adcf64c</md5sum>
 </module>
