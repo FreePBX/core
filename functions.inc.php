@@ -3429,8 +3429,8 @@ function core_get_config($engine) {
        * a GoSub() call which would be slightly more efficient.
        */
 
+      $exten = 's';
       if ($amp_conf['AST_FUNC_SHARED']) {
-        $exten = 's';
 
         // If it BLKVM_CHANNEL exists, return it's value. If not, then set it and return TRUE
         //
