@@ -1238,17 +1238,8 @@ function core_get_config($engine) {
 					if (!empty($item['alertinfo'])) {
 						$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
 					}
-					// Add CID prefix, no need to do checks for existing pre-pends, this is an incoming did so this should
-					// be the first time the CID is manipulated. We set _RGPREFIX which is the same used throughout the different
-					// modules.
-					//
-					// TODO: If/When RGPREFIX is added to trunks, then see code in ringgroups to strip prefix if added here.
-					//
-					// TODO: core FreePBX documentation about this standard. (and probably rename from RGPREFIX to CIDPREFIX)
-					//
 					if (!empty($item['grppre'])) {
-						$ext->add($context, $exten, '', new ext_setvar('_RGPREFIX', $item['grppre']));
-						$ext->add($context, $exten, '', new ext_setvar('CALLERID(name)','${RGPREFIX}${CALLERID(name)}'));
+						$ext->add($context, $exten, '', new ext_macro('prepend-cid', $item['grppre']));
 					}
 					
 					//the goto destination
@@ -1778,6 +1769,24 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
 			}
+
+      /* macro-prepend-cid */
+      // prepend a cid and if set to replace previous prepends, do so, otherwise stack them
+      //
+      $mcontext = 'macro-prepend-cid';
+      $exten = 's';
+
+      if ($amp_conf['CID_PREPEND_REPLACE']) {
+        $ext->add($mcontext, $exten, '', new ext_gotoif('$["${RGPREFIX}" = ""]', 'REPCID'));
+        $ext->add($mcontext, $exten, '', new ext_gotoif('$["${RGPREFIX}" != "${CALLERID(name):0:${LEN(${RGPREFIX})}}"]', 'REPCID'));
+        $ext->add($mcontext, $exten, '', new ext_noop_trace('Current RGPREFIX is ${RGPREFIX}....stripping from Caller ID'));
+        $ext->add($mcontext, $exten, '', new ext_set('CALLERID(name)', '${CALLERID(name):${LEN(${RGPREFIX})}}'));
+        $ext->add($mcontext, $exten, '', new ext_set('_RGPREFIX', ''));
+      }
+      $ext->add($mcontext, $exten, 'REPCID', new ext_set('_RGPREFIX', '${ARG1}'));
+      $ext->add($mcontext, $exten, '', new ext_set('CALLERID(name)','${RGPREFIX}${CALLERID(name)}'));
+
+
 
 			/* outbound routes */
 
@@ -3203,7 +3212,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!=""]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${ARG3} | ${ARG4} | ${ARG5}]?${RINGTIMER}:"")}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_macro('record-enable','${EXTTOCALL},IN'));
 
       // If paging module is not present, then what happens?
