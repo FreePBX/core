@@ -1571,7 +1571,6 @@ function core_get_config($engine) {
         "VMX_LOOPDEST_CONTEXT",
         "VMX_LOOPDEST_EXT",
         "VMX_LOOPDEST_PRI",
-        "MIXMON_POST",
 			);
 
 			$disable_recording = false;
@@ -1608,8 +1607,13 @@ function core_get_config($engine) {
 			}
 
       // Put the MIXMON_DIR, it needs a trailing / so is special cased here
-			$ext->addGlobal('MIXMON_DIR', $amp_conf['MIXMON_DIR'] != '' ? $amp_conf['MIXMON_DIR'].'/' : '');
-			out("Added to globals: MIXMON_DIR = ").$amp_conf['MIXMON_DIR'].'/';
+      $mixmon_dir = $amp_conf['MIXMON_DIR'] != '' ? $amp_conf['MIXMON_DIR'].'/' : '';
+			$ext->addGlobal('MIXMON_DIR', $mixmon_dir);
+			out("Added to globals: MIXMON_DIR = $mixmon_dir");
+
+      // Put the MIXMON_POST
+			$ext->addGlobal('MIXMON_POST', $amp_conf['MIXMON_POST']);
+			out("Added to globals: MIXMON_POST = ".$amp_conf['MIXMON_POST']);
 
 			// Put the asterisk version in a global for agi etc.
 			$ext->addGlobal('ASTVERSION', $version);
