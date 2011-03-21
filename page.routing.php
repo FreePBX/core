@@ -450,7 +450,7 @@ if ($extdisplay) { // editing
 		</tr>
 
 		<tr>
-      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Company will treat this route as an intra-company connection, preserving the internal Caller ID information instead of the outbound CID of either the extension or trunk.")?></span></a></td>
+      <td><a href=# class="info"><?php echo _("Route Type")?>:<span><?php echo _("Optional: Selecting Emergency will enforce the use of a device's Emergency CID setting (if set).  Select this option if this route is used for emergency dialing (ie: 911).").'<br />'._("Optional: Selecting Intra-Company will treat this route as an intra-company connection, preserving the internal CallerID information instead of the outbound CID of either the extension or trunk.")?></span></a></td>
       <td>
         <input type="checkbox" name="emergency" value="YES" <?php echo ($emergency ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Emergency") ?></small>
         <input type="checkbox" name="intracompany" value="YES" <?php echo ($intracompany ? "CHECKED" : "") ?>  tabindex="<?php echo ++$tabindex;?>"/><small><?php echo _("Intra-Company") ?></small>
@@ -875,7 +875,7 @@ function routeEdit_onsubmit(act) {
 	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
 	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
 	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
-	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
+	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	
 	var rname = theForm.routename.value;
 	if (!rname.match('^[a-zA-Z0-9][a-zA-Z0-9_\-]+$'))

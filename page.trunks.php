@@ -523,7 +523,7 @@ if ($helptext != '') {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Caller ID")?><span><?php echo _("Caller ID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound CallerID")?><span><?php echo _("CallerID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span></a>: 
 				</td><td>
 					<input type="text" size="30" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -1132,7 +1132,7 @@ document.trunkEdit.trunk_name.focus();
 function trunkEdit_onsubmit(act) {
   var theForm = document.trunkEdit;
 
-	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound Caller ID'); ?>";
+	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
 	var msgInvalidOutboundDialPrefix = "<?php echo _('The Outbound Dial Prefix contains non-standard characters. If these are intentional the press OK to continue.'); ?>";
@@ -1140,8 +1140,8 @@ function trunkEdit_onsubmit(act) {
 	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
-	var msgCIDValueRequired = "<?php echo _('You must define an Outbound Caller ID when Choosing this CID Options value'); ?>";
-	var msgCIDValueEmpty = "<?php echo _('It is highly recommended that you define an Outbound Caller ID on all trunks, undefined behavior can result when nothing is specified. The CID Options can control when this CID is used. Do you still want to continue?'); ?>";
+	var msgCIDValueRequired = "<?php echo _('You must define an Outbound CallerID when Choosing this CID Options value'); ?>";
+	var msgCIDValueEmpty = "<?php echo _('It is highly recommended that you define an Outbound CallerID on all trunks, undefined behavior can result when nothing is specified. The CID Options can control when this CID is used. Do you still want to continue?'); ?>";
 
 	defaultEmptyOK = true;
 
