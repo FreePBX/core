@@ -111,8 +111,8 @@ $(document).ready(function() {
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
 		var save = $(this).closest('tr').find('input.save');
 		//this is hidden seperatly from the td due to some ie issues, hence we show it separately
-		$(this).closest('tr').find('.savetd').show(); 
-
+		$(this).closest('tr').find('.savetd').show().focus();
+		
 		//if the value was changed since the last page refresh
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
 			save.stop(true, true).delay(100).fadeIn();
