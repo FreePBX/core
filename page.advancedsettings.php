@@ -134,10 +134,10 @@
 				break;
 			case CONF_TYPE_BOOL:
 ?>
-  <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" <?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
+  <span class="radioset"><input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" <?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
   <label for="<?php echo $c['keyword'] ?>-true"><?php echo _("True") ?></label>
   <input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" <?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
-  <label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label>
+  <label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label></span>
 <?php
 				break;
 		}
