@@ -107,29 +107,41 @@ $(document).ready(function() {
 		}
 		$(this).hide();
 	});
+
 	//show save button
 	$('.valueinput').bind('keyup keypress keydown paste change', function(){
 		var save = $(this).closest('tr').find('input.save');
-		//this is hidden seperatly from the td due to some ie issues, hence we show it separately
-		$(this).closest('tr').find('.savetd').show().focus();
+		var savetd = $(this).closest('tr').find('.savetd');
+		var adv_set_default = $(this).closest('tr').find('input.adv_set_default');
 		
 		//if the value was changed since the last page refresh
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
+			if (savetd.is(':hidden')) {
+				savetd.show();
+			}
 			save.stop(true, true).delay(100).fadeIn();
 			//only bind if not already bound
 			if (save.data("events") == undefined || typeof(save.data('events')["click"]) == undefined) {
 				save.bind('click', savebinder);
 			}
-			//show 'revert to defualt'
-			$(this).closest('tr').find('input.adv_set_default').show()
 		} else {
 			save.stop(true, true).delay(100).fadeOut('normal', function(){
-						$(this).closest('tr').find('.savetd').hide();
-						$(this).closest('tr').find('input.adv_set_default').fadeOut()
-				}).unbind('click', savebinder); 
+				if (!savetd.is(':hidden')) {
+					savetd.hide();
+				}
+			}).unbind('click', savebinder); 
 		}
-		
+		if($(this).val() != adv_set_default.attr('data-default')){
+			if (adv_set_default.is(':hidden')) {
+				adv_set_default.show()
+			}
+		} else {
+			if (!adv_set_default.is(':hidden')) {
+				adv_set_default.fadeOut()
+			}
+		}
 	})
+
 	$("#page_reload").click(function(){
 		if (!page_reload_check()) {
 			if (!confirm(msgUnsavedChanges)) {
