@@ -85,18 +85,25 @@
 
     if ($display_friendly_name) {
       $name_label_raw = $c['name'];
+      $description_raw = $c['description'];
       if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
         bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
         bind_textdomain_codeset($c['module'], 'utf8');
         $name_label = dgettext($c['module'],$name_label_raw);
+        $tt_description = dgettext($c['module'],$description_raw);
         if ($name_label == $name_label_raw) {
           $name_label = _($name_label_raw);
         }
+        if ($tt_description == $description_raw) {
+          $tt_description = _($description_raw);
+        }
       } else {
         $name_label = _($name_label_raw);
+        $tt_description = _($description_raw);
       }
     } else {
       $name_label = $c['keyword'];
+      $tt_description = $c['description'];
     }
 
     $row++;
@@ -114,7 +121,7 @@
     } else {
       $default_val .= '<br />'.sprintf(_("Friendly Name: %s"),$c['name']);
     }
-		echo '<tr><td><a href="javascript:void(null)" class="info">'.$name_label.'<span>'.$c['description'].'<br /><br >'.$default_val.'</span></a></td>';
+		echo '<tr><td><a href="javascript:void(null)" class="info">'.$name_label.'<span>'.$tt_description.'<br /><br >'.$default_val.'</span></a></td>';
 		echo '<td>';
 		switch ($c['type']) {
 			case CONF_TYPE_TEXT:
