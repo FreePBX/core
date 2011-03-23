@@ -4023,6 +4023,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		$jump = true;
 	}
 	
+  $emergency_cid = trim($emergency_cid);
 	if(!get_magic_quotes_gpc()) {
 		if(!empty($emergency_cid))
 			$emergency_cid = $db->escapeSimple($emergency_cid);
