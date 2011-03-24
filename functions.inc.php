@@ -2131,7 +2131,7 @@ function core_get_config($engine) {
 			// But add the macro-setmusic if we don't want music on this outbound call
       // if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
 			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -2264,7 +2264,7 @@ function core_get_config($engine) {
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
 			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
-			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
 		
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
@@ -2715,7 +2715,7 @@ function core_get_config($engine) {
       $exten = '_LC-.';
 			$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
 		  $ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
-			$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},M(auto-confirm^${RG_IDX})${DIAL_OPTIONS}'));
+      $ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})'));
 
       /*
         ;------------------------------------------------------------------------
