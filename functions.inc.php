@@ -970,6 +970,84 @@ function core_get_config($engine) {
 				}
 			}
 
+      /* This needs to be before outbound-routes since they can have a wild-card in them
+       *
+        ;------------------------------------------------------------------------
+        ; [ext-local-confirm]
+        ;------------------------------------------------------------------------
+        ; If call confirm is being used in a ringgroup, then calls that do not require confirmation are sent
+        ; to this extension instead of straight to the device.
+        ;
+        ; The sole purpose of sending them here is to make sure we run Macro(auto-confirm) if this
+        ; extension answers the line. This takes care of clearing the database key that is used to inform
+        ; other potential late comers that the extension has been answered by someone else.
+        ;
+        ; ALERT_INFO is deprecated in Asterisk 1.4 but still used throughout the FreePBX dialplan and
+        ; usually set by dialparties.agi. This allows inheritance. Since no dialparties.agi here, set the
+        ; header if it is set.
+        ;
+        ;------------------------------------------------------------------------
+       */
+      $context = 'ext-local-confirm';
+      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
+      $exten = '_LC-.';
+			$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
+		  $ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
+      $ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})'));
+
+      /* This needs to be before outbound-routes since they can have a wild-card in them
+       *
+        ;------------------------------------------------------------------------
+        ; [findmefollow-ringallv2]
+        ;------------------------------------------------------------------------
+        ; This context, to be included in from-internal, implements the PreRing part of findmefollow
+        ; as well as the GroupRing part. It also communicates between the two so that if DND is set
+        ; on the primary extension, and mastermode is enabled, then the other extensions will not ring
+        ;
+        ;------------------------------------------------------------------------
+       */
+      $context = 'findmefollow-ringallv2';
+      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
+      $exten = '_FMPR-.';
+
+      $fm_dnd = $amp_conf['AST_FUNC_SHARED'] ? 'SHARED(FM_DND,${FMUNIQUE})' : 'DB(FM/DND/${FMGRP}/${FMUNIQUE})';
+
+			$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
+			$ext->add($context, $exten, '', new ext_set('RingGroupMethod',''));
+			$ext->add($context, $exten, '', new ext_set('USE_CONFIRMATION',''));
+			$ext->add($context, $exten, '', new ext_set('RINGGROUP_INDEX',''));
+			$ext->add($context, $exten, '', new ext_macro('simple-dial','${EXTEN:5},${FMREALPRERING}'));
+		  $ext->add($context, $exten, '', new ext_execif('$["${DIALSTATUS}" = "BUSY"]', 'Set', "$fm_dnd=DND"));
+			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMPR ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+
+      $exten = '_FMGL-.';
+			$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
+
+			$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
+			$ext->add($context, $exten, 'start', new ext_gotoif('$["${' .$fm_dnd. '}" = "DND"]','dodnd'));
+			$ext->add($context, $exten, '', new ext_wait('1'));
+			$ext->add($context, $exten, '', new ext_noop_trace('FMGL wait loop: ${EPOCH} / ${ENDLOOP}', 6));
+			$ext->add($context, $exten, '', new ext_gotoif('$[${EPOCH} < ${ENDLOOP}]','start'));
+      if ($amp_conf['AST_FUNC_SHARED']) {
+			  $ext->add($context, $exten, '', new ext_set($fm_dnd, ''));
+      } else {
+			  $ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
+      }
+			$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
+			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+      // n+10(dodnd):
+      if ($amp_conf['AST_FUNC_SHARED']) {
+			  $ext->add($context, $exten, 'dodnd', new ext_set($fm_dnd, ''), 'n', 10);
+      } else {
+			  $ext->add($context, $exten, 'dodnd', new ext_dbdel($fm_dnd), 'n', 10);
+      }
+			$ext->add($context, $exten, '', new ext_gotoif('$["${FMPRIME}" = "FALSE"]','dodial'));
+			$ext->add($context, $exten, '', new ext_noop_trace('Got DND in FMGL ${FMGRP} with ${EXTEN:5} in ${RingGroupMethod} mode, aborting'));
+			$ext->add($context, $exten, '', new ext_hangup(''));
+
+
 			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs and SNOMs as a number to dial
 			// when a user pushes a flashing BLF. 
 			//
@@ -2692,81 +2770,6 @@ function core_get_config($engine) {
 			$ext->add($context, 'h', '', new ext_hangup());
 
 			/* end vm-callme context  */
-
-      /*
-        ;------------------------------------------------------------------------
-        ; [ext-local-confirm]
-        ;------------------------------------------------------------------------
-        ; If call confirm is being used in a ringgroup, then calls that do not require confirmation are sent
-        ; to this extension instead of straight to the device.
-        ;
-        ; The sole purpose of sending them here is to make sure we run Macro(auto-confirm) if this
-        ; extension answers the line. This takes care of clearing the database key that is used to inform
-        ; other potential late comers that the extension has been answered by someone else.
-        ;
-        ; ALERT_INFO is deprecated in Asterisk 1.4 but still used throughout the FreePBX dialplan and
-        ; usually set by dialparties.agi. This allows inheritance. Since no dialparties.agi here, set the
-        ; header if it is set.
-        ;
-        ;------------------------------------------------------------------------
-       */
-      $context = 'ext-local-confirm';
-      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
-      $exten = '_LC-.';
-			$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
-		  $ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
-      $ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})'));
-
-      /*
-        ;------------------------------------------------------------------------
-        ; [findmefollow-ringallv2]
-        ;------------------------------------------------------------------------
-        ; This context, to be included in from-internal, implements the PreRing part of findmefollow
-        ; as well as the GroupRing part. It also communicates between the two so that if DND is set
-        ; on the primary extension, and mastermode is enabled, then the other extensions will not ring
-        ;
-        ;------------------------------------------------------------------------
-       */
-      $context = 'findmefollow-ringallv2';
-      $ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
-      $exten = '_FMPR-.';
-
-      $fm_dnd = $amp_conf['AST_FUNC_SHARED'] ? 'SHARED(FM_DND,${FMUNIQUE})' : 'DB(FM/DND/${FMGRP}/${FMUNIQUE})';
-
-			$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
-			$ext->add($context, $exten, '', new ext_set('RingGroupMethod',''));
-			$ext->add($context, $exten, '', new ext_set('USE_CONFIRMATION',''));
-			$ext->add($context, $exten, '', new ext_set('RINGGROUP_INDEX',''));
-			$ext->add($context, $exten, '', new ext_macro('simple-dial','${EXTEN:5},${FMREALPRERING}'));
-		  $ext->add($context, $exten, '', new ext_execif('$["${DIALSTATUS}" = "BUSY"]', 'Set', "$fm_dnd=DND"));
-			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMPR ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
-			$ext->add($context, $exten, '', new ext_hangup(''));
-
-      $exten = '_FMGL-.';
-			$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
-
-			$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
-			$ext->add($context, $exten, 'start', new ext_gotoif('$["${' .$fm_dnd. '}" = "DND"]','dodnd'));
-			$ext->add($context, $exten, '', new ext_wait('1'));
-			$ext->add($context, $exten, '', new ext_noop_trace('FMGL wait loop: ${EPOCH} / ${ENDLOOP}', 6));
-			$ext->add($context, $exten, '', new ext_gotoif('$[${EPOCH} < ${ENDLOOP}]','start'));
-      if ($amp_conf['AST_FUNC_SHARED']) {
-			  $ext->add($context, $exten, '', new ext_set($fm_dnd, ''));
-      } else {
-			  $ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
-      }
-			$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
-			$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
-			$ext->add($context, $exten, '', new ext_hangup(''));
-      // n+10(dodnd):
-      if ($amp_conf['AST_FUNC_SHARED']) {
-			  $ext->add($context, $exten, 'dodnd', new ext_set($fm_dnd, ''), 'n', 10);
-      } else {
-			  $ext->add($context, $exten, 'dodnd', new ext_dbdel($fm_dnd), 'n', 10);
-      }
-			$ext->add($context, $exten, '', new ext_gotoif('$["${FMPRIME}" = "FALSE"]','dodial'));
-			$ext->add($context, $exten, '', new ext_noop_trace('Got DND in FMGL ${FMGRP} with ${EXTEN:5} in ${RingGroupMethod} mode, aborting'));
-			$ext->add($context, $exten, '', new ext_hangup(''));
 
 
       /*
