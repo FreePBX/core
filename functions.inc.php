@@ -2726,7 +2726,7 @@ function core_get_config($engine) {
 		  // If there's no ext-did,s,1, that means there's not a no did/no cid route. Hangup.
 		  $ext->add($context, $exten, '', new ext_macro('Hangupcall', 'dummy'));
 
-		  $ext->add($context, $exten, 'dahdiok', new ext_noop('Is a DAHDI Channel'));
+		  $ext->add($context, $exten, 'dahdiok', new ext_noop('Is a DAHDi Channel'));
 		  $ext->add($context, $exten, '', new ext_set('CHAN', '${CHANNEL:6}'));
 		  $ext->add($context, $exten, '', new ext_set('CHAN', '${CUT(CHAN,-,1)}'));
 		  $ext->add($context, $exten, '', new ext_macro('from-dahdi-${CHAN}', '${DID},1'));
@@ -4556,7 +4556,7 @@ function core_devices_adddahdi($account) {
 	$compiled = $db->prepare('INSERT INTO dahdi (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$dahdifields);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>error adding to DAHDI table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to DAHDi table");	
 	}
 }
 
@@ -6882,7 +6882,7 @@ function core_devices_configpageinit($dispnum) {
       $currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
     }
     if (ast_with_dahdi()) {
-		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDI Device"));
+		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDi Device"));
     }
 		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
 		}
@@ -7020,7 +7020,7 @@ function core_devices_configpageload() {
 		if ($devinfo_tech && $devinfo_tech != "virtual") {
 			$section = _("Device Options");
 
-			$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDI compatibility mode").")":"");
+			$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
 			$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
 			$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 			if (is_array($devopts)) {
