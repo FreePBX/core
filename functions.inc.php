@@ -4736,7 +4736,7 @@ function core_check_destinations($dest=true) {
 	foreach ($results as $result) {
 		$thisdest    = $result['busy_dest'];
 		$thisid      = $result['extension'];
-		$description = sprintf(_("%s: %s (%s)"),$label,$result['name'],$thisid);
+		$description = sprintf("%s: %s (%s)",$label,$result['name'],$thisid);
 		$thisurl     = 'config.php?display='.$display.'&extdisplay='.urlencode($thisid);
 		if (($dest === true && $thisdest != '') || $dest = $thisdest) {
 			$destlist[] = array(
