@@ -883,11 +883,6 @@ function core_get_config($engine) {
 					$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
 				}
 
-        // basic logging:
-        // TODO: probably make filename configurable from full
-        //
-        $core_conf->addLoggerLogfiles('full','notice,warning,error,debug,verbose');
-
 				$fcc = new featurecode($modulename, 'blindxfer');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
