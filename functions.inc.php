@@ -6363,35 +6363,35 @@ function core_users_configpageload() {
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
-    $currentcomponent->addjsfunc('onsubmit()', "
+    if ($action == 'add') {
+      $currentcomponent->addjsfunc('onsubmit()', "
       var exten = $('#extension').val();
-      var exten_action = $('#action').val();
       var ajax_result = true;
       $('#error').remove();
-      if (exten_action != 'edit') {
-        $.ajax({
-          type: 'POST',
-          url: 'config.php',
-          data: 'handler=api&function=framework_get_conflict_url_helper&args=' + exten,
-          dataType: 'json',
-          cache: false,
-          async: false,
-          success: function(data, textStatus, XMLHttpRequest) {
-            if (data.length !== 0) {
-              $('#title').after('<div id=\"error\"><h5>"._("Conflicting Extensions")."</h5>' + data + '</div>');
-              ajax_result = false;
-            }
-          },
-          error: function(data) {
-            console.log('an error was recevied: ' + data);
-            // TODO: Should we stop the submital and do something here?
+      $.ajax({
+        type: 'POST',
+        url: 'config.php',
+        data: 'handler=api&function=framework_get_conflict_url_helper&args=' + exten,
+        dataType: 'json',
+        cache: false,
+        async: false,
+        success: function(data, textStatus, XMLHttpRequest) {
+          if (data.length !== 0) {
+            $('#title').after('<div id=\"error\"><h5>"._("Conflicting Extensions")."</h5>' + data + '</div>');
+            ajax_result = false;
           }
-        });
-      }
+        },
+        error: function(data) {
+          console.log('an error was recevied: ' + data);
+          // TODO: Should we stop the submital and do something here?
+        }
+      });
       if (!ajax_result) {
         alert('". _("Extension number conflict, please choose another.") . "');
-        $('#extension').focus();        return false;
-    }", 9);	
+        $('#extension').focus();
+        return false;
+      }", 9);
+    }
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '!isAlphanumeric() || isWhitespace()', $msgInvalidDispName, false));
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
@@ -6545,22 +6545,7 @@ function core_users_configprocess() {
 		if (!isset($action)) $action = null;
 		switch ($action) {
 			case "add":
-				$conflict_url = array();
-				$usage_arr = framework_check_extension_usage($_REQUEST['extension']);
-				if (!empty($usage_arr)) {
-					$GLOBALS['abort'] = true;
-					$conflict_url = framework_display_extension_usage_alert($usage_arr,true);
-					global $currentcomponent;
-					$id=0;
-					$currentcomponent->addguielem('_top', new gui_link_label('conflict', _("Conflicting Extensions"), _("The following extension numbers are in conflict, you can click on the item(s) below to edit the conflicting entity."), true));
-					foreach ($conflict_url as $edit_link) {
-						$currentcomponent->addguielem('_top', new gui_link('conflict'.$id++, $edit_link['label'], $edit_link['url']));
-					}
-					$msg = ($_REQUEST['display'] == 'users') ? _("Configure user again:") : _("Configure extension again:");
-					$currentcomponent->addguielem('_top', new gui_subheading('conflict_end', $msg, false));
-					unset($_REQUEST['action']);
-					redirect_standard_continue();
-				} elseif (core_users_add($_REQUEST)) {
+				if (core_users_add($_REQUEST)) {
 					needreload();
 					redirect_standard_continue();
 				} else {
