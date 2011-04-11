@@ -6825,7 +6825,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'never', 'text' => _('never - no RFC3581'));
 		$select[] = array('value' => 'route', 'text' => _('route - NAT no rport'));
     $tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.");
-		$tmparr['nat'] = array('value' => $amp_conf['DEVICE_SIP_NAT'], 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['nat'] = array('value' => $amp_conf['DEVICE_SIP_NAT'], 'tt' => $tt, 'select' => $select, 'level' => 0);
 
     $tt = _("Endpoint port number to use, usually 5060. Some 2 ports devices such as ATA may used 5061 for the second port.");
 		$tmparr['port'] = array('value' => '5060', 'tt' => $tt, 'level' => 1);
