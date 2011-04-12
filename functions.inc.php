@@ -3575,7 +3575,8 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', ''));
         $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'BUSY'));
         $ext->add($mcontext,$exten,'', new ext_goto('nodial'));
-        $ext->add($mcontext,$exten,'cwinusebusy', new ext_gotoif('$["${EXTHASCW}"!="" & "${CWINUSEBUSY}"!=""]','next3','continue'));
+        //TODO: we know about CWINUSEBUSY at generation time, so change this and above corresponding targets to streamline at generation
+        $ext->add($mcontext,$exten,'cwinusebusy', new ext_gotoif('$["${EXTHASCW}"!="" & "${CWINUSEBUSY}"="true"]','next3','continue'));
         $ext->add($mcontext,$exten,'next3', new ext_execif('$["${EXTENSION_STATE(${DEXTEN})}"!="UNAVAILABLE" & "${EXTENSION_STATE(${DEXTEN})}"!="NOT_INUSE" & "${EXTENSION_STATE(${DEXTEN})}"!="UNKNOWN"]', 'Set', 'DIALSTATUS_CW=BUSY'));
         $ext->add($mcontext,$exten,'continue', new ext_gotoif('$["${DEXTEN}"=""]','nodial'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$["${DEXTEN:-1}"!="#"]','dstring,1','dlocal,1'));
