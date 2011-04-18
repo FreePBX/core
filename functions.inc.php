@@ -2180,7 +2180,7 @@ function core_get_config($engine) {
       } else {
         if (!defined('DEFAULT_MSG')) define('DEFAULT_MSG', -1);
         if (!defined('CONGESTION_TONE')) define('CONGESTION_TONE', -2);
-        $trunkreportmsg_ids = array('no_answer_msg_id' => -1, 'invalidnmbr_msg_id' => -1, 'unalloc_msg_id' => -1);
+        $trunkreportmsg_ids = array('no_answer_msg_id' => -1, 'invalidnmbr_msg_id' => -1);
       }
 			 
 			$context = 'macro-dialout-trunk';
