@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.9.0rc1.6* #5095
 		*2.9.0rc1.5* #5055
 		*2.9.0rc1.4* #5065, #5057
 		*2.9.0rc1.3* #4871 again

@@ -1271,6 +1271,11 @@ function core_get_config($engine) {
 					// always set CallerID name
 					$ext->add($context, $exten, '', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
 
+          // if VQA present and configured call it
+          if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_INBOUND']) {
+						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_INBOUND'));
+          }
+
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
 						$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
 						$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
@@ -1919,6 +1924,11 @@ function core_get_config($engine) {
 					if ($amp_conf['DIVERSIONHEADER']) {
 						$ext->add($context, $exten, '', new ext_gosubif('$[${LEN(${FROM_DID})}>0 & "${FROM_DID}"!="s"]','sub-diversion-header,s,1'));
 					}
+
+          // if VQA present and configured call it
+          if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_OUTBOUND']) {
+						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND'));
+          }
 
           if ($route['emergency_route'] != '') {
 						$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
