@@ -1,4 +1,4 @@
-<?php
+1<?php
 //This file is part of FreePBX.
 //
 //    FreePBX is free software: you can redistribute it and/or modify
@@ -1273,7 +1273,7 @@ function core_get_config($engine) {
 
           // if VQA present and configured call it
           if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_INBOUND']) {
-						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_INBOUND'));
+						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_INBOUND']));
           }
 
 					if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
@@ -1927,7 +1927,7 @@ function core_get_config($engine) {
 
           // if VQA present and configured call it
           if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_OUTBOUND']) {
-						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND'));
+						$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND']));
           }
 
           if ($route['emergency_route'] != '') {
