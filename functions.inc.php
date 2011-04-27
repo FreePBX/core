@@ -1,4 +1,4 @@
-1<?php
+<?php
 //This file is part of FreePBX.
 //
 //    FreePBX is free software: you can redistribute it and/or modify
