@@ -646,7 +646,7 @@ END;
             insert = '<?php echo _("NXXXXXX,NXXNXXXXXX") ?>';
 					break;
 					case 'tollfree':
-            insert = '<?php echo _("1800NXXXXXX,1888NXXXXXX,1877NXXXXXX,1866NXXXXXX") ?>';
+            insert = '<?php echo _("1800NXXXXXX,1888NXXXXXX,1877NXXXXXX,1866NXXXXXX,1855NXXXXXX") ?>';
 					break;
 					case "ld":
             insert = '<?php echo _("1NXXNXXXXXX") ?>';
