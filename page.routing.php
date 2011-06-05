@@ -313,7 +313,7 @@ switch ($action) {
 }
 
 ?>
-</div>
+
 <script type="text/javascript">
 $(document).ready(function(){
   $("#routelist").sortable({ 
@@ -368,7 +368,6 @@ foreach ($routepriority as $key => $tresult) {
 </ul>
 </div>
 
-<div class="content">
 
 <?php 
 $last_seq = count($routepriority)-1;

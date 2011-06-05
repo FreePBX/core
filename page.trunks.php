@@ -303,7 +303,6 @@ switch ($action) {
 }
 	
 ?>
-</div>
 
 <div class="rnav">
 <ul>
@@ -350,7 +349,6 @@ foreach ($tresults as $tresult) {
 </ul>
 </div>
 
-<div class="content">
 
 <?php 
 if (!$tech && !$extdisplay) {

@@ -49,7 +49,6 @@ switch ($action) {
 
 
 ?> 
-</div>
 
 <div class="rnav"><ul>
 <?php 
@@ -62,8 +61,6 @@ foreach (core_zapchandids_list() as $row) {
 
 ?>
 </ul></div>
-
-<div class="content">
 
 <?php
 

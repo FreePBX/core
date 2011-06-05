@@ -73,7 +73,6 @@ switch ($action) {
 }
 
 ?>
-</div>
 
 <?php
 $display_link = "config.php?display=$dispnum";
@@ -133,7 +132,6 @@ if (isset($inroutes)) {
 </ul>
 </div>
 
-<div class="content">
 <?php 
 	if ($action == 'delIncoming') {
 		echo '<br><h3>Route '.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
