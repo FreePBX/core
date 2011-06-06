@@ -341,7 +341,8 @@ $(document).ready(function(){
           }
         },
         error: function(data) {
-          alert("<?php _("An unknown error occurred repositioning routes, refresh your browser to see the current correct route positions") ?>");
+          alert("<?php echo _("An unknown error occurred repositioning routes, refresh your browser to see the current correct route positions") ?>");
+return false;
         }
       });
 	  }
