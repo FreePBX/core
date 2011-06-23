@@ -222,7 +222,7 @@ foreach ($globals as $global) {
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Timeout VM Msg:")?><span>
-			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>
+			<?php echo _("If this destination is voicemail, select whether or not to play the standard voicemail instructions or just beep."); ?></span></a>.
 			</td>
 			<td colspan="3" align="right">
 			<select name="VMX_OPTS_TIMEOUT" tabindex="<?php echo ++$tabindex;?>">
@@ -310,33 +310,6 @@ foreach ($globals as $global) {
 			</td>
 		</tr>
 	</table>
-
-<?php
-if (function_exists('ivr_list')) {
-  $count = sql('SELECT COUNT(*) FROM `ivr` WHERE `enable_directory` = "CHECKED"','getOne');
-  if ($count) {
-?>
-<h5><?php echo _("Legacy Company Directory")?></h5>
-<table>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Find users in the Company Directory by:")?><span><?php echo _("The Company Directory allows a caller to spell the user's first name, last name, or both when searching for a user. This will select which of these modes are used.")?></span></a>
-	</td><td align="right">
-	<select name="DIRECTORY" tabindex="<?php echo ++$tabindex;?>">
-		<option value="first" <?php  echo ($DIRECTORY == 'first' ? 'SELECTED' : '')?>><?php echo _("first name")?>
-		<option value="last" <?php  echo ($DIRECTORY == 'last' ? 'SELECTED' : '')?>><?php echo _("last name")?>
-		<option value="both" <?php  echo ($DIRECTORY == 'both' ? 'SELECTED' : '')?>><?php echo _("first or last name")?>
-	</select> 
-	</td></tr>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Announce Extension:")?><span><?php echo _("Plays a message \"Please hold while I transfer you to extension xxx\" that lets the caller know what extension to use in the future when connecting from the company directory.")?></span></a>
-	</td><td align="right">
-	<input type="checkbox" value="e" name="DIRECTORY_OPTS" <?php  echo ($DIRECTORY_OPTS ? 'CHECKED' : '')?> tabindex="<?php echo ++$tabindex;?>"> 
-	</td></tr>
-</table>
-<?php
-  }
-}
-?>
 
 <h5><?php echo _("International Settings")?></h5>
 <table>
