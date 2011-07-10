@@ -3948,6 +3948,7 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 		case "SIP":
 		case "ZAP":
 		case "DAHDI":
+		case 'CUSTOM':
 			$sql .= " WHERE tech = '".strtolower($tech)."'";
 			break;
 		case "ALL":
