@@ -3710,24 +3710,33 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
 
-			  /*
-			  * There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
-        * execution with a status of ANSWER. So we hangup at this point
-			  */
-			  $exten = 's-ANSWER';
-			  $ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
-			  $ext->add($context, $exten, '', new ext_macro('hangupcall'));
+		/*
+		* There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
+		* execution with a status of ANSWER. So we hangup at this point
+		*/
+		$exten = 's-ANSWER';
+		$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
+		$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 
-        $exten = 's-TORTURE';
-        $ext->add($mcontext,$exten,'', new ext_goto('1','musiconhold','app-blackhole'));
-        $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
+		$exten = 's-TORTURE';
+		$ext->add($mcontext,$exten,'', new ext_goto('1','musiconhold','app-blackhole'));
+		$ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
 
-        $exten = 's-DONTCALL';
-			  $ext->add($mcontext,$exten,'', new ext_answer(''));
-			  $ext->add($mcontext,$exten,'', new ext_wait('1'));
-			  $ext->add($mcontext,$exten,'', new ext_zapateller(''));
-        $ext->add($mcontext,$exten,'', new ext_playback('ss-noservice'));
-        $ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
+		$exten = 's-DONTCALL';
+		$ext->add($mcontext,$exten,'', new ext_answer(''));
+		$ext->add($mcontext,$exten,'', new ext_wait('1'));
+		$ext->add($mcontext,$exten,'', new ext_zapateller(''));
+		$ext->add($mcontext,$exten,'', new ext_playback('ss-noservice'));
+		$ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
+
+		/* 
+		* If an endpoint is offline, app_dial returns with CHANUNAVAIL, we deal with this the same way
+		* as we do with NOANSWER
+		*/
+		$exten = 's-CHANUNAVAIL';
+		$ext->add($mcontext,$exten,'', new ext_macro('vm','${SCREEN_EXTEN},BUSY,${IVR_RETVM}'));
+		$ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
+		$ext->add($mcontext,$exten,'', new ext_return(''));
 
         /* macro-dial-one */
       }
