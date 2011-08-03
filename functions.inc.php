@@ -1021,6 +1021,7 @@ function core_get_config($engine) {
 
       $fm_dnd = $amp_conf['AST_FUNC_SHARED'] ? 'SHARED(FM_DND,${FMUNIQUE})' : 'DB(FM/DND/${FMGRP}/${FMUNIQUE})';
 
+      $ext->add($context, $exten, '', new ext_nocdr(''));
 			$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
 			$ext->add($context, $exten, '', new ext_set('RingGroupMethod',''));
 			$ext->add($context, $exten, '', new ext_set('USE_CONFIRMATION',''));
@@ -1031,6 +1032,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_hangup(''));
 
       $exten = '_FMGL-.';
+      $ext->add($context, $exten, '', new ext_nocdr(''));
 			$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
 
 			$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
@@ -1996,7 +1998,10 @@ function core_get_config($engine) {
       $context = 'macro-one-touch-record';
       $exten = 's';
 
-      $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${DIALEDPEERNUMBER}:${FROMEXTEN})}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${CUT(CALLFILENAME,-,2)}:${FROMEXTEN})}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
+      $ext->add($context, $exten, '', new ext_noop_trace('CLEAN_DIALEDPEERNUMBER: ${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)} DIALEDPEERNUMBER: ${DIALEDPEERNUMBER}',5));
+      $ext->add($context, $exten, '', new ext_noop_trace('Checking permissions for ${THISEXTEN}: ${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}'));
       $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="RECORDING"]', 'stoprec'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(REC_POLICY_MODE)}"="never"]', 'stopped'));
@@ -2008,8 +2013,8 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
       $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CDR(recordingfile))','${CALLFILENAME}.${MIXMON_FORMAT}'));
       $ext->add($context, $exten, 'recording', new ext_playback('beep'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${FROMEXTEN},INUSE'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${DIALEDPEERNUMBER},INUSE'));
+      $ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
+      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
       $ext->add($context, $exten, '', new ext_macroexit());
 
       $ext->add($context, $exten, 'stoprec', new ext_stopmixmonitor());
@@ -2018,8 +2023,8 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${DIALEDPEERNUMBER}:${FROMEXTEN})}'));
       $ext->add($context, $exten, '', new ext_noop_trace('THISEXTEN: ${THISEXTEN} CALLFILENAME: ${CALLFILENAME}'));
       $ext->add($context, $exten, 'stopped', new ext_playback('beep&beep'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${FROMEXTEN},NOT_INUSE'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${DIALEDPEERNUMBER},NOT_INUSE'));
+      $ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},NOT_INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
+      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},NOT_INUSE'));
       $ext->add($context, $exten, '', new ext_macroexit());
 
       $ext->add($context, $exten, 'sstate', new ext_set('DEVICES','${DB(AMPUSER/${ARG1}/device)}'));
@@ -3729,7 +3734,16 @@ function core_get_config($engine) {
         $skip_label = $next_label;
       }
       $ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
-      $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${DIALEDPEERNUMBER},NOT_INUSE'));
+      $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]', 'macro-one-touch-record,s,sstate', false, '${IF($["${EXTTOCALL}"!=""]?${EXTTOCALL}:${CUT(CALLFILENAME,-,2)})},NOT_INUSE'));
+      $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"!="${CUT(CALLFILENAME,-,2)}"]','macro-one-touch-record,s,sstate',false,'${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
+      $ext->add($mcontext,$exten,'', new ext_noop_trace('ONETOUCH_REC: ${ONETOUCH_REC}',5));
+
+      /* Now generate a clean DIALEDPEERNUMBER if ugly followme/ringgroup extensions dialplans were engaged
+       * doesn't seem like this is need with some of the NoCDRs() but leave for now and keep an eye on it
+       *
+      $ext->add($mcontext, $exten, '', new ext_execif('$["${CLEAN_DIALEDPEERNUMBER}"=""]','Set','CLEAN_DIALEDPEERNUMBER=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
+      $ext->add($mcontext, $exten, '', new ext_set('CDR(clean_dst)','${CLEAN_DIALEDPEERNUMBER}'));
+       */
 
       $ext->add($mcontext,$exten,'', new ext_hangup());
 
