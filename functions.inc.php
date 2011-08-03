@@ -914,6 +914,15 @@ function core_get_config($engine) {
           // was this for automixmon
 					// $core_conf->addFeatureMap($automon,$code);
           $core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
+
+          $ext->addInclude('from-internal-additional', 'device-hints');
+          $device_list = core_devices_list("all", 'full', true);
+          foreach ($device_list as $device) {
+            if ($device['tech'] == 'sip' || $device['tech'] == 'iax2') {
+              $ext->add('device-hints', $code.$device['id'], '', new ext_noop("AutoMixMon Hint for: ".$device['id']));
+              $ext->addHint('device-hints', $code.$device['id'], "Custom:RECORDING".$device['id']);
+            }
+          }
 				}
         // TODO: *** NEED TO MAKE THIS SETTABLE, PLACE HOLDER AND HARD CODED FOR NOW. CAN BE:
         //           'caller' or 'callee' so for dev testing can be overridden in globals_custom.conf
@@ -1080,6 +1089,8 @@ function core_get_config($engine) {
 
 				$picklist = '${EXTEN:'.$fclen.'}';
 				$picklist .= '&${EXTEN:'.$fclen.'}@PICKUPMARK';
+				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_macro('user-callerid'));
+				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_set('PICKUP_EXTEN','${AMPUSER}'));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new $ext_pickup($picklist));
 				$ext->add('app-pickup', "_$fc_pickup.", '', new ext_hangup(''));
 
@@ -1087,6 +1098,8 @@ function core_get_config($engine) {
 					$len = strlen($fc_pickup.$intercom_code);
 					$picklist  = '${EXTEN:'.$len.'}';
 					$picklist .= '&${EXTEN:'.$len.'}@PICKUPMARK';
+				  $ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new ext_macro('user-callerid'));
+				  $ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new ext_set('PICKUP_EXTEN','${AMPUSER}'));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new $ext_pickup($picklist));
 					$ext->add('app-pickup', "_{$fc_pickup}{$intercom_code}.", '', new ext_hangup(''));
 				}
@@ -1120,9 +1133,13 @@ function core_get_config($engine) {
 						$picklist .= '&'.$grp.'@from-internal-xfer'; 
 						$picklist .= '&'.$grp.'@ext-group'; 
 					}
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_macro('user-callerid'));
+					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_set('PICKUP_EXTEN','${AMPUSER}'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new $ext_pickup($picklist));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
 					if ($intercom_code != '') {
+					  $ext->add('app-pickup', "$fc_pickup".$intercom_code.$exten, '', new ext_macro('user-callerid'));
+					  $ext->add('app-pickup', "$fc_pickup".$intercom_code.$exten, '', new ext_set('PICKUP_EXTEN','${AMPUSER}'));
 						$ext->add('app-pickup', "$fc_pickup".$intercom_code.$exten, '', new $ext_pickup($picklist));
 						$ext->add('app-pickup', "$fc_pickup".$intercom_code.$exten, '', new ext_hangup(''));
 					}
@@ -1478,6 +1495,7 @@ function core_get_config($engine) {
 							}
 						}
 					}
+
 					if ($exten['sipname']) {
 						$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
 					}
@@ -1999,7 +2017,9 @@ function core_get_config($engine) {
       $exten = 's';
 
       $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${CUT(CALLFILENAME,-,2)}:${FROMEXTEN})}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${PICKUP_EXTEN}'));
       $ext->add($context, $exten, '', new ext_execif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
+
       $ext->add($context, $exten, '', new ext_noop_trace('CLEAN_DIALEDPEERNUMBER: ${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)} DIALEDPEERNUMBER: ${DIALEDPEERNUMBER}',5));
       $ext->add($context, $exten, '', new ext_noop_trace('Checking permissions for ${THISEXTEN}: ${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}'));
       $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
