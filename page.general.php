@@ -402,15 +402,6 @@ function general_onsubmit() {
 	if (!isInteger(theForm.RINGTIMER.value))
 		return warnInvalid(theForm.RINGTIMER, msgInvalidSeconds);
 
-	// Fax email must be present if selected 'system', otherwise optional
-	if (theForm.FAX_RX.value == "system") {
-		defaultEmptyOK = false;
-	} else {
-		defaultEmptyOK = true;
-	}
-	if (!isEmail(theForm.FAX_RX_EMAIL.value))
-		return warnInvalid(theForm.FAX_RX_EMAIL, msgInvalidDefaultFaxEmail);
-
 	if (hasRing(theForm.TRUNK_OPTIONS.value))
 		return warnConfirm(theForm.TRUNK_OPTIONS, msgRingOptionOutboundTrunk);
 	
