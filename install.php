@@ -143,6 +143,37 @@ $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
+// OUTBOUND_CID_UPDATE
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Display CallerID on Calling Phone';
+$set['description'] = "When set to true and when CONNECTEDLINE() capabilities are configured and supported by your handset, the CID value being transmitted on this call will be updated on your handset in the CNAM field prepended with CID: so you know what is being presented to the caller if the outbound trunk supports and honors setting the transmitted CID.";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('OUTBOUND_CID_UPDATE',$set);
+
+// OUTBOUND_DIAL_UPDATE
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Display Dialed Number on Calling Phone';
+$set['description'] = "When set to true and when CONNECTEDLINE() capabilities are configured and supported by your handset, the number actually dialled will be updated on your handset in the CNUM field. This allows you to see the final manipulation of your number after outbound route and trunk dial manipulation rules have been applied. For example, if you have configured 7 digit dialing on a North America dialplan, the ultimate 10 or 11 digit transmission will be displayed back. Any 'Outbound Dial Prefixes' configured at the trunk level will NOT be shown as these are foten analog line pauses (w) or other characters that distort the CNUM field on updates.";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('OUTBOUND_DIAL_UPDATE',$set);
 
 // Version 2.5 Upgrade needs to migrate directdid user info to incoming table
 //

@@ -2426,6 +2426,13 @@ function core_get_config($engine) {
 			
 			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+      }
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+      }
 		
 			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 			$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '300,${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
@@ -2559,6 +2566,13 @@ function core_get_config($engine) {
 			
 			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+      }
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+      }
 		
 			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
 			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
@@ -2744,6 +2758,14 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
 			//  Replacement for asterisk's ENUMLOOKUP function
 			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
+
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+      }
+      if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+      }
+
 			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
 			// Loop through them trying them in order.
 			$ext->add($context, $exten, 'dialloop', new ext_gotoif('$["foo${DIALARR}"="foo"]', 's-${DIALSTATUS},1'));
