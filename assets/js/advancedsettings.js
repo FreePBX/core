@@ -33,6 +33,7 @@ $(document).ready(function() {
 			},
 			dataType: 'json',
 			success: function(data, textStatus, XMLHttpRequest) {
+				//console.log(data);
 				mythis.attr({src: 'images/accept.png'});
 				if (!data.validated) {
 					alert(data.msg);

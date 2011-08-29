@@ -179,21 +179,10 @@ $route_seq = isset($_REQUEST['route_seq']) ? $_REQUEST['route_seq'] : '';
 switch ($action) {
 	case 'ajaxroutepos':
 		core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
-    needreload();
-    include_once("common/json.inc.php");
-    if ($_POST['send_reload'] == 'yes') {
-      ob_start();
-      include ('views/freepbx_reloadbar.php');
-      $json_array['reload_bar'] = ob_get_clean();
-
-      ob_start();
-      include ('views/freepbx_reload.php');
-      $json_array['reload_header'] = ob_get_clean();
-    }
-    $json_array['show_reload'] = 'yes';
-    $json = new Services_JSON();
-    header("Content-type: application/json"); 
-    echo $json->encode($json_array);
+    	needreload();
+    
+    	header("Content-type: application/json"); 
+    	echo json_encode($json_array);
 		exit;
 
 	break;
@@ -322,23 +311,13 @@ $(document).ready(function(){
     update: function(event, ui){
       var repotrunkkey=+ui.item.attr('id').replace('routelist','');
       var repotrunkdirection=ui.item.index();repotrunkdirection--;
-      var send_reload = '&send_reload='+($('#need_reload_block').size() == 0 ? 'yes':'no');
       $.ajax({
         type: 'POST',
         url: location.href,
-        data: "action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey="+repotrunkkey+"&repotrunkdirection="+repotrunkdirection+send_reload,
+        data: "action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey="+repotrunkkey+"&repotrunkdirection="+repotrunkdirection,
         dataType: 'json',
         success: function(data) {
-          /* if the reload_block is not there, we blindly insert the info we think we got because we told
-             it in the ajax call to send it to use, should wo double check?
-          */
-          if ((data.show_reload == 'yes') && !$('#need_reload_block').fadeIn().size()) {
-            $('#logo').after(data.reload_bar).fadeIn();
-            $('#moduleBox').before(data.reload_header);
-          }
-          if (data.show_reload == 'yes') {
-            $('#need_reload_block').fadeIn();
-          }
+  			toggle_reload_button('show');
         },
         error: function(data) {
           alert("<?php echo _("An unknown error occurred repositioning routes, refresh your browser to see the current correct route positions") ?>");
@@ -795,13 +774,6 @@ $(document).ready(function(){
     addCustomField('','','','');
   });
   $('#pattern_file').hide();
-  $(".dpt-nodisplay").mouseover(function(){
-    $(this).toggleVal({
-      populateFrom: "title",
-      changedClass: "text-normal",
-      focusClass: "text-normal"
-    }).removeClass('dpt-nodisplay').unbind('mouseover');
-  });
 }); 
 
 function patternsRemove(idx) {
@@ -832,12 +804,6 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) 
     </td>\
   </tr>\
   ').prev();
-
-  new_insert.find(".dpt-title").toggleVal({
-    populateFrom: "title",
-    changedClass: "text-normal",
-    focusClass: "text-normal"
-  });
 
   return idx;
 }
@@ -935,17 +901,6 @@ function validatePatterns() {
 	  msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
   }
   if (culprit != undefined) {
-    // now we have to put it back...
-    // do I have to turn it off first though?
-    $(".dpt-display").each(function() {
-      if ($.trim($(this).val()) == '') {
-        $(this).toggleVal({
-          populateFrom: "title",
-          changedClass: "text-normal",
-          focusClass: "text-normal"
-        });
-      }
-    });
     return warnInvalid(culprit, msgInvalidDialPattern);
   } else {
     return true;
