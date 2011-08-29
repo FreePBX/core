@@ -1584,7 +1584,8 @@ function core_get_config($engine) {
 
             // TODO we don't have the OUTNUM until later so fix this...
 						case 'custom':
-              $dial_string = str_replace('$OUTNUM$','\\\\$\\\\{OUTNUM\\\\}',$trunkprops['channelid']);
+              $dial_string = str_replace('$OUTNUM$','${SS}{OUTNUM}',$trunkprops['channelid']);
+              $ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('SS','$'));
 							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',$dial_string));
 							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('DIAL_TRUNK',$trunkprops['trunkid'] ));
 							$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_goto('1',$tcustom,'ext-trunk'));
@@ -1885,7 +1886,7 @@ function core_get_config($engine) {
 			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacroExit'));
 			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
 			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
-				$ext->add($context, $exten, 'record', new ext_mixmonitor('${MIXMON_DIR}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
+				$ext->add($context, $exten, 'record', new ext_mixmonitor('${EVAL(${MIXMON_DIR})}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
 				$ext->add($context, $exten, '', new ext_macroexit());
 			}
 */
@@ -3451,7 +3452,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${ARG3} | ${ARG4} | ${ARG5}]?${RINGTIMER}:"")}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${ARG3} | ${ARG4} | ${ARG5}]?${RINGTIMER}:)}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL}'));
 
       // If paging module is not present, then what happens?
@@ -6930,9 +6931,8 @@ function core_devices_configpageinit($dispnum) {
 
     $secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
     if ($amp_conf['DEVICE_STRONG_SECRETS']) {
-      $secret_validation .= ' || (!isEmpty() && weakSecret()';
+      $secret_validation .= ' || (!isEmpty() && weakSecret())';
     }
-    $secret_validation .= ')';
 
 		// zap
 		$tmparr = array();
