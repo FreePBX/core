@@ -1924,7 +1924,7 @@ function core_get_config($engine) {
       $ext->add($context, $exten, 'next', new ext_execif('$[!${LEN(${ARG1})}]','Return'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!=""]','${ARG1},1'));
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS','INITIALIZED'));
-      $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE','${ARG3}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!=""]','Set','__REC_POLICY_MODE=${ARG3}'));
       $ext->add($context, $exten, '', new ext_set('NOW','${EPOCH}'));
       $ext->add($context, $exten, '', new ext_set('__DAY','${STRFTIME(${NOW},,%d)}'));
       $ext->add($context, $exten, '', new ext_set('__MONTH','${STRFTIME(${NOW},,%m)}'));
@@ -1939,6 +1939,11 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${REC_POLICY_MODE},${FROMEXTEN}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
+      $exten = 'force';
+      $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
+      $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${REC_POLICY_MODE},${FROMEXTEN}'));
+      $ext->add($context, $exten, '', new ext_return(''));
+
       $exten = 'q';
       $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
       $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','recq,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
@@ -1946,12 +1951,13 @@ function core_get_config($engine) {
 
       $exten = 'out';
       $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-      $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE','${DB(AMPUSER/${FROMEXTEN}/recording/out/external)}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!=""]','Set','__REC_POLICY_MODE=${DB(AMPUSER/${FROMEXTEN}/recording/out/external)}'));
       $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'exten,${ARG2},${FROMEXTEN}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
       $exten = 'exten';
       $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
+      $ext->add($context, $exten, '', new ext_gotoif('$["${REC_POLICY_MODE}"!=""]','callee'));
       $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE','${IF($[${LEN(${FROM_DID})}]?${DB(AMPUSER/${ARG2}/recording/in/external)}:${DB(AMPUSER/${ARG2}/recording/in/internal)})}'));
       $ext->add($context, $exten, '', new ext_execif('$[!${LEN(${ARG3})}]','Return'));
 
@@ -2017,12 +2023,19 @@ function core_get_config($engine) {
       $context = 'macro-one-touch-record';
       $exten = 's';
 
+      // TODO: if we are receiving channel, check our globals against the IMPORT() and adjust if not the same. Think about
+      //       how we assess parking since either side could be retrived. Could get messy.
+      //       Maybe only do this if known states show we are in this predicament but got to figure out how
+      //
+      $ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','THISEXTEN=${CUT(CALLFILENAME,-,2)}'));
       $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${CUT(CALLFILENAME,-,2)}:${FROMEXTEN})}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${PICKUP_EXTEN}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
+      //$ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${PICKUP_EXTEN}'));
+      //$ext->add($context, $exten, '', new ext_execif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
 
-      $ext->add($context, $exten, '', new ext_noop_trace('CLEAN_DIALEDPEERNUMBER: ${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)} DIALEDPEERNUMBER: ${DIALEDPEERNUMBER}',5));
+      //$ext->add($context, $exten, '', new ext_noop_trace('CLEAN_DIALEDPEERNUMBER: ${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)} DIALEDPEERNUMBER: ${DIALEDPEERNUMBER}',5));
       $ext->add($context, $exten, '', new ext_noop_trace('Checking permissions for ${THISEXTEN}: ${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}'));
+      $ext->add($context, $exten, '', new ext_noop_trace('AMPUSER: ${AMPUSER}: MASTER_CHANNEL(AMPUSER): ${MASTER_CHANNEL(AMPUSER)}'));
+      $ext->add($context, $exten, '', new ext_noop_trace('CALLFILENAME: ${CALLFILENAME}: MASTER_CHANNEL(CALLFILENAME): ${MASTER_CHANNEL(CALLFILENAME)}'));
       $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="RECORDING"]', 'stoprec'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(REC_POLICY_MODE)}"="never"]', 'stopped'));
@@ -2034,8 +2047,8 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
       $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CDR(recordingfile))','${CALLFILENAME}.${MIXMON_FORMAT}'));
       $ext->add($context, $exten, 'recording', new ext_playback('beep'));
-      $ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
+      //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
+      //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
       $ext->add($context, $exten, '', new ext_macroexit());
 
       $ext->add($context, $exten, 'stoprec', new ext_stopmixmonitor());
@@ -2044,10 +2057,11 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${DIALEDPEERNUMBER}:${FROMEXTEN})}'));
       $ext->add($context, $exten, '', new ext_noop_trace('THISEXTEN: ${THISEXTEN} CALLFILENAME: ${CALLFILENAME}'));
       $ext->add($context, $exten, 'stopped', new ext_playback('beep&beep'));
-      $ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},NOT_INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
-      $ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},NOT_INUSE'));
+      //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},NOT_INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
+      //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},NOT_INUSE'));
       $ext->add($context, $exten, '', new ext_macroexit());
 
+      /*
       $ext->add($context, $exten, 'sstate', new ext_set('DEVICES','${DB(AMPUSER/${ARG1}/device)}'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${DEVICES}"=""]', 'return'));
       $ext->add($context, $exten, '', new ext_set('LOOPCNT','${FIELDQTY(DEVICES,&)}'));
@@ -2056,6 +2070,7 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_set('ITER','$[${ITER}+1]'));
       $ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
       $ext->add($context, $exten, 'return', new ext_return(''));
+       */
 
 
       /* macro-prepend-cid */
@@ -3079,7 +3094,7 @@ function core_get_config($engine) {
         
         ;------------------------------------------------------------------------
        */
-      $context = 'macro-setmusic';
+      $context = 'macro-block-cf';
       $exten = '_X.';
 
 			$ext->add($context, $exten, '', new ext_noop_trace('Blocking callforward to ${EXTEN} because CF is blocked'));
@@ -3776,10 +3791,13 @@ function core_get_config($engine) {
 
         $skip_label = $next_label;
       }
+      $ext->add($mcontext, $exten,'theend', new ext_macroexit(''));
+      /*
       $ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
       $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]', 'macro-one-touch-record,s,sstate', false, '${IF($["${EXTTOCALL}"!=""]?${EXTTOCALL}:${CUT(CALLFILENAME,-,2)})},NOT_INUSE'));
       $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"!="${CUT(CALLFILENAME,-,2)}"]','macro-one-touch-record,s,sstate',false,'${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
       $ext->add($mcontext,$exten,'', new ext_noop_trace('ONETOUCH_REC: ${ONETOUCH_REC}',5));
+       */
 
       /* Now generate a clean DIALEDPEERNUMBER if ugly followme/ringgroup extensions dialplans were engaged
        * doesn't seem like this is need with some of the NoCDRs() but leave for now and keep an eye on it
