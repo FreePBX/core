@@ -5120,8 +5120,6 @@ function core_users_add($vars, $editmode=false) {
 		return false;
 	}
 	
-	//build the recording variable
-	$recording = "out=".$record_out."|in=".$record_in;
   
   // strip the ugly return of the gui radio funciton which comes back as "recording_out_internal=always" for example
   //
@@ -5303,17 +5301,9 @@ function core_users_get($extension){
 		return array();
 	}
 	
-	//explode recording vars
-	$recording = explode("|",$results['recording']);
-	if (isset($recording[1])) {
-		$recout = substr($recording[0],4);
-		$recin = substr($recording[1],3);
-		$results['record_in']=$recin;
-		$results['record_out']=$recout;
-	} else {
-		$results['record_in']='Adhoc';
-		$results['record_out']='Adhoc';
-	}
+  // TODO: go through and really remove the old recording stuff!
+	$results['record_in']='Adhoc';
+	$results['record_out']='Adhoc';
 	if ($astman) {
 
     if (function_exists('paging_get_config')) {
@@ -6826,8 +6816,6 @@ function core_users_configpageload() {
 		}
 
 		$section = _("Recording Options");
-		$currentcomponent->addguielem($section, new gui_selectbox('record_in', $currentcomponent->getoptlist('recordoptions'), $record_in, _("Record Incoming"), _("Record all inbound calls received at this extension."), false));
-		$currentcomponent->addguielem($section, new gui_selectbox('record_out', $currentcomponent->getoptlist('recordoptions'), $record_out, _("Record Outgoing"), _("Record all outbound calls received at this extension."), false));
 
     $recording_in_external = isset($recording_in_external) ? $recording_in_external : 'dontcare';
     $recording_out_external = isset($recording_out_external) ? $recording_out_external : 'dontcare';
@@ -6857,7 +6845,7 @@ function core_users_configpageload() {
       $helptext = _('Optional destination call is routed to when the call is not answered.');
     }
     $nodest_msg = _('Unavail Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('noanswer_dest', '0', $noanswer_dest, _('No Answer'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('noanswer_dest', '0', $noanswer_dest, _('No Answer'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('noanswer_cid', $noanswer_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this no answer destination.")),5,9);
 
     if ($amp_conf['CWINUSEBUSY']) {
@@ -6866,12 +6854,12 @@ function core_users_configpageload() {
       $helptext = _('Optional destination the call is routed to when the phone is busy or the call is rejected by the user.');
     }
     $nodest_msg = _('Busy Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('busy_dest', '1', $busy_dest, _('Busy'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('busy_dest', '1', $busy_dest, _('Busy'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('busy_cid', $busy_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this busy destination.")),5,9);
 
     $helptext = _('Optional destination the call is routed to when the phone is offline, such as a softphone currently off or a phone unplugged.');
     $nodest_msg = _('Unavail Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('chanunavail_dest', '2', $chanunavail_dest, _('Not Reachable'), $helptext, $canbeempty = true, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('chanunavail_dest', '2', $chanunavail_dest, _('Not Reachable'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('chanunavail_cid', $chanunavail_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this not reachable destination.")),5,9);
 	}
 }
