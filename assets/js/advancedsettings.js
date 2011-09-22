@@ -15,7 +15,6 @@ $(document).ready(function() {
 				var myval = $('#' + mykey).val();
 				break;
 		}
-		var send_reload = $('#need_reload_block').size() == 0 ? '1':'0';
 		$.ajax({
 			type: 'POST',
 			url: location.href,
@@ -24,7 +23,6 @@ $(document).ready(function() {
 					skip_astman:1,
 					restrictmods: 'core',
 					action: 'setkey',
-					send_reload: send_reload,
 					keyword: mykey,
 					value: myval
 					},
@@ -47,6 +45,7 @@ $(document).ready(function() {
 					mythis.fadeOut('normal', function(){
 						mythis.closest('tr').find('.savetd').hide();
 					});
+  				toggle_reload_button('show');
 					
 					//hide retor to defualt if its we have reverted to defualt
 					//should not be nesesary -MB

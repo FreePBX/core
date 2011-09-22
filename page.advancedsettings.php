@@ -1,6 +1,6 @@
 <?php /* $Id */
 
-$getvars = array('action', 'keyword', 'value', 'send_reload');
+$getvars = array('action', 'keyword', 'value');
 foreach ($getvars as $v){
 	$var[$v] = isset($_POST[$v]) ? $_POST[$v] : 0;
 }
