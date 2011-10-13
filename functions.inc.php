@@ -2343,8 +2343,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG1}/${UNIQCHAN}'));
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
       if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
-			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(num))','${DIALEDPEERNUMBER}'));
-			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(name))','${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+				// Check that it is numeric so we don't pollute it with odd dialplan stuff like FMGL-blah from followme
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
       }
 
 			/*
@@ -2363,8 +2364,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
       if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
-			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(num))','${DIALEDPEERNUMBER}'));
-			  $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CONNECTEDLINE(name))','${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+				// Check that it is numeric so we don't pollute it with odd dialplan stuff like FMGL-blah from followme
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
       }
 
 			/*
