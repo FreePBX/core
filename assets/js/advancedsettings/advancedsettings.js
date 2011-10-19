@@ -45,7 +45,6 @@ $(document).ready(function() {
 					mythis.fadeOut('normal', function(){
 						mythis.closest('tr').find('.savetd').hide();
 					});
-  				toggle_reload_button('show');
 					
 					//hide retor to defualt if its we have reverted to defualt
 					//should not be nesesary -MB
@@ -70,12 +69,7 @@ $(document).ready(function() {
 							}
 							break;
 						default:
-							if (send_reload == '1') {
-								$('#logo').after(data.reload_bar).fadeIn();
-								$('#moduleBox').before(data.reload_header);
-							} else {
-								$('#need_reload_block').fadeIn();
-							}
+  						toggle_reload_button('show');
 							break;
 						}
 					}
