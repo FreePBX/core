@@ -15,6 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
 // Copyright 2006 Philippe Lindheimer - Astrogen LLC
+if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
 $display = 'zapchandids';
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] :  'setup';

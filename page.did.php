@@ -16,6 +16,7 @@
 //
 //   Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
 //
+if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $extdisplay= htmlspecialchars(isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'');
 $old_extdisplay = $extdisplay;

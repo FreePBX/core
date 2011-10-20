@@ -1,4 +1,5 @@
 <?php /* $Id */
+if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
 $getvars = array('action', 'keyword', 'value');
 foreach ($getvars as $v){
