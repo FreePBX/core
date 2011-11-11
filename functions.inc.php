@@ -1924,7 +1924,7 @@ function core_get_config($engine) {
       $ext->add($context, $exten, 'next', new ext_execif('$[!${LEN(${ARG1})}]','Return'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!=""]','${ARG1},1'));
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS','INITIALIZED'));
-      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!=""]','Set','__REC_POLICY_MODE=${ARG3}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"="" & "${ARG3}"!=""]','Set','__REC_POLICY_MODE=${ARG3}'));
       $ext->add($context, $exten, '', new ext_set('NOW','${EPOCH}'));
       $ext->add($context, $exten, '', new ext_set('__DAY','${STRFTIME(${NOW},,%d)}'));
       $ext->add($context, $exten, '', new ext_set('__MONTH','${STRFTIME(${NOW},,%m)}'));
