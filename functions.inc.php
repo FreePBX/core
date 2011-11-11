@@ -1959,7 +1959,12 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_POLICY_MODE}"!=""]','callee'));
       $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE','${IF($[${LEN(${FROM_DID})}]?${DB(AMPUSER/${ARG2}/recording/in/external)}:${DB(AMPUSER/${ARG2}/recording/in/internal)})}'));
+			/* TODO: this appears to be a bug, ARG3 should never be set. This may be in here because of on-demand recording,
+			 *       testing will have to tell. If it needs to be in here it probably was suppose to be REC_POLICY_MODE and
+			 *       that should be tried. For now remove and do some testing to flush it out.
+			 *
       $ext->add($context, $exten, '', new ext_execif('$[!${LEN(${ARG3})}]','Return'));
+			 */
 
       /* If callee doesn't care, then go to caller to make decision
        * Otherwise, if caller doesn't care, the go to callee to make decision
@@ -3482,14 +3487,14 @@ function core_get_config($engine) {
       $macrodial = 'macrodial';
       if ($intercom_code != '') {
         if ($amp_conf['AST_FUNC_EXTENSION_STATE']) {
-          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}'));
+          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}, CC_RECALL: ${CC_RECALL}'));
           if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
             $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
           } else {
             $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
           }
         } else {
-          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}'));
+          $ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, CC_RECALL: ${CC_RECALL}'));
           if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
             $ext->add($mcontext,$exten,'',new ext_gotoif('$["${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}]','macrodial'));
           } else {
