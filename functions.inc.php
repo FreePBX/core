@@ -2175,7 +2175,7 @@ function core_get_config($engine) {
             }
           }
           $ext->add($context, $exten, '', new ext_set("_NODEST",""));
-          $ext->add($context, $exten, '', new ext_gosub('1','s','sub-record-check','out,${EXTEN}'));
+          $ext->add($context, $exten, '', new ext_gosub('1','s','sub-record-check','out,${EXTEN},'));
 
           $password = $route['password'];
           foreach ($trunks as $trunk_id) {
@@ -3477,7 +3477,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${ARG3} | ${ARG4} | ${ARG5}]?${RINGTIMER}:)}'));
-			$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL}'));
+			$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},'));
 
       // If paging module is not present, then what happens?
       // TODO: test with no paging module
