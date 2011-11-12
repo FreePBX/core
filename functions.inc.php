@@ -1952,7 +1952,7 @@ function core_get_config($engine) {
 
       $exten = 'out';
       $ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!=""]','Set','__REC_POLICY_MODE=${DB(AMPUSER/${FROMEXTEN}/recording/out/external)}'));
+      $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"=""]','Set','__REC_POLICY_MODE=${DB(AMPUSER/${FROMEXTEN}/recording/out/external)}'));
       $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'exten,${ARG2},${FROMEXTEN}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
