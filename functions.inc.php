@@ -3732,9 +3732,12 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
         // if checking, BLKVM_CHANNEL should already exist (if not, we check our channel's copy)
-        //
+				// CC_RECALL was originally used for CallCompletion but is used elsewhere as well for recall automated
+				// calls that should therefore not go to voicemail, for example a wakeup call
+				//
         $mcontext = 'macro-blkvm-check';
         $ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${GOSUB_RETVAL}"="" & "${CC_RECALL}"="1"]', 'Set','GOSUB_RETVAL=TRUE'));
         $ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
       } else { // NO SHARED()
