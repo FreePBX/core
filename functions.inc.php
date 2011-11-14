@@ -1974,7 +1974,7 @@ function core_get_config($engine) {
        */
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_POLICY_MODE}"="dontcare"]', 'caller'));
 			// If FROM_DID is set it's external so it's always the callee policy that rules
-      $ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}"="dontcare" | $["${FROM_DID}"!=""]', 'callee'));
+      $ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}"="dontcare" | "${FROM_DID}"!=""]', 'callee'));
 			// the IF funciton does not like nulls so sourrond with quotes, if this ends up breaking the priority check below then we need to tweak, could be 2 layered quotes
       $ext->add($context, $exten, '', new ext_set('CALLER_PRI','${IF($[${LEN(${DB(AMPUSER/${FROMEXTEN}/recording/priority)})}])?"${DB(AMPUSER/${FROMEXTEN}/recording/priority)}":"0"}'));
       $ext->add($context, $exten, '', new ext_set('CALLEE_PRI','${IF($[${LEN(${DB(AMPUSER/${ARG2}/recording/priority)})}])?"${DB(AMPUSER/${ARG2}/recording/priority)}":"0"}'));
