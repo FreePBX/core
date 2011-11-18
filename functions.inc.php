@@ -2044,7 +2044,7 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_noop_trace('Checking permissions for ${THISEXTEN}: ${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}'));
       $ext->add($context, $exten, '', new ext_noop_trace('AMPUSER: ${AMPUSER}: MASTER_CHANNEL(AMPUSER): ${MASTER_CHANNEL(AMPUSER)}'));
       $ext->add($context, $exten, '', new ext_noop_trace('CALLFILENAME: ${CALLFILENAME}: MASTER_CHANNEL(CALLFILENAME): ${MASTER_CHANNEL(CALLFILENAME)}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
+      $ext->add($context, $exten, '', new ext_execif('$["${CUT(CALLFILENAME,-,1)}"="exten" & "${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="RECORDING"]', 'stoprec'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(REC_POLICY_MODE)}"="never"]', 'stopped'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="" & "${MASTER_CHANNEL(REC_STATUS)}"="RECORDING"]', 'recording'));
