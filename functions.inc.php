@@ -768,7 +768,8 @@ function core_getdestinfo($dest) {
 			return array();
 		} else {
 		  $display = 'trunks';
-		  return array('description' => sprintf(_('Trunk: %s (%s)'),$thisexten['name'],$thisexten['tech']),
+			$name = isset($thisexten['name']) && $thisexten['name'] ? $thisexten['name'] : '';
+		  return array('description' => sprintf(_('Trunk: %s (%s)'),$name,$thisexten['tech']),
 		              'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten),
 							    );
 
