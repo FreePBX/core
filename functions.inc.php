@@ -3806,7 +3806,8 @@ function core_get_config($engine) {
 
         $skip_label = $next_label;
       }
-      $ext->add($mcontext, $exten,'theend', new ext_macroexit(''));
+      $ext->add($mcontext, $exten,'theend', new ext_hangup());
+      $ext->add($mcontext, $exten,'', new ext_macroexit(''));
       /*
       $ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
       $ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]', 'macro-one-touch-record,s,sstate', false, '${IF($["${EXTTOCALL}"!=""]?${EXTTOCALL}:${CUT(CALLFILENAME,-,2)})},NOT_INUSE'));
@@ -3821,7 +3822,6 @@ function core_get_config($engine) {
       $ext->add($mcontext, $exten, '', new ext_set('CDR(clean_dst)','${CLEAN_DIALEDPEERNUMBER}'));
        */
 
-      $ext->add($mcontext,$exten,'', new ext_hangup());
 
       /* macro-hangupcall */
 
