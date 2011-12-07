@@ -41,5 +41,5 @@
 		<wiki category="Admin" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<location>release/2.10/core-2.10.0beta2.0.tgz</location>
-	<md5sum>cb73cb9547f568ab17a3221578accb3e</md5sum>
+	<md5sum>8ba0d5ec34a2944a5c803f8e206a9870</md5sum>
 </module>
