@@ -236,10 +236,7 @@ foreach ($tresults as $tresult) {
 
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
-					$label = dgettext($row['rawname'],$row['name']);
-					if ($label == $row['name']) {
-						$label = _($label);
-					}
+					$label = modgettext::_($row['name'],$row['rawname']);
 					echo ">"._($row['name'])."</option>\n";
 				}
 				echo "</optgroup>\n";

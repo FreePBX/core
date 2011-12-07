@@ -82,37 +82,15 @@ foreach ($conf as $c){
 			echo '<tr></tr>';
 			$row++;
 		}
-		if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
-			bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
-			bind_textdomain_codeset($c['module'], 'utf8');
-			$current_category_loc = dgettext($c['module'],$current_category);
-			if ($current_category_loc == $current_category) {
-					$current_cateogry_loc = _($current_category);
-			}
-		} else {
-			$current_category_loc = _($current_category);
-		}
+		$current_category_loc = modgettext::_($current_category, $c['module']);
 		echo '<tr><td colspan="3"><br><h4 class="category">'._("$current_category_loc").'</h4></td></tr>';
 		$row++;
 	}
 
 	$name_label_raw = $c['name'];
 	$description_raw = $c['description'];
-	if ($c['module'] && extension_loaded('gettext') && is_dir("modules/".$c['module']."/i18n")) {
-		bindtextdomain($c['module'],"modules/".$c['module']."/i18n");
-		bind_textdomain_codeset($c['module'], 'utf8');
-		$name_label = dgettext($c['module'],$name_label_raw);
-		$tt_description = dgettext($c['module'],$description_raw);
-		if ($name_label == $name_label_raw) {
-			$name_label = _($name_label_raw);
-		}
-		if ($tt_description == $description_raw) {
-			$tt_description = _($description_raw);
-		}
-	} else {
-		$name_label = _($name_label_raw);
-		$tt_description = _($description_raw);
-	}
+	$name_label = modgettext::_($name_label_raw, $c['module']);
+	$tt_description = modgettext::_($description_raw, $c['module']);
 	if (!$display_friendly_name) {
 		$tr_friendly_name = $name_label;
 		$name_label = $c['keyword'];
