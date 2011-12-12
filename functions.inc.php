@@ -2354,8 +2354,8 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
       if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
 				// Check that it is numeric so we don't pollute it with odd dialplan stuff like FMGL-blah from followme
-				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
-				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})} && "${DB(AMPUSER/${AMPUSER}/cidname)}]" != ""', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})} && "${DB(AMPUSER/${AMPUSER}/cidname)}]" != ""', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
       }
 
 			/*
@@ -2375,8 +2375,8 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
       if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
 				// Check that it is numeric so we don't pollute it with odd dialplan stuff like FMGL-blah from followme
-				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
-				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})}]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})} && "${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(num))=${DIALEDPEERNUMBER}'));
+				$ext->add($context, $exten, '', new ext_execif('$[!${REGEX("[^0-9]" ${DIALEDPEERNUMBER})} && "${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]', 'Set', 'MASTER_CHANNEL(CONNECTEDLINE(name))=${DB(AMPUSER/${DIALEDPEERNUMBER}/cidname)}'));
       }
 
 			/*
@@ -2456,10 +2456,10 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
       }
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
       }
 		
 			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
@@ -2596,10 +2596,10 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
       }
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
       }
 		
 			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
@@ -2788,10 +2788,10 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
 
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(num,i)', '${DIAL_NUMBER}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
       }
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
-        $ext->add($context, $exten, '', new ext_set('CONNECTEDLINE(name,i)', 'CID:${CALLERID(number)}'));
+        $ext->add($context, $exten, '', new ext_set('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
       }
 
 			// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
@@ -3883,10 +3883,10 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${USEGOTO}"="1"]','usegoto,1'));
 
         // Once setting CONNECTEDLINE(), add the I option to Dial() so the device doesn't further update the value with the
-        // "device" <devicenum> data from device CID information
+        // "device" <devicenum> data from device CID information, don't send an update if the calling party is not an extension it breaks some providers
         //
         if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
-          $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = ""]','godial'));
+          $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
           $ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', '${DB(AMPUSER/${EXTTOCALL}/cidname)}'));
           $ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
           $ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
