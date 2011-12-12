@@ -3524,11 +3524,10 @@ function core_get_config($engine) {
       } else {
 			  $ext->add($mcontext,$exten,$macrodial, new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
       }
-			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"!="novm" & "${SCREEN}"!="" & "${DIALSTATUS}"="NOANSWER"]','exit'));
 			$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
 
 			$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$[("${SV_DIALSTATUS}"="NOANSWER"|"${SV_DIALSTATUS}"="CHANUNAVAIL") & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
-			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!=""]','docfb,1'));
+			$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfb,1'));
 			$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
 
 			$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&${ARG3})|("${DIALSTATUS}"="BUSY"&${ARG4})|("${DIALSTATUS}"="CHANUNAVAIL"&${ARG5})]','MacroExit'));
@@ -3894,7 +3893,8 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'godial', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
 
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
-        $ext->add($mcontext,$exten,'', new ext_gosubif('$["${SCREEN}"!=""|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
+        $ext->add($mcontext,$exten,'', new ext_gosubif('$[("${SCREEN}"!=""&("${DIALSTATUS}"="TORTURE"|"${DIALSTATUS}"="DONTCALL"))|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
+
         $ext->add($mcontext,$exten,'', new ext_macroexit());
         $ext->add($mcontext,$exten,'nodial', new ext_execif('$["${DIALSTATUS}" = ""]', 'Set', 'DIALSTATUS=NOANSWER'));
         $ext->add($mcontext,$exten,'', new ext_noop('Returned from dial-one with nothing to call and DIALSTATUS: ${DIALSTATUS}'));
