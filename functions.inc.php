@@ -1388,9 +1388,8 @@ function core_get_config($engine) {
       // it is for detection with compatibility mode. We need to actually determine if chan_dahdi is present or not at this point
       //
       if (!isset($chan_dahdi_loaded)) {
-        if ($ast_ge_14 && isset($astman) && $astman->connected()) {
-          $response = $astman->send_request('Command', array('Command' => 'module show like chan_dahdi'));
-          $chan_dahdi_loaded = (preg_match('/1 modules loaded/', $response['data']) > 0);
+        if (isset($astman) && $astman->connected()) {
+          $chan_dahdi_loaded = $astman->mod_loaded('chan_dahdi');
         }
 			}
 			foreach (core_zapchandids_list() as $row) {
@@ -3955,7 +3954,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('ITER', '1'));
         $ext->add($mcontext,$exten,'begin', new ext_set('THISDIAL', '${DB(DEVICE/${CUT(DEVICES,&,${ITER})}/dial)}'));
         if ($chan_dahdi) {
-          $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ASTCHANDAHDI}" != ""]','zap2dahdi,1'));
+          $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ASTCHANDAHDI}" = "1"]','zap2dahdi,1'));
         }
         $ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
         $ext->add($mcontext,$exten,'', new ext_set('ITER', '$[${ITER}+1]'));
