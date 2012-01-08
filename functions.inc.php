@@ -917,14 +917,18 @@ function core_get_config($engine) {
 					// $core_conf->addFeatureMap($automon,$code);
           $core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
 
-          $ext->addInclude('from-internal-additional', 'device-hints');
-          $device_list = core_devices_list("all", 'full', true);
-          foreach ($device_list as $device) {
-            if ($device['tech'] == 'sip' || $device['tech'] == 'iax2') {
-              $ext->add('device-hints', $code.$device['id'], '', new ext_noop("AutoMixMon Hint for: ".$device['id']));
-              $ext->addHint('device-hints', $code.$device['id'], "Custom:RECORDING".$device['id']);
-            }
-          }
+					/* At this point we are not using hints since we have not found a good way to be always
+					 * consistent on both sides of the channel
+					 *
+           * $ext->addInclude('from-internal-additional', 'device-hints');
+           * $device_list = core_devices_list("all", 'full', true);
+           * foreach ($device_list as $device) {
+           * 	if ($device['tech'] == 'sip' || $device['tech'] == 'iax2') {
+           *    $ext->add('device-hints', $code.$device['id'], '', new ext_noop("AutoMixMon Hint for: ".$device['id']));
+           *    $ext->addHint('device-hints', $code.$device['id'], "Custom:RECORDING".$device['id']);
+           *   }
+           * }
+					 */
 				}
         // TODO: *** NEED TO MAKE THIS SETTABLE, PLACE HOLDER AND HARD CODED FOR NOW. CAN BE:
         //           'caller' or 'callee' so for dev testing can be overridden in globals_custom.conf
