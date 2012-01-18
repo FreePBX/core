@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.10.0beta3.0</version>
+	<version>2.10.0rc1.0</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.10.0rc1.0* release candidate, remove unused hint
 		*2.10.0beta3.0* #5468, #5299, #5477, #5478
 		*2.10.0beta2.1* #5463, call recording bug fixes, generalize CC_RECALL, misc bug fixes
 		*2.10.0beta2.0* #5407, misc bug fixes
