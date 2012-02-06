@@ -27,13 +27,15 @@ if($var['action'] === 'setkey') {
 			
 			//special case for manager related changes - these need to be applied right away re #5117
 			switch ($keyword) {
-				case 'ASTMANAGERHOST':
+				//case 'ASTMANAGERHOST':
+				//case 'ASTMANAGERPORT':
+				//case 'ASTMANAGERPROXYPORT':
 				case 'AMPMGRPASS':
-				case 'ASTMANAGERPORT':
-				case 'ASTMANAGERPROXYPORT':
+					fpbx_ami_update(false, $var['value']);
+				break;
 				case 'AMPMGRUSER':
-					//$astman->Command('module reload manager');
-					break;
+					fpbx_ami_update($var['value'], false);
+				break;
 			}
 			
 		}

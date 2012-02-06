@@ -15,12 +15,21 @@ $(document).ready(function() {
 				var myval = $('#' + mykey).val();
 				break;
 		}
+		switch (mykey) {
+			case 'AMPMGRUSER':
+			case 'AMPMGRPASS':
+				var skipastman = 0;
+				break;
+			default:
+				var skipastman = 1;
+				break;
+		}
 		$.ajax({
 			type: 'POST',
 			url: location.href,
 			data: {
 					quietmode: 1,
-					skip_astman:1,
+					skip_astman: skipastman,
 					restrictmods: 'core',
 					action: 'setkey',
 					keyword: mykey,
