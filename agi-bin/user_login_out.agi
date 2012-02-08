@@ -50,6 +50,7 @@
 	$cf_devstate = get_var( "CFDEVSTATE" ) == "TRUE" ? true : false;
 	$fm_devstate  = get_var( "FMDEVSTATE" ) == "TRUE" ? true : false;
 	$que_devstate = get_var( "QUEDEVSTATE" ) == "TRUE" ? true : false;
+	$queue_toggle = get_var( "QUEUETOGGLE" );
 	$intercom_code = get_var( "INTERCOMCODE" );
 	$campon_toggle = get_var( "CAMPONTOGGLE" );
 
@@ -57,10 +58,6 @@
 
 	$DEVSTATE = version_compare($ast_version, "1.6", "ge") ? "DEVICE_STATE" : "DEVSTATE";
 
-	/*
-	$ampmgruser  = 'admin';
-	$ampmgrpass  = 'amp111';
-	*/
 	$astman = new AGI_AsteriskManager( );	
 	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass)) {
 		exit (1);
@@ -220,6 +217,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $dnd_devstate;
 		global $cf_devstate;
 		global $que_devstate;
+		global $queue_toggle;
 		global $DEVSTATE;
 
 		$current_user = get_user($device);
@@ -248,9 +246,12 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 				$agi->set_variable($DEVSTATE.'(Custom:FOLLOWME'.$device.')','INVALID');
 			}
 			if ($que_devstate) {
-                        	debug("remove_user: Setting queue DEVSTATES for device $device and user $user",5);
+				debug("remove_user: Setting queue DEVSTATES for device $device and user $user",5);
 				set_queue_states($user,$device,'off');
-                	}
+				if ($queue_toggle) {
+					remove_queue_hint($device);
+				}
+			}
 			if ($dnd_devstate) {
 				debug("Setting device $device DND state to INVALID before deleting",5);
 				$agi->set_variable($DEVSTATE.'(Custom:DEVDND'.$device.')','NOT_INUSE');
@@ -270,6 +271,40 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		}
 	}
 
+	function set_queue_hint($user, $devices) {
+		global $astman;
+		global $ast_version14;
+		global $queue_toggle;
+		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
+
+		debug("entering set_queue_hint user: $user and devices: $devices",6);
+		if (trim($devices) == '') {
+			// don't do anything in this case, handle elsewhere
+			return true;
+		}
+		$queues = get_user_queue_assignments($user);
+		if (!empty($queues)) {
+			$device_array = explode( '&', $devices);
+			foreach ($device_array as $device) {
+				$hlist = 'Custom:QUEUE' . $device . '*' . implode('&Custom:QUEUE' . $device . '*', $queues);
+				debug("Hint for device: $device user: $user hint to $hlist",1);
+				$response = $astman->send_request('Command',array('Command'=>$dp_pre."add extension {$queue_toggle}*{$device},hint,{$hlist} into ext-queues replace"));
+			}
+		}
+	}
+
+	function remove_queue_hint($device) {
+		global $astman;
+		global $ast_version14;
+		global $queue_toggle;
+		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
+		debug("entering remove_queue_hint with device: $device",6);
+		if ($device != '') {
+			debug("removing $queue_toggle*$device@ext-queues hint",1);
+			$response = $astman->send_request('Command',array('Command'=>$dp_pre."remove extension {$queue_toggle}*{$device}@ext-queues hint"));
+		}
+	}
+
 	// Set the hint for a user based on the devices in their AMPUSER object
 	//
 	function set_hint($user, $devices) {
@@ -277,6 +312,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $astman;
 		global $agi;
 		global $dnd_devstate;
+		global $que_devstate;
+		global $queue_toggle;
 		global $intercom_code;
 		global $campon_toggle;
 		global $ast_version14;
@@ -291,6 +328,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
         $dev_arr = explode('&',$dial_string);
         $hint_val = 'ccss:'.implode('&ccss:',$dev_arr);
 				$response = $astman->send_request('Command',array('Command'=>$dp_pre."add extension {$campon_toggle}{$user},hint,{$hint_val} into ext-local replace"));
+			}
+			if ($que_devstate && $queue_toggle) {
+				set_queue_hint($user, $devices);
 			}
 			if ($dnd_devstate) {
 				$dial_string .= "&Custom:DND$user";
@@ -490,7 +530,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 	function set_user_devices($user, $devices) {
 		debug("set_user_devices: user: $user,  devices: $devices", 8);
 		global $agi;
-		if (empty($devices)) {
+		if (trim($devices) == '') {
 			debug("No more devices associated with $user, deletting /device key", 8);
 			$agi->database_del('AMPUSER',$user.'/device');
 		} else {
@@ -591,4 +631,25 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			$agi->set_variable($DEVSTATE.'(Custom:QUEUE'.$device.'*'.$queueno.')',$queuestat);
 		}
 	}
-		
+
+	function get_user_queue_assignments($user) {
+		global $astman;
+		static $qc;
+
+		if (empty($qc)) {
+			$qpenalty=$astman->database_show('QPENALTY');
+			$qc = array();
+			foreach(array_keys($qpenalty) as $key) {
+				$key = explode('/', $key);
+				if ($key[3] == 'agents') {
+					$qc[$key[4]][] = $key[2];
+				}
+			}
+		}
+		file_put_contents('/tmp/freepbx_dbug',print_r($qc,true));
+		if (isset($qc[$user])) {
+			return $qc[$user];
+		} else {
+			return null;
+		}
+	}
