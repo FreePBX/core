@@ -1447,7 +1447,7 @@ function core_get_config($engine) {
 					
           $dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
-					$ext->add('ext-local', $exten['extension'], '', new ext_set('__PICKUPMARK',''));
+					$ext->add('ext-local', $exten['extension'], 'dest', new ext_set('__PICKUPMARK',''));
           if ($exten['noanswer_dest']) {
             if ($exten['noanswer_cid'] != '') {
 						  $ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${DIALSTATUS}"="NOANSWER"]','Set','CALLERID(name)='.$exten['noanswer_cid'].'${CALLERID(name)}'));
