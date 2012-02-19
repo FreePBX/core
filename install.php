@@ -811,3 +811,12 @@ $affected_rows .= $db->affectedRows();
 sql("UPDATE iax SET keyword = 'transfer' WHERE keyword = 'notransfer' AND LOWER(data) = 'mediaonly'");
 $affected_rows .= $db->affectedRows();
 $affected_rows ? out(sprintf(_("updated %s records"),$affected_rows)) : out(_("not needed"));
+
+
+$tables = array('sip', 'iax', 'zap', 'dahdi');
+outn(_("deleting obsoleted record_in and record_out entries.."));
+foreach ($tables as $table) {
+  $sql = "DELETE FROM `$table` WHERE `keyword` in ('record_in', 'record_out')";
+  $db->query($sql);
+}
+out(_("ok"));

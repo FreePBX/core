@@ -370,9 +370,6 @@ class core_conf {
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
-						case 'record_in':
-						case 'record_out':
-							break;
 						case 'context':
 							$context = $result2['data'];
 							//fall-through
@@ -551,9 +548,6 @@ class core_conf {
               if ($option != '')
                 $output .= $result2['keyword']."=".$result2['data']."\n";
               break;
-						case 'record_in':
-						case 'record_out':
-							break;
 						case 'context':
 							$context = $option;
 							//fall-through
@@ -645,8 +639,6 @@ class core_conf {
 						break;
 
 					// These are not zapata.conf variables so keep out of file
-					case 'record_out':
-					case 'record_in':
 					case 'dial':
 						break;
 					default:
@@ -4634,10 +4626,6 @@ function core_devices_addsip($account) {
 	$sipfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
 	$sipfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
 	
-	// Where is this in the interface ??????
-	$sipfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),$flag++);
-	$sipfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),$flag++);
-
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
 	if(DB::IsError($result)) {
@@ -4715,10 +4703,6 @@ function core_devices_addiax2($account) {
 	// Ref - http://bugs.digium.com/view.php?id=456
 	$iaxfields[] = array($account,'setvar',$db->escapeSimple("REALCALLERIDNUM=$account"),$flag++);
 	
-	// Where is this in the interface ??????
-	$iaxfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'),$flag++);
-	$iaxfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'),$flag++);
-	
 	$compiled = $db->prepare('INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$iaxfields);
 	if(DB::IsError($result)) {
@@ -4790,10 +4774,6 @@ function core_devices_addzap($account) {
 	$zapfields[] = array($account,'account',$db->escapeSimple($account));	
 	$zapfields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
 	
-	// Where is this in the interface ??????
-	$zapfields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'));
-	$zapfields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'));
-
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zapfields);
 	if(DB::IsError($result)) {
@@ -4843,10 +4823,6 @@ function core_devices_adddahdi($account) {
 	$dahdifields[] = array($account,'account',$db->escapeSimple($account));	
 	$dahdifields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
 	
-	// Where is this in the interface ??????
-	$dahdifields[] = array($account,'record_in',$db->escapeSimple(($_REQUEST['record_in'])?$_REQUEST['record_in']:'On-Demand'));
-	$dahdifields[] = array($account,'record_out',$db->escapeSimple(($_REQUEST['record_out'])?$_REQUEST['record_out']:'On-Demand'));
-
 	$compiled = $db->prepare('INSERT INTO dahdi (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$dahdifields);
 	if(DB::IsError($result)) {
@@ -5322,9 +5298,6 @@ function core_users_get($extension){
 		return array();
 	}
 	
-  // TODO: go through and really remove the old recording stuff!
-	$results['record_in']='Adhoc';
-	$results['record_out']='Adhoc';
 	if ($astman) {
 
     if (function_exists('paging_get_config')) {
@@ -6622,7 +6595,7 @@ function core_users_configpageload() {
 	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
-	$name = $outboundcid = $record_in = $record_out =  $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
+	$name = $outboundcid = $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
