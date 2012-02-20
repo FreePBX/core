@@ -1460,6 +1460,8 @@ function core_get_config($engine) {
           }
 					
 					if($vm != "novm") {
+						// This usually gets called from macro-exten-vm but if follow-me destination need to go this route
+						$ext->add('ext-local', $exten['extension'], '', new ext_macro('vm',$vm.',${DIALSTATUS},${IVR_RETVM}'));
 						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','vmret'));
 						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
 						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_goto('1','vmret'));
