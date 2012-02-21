@@ -6926,7 +6926,6 @@ function core_devices_configpageinit($dispnum) {
     // to add a new device type.
 		
 		// Some errors for the validation bits
-		$msgInvalidDTMFMODE = _("Please enter the dtmfmode for this device");
 		$msgInvalidChannel = _("Please enter the channel for this device");
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
@@ -7104,7 +7103,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
     $tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.");
-		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidDTMFMODE );
+		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
   // $amp_conf['DEVICE_SIP_CANREINVITE']
   // $amp_conf['DEVICE_SIP_TRUSTRPID']
   // $amp_conf['DEVICE_SIP_SENDRPID']
