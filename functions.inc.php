@@ -17,6 +17,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //
 //    Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
 //
+
 class core_conf {
 	var $_sip_general    = array();
 	var $_sip_notify     = array();
@@ -5521,10 +5522,67 @@ function core_zapchandids_get($channel) {
 
 /* begin page.trunks.php functions */
 
+/**
+ * @pram string; can be a trunk id, all or *, or registered/reg for just trunks that are registered
+ * @pram string; on = trunk is disabled, off  = trunk is enabled
+ */
+function core_trunks_toggle_state($trunk, $switch) {
+	switch ($trunk) {
+		case 'all':
+		case '*':
+			$trunks = core_trunks_getDetails();
+			break;
+		case 'reg':
+		case 'registered':
+			foreach (core_trunks_getDetails() as $t) {
+				if($reg = core_trunks_getTrunkRegister($t['trunkid'])) {
+					$trunks[] = $t;
+				}
+			}
+			break;
+		case '':
+			return false;//cannot call without a trunk
+			break;
+		default:
+			$trunks[] = core_trunks_getDetails($trunk);
+			break;
+	}
+	
+	//return if no trunks!
+	if (!isset($trunks) || !$trunks) {
+		return false;
+	}
+
+	foreach ($trunks as $t) {
+		$trunk			= core_trunks_getDetails($t['trunkid']);
+		$regstring 		= core_trunks_getTrunkRegister($t['trunkid']);
+		$userconfig		= core_trunks_getTrunkUserConfig($t['trunkid']);
+		$peerdetails	= core_trunks_getTrunkPeerDetails($t['trunkid']);
+		$disabled		= $switch;
+		
+		core_trunks_edit(
+			$trunk['trunkid'],
+			$trunk['channelid'],
+			$trunk['dialoutprefix'],
+			$trunk['maxchans'],
+			$trunk['outcid'],
+			$peerdetails,
+			$trunk['usercontext'],
+			$userconfig,
+			$regstring,
+			$trunk['keepcid'],
+			$trunk['failscript'],
+			$disabled,
+			$trunk['name'],
+			$trunk['provider']
+		);
+
+	}
+}
+
 // we're adding ,don't require a $trunknum
 function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="") {
 	global $db;
-	
 	$name = trim($name) == "" ? $channelid : $name;
 
 	// find the next available ID
@@ -5588,7 +5646,7 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 //obsolete
 function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider) {
 	global $db;
-	
+
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
 	
 	//echo  "backendAddTrunk($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register)";
@@ -5659,7 +5717,6 @@ function core_trunks_getTrunkTech($trunknum) {
 //add trunk info to sip or iax table
 function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
 	global $db;
-
 	switch ($type) {
 		case 'peer':
 			$trunknum = 'tr-peer-'.$trunknum;
