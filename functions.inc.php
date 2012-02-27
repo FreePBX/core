@@ -5524,9 +5524,9 @@ function core_zapchandids_get($channel) {
 
 /**
  * @pram string; can be a trunk id, all or *, or registered/reg for just trunks that are registered
- * @pram string; on = trunk is disabled, off  = trunk is enabled
+ * @pram boolean; true disables trunk, false is enables trunk
  */
-function core_trunks_toggle_state($trunk, $switch) {
+function core_trunks_disable($trunk, $switch) {
 	switch ($trunk) {
 		case 'all':
 		case '*':
@@ -5549,7 +5549,7 @@ function core_trunks_toggle_state($trunk, $switch) {
 	}
 	
 	//return if no trunks!
-	if (!isset($trunks) || !$trunks) {
+	if (empty($trunks)) {
 		return false;
 	}
 
@@ -5558,7 +5558,7 @@ function core_trunks_toggle_state($trunk, $switch) {
 		$regstring 		= core_trunks_getTrunkRegister($t['trunkid']);
 		$userconfig		= core_trunks_getTrunkUserConfig($t['trunkid']);
 		$peerdetails	= core_trunks_getTrunkPeerDetails($t['trunkid']);
-		$disabled		= $switch;
+		$disabled		= $switch ? 'on' : 'off';
 		
 		core_trunks_edit(
 			$trunk['trunkid'],
