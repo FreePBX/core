@@ -2035,6 +2035,9 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
+			// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
+			// Meetme does not default to the defined monitor directory.
+			//
       $exten = 'recconf';
       $ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
       $ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${MEETME_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
