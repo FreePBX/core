@@ -218,11 +218,18 @@ class core_conf {
 	}
 
 	function generate_loggergeneral_additional($ast_version) {
+		global $amp_conf;
 		$output = '';
 
-		if (isset($this->_loggergeneral) && is_array($this->_loggergeneral)) {
+		if (!empty($this->_loggergeneral)) {
 			foreach ($this->_loggergeneral as $values) {
 				$output .= $values['key']."=".$values['value']."\n";
+			}
+		} else {
+			// If they don't have anythng in custom then put in a default format
+			$general = parse_ini_file($amp_conf['ASTETCDIR'] . '/logger_general_custom.conf');
+			if (empty($general)) {
+				$output = "dateformat=%F %T" . "\n";
 			}
 		}
 		return $output;
@@ -233,12 +240,19 @@ class core_conf {
 	}
 
 	function generate_loggerlogfiles_additional($ast_version) {
+		global $amp_conf;
 		$output = '';
 
-		if (isset($this->_loggerlogfiles) && is_array($this->_loggerlogfiles)) {
+		if (!empty($this->_loggerlogfiles)) {
 			foreach ($this->_loggerlogfiles as $values) {
 				$output .= $values['key']."=".$values['value']."\n";
 			}
+		} else {
+			// If they don't have anythng in custom then put in a default settng
+			$logfiles = parse_ini_file($amp_conf['ASTETCDIR'] . '/logger_logfiles_custom.conf');
+			if (empty($logfiles)) {
+				$output = "console => notice,warning,error" . "\n";
+				$output .= "full => notice,warning,error,debug,verbose" . "\n"; }
 		}
 		return $output;
 	}
