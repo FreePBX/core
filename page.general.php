@@ -263,8 +263,9 @@ foreach ($globals as $global) {
 			</td>
 			<td colspan="3" align="right">
 			<select name="VMX_TIMEOUT" tabindex="<?php echo ++$tabindex;?>">
+				<option value="0.1"  <?php  echo ($VMX_TIMEOUT == 0 ? 'SELECTED' : '') ?>>0
 <?php
-			for ($i=0;$i<16;$i++) { 
+			for ($i=1;$i<16;$i++) { 
 				$VMX_TIMEOUT = (!isset($VMX_TIMEOUT) || $VMX_TIMEOUT == '')?2:$VMX_TIMEOUT;
 ?>
 				<option value="<?php echo $i?>"  <?php  echo ($VMX_TIMEOUT == $i ? 'SELECTED' : '') ?>><?php echo $i?>

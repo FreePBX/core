@@ -1312,7 +1312,11 @@ function core_get_config($engine) {
 						$exten = "s/$cidnum";
 						$ext->add($context, $exten, '', new ext_execif('$["${FROM_DID}" = ""]','Set','__FROM_DID=${EXTEN}'));
 					} else {
-						$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
+						if ($exten == 's'){
+							$ext->add($context, $exten, '', new ext_execif('$["${FROM_DID}" = ""]','Set','__FROM_DID=${EXTEN}'));
+						}else{
+							$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
+						}
 					}
 					// always set CallerID name
           $ext->add($context, $exten, '', new ext_set('CDR(did)','${FROM_DID}'));

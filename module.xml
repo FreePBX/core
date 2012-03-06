@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.10.0.0</version>
+	<version>2.10.0.1</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.10.0.1* #5385, #5381
 		*2.10.0.0* bump to final, minor tweaks
 		*2.10.0rc1.3* #5618, #5633
 		*2.10.0rc1.2* #5300, #5374, #5358, #4911, #4969, #5073
@@ -47,6 +48,6 @@
 		<ampusers category="Admin">Administrators</ampusers>
 		<wiki category="Admin" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
-	<location>release/2.10/core-2.10.0.0.tgz</location>
-	<md5sum>f8d702f9d147bbafbd26fe880c0f4d5c</md5sum>
+	<location>release/2.10/core-2.10.0.1.tgz</location>
+	<md5sum>63898c4925fc1016b7a94746b8ab1d3a</md5sum>
 </module>
