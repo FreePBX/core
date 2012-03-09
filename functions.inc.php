@@ -868,6 +868,7 @@ function core_get_config($engine) {
 			$ast_lt_16 = version_compare($version, '1.6', 'lt');
 			$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
 			$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
+			$ast_ge_10 = version_compare($version, '10', 'ge');
 
 			// Now add to sip_general_addtional.conf
 			//
@@ -1872,49 +1873,6 @@ function core_get_config($engine) {
         }
 			}
 
-/* TODO: Replaced, will remove this after some additional testing
- *
-			// Generate macro-record-enable, if recording is disabled then we just make it a stub
-			// Otherwise we make it right
-			//
-			$context = 'macro-record-enable';
-			$exten = 's';
-
-			if ($disable_recording) {
-				$ext->add($context, $exten, '', new ext_macroexit());
-			} else {
-				$ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
-				$ext->add($context, $exten, '', new ext_resetcdr('w'));
-
-				if ($ast_ge_14) {
-					$ext->add($context, $exten, '', new ext_stopmixmonitor());
-				} else {
-					$ext->add($context, $exten, '', new ext_stopmonitor());
-				}
-			  $ext->add($context, $exten, 'check', new ext_execif('$["${ARG1}"=""]','MacroExit'));
-				$ext->add($context, $exten, '', new ext_gotoif('$["${ARG2}"="Group"]', 'Group','OUT'));
-			  $ext->add($context, $exten, 'Group', new ext_set('LOOPCNT','${FIELDQTY(ARG1,-)}'));
-			  $ext->add($context, $exten, '', new ext_set('ITER','1'));
-				$ext->add($context, $exten, 'begin', new ext_gotoif('$["${CUT(DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording),=,3)}" != "Always"]', 'continue'));
-			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})}'));
-			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${TEXTEN}',1));
-			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','g${TEXTEN}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
-			  $ext->add($context, $exten, '', new ext_goto('record'));
-			  $ext->add($context, $exten, 'continue', new ext_set('ITER','$[${ITER}+1]'));
-				$ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
-				$ext->add($context, $exten, 'OUT', new ext_gotoif('$["${ARG2}"="IN"]', 'IN'));
-			  $ext->add($context, $exten, '', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,1):4}" != "Always"]','MacroExit'));
-			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
-			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','OUT${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
-			  $ext->add($context, $exten, '', new ext_goto('record'));
-			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacroExit'));
-			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
-			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
-				$ext->add($context, $exten, 'record', new ext_mixmonitor('${EVAL(${MIXMON_DIR})}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
-				$ext->add($context, $exten, '', new ext_macroexit());
-			}
-*/
-
 /*
 ; ARG1: type
 ;       exten, out, rg, q, conf
@@ -2039,15 +1997,21 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
-			// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
-			// Meetme does not default to the defined monitor directory.
-			//
       $exten = 'recconf';
       $ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
       $ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${MEETME_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
-      $ext->add($context, $exten, '', new ext_execif('$[!${MEETME_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
-      $ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFILE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
-      $ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFORMAT','${MIXMON_FORMAT}'));
+			if ($amp_conf['ASTCONFAPP'] == 'app_confbridge' && $ast_ge_10) {
+      	$ext->add($context, $exten, '', new ext_execif('$[!${CONFBRIDGE_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
+      	$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_file)','${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MON_FMT}'));
+				$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_conference)','yes'));
+			} else {
+				// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
+				// Meetme does not default to the defined monitor directory.
+				//
+      	$ext->add($context, $exten, '', new ext_execif('$[!${MEETME_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
+      	$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFILE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
+      	$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFORMAT','${MIXMON_FORMAT}'));
+			}
       $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!="always','Return'));
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS','RECORDING'));
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
