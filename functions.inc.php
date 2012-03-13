@@ -27,6 +27,41 @@ class core_conf {
 	var $_applicationmap = array();
 	var $_loggergeneral  = array();
 	var $_loggerlogfiles = array();
+
+	var $dev_user_map;
+
+	// map the actual vmcontext and user devicename if the device is fixed
+	private function map_dev_user($account, $keyword, $data) {
+
+		if (!isset($this->dev_user_map)) {
+			$this->dev_user_map = core_devices_get_user_mappings();
+		}
+
+		if (!empty($this->dev_user_map[$account]) && $this->dev_user_map[$account]['devicetype'] == 'fixed') {
+			switch (strtolower($keyword)) {
+				case 'callerid':
+					$user_option = $this->dev_user_map[$account]['description'] . ' <' . $account . '>';
+					break;
+				case 'mailbox':
+					if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm') 
+						&& strtolower($data) == "$account" . "@device") {
+						// they have no vm so don't put a mailbox=line
+						return "";
+					} elseif (strtolower($data) == "$account" . "@device" 
+						&& !empty($this->dev_user_map[$account]['vmcontext']) && 
+						$this->dev_user_map[$account]['vmcontext'] != 'novm') {
+						$user_option = $this->dev_user_map[$account]['user'] . "@" . $this->dev_user_map[$account]['vmcontext'];
+					} else {
+						$user_option = $data;
+					}
+				}
+				$output = $keyword . "=" . $user_option . "\n";
+			} else {
+				$output = $keyword . "=" . $data . "\n";
+			}
+		return $output;
+	}
+
 	// return an array of filenames to write
 	function get_filename() {
 		global $chan_dahdi;
@@ -385,6 +420,10 @@ class core_conf {
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
+						case 'callerid':
+						case 'mailbox':
+							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+							break;
 						case 'context':
 							$context = $result2['data'];
 							//fall-through
@@ -563,6 +602,10 @@ class core_conf {
               if ($option != '')
                 $output .= $result2['keyword']."=".$result2['data']."\n";
               break;
+						case 'callerid':
+						case 'mailbox':
+							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+							break;
 						case 'context':
 							$context = $option;
 							//fall-through
@@ -655,6 +698,10 @@ class core_conf {
 
 					// These are not zapata.conf variables so keep out of file
 					case 'dial':
+						break;
+					case 'callerid':
+					case 'mailbox':
+						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
 						break;
 					default:
 						$output .= $result2['keyword']."=".$result2['data']."\n";
@@ -4248,6 +4295,31 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	return $extens;
 }
 
+// get a mapping of the devices to user description and vmcontext
+// used for fixed devices when generating tech.conf files to
+// override some of the mailbox options or remove them if novm
+//
+function core_devices_get_user_mappings() {
+	static $devices;
+
+	if (isset($devices)) {
+		return $devices;
+	}
+	foreach (core_devices_list("all",'full', true) as $device) {
+		$devices[$device['id']] = $device;
+	}
+	foreach (core_users_list(true) as $user) {
+		$users[$user[0]]['description'] = $user[1];
+		$users[$user[0]]['vmcontext'] = $user[2];
+	}
+	foreach ($devices as $id => $device) {
+		if ($device['devicetype'] == 'fixed') {
+			$devices[$id]['vmcontext'] = $users[$device['user']]['vmcontext'];
+			$devices[$id]['description'] = $users[$device['user']]['description'];
+		}
+	}
+	return $devices;
+}
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
 	global $amp_conf;
@@ -4910,12 +4982,16 @@ function core_hint_get($account){
 
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
-function core_users_list() {
-	$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
+function core_users_list($get_all=false) {
+	static $results;
+
+	if (!isset($results)) {
+		$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
+	}
 
 	//only allow extensions that are within administrator's allowed range
 	foreach($results as $result){
-		if (checkRange($result[0])){
+		if ($get_all || checkRange($result[0])){
 			$extens[] = array($result[0],$result[1],$result[2]);
 		}
 	}
