@@ -32,6 +32,7 @@ class core_conf {
 
 	// map the actual vmcontext and user devicename if the device is fixed
 	private function map_dev_user($account, $keyword, $data) {
+		global $amp_conf;
 
 		if (!isset($this->dev_user_map)) {
 			$this->dev_user_map = core_devices_get_user_mappings();
@@ -44,7 +45,7 @@ class core_conf {
 					break;
 				case 'mailbox':
 					if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm') 
-						&& strtolower($data) == "$account" . "@device") {
+						&& strtolower($data) == "$account" . "@device" && $amp_conf['DEVICE_REMOVE_MAILBOX']) {
 						// they have no vm so don't put a mailbox=line
 						return "";
 					} elseif (strtolower($data) == "$account" . "@device" 
