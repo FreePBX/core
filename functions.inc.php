@@ -27,42 +27,6 @@ class core_conf {
 	var $_applicationmap = array();
 	var $_loggergeneral  = array();
 	var $_loggerlogfiles = array();
-
-	var $dev_user_map;
-
-	// map the actual vmcontext and user devicename if the device is fixed
-	private function map_dev_user($account, $keyword, $data) {
-		global $amp_conf;
-
-		if (!isset($this->dev_user_map)) {
-			$this->dev_user_map = core_devices_get_user_mappings();
-		}
-
-		if (!empty($this->dev_user_map[$account]) && $this->dev_user_map[$account]['devicetype'] == 'fixed') {
-			switch (strtolower($keyword)) {
-				case 'callerid':
-					$user_option = $this->dev_user_map[$account]['description'] . ' <' . $account . '>';
-					break;
-				case 'mailbox':
-					if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm') 
-						&& strtolower($data) == "$account" . "@device" && $amp_conf['DEVICE_REMOVE_MAILBOX']) {
-						// they have no vm so don't put a mailbox=line
-						return "";
-					} elseif (strtolower($data) == "$account" . "@device" 
-						&& !empty($this->dev_user_map[$account]['vmcontext']) && 
-						$this->dev_user_map[$account]['vmcontext'] != 'novm') {
-						$user_option = $this->dev_user_map[$account]['user'] . "@" . $this->dev_user_map[$account]['vmcontext'];
-					} else {
-						$user_option = $data;
-					}
-				}
-				$output = $keyword . "=" . $user_option . "\n";
-			} else {
-				$output = $keyword . "=" . $data . "\n";
-			}
-		return $output;
-	}
-
 	// return an array of filenames to write
 	function get_filename() {
 		global $chan_dahdi;
@@ -421,10 +385,6 @@ class core_conf {
 							if ($option != '')
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							break;
-						case 'callerid':
-						case 'mailbox':
-							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-							break;
 						case 'context':
 							$context = $result2['data'];
 							//fall-through
@@ -603,10 +563,6 @@ class core_conf {
               if ($option != '')
                 $output .= $result2['keyword']."=".$result2['data']."\n";
               break;
-						case 'callerid':
-						case 'mailbox':
-							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-							break;
 						case 'context':
 							$context = $option;
 							//fall-through
@@ -699,10 +655,6 @@ class core_conf {
 
 					// These are not zapata.conf variables so keep out of file
 					case 'dial':
-						break;
-					case 'callerid':
-					case 'mailbox':
-						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
 						break;
 					default:
 						$output .= $result2['keyword']."=".$result2['data']."\n";
@@ -916,7 +868,6 @@ function core_get_config($engine) {
 			$ast_lt_16 = version_compare($version, '1.6', 'lt');
 			$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
 			$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
-			$ast_ge_10 = version_compare($version, '10', 'ge');
 
 			// Now add to sip_general_addtional.conf
 			//
@@ -1921,6 +1872,49 @@ function core_get_config($engine) {
         }
 			}
 
+/* TODO: Replaced, will remove this after some additional testing
+ *
+			// Generate macro-record-enable, if recording is disabled then we just make it a stub
+			// Otherwise we make it right
+			//
+			$context = 'macro-record-enable';
+			$exten = 's';
+
+			if ($disable_recording) {
+				$ext->add($context, $exten, '', new ext_macroexit());
+			} else {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
+				$ext->add($context, $exten, '', new ext_resetcdr('w'));
+
+				if ($ast_ge_14) {
+					$ext->add($context, $exten, '', new ext_stopmixmonitor());
+				} else {
+					$ext->add($context, $exten, '', new ext_stopmonitor());
+				}
+			  $ext->add($context, $exten, 'check', new ext_execif('$["${ARG1}"=""]','MacroExit'));
+				$ext->add($context, $exten, '', new ext_gotoif('$["${ARG2}"="Group"]', 'Group','OUT'));
+			  $ext->add($context, $exten, 'Group', new ext_set('LOOPCNT','${FIELDQTY(ARG1,-)}'));
+			  $ext->add($context, $exten, '', new ext_set('ITER','1'));
+				$ext->add($context, $exten, 'begin', new ext_gotoif('$["${CUT(DB(AMPUSER/${CUT(ARG1,-,${ITER})}/recording),=,3)}" != "Always"]', 'continue'));
+			  $ext->add($context, $exten, '', new ext_set('TEXTEN','${CUT(ARG1,-,${ITER})}'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${TEXTEN}',1));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','g${TEXTEN}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+			  $ext->add($context, $exten, '', new ext_goto('record'));
+			  $ext->add($context, $exten, 'continue', new ext_set('ITER','$[${ITER}+1]'));
+				$ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
+				$ext->add($context, $exten, 'OUT', new ext_gotoif('$["${ARG2}"="IN"]', 'IN'));
+			  $ext->add($context, $exten, '', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,1):4}" != "Always"]','MacroExit'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','OUT${ARG1}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+			  $ext->add($context, $exten, '', new ext_goto('record'));
+			  $ext->add($context, $exten, 'IN', new ext_execif('$["${CUT(DB(AMPUSER/${ARG1}/recording),\\\\\|,2):3}" != "Always"]','MacroExit'));
+			  $ext->add($context, $exten, '', new ext_noop_trace('Recording enable for ${ARG1}'));
+			  $ext->add($context, $exten, '', new ext_set('CALLFILENAME','${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}-${UNIQUEID}'));
+				$ext->add($context, $exten, 'record', new ext_mixmonitor('${EVAL(${MIXMON_DIR})}${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
+				$ext->add($context, $exten, '', new ext_macroexit());
+			}
+*/
+
 /*
 ; ARG1: type
 ;       exten, out, rg, q, conf
@@ -2045,21 +2039,15 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
+			// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
+			// Meetme does not default to the defined monitor directory.
+			//
       $exten = 'recconf';
       $ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
       $ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${MEETME_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
-			if ($amp_conf['ASTCONFAPP'] == 'app_confbridge' && $ast_ge_10) {
-      	$ext->add($context, $exten, '', new ext_execif('$[!${CONFBRIDGE_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
-      	$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_file)','${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MON_FMT}'));
-				$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_conference)','yes'));
-			} else {
-				// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
-				// Meetme does not default to the defined monitor directory.
-				//
-      	$ext->add($context, $exten, '', new ext_execif('$[!${MEETME_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
-      	$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFILE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
-      	$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFORMAT','${MIXMON_FORMAT}'));
-			}
+      $ext->add($context, $exten, '', new ext_execif('$[!${MEETME_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
+      $ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFILE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
+      $ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFORMAT','${MIXMON_FORMAT}'));
       $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!="always','Return'));
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS','RECORDING'));
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
@@ -4296,31 +4284,6 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	return $extens;
 }
 
-// get a mapping of the devices to user description and vmcontext
-// used for fixed devices when generating tech.conf files to
-// override some of the mailbox options or remove them if novm
-//
-function core_devices_get_user_mappings() {
-	static $devices;
-
-	if (isset($devices)) {
-		return $devices;
-	}
-	foreach (core_devices_list("all",'full', true) as $device) {
-		$devices[$device['id']] = $device;
-	}
-	foreach (core_users_list(true) as $user) {
-		$users[$user[0]]['description'] = $user[1];
-		$users[$user[0]]['vmcontext'] = $user[2];
-	}
-	foreach ($devices as $id => $device) {
-		if ($device['devicetype'] == 'fixed') {
-			$devices[$id]['vmcontext'] = $users[$device['user']]['vmcontext'];
-			$devices[$id]['description'] = $users[$device['user']]['description'];
-		}
-	}
-	return $devices;
-}
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
 	global $amp_conf;
@@ -4983,16 +4946,12 @@ function core_hint_get($account){
 
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
-function core_users_list($get_all=false) {
-	static $results;
-
-	if (!isset($results)) {
-		$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
-	}
+function core_users_list() {
+	$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
 
 	//only allow extensions that are within administrator's allowed range
 	foreach($results as $result){
-		if ($get_all || checkRange($result[0])){
+		if (checkRange($result[0])){
 			$extens[] = array($result[0],$result[1],$result[2]);
 		}
 	}
@@ -5491,7 +5450,7 @@ function core_users_edit($extension,$vars){
 			$user_devices = explode('&',$ud);
 			foreach ($user_devices as $user_device) {
 				exec("rm -f /var/spool/asterisk/voicemail/device/".$user_device);
-				if ($new_vmcontext != 'novm') {
+				if ($new_context != 'novm') {
 					exec("/bin/ln -s /var/spool/asterisk/voicemail/".$new_vmcontext."/".$extension."/ /var/spool/asterisk/voicemail/device/".$user_device);
 				}
 			}
