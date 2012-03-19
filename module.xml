@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.10.0.3</version>
+	<version>2.10.0.4</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.10.0.3* revert back to .1 r13742 until current issue can be debugged
+		*2.10.0.4* put back changes reverted in r13846 with fix for extension deletion
+		*2.10.0.3* revert back to r13742 until current issue can be debugged
 		*2.10.0.2* #5664, #5678
 		*2.10.0.1* #5385, #5381
 		*2.10.0.0* bump to final, minor tweaks
