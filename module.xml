@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.10.0.4* put back changes reverted in r13846 with fix for extension deletion
+		*2.10.0.4* #2939 and put back changes reverted in r13846 with fix for extension deletion
 		*2.10.0.3* revert back to r13742 until current issue can be debugged
 		*2.10.0.2* #5664, #5678
 		*2.10.0.1* #5385, #5381
