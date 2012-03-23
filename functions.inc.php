@@ -157,6 +157,9 @@ class core_conf {
       foreach ($this->_sip_notify as $section) {
         $output .= "[".$section['section']."]\n";
         foreach ($section['entries'] as $key => $value) {
+					if (strtolower($key) == 'content-length') {
+						continue;
+					}
           $output .= "$key=>$value\n";
         }
         $output .= "\n";
