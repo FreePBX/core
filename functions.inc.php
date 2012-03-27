@@ -5176,7 +5176,7 @@ function core_users_add($vars, $editmode=false) {
 		}
 	}
 
-	$sipname = preg_replace("/\s/" ,"", trim($sipname));
+	$sipname = isset($sipname) ? preg_replace("/\s/" ,"", trim($sipname)) : '';
 	if (! core_sipname_check($sipname, $extension)) {
 		echo "<script>javascript:alert('"._("This sipname: {$sipname} is already in use")."');</script>";
 		return false;
@@ -5218,8 +5218,8 @@ function core_users_add($vars, $editmode=false) {
 
 	//escape quotes and any other bad chars:
 	if(!get_magic_quotes_gpc()) {
-		$outboundcid = $db->escapeSimple($outboundcid);
-		$name = $db->escapeSimple($name);
+		$outboundcid = isset($outboundcid) ? $db->escapeSimple($outboundcid) : '';
+		$name = isset($name) ? $db->escapeSimple($name) : '';
 	}
 
 	//if voicemail is enabled, set the box@context to use
@@ -5237,11 +5237,11 @@ function core_users_add($vars, $editmode=false) {
 	//
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
 	
-  $noanswer_dest = isset($noanswer_dest) && !empty($vars[$vars[$noanswer_dest].'0']) ? q($vars[$vars[$noanswer_dest].'0']) : "''";
+  $noanswer_dest = !empty($noanswer_dest) && $vars[$vars[$noanswer_dest].'0'] != '' ? q($vars[$vars[$noanswer_dest].'0']) : "''";
   $noanswer_cid = isset($noanswer_cid) ? q($noanswer_cid) : "''";
-  $busy_dest = isset($busy_dest) && !empty($vars[$vars[$busy_dest].'1']) ? q($vars[$vars[$busy_dest].'1']) : "''";
+  $busy_dest = !empty($busy_dest) && $vars[$vars[$busy_dest].'1'] != '' ? q($vars[$vars[$busy_dest].'1']) : "''";
   $busy_cid = isset($busy_cid) ? q($busy_cid) : "''";
-  $chanunavail_dest = isset($chanunavail_dest) && !empty($vars[$vars[$chanunavail_dest].'2']) ? q($vars[$vars[$chanunavail_dest].'2']) : "''";
+  $chanunavail_dest = !empty($chanunavail_dest) && $vars[$vars[$chanunavail_dest].'2'] != '' ? q($vars[$vars[$chanunavail_dest].'2']) : "''";
   $chanunavail_cid = isset($chanunavail_cid) ? q($chanunavail_cid) : "''";
 
 	$sql="INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,sipname,noanswer_cid,busy_cid,chanunavail_cid,noanswer_dest,busy_dest,chanunavail_dest) values (\"";
@@ -5276,16 +5276,21 @@ function core_users_add($vars, $editmode=false) {
 		$astman->database_put("AMPUSER",$extension."/outboundcid",isset($outboundcid)?"\"".$outboundcid."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidname",isset($name)?"\"".$name."\"":'');
 		$astman->database_put("AMPUSER",$extension."/cidnum",$cid_masquerade);
-		$astman->database_put("AMPUSER",$extension."/voicemail","\"".isset($voicemail)?$voicemail:''."\"");
-    $astman->database_put("AMPUSER",$extension."/answermode","\"".isset($answermode)?$answermode:'disabled'."\"");
+		$astman->database_put("AMPUSER",$extension."/voicemail","\"".(isset($voicemail)?$voicemail:'')."\"");
+    $astman->database_put("AMPUSER",$extension."/answermode","\""
+		. (isset($answermode)?$answermode:'disabled')
+		. "\"");
 
     $astman->database_put("AMPUSER",$extension."/recording/in/external","\"".$recording_in_external."\"");
     $astman->database_put("AMPUSER",$extension."/recording/out/external","\"".$recording_out_external."\"");
     $astman->database_put("AMPUSER",$extension."/recording/in/internal","\"".$recording_in_internal."\"");
     $astman->database_put("AMPUSER",$extension."/recording/out/internal","\"".$recording_out_internal."\"");
     $astman->database_put("AMPUSER",$extension."/recording/ondemand","\"".$recording_ondemand."\"");
-    $astman->database_put("AMPUSER",$extension."/recording/priority","\"".isset($recording_priority)?$recording_priority:'10'."\"");
-
+    $astman->database_put("AMPUSER",$extension."/recording/priority","\""
+		.(isset($recording_priority)?$recording_priority:'10')
+		."\"");
+	
+	$call_screen = isset($call_screen) ? $call_screen : '0';
 		switch ($call_screen) {
 			case '0':
 				$astman->database_del("AMPUSER",$extension."/screen");
@@ -5297,6 +5302,7 @@ function core_users_add($vars, $editmode=false) {
 				$astman->database_put("AMPUSER",$extension."/screen","\"memory\"");
 				break;
 			default:
+				break;
 		}
 
 		if (!$editmode) {
@@ -5420,6 +5426,8 @@ function core_users_del($extension, $editmode=false){
 		// TODO just change this to delete everything
 		$astman->database_deltree("AMPUSER/".$extension);
 	}
+	
+	return true;
 }
 
 function core_users_directdid_get($directdid=""){
@@ -5444,7 +5452,7 @@ function core_users_cleanastdb($extension) {
 	}
 }
 
-function core_users_edit($extension,$vars){
+function core_users_edit($extension, $vars){
 	global $db;
 	global $amp_conf;
 	global $astman;
