@@ -2101,6 +2101,10 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
       $ext->add($context, $exten, '', new ext_set('MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${MIXMON_FORMAT}:wav)}'));
       $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CDR(recordingfile))','${CALLFILENAME}.${MON_FMT}'));
+
+			// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
+      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(ONETOUCH_RECFILE)','${CALLFILENAME}.${MON_FMT}'));
+
       $ext->add($context, $exten, 'recording', new ext_playback('beep'));
       //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
       //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
@@ -3850,7 +3854,11 @@ function core_get_config($engine) {
 
         $skip_label = $next_label;
       }
-      $ext->add($mcontext, $exten,'theend', new ext_hangup());
+
+			// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
+			$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
+
+      $ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
       $ext->add($mcontext, $exten,'', new ext_macroexit(''));
       /*
       $ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
