@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.10.0.7</version>
+	<version>2.10.0.8</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.10.0.8* #5816 (work around asterisk bug)
 		*2.10.0.7* #5783
 		*2.10.0.6* #5714, undefined variable fixes
 		*2.10.0.5* #5664 additional work
