@@ -4423,7 +4423,8 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$astman->database_del("DEVICE",$id."/emergency_cid");
     }
 
-		if ($user != "none") {
+		$apparent_connecteduser = ($editmode && $user != "none") ? $astman->database_get("DEVICE",$id."/user") : $user;
+		if ($user != "none" && $apparent_connecteduser == $user)  {
 			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 			if (empty($existingdevices)) {
 				$astman->database_put("AMPUSER",$user."/device",$id);
