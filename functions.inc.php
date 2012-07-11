@@ -1939,7 +1939,7 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_stopmixmonitor());
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS',''));
       $ext->add($context, $exten, '', new ext_set('MON_BASE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/'));
-      $ext->add($context, $exten, '', new ext_set('MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}:wav)}'));
+      $ext->add($context, $exten, '', new ext_set('__MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}:wav)}'));
       $ext->add($context, $exten, '', new ext_execif('$[${LEN(${CALLFILENAME})} & ${STAT(f,${MON_BASE}${CALLFILENAME}.${MON_FMT})}]','System','rm -f ${MON_BASE}${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_set('__CALLFILENAME',''));
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)',''));
@@ -1951,7 +1951,10 @@ function core_get_config($engine) {
 
       $ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
       $ext->add($context, $exten, '', new ext_resetcdr(''));
-      $ext->add($context, $exten, 'check', new ext_set('MON_FMT','${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}'));
+      $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}" != "RECORDING"]', 'check'));
+      $ext->add($context, $exten, '', new ext_set('AUDIOHOOK_INHERIT(MixMonitor)','yes'));
+      $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
+      $ext->add($context, $exten, 'check', new ext_set('__MON_FMT','${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!="RECORDING"]', 'next'));
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_return(''));
@@ -2098,6 +2101,10 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
       $ext->add($context, $exten, '', new ext_set('MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${MIXMON_FORMAT}:wav)}'));
       $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CDR(recordingfile))','${CALLFILENAME}.${MON_FMT}'));
+
+			// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
+      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(ONETOUCH_RECFILE)','${CALLFILENAME}.${MON_FMT}'));
+
       $ext->add($context, $exten, 'recording', new ext_playback('beep'));
       //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
       //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
@@ -3847,7 +3854,11 @@ function core_get_config($engine) {
 
         $skip_label = $next_label;
       }
-      $ext->add($mcontext, $exten,'theend', new ext_hangup());
+
+			// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
+			$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
+
+      $ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
       $ext->add($mcontext, $exten,'', new ext_macroexit(''));
       /*
       $ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
@@ -4412,7 +4423,8 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$astman->database_del("DEVICE",$id."/emergency_cid");
     }
 
-		if ($user != "none") {
+		$apparent_connecteduser = ($editmode && $user != "none") ? $astman->database_get("DEVICE",$id."/user") : $user;
+		if ($user != "none" && $apparent_connecteduser == $user)  {
 			$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 			if (empty($existingdevices)) {
 				$astman->database_put("AMPUSER",$user."/device",$id);

@@ -36,6 +36,9 @@ if($var['action'] === 'setkey') {
 				case 'AMPMGRUSER':
 					fpbx_ami_update($var['value'], false);
 				break;
+				case 'ASTMGRWRITETIMEOUT':
+					fpbx_ami_update(false, false, true);
+				break;
 			}
 			
 		}
