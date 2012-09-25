@@ -2018,7 +2018,7 @@ function core_get_config($engine) {
 
       $ext->add($context, $exten, 'callee', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
       $ext->add($context, $exten, '', new ext_return(''));
-      $ext->add($context, $exten, 'caller', new ext_set('REC_POLICY_MODE','${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}'));
+      $ext->add($context, $exten, 'caller', new ext_set('__REC_POLICY_MODE','${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}'));
       $ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
       $ext->add($context, $exten, '', new ext_return(''));
 
