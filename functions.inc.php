@@ -2077,60 +2077,14 @@ function core_get_config($engine) {
       $context = 'macro-one-touch-record';
       $exten = 's';
 
-      // TODO: if we are receiving channel, check our globals against the IMPORT() and adjust if not the same. Think about
-      //       how we assess parking since either side could be retrived. Could get messy.
-      //       Maybe only do this if known states show we are in this predicament but got to figure out how
-      //
-      $ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','THISEXTEN=${CUT(CALLFILENAME,-,2)}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${CUT(CALLFILENAME,-,2)}:${FROMEXTEN})}'));
-      //$ext->add($context, $exten, '', new ext_execif('$["${PICKUP_EXTEN}"!=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${PICKUP_EXTEN}'));
-      //$ext->add($context, $exten, '', new ext_execif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"=""]','Set','MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
-
-      //$ext->add($context, $exten, '', new ext_noop_trace('CLEAN_DIALEDPEERNUMBER: ${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)} DIALEDPEERNUMBER: ${DIALEDPEERNUMBER}',5));
-      $ext->add($context, $exten, '', new ext_noop_trace('Checking permissions for ${THISEXTEN}: ${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}'));
-      $ext->add($context, $exten, '', new ext_noop_trace('AMPUSER: ${AMPUSER}: MASTER_CHANNEL(AMPUSER): ${MASTER_CHANNEL(AMPUSER)}'));
-      $ext->add($context, $exten, '', new ext_noop_trace('CALLFILENAME: ${CALLFILENAME}: MASTER_CHANNEL(CALLFILENAME): ${MASTER_CHANNEL(CALLFILENAME)}'));
-      $ext->add($context, $exten, '', new ext_execif('$["${CUT(CALLFILENAME,-,1)}"="exten" & "${DB(AMPUSER/${THISEXTEN}/recording/ondemand)}"!="enabled"]','MacroExit'));
-      $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="RECORDING"]', 'stoprec'));
-      $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(REC_POLICY_MODE)}"="never"]', 'stopped'));
-      $ext->add($context, $exten, '', new ext_gotoif('$["${MASTER_CHANNEL(ONETOUCH_REC)}"="" & "${MASTER_CHANNEL(REC_STATUS)}"="RECORDING"]', 'recording'));
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(ONETOUCH_REC)','RECORDING'));
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(REC_STATUS)','RECORDING'));
-      $ext->add($context, $exten, '', new ext_noop_trace('THISEXTEN: ${THISEXTEN} CALLFILENAME: ${CALLFILENAME}'));
-      $ext->add($context, $exten, 'mixmon', new ext_set('AUDIOHOOK_INHERIT(MixMonitor)','yes'));
-      $ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
-      $ext->add($context, $exten, '', new ext_set('MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${MIXMON_FORMAT}:wav)}'));
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CDR(recordingfile))','${CALLFILENAME}.${MON_FMT}'));
-
-			// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(ONETOUCH_RECFILE)','${CALLFILENAME}.${MON_FMT}'));
-
-      $ext->add($context, $exten, 'recording', new ext_playback('beep'));
-      //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},INUSE'));
-      //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},INUSE'));
-      $ext->add($context, $exten, '', new ext_macroexit());
-
-      $ext->add($context, $exten, 'stoprec', new ext_stopmixmonitor());
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(ONETOUCH_REC)','PAUSED'));
-      $ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(REC_STATUS)','PAUSED'));
-      $ext->add($context, $exten, '', new ext_execif('$["${THISEXTEN}"=""]','Set','THISEXTEN=${IF($["${REALCALLERIDNUM}"=""]?${DIALEDPEERNUMBER}:${FROMEXTEN})}'));
-      $ext->add($context, $exten, '', new ext_noop_trace('THISEXTEN: ${THISEXTEN} CALLFILENAME: ${CALLFILENAME}'));
-      $ext->add($context, $exten, 'stopped', new ext_playback('beep&beep'));
-      //$ext->add($context, $exten, '', new ext_gosubif('$["${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]','sstate','sstate','${CUT(CALLFILENAME,-,2)},NOT_INUSE','${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
-      //$ext->add($context, $exten, '', new ext_gosub('sstate', false, false,'${CUT(CALLFILENAME,-,3)},NOT_INUSE'));
-      $ext->add($context, $exten, '', new ext_macroexit());
-
-      /*
-      $ext->add($context, $exten, 'sstate', new ext_set('DEVICES','${DB(AMPUSER/${ARG1}/device)}'));
-      $ext->add($context, $exten, '', new ext_gotoif('$["${DEVICES}"=""]', 'return'));
-      $ext->add($context, $exten, '', new ext_set('LOOPCNT','${FIELDQTY(DEVICES,&)}'));
-      $ext->add($context, $exten, '', new ext_set('ITER','1'));
-      $ext->add($context, $exten, 'begin', new ext_set('DEVICE_STATE(Custom:RECORDING${CUT(DEVICES,&,${ITER})})','${ARG2}'));
-      $ext->add($context, $exten, '', new ext_set('ITER','$[${ITER}+1]'));
-      $ext->add($context, $exten, '', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'begin'));
-      $ext->add($context, $exten, 'return', new ext_return(''));
-       */
-
+			// TODO: the script is in callrecordings module, probably need to clean up some???
+			//
+			// The dialplan has been replaced by this system script so that external applications such as user portals
+			// can share a common script that is always in sync with changes. Example today is iSyphony who wrote this
+			// original script.
+			//
+			$ext->add($context, $exten, '', new ext_system($amp_conf['ASTVARLIBDIR'] . '/bin/one_touch_record.php ${CHANNEL(name)}'));
+			$ext->add($context, $exten, '', new ext_macroexit());
 
       /* macro-prepend-cid */
       // prepend a cid and if set to replace previous prepends, do so, otherwise stack them
