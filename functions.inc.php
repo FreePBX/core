@@ -2077,12 +2077,6 @@ function core_get_config($engine) {
       $context = 'macro-one-touch-record';
       $exten = 's';
 
-			// TODO: the script is in callrecordings module, probably need to clean up some???
-			//
-			// The dialplan has been replaced by this system script so that external applications such as user portals
-			// can share a common script that is always in sync with changes. Example today is iSyphony who wrote this
-			// original script.
-			//
 			$ext->add($context, $exten, '', new ext_system($amp_conf['ASTVARLIBDIR'] . '/bin/one_touch_record.php ${CHANNEL(name)}'));
 			$ext->add($context, $exten, '', new ext_macroexit());
 
@@ -2199,7 +2193,13 @@ function core_get_config($engine) {
 					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$offset.'},'.$password));
             $password = '';
           }
-          $ext->add($context, $exten, '', new ext_macro("outisbusy"));
+					if ($route['dest']) {
+						$ext->add($context, $exten, '', new ext_noop_trace('All trunks failed calling ${EXTEN}, going to destination'));
+						$ext->add($context, $exten, '', new ext_goto($route['dest']));
+					} else {
+						$ext->add($context, $exten, '', new ext_noop_trace('All trunks failed calling ${EXTEN}, playing default congestion'));
+          	$ext->add($context, $exten, '', new ext_macro("outisbusy"));
+					}
         }
         unset($add_extra_pri1);
       }
@@ -6274,7 +6274,7 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '') {
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '') {
   global $db;
 
   $route_id = $db->escapeSimple($route_id);
@@ -6287,10 +6287,11 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
   $mohclass = $db->escapeSimple($mohclass);
   $seq = $db->escapeSimple($seq);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
+  $dest = $db->escapeSimple($dest);
   $sql = "UPDATE `outbound_routes` SET 
     `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password', 
     `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
-    `time_group_id`=$time_group_id WHERE `route_id` = ".q($route_id);
+    `time_group_id`=$time_group_id, `dest`='$dest' WHERE `route_id` = ".q($route_id);
   sql($sql);
 
   core_routing_updatepatterns($route_id, $patterns, true);
@@ -6301,7 +6302,7 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
   global $amp_conf;
   global $db;
 
@@ -6313,8 +6314,9 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
   $intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
   $mohclass = $db->escapeSimple($mohclass);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`)
-    VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id)";
+  $dest = $db->escapeSimple($dest);
+  $sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`)
+    VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id, '$dest')";
   sql($sql);
 
   // TODO: sqlite_last_insert_rowid() un-tested and php5 ???

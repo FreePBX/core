@@ -820,3 +820,21 @@ foreach ($tables as $table) {
   $db->query($sql);
 }
 out(_("ok"));
+
+// Added 2.11
+//
+outn(_("checking for dest field in outbound_routes.."));
+$sql = "SELECT `dest` FROM `outbound_routes`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `outbound_routes` ADD `dest` VARCHAR(255) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error trying to add field"));
+		die_freepbx($result->getDebugInfo()); 	
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}

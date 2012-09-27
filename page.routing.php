@@ -176,6 +176,9 @@ $outcid_mode = isset($_REQUEST['outcid_mode']) ? $_REQUEST['outcid_mode'] : '';
 $time_group_id = isset($_REQUEST['time_group_id']) ? $_REQUEST['time_group_id'] : '';
 $route_seq = isset($_REQUEST['route_seq']) ? $_REQUEST['route_seq'] : '';
 
+$goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
+$dest = $goto ? $_REQUEST[$goto . '0'] : '';
+
 //if submitting form, update database
 switch ($action) {
 	case 'ajaxroutepos':
@@ -194,13 +197,13 @@ switch ($action) {
   // Fallthrough to addtrunk now...
   //
 	case "addroute":
-    $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
+    $extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
     $_REQUEST['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
 		needreload();
 		redirect_standard('extdisplay');
 	break;
 	case "editroute":
-		core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq);
+		core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
@@ -370,6 +373,7 @@ if ($action == 'populatenpanxx') {
   $time_group_id = $route_info['time_group_id'];
   $route_seq = $route_info['seq'];
   $routename = $route_info['name'];
+  $dest = $route_info['dest'];
 	echo "<h2>"._("Edit Route")."</h2>";
 } else {	
   $route_seq = $last_seq+1;
@@ -747,6 +751,13 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 <?php 
 	$key++;
 } //for 0..$num_new_boxes ?>
+
+    <tr>
+      <td colspan="2"><h5><a href=# class="info"><?php echo _("Optional Destination on Congestion")?><span><?php echo _("If all the trunks fail because of Asterisk 'CONGESTION' dialstatus you can optionally go to a destination such as a unique recorded message or anywhere else. This destination will NOT be engaged if the trunk is reporting busy, invalid numbers or anything else that would imply the trunk was able to make an 'intelligent' choice about the number that was dialed. The 'Normal Congestion' behavior is to play the 'All Circuits Busy' recording or other options configured in the Route Congestion Messages module when installed.")?><br></span></a><hr></h5></td>
+    </tr>
+<?php
+echo drawselects(!empty($dest)?$dest:null,0,false,true,_("Normal Congestion"),false);
+?>
 
 <?php if ($extdisplay != ''): // editing ?>
 		<tr>
