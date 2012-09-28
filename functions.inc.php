@@ -2105,6 +2105,7 @@ function core_get_config($engine) {
       $ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
       $routes = core_routing_list();
       $trunk_table = core_trunks_listbyid();
+			$trunk_type_needed = array(); // track which macros need to be generated
       $delim = $ast_lt_16 ? '|' : ',';
       foreach ($routes as $route) {
         $add_extra_pri1 = array();
@@ -2190,8 +2191,10 @@ function core_get_config($engine) {
               $trunk_macro = 'dialout-trunk';
               break;
             }
-					  $ext->add($context, $exten, '', new ext_macro($trunk_macro,$trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$offset.'},'.$password));
+						$ext->add($context, $exten, '', new ext_macro(
+							$trunk_macro, $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue']));
             $password = '';
+						$trunk_type_needed['macro-' . $trunk_macro] = true;
           }
 					if ($route['dest']) {
 						$ext->add($context, $exten, '', new ext_noop_trace('All trunks failed calling ${EXTEN}, going to destination'));
@@ -2428,8 +2431,19 @@ function core_get_config($engine) {
         if (!defined('CONGESTION_TONE')) define('CONGESTION_TONE', -2);
         $trunkreportmsg_ids = array('no_answer_msg_id' => -1, 'invalidnmbr_msg_id' => -1);
       }
+
+			// Since rarely used only generate this dialplan if are using this feature
+			//
+			$generate_trunk_monitor_failure = false;
+			foreach ($trunk_table as $tid => $tdetails) {
+				// assign and if true no need to continue
+				if ($generate_trunk_monitor_failure = $generate_trunk_monitor_failure || $tdetails['failscript']) {
+					break;
+				}
+			}
 			 
 			$context = 'macro-dialout-trunk';
+			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
@@ -2477,8 +2491,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'outnum', new ext_set('the_num', '${OUTNUM}'));  // replace "OUTNUM" with the actual number to dial
 			$ext->add($context, $exten, 'skipoutnum', new ext_dial('${pre_num:4}${the_num}${post_num}', '300,${DIAL_TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
-			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
-			
+			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
 		
 			$exten = 's-BUSY';
@@ -2556,8 +2569,10 @@ function core_get_config($engine) {
 			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
-			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
-			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			if ($generate_trunk_monitor_failure) {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
@@ -2565,9 +2580,11 @@ function core_get_config($engine) {
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
 		
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+			} // if trunk_type_needed
 
 
 			$context = 'macro-dialout-dundi';
+			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
 			
 			/*
@@ -2606,8 +2623,7 @@ function core_get_config($engine) {
       }
 		
 			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
-			$ext->add($context, $exten, '', new ext_goto(1, 's-${DIALSTATUS}'));
-			
+			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
 		
 			$exten = 's-BUSY';
@@ -2685,8 +2701,10 @@ function core_get_config($engine) {
 			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
-			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
-			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			if ($generate_trunk_monitor_failure) {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
@@ -2694,6 +2712,7 @@ function core_get_config($engine) {
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
 		
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+			} // if trunk_type_needed
 
 
 
@@ -2773,6 +2792,7 @@ function core_get_config($engine) {
 			}
 	
 			$context = 'macro-dialout-enum';
+			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
 	
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
@@ -2808,7 +2828,8 @@ function core_get_config($engine) {
 			// Now, if we're still here, that means the Dial failed for some reason. 
 			// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
 			// different channel. If there's no more left, the dialloop tag will exit.
-			$ext->add($context, $exten, '', new ext_gotoif('$[ $[ "${DIALSTATUS}" = "CHANUNAVAIL" ] | $[ "${DIALSTATUS}" = "CONGESTION" ] ]', 'dialloop','s-${DIALSTATUS},1'));
+			$ext->add($context, $exten, '', new ext_gotoif('$[ $[ "${DIALSTATUS}" = "CHANUNAVAIL" ] | $[ "${DIALSTATUS}" = "CONGESTION" ] ]', 'dialloop'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			// Here are the exit points for the macro.
 			$ext->add($context, $exten, 'nochans', new ext_noop('max channels used up'));
 
@@ -2887,8 +2908,10 @@ function core_get_config($engine) {
 			$ext->add($context, '_X.', '', new ext_goto('1','continue'));
 
 			$exten = 'continue';
-			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
-			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			if ($generate_trunk_monitor_failure) {
+				$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
 			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
 			
@@ -2896,6 +2919,7 @@ function core_get_config($engine) {
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
 		
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+			} // if trunk_type_needed
 
 			
 			/*
@@ -5610,14 +5634,15 @@ function core_trunks_disable($trunk, $switch) {
 			$trunk['failscript'],
 			$disabled,
 			$trunk['name'],
-			$trunk['provider']
+			$trunk['provider'],
+			$trunk['continue']
 		);
 
 	}
 }
 
 // we're adding ,don't require a $trunknum
-function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="") {
+function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue="off") {
 	global $db;
 	$name = trim($name) == "" ? $channelid : $name;
 
@@ -5642,7 +5667,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		$trunknum++;
 	}
 
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue);
 	return $trunknum;
 }
 
@@ -5666,7 +5691,7 @@ function core_trunks_del($trunknum, $tech = null) {
 	sql("DELETE FROM `trunks` WHERE `trunkid` = '$trunknum'");
 }
 
-function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="") {
+function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off') {
 	global $db;
 	$name = trim($name) == "" ? $channelid : $name;
 
@@ -5675,12 +5700,12 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
     return false;
   }
 	core_trunks_del($trunknum, $tech);
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
-function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider) {
+function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue) {
 	global $db;
 
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
@@ -5718,7 +5743,7 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 
 	$sql = "
 		INSERT INTO `trunks` 
-		(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`)
+		(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`, `continue`)
 		VALUES (
 			'$trunknum', 
 			'".$db->escapeSimple($name)."',
@@ -5731,7 +5756,8 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 			'".$db->escapeSimple($channelid)."',
 			'".$db->escapeSimple($usercontext)."',
 			'".$db->escapeSimple($provider)."',
-			'".$db->escapeSimple($disabletrunk)."'
+			'".$db->escapeSimple($disabletrunk)."',
+			'".$db->escapeSimple($continue)."'
 		)";
 		sql($sql);
 }

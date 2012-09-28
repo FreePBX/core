@@ -340,6 +340,7 @@ function __migrate_trunks_to_table() {
 		`usercontext` VARCHAR( 255 ) NULL, 
 		`provider` VARCHAR( 40 ) NULL, 
 		`disabled` VARCHAR( 4 ) DEFAULT 'off',
+		`continue` VARCHAR( 4 ) DEFAULT 'off',
 	
 		PRIMARY KEY  (`trunkid`, `tech`, `channelid`) 
 	) 
@@ -828,6 +829,22 @@ $sql = "SELECT `dest` FROM `outbound_routes`";
 $check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
 if(DB::IsError($check)) {
 	$sql = "ALTER TABLE `outbound_routes` ADD `dest` VARCHAR(255) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error trying to add field"));
+		die_freepbx($result->getDebugInfo()); 	
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}
+
+outn(_("checking for continue field in trunks.."));
+$sql = "SELECT `continue` FROM `trunks`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `trunks` ADD `continue` VARCHAR( 4 ) DEFAULT 'off'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error trying to add field"));

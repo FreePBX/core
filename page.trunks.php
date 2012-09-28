@@ -41,6 +41,7 @@ $userconfig   = isset($_REQUEST['userconfig'])?$_REQUEST['userconfig']:'';
 $register     = isset($_REQUEST['register'])?$_REQUEST['register']:'';
 $keepcid      = isset($_REQUEST['keepcid'])?$_REQUEST['keepcid']:'off';
 $disabletrunk = isset($_REQUEST['disabletrunk'])?$_REQUEST['disabletrunk']:'off';
+$continue     = isset($_REQUEST['continue'])?$_REQUEST['continue']:'off';
 $provider     = isset($_REQUEST['provider'])?$_REQUEST['provider']:'';
 $trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
 
@@ -154,19 +155,20 @@ switch ($action) {
       $usercontext .= '_copy_' . $trunknum;
     }
     $disabletrunk = 'on';
+    $continue = 'on';
     $trunknum = '';
     $extdisplay='';
   // Fallthrough to addtrunk now...
   //
 	case "addtrunk":
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue);
 		
     core_trunks_update_dialrules($trunknum, $dialpattern_insert);
 		needreload();
 		redirect_standard();
 	break;
 	case "edittrunk":
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider);
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue);
 		
 		// this can rewrite too, so edit is the same
     core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
@@ -389,6 +391,7 @@ if (!$tech && !$extdisplay) {
 		$failtrunk = htmlentities($trunk_details['failscript']);
 		$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 		$disabletrunk = htmlentities($trunk_details['disabled']);
+		$continue = htmlentities($trunk_details['continue']);
 		$provider = $trunk_details['provider'];
 		$trunk_name = htmlentities($trunk_details['name']);
 
@@ -566,12 +569,24 @@ if ($helptext != '') {
 			</tr>
 
 			<tr>
+			    <td><a class="info" href="#"><?php echo _("Continue if Busy")?><span><?php echo _("Normally the next trunk is only tried upon a trunk being 'Congested' in some form, or unavailable. Checking this box will force a failed call to always continue to the next configured trunk or destination even when the channel reports BUSY or INVALID NUMBER.")?></span></a>:
+			    </td>
+			    <td>
+				<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='continue' id="continue" <?php if ($continue=="on") { echo 'CHECKED'; }?> '><label for='continue'><small><?php echo _("Check to always try next trunk")?></small></label>
+			    </td>
+			</tr>
+
+			<tr>
 			    <td><a class="info" href="#"><?php echo _("Disable Trunk")?><span><?php echo _("Check this to disable this trunk in all routes where it is used.")?></span></a>:
 			    </td>
 			    <td>
-				<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><small><?php echo _("Disable")?></small>
+				<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'><label for='disabletrunk'><small><?php echo _("Disable")?></small></label>
 			    </td>
 			</tr>
+
+<?php
+						if ($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_FIELD']) {
+?>
 			<tr>
 			    <td><a class="info" href="#"><?php echo _("Monitor Trunk Failures")?><span><?php echo _("If checked, supply the name of a custom AGI Script that will be called to report, log, email or otherwise take some action on trunk failures that are not caused by either NOANSWER or CANCEL.")?></span></a>:
 			    </td>
@@ -580,6 +595,9 @@ if ($helptext != '') {
 				<input type='checkbox' tabindex="<?php echo ++$tabindex;?>" name='failtrunk_enable' id="failtrunk_enable" value='1' <?php if ($failtrunk_enable) { echo 'CHECKED'; }?> OnClick='disable_field(failtrunk,failtrunk_enable); return true;'><small><?php echo _("Enable")?></small>
 			    </td>
 			</tr>
+<?php
+						}
+?>
 
     <tr>
       <td colspan="2"><h4>
