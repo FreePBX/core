@@ -42,7 +42,6 @@ if ($action == 'editglobals') {
 						array($_REQUEST['TIMEFORMAT'], 'TIMEFORMAT'),
 						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						array($_REQUEST['OPERATOR_XTN'], 'OPERATOR_XTN'),
-						array(isset($_REQUEST['DIRECTORY_OPTS']) ? $_REQUEST['DIRECTORY_OPTS'] : "",'DIRECTORY_OPTS'),
 						array(isset($_REQUEST['VM_OPTS']) ? $_REQUEST['VM_OPTS'] : "",'VM_OPTS'),
 						array(isset($_REQUEST['VMX_CONTEXT']) ? $_REQUEST['VMX_CONTEXT'] : "",'VMX_CONTEXT'),
 						array(isset($_REQUEST['VMX_PRI']) ? $_REQUEST['VMX_PRI'] : "",'VMX_PRI'),
@@ -111,36 +110,6 @@ foreach ($globals as $global) {
 <form name="general" action="config.php" method="post" onsubmit="return general_onsubmit();">
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
-
-<h5><?php echo _("Dialing Options")?></h5>
-<table>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Asterisk Dial command options:")?><span>
-<?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
-<?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
-<?php echo _("r: Generate a ringing tone for the calling party")?><br>
-<?php echo _("x or w: Allow the called user to start recording using One-Touch Recording")?><br>
-<?php echo _("X or W: Allow the calling user to start recording using One-Touch Recording")?><br>
-<?php echo _("Choose automixmon (x/X) or automon (w/W) for One-Touch Recording in Advanced Settings")?><br>
-<?php echo _("See Asterisk documentation for other advanced options.")?><br>
-	</span></a>
-	</td><td align="right">
-	<input type="text" size="10" name="DIAL_OPTIONS" value="<?php  echo htmlspecialchars($DIAL_OPTIONS)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Asterisk Outbound Dial command options:")?><span>
-<?php echo _("t: Allow the called user to transfer the call by hitting #")?><br>
-<?php echo _("T: Allow the calling user to transfer the call by hitting #")?><br>
-<?php echo _("r: You SHOULD NOT use this option on outbound trunks")?><br>
-<?php echo _("x or w: Allow the called user to start recording using One-Touch Recording")?><br>
-<?php echo _("X or W: Allow the calling user to start recording using One-Touch Recording")?><br>
-<?php echo _("Choose automixmon (x/X) or automon (w/W) for One-Touch Recording in Advanced Settings")?><br>
-<?php echo _("See Asterisk documentation for other advanced options.")?><br>
-	</span></a>
-	</td><td align="right">
-	<input type="text" size="10" name="TRUNK_OPTIONS" value="<?php  echo htmlspecialchars($TRUNK_OPTIONS)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-</table>
 
 <h5><?php echo _("Call Recording")?></h5>
 <table>

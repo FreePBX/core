@@ -48,6 +48,8 @@ $trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
 $failtrunk    = isset($_REQUEST['failtrunk'])?$_REQUEST['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
+$dialopts     = isset($_REQUEST['dialopts'])?$_REQUEST['dialopts']:false;
+
 // Check if they uploaded a CSV file for their route patterns
 //
 if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
@@ -161,14 +163,14 @@ switch ($action) {
   // Fallthrough to addtrunk now...
   //
 	case "addtrunk":
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 		
     core_trunks_update_dialrules($trunknum, $dialpattern_insert);
 		needreload();
 		redirect_standard();
 	break;
 	case "edittrunk":
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue);
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 		
 		// this can rewrite too, so edit is the same
     core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
@@ -394,6 +396,7 @@ if (!$tech && !$extdisplay) {
 		$continue = htmlentities($trunk_details['continue']);
 		$provider = $trunk_details['provider'];
 		$trunk_name = htmlentities($trunk_details['name']);
+		$dialopts = $trunk_details['dialopts'] === false ? false : htmlentities($trunk_details['dialopts']);
 
 		if ($tech!="enum") {
 	
@@ -565,6 +568,27 @@ if ($helptext != '') {
 ?>
 				</td><td>
 					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>" tabindex="<?php echo ++$tabindex;?>"/>
+				</td>
+			</tr>
+
+<?php
+	$data['name'] = $data['id'] = 'dialopts';
+	if ($dialopts !== false) {
+		$data['value'] = $dialopts;
+	} else {
+		$data['disabled'] = true;
+	}
+	$data['size'] = '20';
+	$data['tabindex'] = $tabindex++;
+
+	$dialopts_label = fpbx_label(_('Asterisk Trunk Dial Options'), _('Asterisk Dial command options to be used when calling out this trunk. To override the Advanced Settings default, check the box and then provide the required options for this trunk')) . "\n";
+	$dialopts_box = fpbx_form_input_check($data, '', '', '<small>' . _('Override') . '</small>', $amp_conf['TRUNK_OPTIONS'], true) . "\n";
+?>
+			<tr>
+				<td>
+					<?php echo $dialopts_label; ?>
+				</td><td>
+					<?php echo $dialopts_box; ?>
 				</td>
 			</tr>
 

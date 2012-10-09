@@ -1688,7 +1688,8 @@ function core_get_config($engine) {
           $ext->add($tcontext, $tcustom, '', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
           $ext->add($tcontext, $tcustom, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
 
-          $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}','300,${DIAL_TRUNK_OPTIONS}'));
+					$ext->add($tcontext,$tcustom,'',new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+          $ext->add($tcontext,$tcustom,'',new ext_dial('${EVAL(${TDIAL_STRING})}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
           $ext->add($tcontext,$tcustom,'hangit',new ext_hangup());
         }
 
@@ -1705,7 +1706,8 @@ function core_get_config($engine) {
           $ext->add($tcontext,$texten,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
           $ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
-          $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}','300,${DIAL_TRUNK_OPTIONS}'));
+					$ext->add($tcontext,$texten,'',new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+          $ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
           // Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
           // malicious CID that can cause overflows in the Asterisk code.
           //
@@ -1757,8 +1759,6 @@ function core_get_config($engine) {
         "VMX_LOOPDEST_PRI",
 			);
 
-			$disable_recording = false;
-
 			$sql = "SELECT * FROM globals";
 			$globals = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 			foreach($globals as $global) {
@@ -1781,9 +1781,6 @@ function core_get_config($engine) {
 						unset($amp_conf_globals[$index]);
 					}
 				}
-				if (($global['variable'] == 'RECORDING_STATE') && (strtoupper($global['value']) == 'DISABLED')) {
-					$disable_recording = true;
-				}
 			}
 			foreach ($amp_conf_globals as $global) {
 				if (isset($amp_conf[$global])) {
@@ -1801,9 +1798,14 @@ function core_get_config($engine) {
 			$ext->addGlobal('MIXMON_DIR', $mixmon_dir);
 			out("Added to globals: MIXMON_DIR = $mixmon_dir");
 
-      // Put the MIXMON_POST
-			$ext->addGlobal('MIXMON_POST', $amp_conf['MIXMON_POST']);
-			out("Added to globals: MIXMON_POST = ".$amp_conf['MIXMON_POST']);
+			// Add some globals that are used by the dialplan
+			//
+			$add_globals = array('MIXMON_POST', 'DIAL_OPTIONS', 'TRUNK_OPTIONS', 'TRUNK_RING_TIMER');
+			foreach ($add_globals as $g) {
+				$ext->addGlobal($g, $amp_conf[$g]);
+				out("Added to globals: $g = ".$amp_conf[$g]);
+			}
+			unset($add_globals);
 
 			// Put the asterisk version in a global for agi etc.
 			$ext->addGlobal('ASTVERSION', $version);
@@ -2454,7 +2456,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
 			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -2480,7 +2482,7 @@ function core_get_config($engine) {
       }
 		
 			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
-			$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '300,${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
+			$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
 			$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			
@@ -2489,7 +2491,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('post_num', '${CUT(OUT_${DIAL_TRUNK},$,3)}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${the_num}" = "OUTNUM"]', 'outnum', 'skipoutnum'));  // if we didn't find "OUTNUM", then skip to Dial
 			$ext->add($context, $exten, 'outnum', new ext_set('the_num', '${OUTNUM}'));  // replace "OUTNUM" with the actual number to dial
-			$ext->add($context, $exten, 'skipoutnum', new ext_dial('${pre_num:4}${the_num}${post_num}', '300,${DIAL_TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, 'skipoutnum', new ext_dial('${pre_num:4}${the_num}${post_num}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
@@ -2599,7 +2601,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
 			$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
 			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manipulate DIAL_NUMBER
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -2740,6 +2742,11 @@ function core_get_config($engine) {
 			// but keep the REALCALLERID which is used to determine their true identify and lookup info
 			// during outbound calls.
 			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
+
+			// If there is a defined dialopts then use it, otherwise use the global default
+			//
+			$ext->add($context, $exten, '', new ext_set('__DIAL_OPTIONS', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/dialopts)}" = "1"]?${DB_RESULT}:${DIAL_OPTIONS})}'));
+
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
 
 			$ext->add($context, $exten, '', new ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
@@ -2797,14 +2804,14 @@ function core_get_config($engine) {
 	
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
 			$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${ARG1}}foo" = "foo"]', 'nomax'));
 			$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} >= ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
 			$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
-			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${TRUNK_OPTIONS}'));
+			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
 			$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
 			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
 			//  Replacement for asterisk's ENUMLOOKUP function
@@ -5280,6 +5287,14 @@ function core_users_add($vars, $editmode=false) {
 		.(isset($recording_priority)?$recording_priority:'10')
 		."\"");
 	
+		// If not set then we are using system default so delete the tree all-together
+		//
+		if (isset($dialopts)) {
+			$astman->database_put("AMPUSER",$extension."/dialopts", $dialopts);
+		} else {
+			$astman->database_del("AMPUSER",$extension."/dialopts");
+		}
+
 	$call_screen = isset($call_screen) ? $call_screen : '0';
 		switch ($call_screen) {
 			case '0':
@@ -5381,6 +5396,8 @@ function core_users_get($extension){
 	
 		$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
 		$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
+
+		$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
 
 		$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
 		$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
@@ -5642,7 +5659,7 @@ function core_trunks_disable($trunk, $switch) {
 }
 
 // we're adding ,don't require a $trunknum
-function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue="off") {
+function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue="off", $dialopts=false) {
 	global $db;
 	$name = trim($name) == "" ? $channelid : $name;
 
@@ -5672,7 +5689,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 }
 
 function core_trunks_del($trunknum, $tech = null) {
-	global $db;
+	global $db, $astman;
 	
 	if ($tech === null) { // in EditTrunk, we get this info anyways
 		$tech = core_trunks_getTrunkTech($trunknum);
@@ -5689,9 +5706,12 @@ function core_trunks_del($trunknum, $tech = null) {
 		break;
 	}
 	sql("DELETE FROM `trunks` WHERE `trunkid` = '$trunknum'");
+	if ($astman) {
+		$astman->database_del("TRUNK", $trunknum . '/dialopts');
+	}
 }
 
-function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off') {
+function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off', $dialopts = false) {
 	global $db;
 	$name = trim($name) == "" ? $channelid : $name;
 
@@ -5700,13 +5720,13 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
     return false;
   }
 	core_trunks_del($trunknum, $tech);
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
-function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue) {
-	global $db;
+function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts=false) {
+	global $db, $astman;
 
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
 	
@@ -5759,7 +5779,15 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 			'".$db->escapeSimple($disabletrunk)."',
 			'".$db->escapeSimple($continue)."'
 		)";
-		sql($sql);
+	sql($sql);
+
+	if ($astman) {
+		if ($dialopts !== false) {
+			$astman->database_put("TRUNK", $trunknum . '/dialopts',$dialopts);
+		} else {
+			$astman->database_del("TRUNK", $trunknum . '/dialopts');
+		}
+	}
 }
 
 //TODO: replace with NEW table
@@ -5820,6 +5848,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 function core_trunks_getDetails($trunkid='') {
 	global $db;
 	global $amp_conf;
+	global $astman;
 
 	if ($trunkid != '') {
 		$sql = "SELECT * FROM `trunks` WHERE `trunkid` = '$trunkid'";
@@ -5834,9 +5863,22 @@ function core_trunks_getDetails($trunkid='') {
 				$trunk['tech'] = $tech;
 				break;
 		} 
+		if ($astman) {
+			$trunk['dialopts'] = $astman->database_get("TRUNK",$trunkid . "/dialopts");
+		}
 	} else {
 		$sql = "SELECT * FROM `trunks` ORDER BY tech, name";
 		$trunk = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+		if ($astman) {
+			$tops = $astman->database_show('TRUNK');
+			foreach ($trunk as $i => $t) {
+				if (isset($tops['/TRUNK/' . $t['trunkid'] . '/dialopts'])) {
+					$trunk[$i]['dialopts'] = $tops['/TRUNK/' . $t['trunkid'] . '/dialopts'];
+				} else {
+					$trunk[$i]['dialopts'] = false;
+				}
+			}
+		}
 	}
 	return $trunk;
 }
@@ -6872,6 +6914,10 @@ function core_users_configpageload() {
 		$section = _("Extension Options");
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
+
+		$disable_dialopts = $dialopts === false;
+		$currentcomponent->addguielem($section, new gui_textbox_check('dialopts', $dialopts, _("Asterisk Dial Options"), _("Cryptic Asterisk Dial Options, check to customize for this extension or un-check to use system defaults set in Advanced Options. These will not apply to trunk options which are configured with the trunk."), '', '', true, 0, $disable_dialopts, '<small>' . _("Override") . '</small>', $amp_conf['DIAL_OPTIONS'], true));
+
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in the General Tab. If no voicemail is configured this will be ignored."), false));
 
     if (!isset($cfringtimer)) {

@@ -584,6 +584,9 @@ $globals_convert['VMX_LOOPDEST_PRI'] = '1';
 $globals_convert['MIXMON_DIR'] = '';
 $globals_convert['MIXMON_POST'] = '';
 
+$globals_convert['DIAL_OPTIONS'] = 'Ttr';
+$globals_convert['TRUNK_OPTIONS'] = 'Tt';
+
 // VMX_CONTEXT
 //
 $set['value'] = $globals_convert['VMX_CONTEXT'];
@@ -745,6 +748,39 @@ $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('MIXMON_POST',$set);
 
 
+// DIAL_OPTIONS
+//
+$set['value'] = $globals_convert['DIAL_OPTIONS'];
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 1;
+$set['name'] = 'Asterisk Dial Options';
+$set['description'] = "Options to be passed to the Asterisk Dial Command when making internal calls or for calls ringing internal phones. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. The r option allows Asterisk to generate ringing back to the calling phones which is needed by some phones and sometimes needed in complex dialplan features that may otherwise result in silence to the caller.";
+$set['type'] = CONF_TYPE_TEXT;
+$freepbx_conf->define_conf_setting('DIAL_OPTIONS',$set);
+
+
+// TRUNK_OPTIONS
+//
+$set['value'] = $globals_convert['TRUNK_OPTIONS'];
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 1;
+$set['name'] = 'Asterisk Outbound Trunk Dial Options';
+$set['description'] = "Options to be passed to the Asterisk Dial Command when making outbound calls on your trunks when not part of an Intra-Company Route. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. It is HIGHLY DISCOURAGED to use the r option here as this will prevent early media from being delivered from the PSTN and can result in the inability to interact with some external IVRs";
+$set['type'] = CONF_TYPE_TEXT;
+$freepbx_conf->define_conf_setting('TRUNK_OPTIONS',$set);
+
 // Get all the globals that need to be migrated, then prepare the
 // update array to set the current settings in freepbx_conf before
 // deleting them.
@@ -771,8 +807,25 @@ if (count($globals)) {
   $freepbx_conf->commit_conf_settings();
 }
 
-// Now Delete The Globals
+// Add any globals that need to be deleted here while we are
+// othewise cleaning up the ones migrated. These would be ones
+// no longer used. They will be deleted if other migrations
+// occured above.
 //
+$globals_convert['RECORDING_STATE'] = true;
+$globals_convert['DIAL_OUT'] = true;
+$globals_convert['REGTIME'] = true;
+$globals_convert['REGDAYS'] = true;
+$globals_convert['DIALOUTIDS'] = true;
+$globals_convert['IN_OVERRIDE'] = true;
+$globals_convert['AFTER_INCOMING'] = true;
+$globals_convert['DIRECTORY_OPTS'] = true;
+$globals_convert['OPERATOR'] = true;
+
+// Re-compute the where clause to pull in the new ones added and then Delete The Globals
+//
+$sql_where = " FROM globals WHERE `variable` IN ('".implode("','",array_keys($globals_convert))."')";
+
 if (count($globals)) {
 	out(_("General Settings migrated"));
 	outn(_("Deleting migrated settings.."));
