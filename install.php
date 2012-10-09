@@ -294,19 +294,6 @@ if(DB::IsError($check)) {
 	out(_("already exists"));
 }
 
-// Add variable RECORDING_STATE use to globally disable recording
-// TODO: move this to the upgrade script so it only has to be done
-//       once in a major upgrade when we move to next major release
-//
-outn(_("Checking for Global var RECORDING_STATE.."));
-$nrows = $db->getOne("SELECT count(*) from globals where variable='RECORDING_STATE'");
-if (!$nrows) {
-	$db->query("insert into globals values ('RECORDING_STATE', 'ENABLED')");
-	out(_("Created"));
-} else {
-	out(_("Already exists!"));
-}
-
 // This next set of functions and code are used to migrate from the old
 // global variable storage of trunk data to the new trunk table and trunk
 // pattern table for localprefixes.conf
