@@ -1531,8 +1531,6 @@ function core_get_config($engine) {
 						// This usually gets called from macro-exten-vm but if follow-me destination need to go this route
 						$ext->add('ext-local', $exten['extension'], '', new ext_macro('vm',$vm.',${DIALSTATUS},${IVR_RETVM}'));
 						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','vmret'));
-						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
-						$ext->add('ext-local', '${VM_PREFIX}'.$exten['extension'], '', new ext_goto('1','vmret'));
 						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_macro('vm',$vm.',BUSY,${IVR_RETVM}'));
 						$ext->add('ext-local', 'vmb'.$exten['extension'], '', new ext_goto('1','vmret'));
 						$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_macro('vm',$vm.',NOANSWER,${IVR_RETVM}'));
@@ -1574,12 +1572,6 @@ function core_get_config($engine) {
 					$ext->add($ivr_context, $exten['extension'],'', new ext_macro('blkvm-clr'));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
 					$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
-					if($vm != "novm") {
-					  $ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('blkvm-clr'));
-						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_setvar('__NODEST', ''));
-						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_macro('vm',$vm.',DIRECTDIAL,${IVR_RETVM}'));
-						$ext->add($ivr_context, '${VM_PREFIX}'.$exten['extension'],'', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','ext-local,vmret,playret'));
-					}
 				}
 				$ext->add('ext-local', 'vmret', '', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','playret'));
 				$ext->add('ext-local', 'vmret', '', new ext_hangup(''));

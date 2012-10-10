@@ -33,7 +33,6 @@ if ($action == 'editglobals') {
 						array($_REQUEST['MIXMON_POST'],'MIXMON_POST'),
             array($_REQUEST['RINGTIMER'],'RINGTIMER'),
 						array(isset($_REQUEST['DIRECTORY']) ? $_REQUEST['DIRECTORY'] : 'both','DIRECTORY'),
-						array($_REQUEST['VM_PREFIX'],'VM_PREFIX'),
 						array($_REQUEST['VM_DDTYPE'],'VM_DDTYPE'),
 						array($_REQUEST['VM_GAIN'],'VM_GAIN'),
 						array($_REQUEST['DIAL_OPTIONS'],'DIAL_OPTIONS'),
@@ -119,13 +118,6 @@ foreach ($globals as $global) {
   </span></a>
 	</td><td align="right">
 	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
-	<tr><td>
-  <a href=# class="info"><?php echo _("Direct Dial Voicemail Prefix:")?><span>
-  <?php echo _("Prefix used to dial directly to someone's voicemail. Caution should be taken in choosing this prefix to avoid conflicts with featurecodes.")?><br>
-  </span></a>
-	</td><td align="right">
-	<input type="text" size="2" name="VM_PREFIX" value="<?php  echo htmlspecialchars($VM_PREFIX)?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td></tr>
 	<tr><td>
 	<a href=# class="info"><?php echo _("Direct Dial to Voicemail message type:")?><span>
