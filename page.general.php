@@ -106,19 +106,12 @@ foreach ($globals as $global) {
 	<img src="images/cog.png" style="border: none">
 	<?php echo _('Advanced Settings') ?>
 </a>
-<form name="general" action="config.php" method="post" onsubmit="return general_onsubmit();">
+<form name="general" action="config.php" method="post">
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
 
 <h5><?php echo _("Voicemail")?></h5>
 <table>
-	<tr><td>
-  <a href=# class="info"><?php echo _("Ringtime Default:")?><span>
-  <?php echo _("Default number of seconds to ring phones before sending callers to voicemail. This can be set per extension/user and will have no effect on phones with no voicemail.")?><br>
-  </span></a>
-	</td><td align="right">
-	<input type="text" size="2" name="RINGTIMER" value="<?php  echo htmlspecialchars($RINGTIMER)?>" tabindex="<?php echo ++$tabindex;?>"/>
-	</td></tr>
 	<tr><td>
 	<a href=# class="info"><?php echo _("Direct Dial to Voicemail message type:")?><span>
 	<?php echo _("Default message type to use when dialing direct to an extensions voicemail")?><br>
@@ -314,34 +307,12 @@ foreach ($globals as $global) {
 
 var theForm = document.general;
 
-function hasRing (s) {
-	if (s.indexOf('r') >= 0) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
 function warnConfirm (theField, s) {
     theField.focus();
     theField.select();
 		return confirm(s);
 }
 
-function general_onsubmit() {
-	var msgInvalidSeconds = "<?php echo _('Please enter a valid Number of Seconds'); ?>";
-	var msgInvalidDefaultFaxEmail = "<?php echo _('Please enter a valid Fax Email'); ?>";
-	var msgRingOptionOutboundTrunk = "<?php echo _('You have selected the \'r\' option for your trunks. This is highly discouraged and will create problems with calls on many PRI, VoIP, ISDN and other trunks that are capable of signaling. Asterisk will generate a ringing tone until the signaling indicates the line is answered. This will result in some external IVRs being inaccessible and other strange problems.'); ?>";
-
-	defaultEmptyOK = false;
-	if (!isInteger(theForm.RINGTIMER.value))
-		return warnInvalid(theForm.RINGTIMER, msgInvalidSeconds);
-
-	if (hasRing(theForm.TRUNK_OPTIONS.value))
-		return warnConfirm(theForm.TRUNK_OPTIONS, msgRingOptionOutboundTrunk);
-	
-	return true;
-}
 
 //-->
 </script>

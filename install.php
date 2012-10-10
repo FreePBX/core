@@ -558,6 +558,7 @@ $globals_convert['MIXMON_FORMAT'] = 'wav';
 
 $globals_convert['DIAL_OPTIONS'] = 'Ttr';
 $globals_convert['TRUNK_OPTIONS'] = 'Tt';
+$globals_convert['RINGTIMER'] = '15';
 
 // VMX_CONTEXT
 //
@@ -721,7 +722,7 @@ $freepbx_conf->define_conf_setting('MIXMON_POST',$set);
 
 
 // MIXMON_FORMAT
-$set['value'] = $globals_convert['MIXMON_POST'];
+$set['value'] = $globals_convert['MIXMON_FORMAT'];
 $set['defaultval'] =& $set['value'];
 $set['options'] = array('wav','WAV','ulaw','ulaw','alaw','sln','gsm','g729');
 $set['name'] = 'Call Recording Format';
@@ -751,7 +752,6 @@ $set['description'] = "Options to be passed to the Asterisk Dial Command when ma
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('DIAL_OPTIONS',$set);
 
-
 // TRUNK_OPTIONS
 //
 $set['value'] = $globals_convert['TRUNK_OPTIONS'];
@@ -767,6 +767,25 @@ $set['name'] = 'Asterisk Outbound Trunk Dial Options';
 $set['description'] = "Options to be passed to the Asterisk Dial Command when making outbound calls on your trunks when not part of an Intra-Company Route. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. It is HIGHLY DISCOURAGED to use the r option here as this will prevent early media from being delivered from the PSTN and can result in the inability to interact with some external IVRs";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('TRUNK_OPTIONS',$set);
+
+// RINGTIMER
+$opts = array();
+for ($i=0;$i<=120;$i++) {
+	$opts[]=$i;
+}
+$set['value'] = $globals_convert['RINGTIMER'];
+$set['defaultval'] =& $set['value'];
+$set['options'] = $opts;
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = '';
+$set['name'] = 'Ringtime Default';
+$set['description'] = 'Default number of seconds to ring phones before sending callers to voicemail or other extension destinations. This can be set per extension/user. Phones with no voicemail or other destination options will ring indefinitely.';
+$set['type'] = CONF_TYPE_SELECT;
+$freepbx_conf->define_conf_setting('RINGTIMER',$set);
+unset($opts);  
 
 // Get all the globals that need to be migrated, then prepare the
 // update array to set the current settings in freepbx_conf before
