@@ -111,34 +111,6 @@ foreach ($globals as $global) {
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
 
-<h5><?php echo _("Call Recording")?></h5>
-<table>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Extension Recording Override:")?><span>
-	<?php echo _("This will override the recording settings of all extensions/users. If enabled, the system will ignore all Record Always settings of a user and will not turn on recording. This does not effect On Demand recording controlled by the dial options 'w' and 'W' above. It does not effect other recording settings in modules such as Queues and Conferences. If you don't use recordings, setting this is beneficial to system performance as it removes the check that is otherwise done on every single call."); ?></span></a>
-	</td><td align="right">
-	<select name="RECORDING_STATE" tabindex="<?php echo ++$tabindex;?>">
-		<option value="DISABLED"  <?php  echo ($RECORDING_STATE == 'DISABLED' ? 'SELECTED' : '')?>><?php echo _("Enabled")?>
-		<option value="ENABLED"   <?php  echo ($RECORDING_STATE == 'ENABLED'  ? 'SELECTED' : '')?>><?php echo _("Disabled")?>
-	</select>
-	</td></tr>
-	<tr><td>
-  <a href=# class="info"><?php echo _("Call recording format:")?><span>
-  <?php echo _("Pick the format in which to save recorded calls")?>
-  </span></a>
-	</td><td align="right">
-  <select name="MIXMON_FORMAT" tabindex="<?php echo ++$tabindex;?>">
-  <option value="WAV"<?php if ($MIXMON_FORMAT == "WAV") echo " SELECTED"; ?>><?php echo _("WAV"); ?></option>
-  <option value="wav"<?php if ($MIXMON_FORMAT == "wav") echo " SELECTED"; ?>><?php echo _("wav"); ?></option>
-  <option value="ulaw"<?php if ($MIXMON_FORMAT == "ulaw") echo " SELECTED"; ?>><?php echo _("ulaw"); ?></option>
-  <option value="alaw"<?php if ($MIXMON_FORMAT == "alaw") echo " SELECTED"; ?>><?php echo _("alaw"); ?></option>
-  <option value="sln"<?php if ($MIXMON_FORMAT == "sln") echo " SELECTED"; ?>><?php echo _("sln"); ?></option>
-  <option value="gsm"<?php if ($MIXMON_FORMAT == "gsm") echo " SELECTED"; ?>><?php echo _("gsm"); ?></option>
-  <option value="g729"<?php if ($MIXMON_FORMAT == "g729") echo " SELECTED"; ?>><?php echo _("g729"); ?></option>
-  </select>
-	</td></tr>
-</table>
-
 <h5><?php echo _("Voicemail")?></h5>
 <table>
 	<tr><td>

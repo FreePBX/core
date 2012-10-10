@@ -554,6 +554,7 @@ $globals_convert['VMX_LOOPDEST_EXT'] = 'dovm';
 $globals_convert['VMX_LOOPDEST_PRI'] = '1';
 $globals_convert['MIXMON_DIR'] = '';
 $globals_convert['MIXMON_POST'] = '';
+$globals_convert['MIXMON_FORMAT'] = 'wav';
 
 $globals_convert['DIAL_OPTIONS'] = 'Ttr';
 $globals_convert['TRUNK_OPTIONS'] = 'Tt';
@@ -718,6 +719,21 @@ $set['description'] = "An optional script to be run after the call is hangup. Yo
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('MIXMON_POST',$set);
 
+
+// MIXMON_FORMAT
+$set['value'] = $globals_convert['MIXMON_POST'];
+$set['defaultval'] =& $set['value'];
+$set['options'] = array('wav','WAV','ulaw','ulaw','alaw','sln','gsm','g729');
+$set['name'] = 'Call Recording Format';
+$set['description'] = "Format to save recoreded calls for most call recording unless specified differently in specific applications.";
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'System Setup';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_SELECT;
+$freepbx_conf->define_conf_setting('MIXMON_FORMAT',$set);
 
 // DIAL_OPTIONS
 //

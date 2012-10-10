@@ -989,9 +989,6 @@ function core_get_config($engine) {
            * }
 					 */
 				}
-        // TODO: *** NEED TO MAKE THIS SETTABLE, PLACE HOLDER AND HARD CODED FOR NOW. CAN BE:
-        //           'caller' or 'callee' so for dev testing can be overridden in globals_custom.conf
-        $ext->addGlobal('REC_POLICY','caller'); // TODO: IMPLEMENT THIS
 
 				$fcc = new featurecode($modulename, 'disconnect');
 				$code = $fcc->getCodeActive();
@@ -1800,7 +1797,7 @@ function core_get_config($engine) {
 
 			// Add some globals that are used by the dialplan
 			//
-			$add_globals = array('MIXMON_POST', 'DIAL_OPTIONS', 'TRUNK_OPTIONS', 'TRUNK_RING_TIMER');
+			$add_globals = array('MIXMON_POST', 'DIAL_OPTIONS', 'TRUNK_OPTIONS', 'TRUNK_RING_TIMER', 'MIXMON_FORMAT', 'REC_POLICY');
 			foreach ($add_globals as $g) {
 				$ext->addGlobal($g, $amp_conf[$g]);
 				out("Added to globals: $g = ".$amp_conf[$g]);
