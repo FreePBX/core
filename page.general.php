@@ -28,7 +28,6 @@ $cm =& cronmanager::create($db);
 if ($action == 'editglobals') {
 	$globalfields = array(
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
-						array($_REQUEST['TIMEFORMAT'], 'TIMEFORMAT'),
 						);
 
 	$compiled = $db->prepare('UPDATE globals SET value = ? WHERE variable = ?');
@@ -93,14 +92,6 @@ foreach ($globals as $global) {
 		else
 		general_display_zones('us'); 
 		?>
-	</td></tr>
-	<tr><td>
-	<a class="info" href="#"><?php echo _("24-hour format")?><span><?php echo _("Select Yes if you use 24-hour format or No if you are using 12-hour am/pm format")?></span></a>:
-	</td><td align="right">
-	<select name="TIMEFORMAT" tabindex="<?php echo ++$tabindex;?>">
-		<option value="IMp"><?php echo _("no"); ?></option>
-		<option value="kM" <?php echo (($TIMEFORMAT=="kM") ? 'selected="selected"' : '');?>><?php echo _("yes"); ?></option>
-	</select>
 	</td></tr>
 </table>
 

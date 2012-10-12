@@ -780,7 +780,7 @@ $set['readonly'] = 0;
 $set['hidden'] = 0;
 $set['level'] = 0;
 $set['module'] = '';
-$set['category'] = '';
+$set['category'] = 'Dialplan and Operational';
 $set['name'] = 'Ringtime Default';
 $set['description'] = 'Default number of seconds to ring phones before sending callers to voicemail or other extension destinations. This can be set per extension/user. Phones with no voicemail or other destination options will ring indefinitely.';
 $set['type'] = CONF_TYPE_SELECT;
@@ -917,7 +917,6 @@ if(DB::IsError($check)) {
 
 // Migrate ALLOW_SIP_ANON from globals if needed
 //
-$current_prefix = $default_prefix = '*';
 $sql = "SELECT `value` FROM globals WHERE `variable` = 'ALLOW_SIP_ANON'";
 $globals = $db->getAll($sql,DB_FETCHMODE_ASSOC);
 if(!DB::IsError($globals)) {
