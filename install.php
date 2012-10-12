@@ -914,3 +914,32 @@ if(DB::IsError($check)) {
 } else {
 	out(_("already exists"));
 }
+
+// Migrate ALLOW_SIP_ANON from globals if needed
+//
+$current_prefix = $default_prefix = '*';
+$sql = "SELECT `value` FROM globals WHERE `variable` = 'ALLOW_SIP_ANON'";
+$globals = $db->getAll($sql,DB_FETCHMODE_ASSOC);
+if(!DB::IsError($globals)) {
+	if (count($globals)) {
+		$allow_sip_anon = trim($globals[0]['value']);
+		$sql = "DELETE FROM globals WHERE `variable` = 'ALLOW_SIP_ANON'";
+		out(_("migrated ALLOW_SIP_ANON Value: $allow_sip_anon to admin table"));
+		outn(_("deleting ALLOW_SIP_ANON from globals.."));
+		$res = $db->query($sql);
+		if(!DB::IsError($globals)) {
+			out(_("done"));
+		} else {
+			out(_("could not delete"));
+		}
+	}
+}
+if (!empty($allow_sip_anon)) {
+	$result = $db->query("INSERT INTO `admin` (`variable`, `value`) VALUES ('ALLOW_SIP_ANON', '$allow_sip_anon')");
+	if(DB::IsError($result)) {
+		out(_("ERROR: could not insert previous value for ALLOW_SIP_ANON, it may already exist"));
+	} else {
+		out_("Inserted ALLOW_SIP_ANON fine");
+	}
+}
+

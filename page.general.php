@@ -29,7 +29,6 @@ if ($action == 'editglobals') {
 	$globalfields = array(
 						array($_REQUEST['TONEZONE'], 'TONEZONE'),
 						array($_REQUEST['TIMEFORMAT'], 'TIMEFORMAT'),
-						array($_REQUEST['ALLOW_SIP_ANON'], 'ALLOW_SIP_ANON'),
 						);
 
 	$compiled = $db->prepare('UPDATE globals SET value = ? WHERE variable = ?');
@@ -101,21 +100,6 @@ foreach ($globals as $global) {
 	<select name="TIMEFORMAT" tabindex="<?php echo ++$tabindex;?>">
 		<option value="IMp"><?php echo _("no"); ?></option>
 		<option value="kM" <?php echo (($TIMEFORMAT=="kM") ? 'selected="selected"' : '');?>><?php echo _("yes"); ?></option>
-	</select>
-	</td></tr>
-</table>
-<h5><?php echo _("Security Settings")?></h5>
-<table>
-	<tr><td>
-	<a href=# class="info"><?php echo _("Allow Anonymous Inbound SIP Calls?")?><span>
-<?php echo _("** WARNING **")?><br><br>
-<?php echo _("Setting this to 'yes' will potentially allow ANYBODY to call into your Asterisk server using the SIP protocol")?><br><br>
-<?php echo _("It should only be used if you fully understand the impact of allowing anonymous calls into your server")?><br>
-	</span></a>:
-	</td><td align="right">
-	<select name="ALLOW_SIP_ANON" tabindex="<?php echo ++$tabindex;?>">
-	<option value="no"><?php echo _("no"); ?></option>
-	<option <?php if ($ALLOW_SIP_ANON == "yes") echo "SELECTED "?>value="yes"><?php echo _("yes"); ?></option>
 	</select>
 	</td></tr>
 </table>
