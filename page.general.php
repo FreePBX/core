@@ -26,17 +26,6 @@ $cm =& cronmanager::create($db);
 
 //if submitting form, update database
 if ($action == 'editglobals') {
-	$globalfields = array(
-						array($_REQUEST['TONEZONE'], 'TONEZONE'),
-						);
-
-	$compiled = $db->prepare('UPDATE globals SET value = ? WHERE variable = ?');
-	//$compiled = $db->prepare('REPLACE INTO globals (value,variable) VALUES (?, ?)');
-	$result = $db->executeMultiple($compiled,$globalfields);
-	if(DB::IsError($result)) {
-		echo $action.'<br>';
-		die_freepbx($result->getMessage());
-	}
 	
 	/* update online updates and email as appropriate
 	*/
@@ -60,18 +49,6 @@ if ($action == 'editglobals') {
 $online_updates = $cm->updates_enabled() ? 'yes' : 'no';
 $update_email   = $cm->get_email();
 
-//get all rows relating to selected account
-$sql = "SELECT * FROM globals";
-$globals = $db->getAll($sql);
-if(DB::IsError($globals)) {
-die_freepbx($globals->getMessage());
-}
-
-//create a set of variables that match the items in global[0]
-foreach ($globals as $global) {
-	${trim($global[0])} = $global[1];	
-}
-
 ?>
 <br />
 <a href="<?php echo $_SERVER['PHP_SELF'] ?>?display=advancedsettings">
@@ -81,19 +58,6 @@ foreach ($globals as $global) {
 <form name="general" action="config.php" method="post">
 <input type="hidden" name="display" value="general"/>
 <input type="hidden" name="action" value="editglobals"/>
-
-<h5><?php echo _("International Settings")?></h5>
-<table>
-	<tr><td>
-	<a class="info" href="#"><?php echo _("Country Indications")?><span><?php echo _("Select which country you are in")?></span></a>:
-	</td><td align="right">
-	<?php 	if (isset($TONEZONE) && strlen($TONEZONE)) 
-		general_display_zones($TONEZONE); 
-		else
-		general_display_zones('us'); 
-		?>
-	</td></tr>
-</table>
 
 <h5><?php echo _("Online Updates")?></h5>
 	<table>
@@ -122,19 +86,5 @@ foreach ($globals as $global) {
 <h6>
 	<input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
 </h6>
-<script language="javascript">
-<!--
-
-var theForm = document.general;
-
-function warnConfirm (theField, s) {
-    theField.focus();
-    theField.select();
-		return confirm(s);
-}
-
-
-//-->
-</script>
 </form>
 
