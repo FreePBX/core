@@ -104,7 +104,7 @@ foreach ($conf as $c){
 	$row++;
 	$dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
 	$default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
-	if ($c['emptyok'] && $c['type'] != CONF_TYPE_BOOL && $c['type'] != CONF_TYPE_SELECT) {
+	if ($c['emptyok'] && $c['type'] != CONF_TYPE_BOOL && $c['type'] != CONF_TYPE_SELECT && $c['type'] != CONF_TYPE_FSELECT) {
 		$default_val.= ', '._("field can be left blank");
 	}
 	if ($c['type'] == CONF_TYPE_INT && $c['options']) {
@@ -131,6 +131,15 @@ foreach ($conf as $c){
 				foreach($opt as $o) {
 					$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
 					echo '<option value="'.$o.'"'.$selected.'>'.$o.'</option>';
+				}
+			echo '</select>';
+			break;
+		case CONF_TYPE_FSELECT:
+			echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
+				$opt = $c['options'];
+				foreach($opt as $o => $l) {
+					$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
+					echo '<option value="'.$o.'"'.$selected.'>'.modgettext::_($l, $c['module']).'</option>';
 				}
 			echo '</select>';
 			break;
