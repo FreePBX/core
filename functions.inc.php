@@ -1789,7 +1789,16 @@ function core_get_config($engine) {
 
 			// Add some globals that are used by the dialplan
 			//
-			$add_globals = array('MIXMON_POST', 'DIAL_OPTIONS', 'TRUNK_OPTIONS', 'TRUNK_RING_TIMER', 'MIXMON_FORMAT', 'REC_POLICY', 'RINGTIMER');
+			$add_globals = array(
+				'MIXMON_POST', 
+				'DIAL_OPTIONS', 
+				'TRUNK_OPTIONS', 
+				'TRUNK_RING_TIMER', 
+				'MIXMON_FORMAT', 
+				'REC_POLICY', 
+				'RINGTIMER',
+				'TRANSFER_CONTEXT',
+			);
 			foreach ($add_globals as $g) {
 				$ext->addGlobal($g, $amp_conf[$g]);
 				out("Added to globals: $g = ".$amp_conf[$g]);
@@ -1800,6 +1809,8 @@ function core_get_config($engine) {
 			$ext->addGlobal('ASTVERSION', $version);
 			// Put the use of chan_dahdi in a global for dialparties
 			$ext->addGlobal('ASTCHANDAHDI', $chan_dahdi ? '1' : '0');
+			// Create constant NULL in globals
+			$ext->addGlobal('NULL', '""');
 			
 			// Create CallingPresTable to deal with difference that ${CALINGPRES} returns vs. what
 			// SetCallerPres() accepts. This is a workaround that gets resolved in 1.6 where

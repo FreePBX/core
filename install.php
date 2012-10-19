@@ -833,6 +833,14 @@ $globals_convert['IN_OVERRIDE'] = true;
 $globals_convert['AFTER_INCOMING'] = true;
 $globals_convert['DIRECTORY_OPTS'] = true;
 $globals_convert['OPERATOR'] = true;
+$globals_convert['TRANSFER_CONTEXT'] = true;
+$globals_convert['NULL'] = true;
+$globals_convert['PARKNOTIFY'] = true;
+$globals_convert['CALLFILENAME'] = true;
+$globals_convert['FAX'] = true;
+$globals_convert['INCOMING'] = true;
+$globals_convert['DIRECTORY'] = true;
+$globals_convert['RECORDEXTEN'] = true;
 
 // Re-compute the where clause to pull in the new ones added and then Delete The Globals
 //
@@ -840,14 +848,14 @@ $sql_where = " FROM globals WHERE `variable` IN ('".implode("','",array_keys($gl
 
 if (count($globals)) {
 	out(_("General Settings migrated"));
-	outn(_("Deleting migrated settings.."));
-  $sql = "DELETE".$sql_where;
-  $globals = $db->query($sql);
-  if(DB::IsError($globals)) {
-	  out(_("Fatal DB error trying to delete globals, trying to carry on"));
-  } else {
-	  out(_("done"));
-  }
+}
+outn(_("Deleting unused globals.."));
+$sql = "DELETE".$sql_where;
+$globals = $db->query($sql);
+if(DB::IsError($globals)) {
+	out(_("Fatal DB error trying to delete globals, trying to carry on"));
+} else {
+	out(_("done"));
 }
 
 // It's possible that SQL, LOG_SQL values could still bein in AMPSYSLOGLEVEL if amportal.conf
