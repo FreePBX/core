@@ -718,18 +718,30 @@ class core_conf {
 	}
 }
 
+function core_destination_popovers() {
+	global $amp_conf;
+	if ($amp_conf['AMPEXTENSIONS'] == "deviceanduser") {
+		$ret['users'] = 'Users';
+	} else {
+		$ret['extensions'] = 'Extensions';
+	}
+	return $ret;
+}
+
 // The destinations this module provides
 // returns a associative arrays with keys 'destination' and 'description'
 function core_destinations() {
+	global $amp_conf;
 	//static destinations
 	$extens = array();
 	$category = _("Terminate Call");
-	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category);
-	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category);
+	$ds_id = 'blackhole';
+	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
 	
 	//get the list of meetmes
 	$results = core_users_list();
@@ -754,12 +766,14 @@ function core_destinations() {
 	// return an associative array with destination and description
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
+		$cat_id = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+		$cat    = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'Users':'Extensions';
 		foreach($results as $result) {
-			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' <'.$result['0'].'> '.$result['1'], 'category' => 'Extensions');
+			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' <'.$result['0'].'> '.$result['1'], 'category' => $cat, 'id' => $cat_id);
 			if(isset($vmboxes[$result['0']])) {
-				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail');
-				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail');
-				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail');
+				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail', 'id' => 'voicemail');
 			}
 		}
 	}
@@ -770,7 +784,7 @@ function core_destinations() {
       case 'enum':
         break;
       default:
-				$extens[] = array('destination' => 'ext-trunk,'.$trunk['trunkid'].',1', 'description' => $trunk['name'].' ('.$trunk['tech'].')', 'category' => 'Trunks');
+				$extens[] = array('destination' => 'ext-trunk,'.$trunk['trunkid'].',1', 'description' => $trunk['name'].' ('.$trunk['tech'].')', 'category' => 'Trunks', 'id' => 'trunks');
         break;
     }
   }
@@ -7049,8 +7063,6 @@ function core_users_configpageload() {
 }
 
 function core_users_configprocess() {
-	if ( !class_exists('agi_asteriskmanager') )
-		include 'common/php-asmanager.php';
 	
 	//create vars from the request
 	extract($_REQUEST);
@@ -7070,6 +7082,11 @@ function core_users_configprocess() {
 		switch ($action) {
 			case "add":
 				if (core_users_add($_REQUEST)) {
+					// TODO: Check this if it's the same in device and user mode, and in fact we can't support this in that
+					//       mode at least without fixing the complexities of adding the devices which gets ugly!
+					//
+					$this_dest = core_getdest($_REQUEST['extension']);
+					fwmsg::set_dest($this_dest[0]);
 					needreload();
 					redirect_standard_continue();
 				} else {
