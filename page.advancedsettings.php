@@ -12,15 +12,6 @@ if($var['action'] === 'setkey') {
 	if ($freepbx_conf->conf_setting_exists($keyword)) {
 		$freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true,$amp_conf['AS_OVERRIDE_READONLY']);
 		$status = $freepbx_conf->get_last_update_status();
-		/*if ($var['send_reload'] && $status[$keyword]['saved']) {
-			ob_start();
-			include ('views/freepbx_reloadbar.php');
-			$status[$keyword]['reload_bar'] = ob_get_clean();
-
-			ob_start();
-			include ('views/freepbx_reload.php');
-			$status[$keyword]['reload_header'] = ob_get_clean();
-		}*/
 		if ($status[$keyword]['saved']) {
 			freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$var['value']));
 			needreload();
@@ -83,7 +74,6 @@ foreach ($conf as $c){
 		//       starts consistent for each section.
 		//
 		if ($row % 2) {
-			//echo '<tr><td colspan="3"><br></td></tr>';
 			echo '<tr></tr>';
 			$row++;
 		}
