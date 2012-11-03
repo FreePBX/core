@@ -7581,6 +7581,9 @@ function core_devices_configpageload() {
           // We compare the existing secret against what might be in the put to detect changes when validating
           if ($devopt == "secret") {
             $currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
+						if ($devoptcurrent == '') {
+							$devoptcurrent = md5(uniqid());
+						}
           }
 	
 					if ( $devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '') { // editing to show advanced as well
