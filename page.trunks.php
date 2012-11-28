@@ -856,6 +856,12 @@ END;
 					<input type="text" size="8" name="dialoutprefix" id="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
+			<?php if (isset($extdisplay) && !empty($extdisplay) && !empty($dialpattern_array)) {?>
+    		<tr>
+    		    <td><a href=# class="info"><?php echo _("Export Dialplans as CSV")?><span><?php echo sprintf(_("Export patterns as a CSV file with headers listed as: %s, %s and %s in the first row."),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>')?></span><a>:</td>
+    		    <td><input type="button" onclick="parent.location='config.php?quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=core&amp;display=trunks&amp;extdisplay=<?php echo $extdisplay;?>'" value="Export"></td>
+    		</tr>
+    		<?php } ?>
 			<?php if ($tech != "enum") { ?>
 			<tr>
 				<td colspan="2">

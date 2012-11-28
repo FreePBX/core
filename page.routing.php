@@ -680,7 +680,12 @@ END;
         <input type="file" name="pattern_file" id="pattern_file" tabindex="<?php echo ++$tabindex;?>"/>
 			</td>
 		</tr>
-
+		<?php if (isset($extdisplay) && !empty($extdisplay) && !empty($dialpattern_array)) {?>
+		<tr>
+		    <td><a href=# class="info"><?php echo _("Export Dialplans as CSV")?><span><?php echo sprintf(_("Export patterns as a CSV file with headers listed as: %s, %s, %s and %s in the first row."),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span><a>:</td>
+		    <td><input type="button" onclick="parent.location='config.php?quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=core&amp;display=routing&amp;extdisplay=<?php echo $extdisplay;?>'" value="Export"></td>
+		</tr>
+		<?php } ?>
     <tr>
       <td colspan="2"><h5><a href=# class="info"><?php echo _("Trunk Sequence for Matched Routes")?><span><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?><br></span></a><hr></h5></td>
     </tr>
