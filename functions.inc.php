@@ -4027,6 +4027,7 @@ function core_get_config($engine) {
           $ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
         }
         $ext->add($mcontext,$exten,'godial', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+        $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
         $ext->add($mcontext,$exten,'', new ext_gosubif('$[("${SCREEN}"!=""&("${DIALSTATUS}"="TORTURE"|"${DIALSTATUS}"="DONTCALL"))|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
