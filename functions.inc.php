@@ -2805,6 +2805,8 @@ function core_get_config($engine) {
       //
       $ext->add($context, $exten, 'continue', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
       $ext->add($context, $exten, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
+      $ext->add($context, $exten, '', new ext_set('CDR(cnum)','${CALLERID(num)}'));
+      $ext->add($context, $exten, '', new ext_set('CDR(cnam)','${CALLERID(name)}'));
       // CHANNEL(language) does not get inherited (which seems like an Asterisk bug as musicclass does)
       // so if whe have MASTER_CHANNEL() available to us let's rectify that
       //
@@ -3000,6 +3002,8 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
 			$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
+      $ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
+      $ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${IF($[${OUTBOUND_CNAM_LOOKUP}]?${OUTBOUND_CNAM_LOOKUP}:${CALLERID(name)})}'));
 			$ext->add($context, $exten, 'exit', new ext_macroexit());
 
 
@@ -3023,6 +3027,8 @@ function core_get_config($engine) {
           $ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
         }
       }
+      $ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
+      $ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${IF($[${OUTBOUND_CNAM_LOOKUP}]?${OUTBOUND_CNAM_LOOKUP}:${CALLERID(name)})}'));
 
 
       // Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
