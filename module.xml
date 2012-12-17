@@ -55,7 +55,7 @@
 		<users needsenginedb="yes">Users</users>
 		<devices needsenginedb="yes">Devices</devices>
 		<did category="Connectivity">Inbound Routes</did>
-		<zapchandids category="Connectivity">Zap Channel DIDs</zapchandids>
+		<dahdichandids category="Connectivity">DAHDI Channel DIDs</dahdichandids>
 		<routing category="Connectivity">Outbound Routes</routing>
 		<trunks category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>

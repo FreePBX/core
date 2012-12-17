@@ -1,5 +1,5 @@
 <?php 
-// Zap Channel DIDs display for FreePBX
+// DAHDI Channel DIDs display for FreePBX
 // This file is part of FreePBX.
 //
 //    FreePBX is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // Copyright 2006 Philippe Lindheimer - Astrogen LLC
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
-$display = 'zapchandids';
+$display = 'dahdichandids';
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] :  'setup';
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] :  '';
 if (isset($_REQUEST['delete'])) $action = 'delete'; 
@@ -30,19 +30,19 @@ $did         = isset($_REQUEST['did']) ? $_REQUEST['did'] :  '';
 
 switch ($action) {
 	case 'add':
-		if (core_zapchandids_add($description, $channel, $did)) {
+		if (core_dahdichandids_add($description, $channel, $did)) {
 			needreload();
 			redirect_standard();
 		}
 	break;
 	case 'edit':
-		if (core_zapchandids_edit($description, $channel, $did)) {
+		if (core_dahdichandids_edit($description, $channel, $did)) {
 			needreload();
 			redirect_standard('extdisplay');
 		}
 	break;
 	case 'delete':
-		core_zapchandids_delete($channel);
+		core_dahdichandids_delete($channel);
 		needreload();
 		redirect_standard();
 	break;
@@ -56,7 +56,7 @@ switch ($action) {
 
 echo '<li><a href="config.php?display='.$display.'&type='.$type.'">'._('Add Channel').'</a></li>';
 
-foreach (core_zapchandids_list() as $row) {
+foreach (core_dahdichandids_list() as $row) {
 	echo '<li><a href="config.php?display='.$display.'&type='.$type.'&extdisplay='.$row['channel'].'" class="">'.$row['channel'].': '.$row['description'].'</a></li>';
 }
 
@@ -67,21 +67,21 @@ foreach (core_zapchandids_list() as $row) {
 
 if ($extdisplay != '') {
 	// load
-	$row = core_zapchandids_get($extdisplay);
+	$row = core_dahdichandids_get($extdisplay);
 	
 	$description = $row['description'];
 	$channel     = $row['channel'];
 	$did         = $row['did'];
 
-	echo "<h2>"._("Edit Zap Channel: ").$channel."</h2>";
+	echo "<h2>"._("Edit DAHDI Channel: ").$channel."</h2>";
 } else {
-	echo "<h2>"._("Add Zap Channel")."</h2>";
+	echo "<h2>"._("Add DAHDI Channel")."</h2>";
 }
 
-$helptext = _("Zap Channel DIDs allow you to assign a DID to specific Zap Channels. You can supply the same DID to multiple channels. This would be a common scenario if you have multiple POTS lines that are on a hunt group from your provider. You MUST assign the channel's context to from-zaptel for these settings to have effect. It will be a line that looks like:<br /><br />context = from-zaptel<br /><br />in your zapata.conf configuration effecting the specified channel(s). Once you have assigned DIDs you can use standard Inbound Routes with the specified DIDs to route your calls.");
+$helptext = _("DAHDI Channel DIDs allow you to assign a DID to specific DAHDI Channels. You can supply the same DID to multiple channels. This would be a common scenario if you have multiple POTS lines that are on a hunt group from your provider. You MUST assign the channel's context to from-analog for these settings to have effect. It will be a line that looks like:<br /><br />context = from-analog<br /><br />in your chan_dahdi.conf configuration effecting the specified channel(s). Once you have assigned DIDs you can use standard Inbound Routes with the specified DIDs to route your calls.");
 echo "<p>".$helptext."</p>\n";
 ?>
-<form name="editZapchandid" action="<?php  $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return checkZapchandid(editZapchandid);">
+<form name="editDAHDIchandid" action="<?php  $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return checkDAHDIchandid(editDAHDIchandid);">
 	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay; ?>">
 	<input type="hidden" name="channel" value="<?php echo $extdisplay; ?>">
 	<input type="hidden" name="action" value="<?php echo ($extdisplay != '' ? 'edit' : 'add'); ?>">
@@ -91,7 +91,7 @@ echo "<p>".$helptext."</p>\n";
 	if ($extdisplay == '') {
 ?>
 	<tr>
-		<td><a href="#" class="info"><?php echo _("Channel")?>:<span><?php echo _("The Zap Channel number to map to a DID")?></span></a></td>
+		<td><a href="#" class="info"><?php echo _("Channel")?>:<span><?php echo _("The DAHDI Channel number to map to a DID")?></span></a></td>
 		<td><input size="5" type="text" name="channel" value="<?php  echo $channel; ?>" tabindex="<?php echo ++$tabindex;?>"></td>
 	</tr>
 <?php
@@ -121,7 +121,7 @@ echo "<p>".$helptext."</p>\n";
 
 var actionDelete = false;
 
-function checkZapchandid(theForm) {
+function checkDAHDIchandid(theForm) {
 	var msgInvalidChannel = "<?php echo _('Invalid Channel Number, must be numeric and not blank'); ?>";
 	var msgInvalidDID = "<?php echo _('Invalid DID, must be a non-blank DID'); ?>";
 	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number.\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";

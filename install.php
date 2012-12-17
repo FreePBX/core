@@ -956,6 +956,84 @@ if (!empty($allow_sip_anon)) {
 	}
 }
 
+// zapchandids to dahdichandids table rename
+$dahditbl_res = $db->getAll("SELECT * FROM dahdichandids");
+if (DB::IsError($dahditbl_res)) {
+	$sql = $amp_conf["AMPDBENGINE"] == "sqlite3" ? 
+		'ALTER TABLE zapchandids RENAME TO dahdichandids' : 
+		'RENAME TABLE zapchandids to dahdichandids';
+	outn_("renaming table zapchandids to dahdichandids..");
+	$result = $db->query($sql);
+	if (!DB::IsError($result)) {
+		out(_("ok"));
+	} else {
+		out(_("CRITICAL ERROR"));
+		out(_("Could not rename table, if no dahdichandids table present FATAL errors will occur"));
+	}
+}
+
+// migrate from zap table. If empty, remove table. If not empty AND dahdi table empty, then
+// migrate data to dahdi table, otherwise just leave it be.
+//
+$zaptbl_size = $db->getOne("SELECT COUNT(*) FROM zap");
+if (!DB::IsError($zaptbl_size)) {
+	if ($zaptbl_size == 0) {
+		outn(_("removing zap table.."));
+		$res = $db->query("DROP TABLE zap");
+		if (!DB::IsError($res)) {
+			out(_("ok"));
+		} else {
+			out(_("error dropping table"));
+		}
+	} else {
+		$dahditbl_size = $db->getOne("SELECT COUNT(*) FROM dahdi");
+		if (DB::IsError($dahditbl_size)) {
+			out(_("error checking dahdi table size to determine if zap table contents can be migrated"));
+		} else {
+			if ($dahditbl_size > 0) {
+				out(_("dahdi table not empty, can't migrate zap data there"));
+			} else {
+				outn(_("migrating zap table contents to dahdi table.."));
+				$res = $db->query("INSERT INTO dahdi (id, keyword, data, flags) (SELECT id, keyword, data, flags FROM zap)");
+				if (!DB::IsError($res)) {
+					out(_("ok"));
+					outn(_("removing zap table.."));
+					$res = $db->query("DROP TABLE zap");
+					if (!DB::IsError($res)) {
+						out(_("ok"));
+					} else {
+						out(_("error dropping table"));
+					}
+					// Now migrate devices table and update AstDB DEVICES
+					//
+					$zap_devices = $db->getAll("SELECT id, dial FROM devices WHERE lower(tech) = 'zap'", DB_FETCHMODE_ASSOC);
+					if (DB::IsError($zap_devices)) {
+						out(_("Error converting zap to dahdi in devices table and AstDB"));
+					} else if (count($zap_devices) > 0) {
+						$dahdi_update = array();
+						foreach ($zap_devices as $dev) {
+							$chan = explode($dev['dial'],2);
+							$dial = 'DAHDI/' . $chan[1];
+							out(sprintf(_("preparing device %s dial to %s"), $dev['id'], $dial));
+							$dahdi_update[] = array($dial, $dev['id']);
+							$astman->database_put("DEVICE", $dev['id'] . "/dial", $dial);
+						}
+						$compiled = $db->prepare("UPDATE devices SET tech = 'dahdi', dial = ? WHERE id = ?");
+						$result = $db->executeMultiple($compiled, $dahdi_update);
+						if (!DB::IsError($result)) {
+							out(_("zap devices"));
+						} else {
+							out(_(""));
+						}
+					}
+				} else {
+					out(_("error migrating table"));
+				}
+			}
+		}
+	}
+}
+
 function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	global $db, $freepbx_conf;
 

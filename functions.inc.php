@@ -1470,7 +1470,7 @@ function core_get_config($engine) {
           $chan_dahdi_loaded = $astman->mod_loaded('chan_dahdi');
         }
 			}
-			foreach (core_zapchandids_list() as $row) {
+			foreach (core_dahdichandids_list() as $row) {
 				$channel = $row['channel'];
 				$did     = $row['did'];
 
@@ -2088,7 +2088,6 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${CONFBRIDGE_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
       	$ext->add($context, $exten, '', new ext_execif('$[!${CONFBRIDGE_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
       	$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_file)','${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MON_FMT}'));
-				$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_conference)','yes'));
 			} else {
 				// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
 				// Meetme does not default to the defined monitor directory.
@@ -5624,7 +5623,7 @@ function core_directdid_list(){
 	return array();
 }
 
-function core_zapchandids_add($description, $channel, $did) {
+function core_dahdichandids_add($description, $channel, $did) {
 	global $db;
 
 
@@ -5654,7 +5653,7 @@ function core_zapchandids_add($description, $channel, $did) {
 	return true;
 }
 
-function core_zapchandids_edit($description, $channel, $did) {
+function core_dahdichandids_edit($description, $channel, $did) {
 	global $db;
 
 	$description = q($description);
@@ -5669,7 +5668,7 @@ function core_zapchandids_edit($description, $channel, $did) {
 	return true;
 }
 
-function core_zapchandids_delete($channel) {
+function core_dahdichandids_delete($channel) {
 	global $db;
 
 	$channel     = q($channel);
@@ -5682,14 +5681,14 @@ function core_zapchandids_delete($channel) {
 	return true;
 }
 
-function core_zapchandids_list() {
+function core_dahdichandids_list() {
 	global $db;
 
 	$sql = "SELECT * FROM zapchandids ORDER BY channel";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
-function core_zapchandids_get($channel) {
+function core_dahdichandids_get($channel) {
 	global $db;
 
 	$channel     = q($channel);
@@ -5789,7 +5788,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		$trunknum++;
 	}
 
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue);
 	return $trunknum;
 }
 
@@ -7434,12 +7433,7 @@ function core_devices_configpageinit($dispnum) {
 		if ($_SESSION["AMP_user"]->checkSection('999')) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'iax2_generic', _("Generic IAX2 Device"));
-    if (!ast_with_dahdi() || $amp_conf['ZAP2DAHDICOMPAT']) {
-      $currentcomponent->addoptlistitem('devicelist', 'zap_generic', _("Generic ZAP Device"));
-    }
-    if (ast_with_dahdi()) {
-		  $currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDi Device"));
-    }
+		$currentcomponent->addoptlistitem('devicelist', 'dahdi_generic', _("Generic DAHDi Device"));
 		$currentcomponent->addoptlistitem('devicelist', 'custom_custom', _("Other (Custom) Device"));
 		}
 		if ( $dispnum != 'devices' ) {
