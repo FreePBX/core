@@ -1021,9 +1021,9 @@ if (!DB::IsError($zaptbl_size)) {
 						$compiled = $db->prepare("UPDATE devices SET tech = 'dahdi', dial = ? WHERE id = ?");
 						$result = $db->executeMultiple($compiled, $dahdi_update);
 						if (!DB::IsError($result)) {
-							out(_("zap devices"));
+							out(_("zap devices migrated"));
 						} else {
-							out(_(""));
+							out(_("error occured updating devices table"));
 						}
 					}
 				} else {
@@ -1032,6 +1032,14 @@ if (!DB::IsError($zaptbl_size)) {
 			}
 		}
 	}
+}
+// migrate any zap trunks to dahdi
+outn(_("upgrading any zap trunks to dahdi if found"));
+$res = $db->query("UPDATE trunks set tech = 'dahdi' WHERE lower(tech) = 'zap'");
+if (!DB::IsError($res)) {
+	out(_("ok"));
+} else {
+	out(_("error occured"));
 }
 
 function _core_create_update_tonezones($tz = 'us', $commit = true) {
