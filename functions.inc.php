@@ -5643,7 +5643,7 @@ function core_dahdichandids_add($description, $channel, $did) {
 	$channel     = q($channel);
 	$did         = q($did);
 
-	$sql = "INSERT INTO zapchandids (channel, description, did) VALUES ($channel, $description, $did)";
+	$sql = "INSERT INTO dahdichandids (channel, description, did) VALUES ($channel, $description, $did)";
 	$results = $db->query($sql);
 	if (DB::IsError($results)) {
 		if ($results->getCode() == DB_ERROR_ALREADY_EXISTS) {
@@ -5663,7 +5663,7 @@ function core_dahdichandids_edit($description, $channel, $did) {
 	$channel     = q($channel);
 	$did         = q($did);
 
-	$sql = "UPDATE zapchandids SET description = $description, did = $did WHERE channel = $channel";
+	$sql = "UPDATE dahdichandids SET description = $description, did = $did WHERE channel = $channel";
 	$results = $db->query($sql);
 	if (DB::IsError($results)) {
 		die_freepbx($results->getMessage()."<br><br>".$sql);
@@ -5676,7 +5676,7 @@ function core_dahdichandids_delete($channel) {
 
 	$channel     = q($channel);
 
-	$sql = "DELETE FROM zapchandids WHERE channel = $channel";
+	$sql = "DELETE FROM dahdichandids WHERE channel = $channel";
 	$results = $db->query($sql);
 	if (DB::IsError($results)) {
 		die_freepbx($results->getMessage()."<br><br>".$sql);
@@ -5687,7 +5687,7 @@ function core_dahdichandids_delete($channel) {
 function core_dahdichandids_list() {
 	global $db;
 
-	$sql = "SELECT * FROM zapchandids ORDER BY channel";
+	$sql = "SELECT * FROM dahdichandids ORDER BY channel";
 	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 }
 
@@ -5696,7 +5696,7 @@ function core_dahdichandids_get($channel) {
 
 	$channel     = q($channel);
 
-	$sql = "SELECT * FROM zapchandids WHERE channel = $channel";
+	$sql = "SELECT * FROM dahdichandids WHERE channel = $channel";
 	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
 }
 
