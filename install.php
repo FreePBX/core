@@ -952,7 +952,7 @@ if (!empty($allow_sip_anon)) {
 	if(DB::IsError($result)) {
 		out(_("ERROR: could not insert previous value for ALLOW_SIP_ANON, it may already exist"));
 	} else {
-		out_("Inserted ALLOW_SIP_ANON fine");
+		out(_("Inserted ALLOW_SIP_ANON fine"));
 	}
 }
 
@@ -962,7 +962,7 @@ if (DB::IsError($dahditbl_res)) {
 	$sql = $amp_conf["AMPDBENGINE"] == "sqlite3" ? 
 		'ALTER TABLE zapchandids RENAME TO dahdichandids' : 
 		'RENAME TABLE zapchandids to dahdichandids';
-	outn_("renaming table zapchandids to dahdichandids..");
+	outn(_("renaming table zapchandids to dahdichandids.."));
 	$result = $db->query($sql);
 	if (!DB::IsError($result)) {
 		out(_("ok"));
