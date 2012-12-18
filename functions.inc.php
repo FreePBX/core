@@ -1804,18 +1804,18 @@ function core_get_config($engine) {
 			// Add some globals that are used by the dialplan
 			//
 			$add_globals = array(
-				'MIXMON_POST', 
-				'DIAL_OPTIONS', 
-				'TRUNK_OPTIONS', 
-				'TRUNK_RING_TIMER', 
-				'MIXMON_FORMAT', 
-				'REC_POLICY', 
-				'RINGTIMER',
-				'TRANSFER_CONTEXT',
+				'MIXMON_POST' => 'MIXMON_POST', 
+				'DIAL_OPTIONS' => 'DIAL_OPTIONS', 
+				'TRUNK_OPTIONS' => 'TRUNK_OPTIONS', 
+				'TRUNK_RING_TIMER' => 'TRUNK_RING_TIMER', 
+				'MIXMON_FORMAT' => 'MIXMON_FORMAT', 
+				'REC_POLICY' => 'REC_POLICY', 
+				'RINGTIMER' => 'RINGTIMER_DEFAULT',
+				'TRANSFER_CONTEXT' => 'TRANSFER_CONTEXT',
 			);
-			foreach ($add_globals as $g) {
-				$ext->addGlobal($g, $amp_conf[$g]);
-				out("Added to globals: $g = ".$amp_conf[$g]);
+			foreach ($add_globals as $g => $v) {
+				$ext->addGlobal($v, $amp_conf[$g]);
+				out("Added to globals: $l = ".$amp_conf[$g]);
 			}
 			unset($add_globals);
 
