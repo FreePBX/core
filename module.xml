@@ -9,6 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+    *2.11.0.0beta1.9.1* Regression #6068
     *2.11.0.0beta1.9* #6138
     *2.11.0.0beta1.8* #6140, #6141
     *2.11.0.0beta1.7* #6079, #6063, #6109, #6122, #6130

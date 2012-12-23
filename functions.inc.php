@@ -5791,7 +5791,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		$trunknum++;
 	}
 
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue);
+	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
 	return $trunknum;
 }
 
