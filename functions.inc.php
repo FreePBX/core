@@ -27,6 +27,7 @@ class core_conf {
 	var $_applicationmap = array();
 	var $_loggergeneral  = array();
 	var $_loggerlogfiles = array();
+	var $_res_odbc       = array();
 
 	var $dev_user_map;
 
@@ -81,6 +82,7 @@ class core_conf {
 			'sip_notify_additional.conf',
 			'logger_general_additional.conf',
 			'logger_logfiles_additional.conf',
+			'res_odbc_additional.conf',
 		);
 
 		if ($chan_dahdi) {
@@ -144,6 +146,9 @@ class core_conf {
 			case 'logger_logfiles_additional.conf':
 				return $this->generate_loggerlogfiles_additional($version);
 				break;
+			case 'res_odbc_additional.conf':
+				return $this->generate_res_odbc_additional($version);
+				break;
 		}
 	}
 
@@ -161,6 +166,26 @@ class core_conf {
 						continue;
 					}
           $output .= "$key=>$value\n";
+        }
+        $output .= "\n";
+      }
+    }
+    return $output;
+  }
+
+  function addResOdbc($section,$entries) {
+    $this->_res_odbc[$section][] = $entries;
+  }
+
+  function generate_res_odbc_additional($ast_version) {
+    $output = '';
+    if (!empty($this->_res_odbc)) {
+      foreach ($this->_res_odbc as $section) {
+        $output .= "[".$section."]\n";
+        foreach ($section as $key => $entries) {
+					foreach ($entries as $key => $value) {
+          	$output .= "$key=>$value\n";
+					}
         }
         $output .= "\n";
       }
