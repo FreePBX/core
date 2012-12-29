@@ -83,14 +83,8 @@ class core_conf {
 			'logger_general_additional.conf',
 			'logger_logfiles_additional.conf',
 			'res_odbc_additional.conf',
+			'chan_dahdi_additional.conf',
 		);
-
-		if ($chan_dahdi) {
-			$files[] = 	'chan_dahdi_additional.conf';
-		} else {
-			$files[] = 	'zapata_additional.conf';
-		}
-
 		return $files;
 	}
 	
@@ -122,11 +116,7 @@ class core_conf {
 				return $this->generate_iax_registrations($version);
 				break;
 			case 'chan_dahdi_additional.conf':
-        if (ast_with_dahdi() && $amp_conf['ZAP2DAHDICOMPAT']) {
-				  return $this->generate_zapata_additional($version, 'dahdi').$this->generate_zapata_additional($version);
-        } else {
-				  return $this->generate_zapata_additional($version,'dahdi');
-        }
+				return $this->generate_zapata_additional($version, 'dahdi').$this->generate_zapata_additional($version);
 				break;
 			case 'zapata_additional.conf':
 				return $this->generate_zapata_additional($version);
@@ -180,10 +170,10 @@ class core_conf {
   function generate_res_odbc_additional($ast_version) {
     $output = '';
     if (!empty($this->_res_odbc)) {
-      foreach ($this->_res_odbc as $section) {
+      foreach ($this->_res_odbc as $section => $entries) {
         $output .= "[".$section."]\n";
-        foreach ($section as $key => $entries) {
-					foreach ($entries as $key => $value) {
+        foreach ($entries as $key => $entry) {
+					foreach ($entry as $key => $value) {
           	$output .= "$key=>$value\n";
 					}
         }
@@ -696,7 +686,11 @@ class core_conf {
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
-   		die($results->getMessage());
+			if($table_name == 'zap') {
+				return '';
+			} else {
+   			die($results->getMessage());
+			}
 		}
 		foreach ($results as $result) {
 			$additional .= $result['keyword']."=".$result['data']."\n";
