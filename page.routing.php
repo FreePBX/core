@@ -852,7 +852,6 @@ function showDisable(key) {
 function routeEdit_onsubmit(act) {
 	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
 	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
-	var msgInvalidTrunkSelection = "<?php echo _('At least one trunk must be picked'); ?>";
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	
 	var rname = theForm.routename.value;
@@ -870,12 +869,6 @@ function routeEdit_onsubmit(act) {
 	if (!isDialpattern(theForm.dialpattern.value))
 		return warnInvalid(theForm.dialpattern, msgInvalidDialPattern);
     */
-		
-	if (theForm.trunkpri0.value == "") { // should they all be checked ?
-		theForm.trunkpri0.focus();
-		alert(msgInvalidTrunkSelection);
-		return false;
-	}
 	
 	theForm.action.value = act;
 
