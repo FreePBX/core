@@ -757,6 +757,14 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	$key++;
 } //for 0..$num_new_boxes ?>
 
+<?php if ($extdisplay != '') { // editing ?>
+		<tr>
+			<td colspan="2">
+				<input type="submit" value="<?php echo _("Add Trunk")?>">
+			</td>
+		</tr>
+<?php } // if $extdisplay ?>
+
     <tr>
       <td colspan="2"><h5><a href=# class="info"><?php echo _("Optional Destination on Congestion")?><span><?php echo _("If all the trunks fail because of Asterisk 'CONGESTION' dialstatus you can optionally go to a destination such as a unique recorded message or anywhere else. This destination will NOT be engaged if the trunk is reporting busy, invalid numbers or anything else that would imply the trunk was able to make an 'intelligent' choice about the number that was dialed. The 'Normal Congestion' behavior is to play the 'All Circuits Busy' recording or other options configured in the Route Congestion Messages module when installed.")?><br></span></a><hr></h5></td>
     </tr>
@@ -764,13 +772,6 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 echo drawselects(!empty($dest)?$dest:null,0,false,true,_("Normal Congestion"),false);
 ?>
 
-<?php if ($extdisplay != ''): // editing ?>
-		<tr>
-			<td colspan="2">
-				<input type="submit" value="<?php echo _("Add Trunk")?>">
-			</td>
-		</tr>
-<?php endif; // if $extdisplay ?>
 
 		<tr>
 			<td colspan="2">
