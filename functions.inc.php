@@ -2767,6 +2767,39 @@ function core_get_config($engine) {
 			} // if trunk_type_needed
 
 
+			/*
+				;-------------------------------------------------------------------------------
+				; macro-privacy-mgr:
+				;
+				; Privacy Manager Macro makes sure that any calls that don't pass the privacy manager are presented
+				; with congestion since there have been observed cases of the call continuing if not stopped with a 
+				; congestion, and this provides a slightly more friendly 'sorry' message in case the user is
+				; legitimately trying to be cooperative. 
+				;
+				; Note: the following options are configurable in privacy.conf:
+				;
+				;	maxretries = 3 ; default value, number of retries before failing
+				;	minlength = 10 ; default value, number of digits to be accepted as valid CID
+				;
+				;-------------------------------------------------------------------------------
+			 */
+			$context = 'macro-privacy-mgr';
+			$exten = 's';
+
+			$ext->add($context, $exten, '', new ext_set('KEEPCID', '${CALLERID(num)}'));
+			$ext->add($context, $exten, '', new ext_set('TESTCID', '${IF($["${CALLERID(num):0:1}"="+"]?${MATH(1+${CALLERID(num):1})}:${MATH(1+${CALLERID(num)})})}'));
+			$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TESTCID})}=0]', 'Set', 'CALLERID(num)='));
+			$ext->add($context, $exten, '', new ext_privacymanager('${ARG1},${ARG2}'));
+			$ext->add($context, $exten, '', new ext_gotoif('$["${PRIVACYMGRSTATUS}"="FAILED"]', 'fail'));
+			$ext->add($context, $exten, '', new ext_gosubif('$["${CALLED_BLACKLIST}"="1"]','app-blacklist-check,s,1'));
+			$ext->add($context, $exten, '', new ext_set('CALLERID(num-pres)', 'allowed_passed_screen'));
+			$ext->add($context, $exten, '', new ext_macroexit());
+
+			$ext->add($context, $exten, 'fail', new ext_noop('STATUS: ${PRIVACYMGRSTATUS} CID: ${CALLERID(num)} ${CALLERID(name)} CALLPRES: ${CALLLINGPRES}'));
+			$ext->add($context, $exten, '', new ext_playback('sorry-youre-having-problems&goodbye'));
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			$ext->add($context, $exten, '', new ext_congestion(20));
+			$ext->add($context, 'h', '', new ext_hangup());
 
 			/*
 			 * sets the CallerID of the device to that of the logged in user
