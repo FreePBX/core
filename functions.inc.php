@@ -2000,7 +2000,7 @@ function core_get_config($engine) {
       $context = 'sub-record-check';
       $exten = 's';
 
-	  $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE_SAVE','${REC_POLICY_MODE}'));
+	  $ext->add($context, $exten, '', new ext_set('REC_POLICY_MODE_SAVE','${REC_POLICY_MODE}'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
       $ext->add($context, $exten, '', new ext_resetcdr(''));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}" != "RECORDING"]', 'check'));
