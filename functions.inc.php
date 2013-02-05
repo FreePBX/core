@@ -45,12 +45,12 @@ class core_conf {
 					$user_option = $this->dev_user_map[$account]['description'] . ' <' . $account . '>';
 					break;
 				case 'mailbox':
-					if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm') 
+					if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm')
 						&& strtolower($data) == "$account" . "@device" && $amp_conf['DEVICE_REMOVE_MAILBOX']) {
 						// they have no vm so don't put a mailbox=line
 						return "";
-					} elseif (strtolower($data) == "$account" . "@device" 
-						&& !empty($this->dev_user_map[$account]['vmcontext']) && 
+					} elseif (strtolower($data) == "$account" . "@device"
+						&& !empty($this->dev_user_map[$account]['vmcontext']) &&
 						$this->dev_user_map[$account]['vmcontext'] != 'novm') {
 						$user_option = $this->dev_user_map[$account]['user'] . "@" . $this->dev_user_map[$account]['vmcontext'];
 					} else {
@@ -67,7 +67,7 @@ class core_conf {
 	// return an array of filenames to write
 	function get_filename() {
 		global $chan_dahdi;
-		
+
 		$files = array(
 			'sip_additional.conf',
 			'sip_registrations.conf',
@@ -87,7 +87,7 @@ class core_conf {
 		);
 		return $files;
 	}
-	
+
 	// return the output that goes in each of the files
 	function generateConf($file) {
 		global $version;
@@ -320,17 +320,17 @@ class core_conf {
 
 		// Asterisk 1.4 requires call-limit be set for hints to work properly
 		//
-		if (version_compare($ast_version, "1.6.1", "ge")) { 
+		if (version_compare($ast_version, "1.6.1", "ge")) {
 			$call_limit = "callcounter=yes\n";
 			$ver12 = false;
-    } else if (version_compare($ast_version, "1.4", "ge")) { 
+    } else if (version_compare($ast_version, "1.4", "ge")) {
 			$call_limit = "call-limit=50\n";
 			$ver12 = false;
 		} else {
 			$call_limit = "";
 			$ver12 = true;
 		}
-		if (version_compare($ast_version, "1.6", "ge")) { 
+		if (version_compare($ast_version, "1.6", "ge")) {
 			$faxdetect = "faxdetect=no\n";
 			$ver16 = true;
 		} else {
@@ -386,7 +386,7 @@ class core_conf {
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= "[$account]\n";
-	
+
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
@@ -556,17 +556,17 @@ class core_conf {
 		if(DB::IsError($results)) {
    		die($results->getMessage());
 		}
-		
+
 		foreach ($results as $result) {
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= "[$account]\n";
-	
+
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
    			die($results2_pre->getMessage());
-			}	
+			}
 
 			// Move all 'disallow=all' and 'deny=' to the top to avoid errors
 			//
@@ -706,7 +706,7 @@ class core_conf {
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= ";;;;;;[$account]\n";
-	
+
 			$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
@@ -761,10 +761,10 @@ function core_destinations() {
 	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
 	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
 	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
-	
+
 	//get the list of meetmes
 	$results = core_users_list();
-	
+
 	if (isset($results) && function_exists('voicemail_getVoicemail')) {
 		//get voicemail
 		$uservm = voicemail_getVoicemail();
@@ -781,7 +781,7 @@ function core_destinations() {
 			}
 		}
 	}
-	
+
 	// return an associative array with destination and description
 	// core provides both users and voicemail boxes as destinations
 	if (isset($results)) {
@@ -807,7 +807,7 @@ function core_destinations() {
         break;
     }
   }
-	
+
 	if (isset($extens))
 		return $extens;
 	else
@@ -895,22 +895,22 @@ function core_getdestinfo($dest) {
 		$exten = $exten[1];
 
 		switch ($exten) {
-			case 'hangup': 
+			case 'hangup':
 				$description = 'Hangup';
 				break;
-			case 'congestion': 
+			case 'congestion':
 				$description = 'Congestion';
 				break;
-			case 'busy': 
+			case 'busy':
 				$description = 'Busy';
 				break;
-			case 'zapateller': 
+			case 'zapateller':
 				$description = 'Play SIT Tone (Zapateller)';
 				break;
-			case 'musiconhold': 
+			case 'musiconhold':
 				$description = 'Put caller on hold forever';
 				break;
-			case 'ring': 
+			case 'ring':
 				$description = 'Play ringtones to caller';
 				break;
 			default:
@@ -944,7 +944,7 @@ function core_get_config($engine) {
 	global $astman;
 
 	$modulename = "core";
-	
+
 	switch($engine) {
 		case "asterisk":
 
@@ -1066,16 +1066,16 @@ function core_get_config($engine) {
 			// Log on / off -- all in one context
 			if ($fc_userlogoff != '' || $fc_userlogon != '') {
 				$ext->addInclude('from-internal-additional', 'app-userlogonoff'); // Add the include from from-internal
-				
+
 				if ($fc_userlogoff != '') {
 					$ext->add('app-userlogonoff', $fc_userlogoff, '', new ext_macro('user-logoff'));
 					$ext->add('app-userlogonoff', $fc_userlogoff, 'hook_off', new ext_hangup(''));
 				}
-	
+
 				if ($fc_userlogon != '') {
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon'));
 					$ext->add('app-userlogonoff', $fc_userlogon, 'hook_on_1', new ext_hangup(''));
-					
+
 					$clen = strlen($fc_userlogon);
 					$fc_userlogon = "_$fc_userlogon.";
 					$ext->add('app-userlogonoff', $fc_userlogon, '', new ext_macro('user-logon,${EXTEN:'.$clen.'}'));
@@ -1164,7 +1164,7 @@ function core_get_config($engine) {
 
 
 			// Call pickup using app_pickup - Note that '**xtn' is hard-coded into the GXPs and SNOMs as a number to dial
-			// when a user pushes a flashing BLF. 
+			// when a user pushes a flashing BLF.
 			//
 			// We need to add ringgoups to this so that if an extension is part of a ringgroup, we can try to pickup that
 			// extension by trying the ringgoup which is what the pickup application is going to respond to.
@@ -1221,12 +1221,12 @@ function core_get_config($engine) {
 				// to try the ringgoup.
 				foreach ($rg_members as $exten => $grps) {
 					$picklist  = $exten;
-					$picklist .= '&'.$exten.'@PICKUPMARK'; 
+					$picklist .= '&'.$exten.'@PICKUPMARK';
 
 					foreach ($grps as $grp) {
-						$picklist .= '&'.$grp.'@from-internal'; 
-						$picklist .= '&'.$grp.'@from-internal-xfer'; 
-						$picklist .= '&'.$grp.'@ext-group'; 
+						$picklist .= '&'.$grp.'@from-internal';
+						$picklist .= '&'.$grp.'@from-internal-xfer';
+						$picklist .= '&'.$grp.'@ext-group';
 					}
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_macro('user-callerid'));
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_set('PICKUP_EXTEN','${AMPUSER}'));
@@ -1313,12 +1313,12 @@ function core_get_config($engine) {
 					$ext->add('app-pickup', "$fc_pickup".$exten, '', new ext_hangup(''));
 				}
 			}
-			
-			
+
+
 			// zap barge
 			if ($fc_zapbarge != '') {
 				$ext->addInclude('from-internal-additional', 'app-zapbarge'); // Add the include from from-internal
-				
+
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_macro('user-callerid'));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_setvar('GROUP()','${CALLERID(number)}'));
 				$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_answer(''));
@@ -1336,11 +1336,11 @@ function core_get_config($engine) {
 				$ext->add('app-chanspy', $fc_chanspy, '', new ext_chanspy(''));
 				$ext->add('app-chanspy', $fc_chanspy, '', new ext_hangup(''));
 			}
-			
+
 			// Simulate options (ext-test)
 			if ($fc_simu_pstn != '') {
 				$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
-				
+
 				if ($fc_simu_pstn != '') {
 					if (ctype_digit($fc_simu_pstn)) {
 						$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', '${EXTEN}', 'from-pstn'));
@@ -1351,7 +1351,7 @@ function core_get_config($engine) {
 
 				$ext->add('ext-test', 'h', '', new ext_macro('hangupcall'));
 			}
-			
+
 			$ext->addInclude('ext-did', 'ext-did-0001'); // Add the include from from-internal
 			$ext->addInclude('ext-did', 'ext-did-0002'); // Add the include from from-internal
 			$ext->add('ext-did', 'foo','', new ext_noop('bar'));
@@ -1422,7 +1422,7 @@ function core_get_config($engine) {
 						$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
 					}
 
-					if ($exten == "s") {  
+					if ($exten == "s") {
 						//if the exten is s, then also make a catchall for undefined DIDs
 						$catchaccount = "_.".(empty($cidnum)?"":"/".$cidnum);
 						if ($catchaccount =="_." && ! $catchall) {
@@ -1439,7 +1439,7 @@ function core_get_config($engine) {
 						// note - the indirect table could go away as of 1.4.20 where it is fixed so that SetCallerPres can take
 						// the raw format.
 						//
-						if ($ast_lt_16) { 
+						if ($ast_lt_16) {
 							$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLINGPRES_${CALLINGPRES}}'));
 						} else {
 							$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLERPRES()}'));
@@ -1452,14 +1452,14 @@ function core_get_config($engine) {
 					if (!empty($item['grppre'])) {
 						$ext->add($context, $exten, '', new ext_macro('prepend-cid', $item['grppre']));
 					}
-					
+
 					//the goto destination
 					// destination field in 'incoming' database is backwards from what ext_goto expects
 					$goto_context = strtok($item['destination'],',');
 					$goto_exten = strtok(',');
 					$goto_pri = strtok(',');
 					$ext->add($context, $exten, 'dest-ext', new ext_goto($goto_pri,$goto_exten,$goto_context));
-					
+
 				}
 				// If there's not a catchall, make one with an error message
 				if (!$catchall) {
@@ -1474,7 +1474,7 @@ function core_get_config($engine) {
 					$ext->add($catchall_context, '_.', '', new ext_goto('a2','s'));
 					$ext->add($catchall_context, 'h', '', new ext_hangup(''));
 				}
-					
+
 			}
 
 			// Now create macro-from-zaptel-nnn or macro-from-dahdi-nnn for each defined channel to route it to the DID routing
@@ -1537,7 +1537,7 @@ function core_get_config($engine) {
 					$vm = ((($exten['voicemail'] == "novm") || ($exten['voicemail'] == "disabled") || ($exten['voicemail'] == "")) ? "novm" : $exten['extension']);
 
 					$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($[${DB(AMPUSER/'.$exten['extension'].'/ringtimer)} > 0]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
-					
+
           $dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 					$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
 					$ext->add('ext-local', $exten['extension'], 'dest', new ext_set('__PICKUPMARK',''));
@@ -1559,7 +1559,7 @@ function core_get_config($engine) {
             }
 					  $ext->add('ext-local', $exten['extension'], '', new ext_gotoif('$["${DIALSTATUS}"="CHANUNAVAIL"]',$exten['chanunavail_dest']));
           }
-					
+
 					if($vm != "novm") {
 						// This usually gets called from macro-exten-vm but if follow-me destination need to go this route
 						$ext->add('ext-local', $exten['extension'], '', new ext_macro('vm',$vm.',${DIALSTATUS},${IVR_RETVM}'));
@@ -1575,7 +1575,7 @@ function core_get_config($engine) {
 						//
 						$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','return','${IVR_CONTEXT}'));
 					}
-						
+
 					// Create the hints if running in normal mode
 					//
 					if (!$amp_conf['DYNAMICHINTS']) {
@@ -1645,7 +1645,7 @@ function core_get_config($engine) {
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', $trunkgroup));
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_'.$trunkprops['trunkid'].'}" = ""]', 'nomax'));
               $ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT('.$trunkgroup.')} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-              if ($ast_lt_16) { 
+              if ($ast_lt_16) {
                 $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
               } else {
                 $ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
@@ -1695,7 +1695,7 @@ function core_get_config($engine) {
           $ext->add($tcontext,$tcustom,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
           $ext->add($tcontext,$tcustom,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
           $ext->add($tcontext,$tcustom,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-          if ($ast_lt_16) { 
+          if ($ast_lt_16) {
             $ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
           } else {
             $ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
@@ -1719,7 +1719,7 @@ function core_get_config($engine) {
           $ext->add($tcontext,$texten,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
           $ext->add($tcontext,$texten,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
           $ext->add($tcontext,$texten,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-          if ($ast_lt_16) { 
+          if ($ast_lt_16) {
             $ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
           } else {
             $ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
@@ -1744,17 +1744,17 @@ function core_get_config($engine) {
 			/* dialplan globals */
 			// modules should NOT use the globals table to store anything!
 			// modules should use $ext->addGlobal("testvar","testval"); in their module_get_config() function instead
-			// I'm cheating for core functionality - do as I say, not as I do ;-)		
+			// I'm cheating for core functionality - do as I say, not as I do ;-)
 
 			// Auto add these globals to give access to agi scripts and other needs, unless defined in the global table.
 			//
-			$amp_conf_globals = array( 
-				"ASTETCDIR", 
-				"ASTMODDIR", 
-				"ASTVARLIBDIR", 
-				"ASTAGIDIR", 
-				"ASTSPOOLDIR", 
-				"ASTRUNDIR", 
+			$amp_conf_globals = array(
+				"ASTETCDIR",
+				"ASTMODDIR",
+				"ASTVARLIBDIR",
+				"ASTAGIDIR",
+				"ASTSPOOLDIR",
+				"ASTRUNDIR",
 				"ASTLOGDIR",
 				"CWINUSEBUSY",
 				"AMPMGRUSER",
@@ -1823,12 +1823,12 @@ function core_get_config($engine) {
 			// Add some globals that are used by the dialplan
 			//
 			$add_globals = array(
-				'MIXMON_POST' => 'MIXMON_POST', 
-				'DIAL_OPTIONS' => 'DIAL_OPTIONS', 
-				'TRUNK_OPTIONS' => 'TRUNK_OPTIONS', 
-				'TRUNK_RING_TIMER' => 'TRUNK_RING_TIMER', 
-				'MIXMON_FORMAT' => 'MIXMON_FORMAT', 
-				'REC_POLICY' => 'REC_POLICY', 
+				'MIXMON_POST' => 'MIXMON_POST',
+				'DIAL_OPTIONS' => 'DIAL_OPTIONS',
+				'TRUNK_OPTIONS' => 'TRUNK_OPTIONS',
+				'TRUNK_RING_TIMER' => 'TRUNK_RING_TIMER',
+				'MIXMON_FORMAT' => 'MIXMON_FORMAT',
+				'REC_POLICY' => 'REC_POLICY',
 				'RINGTIMER' => 'RINGTIMER_DEFAULT',
 				'TRANSFER_CONTEXT' => 'TRANSFER_CONTEXT',
 			);
@@ -1844,13 +1844,13 @@ function core_get_config($engine) {
 			$ext->addGlobal('ASTCHANDAHDI', $chan_dahdi ? '1' : '0');
 			// Create constant NULL in globals
 			$ext->addGlobal('NULL', '""');
-			
+
 			// Create CallingPresTable to deal with difference that ${CALINGPRES} returns vs. what
 			// SetCallerPres() accepts. This is a workaround that gets resolved in 1.6 where
 			// function CALLINGPRES() is consistent.
 			// This should be fixed in 1.4.20 but for now we keep it in until 1.6
 			//
-			if ($ast_lt_16) { 
+			if ($ast_lt_16) {
 				$ext->addGlobal('CALLINGPRES_0', 'allowed_not_screened');
 				$ext->addGlobal('CALLINGPRES_1', 'allowed_passed_screen');
 				$ext->addGlobal('CALLINGPRES_2', 'allowed_failed_screen');
@@ -1882,12 +1882,12 @@ function core_get_config($engine) {
 			// trunks table
 			//
 			$sqlstr = "
-				SELECT `trunkid`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `disabled` 
+				SELECT `trunkid`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `disabled`
 				FROM `trunks` ORDER BY `trunkid`
 			";
 			$trunks = sql($sqlstr,"getAll",DB_FETCHMODE_ASSOC);
       $trunk_hash = core_trunks_list_dialrules();
- 
+
       // $has_keepcid_cnum is used when macro-outbound-callerid is generated to determine if we need to insert the
       // final execif() statement so it is important to be set before then and here
       //
@@ -1985,6 +1985,7 @@ function core_get_config($engine) {
       $context = 'sub-record-cancel';
       $exten = 's';
 
+	  $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE', '${REC_POLICY_MODE_SAVE}'));
       $ext->add($context, $exten, '', new ext_execif('$["${REC_STATUS}"!="RECORDING"]','Return'));
       $ext->add($context, $exten, '', new ext_stopmixmonitor());
       $ext->add($context, $exten, '', new ext_set('__REC_STATUS',''));
@@ -1999,6 +2000,7 @@ function core_get_config($engine) {
       $context = 'sub-record-check';
       $exten = 's';
 
+	  $ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE_SAVE','${REC_POLICY_MODE}'));
       $ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
       $ext->add($context, $exten, '', new ext_resetcdr(''));
       $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}" != "RECORDING"]', 'check'));
@@ -2009,9 +2011,9 @@ function core_get_config($engine) {
       $ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
       $ext->add($context, $exten, '', new ext_return(''));
       $ext->add($context, $exten, 'next', new ext_execif('$[!${LEN(${ARG1})}]','Return'));
-      $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!=""]','${ARG1},1'));
-      $ext->add($context, $exten, '', new ext_set('__REC_STATUS','INITIALIZED'));
       $ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"="" & "${ARG3}"!=""]','Set','__REC_POLICY_MODE=${ARG3}'));
+	  $ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!=""]','${ARG1},1'));
+      $ext->add($context, $exten, '', new ext_set('__REC_STATUS','INITIALIZED'));
       $ext->add($context, $exten, '', new ext_set('NOW','${EPOCH}'));
       $ext->add($context, $exten, '', new ext_set('__DAY','${STRFTIME(${NOW},,%d)}'));
       $ext->add($context, $exten, '', new ext_set('__MONTH','${STRFTIME(${NOW},,%m)}'));
@@ -2193,13 +2195,13 @@ function core_get_config($engine) {
           // generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
           // CID part of the dialplan will not get executed
           if (!isset($add_extra_pri1[$fpattern['base_pattern']])) {
-            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT')); 
+            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT'));
             $add_extra_pri1[$fpattern['base_pattern']] = true;
           }
           if ($fpattern['base_pattern'] != $exten) {
-            $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT')); 
+            $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT'));
           }
-          $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1)); 
+          $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1));
 
 					// Conditionally Add Divesion Header if the call was diverted
 					if ($amp_conf['DIVERSIONHEADER']) {
@@ -2270,7 +2272,7 @@ function core_get_config($engine) {
 			$ext->add('app-blackhole', 'zapateller', '', new ext_zapateller());
 			// Should hangup ?
 			// $ext->add('app-blackhole', 'zapateller', '', new ext_hangup());
-					
+
 			$ext->add('app-blackhole', 'musiconhold', '', new ext_noop('Blackhole Dest: Put caller on hold forever'));
 			$ext->add('app-blackhole', 'musiconhold', '', new ext_answer());
 			$ext->add('app-blackhole', 'musiconhold', '', new ext_musiconhold());
@@ -2309,7 +2311,7 @@ function core_get_config($engine) {
 			;------------------------------------------------------------------------
 			; [macro-confirm]
 			;------------------------------------------------------------------------
-			; CONTEXT:      macro-confirm                                                                                                              
+			; CONTEXT:      macro-confirm
 			; PURPOSE:      added default message if none supplied
 			;
 			; Follom-Me and Ringgroups provide an option to supply a message to be
@@ -2466,7 +2468,7 @@ function core_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
 					$ext->add($context, $exten, '', new ext_return(''));
 			}
-			
+
 			/*
 			 * dialout using a trunk, using pattern matching (don't strip any prefix)
 			 * arg1 = trunk number, arg2 = number, arg3 = route password
@@ -2493,7 +2495,7 @@ function core_get_config($engine) {
 					break;
 				}
 			}
-			 
+
 			$context = 'macro-dialout-trunk';
 			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
@@ -2511,16 +2513,16 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 			$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 			$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
-		
+
 			// Back to normal processing, whether intracompany or not.
 			// But add the macro-setmusic if we don't want music on this outbound call
       // if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
 			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
-		
+
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
-			
+
 			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
@@ -2530,12 +2532,12 @@ function core_get_config($engine) {
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
         $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
       }
-		
+
 			$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 			$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
 			$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
-			
+
 			$ext->add($context, $exten, 'customtrunk', new ext_set('pre_num', '${CUT(OUT_${DIAL_TRUNK},$,1)}'));
 			$ext->add($context, $exten, '', new ext_set('the_num', '${CUT(OUT_${DIAL_TRUNK},$,2)}'));  // this is where we expect to find string OUTNUM
 			$ext->add($context, $exten, '', new ext_set('post_num', '${CUT(OUT_${DIAL_TRUNK},$,3)}'));
@@ -2545,7 +2547,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
-		
+
 			$exten = 's-BUSY';
 			/*
 			* HANGUPCAUSE 17 = Busy, or SIP 486 Busy everywhere
@@ -2561,7 +2563,7 @@ function core_get_config($engine) {
 			$exten = 's-ANSWER';
 			$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
-		
+
 			$exten = 's-NOANSWER';
 			/*
 			* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
@@ -2607,9 +2609,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
-			
+
 			$exten = '_s-.';
-			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}')); 
+			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
 			$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
 
 			$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
@@ -2626,11 +2628,11 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
-			
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
-		
+
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 			} // if trunk_type_needed
 
@@ -2638,7 +2640,7 @@ function core_get_config($engine) {
 			$context = 'macro-dialout-dundi';
 			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
-			
+
 			/*
 			 * Dialout Dundi Trunk
 			 */
@@ -2660,10 +2662,10 @@ function core_get_config($engine) {
 			// But add the macro-setmusic if we don't want music on this outbound call
 			$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
 			$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
-		
+
 			// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 			// such as adding SIP header information or other requirements. All the channel variables from above are present
-			
+
 			$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
@@ -2673,11 +2675,11 @@ function core_get_config($engine) {
       if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
         $ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
       }
-		
+
 			$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 			$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
-		
+
 			$exten = 's-BUSY';
 			/*
 			* HANGUPCAUSE 17 = Busy, or SIP 486 Busy everywhere
@@ -2693,7 +2695,7 @@ function core_get_config($engine) {
 			$exten = 's-ANSWER';
 			$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
-		
+
 			$exten = 's-NOANSWER';
 			/*
 			* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
@@ -2739,9 +2741,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
-			
+
 			$exten = '_s-.';
-			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}')); 
+			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
 			$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
 
 			$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
@@ -2758,11 +2760,11 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
-			
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
-		
+
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 			} // if trunk_type_needed
 
@@ -2772,9 +2774,9 @@ function core_get_config($engine) {
 				; macro-privacy-mgr:
 				;
 				; Privacy Manager Macro makes sure that any calls that don't pass the privacy manager are presented
-				; with congestion since there have been observed cases of the call continuing if not stopped with a 
+				; with congestion since there have been observed cases of the call continuing if not stopped with a
 				; congestion, and this provides a slightly more friendly 'sorry' message in case the user is
-				; legitimately trying to be cooperative. 
+				; legitimately trying to be cooperative.
 				;
 				; Note: the following options are configurable in privacy.conf:
 				;
@@ -2806,14 +2808,14 @@ function core_get_config($engine) {
 			 *
 			 * ${AMPUSER} is set upon return to the real user despite any aliasing that may
 			 * have been set as a result of the AMPUSER/<nnn>/cidnum field. This is used by
-			 * features like DND, CF, etc. to set the proper structure on aliased instructions 
+			 * features like DND, CF, etc. to set the proper structure on aliased instructions
 			 */
 			$context = 'macro-user-callerid';
 			$exten = 's';
-			
+
 			//$ext->add($context, $exten, '', new ext_noop('user-callerid: ${CALLERID(name)} ${CALLERID(number)}'));
-							
-			// make sure AMPUSER is set if it doesn't get set below			
+
+			// make sure AMPUSER is set if it doesn't get set below
 			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["foo${AMPUSER}" = "foo"]?${CALLERID(number)}:${AMPUSER})}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
 			$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
@@ -2869,10 +2871,10 @@ function core_get_config($engine) {
       }
 			$ext->add($context, $exten, '', new ext_noop_trace('Using CallerID ${CALLERID(all)}'));
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
-			
+
 			/*
 			 * arg1 = trunk number, arg2 = number
-			 * 
+			 *
 			 * Re-written to use enumlookup.agi
 			 */
 
@@ -2882,11 +2884,11 @@ function core_get_config($engine) {
 			if($amp_conf['USEGOOGLEDNSFORENUM']) {
 			$ext->addGlobal('ENUMUSEGOOGLEDNS', 'TRUE');
 			}
-	
+
 			$context = 'macro-dialout-enum';
 			if (!empty($trunk_type_needed[$context])) {
 			$exten = 's';
-	
+
 			$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 			$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
@@ -2917,7 +2919,7 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('TRYDIAL', '${CUT(DIALARR,%,1)}'));
 			$ext->add($context, $exten, '', new ext_set('DIALARR', '${CUT(DIALARR,%,2-)}'));
 			$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', '${DIAL_TRUNK_OPTIONS}'));
-			// Now, if we're still here, that means the Dial failed for some reason. 
+			// Now, if we're still here, that means the Dial failed for some reason.
 			// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
 			// different channel. If there's no more left, the dialloop tag will exit.
 			$ext->add($context, $exten, '', new ext_gotoif('$[ $[ "${DIALSTATUS}" = "CHANUNAVAIL" ] | $[ "${DIALSTATUS}" = "CONGESTION" ] ]', 'dialloop'));
@@ -2940,7 +2942,7 @@ function core_get_config($engine) {
 			$exten = 's-ANSWER';
 			$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
 			$ext->add($context, $exten, '', new ext_macro('hangupcall'));
-		
+
 			$exten = 's-NOANSWER';
 			/*
 			* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
@@ -2986,9 +2988,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
 			$ext->add($context, $exten, '', new ext_playtones('busy'));
 			$ext->add($context, $exten, '', new ext_busy(20));
-			
+
 			$exten = '_s-.';
-			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}')); 
+			$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
 			$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
 
 			$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
@@ -3005,15 +3007,15 @@ function core_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 			}
 			$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}')); 
-			
+			$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+
 			$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 			$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
-		
+
 			$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 			} // if trunk_type_needed
 
-			
+
 			/*
 			 * overrides CallerID out trunks
 			 * arg1 is trunk
@@ -3022,11 +3024,11 @@ function core_get_config($engine) {
 
 			$context = 'macro-outbound-callerid';
 			$exten = 's';
-			
+
 			// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 			// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 			//
-			if ($ast_lt_16) { 
+			if ($ast_lt_16) {
 				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
 			} else {
 				$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
@@ -3042,9 +3044,9 @@ function core_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 			//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
-			// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal 
-			// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device 
-			// is set for this CID, then it must be internal 
+			// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
+			// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
+			// is set for this CID, then it must be internal
 			// If we end up using USEROUTCID at the end, it may still be the REALCALLERIDNUM we saved above. That is determined
 			// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 			// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
@@ -3063,11 +3065,11 @@ function core_get_config($engine) {
 
 			$ext->add($context, $exten, 'trunkcid', new ext_execif('$[${LEN(${TRUNKOUTCID})} != 0]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
 			$ext->add($context, $exten, 'usercid', new ext_execif('$[${LEN(${USEROUTCID})} != 0]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
-      /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of 
+      /* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of
        * an Emergency CID on an Emergency Route
        */
 			$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
-			if ($ast_lt_16) { 
+			if ($ast_lt_16) {
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'SetCallerPres', 'prohib_passed_screen'));
 			} else {
 				$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES()=prohib_passed_screen'));
@@ -3087,18 +3089,18 @@ function core_get_config($engine) {
 
       // Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
       //
-			$ext->addInclude('from-zaptel', 'from-dahdi'); 
+			$ext->addInclude('from-zaptel', 'from-dahdi');
 			$ext->add('from-zaptel', 'foo','', new ext_noop('bar'));
 
 		  $context = 'from-dahdi';
 		  $exten = '_X.';
-			
+
 		  $ext->add($context, $exten, '', new ext_set('DID', '${EXTEN}'));
 		  $ext->add($context, $exten, '', new ext_goto(1, 's'));
 
 		  $exten = 's';
 		  $ext->add($context, $exten, '', new ext_noop('Entering from-dahdi with DID == ${DID}'));
-		  // Some trunks _require_ a RINGING be sent before an Answer. 
+		  // Some trunks _require_ a RINGING be sent before an Answer.
 		  $ext->add($context, $exten, '', new ext_ringing());
 		  // If ($did == "") { $did = "s"; }
 		  $ext->add($context, $exten, '', new ext_set('DID', '${IF($["${DID}"= ""]?s:${DID})}'));
@@ -3226,7 +3228,7 @@ function core_get_config($engine) {
         [block-cf]
         exten => _X.,1,Noop(Blocking callforward to ${EXTEN} because CF is blocked)
         exten => _X.,n,Hangup()
-        
+
         ;------------------------------------------------------------------------
        */
       $context = 'macro-block-cf';
@@ -3237,9 +3239,9 @@ function core_get_config($engine) {
 
 
 			/*
-			* macro-vm 
+			* macro-vm
 			*/
-			
+
 			/*
                         ;------------------------------------------------------------------------
                         ; [macro-vm]
@@ -3378,7 +3380,7 @@ function core_get_config($engine) {
 
 			// we didn't branch so block this from voicemail
 			//
-			$ext->add('macro-vm','s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE')); 
+			$ext->add('macro-vm','s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE'));
 			$ext->add('macro-vm','s', '', new ext_hangup(''));
 
 			// If vmx not enabled for the current mode,then jump to normal voicemail behavior
@@ -3410,7 +3412,7 @@ function core_get_config($engine) {
 			// If 1.4 or above, use the STAT function to check for the file. Prior to 1.4, use the AGI script since the System() command tried
 			// in the past had errors.
 			//
-			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));			
+			$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));
 			//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.[wW][aA][vV]'));
 			if ($ast_ge_14) {
 				$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
@@ -3422,7 +3424,7 @@ function core_get_config($engine) {
 				$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
 			}
 
-			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));			
+			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));
 			/* Replaced
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_REPEAT", '${DB_RESULT}'));
@@ -3434,7 +3436,7 @@ function core_get_config($engine) {
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEOUT", '${DB_RESULT}'));
 			 */
 			$ext->add('macro-vm','vmx', 'vmxtime', new ext_set('VMX_TIMEOUT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timeout)}" = "1"]?${DB_RESULT}:${VMX_TIMEOUT})}'));
-		
+
 			/* Replaced
 			$ext->add('macro-vm','vmx', 'vmxloops', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loops)}" = "0"]','vmxanswer'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPS", '${DB_RESULT}'));
@@ -3450,13 +3452,13 @@ function core_get_config($engine) {
 
 			// If we are here we timed out, go to the required destination
 			//
-			$ext->add('macro-vm','vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));			
+			$ext->add('macro-vm','vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));
 			// this is always set, if not it will default to no options
 			$ext->add('macro-vm','vmx', '', new ext_set('VMX_OPTS', '${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}'));
 
 			// TODO should we just go do the other sets and skip the complexity, will have to if we remove the globals since they will be gonein dotime
 			$ext->add('macro-vm','vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
-			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));	
+			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));
 			/* this is the alternative if re the above TODO
 			$ext->add('macro-vm','vmx', 'chktime', new ext_set('VMX_TIMEDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_EXT})}'));
 			 */
@@ -3485,12 +3487,12 @@ function core_get_config($engine) {
 			//
 			$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$[${LOOPCOUNT} > ${VMX_LOOPS}]','toomany'));
-			$ext->add('macro-vm','vmx','',new ext_playback('pm-invalid-option&please-try-again'));			
+			$ext->add('macro-vm','vmx','',new ext_playback('pm-invalid-option&please-try-again'));
 			$ext->add('macro-vm','vmx','',new ext_goto('loopstart'));
 
 			// tomany: to many invalid options, go to the specified destination
 			//
-			$ext->add('macro-vm','vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));			
+			$ext->add('macro-vm','vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOP}'));
 			/* Replaced
 			$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/loops)}" = "0"]','chkloop'));
@@ -3521,7 +3523,7 @@ function core_get_config($engine) {
 
 			// doopt: execute the valid option that was chosen
 			//
-			$ext->add('macro-vm','vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));			
+			$ext->add('macro-vm','vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));
 			$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_EXT",'${DB_RESULT}'));
 
 			// Special case, if this option was to go to voicemail, set options and go
@@ -3534,7 +3536,7 @@ function core_get_config($engine) {
 			 */
 			$ext->add('macro-vm','vmx', 'vmxopts', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/dovm)}" = "1"]?${DB_RESULT}:${VMX_OPTS_DOVM})}'));
 
-			$ext->add('macro-vm','vmx','vmxdovm',new ext_goto('1','dovm'));			
+			$ext->add('macro-vm','vmx','vmxdovm',new ext_goto('1','dovm'));
 
 			// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
 			// reasonable values
@@ -3566,7 +3568,7 @@ function core_get_config($engine) {
 			// message is played and the caller know's what is going on.
 			//
 			$ext->add('macro-vm','dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
-			$ext->add('macro-vm','dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}')); 
+			$ext->add('macro-vm','dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}'));
 			$ext->add('macro-vm','dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
 
 			$ext->add('macro-vm','s-BUSY','',new ext_NoOp('BUSY voicemail'));
@@ -3751,7 +3753,7 @@ function core_get_config($engine) {
       // the SIPRemoveHeader() option to remove the specific headers. We are trying to be careful not to remove similar headers that
       // may be used for 'distinctive ring' type reasons from elsewhere in the dialplan. Thus only if we detected the intercom situation
       // do we do it here.
-      // 
+      //
       // If we are pre 1.6.2 then some experimentation on 1.4.X has shown that we are able to clear the SIPADDHEADERnn channel variables
       // that result from setting the headers so we start from 1 (the first) and iterate up until we find one. In some weird situations
       // if a header had been removed, we could miss out since it is not possible to detect the existence of a blank channel variable
@@ -3935,7 +3937,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
       } else { // NO SHARED()
-        
+
         // If it BLKVM_OVERRIDE exists, return it's value. If not, then set it and return TRUE
         //
         $mcontext = 'macro-blkvm-setifempty';
@@ -4099,7 +4101,7 @@ function core_get_config($engine) {
 
         $exten = 'h';
         $ext->add($mcontext, $exten, '', new ext_macro('hangupcall'));
-        
+
         $exten = 'usegoto';
         $ext->add($mcontext,$exten,'', new ext_set('USEGOTO', ''));
         $ext->add($mcontext,$exten,'', new ext_goto('1','${DSTRING}','from-internal'));
@@ -4193,7 +4195,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_playback('ss-noservice'));
 			$ext->add($mcontext,$exten,'', new ext_macro('hangupcall'));
 
-			/* 
+			/*
 			 * If an endpoint is offline, app_dial returns with CHANUNAVAIL, we deal with this the same way
 			 * as we do with NOANSWER
 			 */
@@ -4225,7 +4227,7 @@ function core_ampusers_add($username, $password, $extension_low, $extension_high
 	$sql .= "'".$extension_high."',";
 	$sql .= "'".$deptname."',";
 	$sql .= "'".implode(";",$sections)."');";
-	
+
 	sql($sql,"query");
 }
 
@@ -4383,7 +4385,7 @@ function core_did_add($incoming,$target=false){
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
          	$invalidDIDChars = array('<','>');
          	$extension = str_replace($invalidDIDChars,"",$extension);
-         	$cidnum = str_replace($invalidDIDChars,"",$cidnum);	
+         	$cidnum = str_replace($invalidDIDChars,"",$cidnum);
 
 		$destination= ($target) ? $target : ${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
@@ -4489,7 +4491,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
   if ($tech == '' || trim($tech) == 'virtual') {
     return true;
   }
-	
+
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 
 	if (trim($id) == '' ) {
@@ -4498,7 +4500,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		}
 		return false;
 	}
-	
+
 	//ensure this id is not already in use
 	$devices = core_devices_list();
 	if (is_array($devices)) {
@@ -4525,13 +4527,13 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 			$dial = strtoupper($tech)."/".$id;
 		}
 	}
-	
+
 	//check to see if we are requesting a new user
 	if ($user == "new") {
 		$user = $id;
 		$jump = true;
 	}
-	
+
   $emergency_cid = trim($emergency_cid);
 	if(!get_magic_quotes_gpc()) {
 		if(!empty($emergency_cid))
@@ -4539,11 +4541,11 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		if(!empty($description))
 			$description = $db->escapeSimple($description);
 	}
-	
+
 	//insert into devices table
 	$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (\"$id\",\"$tech\",\"$dial\",\"$devicetype\",\"$user\",\"$description\",\"$emergency_cid\")";
 	sql($sql);
-	
+
 	//add details to astdb
 	if ($astman) {
 		// if adding or editting a fixed device, user property should always be set
@@ -4585,24 +4587,24 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-	
+
 	// create a voicemail symlink if needed
 	$thisUser = core_users_get($user);
 	if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 		if(empty($thisUser['voicemail'])) {
 			$vmcontext = "default";
-		} else { 
+		} else {
 			$vmcontext = $thisUser['voicemail'];
 		}
-		
+
 		//voicemail symlink
 		exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
 		exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
 	}
-		
+
 	//take care of sip/iax/zap config
 	$funct = "core_devices_add".strtolower($tech);
-  
+
   // before calling device specifc funcitions, get rid of any bogus fields in the REQUEST array
   //
   if (isset($_REQUEST['devinfo_secret_origional'])) {
@@ -4611,11 +4613,11 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 	if(function_exists($funct)){
 		$funct($id);
 	}
-	
+
 /*	if($user != "none") {
 		core_hint_add($user);
 	}*/
-	
+
 	//if we are requesting a new user, let's jump to users.php
 	if (isset($jump)) {
 		echo("<script language=\"JavaScript\">window.location=\"config.php?display=users&extdisplay={$id}&name={$description}\";</script>");
@@ -4647,7 +4649,7 @@ function core_devices_del($account,$editmode=false){
 			unset($userdevicesarr_hash[$account]);
 			$userdevicesarr = array_flip($userdevicesarr_hash);
 			$userdevices = implode("&", $userdevicesarr);
-			
+
 			if (empty($userdevices)) {
 					$astman->database_del("AMPUSER",$deviceuser."/device");
 			} else {
@@ -4671,7 +4673,7 @@ function core_devices_del($account,$editmode=false){
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-	
+
 	//take care of sip/iax/zap config
 	$funct = "core_devices_del".strtolower($devinfo['tech']);
 	if(function_exists($funct)){
@@ -4686,7 +4688,7 @@ function core_devices_get($account){
   if (empty($results)) {
     return array();
   }
-	
+
 	//take care of sip/iax/zap config
 	$funct = "core_devices_get".strtolower($results['tech']);
 	if (!empty($results['tech']) && function_exists($funct)) {
@@ -4695,7 +4697,7 @@ function core_devices_get($account){
 			$results = array_merge($results,$devtech);
 		}
 	}
-	
+
 	return $results;
 }
 
@@ -4712,10 +4714,10 @@ function core_devices2astdb(){
 	if ($astman) {
 		$astman->database_deltree("DEVICE");
 		foreach ($devresults as $dev) {
-			extract($dev);	
+			extract($dev);
 			$astman->database_put("DEVICE",$id."/dial",$dial);
 			$astman->database_put("DEVICE",$id."/type",$devicetype);
-			$astman->database_put("DEVICE",$id."/user",$user);		
+			$astman->database_put("DEVICE",$id."/user",$user);
 			$astman->database_put("DEVICE",$id."/default_user",$user);
 			if(trim($emergency_cid) != '') {
 				$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
@@ -4735,13 +4737,13 @@ function core_devices2astdb(){
     			}
     		}
 
-			
+
 			// create a voicemail symlink if needed
 			$thisUser = core_users_get($user);
 			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 				if(empty($thisUser['voicemail']))
 					$vmcontext = "default";
-				else 
+				else
 					$vmcontext = $thisUser['voicemail'];
 				//voicemail symlink
 				exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
@@ -4763,7 +4765,7 @@ function core_users2astdb(){
 
 	$sql = "SELECT * FROM users";
 	$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	
+
 	//add details to astdb
 	if ($astman) {
 		foreach($userresults as $usr) {
@@ -4775,13 +4777,13 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$db->escapeSimple($outboundcid)."\"");
 			$astman->database_put("AMPUSER",$extension."/cidname","\"".$db->escapeSimple($name)."\"");
 			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
-		}	
+		}
 		return true;
 	} else {
 		return false;
 	}
 
-//	TODO: this was...	
+//	TODO: this was...
 // 	return $astman->disconnect();
 //	is "true" the correct value...?
 }
@@ -4807,7 +4809,7 @@ function core_devices_addsip($account) {
 			}
 		}
 	}
-	
+
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
 		$sipfields[] = array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++);
     $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
@@ -4844,22 +4846,22 @@ function core_devices_addsip($account) {
 	}
 
 	// Very bad
-	$sipfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
+	$sipfields[] = array($account,'account',$db->escapeSimple($account),$flag++);
 	$sipfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
-	
+
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error adding to SIP table');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error adding to SIP table');
 	}
 }
 
 function core_devices_delsip($account) {
 	global $db;
-	
+
 	$sql = "DELETE FROM sip WHERE id = '$account'";
 	$result = $db->query($sql);
-	
+
 	if(DB::IsError($result)) {
 		die_freepbx($result->getMessage().$sql);
 	}
@@ -4872,7 +4874,7 @@ function core_devices_getsip($account) {
 	if(DB::IsError($results)) {
 		$results = null;
 	}
-	
+
 	return $results;
 }
 
@@ -4894,7 +4896,7 @@ function core_devices_addiax2($account) {
 			}
 		}
 	}
-	
+
 	if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
 		$iaxfields = array(
 			array($account,'secret',$db->escapeSimple(($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++),
@@ -4907,7 +4909,7 @@ function core_devices_addiax2($account) {
 			array($account,'port',$db->escapeSimple(($_REQUEST['port'])?$_REQUEST['port']:'4569'),$flag++),
 			array($account,'qualify',$db->escapeSimple(($_REQUEST['qualify'])?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++),
 			array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
-			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),			
+			array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),
 			array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++),
 			array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++),
 			array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++),
@@ -4916,27 +4918,27 @@ function core_devices_addiax2($account) {
 	}
 
 	// Very bad
-	$iaxfields[] = array($account,'account',$db->escapeSimple($account),$flag++);	
+	$iaxfields[] = array($account,'account',$db->escapeSimple($account),$flag++);
 	$iaxfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
 	// Asterisk treats no CallerID from an IAX device as 'hide CallerID', and ignores the CallerID
-	// set in iax.conf. As we rely on this for pretty much everything, we need to specify the 
+	// set in iax.conf. As we rely on this for pretty much everything, we need to specify the
 	// CallerID as a variable which gets picked up in macro-callerid.
 	// Ref - http://bugs.digium.com/view.php?id=456
 	$iaxfields[] = array($account,'setvar',$db->escapeSimple("REALCALLERIDNUM=$account"),$flag++);
-	
+
 	$compiled = $db->prepare('INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$iaxfields);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>error adding to IAX table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to IAX table");
 	}
 }
 
 function core_devices_deliax2($account) {
 	global $db;
-	
+
 	$sql = "DELETE FROM iax WHERE id = '$account'";
 	$result = $db->query($sql);
-	
+
 	if(DB::IsError($result)) {
 		die_freepbx($result->getMessage().$sql);
 	}
@@ -4949,14 +4951,14 @@ function core_devices_getiax2($account) {
 	if(DB::IsError($results)) {
 		$results = null;
 	}
-	
+
 	return $results;
 }
 
 function core_devices_addzap($account) {
 	global $db;
 	global $amp_conf;
-		
+
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
@@ -4970,7 +4972,7 @@ function core_devices_addzap($account) {
 			}
 		}
 	}
-	
+
 	if ( !is_array($zapfields) ) { // left for compatibilty....lord knows why !
 		$zapfields = array(
 			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
@@ -4979,7 +4981,7 @@ function core_devices_addzap($account) {
 			array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
 			array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
 			array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
-			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),	
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
 			array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
 			array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
 			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
@@ -4992,20 +4994,20 @@ function core_devices_addzap($account) {
 	}
 
 	// Very bad
-	$zapfields[] = array($account,'account',$db->escapeSimple($account));	
+	$zapfields[] = array($account,'account',$db->escapeSimple($account));
 	$zapfields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
-	
+
 	$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zapfields);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>error adding to ZAP table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to ZAP table");
 	}
 }
 
 function core_devices_adddahdi($account) {
 	global $db;
 	global $amp_conf;
-		
+
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
@@ -5019,7 +5021,7 @@ function core_devices_adddahdi($account) {
 			}
 		}
 	}
-	
+
 	if ( !is_array($dahdifields) ) { // left for compatibilty....lord knows why !
 		$dahdifields = array(
 			array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
@@ -5028,7 +5030,7 @@ function core_devices_adddahdi($account) {
 			array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
 			array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
 			array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
-			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),	
+			array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
 			array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
 			array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
 			array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
@@ -5041,19 +5043,19 @@ function core_devices_adddahdi($account) {
 	}
 
 	// Very bad
-	$dahdifields[] = array($account,'account',$db->escapeSimple($account));	
+	$dahdifields[] = array($account,'account',$db->escapeSimple($account));
 	$dahdifields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
-	
+
 	$compiled = $db->prepare('INSERT INTO dahdi (id, keyword, data) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$dahdifields);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>error adding to DAHDi table");	
+		die_freepbx($result->getMessage()."<br><br>error adding to DAHDi table");
 	}
 }
 
 function core_devices_delzap($account) {
 	global $db;
-	
+
 	$sql = "DELETE FROM zap WHERE id = '$account'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
@@ -5063,7 +5065,7 @@ function core_devices_delzap($account) {
 
 function core_devices_deldahdi($account) {
 	global $db;
-	
+
 	$sql = "DELETE FROM dahdi WHERE id = '$account'";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
@@ -5111,7 +5113,7 @@ function core_hint_get($account){
 		$sql = "SELECT dial from devices where user = '{$account}'";
 	}
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	
+
 	//create an array of strings
 	if (is_array($results)){
 		foreach ($results as $result) {
@@ -5122,7 +5124,7 @@ function core_hint_get($account){
 			}
 		}
 	}
-	
+
 	//create a string with & delimiter
 	if (isset($dial) && is_array($dial)){
 		$hint = implode($dial,"&");
@@ -5133,7 +5135,7 @@ function core_hint_get($account){
 			$hint = null;
 		}
 	}
-	
+
 	return $hint;
 }
 
@@ -5152,7 +5154,7 @@ function core_users_list($get_all=false) {
 			$extens[] = array($result[0],$result[1],$result[2]);
 		}
 	}
-	
+
 	if (isset($extens)) {
 		sort($extens);
 		return $extens;
@@ -5260,13 +5262,13 @@ function core_check_destinations($dest=true) {
 function core_change_destination($old_dest, $new_dest) {
 	$sql = 'UPDATE users SET noanswer_dest = "' . $new_dest . '" WHERE noanswer_dest = "' . $old_dest . '"';
 	sql($sql, "query");
-	
+
 	$sql = 'UPDATE users SET busy_dest = "' . $new_dest . '" WHERE busy_dest = "' . $old_dest . '"';
 	sql($sql, "query");
-	
+
 	$sql = 'UPDATE users SET chanunavail_dest = "' . $new_dest . '" WHERE chanunavail_dest = "' . $old_dest . '"';
 	sql($sql, "query");
-	
+
 	$sql = 'UPDATE incoming SET destination = "' . $new_dest . '" WHERE destination = "' . $old_dest . '"';
 	sql($sql, "query");
 }
@@ -5282,8 +5284,8 @@ function core_sipname_check($sipname, $extension) {
 	if(DB::IsError($results)) {
         die_freepbx($results->getMessage().$sql);
 	}
-	
-	if (isset($results['sipname']) && trim($results['sipname']) == $sipname) 
+
+	if (isset($results['sipname']) && trim($results['sipname']) == $sipname)
 		return false;
 	else
 		return true;
@@ -5291,7 +5293,7 @@ function core_sipname_check($sipname, $extension) {
 
 function core_users_add($vars, $editmode=false) {
 	extract($vars);
-	
+
 	global $db;
 	global $amp_conf;
 	global $astman;
@@ -5337,8 +5339,8 @@ function core_users_add($vars, $editmode=false) {
 		echo "<script>javascript:alert('"._("This sipname: {$sipname} is already in use")."');</script>";
 		return false;
 	}
-	
-  
+
+
   // strip the ugly return of the gui radio funciton which comes back as "recording_out_internal=always" for example
   //
   if (isset($recording_in_external)) {
@@ -5392,7 +5394,7 @@ function core_users_add($vars, $editmode=false) {
 	// Clean replace any <> with () in display name - should have javascript stopping this but ...
 	//
 	$name = preg_replace(array('/</','/>/'), array('(',')'), trim($name));
-	
+
   $noanswer_dest = !empty($noanswer_dest) && $vars[$vars[$noanswer_dest].'0'] != '' ? q($vars[$vars[$noanswer_dest].'0']) : "''";
   $noanswer_cid = isset($noanswer_cid) ? q($noanswer_cid) : "''";
   $busy_dest = !empty($busy_dest) && $vars[$vars[$busy_dest].'1'] != '' ? q($vars[$vars[$busy_dest].'1']) : "''";
@@ -5445,7 +5447,7 @@ function core_users_add($vars, $editmode=false) {
     $astman->database_put("AMPUSER",$extension."/recording/priority","\""
 		.(isset($recording_priority)?$recording_priority:'10')
 		."\"");
-	
+
 		// If not set then we are using system default so delete the tree all-together
 		//
 		if (isset($dialopts)) {
@@ -5532,7 +5534,7 @@ function core_users_get($extension){
 	if (empty($results)) {
 		return array();
 	}
-	
+
 	if ($astman) {
 
     if (function_exists('paging_get_config')) {
@@ -5552,7 +5554,7 @@ function core_users_get($extension){
 		$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
 
 		$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
-	
+
 		$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
 		$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
 
@@ -5576,7 +5578,7 @@ function core_users_del($extension, $editmode=false){
 	global $db;
 	global $amp_conf;
 	global $astman;
-	
+
 	//delete from devices table
 	$sql="DELETE FROM users WHERE extension = \"$extension\"";
 	$results = $db->query($sql);
@@ -5592,7 +5594,7 @@ function core_users_del($extension, $editmode=false){
 		// TODO just change this to delete everything
 		$astman->database_deltree("AMPUSER/".$extension);
 	}
-	
+
 	return true;
 }
 
@@ -5622,7 +5624,7 @@ function core_users_edit($extension, $vars){
 	global $db;
 	global $amp_conf;
 	global $astman;
-	
+
 	//I we are editing, we need to remember existing user<->device mapping, so we can delete and re-add
 	if ($astman) {
 		$ud = $astman->database_get("AMPUSER",$extension."/device");
@@ -5632,7 +5634,7 @@ function core_users_edit($extension, $vars){
 	} else {
 		die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
 	}
-	
+
 	// clean and check the did to make sure it is not being used by another extension or in did routing
 	//
 	$newdid_name = isset($newdid_name) ? $db->escapeSimple($newdid_name) : '';
@@ -5783,7 +5785,7 @@ function core_trunks_disable($trunk, $switch) {
 			$trunks[] = core_trunks_getDetails($trunk);
 			break;
 	}
-	
+
 	//return if no trunks!
 	if (empty($trunks)) {
 		return false;
@@ -5795,7 +5797,7 @@ function core_trunks_disable($trunk, $switch) {
 		$userconfig		= core_trunks_getTrunkUserConfig($t['trunkid']);
 		$peerdetails	= core_trunks_getTrunkPeerDetails($t['trunkid']);
 		$disabled		= $switch ? 'on' : 'off';
-		
+
 		core_trunks_edit(
 			$trunk['trunkid'],
 			$trunk['channelid'],
@@ -5849,7 +5851,7 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 
 function core_trunks_del($trunknum, $tech = null) {
 	global $db, $astman;
-	
+
 	if ($tech === null) { // in EditTrunk, we get this info anyways
 		$tech = core_trunks_getTrunkTech($trunknum);
 	}
@@ -5860,7 +5862,7 @@ function core_trunks_del($trunknum, $tech = null) {
       $tech = "iax";
       // fall through
 		case "iax":
-		case "sip": 
+		case "sip":
 			sql("DELETE FROM `$tech` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
 		break;
 	}
@@ -5888,16 +5890,16 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 	global $db, $astman;
 
 	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
-	
+
 	//echo  "backendAddTrunk($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register)";
-	
+
 	// change iax to "iax2" (only spot we actually store iax2, since its used by Dial()..)
 	$techtemp = ((strtolower($tech) == "iax") ? "iax2" : $tech);
 	$outval = (($techtemp == "custom") ? "AMP:".$channelid : strtoupper($techtemp).'/'.$channelid);
-	unset($techtemp); 
-	
+	unset($techtemp);
+
 	$disable_flag = ($disabletrunk == "on")?1:0;
-	
+
 	switch (strtolower($tech)) {
 		case "iax":
 		case "iax2":
@@ -5918,13 +5920,13 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 				core_trunks_addRegister($trunknum,'sip',$register,$disable_flag);
 			}
 		break;
-	}	
+	}
 
 	$sql = "
-		INSERT INTO `trunks` 
+		INSERT INTO `trunks`
 		(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`, `continue`)
 		VALUES (
-			'$trunknum', 
+			'$trunknum',
 			'".$db->escapeSimple($name)."',
 			'".$db->escapeSimple($tech)."',
 			'".$db->escapeSimple($outcid)."',
@@ -5999,7 +6001,7 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
 	$result = $db->executeMultiple($compiled,$dbconfitem);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,'$disable_flag')");	
+		die_freepbx($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,'$disable_flag')");
 	}
 }
 
@@ -6021,7 +6023,7 @@ function core_trunks_getDetails($trunkid='') {
 			default:
 				$trunk['tech'] = $tech;
 				break;
-		} 
+		}
 		if ($astman) {
 			$trunk['dialopts'] = $astman->database_get("TRUNK",$trunkid . "/dialopts");
 		}
@@ -6070,7 +6072,7 @@ function core_trunks_list($assoc = false) {
 
 	global $db;
 	global $amp_conf;
-	
+
 	$sql = "SELECT `trunkid` , `tech` , `channelid` , `disabled` FROM `trunks` ORDER BY `trunkid`";
 	$trunks = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
@@ -6103,7 +6105,7 @@ function core_trunks_list($assoc = false) {
 				'tech' => $tech,
 				'globalvar' => $trunk[0], // ick
 				'value' => $trunk[2], // ??  no idea what this is.
-			);	
+			);
 		}
 
 		return $trunkinfo;
@@ -6148,7 +6150,7 @@ function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
 	$compiled = $db->prepare('INSERT INTO `trunk_dialpatterns` (`trunkid`, `match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`, `seq`) VALUES ('.$trunknum.',?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$insert_pattern);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating trunk_dialpatterns');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating trunk_dialpatterns');
 	}
 }
 
@@ -6171,7 +6173,7 @@ function core_trunks_parse_conf($filename, &$conf, &$section) {
 	if (is_null($section)) {
 		$section = "general";
 	}
-	
+
 	if (file_exists($filename)) {
 		$fd = fopen($filename, "r");
 		while ($line = fgets($fd, 1024)) {
@@ -6184,7 +6186,7 @@ function core_trunks_parse_conf($filename, &$conf, &$section) {
 				$section = strtolower($matches[1]);
 			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
 				// include another file
-				
+
 				if ($matches[1][0] == "/") {
 					// absolute path
 					$filename = $matches[1];
@@ -6192,7 +6194,7 @@ function core_trunks_parse_conf($filename, &$conf, &$section) {
 					// relative path
 					$filename =  dirname($filename)."/".$matches[1];
 				}
-				
+
 				core_trunks_parse_conf($filename, $conf, $section);
 			}
 		}
@@ -6206,13 +6208,13 @@ function core_trunks_getTrunkTrunkName($trunknum) {
 
 function core_trunks_getTrunkPeerDetails($trunknum) {
 	global $db;
-	
+
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
+
 	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
-	
+
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
-	
+
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
 			if (isset($confdetail))
@@ -6231,11 +6233,11 @@ function core_trunks_getTrunkUserContext($trunknum) {
 
 function core_trunks_getTrunkUserConfig($trunknum) {
 	global $db;
-	
+
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
+
 	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
-	
+
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
 	foreach ($results as $result) {
@@ -6252,9 +6254,9 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 //get trunk account register string
 function core_trunks_getTrunkRegister($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
+
 	if ($tech == "zap" || $tech == "dahdi" || $tech == "") return ""; // zap has no register
-	
+
 	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
 	foreach ($results as $result) {
@@ -6342,7 +6344,7 @@ function core_routing_get($route_id) {
   return $route;
 }
 
-// function core_routing_getroutenames() 
+// function core_routing_getroutenames()
 function core_routing_list() {
   $sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
   $routes = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
@@ -6354,9 +6356,9 @@ function core_routing_setrouteorder($route_id, $seq) {
   global $db;
 
   $sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
-	$sequence = $db->getCol($sql); 
-	if(DB::IsError($sequence)) {     
-		die_freepbx($sequence->getDebugInfo()); 
+	$sequence = $db->getCol($sql);
+	if(DB::IsError($sequence)) {
+		die_freepbx($sequence->getDebugInfo());
 	}
 
   if ($seq != 'new') {
@@ -6425,7 +6427,7 @@ function core_routing_setrouteorder($route_id, $seq) {
 	$compiled = $db->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
 	$result = $db->executeMultiple($compiled,$insert_array);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error reordering outbound_route_sequence');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error reordering outbound_route_sequence');
 	}
   return $final_seq;
 }
@@ -6471,12 +6473,12 @@ function core_routing_getroutepatternsbyid($route_id) {
 function core_routing_formatpattern($pattern) {
   $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
   $cid = $pattern['match_cid'];
-  if (!preg_match("/^[0-9*+]+$/",$exten)) { 
+  if (!preg_match("/^[0-9*+]+$/",$exten)) {
     // if # is detected above (as not in the list of acceptable patterns) then _ is appended due to Asterisk
     // particulars in dealing with #
     $exten = "_".$exten;
   }
-  if ($cid != '' && !preg_match("/^[0-9*+]+$/",$cid)) { 
+  if ($cid != '' && !preg_match("/^[0-9*+]+$/",$cid)) {
     // same comment as above wrt to #
     $cid = "_".$cid;
   }
@@ -6493,9 +6495,9 @@ function core_routing_getroutetrunksbyid($route_id) {
   global $db;
   $route_id = q($db->escapeSimple($route_id));
   $sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = $route_id ORDER BY `seq`";
-	$trunks = $db->getCol($sql); 
-	if(DB::IsError($trunks)) {     
-		die_freepbx($trunks->getDebugInfo()); 
+	$trunks = $db->getCol($sql);
+	if(DB::IsError($trunks)) {
+		die_freepbx($trunks->getDebugInfo());
 	}
   return $trunks;
 }
@@ -6515,9 +6517,9 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
   $seq = $db->escapeSimple($seq);
   $time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
   $dest = $db->escapeSimple($dest);
-  $sql = "UPDATE `outbound_routes` SET 
-    `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password', 
-    `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass', 
+  $sql = "UPDATE `outbound_routes` SET
+    `name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password',
+    `emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass',
     `time_group_id`=$time_group_id, `dest`='$dest' WHERE `route_id` = ".q($route_id);
   sql($sql);
 
@@ -6593,7 +6595,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$insert_pattern);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');
 	}
 }
 
@@ -6613,7 +6615,7 @@ function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
 	$compiled = $db->prepare("INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES ($route_id,?,?)");
 	$result = $db->executeMultiple($compiled,$insert_trunk);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_trunks');	
+		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_trunks');
 	}
 }
 
@@ -6826,7 +6828,7 @@ function core_users_configpageinit($dispnum) {
 
 		// Special CID handling to deal with Private, etc.
 		//
-		$js = 
+		$js =
 		'var mycid = thiscid.toLowerCase();
 		if (isDialpattern(thiscid) || mycid.substring(0,4) == "priv" || mycid.substring(0,5) == "block" || mycid == "unknown" || mycid.substring(0,8) == "restrict" || mycid.substring(0,7) == "unavail" || mycid.substring(0,6) == "anonym") { return true } else { return false };
 		';
@@ -6838,7 +6840,7 @@ function core_users_configpageinit($dispnum) {
 		// other modules to call stuff before / after the processing of users if needed
 		// e.g. Voicemail module needs to create mailbox BEFORE the users as the mailbox
 		// context is needed by the add users function
-		$currentcomponent->addprocessfunc('core_users_configprocess', 5);			
+		$currentcomponent->addprocessfunc('core_users_configprocess', 5);
 	}
 }
 
@@ -6875,8 +6877,8 @@ function core_users_configpageload() {
 	} else {
 
 		$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
-	
-		if ( is_string($extdisplay) ) {	
+
+		if ( is_string($extdisplay) ) {
 
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				$extenInfo=core_users_get($extdisplay);
@@ -6884,7 +6886,7 @@ function core_users_configpageload() {
 			}
 			if (isset($deviceInfo) && is_array($deviceInfo))
 				extract($deviceInfo);
-	
+
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
 				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
@@ -6914,11 +6916,11 @@ function core_users_configpageload() {
 		} elseif ( $display != 'extensions' ) {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add User/Extension")), 0);
 		}
-		
-		// Setup vars for use in the gui later on							
+
+		// Setup vars for use in the gui later on
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
-		
+
 		$msgInvalidExtNum = _("Please enter a valid extension number.");
 		$msgInvalidCidNum = _("Please enter a valid CID Num Alias (must be a valid number).");
 		$msgInvalidExtPwd = _("Please enter valid User Password using numbers only");
@@ -6931,9 +6933,9 @@ function core_users_configpageload() {
 		// This is the actual gui stuff
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
-		
+
 		if ( $display == 'extensions' ) {
-			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));			
+			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
 		} else {
 			$section = ($extdisplay ? _("Edit User") : _("Add User"));
 		}
@@ -7001,12 +7003,12 @@ function core_users_configpageload() {
 					$device_label = '<span>
 						<img width="16" height="16" border="0" title="Edit Device" alt="Edit Device" src="'.$device_icon.'"/>'.$device_label.
 						'</span> ';
-					
+
 					$currentcomponent->addguielem($section, new gui_link('dev'.$link_count++, $device_label, $editURL, true, false), 2);
 				}
 			}
 		}
-		
+
 		$section = _("Extension Options");
 		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
@@ -7125,10 +7127,10 @@ function core_users_configpageload() {
 }
 
 function core_users_configprocess() {
-	
+
 	//create vars from the request
 	extract($_REQUEST);
-	
+
 	//make sure we can connect to Asterisk Manager
 	if (!checkAstMan()) {
 		return false;
@@ -7191,7 +7193,7 @@ function core_devices_configpageinit($dispnum) {
     // We don't call: $currentcomponent->addgeneralarray('devtechs') because the first
     // call to addgeneralarrayitem will initiate the array and this allows other modules
     // to add a new device type.
-		
+
 		// Some errors for the validation bits
 		$msgInvalidChannel = _("Please enter the channel for this device");
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
@@ -7303,7 +7305,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'dahdi', $tmparr);
 		unset($tmparr);
-		
+
 		// iax2
 		$tmparr = array();
     $tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
@@ -7483,7 +7485,7 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 0);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'custom', $tmparr);
 		unset($tmparr);
-		
+
 		// Devices list
 		if ($_SESSION["AMP_user"]->checkSection('999')) {
 		$currentcomponent->addoptlistitem('devicelist', 'sip_generic', _("Generic SIP Device"));
@@ -7501,7 +7503,7 @@ function core_devices_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', _("Fixed"));
 		$currentcomponent->addoptlistitem('devicetypelist', 'adhoc', _("Adhoc"));
 		$currentcomponent->setoptlistopts('devicetypelist', 'sort', false);
-		
+
 		$currentcomponent->addoptlistitem('deviceuserlist', 'none', _("none"));
 		$currentcomponent->addoptlistitem('deviceuserlist', 'new', _("New User"));
 		$users = core_users_list();
@@ -7531,7 +7533,7 @@ function core_devices_configpageload() {
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-	
+
 	if ( $action == 'del' ) { // Deleted
 
 		if ( $display != 'extensions' )
@@ -7575,7 +7577,7 @@ function core_devices_configpageload() {
 			$deviceInfo['tech'] = $tmparr[0];
 			$deviceInfo['hardware'] = $tmparr[1];
 			unset($tmparr);
-			
+
 			if ( $display != 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', sprintf(_("Add %s Device"), strtoupper($deviceInfo['tech'])) ), 0);
 			} else {
@@ -7591,7 +7593,7 @@ function core_devices_configpageload() {
 			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
 		}
 
-		// Setup vars for use in the gui later on							
+		// Setup vars for use in the gui later on
 		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
 		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
 
@@ -7599,7 +7601,7 @@ function core_devices_configpageload() {
 		$msgInvalidDevDesc = _("Please enter a valid Description for this device");
 		$msgInvalidEmergCID = _("Please enter a valid Emergency CID");
 		$msgInvalidExtNum = _("Please enter a valid extension number.");
-		
+
 		// Actual gui
 		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
@@ -7642,7 +7644,7 @@ function core_devices_configpageload() {
 							$devoptcurrent = md5(uniqid());
 						}
           }
-	
+
 					if ( $devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '') { // editing to show advanced as well
             // Added optional selectbox to enable the unsupported misdn module
             $tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
@@ -7668,7 +7670,7 @@ function core_devices_configprocess() {
 	if (!checkAstMan()) {
 		return false;
 	}
-	
+
 	//create vars from the request
   $tech = $action = null;
 	extract($_REQUEST);
@@ -7687,7 +7689,7 @@ function core_devices_configprocess() {
 		$deviceid = $deviceuser = $extension;
         $description = $name;
 	}
-	
+
 	//if submitting form, update database
 	switch ($action) {
 		case "add":
@@ -7705,7 +7707,7 @@ function core_devices_configprocess() {
 			// the user who does not have add permission from adding a new extension.
 			//
 			$GLOBALS['abort'] = true;
-		}	
+		}
 		break;
 		case "del":
 			core_devices_del($extdisplay);
