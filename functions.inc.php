@@ -16,13 +16,18 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
 //
 //    Copyright (C) 2004 Coalescent Systems Inc. (info@coalescentsystems.ca)
+//    Copyright (C) 2013 Philippe Lindheimer
 //
 
 class core_conf {
 	var $_sip_general    = array();
+	var $_sip_additional = array();
 	var $_sip_notify     = array();
 	var $_iax_general    = array();
+	var $_iax_additional = array();
+	var $_dahdi_additional = array();
 	var $_featuregeneral = array();
+	var $_featuregeneralsection = array();
 	var $_featuremap     = array();
 	var $_applicationmap = array();
 	var $_loggergeneral  = array();
@@ -217,12 +222,22 @@ class core_conf {
 		$this->_featuregeneral[] = array('key' => $key, 'value' => $value);
 	}
 
+	function addFeatureGeneralSection($section, $key, $value) {
+		$this->_featuregeneralsection[$section][] = array('key' => $key, 'value' => $value);
+	}
+
 	function generate_featuregeneral_additional($ast_version) {
 		$output = '';
 
 		if (isset($this->_featuregeneral) && is_array($this->_featuregeneral)) {
 			foreach ($this->_featuregeneral as $values) {
 				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		foreach ($this->_featuregeneralsection as $section => $values) {
+			$output .= "\n[$section]\n";
+			foreach ($values as $value) {
+				$output .= $value['key'] . "=" . $value['value'] . "\n";
 			}
 		}
 		return $output;
@@ -309,6 +324,10 @@ class core_conf {
 				$output .= "full => notice,warning,error,debug,verbose" . "\n"; }
 		}
 		return $output;
+	}
+
+	function addSipAdditional($section, $key, $value) {
+		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
 	}
 
 	function generate_sip_additional($ast_version) {
@@ -480,6 +499,11 @@ class core_conf {
             $output .= $cc_monitor_policy;
           }
 			}
+			if (isset($this->_sip_additional[$account])) {
+				foreach ($this->_sip_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
 			$output .= $additional."\n";
 		}
 		return $output;
@@ -502,6 +526,10 @@ class core_conf {
 		}
 
 		return $output;
+	}
+
+	function addIaxAdditional($section, $key, $value) {
+		$this->_iax_additional[$section][] = array('key' => $key, 'value' => $value);
 	}
 
 	function generate_iax_additional($ast_version) {
@@ -653,6 +681,11 @@ class core_conf {
 					break;
 				default:
 			}
+			if (isset($this->_iax_additional[$account])) {
+				foreach ($this->_iax_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
 			$output .= $additional."\n";
 		}
 		return $output;
@@ -675,6 +708,10 @@ class core_conf {
 		}
 
 		return $output;
+	}
+
+	function addDahdiAdditional($section, $key, $value) {
+		$this->_dahdi_additional[$section][] = array('key' => $key, 'value' => $value);
 	}
 
 	function generate_zapata_additional($ast_version, $table_name = 'zap') {
@@ -730,8 +767,13 @@ class core_conf {
 						$output .= $result2['keyword']."=".$result2['data']."\n";
 				}
 			}
+			if (isset($this->_dahdi_additional[$account])) {
+				foreach ($this->_dahdi_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
+			$output .= $additional ? $additional."\n" : '';
 			$output .= "channel=>$zapchannel\n";
-			$output .= $additional."\n";
 		}
 		return $output;
 	}
@@ -1834,7 +1876,7 @@ function core_get_config($engine) {
 			);
 			foreach ($add_globals as $g => $v) {
 				$ext->addGlobal($v, $amp_conf[$g]);
-				out("Added to globals: $l = ".$amp_conf[$g]);
+				out("Added to globals: $v = ".$amp_conf[$g]);
 			}
 			unset($add_globals);
 
