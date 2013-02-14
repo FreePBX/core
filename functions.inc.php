@@ -30,9 +30,6 @@ class core_conf {
 	var $_featuregeneralsection = array();
 	var $_featuremap     = array();
 	var $_applicationmap = array();
-	var $_loggergeneral  = array();
-	var $_loggerlogfiles = array();
-	var $_res_odbc       = array();
 
 	var $dev_user_map;
 
@@ -85,10 +82,6 @@ class core_conf {
 			'features_featuremap_additional.conf',
 			'localprefixes.conf',
 			'sip_notify_additional.conf',
-			'logger_general_additional.conf',
-			'logger_logfiles_additional.conf',
-			'res_odbc_additional.conf',
-			'chan_dahdi_additional.conf',
 		);
 		return $files;
 	}
@@ -134,15 +127,6 @@ class core_conf {
 				break;
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
-				break;
-			case 'logger_general_additional.conf':
-				return $this->generate_loggergeneral_additional($version);
-				break;
-			case 'logger_logfiles_additional.conf':
-				return $this->generate_loggerlogfiles_additional($version);
-				break;
-			case 'res_odbc_additional.conf':
-				return $this->generate_res_odbc_additional($version);
 				break;
 		}
 	}
@@ -280,54 +264,6 @@ class core_conf {
 			}
 		}
 		return $output;
-	}
-
-	function addLoggerGeneral($key, $value) {
-		$this->_loggergeneral[] = array('key' => $key, 'value' => $value);
-	}
-
-	function generate_loggergeneral_additional($ast_version) {
-		global $amp_conf;
-		$output = '';
-
-		if (!empty($this->_loggergeneral)) {
-			foreach ($this->_loggergeneral as $values) {
-				$output .= $values['key']."=".$values['value']."\n";
-			}
-		} else {
-			// If they don't have anythng in custom then put in a default format
-			$general = parse_ini_file($amp_conf['ASTETCDIR'] . '/logger_general_custom.conf');
-			if (empty($general)) {
-				$output = "dateformat=%F %T" . "\n";
-			}
-		}
-		return $output;
-	}
-
-	function addLoggerLogfiles($key, $value) {
-		$this->_loggerlogfiles[] = array('key' => $key, 'value' => $value);
-	}
-
-	function generate_loggerlogfiles_additional($ast_version) {
-		global $amp_conf;
-		$output = '';
-
-		if (!empty($this->_loggerlogfiles)) {
-			foreach ($this->_loggerlogfiles as $values) {
-				$output .= $values['key']."=".$values['value']."\n";
-			}
-		} else {
-			// If they don't have anythng in custom then put in a default settng
-			$logfiles = parse_ini_file($amp_conf['ASTETCDIR'] . '/logger_logfiles_custom.conf');
-			if (empty($logfiles)) {
-				$output = "console => notice,warning,error" . "\n";
-				$output .= "full => notice,warning,error,debug,verbose" . "\n"; }
-		}
-		return $output;
-	}
-
-	function addSipAdditional($section, $key, $value) {
-		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
 	}
 
 	function generate_sip_additional($ast_version) {
