@@ -82,6 +82,7 @@ class core_conf {
 			'features_featuremap_additional.conf',
 			'localprefixes.conf',
 			'sip_notify_additional.conf',
+            'chan_dahdi_additional.conf'
 		);
 		return $files;
 	}
@@ -171,6 +172,10 @@ class core_conf {
     }
     return $output;
   }
+  
+    function addSipAdditional($section, $key, $value) { 
+      $this->_sip_additional[$section][] = array('key' => $key, 'value' => $value); 
+    } 
 
 	function addSipGeneral($key, $value) {
 		$this->_sip_general[] = array('key' => $key, 'value' => $value);
