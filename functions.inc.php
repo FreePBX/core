@@ -30,7 +30,7 @@ class core_conf {
 	var $_featuregeneralsection = array();
 	var $_featuremap     = array();
 	var $_applicationmap = array();
-
+	var $_res_odbc       = array();
 	var $dev_user_map;
 
 	// map the actual vmcontext and user devicename if the device is fixed
@@ -82,7 +82,8 @@ class core_conf {
 			'features_featuremap_additional.conf',
 			'localprefixes.conf',
 			'sip_notify_additional.conf',
-            'chan_dahdi_additional.conf'
+			'res_odbc_additional.conf',
+			'chan_dahdi_additional.conf'
 		);
 		return $files;
 	}
@@ -128,6 +129,9 @@ class core_conf {
 				break;
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
+				break;
+			case 'res_odbc_additional.conf': 
+				return $this->generate_res_odbc_additional($version); 
 				break;
 		}
 	}
