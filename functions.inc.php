@@ -31,6 +31,7 @@ class core_conf {
 	var $_featuremap     = array();
 	var $_applicationmap = array();
 	var $_res_odbc       = array();
+	var $_rtp_additional	= array();
 	var $dev_user_map;
 
 	// map the actual vmcontext and user devicename if the device is fixed
@@ -83,7 +84,8 @@ class core_conf {
 			'localprefixes.conf',
 			'sip_notify_additional.conf',
 			'res_odbc_additional.conf',
-			'chan_dahdi_additional.conf'
+			'chan_dahdi_additional.conf',
+			'rtp_additional.conf'
 		);
 		return $files;
 	}
@@ -133,8 +135,32 @@ class core_conf {
 			case 'res_odbc_additional.conf': 
 				return $this->generate_res_odbc_additional($version); 
 				break;
+			case 'rtp_additional.conf':
+				return $this->generate_rtp_additional($version);
+				break;
 		}
 	}
+	
+    function addRtpAdditional($section,$entries) {
+      $this->_rtp_additional[$section][] = $entries;
+    }
+
+    function generate_rtp_additional($ast_version) {
+	    $output = '';
+	    if (!empty($this->_rtp_additional)) {
+	      foreach ($this->_rtp_additional as $section => $entries) {
+	        $output .= "[".$section."]\n";
+	        foreach ($entries as $key => $entry) {
+				foreach ($entry as $ekey => $value) {
+	          		$output .= "$ekey=$value\n";
+				}
+	        }
+	        $output .= "\n";
+	      }
+	    }
+	    return $output;
+
+    }
 
   function addSipNotify($section,$entries) {
     $this->_sip_notify[] = array('section' => $section, 'entries' => $entries);
