@@ -6030,8 +6030,9 @@ function core_trunks_getTrunkPeerDetails($trunknum) {
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
 	
-	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
-	
+	if (!core_trunk_has_registrations($tech)) {
+		return '';
+	}	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
 	
 	foreach ($results as $result) {
@@ -6054,8 +6055,9 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 	global $db;
 	
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
-	if ($tech == "zap" || $tech =="dahdi" || $tech == "") return ""; // zap has no details
+	if (!core_trunk_has_registrations($tech)) {
+		return '';
+	}
 	
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
@@ -6073,8 +6075,9 @@ function core_trunks_getTrunkUserConfig($trunknum) {
 //get trunk account register string
 function core_trunks_getTrunkRegister($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
-	if ($tech == "zap" || $tech == "dahdi" || $tech == "") return ""; // zap has no register
+	if (!core_trunk_has_registrations($tech)){
+		return '';
+	}	
 	
 	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
@@ -6123,6 +6126,17 @@ function core_trunks_addDialRules($trunknum, $dialrules) {
   $trace = debug_backtrace();
   $function = $trace[0]['function'];
   die_freepbx("function: $function has been deprecated and removed");
+}
+
+function core_trunk_has_registrations($type = ''){
+	$types = array(
+				'zap',
+				'dahdi',
+				'custom',
+				''
+			);
+	return !in_array($type, $types);
+
 }
 
 function core_trunks_deleteDialRules($trunknum) {
