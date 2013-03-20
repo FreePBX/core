@@ -988,7 +988,8 @@ function core_get_config($engine) {
 				} else {
 					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
-        $useragent = "FPBX-".getversion()."($version)";
+        		$useragent = $amp_conf['SIPUSERAGENT'] 
+        					. getversion() . "($version)";
 				$core_conf->addSipGeneral('useragent',$useragent);
 				$core_conf->addIaxGeneral('disallow','all');
 				$core_conf->addIaxGeneral('allow','ulaw');
@@ -2828,6 +2829,7 @@ function core_get_config($engine) {
 
 			//$ext->add($context, $exten, '', new ext_noop('user-callerid: ${CALLERID(name)} ${CALLERID(number)}'));
 
+			$ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 			// make sure AMPUSER is set if it doesn't get set below
 			$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["foo${AMPUSER}" = "foo"]?${CALLERID(number)}:${AMPUSER})}'));
 			$ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
