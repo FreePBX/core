@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.0beta2.6</version>
+	<version>2.11.0.0beta2.7</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.0beta2.7* Fixes #6459, #6237 call fails on internal pickup in ring group when call confirm is enabled
 		*2.11.0.0beta2.6* r15400
 		*2.11.0.0beta2.5* r15308 
 		*2.11.0.0beta2.4* Move control of rtp.conf and rtp_additional.conf into core re #6397
