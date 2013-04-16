@@ -1090,18 +1090,6 @@ function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	$set['type'] = CONF_TYPE_FSELECT;
 	$freepbx_conf->define_conf_setting('TONEZONE',$set,$commit);
 	unset($zlist);  
-
-	//sip user agent
-	$set['value'] = 'FPBX';
-	$set['options'] = '';
-	$set['category'] = 'Styling and Logos';
-	$set['name'] = 'Sip User Agent';
-	$set['description'] = 'User Agent to be used';
-	$set['emptyok'] = 0;
-	$set['readonly'] = 0;
-	$set['sortorder'] = -150;
-	$set['type'] = CONF_TYPE_TEXT;
-	$freepbx_conf->define_conf_setting('SIPUSERAGENT',$set);
 }
 
 function _initialize_zonelist() {
