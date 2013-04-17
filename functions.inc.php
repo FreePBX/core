@@ -169,16 +169,17 @@ class core_conf {
 
 	function generate_rtp_additional($ast_version) {
 		$output = '';
-		if (!empty($this->_rtp_additional)) {
-			foreach ($this->_rtp_additional as $section => $entries) {
-				$output .= "[".$section."]\n";
-				foreach ($entries as $key => $entry) {
-					foreach ($entry as $ekey => $value) {
-						$output .= "$ekey=$value\n";
-					}
+		if (empty($this->_rtp_additional)) {
+			$this->setDefaultRtp();
+		}
+		foreach ($this->_rtp_additional as $section => $entries) {
+			$output .= "[".$section."]\n";
+			foreach ($entries as $key => $entry) {
+				foreach ($entry as $ekey => $value) {
+					$output .= "$ekey=$value\n";
 				}
-				$output .= "\n";
 			}
+			$output .= "\n";
 		}
 		return $output;
 	}
