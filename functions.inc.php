@@ -1012,8 +1012,7 @@ function core_get_config($engine) {
 				} else {
 					$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
 				}
-        		$useragent = $amp_conf['SIPUSERAGENT'] 
-        					. getversion() . "($version)";
+				$useragent = $amp_conf['SIPUSERAGENT'] . '-' . getversion() . "($version)";
 				$core_conf->addSipGeneral('useragent',$useragent);
 				$core_conf->addIaxGeneral('disallow','all');
 				$core_conf->addIaxGeneral('allow','ulaw');
