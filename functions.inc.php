@@ -7161,7 +7161,7 @@ function core_users_configpageload() {
       $helptext = _('Optional destination call is routed to when the call is not answered.');
     }
     $nodest_msg = _('Unavail Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('noanswer_dest', '0', $noanswer_dest, _('No Answer'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('noanswer_dest', '0', $noanswer_dest, _('No Answer'), $helptext, false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('noanswer_cid', $noanswer_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this no answer destination.")),5,9);
 
     if ($amp_conf['CWINUSEBUSY']) {
@@ -7170,12 +7170,12 @@ function core_users_configpageload() {
       $helptext = _('Optional destination the call is routed to when the phone is busy or the call is rejected by the user.');
     }
     $nodest_msg = _('Busy Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('busy_dest', '1', $busy_dest, _('Busy'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('busy_dest', '1', $busy_dest, _('Busy'), $helptext, false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('busy_cid', $busy_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this busy destination.")),5,9);
 
     $helptext = _('Optional destination the call is routed to when the phone is offline, such as a softphone currently off or a phone unplugged.');
     $nodest_msg = _('Unavail Voicemail if Enabled');
-    $currentcomponent->addguielem($section, new gui_drawselects('chanunavail_dest', '2', $chanunavail_dest, _('Not Reachable'), $helptext, $canbeempty = false, '', $nodest_msg),5,9);
+    $currentcomponent->addguielem($section, new gui_drawselects('chanunavail_dest', '2', $chanunavail_dest, _('Not Reachable'), $helptext, false, '', $nodest_msg),5,9);
 		$currentcomponent->addguielem($section, new gui_textbox('chanunavail_cid', $chanunavail_cid, '&nbsp;&nbsp;'._("CID Prefix"), _("Optional CID Prefix to add before sending to this not reachable destination.")),5,9);
 	}
 }
