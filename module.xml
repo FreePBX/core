@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.0rc1.4</version>
+	<version>2.11.0.0rc1.5</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.0rc1.5* change dependency
 		*2.11.0.0rc1.4* #6366, #6541
 		*2.11.0.0rc1.3* Fixes to gui_drawselects re #6541
 		*2.11.0.0rc1.2* Fixes #6446, queue recording
@@ -35,7 +36,7 @@
 		*2.11.0.0beta1.0* bump to beta and #5998, #5999
 	</changelog>
 	<depends>
-		<version>2.11.0.0rc1.8</version>
+		<version>2.11.0alpha0</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
