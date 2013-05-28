@@ -3409,7 +3409,7 @@ function core_get_config($engine) {
 			// ARG3 - RETURN makes macro return, otherwise hangup
 			//
 			$ext->add('macro-vm', 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
-			$ext->add('macro-vm','s', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})":"")}'));
+			$ext->add('macro-vm','s', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})": )}'));
 
 			// If blkvm-check is set TRUE, then someone told us to block calls from going to
 			// voicemail. This variable is reset by the answering channel so subsequent
@@ -3713,7 +3713,7 @@ function core_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 			$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 			$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
-			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${LEN(${ARG3})} | ${LEN(${ARG4})} | ${LEN(${ARG5})}]?${RINGTIMER}:)}'));
+			$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | ${LEN(${ARG3})} | ${LEN(${ARG4})} | ${LEN(${ARG5})}]?${RINGTIMER}: )}'));
 			$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},'));
 
       // If paging module is not present, then what happens?
@@ -4080,7 +4080,7 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'BUSY'));
         $ext->add($mcontext,$exten,'skip1', new ext_gotoif('$["${DEXTEN}"=""]','nodial'));
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"="#"]','continue'));
-        $ext->add($mcontext,$exten,'', new ext_set('EXTHASCW', '${IF($["${CWIGNORE}"!=""]?"":${DB(CW/${DEXTEN})})}'));
+        $ext->add($mcontext,$exten,'', new ext_set('EXTHASCW', '${IF($["${CWIGNORE}"!=""]? :${DB(CW/${DEXTEN})})}'));
         $ext->add($mcontext,$exten,'', new ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!="" | "${DB(CFU/${DEXTEN})}"!=""]','next1','cwinusebusy'));
 
         $ext->add($mcontext,$exten,'next1', new ext_gotoif('$["${DB(CFU/${DEXTEN})}"!="" & ("${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN")]','docfu','skip3'));
@@ -4158,8 +4158,8 @@ function core_get_config($engine) {
         $ext->add($mcontext,$exten,'', new ext_set('CFAMPUSER', '${IF($["${AMPUSER}"=""]?${CALLERID(number)}:${AMPUSER})}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(CF/${DEXTEN})}"="${CFAMPUSER}" | "${DB(CF/${DEXTEN})}"="${REALCALLERIDNUM}" | "${CUT(CUT(BLINDTRANSFER,-,1),/,1)}" = "${DB(CF/${DEXTEN})}" | "${DEXTEN}"="${DB(CF/${DEXTEN})}"]', 'Return'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DB(AMPUSER/${DEXTEN}/cfringtimer)}" != "0" & "${DB(AMPUSER/${DEXTEN}/cfringtimer)}" != ""]', 'Set', 'ARG1=${IF($["${DB(AMPUSER/${DEXTEN}/cfringtimer)}"="-1"]? : ${DB(AMPUSER/${DEXTEN}/cfringtimer)})}'));
-        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#":"")}'));
-				if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional":"")}'));
+        $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#": )}'));
+				if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional": )}'));
         $ext->add($mcontext,$exten,'', new ext_execif('$["${DEXTEN}"!=""]', 'Return'));
         $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS', 'NOANSWER'));
         $ext->add($mcontext,$exten,'', new ext_return(''));
