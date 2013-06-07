@@ -1042,6 +1042,13 @@ if (!DB::IsError($res)) {
 	out(_("error occured"));
 }
 
+//migrate the username field in ampusers
+$res = $db->getAll('SHOW COLUMNS FROM ampusers WHERE FIELD = "username"', DB_FETCHMODE_ASSOC);
+if ($res[0]['Type'] == 'varchar(20)') {
+        sql('ALTER TABLE ampusers CHANGE username username varchar(255) NOT NULL');
+		outn(_("migrated username column to allow for longer usernames"));
+}
+
 function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	global $db, $freepbx_conf;
 
