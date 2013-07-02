@@ -15,23 +15,6 @@ if($var['action'] === 'setkey') {
 		if ($status[$keyword]['saved']) {
 			freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$var['value']));
 			needreload();
-			
-			//special case for manager related changes - these need to be applied right away re #5117
-			switch ($keyword) {
-				//case 'ASTMANAGERHOST':
-				//case 'ASTMANAGERPORT':
-				//case 'ASTMANAGERPROXYPORT':
-				case 'AMPMGRPASS':
-					fpbx_ami_update(false, $var['value']);
-				break;
-				case 'AMPMGRUSER':
-					fpbx_ami_update($var['value'], false);
-				break;
-				case 'ASTMGRWRITETIMEOUT':
-					fpbx_ami_update(false, false, true);
-				break;
-			}
-			
 		}
 		echo json_encode($status[$keyword]);
 		exit;
