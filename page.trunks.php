@@ -1001,7 +1001,7 @@ END;
 				</tr>
 				<tr>
 					<td colspan="2">
-						<input type="text" size="40" name="register" value="<?php echo htmlspecialchars($register) ?>" tabindex="<?php echo ++$tabindex;?>" />
+						<input type="text" size="90" name="register" value="<?php echo htmlspecialchars($register) ?>" tabindex="<?php echo ++$tabindex;?>" />
 					</td>
 				</tr>
 	<?php 
