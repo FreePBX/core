@@ -2241,6 +2241,9 @@ function core_get_config($engine) {
             $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT'));
           }
           $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1));
+					if ($route['dest']) {
+						$ext->add($context, $exten, '', new ext_set("ROUTE_CIDSAVE",'${CALLERID(all)}'));
+					}
 
 					// Conditionally Add Divesion Header if the call was diverted
 					if ($amp_conf['DIVERSIONHEADER']) {
@@ -2290,7 +2293,13 @@ function core_get_config($engine) {
 						$trunk_type_needed['macro-' . $trunk_macro] = true;
           }
 					if ($route['dest']) {
+						// Put back the saved CID since each trunk attempt screws with it and set KEEPCID since this is
+						// a form of forwarding at this point. We could use REALCALLERIDNUM but that doesn't preserve CNAM
+						// which may be wiped out and we may want it.
+						//
 						$ext->add($context, $exten, '', new ext_noop_trace('All trunks failed calling ${EXTEN}, going to destination'));
+						$ext->add($context, $exten, '', new ext_set('CALLERID(all)','${ROUTE_CIDSAVE}'));
+						$ext->add($context, $exten, '', new ext_set('_KEEPCID','TRUE'));
 						$ext->add($context, $exten, '', new ext_goto($route['dest']));
 					} else {
 						$ext->add($context, $exten, '', new ext_noop_trace('All trunks failed calling ${EXTEN}, playing default congestion'));
