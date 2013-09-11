@@ -2457,6 +2457,10 @@ function core_get_config($engine) {
 			$context = 'macro-auto-confirm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, '', new ext_set('CFIGNORE',''));
+			$ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CFIGNORE)',''));
+			$ext->add($context, $exten, '', new ext_set('FORWARD_CONTEXT','from-internal'));
+			$ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(FORWARD_CONTEXT)','from-internal'));
 			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
 			$ext->add($context, $exten, '', new ext_dbdel('RG/${ARG1}/${UNIQCHAN}'));
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
@@ -2479,6 +2483,10 @@ function core_get_config($engine) {
 			$context = 'macro-auto-blkvm';
 			$exten = 's';
 			$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT',''));
+			$ext->add($context, $exten, '', new ext_set('CFIGNORE',''));
+			$ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(CFIGNORE)',''));
+			$ext->add($context, $exten, '', new ext_set('FORWARD_CONTEXT','from-internal'));
+			$ext->add($context, $exten, '', new ext_set('MASTER_CHANNEL(FORWARD_CONTEXT)','from-internal'));
 			$ext->add($context, $exten, '', new ext_macro('blkvm-clr'));
 			$ext->add($context, $exten, '', new ext_noop_trace('DIALEDPEERNUMBER: ${DIALEDPEERNUMBER} CID: ${CALLERID(all)}'));
       if ($amp_conf['AST_FUNC_MASTER_CHANNEL'] && $amp_conf['AST_FUNC_CONNECTEDLINE']) {
