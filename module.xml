@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.3</version>
+	<version>2.11.0.4</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.4* #6732, #6766
 		*2.11.0.3* #6147, #6681, #6731
 		*2.11.0.2* #6654, #6639, #6366
 		*2.11.0.1* #6535, #6604, #6576
