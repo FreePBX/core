@@ -4875,37 +4875,42 @@ function core_devices_addsip($account) {
 
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
 		$sipfields[] = array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++);
-    $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
-    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
-    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
-    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
-    $sipfields[] = array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++);
-    $sipfields[] = array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++);
-    $sipfields[] = array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++);
-    $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
-    $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
-    $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
-    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
-    $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
-    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
-    if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
-      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
-    }
-    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
-      $sipfields[] = array($account,'transport',$db->escapeSimple((isset($_REQUEST['transport']))?$_REQUEST['transport']:'udp'),$flag++);
-      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
-    }
-    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
-    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
-    $sipfields[] = array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++);
-    $sipfields[] = array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++);
-    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
-    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
+	    $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
+	    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
+	    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
+	    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
+	    $sipfields[] = array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++);
+	    $sipfields[] = array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++);
+	    $sipfields[] = array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++);
+	    $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
+	    $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
+	    $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
+	    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
+	    $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
+	    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
+	    if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
+	      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
+	    }
+	    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+	      $sipfields[] = array($account,'transport',$db->escapeSimple((isset($_REQUEST['transport']))?$_REQUEST['transport']:'udp'),$flag++);
+	      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
+	    }
+	    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
+	    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
+	    $sipfields[] = array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++);
+	    $sipfields[] = array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++);
+	    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
+	    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
 
-    $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
-    if ($vmexten != '') {
-      $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
-    }
+		if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			$sipfields[] = array($account,'avpf',$db->escapeSimple((isset($_REQUEST['avpf']))?$_REQUEST['avpf']:'no'),$flag++);
+			$sipfields[] = array($account,'icesupport',$db->escapeSimple((isset($_REQUEST['icesupport']))?$_REQUEST['icesupport']:'no'),$flag++);
+		}
+	
+	    $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
+	    if ($vmexten != '') {
+	      $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
+	    }
 	}
 
 	// Very bad
@@ -7514,15 +7519,37 @@ function core_devices_configpageinit($dispnum) {
 		  $tmparr['qualifyfreq'] = array('value' => $amp_conf['DEVICE_SIP_QUALIFYFREQ'], 'tt' => $tt, 'level' => 1);
     }
     if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
-      unset($select);
+      	unset($select);
 		  $select[] = array('value' => 'udp,tcp,tls', 'text' => _('All - UDP Primary'));
 		  $select[] = array('value' => 'tcp,udp,tls', 'text' => _('All - TCP Primary'));
 		  $select[] = array('value' => 'tls,udp,tcp', 'text' => _('All - TLS Primary'));
+		  if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			  $select[] = array('value' => 'ws,udp,tcp,tls', 'text' => _('All - WS Primary'));
+		  }
 		  $select[] = array('value' => 'udp', 'text' => _('UDP Only'));
 		  $select[] = array('value' => 'tcp', 'text' => _('TCP Only'));
 		  $select[] = array('value' => 'tls', 'text' => _('TLS Only'));
-      $tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured.");
+		  if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			  $select[] = array('value' => 'ws', 'text' => _('WS Only'));
+		  }
+      	$tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured. If you are using websockets (such as WebRTC) then you must select an option that includes WS");
 		  $tmparr['transport'] = array('value' => 'udp', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+		  if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			unset($select);
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("Whether to Enable AVPF. Defaults to no. The WebRTC standard has selected AVPF as the audio video profile to use for media streams. This is not the default profile in use by Asterisk. As a result the following must be enabled to use WebRTC");
+			$tmparr['avpf'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		}
+
+		if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			unset($select);
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("Whether to Enable ICE Support. Defaults to no. ICE (Interactive Connectivity Establishment) is a protocol for Network Address Translator(NAT) traversal for UDP-based multimedia sessions established with the offer/answer model. This option is commonly enabled in WebRTC setups");
+			$tmparr['icesupport'] = array('value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		}
 
       unset($select);
 		  $select[] = array('value' => 'no', 'text' => _('No'));
