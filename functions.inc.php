@@ -2333,7 +2333,6 @@ function core_get_config($engine) {
 			$ext->add('app-blackhole', 'musiconhold', '', new ext_musiconhold());
 
 			$ext->add('app-blackhole', 'congestion', '', new ext_noop('Blackhole Dest: Congestion'));
-			$ext->add('app-blackhole', 'congestion', '', new ext_answer());
 			$ext->add('app-blackhole', 'congestion', '', new ext_playtones('congestion'));
 			$ext->add('app-blackhole', 'congestion', '', new ext_congestion());
 			$ext->add('app-blackhole', 'congestion', '', new ext_hangup());
