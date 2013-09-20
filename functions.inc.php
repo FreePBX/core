@@ -2241,11 +2241,11 @@ function core_get_config($engine) {
           // generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
           // CID part of the dialplan will not get executed
           if (!isset($add_extra_pri1[$fpattern['base_pattern']])) {
-            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT'));
+            $ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT,EXTERNAL'));
             $add_extra_pri1[$fpattern['base_pattern']] = true;
           }
           if ($fpattern['base_pattern'] != $exten) {
-            $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT'));
+            $ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT,EXTERNAL'));
           }
           $ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1));
 					if ($route['dest']) {
@@ -2889,7 +2889,7 @@ function core_get_config($engine) {
 			// user may masquerade as a different user internally, so set the internal cid as indicated
 			// but keep the REALCALLERID which is used to determine their true identify and lookup info
 			// during outbound calls.
-			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
+			$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${ARG2}" != "EXTERNAL" & "${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
 
 			// If there is a defined dialopts then use it, otherwise use the global default
 			//
