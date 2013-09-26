@@ -349,7 +349,7 @@ function editGRP_onsubmit() {
 	}
 
 	var mycid = theForm.cidnum.value.toLowerCase();
-	if (!isDialpattern(mycid) && mycid.substring(0,4) != "priv" && mycid.substring(0,5) != "block" && mycid != "unknown" && mycid.substring(0,8) != "restrict" && mycid.substring(0,7) != "unavail" && mycid.substring(0,6) != "anonym" && mycid.substring(0,7) != "witheld")
+	if (!isDialpattern(mycid) && mycid.substring(0,4) != "priv" && mycid.substring(0,5) != "block" && mycid != "unknown" && mycid.substring(0,8) != "restrict" && mycid.substring(0,7) != "unavail" && mycid.substring(0,6) != "anonym" && mycid.substring(0,7) != "withheld")
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
 	
 	if (!isInteger(theForm.delay_answer.value))
