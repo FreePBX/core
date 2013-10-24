@@ -7611,7 +7611,7 @@ function core_devices_configpageinit($dispnum) {
 		$users = core_users_list();
 		if (isset($users)) {
 			foreach ($users as $auser) {
-				$currentcomponent->addoptlistitem('deviceuserlist', $auser[0], $auser[0]);
+				$currentcomponent->addoptlistitem('deviceuserlist', $auser[0], $auser[0] . " (" . $auser[1] . ")");
 			}
 		}
 		$currentcomponent->setoptlistopts('deviceuserlist', 'sort', false);
