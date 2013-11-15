@@ -168,7 +168,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		set_user_devices($user, $new_devices);
 		set_hint($user, $new_devices);
 		set_queue_hint($user, $device);
-		if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
+		if (version_compare(get_var("ASTVERSION"), "1.8.0", "ge")) {
+			$user_event_body = "\"UserDeviceAdded,Data: {$user}\\\\,{$device}\"";
+		} else if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
  			$user_event_body = "\"UserDeviceAdded|Data: {$user}\\,{$device}\"";
  		} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
  			$user_event_body = "UserDeviceAdded,\"Data: {$user}\\\\,{$device}\"";
@@ -225,7 +227,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
 			
-			if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
+			if(version_compare(get_var("ASTVERSION"), "1.8.0", "ge")) {
+				$user_event_body = "\"UserDeviceRemoved,Data: {$current_user}\\\\,{$device}\"";
+			} else if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
 				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user}\\,{$device}\"";
  			} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
  				$user_event_body = "UserDeviceRemoved,\"Data: {$current_user}\\\\,{$device}\"";
