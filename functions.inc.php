@@ -4447,8 +4447,8 @@ function core_did_add($incoming,$target=false){
 	if (empty($existing)) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
          	$invalidDIDChars = array('<','>');
-         	$extension = str_replace($invalidDIDChars,"",$extension);
-         	$cidnum = str_replace($invalidDIDChars,"",$cidnum);
+         	$extension = trim(str_replace($invalidDIDChars,"",$extension));
+         	$cidnum = trim(str_replace($invalidDIDChars,"",$cidnum));
 
 		$destination= ($target) ? $target : ${$goto0.'0'};
 		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
