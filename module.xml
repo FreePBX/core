@@ -47,4 +47,4 @@
 	<location>release/2.3/core-2.3.0beta2.3.1.tgz</location>
 	<info>http://freepbx.org/wiki/Core</info>
 	<md5sum>a6c570a868530d8fc562366450625bf2</md5sum>
-</module>
+<supported><version>2.3</version></supported></module>
