@@ -71,4 +71,4 @@
  	</popovers>
 	<location>release/2.11/core-2.11.0.0beta1.5.tgz</location>
 	<md5sum>ec94f19baca19a2465a912f953576d2e</md5sum>
-</module>
+<supported><version>2.11</version></supported></module>
