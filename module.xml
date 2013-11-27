@@ -61,4 +61,4 @@
 	</menuitems>
 	<location>release/2.4/core-2.4.0alpha1.0.tgz</location>
 	<md5sum>0110d1dea02a460cc7002cde8da688b9</md5sum>
-</module>
+<supported><version>2.4</version></supported></module>
