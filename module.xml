@@ -60,4 +60,4 @@
 	</menuitems>
 	<location>release/2.11/core-2.11.0.0beta1.2.tgz</location>
 	<md5sum>19e17732992d2766b018721b53c1a012</md5sum>
-</module>
+<supported><version>2.11</version></supported></module>
