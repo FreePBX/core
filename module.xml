@@ -110,4 +110,4 @@
 	</menuitems>
 	<location>release/2.9/core-2.9.0rc1.2.tgz</location>
 	<md5sum>612e1aeca0f4d2ab501e0a1389e8bd49</md5sum>
-</module>
+<supported><version>2.9</version></supported></module>
