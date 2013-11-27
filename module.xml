@@ -40,4 +40,4 @@
 	</menuitems>
 	<location>release/2.10/core-2.10.0.beta1.tgz</location>
 	<md5sum>66127879951a3a99152568915bc9c715</md5sum>
-</module>
+<supported><version>2.10</version></supported></module>
