@@ -113,4 +113,4 @@
 	</menuitems>
 	<location>release/2.9/core-2.9.0rc1.5.tgz</location>
 	<md5sum>3717a72b04d9c3c6da4f3a0cd4341abf</md5sum>
-</module>
+<supported><version>2.9</version></supported></module>
