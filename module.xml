@@ -66,4 +66,4 @@
 	</menuitems>
 	<location>release/2.8/core-2.8.0.0beta1.3.tgz</location>
 	<md5sum>106a999046faa0b4ad67f88a959dde8a</md5sum>
-</module>
+<supported><version>2.8</version></supported></module>
