@@ -51,4 +51,4 @@
 	</menuitems>
 	<location>release/2.3/core-2.3.0rc1.0.tgz</location>
 	<md5sum>ed65868a518f6a94bce5c57e79ac453e</md5sum>
-</module>
+<supported><version>2.3</version></supported></module>
