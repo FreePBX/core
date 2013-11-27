@@ -76,4 +76,4 @@
 	</menuitems>
 	<location>release/2.6/core-2.6.0RC2.0.tgz</location>
 	<md5sum>2d527f06ca52032198ea96fe480d8d82</md5sum>
-</module>
+<supported><version>2.6</version></supported></module>
