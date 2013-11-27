@@ -77,4 +77,4 @@
 	</menuitems>
 	<location>release/2.5/core-2.5.0beta1.1.tgz</location>
 	<md5sum>bf54d65ef2a9ed87bcaead965cc39586</md5sum>
-</module>
+<supported><version>2.5</version></supported></module>
