@@ -65,4 +65,4 @@
  	</popovers>
 	<location>release/2.11/core-2.11.0.1.tgz</location>
 	<md5sum>e3b323bf480faaf8b5ef9ccb46b216b3</md5sum>
-</module>
+<supported><version>2.11</version></supported></module>
