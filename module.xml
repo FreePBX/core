@@ -58,4 +58,4 @@
 	</menuitems>
 	<location>release/2.3/core-2.3.0.2.tgz</location>
 	<md5sum>743388d9a7d5b4ca1ea60a9c82a4a0de</md5sum>
-</module>
+<supported><version>2.3</version></supported></module>
