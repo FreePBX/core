@@ -72,4 +72,4 @@
 	</menuitems>
 	<location>release/2.6/core-2.6.0beta2.1.tgz</location>
 	<md5sum>5393d7f0b4e1aebbb1986dbb726ab8b3</md5sum>
-</module>
+<supported><version>2.6</version></supported></module>
