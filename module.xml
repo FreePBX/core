@@ -96,4 +96,4 @@
 	</menuitems>
 	<location>release/2.9/core-2.9.0beta1.2.tgz</location>
 	<md5sum>616c83cb85a9e97fd80d02b424ba3365</md5sum>
-</module>
+<supported><version>2.9</version></supported></module>
