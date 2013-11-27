@@ -74,4 +74,4 @@
 	</menuitems>
 	<location>release/2.5/core-2.5.0alpha1.0.tgz</location>
 	<md5sum>4209c3b37f895ecd0d9f7cd34e2441d1</md5sum>
-</module>
+<supported><version>2.5</version></supported></module>
