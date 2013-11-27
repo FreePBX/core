@@ -53,4 +53,4 @@
 	</menuitems>
 	<location>release/2.5/core-2.5.0.0.tgz</location>
 	<md5sum>04429c47d83eaeaff8ab3cab03af12e4</md5sum>
-</module>
+<supported><version>2.5</version></supported></module>
