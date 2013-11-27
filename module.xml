@@ -90,4 +90,4 @@
 	</menuitems>
 	<location>release/2.7/core-2.7.0.0.tgz</location>
 	<md5sum>3522f98af640c18c93dfa5408b93e72e</md5sum>
-</module>
+<supported><version>2.7</version></supported></module>
