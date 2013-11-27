@@ -82,4 +82,4 @@
 	</menuitems>
 	<location>release/2.7/core-2.7.0beta1.2.tgz</location>
 	<md5sum>ea7eac26004a3c9dfc685255b4549df3</md5sum>
-</module>
+<supported><version>2.7</version></supported></module>
