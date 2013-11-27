@@ -48,4 +48,4 @@
 	</menuitems>
 	<location>release/2.10/core-2.10.0rc1.3.tgz</location>
 	<md5sum>ff067710069972dd3e0e39d82bc97556</md5sum>
-</module>
+<supported><version>2.10</version></supported></module>
