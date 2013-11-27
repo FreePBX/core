@@ -85,4 +85,4 @@
 	</menuitems>
 	<location>release/2.7/core-2.7.0RC1.1.tgz</location>
 	<md5sum>97b80fbfe8b9a256945014d5e0956c2a</md5sum>
-</module>
+<supported><version>2.7</version></supported></module>
