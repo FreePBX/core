@@ -81,4 +81,4 @@
 	</menuitems>
 	<location>release/2.8/core-2.8.0.0RC1.3.tgz</location>
 	<md5sum>eeb453837577b8c38cac3aa13a13d171</md5sum>
-</module>
+<supported><version>2.8</version></supported></module>
