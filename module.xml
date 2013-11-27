@@ -92,4 +92,4 @@
 	</menuitems>
 	<location>release/2.9/core-2.9.0alpha1.5.tgz</location>
 	<md5sum>8de1dd4142315c91bf13bfa870b0410b</md5sum>
-</module>
+<supported><version>2.9</version></supported></module>
