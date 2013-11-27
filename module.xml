@@ -70,4 +70,4 @@
  	</popovers>
 	<location>release/2.11/core-2.11.0.0beta1.4.tgz</location>
 	<md5sum>0eee58dcca0c849d533dcfaae41cd8c5</md5sum>
-</module>
+<supported><version>2.11</version></supported></module>
