@@ -67,4 +67,4 @@
 	</menuitems>
 	<location>release/2.4/core-2.4.0beta1.2.tgz</location>
 	<md5sum>70d99347ff0f7a26ead9584250d2bee1</md5sum>
-</module>
+<supported><version>2.4</version></supported></module>
