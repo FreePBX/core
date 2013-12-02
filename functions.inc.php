@@ -4860,7 +4860,7 @@ function core_devices_addsip($account) {
 	foreach ($_REQUEST as $req=>$data) {
 		if ( substr($req, 0, 8) == 'devinfo_' ) {
 			$keyword = substr($req, 8);
-      $data = $db->escapeSimple(trim($data));
+			$data = trim($data);
 			if ( $keyword == 'dial' && $data == '' ) {
 				$sipfields[] = array($account, $keyword, 'SIP/'.$account, $flag++);
 			} elseif ($keyword == 'mailbox' && $data == '') {
@@ -4874,48 +4874,48 @@ function core_devices_addsip($account) {
 	}
 
 	if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
-		$sipfields[] = array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:''),$flag++);
-	    $sipfields[] =array($account,'secret',$db->escapeSimple((isset($_REQUEST['secret']))?$_REQUEST['secret']:''),$flag++);
-	    $sipfields[] = array($account,'canreinvite',$db->escapeSimple((isset($_REQUEST['canreinvite']))?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
-	    $sipfields[] = array($account,'trustrpid',$db->escapeSimple((isset($_REQUEST['trustrpid']))?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
-	    $sipfields[] = array($account,'sendrpid',$db->escapeSimple((isset($_REQUEST['sendrpid']))?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
-	    $sipfields[] = array($account,'context',$db->escapeSimple((isset($_REQUEST['context']))?$_REQUEST['context']:'from-internal'),$flag++);
-	    $sipfields[] = array($account,'dtmfmode',$db->escapeSimple((isset($_REQUEST['dtmfmode']))?$_REQUEST['dtmfmode']:''),$flag++);
-	    $sipfields[] = array($account,'host',$db->escapeSimple((isset($_REQUEST['host']))?$_REQUEST['host']:'dynamic'),$flag++);
-	    $sipfields[] = array($account,'type',$db->escapeSimple((isset($_REQUEST['type']))?$_REQUEST['type']:'friend'),$flag++);
-	    $sipfields[] = array($account,'mailbox',$db->escapeSimple((isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox']))?$_REQUEST['mailbox']:$account.'@device'),$flag++);
-	    $sipfields[] = array($account,'username',$db->escapeSimple((isset($_REQUEST['username']))?$_REQUEST['username']:$account),$flag++);
-	    $sipfields[] = array($account,'nat',$db->escapeSimple((isset($_REQUEST['nat']))?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
-	    $sipfields[] = array($account,'port',$db->escapeSimple((isset($_REQUEST['port']))?$_REQUEST['port']:'5060'),$flag++);
-	    $sipfields[] = array($account,'qualify',$db->escapeSimple((isset($_REQUEST['qualify']))?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
+		$sipfields[] = array($account,'accountcode',(isset($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++);
+	    $sipfields[] = array($account,'secret',(isset($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++);
+	    $sipfields[] = array($account,'canreinvite',(isset($_REQUEST['canreinvite'])?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
+	    $sipfields[] = array($account,'trustrpid',(isset($_REQUEST['trustrpid'])?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
+	    $sipfields[] = array($account,'sendrpid',(isset($_REQUEST['sendrpid'])?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
+	    $sipfields[] = array($account,'context',(isset($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),$flag++);
+	    $sipfields[] = array($account,'dtmfmode',(isset($_REQUEST['dtmfmode'])?$_REQUEST['dtmfmode']:''),$flag++);
+	    $sipfields[] = array($account,'host',(isset($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),$flag++);
+	    $sipfields[] = array($account,'type',(isset($_REQUEST['type'])?$_REQUEST['type']:'friend'),$flag++);
+	    $sipfields[] = array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),$flag++);
+	    $sipfields[] = array($account,'username',(isset($_REQUEST['username'])?$_REQUEST['username']:$account),$flag++);
+	    $sipfields[] = array($account,'nat',(isset($_REQUEST['nat'])?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
+	    $sipfields[] = array($account,'port',(isset($_REQUEST['port'])?$_REQUEST['port']:'5060'),$flag++);
+	    $sipfields[] = array($account,'qualify',(isset($_REQUEST['qualify'])?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
 	    if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
-	      $sipfields[] = array($account,'qualifyfreq',$db->escapeSimple((isset($_REQUEST['qualifyfreq']))?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
+	      $sipfields[] = array($account,'qualifyfreq',(isset($_REQUEST['qualifyfreq'])?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
 	    }
 	    if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
-	      $sipfields[] = array($account,'transport',$db->escapeSimple((isset($_REQUEST['transport']))?$_REQUEST['transport']:'udp'),$flag++);
-	      $sipfields[] = array($account,'encryption',$db->escapeSimple((isset($_REQUEST['encryption']))?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
+	      $sipfields[] = array($account,'transport',(isset($_REQUEST['transport'])?$_REQUEST['transport']:'udp'),$flag++);
+	      $sipfields[] = array($account,'encryption',(isset($_REQUEST['encryption'])?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
 	    }
-	    $sipfields[] = array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
-	    $sipfields[] = array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
-	    $sipfields[] = array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++);
-	    $sipfields[] = array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++);
-	    $sipfields[] = array($account,'disallow',$db->escapeSimple((isset($_REQUEST['disallow']))?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
-	    $sipfields[] = array($account,'allow',$db->escapeSimple((isset($_REQUEST['allow']))?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
+	    $sipfields[] = array($account,'callgroup',(isset($_REQUEST['callgroup'])?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
+	    $sipfields[] = array($account,'pickupgroup',(isset($_REQUEST['pickupgroup'])?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
+	    $sipfields[] = array($account,'deny',(isset($_REQUEST['deny'])?$_REQUEST['deny']:''),$flag++);
+	    $sipfields[] = array($account,'permit',(isset($_REQUEST['permit'])?$_REQUEST['permit']:''),$flag++);
+	    $sipfields[] = array($account,'disallow',(isset($_REQUEST['disallow'])?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
+	    $sipfields[] = array($account,'allow',(isset($_REQUEST['allow'])?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
 
 		if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
-			$sipfields[] = array($account,'avpf',$db->escapeSimple((isset($_REQUEST['avpf']))?$_REQUEST['avpf']:'no'),$flag++);
-			$sipfields[] = array($account,'icesupport',$db->escapeSimple((isset($_REQUEST['icesupport']))?$_REQUEST['icesupport']:'no'),$flag++);
+			$sipfields[] = array($account,'avpf',(isset($_REQUEST['avpf'])?$_REQUEST['avpf']:'no'),$flag++);
+			$sipfields[] = array($account,'icesupport',(isset($_REQUEST['icesupport'])?$_REQUEST['icesupport']:'no'),$flag++);
 		}
 	
-	    $vmexten = isset($_REQUEST['vmexten'])?$db->escapeSimple(trim($_REQUEST['vmexten'])):'';
+	    $vmexten = isset($_REQUEST['vmexten'])?trim($_REQUEST['vmexten']):'';
 	    if ($vmexten != '') {
 	      $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
 	    }
 	}
 
 	// Very bad
-	$sipfields[] = array($account,'account',$db->escapeSimple($account),$flag++);
-	$sipfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
+	$sipfields[] = array($account,'account',$account,$flag++);
+	$sipfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>',$flag++);
 
 	$compiled = $db->prepare('INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)');
 	$result = $db->executeMultiple($compiled,$sipfields);
