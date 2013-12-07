@@ -788,6 +788,8 @@ function core_destinations() {
 	global $amp_conf;
 	//static destinations
 	$extens = array();
+	$td = textdomain();
+	textdomain("amp");
 	$category = _("Terminate Call");
 	$ds_id = 'blackhole';
 	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category, 'id' => $ds_id);
@@ -796,6 +798,7 @@ function core_destinations() {
 	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
 	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
 	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
+	textdomain($td);
 
 	//get the list of meetmes
 	$results = core_users_list();
@@ -7742,7 +7745,7 @@ function core_devices_configpageload() {
           // We compare the existing secret against what might be in the put to detect changes when validating
           if ($devopt == "secret") {
             $currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
-						if ($devoptcurrent == '') {
+						if ($devoptcurrent == '' && empty($extdisplay)) {
 							$devoptcurrent = md5(uniqid());
 						}
           }
