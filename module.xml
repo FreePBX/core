@@ -71,6 +71,6 @@
 			<display>users</display>
 		</users>
  	</popovers>
-	<location>release/2.11/core-2.11.0.8.tgz</location>
-	<md5sum>8aafd8ed3b3afb1b676426300f0f933a</md5sum>
+	<location>release/2.11/core-2.11.0.9.tgz</location>
+	<md5sum>40f7940261f22a2473f091087b326abe</md5sum>
 </module>
