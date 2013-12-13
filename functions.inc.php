@@ -1029,17 +1029,13 @@ function core_get_config($engine) {
 				$fcc = new featurecode($modulename, 'blindxfer');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
-				if ($code != '') {
-					$core_conf->addFeatureMap('blindxfer',$code);
-				}
+				$core_conf->addFeatureMap('blindxfer',$code);
 
 				$fcc = new featurecode($modulename, 'atxfer');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
-				if ($code != '') {
-					$core_conf->addFeatureMap('atxfer',$code);
-				}
-
+				$core_conf->addFeatureMap('atxfer',$code);
+				
 				$fcc = new featurecode($modulename, 'automon');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
@@ -1066,16 +1062,12 @@ function core_get_config($engine) {
 				$fcc = new featurecode($modulename, 'disconnect');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
-				if ($code != '') {
-					$core_conf->addFeatureMap('disconnect',$code);
-				}
-
+				$core_conf->addFeatureMap('disconnect',$code);
+				
 				$fcc = new featurecode($modulename, 'pickupexten');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
-				if ($code != '') {
-					$core_conf->addFeatureGeneral('pickupexten',$code);
-				}
+				$core_conf->addFeatureGeneral('pickupexten',$code);
 			}
 
 			// FeatureCodes
