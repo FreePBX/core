@@ -6201,7 +6201,7 @@ function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
   foreach ($patterns as $pattern) {
     $match_pattern_prefix = $db->escapeSimple(preg_replace($filter_prefix,'',strtoupper(trim($pattern['match_pattern_prefix']))));
     $match_pattern_pass = $db->escapeSimple(preg_replace($filter_match,'',strtoupper(trim($pattern['match_pattern_pass']))));
-    $prepend_digits = $db->escapeSimple(preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits']))));
+    $prepend_digits = $db->escapeSimple(str_replace('W', 'w', preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits'])))));
     if ($match_pattern_prefix.$match_pattern_pass == '') {
       continue;
     }
