@@ -27,7 +27,7 @@
 <?php if(!empty($helptext)) {?>
 	<div class="alert alert-warning"><?php echo $helptext?></div>
 <?php } ?>
-		<form enctype="multipart/form-data" name="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
+		<form enctype="multipart/form-data" name="trunkEdit" id="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" name="action" value=""/>

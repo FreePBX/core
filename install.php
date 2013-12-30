@@ -1049,6 +1049,16 @@ if ($res[0]['Type'] == 'varchar(20)') {
 		outn(_("migrated username column to allow for longer usernames"));
 }
 
+$sql = "CREATE TABLE IF NOT EXISTS `pjsip` (
+  `id` varchar(20) NOT NULL DEFAULT '-1',
+  `keyword` varchar(30) NOT NULL DEFAULT '',
+  `data` varchar(255) NOT NULL,
+  `flags` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`keyword`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+	$db->query($sql);
+	
+	
 function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	global $db, $freepbx_conf;
 

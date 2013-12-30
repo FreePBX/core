@@ -161,8 +161,9 @@ function validatePatterns() {
 document.trunkEdit.trunk_name.focus();
 
 function trunkEdit_onsubmit(act) {
-  var theForm = document.trunkEdit;
-
+	var theForm = document.trunkEdit;
+	
+	var tech = '<?php echo $tech ?>';
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
@@ -176,60 +177,62 @@ function trunkEdit_onsubmit(act) {
 
 	defaultEmptyOK = true;
 
-	if (isEmpty($.trim(theForm.outcid.value))) {
-	  if (theForm.keepcid.value == 'on' || theForm.keepcid.value == 'all') {
-		  return warnInvalid(theForm.outcid, msgCIDValueRequired);
-      } else {
-				if (confirm(msgCIDValueEmpty) == false) {
-				  return false;
-      }
-    }
-  }
-
-	if (!isCallerID(theForm.outcid.value))
-		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
-	
-	if (!isInteger(theForm.maxchans.value))
-		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
-	
-	if (!isDialIdentifierSpecial(theForm.dialoutprefix.value)) {
-    if (confirm(msgInvalidOutboundDialPrefix) == false) {
-      $('#dialoutprefix').focus();
-      return false;
-    }
-  }
-	
-	<?php if ($tech != "enum" && $tech != "custom" && $tech != "dundi") { ?>
-	defaultEmptyOK = true;
-	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
-		return warnInvalid(theForm.channelid, msgInvalidTrunkName);
-	
-	if (theForm.channelid.value == theForm.usercontext.value)
-		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-	<?php } else if ($tech == "custom" || $tech == "dundi") { ?> 
-	if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value)) 
-		return warnInvalid(theForm.channelid, msgInvalidChannelName); 
-
-	if (theForm.channelid.value == theForm.usercontext.value) 
-		return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-	<?php } ?>
-
-	<?php if ($tech == "sip" || substr($tech,0,3) == "iax") { ?>
-	if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && 
-		(!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) &&
-			(theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
-				if (confirm(msgConfirmBlankContext) == false)
+	if (isEmpty($.trim($('#trunkEdit input[name="outcid"]').val()))) {
+		if ($('#trunkEdit input[name="keepcid"]').val() == 'on' || $('#trunkEdit input[name="keepcid"]').val() == 'all') {
+			return warnInvalid(theForm.outcid, msgCIDValueRequired);
+		} else {
+			if (confirm(msgCIDValueEmpty) == false) {
 				return false;
 			}
-	<?php } ?>
+		}
+	}
+	
+	if (!isCallerID($('#trunkEdit input[name="outcid"]').val()))
+		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
+	
+	if (!isInteger($('#trunkEdit input[name="maxchans"]').val()))
+		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
+	
+	if (!isDialIdentifierSpecial($('#dialoutprefix').val())) {
+		if (confirm(msgInvalidOutboundDialPrefix) == false) {
+			$('#dialoutprefix').focus();
+			return false;
+		}
+	}
+	
+	if (isEmpty($.trim($('#trunkEdit input[name="trunk_name"]').val()))) {
+		return warnInvalid(theForm.trunk_name, msgInvalidTrunkName);
+	}
+	
+	if(tech != 'enum' && tech != 'custom' && tech != 'dundi' && tech != 'pjsip') {
+		defaultEmptyOK = true;
+		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+			return warnInvalid(theForm.channelid, msgInvalidTrunkName);
+	
+		if (theForm.channelid.value == theForm.usercontext.value)
+			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+	} else if (tech == 'custom' || tech == 'dundi') {
+		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value)) 
+			return warnInvalid(theForm.channelid, msgInvalidChannelName); 
 
-  clearPatterns();
-  if (validatePatterns()) {
-	  theForm.action.value = act;
-	  return true;
-  } else {
-    return false;
-  }
+		if (theForm.channelid.value == theForm.usercontext.value) 
+			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+	}
+
+	if(tech == 'sip' || tech.substr(0,3) == 'iax') {
+		if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && (!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) && (theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
+			if (confirm(msgConfirmBlankContext) == false)
+			return false;
+		}
+	}
+
+	clearPatterns();
+	if (validatePatterns()) {
+		theForm.action.value = act;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)

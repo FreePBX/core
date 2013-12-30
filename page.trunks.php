@@ -140,7 +140,6 @@ if (!empty($csv_file)) {
 // TODO: remember old name, if new one is different the don't rename
 //
 //if submitting form, update database
-dbug($action);
 switch ($action) {
 	case "copytrunk":
 		$sv_channelid    = isset($_REQUEST['sv_channelid'])?$_REQUEST['sv_channelid']:'';
