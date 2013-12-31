@@ -519,8 +519,10 @@ if (!$tech && !$extdisplay) {
 		show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
 		break;
 	case "pjsip":
-	show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
-	break;
+		// displayvars is passed by reference, and may or may not be updated.
+		FreePBX::create()->PJSip->getDisplayVars($extdisplay, $displayvars);
+		show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
+		break;
 	case "sip":
 		$displayvars['peerdetails'] = $peerdetails;
 		$displayvars['usercontext'] = $usercontext;
@@ -537,3 +539,4 @@ if (!$tech && !$extdisplay) {
 	echo $module_hook->hookHtml;
 	show_view(dirname(__FILE__).'/views/trunks/trunk_footer.php',$displayvars);
 }
+

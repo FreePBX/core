@@ -452,4 +452,9 @@ class PJSip implements BMO {
 
 		// TODO: prepend, pattern_prefix and pattern_pass
 	}
+
+	public function getDisplayVars($trunkid, &$dispvars) {
+		$dispvars['client_uri'] = "this should work";
+	}
+
 }

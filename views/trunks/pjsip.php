@@ -42,7 +42,7 @@
 	<td>
 		<a href=# class="info"><?php echo _("Client URI")?><span><?php echo _("Client SIP URI used when attemping outbound registration.")?></span></a>: 
 	</td><td>
-		<input type="text" name="client_uri" value=""/>
+	<input type="text" name="client_uri" value="<?php echo $client_uri?>"/>
 	</td>
 </tr>
 <tr>
@@ -80,3 +80,4 @@
 		<input type="text" name="secret" value=""/>
 	</td>
 </tr>
+
