@@ -481,6 +481,7 @@ class PJSip implements BMO {
 				"context" => "from-pstn",
 				"transport" => 'udp',
 				"codecs" => array(
+					"g722" => true,
 					"ulaw" => true,
 					"alaw" => false,
 					"gsm" => false
