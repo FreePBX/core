@@ -292,8 +292,8 @@ class PJSip implements BMO {
 
 	public function doConfigPageInit($page) {
 		if (isset($_REQUEST['tech']) && strtoupper($_REQUEST['tech']) == 'PJSIP') {
-			print "PJSip was called with $page<br />";
-			print_r($_REQUEST);
+			//print "PJSip was called with $page<br />";
+			//print_r($_REQUEST);
 		}
 	}
 
@@ -430,6 +430,7 @@ class PJSip implements BMO {
 		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
 		// We care about the arrays later
 
+		$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
 		foreach ($_REQUEST as $k => $v) {
 			// Skip this value if we don't care about it.

@@ -30,7 +30,7 @@
 		<form enctype="multipart/form-data" name="trunkEdit" id="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
-			<input type="hidden" name="action" value=""/>
+			<input type="hidden" name="action" value="<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>"/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
 			<input type="hidden" name="provider" value="<?php echo $provider?>"/>
 			<input type="hidden" name="sv_trunk_name" value="<?php echo $trunk_name?>"/>

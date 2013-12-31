@@ -148,7 +148,7 @@ echo '<ul class="sortable">';
 		. 'id="'. $codec . '" '
 		. 'class="audio-codecs" tabindex="' . $tabindex. '" '
 		. $codec_checked
-		. ' disabled/>'
+		. ' />'
 		. '<label for="'. $codec . '"> '
 		. '<small>' . $codec_trans . '</small>'
 		. ' </label></a></li>';
@@ -160,7 +160,7 @@ echo '</ul>';
   </tr>
 <script>
 $(function() {
-	$( ".sortable" ).sortable({ disabled: true });
+	$( ".sortable" ).sortable();
 });
 $('#configmode').change(function(e){
 	switch_view();

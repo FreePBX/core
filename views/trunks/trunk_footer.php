@@ -163,7 +163,7 @@ document.trunkEdit.trunk_name.focus();
 function trunkEdit_onsubmit(act) {
 	var theForm = document.trunkEdit;
 	
-	var tech = '<?php echo $tech ?>';
+	var tech = '<?php echo !empty($tech) ? strtolower($tech) : strtolower($_REQUEST['tech']) ?>';
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
@@ -210,6 +210,7 @@ function trunkEdit_onsubmit(act) {
 	}
 	
 	if(tech == 'pjsip') {
+		console.log('OK');
 		if($('#configmode').val() == 'advanced') {
 			if (isEmpty($('#trunkEdit input[name="client_uri"]').val())) {
 				return warnInvalid(theForm.client_uri, msgInvalidClientURI);
