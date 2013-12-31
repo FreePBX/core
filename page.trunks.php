@@ -162,6 +162,9 @@ switch ($action) {
 	// Fallthrough to addtrunk now...
 	//
 	case "addtrunk":
+		if($tech == 'pjsip') {
+			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
+		}
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 		
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert);
@@ -169,6 +172,9 @@ switch ($action) {
 		redirect_standard();
 	break;
 	case "edittrunk":
+		if($tech == 'pjsip') {
+			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
+		}
 		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 		
 		// this can rewrite too, so edit is the same

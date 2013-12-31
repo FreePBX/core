@@ -1699,6 +1699,7 @@ function core_get_config($engine) {
 													$trunkprops['tech'] = 'iax2';
 													// fall-through
 												case 'iax2':
+												case 'pjsip':
 												case 'sip':
 													$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
 													$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
