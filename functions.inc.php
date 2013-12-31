@@ -5925,12 +5925,15 @@ function core_trunks_del($trunknum, $tech = null) {
 	// conditionally, delete from iax or sip
 	switch (strtolower($tech)) {
 		case "iax2":
-      $tech = "iax";
-      // fall through
+			$tech = "iax";
+			// fall through
 		case "iax":
 		case "sip":
 			sql("DELETE FROM `$tech` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
-		break;
+			break;
+		case "pjsip":
+			sql("DELETE FROM `pjsip` WHERE `id`='$trunknum'");
+			break;
 	}
 	sql("DELETE FROM `trunks` WHERE `trunkid` = '$trunknum'");
 	if ($astman) {
@@ -5952,6 +5955,7 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
+// This is not obsolete 8-( 2013-12-31.
 function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts=false) {
 	global $db, $astman;
 
@@ -5985,6 +5989,9 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 			if ($register != ""){
 				core_trunks_addRegister($trunknum,'sip',$register,$disable_flag);
 			}
+		break;
+		case "pjsip":
+			FreePBX::create()->PJSip->addTrunk($trunknum);
 		break;
 	}
 

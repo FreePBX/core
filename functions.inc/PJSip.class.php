@@ -432,4 +432,24 @@ class PJSip implements BMO {
 		foreach ($this->PJSipModules as $mod)
 			$m->noload($mod);
 	}
+
+	public function addTrunk($trunknum) {
+		// These are the vars we DON'T care about that are being submitted from the PJSip page
+		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
+		// We care about the arrays later
+
+		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
+		foreach ($_REQUEST as $k => $v) {
+			// Skip this value if we don't care about it.
+			if (in_array($k, $ignore))
+				continue;
+
+			// Otherwise, we can insert it.
+			$ins->bindParam(':keyword', $k);
+			$ins->bindParam(':data', $v);
+			$ins->execute();
+		}
+
+		// TODO: prepend, pattern_prefix and pattern_pass
+	}
 }
