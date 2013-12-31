@@ -325,78 +325,70 @@ class PJSip implements BMO {
 			'type=global',
 			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
 		);
-
-		$conf['pjsip.registration.conf']['mytrunk1'] = array(
-			'type=registration',
-			'transport=udp',
-			'outbound_auth=mytrunk1',
-			'server_uri=sip:<user>@trunk1.freepbx.com:5060',
-			'client_uri=sip:<user>@<localip>:5060',
-			'retry_interval=60',
-			'expiration=60'
-		);
-		$conf['pjsip.auth.conf']['mytrunk1'] = array(
-			'type=auth',
-			'auth_type=userpass',
-			'password=<pass>',
-			'username=<secret>'
-		);
-		$conf['pjsip.aor.conf']['mytrunk1'] = array(
-			'type=aor',
-			'contact=trunk1.freepbx.com',
-			
-		);
-		$conf['pjsip.endpoint.conf']['mytrunk1'] = array(
-			'type=endpoint',
-			'transport=udp',
-			'context=from-pstn',
-			'disallow=all',
-			'allow=ulaw',
-			'outbound_auth=mytrunk1',
-			'aors=mytrunk1'
-		);
-		$conf['pjsip.identify.conf']['mytrunk1'] = array(
-			'type=identify',
-			'endpoint=mytrunk1',
-			'match=trunk1.freepbx.com'
-			
-		);
 		
-		$conf['pjsip.registration.conf']['mytrunk2'] = array(
-			'type=registration',
-			'transport=udp',
-			'outbound_auth=mytrunk2',
-			'server_uri=sip:<user>@trunk2.freepbx.com:5060',
-			'client_uri=sip:<user>@<localip>:5060',
-			'retry_interval=60',
-			'expiration=60'
-		);
-		$conf['pjsip.auth.conf']['mytrunk2'] = array(
-			'type=auth',
-			'auth_type=userpass',
-			'password=<pass>',
-			'username=<user>'
-		);
-		$conf['pjsip.aor.conf']['mytrunk2'] = array(
-			'type=aor',
-			'contact=trunk2.freepbx.com',
+		$trunks = $this->getAllTrunks();
+		
+		foreach($trunks as $trunk) {
+			$tn = $trunk['trunk_name'];
+			//prevent....special people
+			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
+			$conf['pjsip.registration.conf'][$tn] = array(
+				'type' => 'registration',
+				'transport' => 'udp',
+				'outbound_auth' => $tn,
+				'contact_user' => $trunk['contact_user'],
+				'retry_interval' => $trunk['retry_interval'],
+				'expiration' => $trunk['expiration'],
+				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
+			);
 			
-		);
-		$conf['pjsip.endpoint.conf']['mytrunk2'] = array(
-			'type=endpoint',
-			'transport=udp',
-			'context=from-pstn',
-			'disallow=all',
-			'allow=ulaw',
-			'outbound_auth=mytrunk2',
-			'aors=mytrunk2'
-		);
-		$conf['pjsip.identify.conf']['mytrunk2'] = array(
-			'type=identify',
-			'endpoint=mytrunk2',
-			'match=trunk2.freepbx.com'
+			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
+				if(empty($trunk['sip_server'])) {
+					throw new Exception('Asterisk will crash if sip_server is blank!');
+				}
+				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			} else {
+				if(empty($trunk['server_uri']) || $trunk['client_uri']) {
+					throw new Exception('Asterisk will crash if server_uri or client_uri is blank!');
+				}
+				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
+				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
+			}
 			
-		);
+			$conf['pjsip.auth.conf'][$tn] = array(
+				'type' => 'auth',
+				'auth_type' => 'userpass',
+				'password' => $trunk['secret'],
+				'username' => $trunk['username']
+			);
+			
+			$conf['pjsip.aor.conf'][$tn] = array(
+				'type' => 'aor'
+			);
+			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
+				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			} else {
+				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
+			}
+			
+			//TODO: This isn't used by FreePBX and skips all inbound route processing so needs to be fixed.
+			$conf['pjsip.endpoint.conf'][$tn] = array(
+				'type' => 'endpoint',
+				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
+				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
+				'disallow' => 'all',
+				'allow' => 'ulaw',
+				'outbound_auth' => $tn,
+				'aors' => $tn
+			);
+			
+			$conf['pjsip.identify.conf'][$tn] = array(
+				'type' => 'identify',
+				'endpoint' => $tn,
+				'match' => gethostbyname($trunk['sip_server'])
+			);
+		}
 		return $conf;
 	}
 
@@ -452,9 +444,48 @@ class PJSip implements BMO {
 
 		// TODO: prepend, pattern_prefix and pattern_pass
 	}
-
-	public function getDisplayVars($trunkid, &$dispvars) {
-		$dispvars['client_uri'] = "this should work";
+	
+	public function getAllTrunks() {
+		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
+		$get->execute();
+		$result = $get->fetchAll(PDO::FETCH_ASSOC);
+		$final = array();
+		foreach($result as $values) {
+			$final[$values['id']][$values['keyword']] = $values['data'];
+		}
+		return $final;
 	}
 
+	public function getDisplayVars($trunkid, &$dispvars) {
+		if(!empty($trunkid)) {
+			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
+			$get->bindParam(':id', str_replace('OUT_','',$trunkid));
+			$get->execute();
+			$result = $get->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+			foreach($result as $key => $val) {
+				$dispvars[$key] = $val[0];
+			}
+			$dispvars['codecs'] = array(
+				"ulaw" => true,
+				"alaw" => false,
+				"gsm" => false
+			);
+		} else {
+			$dispvars = array(
+				"auth_rejection_permanent" => "on",
+				"expiration" => 3600,
+				"retry_interval" => 60,
+				"forbidden_retry_interval" => 10,
+				"max_retries" => 10,
+				"context" => "from-pstn",
+				"transport" => 'udp',
+				"codecs" => array(
+					"ulaw" => true,
+					"alaw" => false,
+					"gsm" => false
+				)
+			);
+		}
+		$dispvars['transports'] = array_keys($this->getTransportConfigs());
+	}
 }
