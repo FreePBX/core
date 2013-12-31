@@ -303,8 +303,8 @@ class PJSip implements BMO {
 
 		// Generate includes
 		$pjsip = "#include pjsip.custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
-		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.manualtrunks.conf\n";
-		$conf['pjsip.conf'] = $pjsip;
+		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.manualtrunks.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
+		$conf['pjsip.conf'][] = $pjsip;
 
 		// Transports are a multi-dimensional array, because
 		// we use it earlier to match extens with transports
@@ -318,7 +318,85 @@ class PJSip implements BMO {
 			}
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
+		
+		//TODO: Rob can we fix this please?
+		global $version;
+		$conf['pjsip.conf']['global'] = array(
+			'type=global',
+			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
+		);
 
+		$conf['pjsip.registration.conf']['mytrunk1'] = array(
+			'type=registration',
+			'transport=udp',
+			'outbound_auth=mytrunk1',
+			'server_uri=sip:<user>@trunk1.freepbx.com:5060',
+			'client_uri=sip:<user>@<localip>:5060',
+			'retry_interval=60',
+			'expiration=60'
+		);
+		$conf['pjsip.auth.conf']['mytrunk1'] = array(
+			'type=auth',
+			'auth_type=userpass',
+			'password=<pass>',
+			'username=<secret>'
+		);
+		$conf['pjsip.aor.conf']['mytrunk1'] = array(
+			'type=aor',
+			'contact=trunk1.freepbx.com',
+			
+		);
+		$conf['pjsip.endpoint.conf']['mytrunk1'] = array(
+			'type=endpoint',
+			'transport=udp',
+			'context=from-pstn',
+			'disallow=all',
+			'allow=ulaw',
+			'outbound_auth=mytrunk1',
+			'aors=mytrunk1'
+		);
+		$conf['pjsip.identify.conf']['mytrunk1'] = array(
+			'type=identify',
+			'endpoint=mytrunk1',
+			'match=trunk1.freepbx.com'
+			
+		);
+		
+		$conf['pjsip.registration.conf']['mytrunk2'] = array(
+			'type=registration',
+			'transport=udp',
+			'outbound_auth=mytrunk2',
+			'server_uri=sip:<user>@trunk2.freepbx.com:5060',
+			'client_uri=sip:<user>@<localip>:5060',
+			'retry_interval=60',
+			'expiration=60'
+		);
+		$conf['pjsip.auth.conf']['mytrunk2'] = array(
+			'type=auth',
+			'auth_type=userpass',
+			'password=<pass>',
+			'username=<user>'
+		);
+		$conf['pjsip.aor.conf']['mytrunk2'] = array(
+			'type=aor',
+			'contact=trunk2.freepbx.com',
+			
+		);
+		$conf['pjsip.endpoint.conf']['mytrunk2'] = array(
+			'type=endpoint',
+			'transport=udp',
+			'context=from-pstn',
+			'disallow=all',
+			'allow=ulaw',
+			'outbound_auth=mytrunk2',
+			'aors=mytrunk2'
+		);
+		$conf['pjsip.identify.conf']['mytrunk2'] = array(
+			'type=identify',
+			'endpoint=mytrunk2',
+			'match=trunk2.freepbx.com'
+			
+		);
 		return $conf;
 	}
 
