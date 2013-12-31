@@ -34,6 +34,21 @@ class core_conf {
 	var $_rtp_additional	= array();
 	var $dev_user_map;
 
+	// Static Object used for self-referencing.
+	private static $obj;
+
+	public function __construct() {
+		// Ensure the local object is available
+		self::$obj = $this;
+	}
+
+	public static function create() {
+		if (!isset(self::$obj))
+			self::$obj = new FreePBX();
+
+		return self::$obj;
+	}
+
 	// map the actual vmcontext and user devicename if the device is fixed
 	private function map_dev_user($account, $keyword, $data) {
 		global $amp_conf;
@@ -172,6 +187,7 @@ class core_conf {
 		if (empty($this->_rtp_additional)) {
 			$this->setDefaultRtp();
 		}
+
 		foreach ($this->_rtp_additional as $section => $entries) {
 			$output .= "[".$section."]\n";
 			foreach ($entries as $key => $entry) {
