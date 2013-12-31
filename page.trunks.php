@@ -427,8 +427,8 @@ if (!$tech && !$extdisplay) {
 		if($num_routes > 0) {
 			$usage_list = framework_display_destination_usage(core_getdest(ltrim($extdisplay,'OUT_')));
 		}
-	} else {
-		// set defaults
+	} else { // 'Add New Trunk' selected.
+		// Generic defaults
 		$outcid = "";
 		$maxchans = "";
 		$dialoutprefix = "";
@@ -497,41 +497,40 @@ if (!$tech && !$extdisplay) {
 
 	switch ($tech) {
 	case "zap":
-	show_view(dirname(__FILE__).'/views/trunks/zap.php',$displayvars);
-	break;
+		show_view(dirname(__FILE__).'/views/trunks/zap.php',$displayvars);
+		break;
 	case "dahdi":
-	show_view(dirname(__FILE__).'/views/trunks/dahdi.php',$displayvars);
-	break;
+		show_view(dirname(__FILE__).'/views/trunks/dahdi.php',$displayvars);
+		break;
 	case "enum":
-	break;
+		break;
 	//--------------------------------------------------------------------------------------
 	// Added to enable the unsupported misdn module
 	case "misdn":
-	if (function_exists('misdn_groups_ports')) {
-	show_view(dirname(__FILE__).'/views/trunks/misdn.php',$displayvars);
-	}
-	break; 
+		if (function_exists('misdn_groups_ports')) {
+		show_view(dirname(__FILE__).'/views/trunks/misdn.php',$displayvars);
+		}
+		break; 
 	//--------------------------------------------------------------------------------------
 	case "custom":
-	show_view(dirname(__FILE__).'/views/trunks/custom.php',$displayvars);
-	break;
+		show_view(dirname(__FILE__).'/views/trunks/custom.php',$displayvars);
+		break;
 	case "dundi":
-	show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
-	break;
+		show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
+		break;
 	case "pjsip":
 	show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
 	break;
 	case "sip":
-	$displayvars['peerdetails'] = $peerdetails;
-	$displayvars['usercontext'] = $usercontext;
-	$displayvars['userconfig'] = $userconfig;
-	$displayvars['register'] = $register;
-	$displayvars['peerdetails'] = $peerdetails;
-	show_view(dirname(__FILE__).'/views/trunks/sip.php',$displayvars);
-	break;
+		$displayvars['peerdetails'] = $peerdetails;
+		$displayvars['usercontext'] = $usercontext;
+		$displayvars['userconfig'] = $userconfig;
+		$displayvars['register'] = $register;
+		$displayvars['peerdetails'] = $peerdetails;
+		show_view(dirname(__FILE__).'/views/trunks/sip.php',$displayvars);
+		break;
 	default:
-
-	break;
+		break;
 	}
 	// implementation of module hook
 	// object was initialized in config.php
