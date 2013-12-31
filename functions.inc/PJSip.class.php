@@ -3,6 +3,12 @@
 
 class PJSip implements BMO {
 
+	private $codecs = array(
+		"g722" => true,
+		"ulaw" => true,
+		"alaw" => false,
+		"gsm" => false,
+	);
 	private $PJSipModules = array("chan_pjsip.so", "res_pjsip_endpoint_identifier_anonymous.so", "res_pjsip_messaging.so",
 		"res_pjsip_pidf.so", "res_pjsip_session.so", "func_pjsip_endpoint.so", "res_pjsip_endpoint_identifier_ip.so", "res_pjsip_mwi.so",
 		"res_pjsip_pubsub.so", "res_pjsip.so", "res_pjsip_acl.so", "res_pjsip_endpoint_identifier_user.so", "res_pjsip_nat.so",
@@ -378,7 +384,7 @@ class PJSip implements BMO {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => 'ulaw',
+				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
 				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
@@ -466,11 +472,18 @@ class PJSip implements BMO {
 			foreach($result as $key => $val) {
 				$dispvars[$key] = $val[0];
 			}
-			$dispvars['codecs'] = array(
-				"ulaw" => true,
-				"alaw" => false,
-				"gsm" => false
-			);
+			
+			$codecs = explode(",",$dispvars['codecs']);
+			$dispvars['codecs'] = array();
+			foreach($codecs as $codec) {
+				$dispvars['codecs'][$codec] = true;
+			}
+			
+			foreach($this->codecs as $codec => $state) {
+				if(!isset($dispvars['codecs'][$codec])) {
+					$dispvars['codecs'][$codec] = false;
+				}
+			}
 		} else {
 			$dispvars = array(
 				"auth_rejection_permanent" => "on",
@@ -480,12 +493,7 @@ class PJSip implements BMO {
 				"max_retries" => 10,
 				"context" => "from-pstn",
 				"transport" => 'udp',
-				"codecs" => array(
-					"g722" => true,
-					"ulaw" => true,
-					"alaw" => false,
-					"gsm" => false
-				)
+				"codecs" => $this->codecs
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());
