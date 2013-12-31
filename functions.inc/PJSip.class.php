@@ -386,7 +386,7 @@ class PJSip implements BMO {
 			$conf['pjsip.identify.conf'][$tn] = array(
 				'type' => 'identify',
 				'endpoint' => $tn,
-				'match' => gethostbyname($trunk['sip_server'])
+				'match' => $trunk['sip_server']//gethostbyname()
 			);
 		}
 		return $conf;

@@ -545,4 +545,3 @@ if (!$tech && !$extdisplay) {
 	echo $module_hook->hookHtml;
 	show_view(dirname(__FILE__).'/views/trunks/trunk_footer.php',$displayvars);
 }
-
