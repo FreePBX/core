@@ -1,5 +1,7 @@
 <?php
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
+// vim: set ai ts=4 sw=4 ft=php:
+//
 //This file is part of FreePBX.
 //
 //    FreePBX is free software: you can redistribute it and/or modify
@@ -1714,8 +1716,8 @@ function core_get_config($engine) {
 												case 'iax':
 													$trunkprops['tech'] = 'iax2';
 													// fall-through
-												case 'iax2':
 												case 'pjsip':
+												case 'iax2':
 												case 'sip':
 													$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
 													$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
@@ -1723,7 +1725,14 @@ function core_get_config($engine) {
 													// fall-through
 												case 'zap':
 												case 'dahdi':
-													$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',strtoupper($trunkprops['tech']).'/'.$trunkprops['channelid']));
+													// PJSip hack. This needs to be re-written, I think.
+													if ($trunkprops['tech'] == "pjsip") {
+														$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_SUFFIX',"@".$trunkprops['channelid']));
+														$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',strtoupper($trunkprops['tech'])));
+													} else {
+														$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('TDIAL_STRING',strtoupper($trunkprops['tech']).'/'.$trunkprops['channelid']));
+													}
+													$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
 													$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_set('DIAL_TRUNK',$trunkprops['trunkid'] ));
 													$ext->add($tcontext, $trunkprops['trunkid'], '', new ext_goto('1',$texten,'ext-trunk'));
 													$generate_texten = true;
@@ -1784,7 +1793,7 @@ function core_get_config($engine) {
 											$ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 
 											$ext->add($tcontext,$texten,'',new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
-											$ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
+											$ext->add($tcontext,$texten,'',new ext_dial('${TDIAL_STRING}/${OUTNUM}${TDIAL_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
 											// Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
 											// malicious CID that can cause overflows in the Asterisk code.
 											//
@@ -1957,9 +1966,13 @@ function core_get_config($engine) {
 										}
 										if ($tech == 'CUSTOM') {
 											$ext->addGlobal('OUT_'.$tid, 'AMP:'.$trunk['channelid']);
-										} else {
+										} elseif ($tech != 'PJSIP') {
 											$ext->addGlobal('OUT_'.$tid, $tech."/".$trunk['channelid']);
+										} else {
+											$ext->addGlobal('OUT_'.$tid, $tech);
+											$ext->addGlobal('OUT_'.$tid.'_SUFFIX', '@'.$trunk['channelid']);
 										}
+
 										$ext->addGlobal('OUTCID_'.$tid,      $trunk['outcid']);
 										$ext->addGlobal('OUTMAXCHANS_'.$tid, $trunk['maxchans']);
 										$ext->addGlobal('OUTFAIL_'.$tid,     $trunk['failscript']);
@@ -2613,7 +2626,7 @@ function core_get_config($engine) {
 												}
 
 												$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
-												$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
+												$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
 												$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 												$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
