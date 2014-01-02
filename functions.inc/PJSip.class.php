@@ -399,7 +399,8 @@ class PJSip implements BMO {
 	}
 
 	public function writeConfig($conf) {
-		//TODO: Rob please remove this global		
+		//TODO: Rob please remove this global
+		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
 		global $astman;
 		$nt = notifications::create($db);
 		$sip_change = _("SIP Channel Driver Changed");
