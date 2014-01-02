@@ -4,9 +4,9 @@
 class PJSip implements BMO {
 
 	private $codecs = array(
-		"g722" => true,
+		"g722" => false,
 		"ulaw" => true,
-		"alaw" => false,
+		"alaw" => true,
 		"gsm" => false,
 	);
 	private $PJSipModules = array("chan_pjsip.so", "res_pjsip_endpoint_identifier_anonymous.so", "res_pjsip_messaging.so",
