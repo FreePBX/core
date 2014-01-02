@@ -361,6 +361,10 @@ $displayvars = array(
 );
 show_view(dirname(__FILE__).'/views/trunks/header.php',$displayvars);
 
+$freepbx = FreePBX::create();
+
+$sipdriver = $freepbx->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
+
 if (!$tech && !$extdisplay) {
 	//driver => label
 	$trunk_types = array(
