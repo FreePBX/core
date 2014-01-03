@@ -103,7 +103,7 @@ class PJSip implements BMO {
 		if (empty($sip['bindport'])) {
 			$port = "5060";
 		} else {
-			$port = $sip['bindport'];
+			$port = $sip['bindport']-1;
 		}
 
 		$transport['udp'] = array( "protocol" => "udp", "bind" => "$bind:$port", "type" => "transport");

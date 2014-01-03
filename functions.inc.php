@@ -7523,7 +7523,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
-		$tt = _("dThe DTMF signaling mode used by this device, usually rfc2833 for most phones.");
+		$tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.");
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
 		// $amp_conf['DEVICE_SIP_CANREINVITE']
 		// $amp_conf['DEVICE_SIP_TRUSTRPID']
