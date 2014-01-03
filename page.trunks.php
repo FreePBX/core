@@ -361,21 +361,23 @@ $displayvars = array(
 );
 show_view(dirname(__FILE__).'/views/trunks/header.php',$displayvars);
 
-$freepbx = FreePBX::create();
+$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 
-$sipdriver = $freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 
 if (!$tech && !$extdisplay) {
 	//driver => label
-	$trunk_types = array(
-		"PJSIP" => sprintf(_('SIP (%s)'),'chan_pjsip'),
-		"SIP" => sprintf(_('SIP (%s)'),'chan_sip'),
+	$default_trunk_types = array(
 		"DAHDI" => 'DAHDi',
 		"IAX2" => 'IAX2',
 		"ENUM" => 'ENUM',
 		"DUNDI" => 'DUNDi',
 		"CUSTOM" => 'Custom'
 	);
+	
+	$sip = ($sipdriver == 'both' || $sipdriver == 'chan_sip') ? array("SIP" => sprintf(_('SIP (%s)'),'chan_sip')) : array();
+	$pjsip = ($sipdriver == 'both' || $sipdriver == 'chan_pjsip') ? array("PJSIP" => sprintf(_('SIP (%s)'),'chan_pjsip')) : array();
+
+	$trunk_types = $pjsip+$sip+$default_trunk_types;
 
 	// Added to enable the unsupported misdn module
 	if (function_exists('misdn_ports_list_trunks') && count(misdn_ports_list_trunks())) {

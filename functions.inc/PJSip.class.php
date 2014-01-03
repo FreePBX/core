@@ -159,9 +159,12 @@ class PJSip implements BMO {
 	}
 
 	private function generateEndpoint($config, &$retarr) {
-
 		// Validate $config array
 		$this->validateEndpoint($config);
+		
+		if($config['sipdriver'] != 'chan_pjsip') {
+			return false;
+		}
 
 		// With pjsip, we need three sections. 
 		$endpointname = $config['account'];

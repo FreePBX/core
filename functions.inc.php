@@ -412,6 +412,7 @@ class core_conf {
 			die($results->getMessage());
 		}
 
+		$finaloutput .= $output;
 		foreach ($results as $result) {
 			$account = $result['data'];
 			$id = $result['id'];
@@ -427,6 +428,12 @@ class core_conf {
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
+				if($element['keyword'] == 'sipdriver' && $element['data'] == 'chan_pjsip'){
+					continue(2);
+				}
+				if($element['keyword'] == 'sipdriver'){
+					continue;
+				}
 				if (strtolower(trim($element['keyword'])) != 'secret') {
 					$options = explode("&", $element['data']);
 					foreach ($options as $option) {
@@ -516,8 +523,9 @@ class core_conf {
 				}
 			}
 			$output .= $additional."\n";
+			$finaloutput .= $output;
 		}
-		return $output;
+		return $finaloutput;
 	}
 
 	function generate_sip_registrations($ast_version) {
@@ -4880,19 +4888,25 @@ function core_get_config($engine) {
 										// 	return $astman->disconnect();
 										//	is "true" the correct value...?
 									}
+									
+									//I dont wanna talk about it.
+									function core_devices_addpjsip($account) {
+										core_devices_addsip($account,'PJSIP');
+									}
 
 									//add to sip table
-									function core_devices_addsip($account) {
+									function core_devices_addsip($account,$tech='SIP') {
 										global $db;
 										global $amp_conf;
 
 										$flag = 2;
+
 										foreach ($_REQUEST as $req=>$data) {
 											if ( substr($req, 0, 8) == 'devinfo_' ) {
 												$keyword = substr($req, 8);
 												$data = trim($data);
 												if ( $keyword == 'dial' && $data == '' ) {
-													$sipfields[] = array($account, $keyword, 'SIP/'.$account, $flag++);
+													$sipfields[] = array($account, $keyword, $tech.'/'.$account, $flag++);
 												} elseif ($keyword == 'mailbox' && $data == '') {
 													$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
 												} elseif ($keyword == 'vmexten' && $data == '') {
@@ -4902,9 +4916,11 @@ function core_get_config($engine) {
 												}
 											}
 										}
-
+										
 										if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
+										
 											$sipfields[] = array($account,'accountcode',(isset($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++);
+											$sipfields[] = array($account,'sipdriver',(isset($_REQUEST['sipdriver'])?$_REQUEST['sipdriver']:'chan_sip'),$flag++);
 											$sipfields[] = array($account,'secret',(isset($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++);
 											$sipfields[] = array($account,'canreinvite',(isset($_REQUEST['canreinvite'])?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
 											$sipfields[] = array($account,'trustrpid',(isset($_REQUEST['trustrpid'])?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
@@ -4954,6 +4970,10 @@ function core_get_config($engine) {
 										}
 									}
 
+									function core_devices_delpjsip($account) {
+										core_devices_delsip($account);
+									}
+									
 									function core_devices_delsip($account) {
 										global $db;
 
@@ -4964,7 +4984,11 @@ function core_get_config($engine) {
 											die_freepbx($result->getMessage().$sql);
 										}
 									}
-
+									
+									function core_devices_getpjsip($account) {
+										return core_devices_getsip($account);
+									}
+									
 									function core_devices_getsip($account) {
 										global $db;
 										$sql = "SELECT keyword,data FROM sip WHERE id = '$account'";
@@ -7477,8 +7501,19 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		// sip
-		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
+		unset($select);
+		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
+		if($sipdriver == 'both' || $sipdriver == 'chan_pjsip') {
+			$select[] = array('value' => 'chan_pjsip', 'text' => _('CHAN_PJSIP'));
+		}
+		$select[] = array('value' => 'chan_sip', 'text' => _('CHAN_SIP'));
+		$tt = _("The SIP Driver to use. If you only have one SIP driver working then this select box will only show one option");
 		$tmparr = array();
+		$default = ($sipdriver == 'both') ? 'chan_pjsip' : $sipdriver;
+		$tmparr['sipdriver'] = array('value' => 'chan_pjsip', 'tt' => $tt, 'select' => $select, 'level' => 0, 'onchange' => 'frm_'.$dispnum.'_channelDriverChange();');
+
+		
+		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
 		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 
 
@@ -7488,7 +7523,7 @@ function core_devices_configpageinit($dispnum) {
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
-		$tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.");
+		$tt = _("dThe DTMF signaling mode used by this device, usually rfc2833 for most phones.");
 		$tmparr['dtmfmode'] = array('value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
 		// $amp_conf['DEVICE_SIP_CANREINVITE']
 		// $amp_conf['DEVICE_SIP_TRUSTRPID']
@@ -7616,6 +7651,8 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
 		$tmparr['permit'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'sip', $tmparr);
+		//lame hack
+		$currentcomponent->addgeneralarrayitem('devtechs', 'pjsip', $tmparr);
 		unset($tmparr);
 
 		// custom
@@ -7695,6 +7732,8 @@ function core_devices_configpageload() {
 
 			$deviceInfo = core_devices_get($extdisplay);
 
+			$currentcomponent->addjsfunc('channelDriverChange()', "if($('#devinfo_sipdriver').val() == 'chan_pjsip'){  }else{  }", 5);
+
 			if ( $display != 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
@@ -7711,7 +7750,7 @@ function core_devices_configpageload() {
 				}
 			}
 		} else {
-
+			
 			$tmparr = explode('_', $tech_hardware);
 			$deviceInfo['tech'] = $tmparr[0];
 			$deviceInfo['hardware'] = $tmparr[1];
@@ -7775,6 +7814,8 @@ function core_devices_configpageload() {
 					$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
 					$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
 					$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+					$devdisable = isset($devoptarr['disable']) ? $devoptarr['disable'] : false;
+					$devonchange = isset($devoptarr['onchange']) ? $devoptarr['onchange'] : '';
 
 					// We compare the existing secret against what might be in the put to detect changes when validating
 					if ($devopt == "secret") {
@@ -7788,9 +7829,9 @@ function core_devices_configpageload() {
 						// Added optional selectbox to enable the unsupported misdn module
 						$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 						if (isset($devoptarr['select'])) {
-							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, $tooltip, $devoptjs, $devoptfailmsg), 4);
+							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $devopt, $tooltip, false, $devonchange, $devdisable), 4);
 						} else {
-							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, $tooltip, $devoptjs, $devoptfailmsg), 4);
+							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $devopt, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4);
 						}
 					} else { // add so only basic
 						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
@@ -7835,6 +7876,11 @@ function core_devices_configprocess() {
 			// really bad hack - but if core_users_add fails, want to stop core_devices_add
 
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true || !$_SESSION["AMP_user"]->checkSection('999')) {
+				if(isset($_REQUEST['devinfo_sipdriver']) && $_REQUEST['devinfo_sipdriver'] == 'chan_pjsip') {
+					$tech = 'pjsip';
+				} else {
+					$tech = 'sip';
+				}
 				if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 					needreload();
 					if ($deviceuser != 'new') {
@@ -7857,6 +7903,11 @@ function core_devices_configprocess() {
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				core_devices_del($extdisplay,true);
+				if(isset($_REQUEST['devinfo_sipdriver']) && $_REQUEST['devinfo_sipdriver'] == 'chan_pjsip') {
+					$tech = 'pjsip';
+				} else {
+					$tech = 'sip';
+				}
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
 				redirect_standard_continue('extdisplay');
