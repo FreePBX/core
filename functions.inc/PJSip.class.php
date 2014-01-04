@@ -439,48 +439,14 @@ class PJSip implements BMO {
 		$nt = notifications::create($db);
 		
 		if(version_compare($version, '12', 'ge')) {
-			$sip_change = _("SIP Channel Driver Changed");
-			$sip_change_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to %s because %s is not installed on your Asterisk installation");
-
-			$sip_missing = _("No SIP Channel Driver");
-			$sip_missing_desc = _("Neither chan_sip nor chan_pjsip is configured in Asterisk, nothing will not work properly");
-
-			$old_sipdriver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
-			if ($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both' && !$astman->chan_exists('sip') && !$astman->chan_exists('pjsip')) {
-				$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
-			} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('sip')) {
-				if ($astman->chan_exists('pjsip')) {
-					$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_pjsip','chan_sip'));
-					$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_pjsip'), true, true);
-					$nt->delete('framework', 'ASTSIPDRIVERMISSING');
-				} else {
-					$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
-				}
-			} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_pjsip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('pjsip')) {
-				if ($astman->chan_exists('sip')) {
-					$nt->add_notice('framework', 'ASTCONFAPPCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_sip','chan_pjsip'));
-					$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-					$nt->delete('framework', 'ASTSIPDRIVERMISSING');
-				} else {
-					$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
-				}
-			} else {
-				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
-			}		
-		
-			if($old_sipdriver == 'both') {
+			if($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') {
 				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
 				foreach ($this->PJSipModules as $mod)
 					$this->FreePBX->ModulesConf->removenoload($mod);
-			} elseif($old_sipdriver == 'chan_pjsip') {
-				$this->FreePBX->ModulesConf->noload("chan_sip.so");
-				foreach ($this->PJSipModules as $mod)
-					$this->FreePBX->ModulesConf->removenoload($mod);
-			} elseif($old_sipdriver == 'chan_sip') {
-				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
-				foreach ($this->PJSipModules as $mod)
-					$this->FreePBX->ModulesConf->noload($mod);
-			}
+			} elseif($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_pjsip') {
+				$this->enablePJSipModules();
+			} elseif($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip') {
+				$this->disablePJSipModules();
 		} else {
 			$sip_missing = _("PJSIP Not Supported");
 			$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
