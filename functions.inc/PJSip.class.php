@@ -17,13 +17,33 @@ class PJSip implements BMO {
 		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so", 
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
-
+	
 	public function __construct($freepbx = null) {
 		if ($freepbx == null)
 			throw new Exception("Not given a FreePBX Object");
 
 		$this->FreePBX = $freepbx;
 		$this->db = $freepbx->Database;
+	}
+	
+	private function getAllDevs() {
+		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",PDO::FETCH_ASSOC);
+		$devlist = array();
+		foreach($alldevices as $device) {
+			$id = $device['id'];
+			// Have we already prepared our query?
+			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
+
+			$q->execute(array(":id" => $id));
+			$data = $q->fetchAll(PDO::FETCH_ASSOC);
+			
+			$devlist[$id] = $device;
+			
+			foreach($data as $setting) {
+				$devlist[$id][$setting['keyword']] = $setting['data'];
+			}
+		}
+		return $devlist;
 	}
 
 	// Return an array consisting of all SIP devices, Trunks, or both.
@@ -101,9 +121,9 @@ class PJSip implements BMO {
 		}
 
 		if (empty($sip['bindport'])) {
-			$port = "5060";
+			$port = "5061";
 		} else {
-			$port = $sip['bindport']-1;
+			$port = $sip['bindport']-1; //temp solution to be able to run both at the same time
 		}
 
 		$transport['udp'] = array( "protocol" => "udp", "bind" => "$bind:$port", "type" => "transport");
@@ -134,11 +154,10 @@ class PJSip implements BMO {
 	}
 
 	private function generateEndpoints() {
-		// Only old stuff for the moment.
-		$allEndpoints = $this->getAllOld("devices");
-
-		foreach ($allEndpoints['device'] as $dev)
-			$this->generateEndpoint($this->getExtOld($dev), $retarr);
+		// More Efficent Function here.
+		foreach ($this->getAllDevs() as $dev) {
+			$this->generateEndpoint($dev, $retarr);
+		}
 
 		// Check to see if 'Allow Guest' is enabled in SIP Settings. If it is,
 		// we need to create the magic 'anonymous' endpoint.
@@ -187,6 +206,11 @@ class PJSip implements BMO {
 		$endpoint[] = "callerid=".$config['callerid'];
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 		$endpoint[] = "mailboxes=".$config['mailbox'];
+		//check transport to make sure it's valid
+		$trans = array_keys($this->getTransportConfigs());
+		if(!in_array($config['transport'],$trans)) {
+			throw new Exception('Invalid Transport Defined on device '.$endpointname);
+		}
 		$endpoint[] = "transport=".$config['transport'];
 		if (!empty($config['call_group']))
 			$endpoint[] = "call_group=".$config['callgroup'];
@@ -218,7 +242,14 @@ class PJSip implements BMO {
 		$auth[] = "username=".$config['username'];
 
 		// AOR
-		$aor[] = "max_contacts=1";
+		// check for 0? allow 0? why?
+		$aor[] = !empty($config['max_contacts']) ? "max_contacts=".$config['max_contacts'] : "max_contacts=1";
+
+		//If remove existing hasn't been defined then set to yes, which is not the default but makes pjsip act like chan_sip
+		$aor[] = !empty($config['remove_existing']) ? "remove_existing=".$config['remove_existing'] : "remove_existing=yes";
+		
+		if (!empty($config['qualifyfreq']))
+			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
 		if (isset($retarr["pjsip.endpoint.conf"][$endpointname]))
 			throw new Exception("Endpoint $endpointname already exists.");
@@ -404,41 +435,59 @@ class PJSip implements BMO {
 	public function writeConfig($conf) {
 		//TODO: Rob please remove this global
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		global $astman;
+		global $astman,$version;
 		$nt = notifications::create($db);
-		$sip_change = _("SIP Channel Driver Changed");
-		$sip_change_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to %s because %s is not installed on your Asterisk installation");
+		
+		if(version_compare($version, '12', 'ge')) {
+			$sip_change = _("SIP Channel Driver Changed");
+			$sip_change_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to %s because %s is not installed on your Asterisk installation");
 
-		$sip_missing = _("No SIP Channel Driver");
-		$sip_missing_desc = _("Neither chan_sip nor chan_pjsip is configured in Asterisk, nothing will not work properly");
+			$sip_missing = _("No SIP Channel Driver");
+			$sip_missing_desc = _("Neither chan_sip nor chan_pjsip is configured in Asterisk, nothing will not work properly");
 
-		if ($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both' && !$astman->chan_exists('sip') && !$astman->chan_exists('pjsip')) {
-			$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
-		} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('sip')) {
-			if ($astman->chan_exists('pjsip')) {
-				$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_pjsip','chan_sip'));
-				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_pjsip'), true, true);
-				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
-			} else {
+			$old_sipdriver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
+			if ($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both' && !$astman->chan_exists('sip') && !$astman->chan_exists('pjsip')) {
 				$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
-			}
-		} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_pjsip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('pjsip')) {
-			if ($astman->chan_exists('sip')) {
-				$nt->add_notice('framework', 'ASTCONFAPPCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_sip','chan_pjsip'));
-				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+			} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('sip')) {
+				if ($astman->chan_exists('pjsip')) {
+					$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_pjsip','chan_sip'));
+					$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_pjsip'), true, true);
+					$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+				} else {
+					$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
+				}
+			} elseif (($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_pjsip' || $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') && !$astman->chan_exists('pjsip')) {
+				if ($astman->chan_exists('sip')) {
+					$nt->add_notice('framework', 'ASTCONFAPPCHG', $sip_change, sprintf($sip_change_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER'),'chan_sip','chan_pjsip'));
+					$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
+					$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+				} else {
+					$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
+				}
 			} else {
-				$nt->add_error('framework', 'ASTSIPDRIVERMISSING', $sip_missing, $sip_missing_desc);
+				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+			}		
+		
+			if($old_sipdriver == 'both') {
+				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
+				foreach ($this->PJSipModules as $mod)
+					$this->FreePBX->ModulesConf->removenoload($mod);
+			} elseif($old_sipdriver == 'chan_pjsip') {
+				$this->FreePBX->ModulesConf->noload("chan_sip.so");
+				foreach ($this->PJSipModules as $mod)
+					$this->FreePBX->ModulesConf->removenoload($mod);
+			} elseif($old_sipdriver == 'chan_sip') {
+				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
+				foreach ($this->PJSipModules as $mod)
+					$this->FreePBX->ModulesConf->noload($mod);
 			}
 		} else {
+			$sip_missing = _("PJSIP Not Supported");
+			$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
+			$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER')));
+			$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
 			$nt->delete('framework', 'ASTSIPDRIVERMISSING');
 		}
-		
-		//Just enable them all. Enable all the modules!
-		$m = $this->FreePBX->ModulesConf;
-		$m->removenoload("chan_sip.so");
-		foreach ($this->PJSipModules as $mod)
-			$m->removenoload($mod);
 		
 		$this->FreePBX->WriteConfig($conf);
 	}
@@ -495,6 +544,17 @@ class PJSip implements BMO {
 			$final[$values['id']][$values['keyword']] = $values['data'];
 		}
 		return $final;
+	}
+	
+	public function getActiveTransports() {
+		$tports = array();
+		foreach(array_keys($this->getTransportConfigs()) as $tran) {
+			$tports[] = array(
+				'value' => $tran,
+				'text' => $tran . ' Only'
+			);
+		}
+		return $tports;
 	}
 
 	public function getDisplayVars($trunkid, &$dispvars) {
