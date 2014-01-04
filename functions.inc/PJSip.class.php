@@ -1,7 +1,7 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 
-class PJSip extends BMO {
+class PJSip implements BMO {
 
 	private $codecs = array(
 		"g722" => false,
@@ -17,6 +17,14 @@ class PJSip extends BMO {
 		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so", 
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
+
+	public function __construct($freepbx = null) {
+		if ($freepbx == null)
+			throw new Exception("Not given a FreePBX Object");
+
+		$this->FreePBX = $freepbx;
+		$this->db = $freepbx->Database;
+	}
 
 	// Return an array consisting of all SIP devices, Trunks, or both.
 	private function getAllOld($type = null) {
