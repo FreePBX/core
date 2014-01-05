@@ -447,6 +447,7 @@ class PJSip implements BMO {
 				$this->enablePJSipModules();
 			} elseif($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip') {
 				$this->disablePJSipModules();
+			}
 		} else {
 			$sip_missing = _("PJSIP Not Supported");
 			$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
