@@ -1,6 +1,6 @@
 <?php
 
-class SipSettings {
+class Core_SipSettings {
 
 	public function __construct($freepbx) {
 		$this->FreePBX = $freepbx;
