@@ -24,6 +24,13 @@ class PJSip implements BMO {
 
 		$this->FreePBX = $freepbx;
 		$this->db = $freepbx->Database;
+
+		// Add SipSettings class
+		if (!class_exists("SipSettings"))
+			include "SipSettings.class.php";
+
+		$this->SipSettings = new SipSettings($this->FreePBX);
+
 	}
 	
 	private function getAllDevs() {
@@ -316,11 +323,7 @@ class PJSip implements BMO {
 	/* Hook Callbacks */
 	public function doGuiIntercept($filename, &$text) {
 		if ($filename == "modules/sipsettings/page.sipsettings.php") {
-			$foo = split("\n", $text);
-			$header = array_shift($foo);
-			$str = "Asterisk is currently using <strong>".$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER')."</strong> for SIP Traffic.<br />You can change this on the Advanced Settings Page<br />\n";
-			array_unshift($foo, $header, $str);
-			$text = implode("\n", $foo);
+			$this->SipSettings->doPage("page.sipsettings.php", $text);
 		} else {
 			throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
 		}
