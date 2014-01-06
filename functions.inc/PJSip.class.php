@@ -17,7 +17,7 @@ class PJSip implements BMO {
 		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so", 
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
-	
+
 	public function __construct($freepbx = null) {
 		if ($freepbx == null)
 			throw new Exception("Not given a FreePBX Object");
@@ -32,7 +32,7 @@ class PJSip implements BMO {
 		$this->Core_SipSettings = new Core_SipSettings($this->FreePBX);
 
 	}
-	
+
 	private function getAllDevs() {
 		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",PDO::FETCH_ASSOC);
 		$devlist = array();
@@ -43,9 +43,9 @@ class PJSip implements BMO {
 
 			$q->execute(array(":id" => $id));
 			$data = $q->fetchAll(PDO::FETCH_ASSOC);
-			
+
 			$devlist[$id] = $device;
-			
+
 			foreach($data as $setting) {
 				$devlist[$id][$setting['keyword']] = $setting['data'];
 			}
@@ -122,24 +122,25 @@ class PJSip implements BMO {
 		$binds = $this->FreePBX->Sipsettings->getConfig("binds");
 
 		foreach ($binds as $protocol => $arr) {
-			$ip = key($arr);
-			$t = "$ip-$protocol";
-			$transport[$t]['type'] = "transport";
-			$transport[$t]['protocol'] = $protocol;
-			$port = $this->FreePBX->Sipsettings->getConfig($protocol."port-$ip");
-			if (!$port) {
-				$transport[$t]['bind'] = "$ip";
-			} else {
-				$transport[$t]['bind'] = "$ip:$port";
-			}
-			$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
-			if ($extip) {
-				$transport[$t]['external_media_address'] = $extip;
-				$transport[$t]['external_signaling_address'] = $extip;
-			}
-			$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
-			if ($localnet) {
-				$transport[$t]['local_net'] = $localnet;
+			foreach ($arr as $ip => $on) {
+				$t = "$ip-$protocol";
+				$transport[$t]['type'] = "transport";
+				$transport[$t]['protocol'] = $protocol;
+				$port = $this->FreePBX->Sipsettings->getConfig($protocol."port-$ip");
+				if (!$port) {
+					$transport[$t]['bind'] = "$ip";
+				} else {
+					$transport[$t]['bind'] = "$ip:$port";
+				}
+				$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
+				if ($extip) {
+					$transport[$t]['external_media_address'] = $extip;
+					$transport[$t]['external_signaling_address'] = $extip;
+				}
+				$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
+				if ($localnet) {
+					$transport[$t]['local_net'] = $localnet;
+				}
 			}
 		}
 
@@ -174,7 +175,7 @@ class PJSip implements BMO {
 	private function generateEndpoint($config, &$retarr) {
 		// Validate $config array
 		$this->validateEndpoint($config);
-		
+
 		if($config['sipdriver'] != 'chan_pjsip') {
 			return false;
 		}
@@ -241,7 +242,7 @@ class PJSip implements BMO {
 
 		//If remove existing hasn't been defined then set to yes, which is not the default but makes pjsip act like chan_sip
 		$aor[] = !empty($config['remove_existing']) ? "remove_existing=".$config['remove_existing'] : "remove_existing=yes";
-		
+
 		if (!empty($config['qualifyfreq']))
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
@@ -298,23 +299,23 @@ class PJSip implements BMO {
 
 	/* Assorted stubs to validate the BMO Interface */
 	public function install() {}
-	public function uninstall() {}
-	public function backup() {}
-	public function restore($config) {}
-	public function showPage($request) { return false; }
+		public function uninstall() {}
+		public function backup() {}
+		public function restore($config) {}
+		public function showPage($request) { return false; }
 
-	/* Hook definitions */
-	public static function xmyGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
-	public static function myConfigPageInits() { return array("trunks"); }
+		/* Hook definitions */
+		public static function xmyGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
+		public static function myConfigPageInits() { return array("trunks"); }
 
-	/* Hook Callbacks */
-	public function doGuiIntercept($filename, &$text) {
-		if ($filename == "modules/sipsettings/page.sipsettings.php") {
-			$this->Core_SipSettings->doPage("page.sipsettings.php", $text);
-		} else {
-			throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
+		/* Hook Callbacks */
+		public function doGuiIntercept($filename, &$text) {
+			if ($filename == "modules/sipsettings/page.sipsettings.php") {
+				$this->Core_SipSettings->doPage("page.sipsettings.php", $text);
+			} else {
+				throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
+			}
 		}
-	}
 
 	public function doGuiHook(&$currentconfig) {
 		return true;
@@ -348,16 +349,16 @@ class PJSip implements BMO {
 			}
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
-		
+
 		//TODO: Rob can we fix this please?
 		global $version;
 		$conf['pjsip.conf']['global'] = array(
 			'type=global',
 			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
 		);
-		
+
 		$trunks = $this->getAllTrunks();
-		
+
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
@@ -371,7 +372,7 @@ class PJSip implements BMO {
 				'expiration' => $trunk['expiration'],
 				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 			);
-			
+
 			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
 				if(empty($trunk['sip_server'])) {
 					throw new Exception('Asterisk will crash if sip_server is blank!');
@@ -385,14 +386,14 @@ class PJSip implements BMO {
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
 			}
-			
+
 			$conf['pjsip.auth.conf'][$tn] = array(
 				'type' => 'auth',
 				'auth_type' => 'userpass',
 				'password' => $trunk['secret'],
 				'username' => $trunk['username']
 			);
-			
+
 			$conf['pjsip.aor.conf'][$tn] = array(
 				'type' => 'aor'
 			);
@@ -401,7 +402,7 @@ class PJSip implements BMO {
 			} else {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
 			}
-			
+
 			//TODO: This isn't used by FreePBX and skips all inbound route processing so needs to be fixed.
 			$conf['pjsip.endpoint.conf'][$tn] = array(
 				'type' => 'endpoint',
@@ -412,7 +413,7 @@ class PJSip implements BMO {
 				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
-			
+
 			$conf['pjsip.identify.conf'][$tn] = array(
 				'type' => 'identify',
 				'endpoint' => $tn,
@@ -427,7 +428,7 @@ class PJSip implements BMO {
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
 		global $astman,$version;
 		$nt = notifications::create($db);
-		
+
 		if(version_compare($version, '12', 'ge')) {
 			if($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') {
 				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
@@ -445,7 +446,7 @@ class PJSip implements BMO {
 			$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
 			$nt->delete('framework', 'ASTSIPDRIVERMISSING');
 		}
-		
+
 		$this->FreePBX->WriteConfig($conf);
 	}
 
@@ -491,7 +492,7 @@ class PJSip implements BMO {
 
 		// TODO: prepend, pattern_prefix and pattern_pass
 	}
-	
+
 	public function getAllTrunks() {
 		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
 		$get->execute();
@@ -502,7 +503,7 @@ class PJSip implements BMO {
 		}
 		return $final;
 	}
-	
+
 	public function getActiveTransports() {
 		$tports = array();
 		foreach(array_keys($this->getTransportConfigs()) as $tran) {
@@ -523,13 +524,13 @@ class PJSip implements BMO {
 			foreach($result as $key => $val) {
 				$dispvars[$key] = $val[0];
 			}
-			
+
 			$codecs = explode(",",$dispvars['codecs']);
 			$dispvars['codecs'] = array();
 			foreach($codecs as $codec) {
 				$dispvars['codecs'][$codec] = true;
 			}
-			
+
 			foreach($this->codecs as $codec => $state) {
 				if(!isset($dispvars['codecs'][$codec])) {
 					$dispvars['codecs'][$codec] = false;
