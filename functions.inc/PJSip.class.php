@@ -426,6 +426,15 @@ class PJSip implements BMO {
 				'match' => $trunk['sip_server']
 			);
 		}
+
+		//if we have an additional and custom file for sip_notify, write a pjsip_notify.conf
+		$ast_etc_dir = $this->FreePBX->Config->get_conf_setting('ASTETCDIR');
+		$ast_sip_notify_additional_conf = $ast_etc_dir . "/sip_notify_additional.conf";
+		$ast_sip_notify_custom_conf = $ast_etc_dir . "/sip_notify_custom.conf";
+		if (file_exists($ast_sip_notify_additional_conf) && file_exists($ast_sip_notify_custom_conf)) {
+			$conf['pjsip_notify.conf'] = "\n#include sip_notify_custom.conf\n#include sip_notify_additional.conf\n";
+		}
+
 		return $conf;
 	}
 
