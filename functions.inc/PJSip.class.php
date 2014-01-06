@@ -114,49 +114,36 @@ class PJSip implements BMO {
 		//
 		// Grab settings from sipsettings module.
 		//
-		$sipsettings = $this->db->query('SELECT `keyword`, `data` FROM `sipsettings` WHERE `type`=0');
-		$settings = $sipsettings->fetchAll(PDO::FETCH_ASSOC);
 
-		foreach($settings as $row) {
-			$sip[$row['keyword']] = $row['data'];
+		// Cache
+		if (isset($this->TransportConfigCache))
+			return $this->TransportConfigCache;
+
+		$binds = $this->FreePBX->Sipsettings->getConfig("binds");
+
+		foreach ($binds as $protocol => $arr) {
+			$ip = key($arr);
+			$t = "$ip-$protocol";
+			$transport[$t]['type'] = "transport";
+			$transport[$t]['protocol'] = $protocol;
+			$port = $this->FreePBX->Sipsettings->getConfig($protocol."port-$ip");
+			if (!$port) {
+				$transport[$t]['bind'] = "$ip";
+			} else {
+				$transport[$t]['bind'] = "$ip:$port";
+			}
+			$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
+			if ($extip) {
+				$transport[$t]['external_media_address'] = $extip;
+				$transport[$t]['external_signalling_address'] = $extip;
+			}
+			$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
+			if ($localnet) {
+				$transport[$t]['local_net'] = $localnet;
+			}
 		}
 
-		if (empty($sip['bindaddr'])) {
-			$bind = "0.0.0.0";
-		} else {
-			$bind = $sip['bindaddr'];
-		}
-
-		if (empty($sip['bindport'])) {
-			$port = "5061";
-		} else {
-			$port = $sip['bindport']-1; //temp solution to be able to run both at the same time
-		}
-
-		$transport['udp'] = array( "protocol" => "udp", "bind" => "$bind:$port", "type" => "transport");
-
-		// Do we know about NAT?
-		if (isset($sip['nat']) && $sip['nat'] != 'never') {
-			// At Asterisk 12-b1, only one local_net works.
-			if (isset($sip['localnet_1']))
-				throw new Exception('Only one local net supported with PJSip');
-
-			$transport['udp'] =
-				// FIXME - localnet needs to have its subnet calculated
-				array( 
-					"type" => "transport", "protocol" => "udp", "bind" => "$bind:$port", 
-					"local_net" => $sip['localnet_0']."/24", "external_media_address" => $sip['externip_val'],
-					"external_signaling_address" => $sip['externip_val']
-			);
-		}
-
-		$transport['tcp'] = array( "protocol" => "tcp", "bind" => "$bind:$port", "type" => "transport");
-		$transport['ws'] = array( "protocol" => "ws", "bind" => $bind, "type" => "transport");
-		$transport['wss'] = array( "protocol" => "wss", "bind" => $bind, "type" => "transport");
-
-		// Add TLS Configuration here.
-		// $transport['tls'] = array( "protocol" => "tls", "bind" => "$bind:", "type" => "transport");
-		// $transport['tls] = $this->getTLSConfig();
+		$this->TransportConfigCache = $transport;
 		return $transport;
 	}
 
@@ -317,7 +304,7 @@ class PJSip implements BMO {
 	public function showPage($request) { return false; }
 
 	/* Hook definitions */
-	public static function myGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
+	public static function xmyGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
 	public static function myConfigPageInits() { return array("trunks"); }
 
 	/* Hook Callbacks */
