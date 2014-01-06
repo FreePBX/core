@@ -135,7 +135,7 @@ class PJSip implements BMO {
 			$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
 			if ($extip) {
 				$transport[$t]['external_media_address'] = $extip;
-				$transport[$t]['external_signalling_address'] = $extip;
+				$transport[$t]['external_signaling_address'] = $extip;
 			}
 			$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
 			if ($localnet) {
