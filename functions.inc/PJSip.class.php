@@ -230,6 +230,8 @@ class PJSip implements BMO {
 				$endpoint[] = "send_pai=yes";
 			}
 		}
+		
+		$endpoint[] = !empty($config['rtp_symmetric']) ? "rtp_symmetric=".$config['rtp_symmetric'] : "rtp_symmetric=yes";
 
 		// Auth
 		$auth[] = "auth_type=userpass";
