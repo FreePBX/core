@@ -7681,6 +7681,12 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
 		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
+
+		$select[] = array('value' => 'yes', 'text' => 'Yes');
+		$select[] = array('value' => 'no', 'text' => 'No');
+		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
+		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
 		
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = FreePBX::create()->PJSip->getActiveTransports();
