@@ -22,6 +22,13 @@
 </tr>
 <tr>
 	<td>
+		<a href=# class="info"><?php echo _("Retry Interval")?><span><?php echo _("Maximum number of registration attempts.")?></span></a>: 
+	</td><td>
+		<input type="text" size="8" name="retry_interval" value="<?php echo $retry_interval?>"/>
+	</td>
+</tr>
+<tr>
+	<td>
 		<a href=# class="info"><?php echo _("Expiration")?><span><?php echo _("Expiration time for registrations in seconds.")?></span></a>: 
 	</td><td>
 		<input type="text" size="8" name="expiration" value="<?php echo $expiration?>"/>
@@ -29,14 +36,7 @@
 </tr>
 <tr>
 	<td>
-		<a href=# class="info"><?php echo _("Retry Interval")?><span><?php echo _("Interval used when receiving a 403 Forbidden response.")?></span></a>: 
-	</td><td>
-		<input type="text" name="retry_interval" value="<?php echo $retry_interval?>"/>
-	</td>
-</tr>
-<tr>
-	<td>
-		<a href=# class="info"><?php echo _("Forbidden Retry Interval")?><span><?php echo _("Maximum number of registration attempts.")?></span></a>: 
+		<a href=# class="info"><?php echo _("Forbidden Retry Interval")?><span><?php echo _("Interval used when receiving a 403 Forbidden response.")?></span></a>: 
 	</td><td>
 		<input type="text" size="8" name="forbidden_retry_interval" value="<?php echo $forbidden_retry_interval?>"/>
 	</td>
@@ -46,6 +46,13 @@
 		<a href=# class="info"><?php echo _("Max Retries")?><span><?php echo _("Maximum number of registration attempts.")?></span></a>: 
 	</td><td>
 		<input type="text" size="8" name="max_retries" value="<?php echo $max_retries?>"/>
+	</td>
+</tr>
+<tr>
+	<td>
+		<a href=# class="info"><?php echo _("Qualify Frequency")?><span><?php echo _("Interval at which to qualify.")?></span></a>: 
+	</td><td>
+		<input type="text" size="8" name="qualify_frequency" value="<?php echo $qualify_frequency?>"/>
 	</td>
 </tr>
 <tr>
@@ -130,9 +137,9 @@
 	</select>
 	</td>
 </tr>
-  <tr>
-    <td valign='top'><a href="#" class="info"><?php echo _("Codecs")?>:<span><?php echo _("Check the desired codecs, all others will be disabled. Drag to re-order.")?></span></a></td>
-    <td>
+<tr>
+	<td valign='top'><a href="#" class="info"><?php echo _("Codecs")?>:<span><?php echo _("Check the desired codecs, all others will be disabled. Drag to re-order.")?></span></a></td>
+	<td>
 <?php
   $seq = 1;
 echo '<ul class="sortable">';

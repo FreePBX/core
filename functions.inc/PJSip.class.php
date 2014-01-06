@@ -370,13 +370,14 @@ class PJSip implements BMO {
 			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
 			$conf['pjsip.registration.conf'][$tn] = array(
 				'type' => 'registration',
-				'transport' => 'udp',
+				'transport' => $trunk['transport'],
 				'outbound_auth' => $tn,
-				'contact_user' => $trunk['contact_user'],
 				'retry_interval' => $trunk['retry_interval'],
 				'expiration' => $trunk['expiration'],
 				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 			);
+			if(!empty($trunk['contact_user']))
+				$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
 
 			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
 				if(empty($trunk['sip_server'])) {
@@ -400,7 +401,8 @@ class PJSip implements BMO {
 			);
 
 			$conf['pjsip.aor.conf'][$tn] = array(
-				'type' => 'aor'
+				'type' => 'aor',
+				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
 			);
 			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
@@ -408,7 +410,6 @@ class PJSip implements BMO {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
 			}
 
-			//TODO: This isn't used by FreePBX and skips all inbound route processing so needs to be fixed.
 			$conf['pjsip.endpoint.conf'][$tn] = array(
 				'type' => 'endpoint',
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
@@ -422,7 +423,7 @@ class PJSip implements BMO {
 			$conf['pjsip.identify.conf'][$tn] = array(
 				'type' => 'identify',
 				'endpoint' => $tn,
-				'match' => $trunk['sip_server']//gethostbyname()
+				'match' => $trunk['sip_server']
 			);
 		}
 		return $conf;
@@ -514,7 +515,7 @@ class PJSip implements BMO {
 		foreach(array_keys($this->getTransportConfigs()) as $tran) {
 			$tports[] = array(
 				'value' => $tran,
-				'text' => $tran . ' Only'
+				'text' => $tran
 			);
 		}
 		return $tports;
@@ -541,6 +542,8 @@ class PJSip implements BMO {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
+			
+			$dispvars['qualify_frequency'] = !empty($dispvars['qualify_frequency']) ? $dispvars['qualify_frequency'] : 60;
 		} else {
 			$dispvars = array(
 				"auth_rejection_permanent" => "on",
@@ -549,8 +552,9 @@ class PJSip implements BMO {
 				"forbidden_retry_interval" => 10,
 				"max_retries" => 10,
 				"context" => "from-pstn",
-				"transport" => 'udp',
-				"codecs" => $this->codecs
+				"transport" => null,
+				"codecs" => $this->codecs,
+				"qualify_frequency" => 60
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());

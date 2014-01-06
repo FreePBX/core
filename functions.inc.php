@@ -7694,6 +7694,7 @@ function core_devices_configpageinit($dispnum) {
 			$select[] = array('value' => $transport['value'], 'text' => $transport['text']);
 		}
 		$tmparr['transport']['select'] = $select;
+		$tmparr['transport']['level'] = 0;
 		unset($select);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'pjsip', $tmparr);
 		unset($tmparr);
