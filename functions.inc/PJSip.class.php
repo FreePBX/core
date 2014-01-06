@@ -445,13 +445,15 @@ class PJSip implements BMO {
 		$nt = notifications::create($db);
 
 		if(version_compare($version, '12', 'ge')) {
-			if($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'both') {
+			$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
+			if($ast_sip_driver == 'both') {
 				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
-				foreach ($this->PJSipModules as $mod)
+				foreach ($this->PJSipModules as $mod) {
 					$this->FreePBX->ModulesConf->removenoload($mod);
-			} elseif($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_pjsip') {
+				}
+			} elseif($ast_sip_driver == 'chan_pjsip') {
 				$this->enablePJSipModules();
-			} elseif($this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER') == 'chan_sip') {
+			} elseif($ast_sip_driver == 'chan_sip') {
 				$this->disablePJSipModules();
 			}
 		} else {
