@@ -303,24 +303,27 @@ class PJSip implements BMO {
 	}
 
 	/* Assorted stubs to validate the BMO Interface */
-	public function install() {}
-		public function uninstall() {}
-		public function backup() {}
-		public function restore($config) {}
-		public function showPage($request) { return false; }
+	public function install() {
+	}
+	public function uninstall() {
+	}
+	public function backup() {
+	}
+	public function restore($config) {
+	}
 
-		/* Hook definitions */
-		public static function xmyGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
-		public static function myConfigPageInits() { return array("trunks"); }
+	/* Hook definitions */
+	// public static function myGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
+	// public static function myConfigPageInits() { return array("trunks"); }
 
-		/* Hook Callbacks */
-		public function doGuiIntercept($filename, &$text) {
-			if ($filename == "modules/sipsettings/page.sipsettings.php") {
-				$this->Core_SipSettings->doPage("page.sipsettings.php", $text);
-			} else {
-				throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
-			}
+	/* Hook Callbacks */
+	public function doGuiIntercept($filename, &$text) {
+		if ($filename == "modules/sipsettings/page.sipsettings.php") {
+			$this->Core_SipSettings->doPage("page.sipsettings.php", $text);
+		} else {
+			throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
 		}
+	}
 
 	public function doGuiHook(&$currentconfig) {
 		return true;
@@ -333,7 +336,7 @@ class PJSip implements BMO {
 		}
 	}
 
-	public function getConfig() {
+	public function genConfig() {
 
 		$conf = $this->generateEndpoints();
 
