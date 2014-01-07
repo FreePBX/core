@@ -286,19 +286,9 @@ class PJSip implements BMO {
 
 	public function getDefaultSIPCodecs() {
 		// Grab the default Codecs from the sipsettings module. 
-		if (isset($this->DefaultSipCodecs))
-			return $this->DefaultSipCodecs;
+		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
 
-		// If module_exists('sipsettings') ..
-		$codecsquery = $this->db->query('SELECT `keyword` from `sipsettings` WHERE `type`=1 AND `data` <> ""  ORDER BY `data`');
-		$codecs = $codecsquery->fetchAll(PDO::FETCH_NUM);
-		foreach ($codecs as $res) {
-			$codecarr[] = $res[0];
-		}
-		if (empty($codecarr))
-			throw new Exception("No SIP Codecs defined. This will never work.");
-
-		$this->DefaultSipCodecs = join(",", $codecarr);
+		$this->DefaultSipCodecs = join(",", array_keys($codecs));
 		return $this->DefaultSipCodecs;
 	}
 
