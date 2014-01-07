@@ -33,7 +33,6 @@ class core_conf {
 	var $_featuremap     = array();
 	var $_applicationmap = array();
 	var $_res_odbc       = array();
-	var $_rtp_additional	= array();
 	var $dev_user_map;
 
 	// Static Object used for self-referencing.
@@ -102,7 +101,6 @@ class core_conf {
 				'sip_notify_additional.conf',
 				'res_odbc_additional.conf',
 				'chan_dahdi_additional.conf',
-				'rtp_additional.conf'
 			      );
 		return $files;
 	}
@@ -152,54 +150,7 @@ class core_conf {
 			case 'res_odbc_additional.conf': 
 				return $this->generate_res_odbc_additional($version); 
 				break;
-			case 'rtp_additional.conf':
-				return $this->generate_rtp_additional($version);
-				break;
 		}
-	}
-
-	// If sipsettings isn't there this will try to set the rtp.conf value
-	//
-	function setDefaultRtp() {
-		// if we have sipsettings then we don't need to do anything
-		// it will be done there
-		if (function_exists('sipsettings_hookGet_config')) {
-			return true;
-		}
-
-		$sql = "SELECT value FROM admin WHERE variable = 'RTPSTART'";
-		$rtpstart = sql($sql,'getOne');
-		$rtpstart = $rtpstart ? $rtpstart : '10000';
-
-		$sql = "SELECT value FROM admin WHERE variable = 'RTPEND'";
-		$rtpend = sql($sql,'getOne');
-		$rtpend = $rtpend ? $rtpend : '20000';
-
-		$this->addRtpAdditional('general', array('rtpstart' => $rtpstart));
-		$this->addRtpAdditional('general', array('rtpend' => $rtpend));
-		return true;
-	}
-
-	function addRtpAdditional($section,$entries) {
-		$this->_rtp_additional[$section][] = $entries;
-	}
-
-	function generate_rtp_additional($ast_version) {
-		$output = '';
-		if (empty($this->_rtp_additional)) {
-			$this->setDefaultRtp();
-		}
-
-		foreach ($this->_rtp_additional as $section => $entries) {
-			$output .= "[".$section."]\n";
-			foreach ($entries as $key => $entry) {
-				foreach ($entry as $ekey => $value) {
-					$output .= "$ekey=$value\n";
-				}
-			}
-			$output .= "\n";
-		}
-		return $output;
 	}
 
 	function addSipNotify($section,$entries) {
@@ -1018,7 +969,6 @@ function core_get_config($engine) {
 		// Now add to sip_general_addtional.conf
 		//
 		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-			$core_conf->setDefaultRtp();
 
 			$core_conf->addSipGeneral('disallow','all');
 			$core_conf->addSipGeneral('allow','ulaw');
