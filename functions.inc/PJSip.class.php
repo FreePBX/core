@@ -137,9 +137,17 @@ class PJSip implements BMO {
 					$transport[$t]['external_media_address'] = $extip;
 					$transport[$t]['external_signaling_address'] = $extip;
 				}
+
+				// Add the Generic localnet settings.
+				$localnets = $this->FreePBX->Sipsettings->getConfig('localnets');
+				foreach($localnets as $arr) {
+					$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
+				}
+
+				// If there's a specific local net for this interface, add it too.
 				$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
 				if ($localnet) {
-					$transport[$t]['local_net'] = $localnet;
+					$transport[$t]['local_net'][] =  $localnet;
 				}
 			}
 		}
@@ -343,7 +351,14 @@ class PJSip implements BMO {
 		foreach ($transports as $transport => $entries) {
 			$tmparr = array();
 			foreach ($entries as $key => $val) {
-				$tmparr[] = "$key=$val";
+				// Check for multiple defintions of the same var (eg, local_net)
+				if (is_array($val)) {
+					foreach ($val as $line) {
+						$tmparr[] = "$key=$line";
+					}
+				} else {
+					$tmparr[] = "$key=$val";
+				}
 			}
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
