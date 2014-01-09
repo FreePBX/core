@@ -7607,18 +7607,8 @@ function core_devices_configpageinit($dispnum) {
 		
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
-		$tt = _("On receiving a new registration to this device whether Asterisk should remove the existing contact that was registered against it previously.");
-		$tmparr['remove_existing'] = array('prompttext' => _('Remove Existing'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
-		unset($select);
-		
-		$select[] = array('value' => 'yes', 'text' => 'Yes');
-		$select[] = array('value' => 'no', 'text' => 'No');
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
 		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
-		unset($select);
-
-		$select[] = array('value' => 'yes', 'text' => 'Yes');
-		$select[] = array('value' => 'no', 'text' => 'No');
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);

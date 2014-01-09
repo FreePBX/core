@@ -250,11 +250,14 @@ class PJSip implements BMO {
 		$auth[] = "username=".$config['username'];
 
 		// AOR
-		// check for 0? allow 0? why?
-		$aor[] = !empty($config['max_contacts']) ? "max_contacts=".$config['max_contacts'] : "max_contacts=1";
-
-		//If remove existing hasn't been defined then set to yes, which is not the default but makes pjsip act like chan_sip
-		$aor[] = !empty($config['remove_existing']) ? "remove_existing=".$config['remove_existing'] : "remove_existing=yes";
+		// Never allow zero. Zero is not what you want.
+		if (!isset($config['max_contacts']) || $config['max_contacts'] < 2) {
+			$aor[]="max_contacts=1";
+			$aor[]="remove_existing=yes";
+		} else {
+			$aor[]="max_contacts=".$config['max_contacts'];
+			$aor[]="remove_existing=no";
+		}
 
 		if (!empty($config['qualifyfreq']))
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
