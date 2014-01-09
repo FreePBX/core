@@ -242,7 +242,7 @@ class PJSip implements BMO {
 		//rtp_symmetric needs to be yes for NAT --mjordan, Digium
 		$endpoint[] = !empty($config['rtp_symmetric']) ? "rtp_symmetric=".$config['rtp_symmetric'] : "rtp_symmetric=yes";
 		//rewrite_contact needs to be yes for NAT --mjordan, Digium
-		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['max_contacts'] : "rewrite_contact=yes";
+		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['rewrite_contact'] : "rewrite_contact=yes";
 
 		// Auth
 		$auth[] = "auth_type=userpass";
