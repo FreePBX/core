@@ -142,8 +142,16 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			}
 		}
 
-		$this->TransportConfigCache = $transport;
-		return $transport;
+		// Usability hack. Always put UDP First.
+		$newTransport['udp'] = $transport['udp'];
+		unset ($transport['udp']);
+		$remaining = array_keys($transport);
+		foreach ($remaining as $r) {
+			$newTransport[$r] = $transport[$r];
+			unset ($transport[$r]);
+		}
+		$this->TransportConfigCache = $newTransport;
+		return $newTransport;
 	}
 
 	private function generateEndpoints() {
@@ -201,10 +209,15 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		$endpoint[] = "mailboxes=".$config['mailbox'];
 		//check transport to make sure it's valid
 		$trans = array_keys($this->getTransportConfigs());
-		if(!in_array($config['transport'],$trans)) {
-			throw new Exception('Invalid Transport Defined on device '.$endpointname);
+		if(!empty($config['transport'])) {
+		   if (!in_array($config['transport'],$trans)) {
+			   // throw new Exception('Invalid Transport Defined on device '.$endpointname);
+			   // Remove it, it's now autodetecting.
+			   unset($config['transport']);
+		   } else {
+			   $endpoint[] = "transport=".$config['transport'];
+		   }
 		}
-		$endpoint[] = "transport=".$config['transport'];
 		if (!empty($config['call_group']))
 			$endpoint[] = "call_group=".$config['callgroup'];
 
@@ -521,7 +534,8 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	}
 
 	public function getActiveTransports() {
-		$tports = array();
+		$tports = array(array("value" => "", "text" => "Auto"));
+
 		foreach(array_keys($this->getTransportConfigs()) as $tran) {
 			$tports[] = array(
 				'value' => $tran,
