@@ -1,7 +1,7 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 
-class PJSip implements BMO {
+class PJSip extends FreePBX_Helpers implements BMO {
 
 	private $codecs = array(
 		"g722" => false,
@@ -18,19 +18,9 @@ class PJSip implements BMO {
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
 
-	public function __construct($freepbx = null) {
-		if ($freepbx == null)
-			throw new Exception("Not given a FreePBX Object");
-
-		$this->FreePBX = $freepbx;
-		$this->db = $freepbx->Database;
-
-		// Add Core_SipSettings class
-		if (!class_exists("Core_SipSettings"))
-			include "Core_SipSettings.class.php";
-
-		$this->Core_SipSettings = new Core_SipSettings($this->FreePBX);
-
+	public function __construct($freepbx) {
+		parent::__construct($freepbx);
+		$this->db = $this->Database;
 	}
 
 	private function getAllDevs() {
@@ -164,7 +154,7 @@ class PJSip implements BMO {
 
 		// Check to see if 'Allow Guest' is enabled in SIP Settings. If it is,
 		// we need to create the magic 'anonymous' endpoint.
-		$allowguest = $this->db->getOne('SELECT `data` FROM `sipsettings` WHERE `keyword`="allowguest"');
+		$allowguest = $this->Sipsettings->getConfig('allowguest');
 		if ($allowguest == 'yes') {
 			$endpoint[] = "type=endpoint";
 			// Do we have a custom contet for anon calls to go to?
@@ -320,9 +310,7 @@ class PJSip implements BMO {
 	/* Hook Callbacks */
 	public function doGuiIntercept($filename, &$text) {
 		if ($filename == "modules/sipsettings/page.sipsettings.php") {
-			$this->Core_SipSettings->doPage("page.sipsettings.php", $text);
-		} else {
-			throw new Exception("doGuiIntercept was called with $filename. This shouldn't ever happen");
+			// $this->doPage("page.sipsettings.php", $text);
 		}
 	}
 
