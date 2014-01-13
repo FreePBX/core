@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha3</version>
+	<version>12.0.1alpha4</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha4* Asterisk module management
 		*12.0.1alpha3* More work on PJSip in extensions
 		*12.0.1alpha2* Bump Version Number and make release 12 branch
 		*2.12.0alpha1* PJSIP Support
@@ -62,6 +63,7 @@
 		<trunks category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>
 		<ampusers category="Admin">Administrators</ampusers>
+		<astmodules category="Admin">Asterisk Modules</astmodules>
 		<wiki category="Admin" requires_auth="false" href="http://freepbx.org" target="_blank" access="all">FreePBX Support</wiki>
 	</menuitems>
 	<popovers>
