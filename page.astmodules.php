@@ -1,8 +1,4 @@
 <?php
-
-global $currentcomponent;
-$cc =& $currentcomponent;
-
 $mods = FreePBX::create()->ModulesConf();
 
 print "<h2>"._("Asterisk Modules")."<hr></h2>\n";
@@ -19,16 +15,16 @@ unset($pc['autoload']);
 
 foreach ($pc as $type => $filename) {
 	if ($type == "preload") {
-		$header = _("Preloaded Modules");
+		$title = _("Preloaded Modules");
 	} elseif ($type == "noload") {
-		$header = _("Excluded Modules");
+		$title = _("Excluded Modules");
 	} elseif ($type == "load") {
-		$header = _("Manually Loaded Modules");
+		$title= _("Manually Loaded Modules");
 	} else {
-		$header = _("Unknown Entry")." '$type'";
+		$title = _("Unknown Entry")." '$type'";
 	}
 
-	print "<th colspan=2>$header</th>\n";
+	print "<th colspan=2>$title</th>\n";
 
 	if (is_array($filename)) {
 		foreach($filename as $file) {
@@ -41,8 +37,7 @@ foreach ($pc as $type => $filename) {
 }
 
 print "</table>\n";
-
-
+print "</form>\n";
 
 function showEntry($file) {
 	print "<tr><td><span style='font-family: monospace'>$file</span></td><td>Delete</td></tr>\n";
