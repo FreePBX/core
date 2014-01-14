@@ -10,10 +10,9 @@ print "<form method='post'>\n";
 print "<table>\n";
 $pc = $mods->ProcessedConfig['modules'];
 
-// Autoload is always on, for the moment.
-unset($pc['autoload']);
+$sections = array ("noload", "preload", "load");
 
-foreach ($pc as $type => $filename) {
+foreach ($sections as $type) {
 	if ($type == "preload") {
 		$title = _("Preloaded Modules");
 	} elseif ($type == "noload") {
@@ -25,22 +24,44 @@ foreach ($pc as $type => $filename) {
 	}
 
 	print "<th colspan=2>$title</th>\n";
+	print "<input type='hidden' name='area' value='$type'>\n";
 
-	if (is_array($filename)) {
-		foreach($filename as $file) {
-			showEntry($file);
+	if (isset($pc[$type])) {
+		$files = $pc[$type];
+		if (is_array($files)) {
+			foreach($files as $file) {
+				showEntry($type, $file);
+			}
+		} else {
+			showEntry($type, $files);
 		}
-	} else {
-		showEntry($filename);
 	}
-	print "<tr><td><input name='new-$type' type='text' size=35 style='font-family: monospace'></td>\n";
-	print "<td><input type='submit' name='add-$type' value='"._("Add")."' /></td></tr>\n";
+	print "<tr><td><input class='txt' name='new-$type' data-submit='add-$type' type='text' size=35 style='font-family: monospace'></td>\n";
+	print "<td><input type='submit' id='add-$type' name='add-$type' value='"._("Add")."' /></td></tr>\n";
 }
 
 print "</table>\n";
 print "</form>\n";
 
-function showEntry($file) {
+function showEntry($type, $file) {
 	print "<tr><td><span style='font-family: monospace'>$file</span></td>\n";
-	print "<td><input type='submit' name='delete-$file' value='"._("Delete")."' /></td></tr>\n";
+	print "<td><input type='submit' name='delete-$type-".base64_encode($file)."' value='"._("Delete")."' /></td></tr>\n";
 }
+?>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".txt").keyup(function(e) {
+		console.log(e);
+		if (e.which == 13) {
+			var target = $(e.currentTarget).data('submit');
+			$("#"+target).click();
+		}
+	}).keydown(function(e) {
+		if (e.which == 13) {
+			e.preventDefault();
+		}
+	});
+});
+</script>
+
