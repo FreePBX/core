@@ -13,3 +13,4 @@ div.dialpatterns {
 .savetd, .save{display:none;}
 
 th { padding-top: 1em; border-bottom: 2px solid black; }
+tr>td:first-child { width: 20em; }

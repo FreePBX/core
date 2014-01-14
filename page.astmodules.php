@@ -33,12 +33,14 @@ foreach ($pc as $type => $filename) {
 	} else {
 		showEntry($filename);
 	}
-	print "<tr><td><input name='new-$type' type='text'></td><td>Add</td></tr>\n";
+	print "<tr><td><input name='new-$type' type='text' size=35 style='font-family: monospace'></td>\n";
+	print "<td><input type='submit' name='add-$type' value='"._("Add")."' /></td></tr>\n";
 }
 
 print "</table>\n";
 print "</form>\n";
 
 function showEntry($file) {
-	print "<tr><td><span style='font-family: monospace'>$file</span></td><td>Delete</td></tr>\n";
+	print "<tr><td><span style='font-family: monospace'>$file</span></td>\n";
+	print "<td><input type='submit' name='delete-$file' value='"._("Delete")."' /></td></tr>\n";
 }
