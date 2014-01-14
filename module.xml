@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*12.0.1alpha4* Asterisk module management
+		*12.0.1alpha4* Asterisk module management and fixes
 		*12.0.1alpha3* More work on PJSip in extensions
 		*12.0.1alpha2* Bump Version Number and make release 12 branch
 		*2.12.0alpha1* PJSIP Support
@@ -48,7 +48,7 @@
 		*2.11.0.0beta1.0* bump to beta and #5998, #5999
 	</changelog>
 	<depends>
-		<version>12.0.1alpha4</version>
+		<version>12.0.1alpha8</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
