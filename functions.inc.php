@@ -4180,7 +4180,14 @@ function core_get_config($engine) {
 												if ($chan_dahdi) {
 													$ext->add($mcontext,$exten,'', new ext_gosubif('$["${ASTCHANDAHDI}" = "1"]','zap2dahdi,1'));
 												}
-												$ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
+												// PJSip checks. Instead of just dialling PJSIP/xxx, always reference the function
+												// PJSIP_DIAL_CONTACTS with the endpoint id. This may return 'PJSIP/xxx', or it may
+												// return any number of strings that will be valid to pass to Dial().
+												$ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL:0:5}"!="PJSIP"]', 'doset'));
+												$ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}, updaing with PJSIP_DIAL_CONTACTS'));
+												$ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${PJSIP_DIAL_CONTACTS(${THISDIAL:6})}'));
+
+												$ext->add($mcontext,$exten,'doset', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
 												$ext->add($mcontext,$exten,'', new ext_set('ITER', '$[${ITER}+1]'));
 												$ext->add($mcontext,$exten,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]','begin'));
 												$ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING:0:$[${LEN(${DSTRING})}-1]}'));
