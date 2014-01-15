@@ -7433,34 +7433,28 @@ function core_devices_configpageinit($dispnum) {
 		// sip
 		unset($select);
 		
-		$tmparr = explode('_', $_REQUEST['tech_hardware']);
-		$deviceInfo['tech'] = $tmparr[0];
-		$deviceInfo['hardware'] = $tmparr[1];
-		unset($tmparr);
-		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
-		if($sipdriver == 'both') {
-			if($deviceInfo['tech'] == 'sip') {
-				$select[] = array('value' => 'chan_sip', 'text' => _('CHAN_SIP'));
-			} else {
-				$select[] = array('value' => 'chan_pjsip', 'text' => _('CHAN_PJSIP'));
-			}
-		} elseif($sipdriver == 'chan_sip') {
-			$select[] = array('value' => 'chan_sip', 'text' => _('CHAN_SIP'));
-		} elseif($sipdriver == 'chan_pjsip') {
-			$select[] = array('value' => 'chan_pjsip', 'text' => _('CHAN_PJSIP'));
+		if(!empty($_REQUEST['tech_hardware'])) {
+			$tmparr = explode('_', $_REQUEST['tech_hardware']);
+			$deviceInfo['tech'] = $tmparr[0];
+		} else {
+			$tmparr = core_devices_get($_REQUEST['extdisplay']);
+			$deviceInfo['tech'] = $tmparr['tech'];
 		}
+		unset($tmparr);
 		
-		$tt = _("The SIP Driver to use. If you only have one SIP driver working then this select box will only show one option");
-		$tmparr = array();
+		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 		$default = (empty($_REQUEST['extdisplay'])) ? 'chan_'.$deviceInfo['tech'] : (($sipdriver == 'both') ? 'chan_pjsip' : $sipdriver);
-		$tmparr['sipdriver'] = array('prompttext' => _('SIP Driver'), 'value' => $default, 'tt' => $tt, 'select' => $select, 'level' => 0, 'onchange' => 'frm_'.$dispnum.'_channelDriverChange();');
-
+		$tmparr['sipdriver'] = array('hidden' => true, 'value' => $default, 'level' => 0);
+		
+		$tt = _("Change the SIP Channel Driver.");
+		$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
+		$ttt = sprintf(_("Change To %s Driver"),$ndriver);
+		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 0, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
 		
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
-
-
-		unset($select);
+		unset($tt, $ttt, $ndriver);
+		
 		$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
 		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
@@ -7618,6 +7612,17 @@ function core_devices_configpageinit($dispnum) {
 		unset($select);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'pjsip', $tmparr);
 		unset($tmparr);
+		
+		$currentcomponent->addjsfunc('changeDriver()',"
+			if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver (The Page will save and refresh)?')."')) {
+				if($('#devinfo_sipdriver').val() == 'chan_sip') {
+					$('#devinfo_sipdriver').val('chan_pjsip');
+				} else {
+					$('#devinfo_sipdriver').val('chan_sip');
+				}
+				$('form[name=frm_".$dispnum."]').submit();
+			}
+		",0);
 
 		// custom
 		$tmparr = array();
@@ -7704,8 +7709,6 @@ function core_devices_configpageload() {
 
 			$deviceInfo = core_devices_get($extdisplay);
 
-			$currentcomponent->addjsfunc('channelDriverChange()', "if($('#devinfo_sipdriver').val() == 'chan_pjsip'){  }else{  }", 5);
-
 			if ( $display != 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
@@ -7789,6 +7792,9 @@ function core_devices_configpageload() {
 					$devdisable = isset($devoptarr['disable']) ? $devoptarr['disable'] : false;
 					$devonchange = isset($devoptarr['onchange']) ? $devoptarr['onchange'] : '';
 					$prompttext = isset($devoptarr['prompttext']) ? $devoptarr['prompttext'] : $devopt;
+					$hidden =  isset($devoptarr['hidden']) ? $devoptarr['hidden'] : false;
+					$type = isset($devoptarr['type']) ? $devoptarr['type'] : (isset($devoptarr['select']) ? 'select' : 'text');
+					$text = isset($devoptarr['text']) ? $devoptarr['text'] : '';
 
 					// We compare the existing secret against what might be in the put to detect changes when validating
 					if ($devopt == "secret") {
@@ -7798,13 +7804,15 @@ function core_devices_configpageload() {
 						}
 					}
 
-					if ( $devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '') { // editing to show advanced as well
+					if (!$hidden && ($devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '')) { // editing to show advanced as well
 						// Added optional selectbox to enable the unsupported misdn module
 						$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
-						if (isset($devoptarr['select'])) {
+						if ($type == 'select') {
 							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4);
-						} else {
+						} elseif($type == 'text') {
 							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4);
+						} elseif($type == 'button') {
+							$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4);
 						}
 					} else { // add so only basic
 						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
@@ -7871,6 +7879,11 @@ function core_devices_configprocess() {
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				core_devices_del($extdisplay,true);
+				if(!empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
+					$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
+					$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
+					$_REQUEST['devinfo_dial'] = $devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
+				}
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
 				redirect_standard_continue('extdisplay');
@@ -7878,7 +7891,7 @@ function core_devices_configprocess() {
 		break;
 		case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
 			core_users2astdb();
-		core_devices2astdb();
+			core_devices2astdb();
 		break;
 	}
 	return true;
