@@ -96,6 +96,9 @@ switch ($action) {
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
 		}
+		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
+			unset($_SESSION['AMP_user']);
+		}
 		//indicate 'need reload' link in footer.php 
 		needreload();
 		redirect_standard('userdisplay');
@@ -110,8 +113,6 @@ switch ($action) {
 }
 
 ?>
-
-
 <div class="rnav">
 <ul>
 	<li><a <?php  echo ($userdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add User")?></a></li>
