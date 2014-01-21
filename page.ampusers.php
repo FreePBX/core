@@ -185,14 +185,14 @@ foreach ($tresults as $tresult) {
 <?php } ?>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Username<span>Create a unique username for this new user</span>")?></a>: 
+					<a href=# class="info"><?php echo _("Username")?><span><?php echo _("Create a unique username for this user")?></span></a>: 
 				</td><td>
 					<input type="text" size="20" name="username" value="<?php echo $username;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Password<span>Create a password for this new user</span>")?></a>: 
+					<a href=# class="info"><?php echo _("Password")?><span><?php echo _("Create a password for this new user")?></span></a>: 
 				</td><td>
 					<input type="password" size="20" name="password" value="<?php echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -205,14 +205,14 @@ foreach ($tresults as $tresult) {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Department Name<span>Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.</span>")?></a>: 
+					<a href=# class="info"><?php echo _("Department Name")?><span><?php echo _("Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.")?></span></a>: 
 				</td><td>
 					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Extension Range<span>Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.</span>")?></a>: 
+					<a href=# class="info"><?php echo _("Extension Range")?><span><?php echo _("Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.")?></span></a>: 
 				</td><td>
 					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>" tabindex="<?php echo ++$tabindex;?>"/>
 					&nbsp;to
@@ -221,7 +221,7 @@ foreach ($tresults as $tresult) {
 			</tr>
 			<tr>
 				<td valign="top">
-					<a href=# class="info"><?php echo _("Admin Access<span>Select the Admin Sections this user should have access to.</span>")?></a>: 
+					<a href=# class="info"><?php echo _("Admin Access")?><span><?php echo _("Select the Admin Sections this user should have access to.")?></span></a>: 
 				</td><td>
 					<select multiple name="sections[]" tabindex="<?php echo ++$tabindex;?>" size="15">
             <option></option>
