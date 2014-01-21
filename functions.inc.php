@@ -7549,7 +7549,7 @@ function core_devices_configpageinit($dispnum) {
 				$select[] = array('value' => 'ws', 'text' => _('WS Only'));
 			}
 			$tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured. If you are using websockets (such as WebRTC) then you must select an option that includes WS");
-			$tmparr['transport'] = array('prompttext' => _('Transport'), 'value' => 'udp', 'tt' => $tt, 'select' => $select, 'level' => 1);
+			$tmparr['transport'] = array('prompttext' => _('Transport'), 'value' => 'Auto', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
 				unset($select);
