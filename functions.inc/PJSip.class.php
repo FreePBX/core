@@ -294,6 +294,16 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		// Grab the default Codecs from the sipsettings module. 
 		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
 
+		if (!$codecs) {
+			// Sipsettings doesn't have any codecs yet. 
+			// Grab the default codecs from BMO
+			foreach ($this->FreePBX->Codecs->getAudio(true) as $c => $en) {
+				if ($en) {
+					$codecs[$c] = $en;
+				}
+			}
+		}
+
 		$this->DefaultSipCodecs = join(",", array_keys($codecs));
 		return $this->DefaultSipCodecs;
 	}
