@@ -142,16 +142,8 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			}
 		}
 
-		// Usability hack. Always put UDP First.
-		$newTransport['udp'] = $transport['udp'];
-		unset ($transport['udp']);
-		$remaining = array_keys($transport);
-		foreach ($remaining as $r) {
-			$newTransport[$r] = $transport[$r];
-			unset ($transport[$r]);
-		}
-		$this->TransportConfigCache = $newTransport;
-		return $newTransport;
+		$this->TransportConfigCache = $transport;
+		return $transport;
 	}
 
 	private function generateEndpoints() {
