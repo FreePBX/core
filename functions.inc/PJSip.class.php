@@ -419,7 +419,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
 			);
 			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			} else {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
 			}
