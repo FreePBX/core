@@ -1155,3 +1155,99 @@ function _initialize_zonelist() {
  array ( "name" => "United States Circa 1950/ North America",  "iso" => "us-old", "conf" => "ringcadence = 2000,4000\ndial = 600*120\nbusy = 500*100/500,0/500\nring = 420*40/2000,0/4000\ncongestion = 500*100/250,0/250\ncallwaiting = 440/300,0/10000\ndialrecall = !600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,600*120\nrecord = 1400/500,0/15000\ninfo = !950/330,!1400/330,!1800/330,0\nstutter = !600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,!600*120/100,!0/100,600*120\n"),
  array ( "name" => "Venezuela / South America",  "iso" => "ve", "conf" => "; Tone definition source for ve found on\n; Reference: http://www.itu.int/ITU-T/inr/forms/files/tones-0203.pdf\nringcadence = 1000,4000\ndial = 425\nbusy = 425/500,0/500\nring = 425/1000,0/4000\ncongestion = 425/250,0/250\ncallwaiting = 400+450/300,0/6000\ndialrecall = 425\nrecord =  1400/500,0/15000\ninfo = !950/330,!1440/330,!1800/330,0/1000\n"),);
 }
+
+
+//
+// CATEGORY: Asterisk Manager
+//
+unset($set);
+$set['module'] = '';
+$set['category'] = 'Asterisk Builtin mini-HTTP server';
+
+if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
+	// HTTPENABLED
+	$set['value'] = false;
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'Enable the mini-HTTP Server';
+	$set['description'] = 'Whether the Asterisk HTTP interface is enabled or not. This is for Asterisk, it is not directly related for FreePBX usage and the value of this setting is irrelevant for accessing core FreePBX settings. Default is no.';
+	$set['emptyok'] = 0;
+	$set['level'] = 1;
+	$set['readonly'] = 0;
+	$set['type'] = CONF_TYPE_BOOL;
+	$freepbx_conf->define_conf_setting('HTTPENABLED',$set);
+
+	// HTTPENABLESTATIC
+	$set['value'] = false;
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'Enable Static Content';
+	$set['description'] = 'Whether Asterisk should serve static content from http-static (HTML pages, CSS, javascript, etc.). Default is no.';
+	$set['emptyok'] = 0;
+	$set['level'] = 2;
+	$set['readonly'] = 0;
+	$set['type'] = CONF_TYPE_BOOL;
+	$freepbx_conf->define_conf_setting('HTTPENABLESTATIC',$set);
+
+	// HTTPBINDADDRESS
+	$set['value'] = '0.0.0.0';
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'HTTP Bind Address';
+	$set['description'] = 'Address to bind to. Default is 0.0.0.0';
+	$set['emptyok'] = 0;
+	$set['type'] = CONF_TYPE_TEXT;
+	$set['level'] = 2;
+	$set['readonly'] = 0;
+	$freepbx_conf->define_conf_setting('HTTPBINDADDRESS',$set);
+
+	// HTTPBINDPORT
+	$set['value'] = '8088';
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'HTTP Bind Port';
+	$set['description'] = 'Port to bind to. Default is 8088';
+	$set['emptyok'] = 0;
+	$set['type'] = CONF_TYPE_TEXT;
+	$set['level'] = 2;
+	$set['readonly'] = 0;
+	$freepbx_conf->define_conf_setting('HTTPBINDPORT',$set);
+
+	// HTTPPREFIX
+	$set['value'] = '';
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'HTTP Prefix';
+	$set['description'] = 'HTTP Prefix allows you to specify a prefix for all requests to the server. For example, if the prefix is set to "asterisk" then all requests must begin with /asterisk. If this field is blank it is akin to saying all requests must being with /, essentially no prefix';
+	$set['emptyok'] = 1;
+	$set['type'] = CONF_TYPE_TEXT;
+	$set['level'] = 2;
+	$set['readonly'] = 0;
+	$freepbx_conf->define_conf_setting('HTTPPREFIX',$set);
+
+	$freepbx_conf->commit_conf_settings();
+
+	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf') && !$http_migrate) {
+		$settings = array();
+		$httpcontents = file_get_contents($amp_conf['ASTETCDIR'].'/http.conf');
+		if(preg_match('/enabled=(.*)/i',$httpcontents,$matches)) {
+			$settings['HTTPENABLED'] = ($matches[1] == 'yes') ? true : false;
+		}
+	
+		if(preg_match('/bindaddr=(.*)/i',$httpcontents,$matches)) {
+			$settings['HTTPBINDADDRESS'] = !empty($matches[1]) ? $matches[1] : '0.0.0.0';
+		}
+	
+		if(preg_match('/bindport=(.*)/i',$httpcontents,$matches)) {
+			$settings['HTTPBINDPORT'] = !empty($matches[1]) ? $matches[1] : '8088';
+		}
+	
+		if(preg_match('/prefix=(.*)/i',$httpcontents,$matches)) {
+			$settings['HTTPPREFIX'] = !empty($matches[1]) ? $matches[1] : '';
+		}
+	
+		if(!empty($settings)) {
+			$freepbx_conf->set_conf_values($settings,true);
+		}
+	}
+}
