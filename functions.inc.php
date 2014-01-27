@@ -101,6 +101,7 @@ class core_conf {
 				'sip_notify_additional.conf',
 				'res_odbc_additional.conf',
 				'chan_dahdi_additional.conf',
+				'http_additional.conf'
 			      );
 		return $files;
 	}
@@ -150,6 +151,9 @@ class core_conf {
 			case 'res_odbc_additional.conf': 
 				return $this->generate_res_odbc_additional($version); 
 				break;
+			case 'http_additional.conf': 
+				return $this->generate_http_additional($version); 
+				break;
 		}
 	}
 
@@ -191,6 +195,18 @@ class core_conf {
 				$output .= "\n";
 			}
 		}
+		return $output;
+	}
+	
+	function generate_http_additional($ast_version) {
+		$freepbx_conf =& freepbx_conf::create();
+		
+		$output = "[general]\n";
+		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
+		$output .= "enablestatic=".($freepbx_conf->get_conf_setting('HTTPENABLESTATIC') ? 'yes' : 'no')."\n";
+		$output .= "bindaddr=".$freepbx_conf->get_conf_setting('HTTPBINDADDRESS')."\n";
+		$output .= "bindport=".$freepbx_conf->get_conf_setting('HTTPBINDPORT')."\n";
+		$output .= "prefix=".$freepbx_conf->get_conf_setting('HTTPPREFIX')."\n";
 		return $output;
 	}
 

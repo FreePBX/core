@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha7</version>
+	<version>12.0.1alpha8</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha8* Added Asterisk HTTP Definitions 
 		*12.0.1alpha7* Log out logged in user is they are changing the password
 		*12.0.1alpha6* Use PJSIP_DIAL_CONTACTS for PJSIP channels.
 		*12.0.1alpha5* Allow changing of SIP Driver on extensions
