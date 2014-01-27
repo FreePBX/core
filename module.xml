@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.10</version>
+	<version>2.11.0.11</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.11.0.10* Added HTTP.conf to core
+		*2.11.0.11* Added HTTP.conf to core
+		*2.11.0.10* #6915, #6318, #6902
 		*2.11.0.9* #6993 Add new toll-free route to wizard
 		*2.11.0.8* Dont generate SIP Secret if device was previously saved with no SIP Secret
 		*2.11.0.7* #6786, #6462, #6922, #6345
@@ -72,6 +73,9 @@
 			<display>users</display>
 		</users>
  	</popovers>
+ 	<supported>
+ 		<version>2.11</version>
+	</supported>
 	<location>release/2.11/core-2.11.0.9.tgz</location>
 	<md5sum>40f7940261f22a2473f091087b326abe</md5sum>
 </module>
