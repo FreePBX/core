@@ -508,43 +508,44 @@ if (!$tech && !$extdisplay) {
 	show_view(dirname(__FILE__).'/views/trunks/trunk_header.php',$displayvars);
 
 	switch ($tech) {
-	case "zap":
-		show_view(dirname(__FILE__).'/views/trunks/zap.php',$displayvars);
-		break;
-	case "dahdi":
-		show_view(dirname(__FILE__).'/views/trunks/dahdi.php',$displayvars);
-		break;
-	case "enum":
-		break;
-	//--------------------------------------------------------------------------------------
-	// Added to enable the unsupported misdn module
-	case "misdn":
-		if (function_exists('misdn_groups_ports')) {
-		show_view(dirname(__FILE__).'/views/trunks/misdn.php',$displayvars);
-		}
-		break; 
-	//--------------------------------------------------------------------------------------
-	case "custom":
-		show_view(dirname(__FILE__).'/views/trunks/custom.php',$displayvars);
-		break;
-	case "dundi":
-		show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
-		break;
-	case "pjsip":
-		// displayvars is passed by reference, and may or may not be updated.
-		FreePBX::create()->PJSip->getDisplayVars($extdisplay, $displayvars);
-		show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
-		break;
-	case "sip":
-		$displayvars['peerdetails'] = $peerdetails;
-		$displayvars['usercontext'] = $usercontext;
-		$displayvars['userconfig'] = $userconfig;
-		$displayvars['register'] = $register;
-		$displayvars['peerdetails'] = $peerdetails;
-		show_view(dirname(__FILE__).'/views/trunks/sip.php',$displayvars);
-		break;
-	default:
-		break;
+		case "zap":
+			show_view(dirname(__FILE__).'/views/trunks/zap.php',$displayvars);
+			break;
+		case "dahdi":
+			show_view(dirname(__FILE__).'/views/trunks/dahdi.php',$displayvars);
+			break;
+		case "enum":
+			break;
+		//--------------------------------------------------------------------------------------
+		// Added to enable the unsupported misdn module
+		case "misdn":
+			if (function_exists('misdn_groups_ports')) {
+				show_view(dirname(__FILE__).'/views/trunks/misdn.php',$displayvars);
+			}
+			break; 
+		//--------------------------------------------------------------------------------------
+		case "custom":
+			show_view(dirname(__FILE__).'/views/trunks/custom.php',$displayvars);
+			break;
+		case "dundi":
+			show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
+			break;
+		case "pjsip":
+			// displayvars is passed by reference, and may or may not be updated.
+			FreePBX::create()->PJSip->getDisplayVars($extdisplay, $displayvars);
+			show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
+			break;
+		case "iax2":
+		case "sip":
+			$displayvars['peerdetails'] = $peerdetails;
+			$displayvars['usercontext'] = $usercontext;
+			$displayvars['userconfig'] = $userconfig;
+			$displayvars['register'] = $register;
+			$displayvars['peerdetails'] = $peerdetails;
+			show_view(dirname(__FILE__).'/views/trunks/sip.php',$displayvars);
+			break;
+		default:
+			break;
 	}
 	// implementation of module hook
 	// object was initialized in config.php
