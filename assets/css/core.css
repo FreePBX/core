@@ -5,6 +5,7 @@ div.dialpatterns {
 	width: 500px;
 	overflow: auto; 
 	border: 1px solid #CCCCCC;
+    white-space: nowrap;
 }
 #pattern_file {
 	display: none;
