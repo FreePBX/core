@@ -93,38 +93,76 @@ $n_idx = 0;
 // If we have a CSV file it replaces any existing patterns
 //
 if (!empty($csv_file)) {
-  foreach ($csv_file as $row) {
-    $this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
-    $this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
-    $this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
-    $this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
+	foreach ($csv_file as $row) {
+		$this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
+		$this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
+		$this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
+		$this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
 
-    if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
-      $dialpattern_insert[] = array(
-        'prepend_digits' => $this_prepend,
-        'match_pattern_prefix' => $this_prefix,
-        'match_pattern_pass' => $this_match_pattern,
-        'match_cid' => $this_callerid,
-      );
-    }
-  }
+		if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
+			$dialpattern_insert[] = array(
+				'prepend_digits' => $this_prepend,
+				'match_pattern_prefix' => $this_prefix,
+				'match_pattern_pass' => $this_match_pattern,
+				'match_cid' => $this_callerid,
+			);
+		}
+	}
 } else if (isset($_POST["prepend_digit"])) {
-  $prepend_digit = $_POST["prepend_digit"];
-  $pattern_prefix = $_POST["pattern_prefix"];
-  $pattern_pass = $_POST["pattern_pass"];
-  $match_cid = $_POST["match_cid"];
+	$prepend_digit = $_POST["prepend_digit"];
+	$pattern_prefix = $_POST["pattern_prefix"];
+	$pattern_pass = $_POST["pattern_pass"];
+	$match_cid = $_POST["match_cid"];
 
-  foreach (array_keys($prepend_digit) as $key) {
-    if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
+	foreach (array_keys($prepend_digit) as $key) {
+		if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
 
-      $dialpattern_insert[] = array(
-        'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
-        'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
-        'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
-        'match_cid' => htmlspecialchars(trim($match_cid[$key])),
-      );
-    }
-  }
+			$dialpattern_insert[] = array(
+				'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
+				'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
+				'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
+				'match_cid' => htmlspecialchars(trim($match_cid[$key])),
+			);
+		}
+	}
+} else if (isset($_POST["bulk_patterns"])) {
+	$prepend = '/^([^+]*)\+/';
+    $prefix = '/^([^|]*)\|/';
+    $match_pattern = '/([^/]*)/';
+    $callerid = '/\/(.*)$/';
+	
+	$data = explode("\n",$_POST['bulk_patterns']);
+	foreach($data as $list) {
+		if (preg_match('/^\s*$/', $list)) {
+			continue;
+		}
+
+		$this_prepend = $this_prefix = $this_callerid = '';
+
+		if (preg_match($prepend, $list, $matches)) {
+			$this_prepend = $matches[1];
+			$list = preg_replace($prepend, '', $list);
+		}
+
+		if (preg_match($prefix, $list, $matches)) {
+			$this_prefix = $matches[1];
+			$list = preg_replace($prefix, '', $list);
+		}
+
+		if (preg_match($callerid, $list, $matches)) {
+			$this_callerid = $matches[1];
+			$list = preg_replace($callerid, '', $list);
+		}
+
+		$dialpattern_insert[] = array(
+			'prepend_digits' => htmlspecialchars(trim($this_prepend)),
+			'match_pattern_prefix' => htmlspecialchars(trim($this_prefix)),
+			'match_pattern_pass' => htmlspecialchars(trim($list)),
+			'match_cid' => htmlspecialchars(trim($this_callerid)),
+		);
+
+		$i++;
+	}
 }
 
 if ( isset($_REQUEST['reporoutedirection']) && $_REQUEST['reporoutedirection'] != '' && isset($_REQUEST['reporoutekey']) && $_REQUEST['reporoutekey'] != '') {
@@ -523,47 +561,45 @@ if ($extdisplay) { // editing
       <hr></h5></td>
     </tr>
 
-    <tr><td colspan="2"><div class="dialpatterns"><table>
 <?php
-  $pp_tit = _("prepend");
-  $pf_tit = _("prefix");
-  $mp_tit = _("match pattern");
-  $ci_tit = _("CallerID");
+$pp_tit = _("prepend");
+$pf_tit = _("prefix");
+$mp_tit = _("match pattern");
+$ci_tit = _("CallerID");
+	if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
+		?><tr><td colspan="2"><div class="dialpatterns"><table><?php
 
-  $dpt_title_class = 'dpt-title';
-  foreach ($dialpattern_array as $idx => $pattern) {
-    $tabindex++;
-    if ($idx == 50) {
-      $dpt_title_class = 'dpt-title dpt-nodisplay';
-    }
-    $dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-    <tr>
-      <td colspan="2">
-        (<input title="$pp_tit" type="text" size="8" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
-END;
-    $tabindex++;
-    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-        <input title="$pf_tit" type="text" size="6" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="$dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
-END;
-    $tabindex++;
-    $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-        [<input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="$dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex"> /
-END;
-    $tabindex++;
-    $dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-        <input title="$ci_tit" type="text" size="10" id="match_cid_$idx" name="match_cid[$idx]" class="$dpt_class" value="{$pattern['match_cid']}" tabindex="$tabindex">]
-END;
-?>
-        <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px; cursor:pointer;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo _("$idx") ?>)">
-      </td>
-    </tr>
+		$dpt_title_class = 'dpt-title';
+		foreach ($dialpattern_array as $idx => $pattern) {
+			$tabindex++;
+			if ($idx == 50) {
+				$dpt_title_class = 'dpt-title dpt-nodisplay';
+			}
+			$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
+			?>
+		    <tr>
+		      <td colspan="2">
+		        (<input placeholder="<?php echo $pp_tit?>" type="text" size="8" id="prepend_digit_<?php echo $idx?>" name="prepend_digit[<?php echo $idx?>]" class="dial-pattern <?php echo $dpt_class ?>" value="<?php echo $pattern['prepend_digits'] ?>" tabindex="<?php echo $tabindex++ ?>">) +
+		    <?php 
+		    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
+			?>
+		        <input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $idx?>" name="pattern_prefix[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_prefix'] ?>" tabindex="<?php echo $tabindex++ ?>"> |
+		    <?php 
+		   $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
+			?>
+		        [<input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $idx?>" name="pattern_pass[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_pass'] ?>" tabindex="<?php echo $tabindex++ ?>"> /
+		    <?php 
+		   $dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
+			?>
+		        <input placeholder="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_<?php echo $idx?>" name="match_cid[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_cid']?>" tabindex="<?php echo $tabindex++ ?>">]
+		        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern before this pattern')?>" onclick="addCustomField('','','','',$('#prepend_digit_<?php echo $idx?>').parent().parent(),false)">
+				<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px; cursor:pointer;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo _("$idx") ?>)">
+		      </td>
+		    </tr>
 <?php
-  }
-  $next_idx = count($dialpattern_array);
+  		}
+ 	   $next_idx = count($dialpattern_array);
+	   $idx = !empty($idx) ? $idx : $next_idx;
 ?>
     <tr>
       <td colspan="2">
@@ -571,18 +607,36 @@ END;
         <input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> |
         [<input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>"> /
         <input placeholder="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_<?php echo $next_idx?>" name="match_cid[<?php echo $next_idx?>]" class="dpt-title" value="" tabindex="<?php echo ++$tabindex;?>">]
-        <img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;cursor:pointer;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
+        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern before this pattern')?>" onclick="addCustomField('','','','',$('#prepend_digit_<?php echo $idx?>').parent().parent(),false)">
+		<img src="images/trash.png" style="float:none; margin-left:0px; margin-bottom:-3px;cursor:pointer;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo _("$next_idx") ?>)">
 
       </td>
     </tr>
     <tr id="last_row"></tr> 
-    </table></div></tr>
+    </table>
+</div>
+<?php if(count($dialpattern_array) > 500) {?>
+	<div class="alert alert-warning"><?php echo _('We have detected that you have more than 500 dial patterns, It is advised you turn on the <a href="config.php?display=advancedsettings" target="_as">Advanced Setting</a> called "Enable The Old Style FreePBX Dial Patterns Textarea" to turn this into a simple Text Area')?></div>
+<?php } ?>
+</tr>
     <tr><td colspan="2">
       <input type="button" id="dial-pattern-add"  value="<?php echo _("+ Add More Dial Pattern Fields")?>" />
     </td></tr>
 <?php
   $tabindex += 2000; // make room for dynamic insertion of new fields
-?>
+} else { ?>
+	<tr>
+		<td colspan="2">
+			<textarea textarea name="bulk_patterns" id="bulk_patterns" rows="20" cols="70"><?php foreach ($dialpattern_array as $pattern) {
+				$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
+				$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
+				$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
+				echo $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid."\n";
+			}
+			?></textarea>
+		</td>
+	</tr>
+<?php } ?>
 		<tr>
 			<td>
 			<a href=# class="info"><?php echo _("Dial patterns wizards")?><span>
@@ -603,10 +657,10 @@ END;
 					if (npanxx == null) return;
 				} while (!npanxx.match("^[2-9][0-9][0-9][-]?[2-9][0-9][0-9]$") && <?php echo '!alert("'._("Invalid NPA-NXX. Must be of the format \'NXX-NXX\'").'")'?>);
 				
-				document.getElementById('npanxx').value = npanxx;
-				document.getElementById('routeEdit').action.value = "populatenpanxx";
-        clearPatterns();
-				document.getElementById('routeEdit').submit();
+					document.getElementById('npanxx').value = npanxx;
+					document.getElementById('routeEdit').action.value = "populatenpanxx";
+					clearPatterns();
+					document.getElementById('routeEdit').submit();
 <?php  
 	} else { // curl is not installed
 ?>
@@ -617,51 +671,55 @@ END;
 			}
 
 			function insertCode() {
-        // hide the file box if nothing was set
-        if ($('#pattern_file').val() == '') {
-          $('#pattern_file').hide();
-        }
-				code = document.getElementById('inscode').value;
+				// hide the file box if nothing was set
+				if ($('#pattern_file').val() == '') {
+					$('#pattern_file').hide();
+				}
+				code = $('#inscode').val();
 				insert = '';
 				switch(code) {
 					case "local":
-            insert = '<?php echo _("NXXXXXX") ?>';
+						insert = '<?php echo _("NXXXXXX") ?>';
 					break;
 					case "local10":
-            insert = '<?php echo _("NXXXXXX,NXXNXXXXXX") ?>';
+            			insert = '<?php echo _("NXXXXXX,NXXNXXXXXX") ?>';
 					break;
 					case 'tollfree':
-            insert = '<?php echo _("1800NXXXXXX,1888NXXXXXX,1877NXXXXXX,1866NXXXXXX,1855NXXXXXX,1844NXXXXXX") ?>';
+						insert = '<?php echo _("1800NXXXXXX,1888NXXXXXX,1877NXXXXXX,1866NXXXXXX,1855NXXXXXX,1844NXXXXXX") ?>';
 					break;
 					case "ld":
-            insert = '<?php echo _("1NXXNXXXXXX") ?>';
+						insert = '<?php echo _("1NXXNXXXXXX") ?>';
 					break;
 					case "int":
-            insert = '<?php echo _("011.") ?>';
+						insert = '<?php echo _("011.") ?>';
 					break;
 					case 'info':
-            insert = '<?php echo _("411,311") ?>';
+						insert = '<?php echo _("411,311") ?>';
 					break;
 					case 'emerg':
-            insert = '<?php echo _("911") ?>';
+						insert = '<?php echo _("911") ?>';
 					break;
 					case 'lookup':
 						populateLookup();
 						insert = '';
 					break;
 					case 'csv':
-            $('#pattern_file').show().click();
-            return true;
+						$('#pattern_file').show().click();
+						return true;
 					break;
 				}
 
-        patterns = insert.split(',')
-        for (var i in patterns) {
-          addCustomField("","",patterns[i],"");
-        }
-
+				if($('#bulk_patterns').length) {
+					$('#bulk_patterns').val($('#bulk_patterns').val()+insert.split(',').join("\n")+"\n");
+				} else {
+			        patterns = insert.split(',')
+			        for (var i in patterns) {
+						addCustomField("","",patterns[i],"",$("#last_row"));
+			        }
+				}
+				
 				// reset element
-				document.getElementById('inscode').value = '';
+				$('#inscode').val('');
 			}
 			
 			--></script>
@@ -790,7 +848,7 @@ echo drawselects(!empty($dest)?$dest:null,0,false,true,_("Normal Congestion"),fa
 $(document).ready(function(){
   /* Add a Custom Var / Val textbox */
   $("#dial-pattern-add").click(function(){
-    addCustomField('','','','');
+    addCustomField('','','','',$("#last_row"));
   });
   $('#pattern_file').hide();
 }); 
@@ -799,32 +857,40 @@ function patternsRemove(idx) {
   $("#prepend_digit_"+idx).parent().parent().remove();
 }
 
-function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid) {
-  var idx = $(".dial-pattern").size();
-  var idxp = idx - 1;
-  var tabindex = parseInt($("#match_cid_"+idxp).attr('tabindex')) + 1;
-  var tabindex1 = tabindex + 2;
-  var tabindex2 = tabindex + 3;
-  var tabindex3 = tabindex + 4;
-  var dpt_title = 'dpt-title';
-  var dpt_prepend_digit = prepend_digit == '' ? dpt_title : 'dpt-value';
-  var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
-  var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
-  var dpt_match_cid = match_cid == '' ? dpt_title : 'dpt-value';
+function addCustomField(prepend_digit, pattern_prefix, pattern_pass, match_cid, start_loc, scroll) {
+	if(typeof scroll === 'undefined'){
+		var scroll = true;
+	};
+	
+	var idx = $(".dial-pattern").size();
+	var idxp = idx - 1;
+	var tabindex = parseInt($("#match_cid_"+idxp).attr('tabindex')) + 1;
+	var tabindex1 = tabindex + 2;
+	var tabindex2 = tabindex + 3;
+	var tabindex3 = tabindex + 4;
+	var dpt_title = 'dpt-title';
+	var dpt_prepend_digit = prepend_digit == '' ? dpt_title : 'dpt-value';
+	var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
+	var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
+	var dpt_match_cid = match_cid == '' ? dpt_title : 'dpt-value';
 
-  var new_insert = $("#last_row").before('\
-  <tr>\
-    <td colspan="2">\
-    (<input placeholder="<?php echo $pp_tit?>" type="text" size="8" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
-    <input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="'+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
-    [<input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="'+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'"> /\
-    <input placeholder="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_'+idx+'" name="match_cid['+idx+']" class="'+dpt_match_cid+'" value="'+match_cid+'" tabindex="'+tabindex3+'">]\
-      <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
-    </td>\
-  </tr>\
-  ').prev();
+	var new_insert = start_loc.before('\
+		<tr>\
+			<td colspan="2">\
+				(<input placeholder="<?php echo $pp_tit?>" type="text" size="8" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
+				<input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="'+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
+				[<input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="'+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'"> /\
+				<input placeholder="<?php echo $ci_tit?>" type="text" size="10" id="match_cid_'+idx+'" name="match_cid['+idx+']" class="'+dpt_match_cid+'" value="'+match_cid+'" tabindex="'+tabindex3+'">]\
+				<img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _("Click here to insert a new pattern before this pattern")?>" onclick="addCustomField(\'\',\'\',\'\',\'\',$(\'#prepend_digit_'+idx+'\').parent().parent(), false)">\
+				<img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
+			</td>\
+		</tr>\
+	').prev();
 
-  return idx;
+	if(scroll) {
+		$('.dialpatterns').animate({"scrollTop": $('.dialpatterns')[0].scrollHeight}, "fast");
+	}
+	return idx;
 }
 
 var theForm = document.routeEdit;

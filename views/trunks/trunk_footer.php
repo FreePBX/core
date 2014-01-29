@@ -9,6 +9,11 @@
 			</tr>
 			</table>
 
+<?php
+$pp_tit = _("prepend");
+$pf_tit = _("prefix");
+$mp_tit = _("match pattern");
+?>
 <script language="javascript">
 <!--
 
@@ -39,36 +44,48 @@ function patternsRemove(idx) {
   $("#prepend_digit_"+idx).parent().parent().remove();
 }
 
-function addCustomField(prepend_digit, pattern_prefix, pattern_pass, start_loc) {
-  var idx = $(".dial-pattern").size();
-  var idxp = idx - 1;
-  var tabindex = parseInt($("#pattern_pass_"+idxp).attr('tabindex')) + 1;
-  var tabindex1 = tabindex + 2;
-  var tabindex2 = tabindex + 3;
-  var dpt_title = 'dpt-title dpt-display';
-  var dpt_prepend_digit = prepend_digit == '' ? dpt_title : 'dpt-value';
-  var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
-  var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
+function addCustomField(prepend_digit, pattern_prefix, pattern_pass, start_loc, scroll) {
+	if(typeof scroll === 'undefined'){
+		var scroll = true;
+	};
+	if($('#bulk_patterns').length) {
+		var idx = 1;
+		var prepend_digit = (prepend_digit != '') ? prepend_digit+"+" : "";
+		var pattern_prefix = (pattern_prefix != '') ? pattern_prefix+"|" : "";
+		$('#bulk_patterns').val($('#bulk_patterns').val()+prepend_digit+pattern_prefix+pattern_pass+"\n");
+	} else {
+		var idx = $(".dial-pattern").size();
+		var idxp = idx - 1;
+		var tabindex = parseInt($("#pattern_pass_"+idxp).attr('tabindex')) + 1;
+		var tabindex1 = tabindex + 2;
+		var tabindex2 = tabindex + 3;
+		var dpt_title = 'dpt-title dpt-display';
+		var dpt_prepend_digit = prepend_digit == '' ? dpt_title : 'dpt-value';
+		var dpt_pattern_prefix = pattern_prefix == '' ? dpt_title : 'dpt-value';
+		var dpt_pattern_pass = pattern_pass == '' ? dpt_title : 'dpt-value';
 
-  var new_insert = start_loc.before('\
-  <tr>\
-    <td colspan="2">\
-    (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
-    <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
-    <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="dp-match '+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'">\
-      <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _("Click here to insert a new pattern")?>" onclick="addCustomField(\'\',\'\',\'\',$(\'#prepend_digit_'+idx+'\').parent().parent())">\
-      <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
-    </td>\
-  </tr>\
-  ').prev();
+		var new_insert = start_loc.before('\
+			<tr>\
+				<td colspan="2">\
+					(<input placeholder="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_'+idx+'" name="prepend_digit['+idx+']" class="dp-prepend dial-pattern '+dpt_prepend_digit+'" value="'+prepend_digit+'" tabindex="'+tabindex+'">) +\
+					<input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_'+idx+'" name="pattern_prefix['+idx+']" class="dp-prefix '+dpt_pattern_prefix+'" value="'+pattern_prefix+'" tabindex="'+tabindex1+'"> |\
+					<input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_'+idx+'" name="pattern_pass['+idx+']" class="dp-match '+dpt_pattern_pass+'" value="'+pattern_pass+'" tabindex="'+tabindex2+'">\
+					<img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _("Click here to insert a new pattern before this pattern")?>" onclick="addCustomField(\'\',\'\',\'\',$(\'#prepend_digit_'+idx+'\').parent().parent(),false)">\
+					<img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove('+idx+')">\
+				</td>\
+			</tr>\
+		').prev();
 
-  new_insert.find(".dpt-title").toggleVal({
-    populateFrom: "title",
-    changedClass: "text-normal",
-    focusClass: "text-normal"
-  });
-
-  return idx;
+		new_insert.find(".dpt-title").toggleVal({
+			populateFrom: "title",
+			changedClass: "text-normal",
+			focusClass: "text-normal"
+		});
+		if(scroll) {
+			$('.dialpatterns').animate({"scrollTop": $('.dialpatterns')[0].scrollHeight}, "fast");
+		}
+	}
+	return idx;
 }
 
 function clearPatterns() {
