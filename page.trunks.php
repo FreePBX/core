@@ -134,6 +134,44 @@ if (!empty($csv_file)) {
 			);
 		}
 	}
+} else if (isset($_POST["bulk_patterns"])) {
+	$prepend = '/^([^+]*)\+/';
+    $prefix = '/^([^|]*)\|/';
+    $match_pattern = '/([^/]*)/';
+    $callerid = '/\/(.*)$/';
+	
+	$data = explode("\n",$_POST['bulk_patterns']);
+	foreach($data as $list) {
+		if (preg_match('/^\s*$/', $list)) {
+			continue;
+		}
+
+		$this_prepend = $this_prefix = $this_callerid = '';
+
+		if (preg_match($prepend, $list, $matches)) {
+			$this_prepend = $matches[1];
+			$list = preg_replace($prepend, '', $list);
+		}
+
+		if (preg_match($prefix, $list, $matches)) {
+			$this_prefix = $matches[1];
+			$list = preg_replace($prefix, '', $list);
+		}
+
+		if (preg_match($callerid, $list, $matches)) {
+			$this_callerid = $matches[1];
+			$list = preg_replace($callerid, '', $list);
+		}
+
+		$dialpattern_insert[] = array(
+			'prepend_digits' => htmlspecialchars(trim($this_prepend)),
+			'match_pattern_prefix' => htmlspecialchars(trim($this_prefix)),
+			'match_pattern_pass' => htmlspecialchars(trim($list)),
+			'match_cid' => htmlspecialchars(trim($this_callerid)),
+		);
+
+		$i++;
+	}
 }
 
 

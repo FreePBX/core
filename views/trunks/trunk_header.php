@@ -153,35 +153,32 @@
       <hr></h4></td>
     </tr>
 
-    <tr><td colspan="2"><div class="dialpatterns"><table>
+    
 <?php
   $pp_tit = _("prepend");
   $pf_tit = _("prefix");
   $mp_tit = _("match pattern");
-  $dpt_title_class = 'dpt-title dpt-display';
-  foreach ($dialpattern_array as $idx => $pattern) {
-    $tabindex++;
-    if ($idx == 50) {
-      $dpt_title_class = 'dpt-title dpt-nodisplay';
-    }
-    $dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-    <tr>
-      <td colspan="2">
-        (<input title="$pp_tit" type="text" size="10" id="prepend_digit_$idx" name="prepend_digit[$idx]" class="dial-pattern dp-prepend $dpt_class" value="{$pattern['prepend_digits']}" tabindex="$tabindex">) +
-END;
-    $tabindex++;
-    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-        <input title="$pf_tit" type="text" size="6" id="pattern_prefix_$idx" name="pattern_prefix[$idx]" class="dp-prefix $dpt_class" value="{$pattern['match_pattern_prefix']}" tabindex="$tabindex"> |
-END;
-    $tabindex++;
-    $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
-    echo <<< END
-        <input title="$mp_tit" type="text" size="16" id="pattern_pass_$idx" name="pattern_pass[$idx]" class="dp-match $dpt_class" value="{$pattern['match_pattern_pass']}" tabindex="$tabindex">
-END;
-?>
-        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern')?>" onclick="addCustomField('','','',$('#prepend_digit_<?php echo $idx?>').parent().parent())">
+  if(true) {
+	  ?><tr><td colspan="2"><div class="dialpatterns"><table><?php
+	  $dpt_title_class = 'dpt-title dpt-display';
+	  foreach ($dialpattern_array as $idx => $pattern) {
+		  $tabindex++;
+		if ($idx == 50) {
+			$dpt_title_class = 'dpt-title dpt-nodisplay';
+		}
+		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
+		?>
+	    <tr>
+	      <td colspan="2">
+	        (<input placeholder="f<?php echo $pp_tit ?>" type="text" size="10" id="prepend_digit_<?php echo $idx?>" name="prepend_digit[<?php echo $idx?>]" class="dial-pattern <?php echo $dpt_class ?>" value="<?php echo $pattern['prepend_digits'] ?>" tabindex="<?php echo $tabindex++ ?>">) +
+	    <?php 
+	    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
+		?>
+	        <input placeholder="<?php echo $pf_tit ?>" type="text" size="6" id="pattern_prefix_<?php echo $idx?>" name="pattern_prefix[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_prefix'] ?>" tabindex="<?php echo $tabindex++ ?>"> |
+	    <?php 
+	   $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
+		?>
+	    <input placeholder="<?php echo $mp_tit ?>" type="text" size="16" id="pattern_pass_<?php echo $idx?>" name="pattern_pass[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_pass'] ?>" tabindex="<?php echo $tabindex++ ?>">
         <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _('Click here to remove this pattern')?>" onclick="patternsRemove(<?php echo "$idx" ?>)">
       </td>
     </tr>
@@ -191,10 +188,9 @@ END;
 ?>
     <tr>
       <td colspan="2">
-        (<input title="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">) +
-        <input title="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>"> |
-        <input title="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dp-match dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">
-        <img src="images/core_add.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("insert")?>" title="<?php echo _('Click here to insert a new pattern')?>" onclick="addCustomField('','','',$('#prepend_digit_<?php echo $idx?>').parent().parent())">
+        (<input placeholder="<?php echo $pp_tit?>" type="text" size="10" id="prepend_digit_<?php echo $next_idx?>" name="prepend_digit[<?php echo $next_idx?>]" class="dp-prepend dial-pattern dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">) +
+        <input placeholder="<?php echo $pf_tit?>" type="text" size="6" id="pattern_prefix_<?php echo $next_idx?>" name="pattern_prefix[<?php echo $next_idx?>]" class="dp-prefix dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>"> |
+        <input placeholder="<?php echo $mp_tit?>" type="text" size="16" id="pattern_pass_<?php echo $next_idx?>" name="pattern_pass[<?php echo $next_idx?>]" class="dp-match dpt-title dpt-display" value="" tabindex="<?php echo ++$tabindex;?>">
         <img src="images/trash.png" style="cursor:pointer; float:none; margin-left:0px; margin-bottom:-3px;" alt="<?php echo _("remove")?>" title="<?php echo _("Click here to remove this pattern")?>" onclick="patternsRemove(<?php echo "$next_idx" ?>)">
 
       </td>
@@ -207,7 +203,21 @@ END;
     <tr><td colspan="2">
       <input type="button" id="dial-pattern-add"  value="<?php echo _("+ Add More Dial Pattern Fields")?>" />
       <input type="button" id="dial-pattern-clear"  value="<?php echo _("Clear all Fields")?>" />
-    </td></tr>
+    </td>
+</tr>
+<?php } else { ?>
+	<tr>
+		<td colspan="2">
+			<textarea textarea name="bulk_patterns" id="bulk_patterns" rows="20" cols="70"><?php foreach ($dialpattern_array as $pattern) {
+				$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
+				$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
+				$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
+				echo $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid."\n";
+			}
+			?></textarea>
+		</td>
+	</tr>
+<?php } ?>
 			<tr>
 				<td>
 					<a href=# class="info"><?php echo _("Dial Rules Wizards")?><span>
