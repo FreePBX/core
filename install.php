@@ -1169,13 +1169,13 @@ function _initialize_zonelist() {
 
 
 //
-// CATEGORY: Asterisk Manager
-//
-unset($set);
-$set['module'] = '';
-$set['category'] = 'Asterisk Builtin mini-HTTP server';
+// CATEGORY:  Asterisk Builtin mini-HTTP server
 
 if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
+	unset($set);
+	$set['module'] = '';
+	$set['category'] = 'Asterisk Builtin mini-HTTP server';
+	
 	// HTTPENABLED
 	$set['value'] = false;
 	$set['defaultval'] =& $set['value'];
@@ -1261,5 +1261,26 @@ if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
 			$freepbx_conf->set_conf_values($settings,true);
 		}
 	}
+}
 
+//
+// CATEGORY: GUI Behavior
+//
+if(!$freepbx_conf->conf_setting_exists('ENABLEOLDDIALPATTERNS')) {
+	unset($set);
+	$set['module'] = '';
+	$set['category'] = 'GUI Behavior';
+	// HTTPENABLED
+	$set['value'] = false;
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'Enable The Old Style FreePBX Dial Patterns Textarea';
+	$set['description'] = 'If enabled the intuitive Dial Patterns boxes on the Routing and Trunks pages will be replaced with a text box which restores the functionality from FreePBX 2.7 and lower.';
+	$set['emptyok'] = 0;
+	$set['level'] = 1;
+	$set['readonly'] = 0;
+	$set['type'] = CONF_TYPE_BOOL;
+	$freepbx_conf->define_conf_setting('ENABLEOLDDIALPATTERNS',$set);
+	
+	$freepbx_conf->commit_conf_settings();
 }
