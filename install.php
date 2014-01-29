@@ -1261,4 +1261,5 @@ if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
 			$freepbx_conf->set_conf_values($settings,true);
 		}
 	}
+
 }
