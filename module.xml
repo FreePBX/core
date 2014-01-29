@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha10</version>
+	<version>12.0.1alpha11</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha11* Monitor Presence on extension hints
 		*12.0.1alpha10* FREEPBX-7077 Allow old style dial patterns for users with 1000s of Dial Patterns
 		*12.0.1alpha9* FREEPBX-7091 Added back ability to edit and add IAX2
 		*12.0.1alpha8* Added Asterisk HTTP Definitions 
@@ -19,6 +20,10 @@
 		*12.0.1alpha3* More work on PJSip in extensions
 		*12.0.1alpha2* Bump Version Number and make release 12 branch
 		*2.12.0alpha1* PJSIP Support
+		*2.11.0.11* Added HTTP.conf to core
+		*2.11.0.10* #6915, #6318, #6902
+		*2.11.0.9* #6993 Add new toll-free route to wizard
+		*2.11.0.8* Dont generate SIP Secret if device was previously saved with no SIP Secret
 		*2.11.0.7* #6786, #6462, #6922, #6345
 		*2.11.0.6* #6522, #6758, #6750, #6753
 		*2.11.0.5* #6760
