@@ -51,6 +51,35 @@
 		*2.11.0.0beta1.2* #6034, #6024 #6023, #6021, #6019, #6015, #6013, #6.12, #6001, #6002, #5998
 		*2.11.0.0beta1.1* #6001
 		*2.11.0.0beta1.0* bump to beta and #5998, #5999
+		*2.10.1.2* r15308 
+		*2.10.1.1* #5904, #5981, #6109, #6122, #6130
+		*2.10.1.0* #5863
+		*2.10.0.8* #5816 (work around asterisk bug)
+		*2.10.0.7* #5783
+		*2.10.0.6* #5714, undefined variable fixes
+		*2.10.0.5* #5664 additional work
+		*2.10.0.4* #2939 and put back changes reverted in r13846 with fix for extension deletion
+		*2.10.0.3* revert back to r13742 until current issue can be debugged
+		*2.10.0.2* #5664, #5678
+		*2.10.0.1* #5385, #5381
+		*2.10.0.0* bump to final, minor tweaks
+		*2.10.0rc1.3* #5618, #5633
+		*2.10.0rc1.2* #5300, #5374, #5358, #4911, #4969, #5073
+		*2.10.0rc1.1* #5117, #5456
+		*2.10.0rc1.0* release candidate, remove unused hint
+		*2.10.0beta3.0* #5468, #5299, #5477, #5478
+		*2.10.0beta2.1* #5463, call recording bug fixes, generalize CC_RECALL, misc bug fixes
+		*2.10.0beta2.0* #5407, misc bug fixes
+		*2.10.0beta1.1* bug fixes
+		*2.10.0beta1.0* beta1 release, see svn log
+		*2.9.0.0* #5117
+		*2.9.0rc1.6* #5095, #5109
+		*2.9.0rc1.5* #5055
+		*2.9.0rc1.4* #5065, #5057
+		*2.9.0rc1.3* #4871 again
+		*2.9.0rc1.2* #4871, misc
+		*2.9.0rc1.1* #5011, #5017, #5033
+		*2.9.0rc1.0* #4987, #4989, #5000, #4998, #4995
 	</changelog>
 	<depends>
 		<version>12.0.1alpha10</version>
