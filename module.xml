@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha11</version>
+	<version>12.0.1alpha12</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha12* Fix for incorrectly parsed http.conf migration settings
 		*12.0.1alpha11* Monitor Presence on extension hints
 		*12.0.1alpha10* FREEPBX-7077 Allow old style dial patterns for users with 1000s of Dial Patterns
 		*12.0.1alpha9* FREEPBX-7091 Added back ability to edit and add IAX2

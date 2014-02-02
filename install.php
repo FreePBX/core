@@ -1238,25 +1238,49 @@ if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
 
 	$freepbx_conf->commit_conf_settings();
 
-	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf') && !$http_migrate) {
+	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf')) {
 		$settings = array();
 		$httpcontents = file_get_contents($amp_conf['ASTETCDIR'].'/http.conf');
-		if(preg_match('/enabled=(.*)/i',$httpcontents,$matches)) {
+		if(preg_match('/^enabled=(.*)/im',$httpcontents,$matches)) {
 			$settings['HTTPENABLED'] = ($matches[1] == 'yes') ? true : false;
 		}
 	
-		if(preg_match('/bindaddr=(.*)/i',$httpcontents,$matches)) {
+		if(preg_match('/^bindaddr=(.*)/im',$httpcontents,$matches)) {
 			$settings['HTTPBINDADDRESS'] = !empty($matches[1]) ? $matches[1] : '0.0.0.0';
 		}
 	
-		if(preg_match('/bindport=(.*)/i',$httpcontents,$matches)) {
+		if(preg_match('/^bindport=(.*)/im',$httpcontents,$matches)) {
 			$settings['HTTPBINDPORT'] = !empty($matches[1]) ? $matches[1] : '8088';
 		}
 	
-		if(preg_match('/prefix=(.*)/i',$httpcontents,$matches)) {
+		if(preg_match('/^prefix=(.*)/im',$httpcontents,$matches)) {
 			$settings['HTTPPREFIX'] = !empty($matches[1]) ? $matches[1] : '';
 		}
 	
+		if(!empty($settings)) {
+			$freepbx_conf->set_conf_values($settings,true);
+		}
+	}
+} else {
+	//For security, if the file is not symlinked then we need to keep reading the settings and applying them to advanced settings just to be safe
+	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf') && !is_link($amp_conf['ASTETCDIR'].'/http.conf')) {
+		$settings = array();
+		$httpcontents = file_get_contents($amp_conf['ASTETCDIR'].'/http.conf');
+		if(preg_match('/^enabled=(.*)/im',$httpcontents,$matches)) {
+			$settings['HTTPENABLED'] = ($matches[1] == 'yes') ? true : false;
+		}
+		if(preg_match('/^bindaddr=(.*)/im',$httpcontents,$matches)) {
+			$settings['HTTPBINDADDRESS'] = !empty($matches[1]) ? $matches[1] : '0.0.0.0';
+		}
+	
+		if(preg_match('/^bindport=(.*)/im',$httpcontents,$matches)) {
+			$settings['HTTPBINDPORT'] = !empty($matches[1]) ? $matches[1] : '8088';
+		}
+	
+		if(preg_match('/^prefix=(.*)/im',$httpcontents,$matches)) {
+			$settings['HTTPPREFIX'] = !empty($matches[1]) ? $matches[1] : '';
+		}
+		
 		if(!empty($settings)) {
 			$freepbx_conf->set_conf_values($settings,true);
 		}
