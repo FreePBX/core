@@ -45,6 +45,9 @@
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
+	<supported>
+		<version>2.10</version>
+	</supported>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
