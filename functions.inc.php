@@ -7469,7 +7469,7 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("Change the SIP Channel Driver.");
 		$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
 		$ttt = sprintf(_("Change To %s Driver"),$ndriver);
-		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 0, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
+		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
 		
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
