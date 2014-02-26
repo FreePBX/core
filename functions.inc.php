@@ -7614,6 +7614,7 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("Maximum number of Endpoints that can associate with this Device");
 		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);
 		
+		unset($select);
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
