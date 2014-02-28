@@ -2342,6 +2342,33 @@ function core_get_config($engine) {
 												$ext->add($context, $exten, '', new ext_hangup());
 											}
 
+											if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
+												$states = array(
+													'available' => 'Available',
+													'chat' => 'Chatty',
+													'away' => 'Away',
+													'dnd' => 'DND',
+													'xa' => 'Extended Away',
+													'unavailable' => 'Unavailable'
+												);
+
+												$context = 'sub-presencestate-display';
+
+												$exten = 's';
+												$ext->add($context, $exten, '', new ext_goto(1, 's-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
+
+												foreach ($states as $state => $display) {
+													$exten = 's-' . $state;
+													$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', '(' . $display . ')'));
+													$ext->add($context, $exten, '', new ext_return(''));
+												}
+
+												// Don't display anything if presencestate is empty (not set).
+												$exten = '_s-.';
+												$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+												$ext->add($context, $exten, '', new ext_return(''));
+											}
+
 											/*
 											   ;------------------------------------------------------------------------
 											   ; [macro-confirm]
@@ -4128,7 +4155,12 @@ function core_get_config($engine) {
 												//
 												if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
 													$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
-													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', '${DB(AMPUSER/${EXTTOCALL}/cidname)}'));
+													$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
+													if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
+														$ext->add($mcontext,$exten,'', new ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
+														$cidnameval.= '${PRESENCESTATE_DISPLAY}';
+													}
+													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', $cidnameval));
 													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
 													$ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
 												}
