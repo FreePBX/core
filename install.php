@@ -788,6 +788,22 @@ $set['type'] = CONF_TYPE_SELECT;
 $freepbx_conf->define_conf_setting('RINGTIMER',$set);
 unset($opts);  
 
+// CONNECTEDLINE_PRESENCESTATE
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Display Presence State of Callee';
+$set['description'] = "When set to true and when CONNECTEDLINE() capabilities are configured and supported by your handset, the name displayed will include the presence state of the callee.";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('CONNECTEDLINE_PRESENCESTATE',$set);
+
 // TONEZONE
 // This function will assure the table is there and then create/setup the Advanced Setting
 //
