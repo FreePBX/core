@@ -13,7 +13,7 @@
 		*12.0.1alpha11* Monitor Presence on extension hints
 		*12.0.1alpha10* FREEPBX-7077 Allow old style dial patterns for users with 1000s of Dial Patterns
 		*12.0.1alpha9* FREEPBX-7091 Added back ability to edit and add IAX2
-		*12.0.1alpha8* Added Asterisk HTTP Definitions 
+		*12.0.1alpha8* Added Asterisk HTTP Definitions
 		*12.0.1alpha7* Log out logged in user is they are changing the password
 		*12.0.1alpha6* Use PJSIP_DIAL_CONTACTS for PJSIP channels.
 		*12.0.1alpha5* Allow changing of SIP Driver on extensions
@@ -41,7 +41,7 @@
 		*2.11.0.0rc1.0* rtp.conf cleanup, misc
 		*2.11.0.0beta2.7* Fixes #6459, #6237 call fails on internal pickup in ring group when call confirm is enabled
 		*2.11.0.0beta2.6* r15400
-		*2.11.0.0beta2.5* r15308 
+		*2.11.0.0beta2.5* r15308
 		*2.11.0.0beta2.4* Move control of rtp.conf and rtp_additional.conf into core re #6397
 	    *2.11.0.0beta2.3* #5977, #6262, #6292, #6337
 	    *2.11.0.0beta2.2* #5828, #6263
@@ -58,7 +58,7 @@
 		*2.11.0.0beta1.2* #6034, #6024 #6023, #6021, #6019, #6015, #6013, #6.12, #6001, #6002, #5998
 		*2.11.0.0beta1.1* #6001
 		*2.11.0.0beta1.0* bump to beta and #5998, #5999
-		*2.10.1.2* r15308 
+		*2.10.1.2* r15308
 		*2.10.1.1* #5904, #5981, #6109, #6122, #6130
 		*2.10.1.0* #5863
 		*2.10.0.8* #5816 (work around asterisk bug)
@@ -94,9 +94,6 @@
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
-	<supported>
-		<version>2.11</version>
-	</supported>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
