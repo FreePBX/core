@@ -1,4 +1,5 @@
 <?php
+// vim: :set filetype=php tabstop=4 shiftwidth=4 autoindent smartindent:
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //This file is part of FreePBX.
 //
