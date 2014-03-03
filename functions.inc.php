@@ -1433,10 +1433,13 @@ function core_get_config($engine) {
 												$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_INBOUND']));
 											}
 
-											if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
-												$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
-												$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
+											// Always set __MOHCLASS and moh.
+											if (empty($item['mohclass'])) {
+												// Should never happen
+												$item['mohclass'] = "default";
 											}
+											$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+											$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
 
 											// If we require RINGING, signal it as soon as we enter.
 											if ($item['ringing'] === "CHECKED") {
