@@ -4156,7 +4156,7 @@ function core_get_config($engine) {
 												if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
 													$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
 													$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
-													if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
+													if ($amp_conf['AST_FUNC_PRESENCE_STATE'] && $amp_conf['CONNECTEDLINE_PRESENCESTATE']) {
 														$ext->add($mcontext,$exten,'', new ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
 														$cidnameval.= '${PRESENCESTATE_DISPLAY}';
 													}
