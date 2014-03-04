@@ -1,10 +1,6 @@
 $(document).ready(function() {
 	//save settings
 	function savebinder(e) {
-		if (!can_write_amportalconf) {
-			alert(amportalconf_error);
-			return false;
-		}
 		var mythis = $(this);
 		var mykey = $(this).attr('data-key');
 		switch ($(this).attr('data-type')) {
