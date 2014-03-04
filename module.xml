@@ -86,9 +86,6 @@
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
 	</requirements>
-	<supported>
-		<version>2.11</version>
-	</supported>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
