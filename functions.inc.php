@@ -1433,10 +1433,13 @@ function core_get_config($engine) {
 												$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_INBOUND']));
 											}
 
-											if (!empty($item['mohclass']) && trim($item['mohclass']) != 'default') {
-												$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
-												$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
+											// Always set __MOHCLASS and moh.
+											if (empty($item['mohclass'])) {
+												// Should never happen
+												$item['mohclass'] = "default";
 											}
+											$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+											$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
 
 											// If we require RINGING, signal it as soon as we enter.
 											if ($item['ringing'] === "CHECKED") {
@@ -2340,6 +2343,38 @@ function core_get_config($engine) {
 												$ext->add($context, $exten, '', new ext_wait('1'));
 												$ext->add($context, $exten, '', new ext_congestion('20'));
 												$ext->add($context, $exten, '', new ext_hangup());
+											}
+
+											if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
+												$states = array(
+													'available' => 'Available',
+													'chat' => 'Chatty',
+													'away' => 'Away',
+													'dnd' => 'DND',
+													'xa' => 'Extended Away',
+													'unavailable' => 'Unavailable'
+												);
+
+												$context = 'sub-presencestate-display';
+
+												$exten = 's';
+												$ext->add($context, $exten, '', new ext_goto(1, 'state-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
+
+												foreach ($states as $state => $display) {
+													$exten = 'state-' . $state;
+													$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', '(' . $display . ')'));
+													$ext->add($context, $exten, '', new ext_return(''));
+												}
+
+												// Don't display anything if presencestate is unknown (Coding bug)
+												$exten = '_state-.';
+												$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+												$ext->add($context, $exten, '', new ext_return(''));
+
+												// Don't display anything if presencestate is empty (not set).
+												$exten = 'state-';
+												$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+												$ext->add($context, $exten, '', new ext_return(''));
 											}
 
 											/*
@@ -4128,7 +4163,12 @@ function core_get_config($engine) {
 												//
 												if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
 													$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
-													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', '${DB(AMPUSER/${EXTTOCALL}/cidname)}'));
+													$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
+													if ($amp_conf['AST_FUNC_PRESENCE_STATE'] && $amp_conf['CONNECTEDLINE_PRESENCESTATE']) {
+														$ext->add($mcontext,$exten,'', new ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
+														$cidnameval.= '${PRESENCESTATE_DISPLAY}';
+													}
+													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', $cidnameval));
 													$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
 													$ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
 												}
