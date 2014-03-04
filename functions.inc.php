@@ -2386,16 +2386,21 @@ function core_get_config($engine) {
 				$context = 'sub-presencestate-display';
 
 				$exten = 's';
-				$ext->add($context, $exten, '', new ext_goto(1, 's-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
+				$ext->add($context, $exten, '', new ext_goto(1, 'state-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
 
 				foreach ($states as $state => $display) {
-					$exten = 's-' . $state;
+					$exten = 'state-' . $state;
 					$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', '(' . $display . ')'));
 					$ext->add($context, $exten, '', new ext_return(''));
 				}
 
+				// Don't display anything if presencestate is unknown (Coding bug)
+				$exten = '_state-.';
+				$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+				$ext->add($context, $exten, '', new ext_return(''));
+
 				// Don't display anything if presencestate is empty (not set).
-				$exten = '_s-.';
+				$exten = 'state-';
 				$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
 				$ext->add($context, $exten, '', new ext_return(''));
 			}
