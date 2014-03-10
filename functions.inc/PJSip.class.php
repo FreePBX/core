@@ -14,7 +14,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		"res_pjsip_pubsub.so", "res_pjsip.so", "res_pjsip_acl.so", "res_pjsip_endpoint_identifier_user.so", "res_pjsip_nat.so",
 		"res_pjsip_refer.so", "res_pjsip_t38.so", "res_pjsip_authenticator_digest.so", "res_pjsip_exten_state.so", "res_pjsip_notify.so",
 		"res_pjsip_registrar_expire.so", "res_pjsip_transport_websocket.so", "res_pjsip_caller_id.so", "res_pjsip_header_funcs.so",
-		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so", 
+		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so",
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
 
@@ -49,7 +49,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		$out = $allkeys->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($out as $res) {
 			if (strpos($res['id'], "tr-") === false) {
-				// This isn't a trunk. 
+				// This isn't a trunk.
 				// Do we want stuff that's not a trunk?
 				if (!$type || $type == "devices") {
 					$retarr['device'][] = $res['id'];
@@ -178,7 +178,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			return false;
 		}
 
-		// With pjsip, we need three sections. 
+		// With pjsip, we need three sections.
 		$endpointname = $config['account'];
 		$endpoint[] = "type=endpoint";
 		$authname = "$endpointname-auth";
@@ -233,7 +233,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 				$endpoint[] = "send_pai=yes";
 			}
 		}
-		
+
 		//rtp_symmetric needs to be yes for NAT --mjordan, Digium
 		$endpoint[] = !empty($config['rtp_symmetric']) ? "rtp_symmetric=".$config['rtp_symmetric'] : "rtp_symmetric=yes";
 		//rewrite_contact needs to be yes for NAT --mjordan, Digium
@@ -267,13 +267,13 @@ class PJSip extends FreePBX_Helpers implements BMO {
 
 		if (isset($retarr["pjsip.aor.conf"][$aorname]))
 			throw new Exception("AOR $aorname already exists.");
-		$retarr["pjsip.aor.conf"][$aorname] = $aor; 
+		$retarr["pjsip.aor.conf"][$aorname] = $aor;
 	}
 
 	private function validateEndpoint(&$config) {
 
-		// Currently unported: 
-		//   accountcode, callgroup, 
+		// Currently unported:
+		//   accountcode, callgroup,
 
 		// DTMF Mode has changed.
 		if ($config['dtmfmode'] == "rfc2833")
@@ -291,11 +291,11 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	}
 
 	public function getDefaultSIPCodecs() {
-		// Grab the default Codecs from the sipsettings module. 
+		// Grab the default Codecs from the sipsettings module.
 		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
 
 		if (!$codecs) {
-			// Sipsettings doesn't have any codecs yet. 
+			// Sipsettings doesn't have any codecs yet.
 			// Grab the default codecs from BMO
 			foreach ($this->FreePBX->Codecs->getAudio(true) as $c => $en) {
 				if ($en) {
@@ -458,8 +458,8 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		global $astman,$version;
 		$nt = notifications::create($db);
 
+		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
 		if(version_compare($version, '12', 'ge')) {
-			$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
 			if($ast_sip_driver == 'both') {
 				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
 				foreach ($this->PJSipModules as $mod) {
@@ -471,11 +471,13 @@ class PJSip extends FreePBX_Helpers implements BMO {
 				$this->disablePJSipModules();
 			}
 		} else {
-			$sip_missing = _("PJSIP Not Supported");
-			$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
-			$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER')));
-			$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-			$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
+				$sip_missing = _("PJSIP Not Supported");
+				$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
+				$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$ast_sip_driver));
+				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
+				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+			}
 		}
 
 		$this->FreePBX->WriteConfig($conf);
@@ -484,7 +486,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	private function enablePJSipModules() {
 		// We need to DISABLE chan_sip.so, and remove any noload lines for the pjsip stuff.
 		//
-		// This is just to save typing. I'm lazy. 
+		// This is just to save typing. I'm lazy.
 		$m = $this->FreePBX->ModulesConf;
 
 		$m->noload("chan_sip.so");
@@ -495,7 +497,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	private function disablePJSipModules() {
 		// We need to ENABLE chan_sip.so, and add all the noload lines for the pjsip stuff.
 		//
-		// This is just to save typing. I'm lazy. 
+		// This is just to save typing. I'm lazy.
 		$m = $this->FreePBX->ModulesConf;
 
 		$m->removenoload("chan_sip.so");
@@ -568,7 +570,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
-			
+
 			$dispvars['qualify_frequency'] = !empty($dispvars['qualify_frequency']) ? $dispvars['qualify_frequency'] : 60;
 		} else {
 			$dispvars = array(
