@@ -1,10 +1,6 @@
 $(document).ready(function() {
 	//save settings
 	function savebinder(e) {
-		if (!can_write_amportalconf) {
-			alert(amportalconf_error);
-			return false;
-		}
 		var mythis = $(this);
 		var mykey = $(this).attr('data-key');
 		switch ($(this).attr('data-type')) {
@@ -50,7 +46,8 @@ $(document).ready(function() {
 				}
 				if (data.saved) {
 					//remove save button
-					mythis.unbind('click', savebinder);
+					mythis.off('click');
+					mythis.data('isbound', false);
 					mythis.fadeOut('normal', function(){
 						mythis.closest('tr').find('.savetd').hide();
 					});
@@ -124,15 +121,17 @@ $(document).ready(function() {
 			}
 			save.stop(true, true).delay(100).fadeIn();
 			//only bind if not already bound
-			if (save.data("events") == undefined || typeof(save.data('events')["click"]) == undefined) {
+			if (typeof(save.data("isbound")) == 'undefined' || !save.data('isbound')) {
+				save.data("isbound", true);
 				save.bind('click', savebinder);
 			}
 		} else {
+			save.data("isbound", false);
 			save.stop(true, true).delay(100).fadeOut('normal', function(){
 				if (!savetd.is(':hidden')) {
 					savetd.hide();
 				}
-			}).unbind('click', savebinder); 
+			}).off('click'); 
 		}
 		if($(this).val() != adv_set_default.attr('data-default')){
 			if (adv_set_default.is(':hidden')) {
