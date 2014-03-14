@@ -7,9 +7,18 @@ foreach ($getvars as $v){
 }
 
 if($var['action'] === 'setkey') {
-	header("Content-type: application/json"); 
+	header("Content-type: application/json");
 	$keyword = $var['keyword'];
 	if ($freepbx_conf->conf_setting_exists($keyword)) {
+		//special cron manager detections
+		if($keyword == 'CRONMAN_UPDATES_CHECK') {
+			$cm =& cronmanager::create($db);
+			if($var['value']) {
+				$cm->enable_updates();
+			} else {
+				$cm->disable_updates();
+			}
+		}
 		$freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true,$amp_conf['AS_OVERRIDE_READONLY']);
 		$status = $freepbx_conf->get_last_update_status();
 		if ($status[$keyword]['saved']) {
@@ -128,13 +137,13 @@ foreach ($conf as $c){
 	echo '</td>';
 	if(!$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden']){
 		echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" title="'._('Revert to Default').'"'
-			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
-			. (($amp_conf[$c['keyword']] == $c['defaultval']) ? ' style="display:none" ' : '') 
+			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" '
+			. (($amp_conf[$c['keyword']] == $c['defaultval']) ? ' style="display:none" ' : '')
 			.'></td>';
 		echo '<td class="savetd"><input type="image" class="save" src="images/accept.png" data-key="'
-			. $c['keyword'] 
+			. $c['keyword']
 			. '" title="' . _('Save') . '"'
-			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" ' 
+			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" '
 			. '></td>';
 	}
 	echo '</tr>';
