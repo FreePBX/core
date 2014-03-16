@@ -148,11 +148,11 @@ class core_conf {
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
 				break;
-			case 'res_odbc_additional.conf': 
-				return $this->generate_res_odbc_additional($version); 
+			case 'res_odbc_additional.conf':
+				return $this->generate_res_odbc_additional($version);
 				break;
-			case 'http_additional.conf': 
-				return $this->generate_http_additional($version); 
+			case 'http_additional.conf':
+				return $this->generate_http_additional($version);
 				break;
 		}
 	}
@@ -197,10 +197,10 @@ class core_conf {
 		}
 		return $output;
 	}
-	
+
 	function generate_http_additional($ast_version) {
 		$freepbx_conf =& freepbx_conf::create();
-		
+
 		$output = "[general]\n";
 		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
 		$output .= "enablestatic=".($freepbx_conf->get_conf_setting('HTTPENABLESTATIC') ? 'yes' : 'no')."\n";
@@ -210,9 +210,9 @@ class core_conf {
 		return $output;
 	}
 
-	function addSipAdditional($section, $key, $value) { 
-		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value); 
-	} 
+	function addSipAdditional($section, $key, $value) {
+		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
+	}
 
 	function addSipGeneral($key, $value) {
 		$this->_sip_general[] = array('key' => $key, 'value' => $value);
@@ -2895,12 +2895,16 @@ function core_get_config($engine) {
 
 											$ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 											// make sure AMPUSER is set if it doesn't get set below
-											$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["foo${AMPUSER}" = "foo"]?${CALLERID(number)}:${AMPUSER})}'));
+											$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
 											$ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
 											$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
 											$ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
+
+											// Device & User: If they're not signed in, then they can't do anything.
+											$ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSER}" = "none"]', 'limit'));
+
 											$ext->add($context, $exten, '', new ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
-											$ext->add($context, $exten, '', new ext_gotoif('$["x${AMPUSERCIDNAME:1:2}" = "x"]', 'report'));
+											$ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSERCIDNAME:1:2}" = ""]', 'report'));
 
 											// user may masquerade as a different user internally, so set the internal cid as indicated
 											// but keep the REALCALLERID which is used to determine their true identify and lookup info
@@ -4878,7 +4882,7 @@ function core_get_config($engine) {
 										// 	return $astman->disconnect();
 										//	is "true" the correct value...?
 									}
-									
+
 									//I dont wanna talk about it.
 									function core_devices_addpjsip($account) {
 										core_devices_addsip($account,'PJSIP');
@@ -4906,9 +4910,9 @@ function core_get_config($engine) {
 												}
 											}
 										}
-										
+
 										if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
-										
+
 											$sipfields[] = array($account,'accountcode',(isset($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++);
 											$sipfields[] = array($account,'sipdriver',(isset($_REQUEST['sipdriver'])?$_REQUEST['sipdriver']:'chan_sip'),$flag++);
 											$sipfields[] = array($account,'secret',(isset($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++);
@@ -4963,7 +4967,7 @@ function core_get_config($engine) {
 									function core_devices_delpjsip($account) {
 										core_devices_delsip($account);
 									}
-									
+
 									function core_devices_delsip($account) {
 										global $db;
 
@@ -4974,11 +4978,11 @@ function core_get_config($engine) {
 											die_freepbx($result->getMessage().$sql);
 										}
 									}
-									
+
 									function core_devices_getpjsip($account) {
 										return core_devices_getsip($account);
 									}
-									
+
 									function core_devices_getsip($account) {
 										global $db;
 										$sql = "SELECT keyword,data FROM sip WHERE id = '$account'";
@@ -6330,7 +6334,7 @@ function core_get_config($engine) {
 
 										if (!core_trunk_has_registrations($tech)) {
 											return '';
-										}	
+										}
 										$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
 										foreach ($results as $result) {
@@ -6375,7 +6379,7 @@ function core_get_config($engine) {
 										$tech = core_trunks_getTrunkTech($trunknum);
 										if (!core_trunk_has_registrations($tech)){
 											return '';
-										}	
+										}
 
 										$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
@@ -7492,7 +7496,7 @@ function core_devices_configpageinit($dispnum) {
 
 		// sip
 		unset($select);
-		
+
 		if(!empty($_REQUEST['tech_hardware'])) {
 			$tmparr = explode('_', $_REQUEST['tech_hardware']);
 			$deviceInfo['tech'] = $tmparr[0];
@@ -7501,20 +7505,20 @@ function core_devices_configpageinit($dispnum) {
 			$deviceInfo['tech'] = $tmparr['tech'];
 		}
 		unset($tmparr);
-		
+
 		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 		$default = (empty($_REQUEST['extdisplay'])) ? 'chan_'.$deviceInfo['tech'] : (($sipdriver == 'both') ? 'chan_pjsip' : $sipdriver);
 		$tmparr['sipdriver'] = array('hidden' => true, 'value' => $default, 'level' => 0);
-		
+
 		$tt = _("Change the SIP Channel Driver.");
 		$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
 		$ttt = sprintf(_("Change To %s Driver"),$ndriver);
 		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 0, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
-		
+
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 		unset($tt, $ttt, $ndriver);
-		
+
 		$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
 		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
 		$select[] = array('value' => 'auto', 'text' => _('Auto'));
@@ -7653,7 +7657,7 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
 		$tt = _("Maximum number of Endpoints that can associate with this Device");
 		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);
-		
+
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
@@ -7661,7 +7665,7 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
-		
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = FreePBX::create()->PJSip->getActiveTransports();
 		foreach($transports as $transport) {
@@ -7672,7 +7676,7 @@ function core_devices_configpageinit($dispnum) {
 		unset($select);
 		$currentcomponent->addgeneralarrayitem('devtechs', 'pjsip', $tmparr);
 		unset($tmparr);
-		
+
 		$currentcomponent->addjsfunc('changeDriver()',"
 			if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver (The Page will save and refresh)?')."')) {
 				if($('#devinfo_sipdriver').val() == 'chan_sip') {
@@ -7785,7 +7789,7 @@ function core_devices_configpageload() {
 				}
 			}
 		} else {
-			
+
 			$tmparr = explode('_', $tech_hardware);
 			$deviceInfo['tech'] = $tmparr[0];
 			$deviceInfo['hardware'] = $tmparr[1];
