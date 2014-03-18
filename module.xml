@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.16</version>
+	<version>2.11.0.17</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.17* Tidy up ancient checks in macro-user-callerid, add minor D&U fix
 		*2.11.0.16* Update Cron Manager settings when changed from advanced settings
 		*2.11.0.15* #7202 Ensure MoH Variables are always set
 		*2.11.0.14* Add option for displaying presence state in connectedline name
