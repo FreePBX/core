@@ -7190,7 +7190,7 @@ $dids = core_did_list('extension');
 $did_count = 0;
 foreach ($dids as $did) {
 	$did_dest = preg_split('/,/',$did['destination']);
-	if (isset($did_dest[1]) && $did_dest[1] == $extdisplay) {
+	if (isset($did_dest[1]) && $did_dest[1] === $extdisplay) {
 
 		$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
@@ -7514,7 +7514,7 @@ function core_devices_configpageinit($dispnum) {
 		$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
 		$ttt = sprintf(_("Change To %s Driver"),$ndriver);
 		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
-		
+
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 		unset($tt, $ttt, $ndriver);
@@ -7658,7 +7658,7 @@ function core_devices_configpageinit($dispnum) {
 		$tt = _("Maximum number of Endpoints that can associate with this Device");
 		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);
 		unset($select);
-		
+
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
