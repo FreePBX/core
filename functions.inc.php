@@ -134,18 +134,18 @@ class core_conf {
 			case 'features_featuremap_additional.conf':
 				return $this->generate_featuremap_additional($version);
 				break;
-			case 'res_odbc_additional.conf': 
-				return $this->generate_res_odbc_additional($version); 
+			case 'res_odbc_additional.conf':
+				return $this->generate_res_odbc_additional($version);
 				break;
 			case 'rtp_additional.conf':
 				return $this->generate_rtp_additional($version);
 				break;
-			case 'http_additional.conf': 
-				return $this->generate_http_additional($version); 
+			case 'http_additional.conf':
+				return $this->generate_http_additional($version);
 				break;
 		}
 	}
-	
+
 	// If sipsettings isn't there this will try to set the rtp.conf value
 	//
 	function setDefaultRtp() {
@@ -188,10 +188,10 @@ class core_conf {
 		}
 		return $output;
 	}
-	
+
 	function generate_http_additional($ast_version) {
 		$freepbx_conf =& freepbx_conf::create();
-		
+
 		$output = "[general]\n";
 		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
 		$output .= "enablestatic=".($freepbx_conf->get_conf_setting('HTTPENABLESTATIC') ? 'yes' : 'no')."\n";
@@ -241,10 +241,10 @@ class core_conf {
     }
     return $output;
   }
-  
-    function addSipAdditional($section, $key, $value) { 
-      $this->_sip_additional[$section][] = array('key' => $key, 'value' => $value); 
-    } 
+
+    function addSipAdditional($section, $key, $value) {
+      $this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
+    }
 
 	function addSipGeneral($key, $value) {
 		$this->_sip_general[] = array('key' => $key, 'value' => $value);
@@ -1052,7 +1052,7 @@ function core_get_config($engine) {
 				$code = $fcc->getCodeActive();
 				unset($fcc);
 				$core_conf->addFeatureMap('atxfer',$code);
-				
+
 				$fcc = new featurecode($modulename, 'automon');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
@@ -1080,7 +1080,7 @@ function core_get_config($engine) {
 				$code = $fcc->getCodeActive();
 				unset($fcc);
 				$core_conf->addFeatureMap('disconnect',$code);
-				
+
 				$fcc = new featurecode($modulename, 'pickupexten');
 				$code = $fcc->getCodeActive();
 				unset($fcc);
@@ -4959,7 +4959,7 @@ function core_devices_addsip($account) {
 			$sipfields[] = array($account,'avpf',(isset($_REQUEST['avpf'])?$_REQUEST['avpf']:'no'),$flag++);
 			$sipfields[] = array($account,'icesupport',(isset($_REQUEST['icesupport'])?$_REQUEST['icesupport']:'no'),$flag++);
 		}
-	
+
 	    $vmexten = isset($_REQUEST['vmexten'])?trim($_REQUEST['vmexten']):'';
 	    if ($vmexten != '') {
 	      $sipfields[] = array($account,'vmexten',$vmexten,$flag++);
@@ -6327,14 +6327,14 @@ function core_trunks_getTrunkTrunkName($trunknum) {
 
 function core_trunks_getTrunkPeerDetails($trunknum) {
 	global $db;
-	
+
 	$tech = core_trunks_getTrunkTech($trunknum);
-	
+
 	if (!core_trunk_has_registrations($tech)) {
 		return '';
-	}	
+	}
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
-	
+
 	foreach ($results as $result) {
 		if ($result[0] != 'account') {
 			if (isset($confdetail))
@@ -6353,12 +6353,12 @@ function core_trunks_getTrunkUserContext($trunknum) {
 
 function core_trunks_getTrunkUserConfig($trunknum) {
 	global $db;
-	
+
 	$tech = core_trunks_getTrunkTech($trunknum);
 	if (!core_trunk_has_registrations($tech)) {
 		return '';
 	}
-	
+
 	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
 
 	foreach ($results as $result) {
@@ -6377,8 +6377,8 @@ function core_trunks_getTrunkRegister($trunknum) {
 	$tech = core_trunks_getTrunkTech($trunknum);
 	if (!core_trunk_has_registrations($tech)){
 		return '';
-	}	
-	
+	}
+
 	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
 
 	foreach ($results as $result) {
