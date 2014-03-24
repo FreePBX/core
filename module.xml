@@ -9,7 +9,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*2.11.0.18* #7202, #7231, add display of presence state in connectedline name, stop duplicate trigger events on advanced settings page, minor D&U fix, tidy up ancient checks in macro-user-callerid, helper for changes to cronmanager updated
+		*2.11.0.18* #7202, #7231, add display of presence state in connectedline name, stop duplicate trigger events on advanced settings page, minor device and user mode fix, tidy up ancient checks in macro-user-callerid, helper for changes to cronmanager updated
 		*2.11.0.17* Tidy up ancient checks in macro-user-callerid, add minor Device User Mode fix
 		*2.11.0.16* Update Cron Manager settings when changed from advanced settings
 		*2.11.0.15* #7202 Ensure MoH Variables are always set
