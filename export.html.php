@@ -9,18 +9,18 @@ $display = isset($_REQUEST['display']) && !empty($_REQUEST['display']) ? $_REQUE
 
 $csvdata = array();
 $header = array();
-
+global $db;
 switch($display) {
     case "routing":
         //Setup Column headers.
         $header[0] = array("prepend", "prefix", "match pattern" , "callerid");
         
         //Get route name
-        $sql = "SELECT name FROM outbound_routes WHERE `route_id` = '".mysql_real_escape_string($extdisplay)."'";
+        $sql = "SELECT name FROM outbound_routes WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
         $name = sql($sql,'getOne');
         if(isset($name) && !empty($name)) {
             //Get all dial patterns for this route
-            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass, match_cid  FROM outbound_route_patterns WHERE `route_id` = '".mysql_real_escape_string($extdisplay)."'";
+            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass, match_cid  FROM outbound_route_patterns WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
             $csvdata = sql($sql,'getAll');
         }
         break;
@@ -30,11 +30,11 @@ switch($display) {
         $header[0] = array("prepend", "prefix", "match pattern");
         
         //Get trunk name
-        $sql = "SELECT name FROM trunks WHERE `trunkid` = '".mysql_real_escape_string($extdisplay)."'";
+        $sql = "SELECT name FROM trunks WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
         $name = sql($sql,'getOne');
         if(isset($name) && !empty($name)) {
             //Get all dial patterns for this trunk
-            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass  FROM trunk_dialpatterns WHERE `trunkid` = '".mysql_real_escape_string($extdisplay)."'";
+            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass  FROM trunk_dialpatterns WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
             $csvdata = sql($sql,'getAll');
         }
         break;

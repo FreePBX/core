@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.17</version>
+	<version>2.11.0.18</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.18* Use Framework new wrapper function for last_id
 		*2.11.0.17* Tidy up ancient checks in macro-user-callerid, add minor Device User Mode fix
 		*2.11.0.16* Update Cron Manager settings when changed from advanced settings
 		*2.11.0.15* #7202 Ensure MoH Variables are always set
@@ -83,6 +84,7 @@
 		*2.9.0rc1.0* #4987, #4989, #5000, #4998, #4995
 	</changelog>
 	<depends>
+		<module>framework ge 2.11.0.30</module>
 		<version>2.11.0alpha0</version>
 	</depends>
 	<requirements>
