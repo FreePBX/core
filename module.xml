@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha16</version>
+	<version>12.0.1alpha17</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha17* Use Framework new wrapper function for last_id
 		*12.0.1alpha16* Tidy up ancient checks in macro-user-callerid, add minor Device User Mode fix
 		*12.0.1alpha15* Cron Manager changes to allow changes from advanced settings page
 		*12.0.1alpha14* fixes for presence state
@@ -93,6 +94,7 @@
 		*2.9.0rc1.0* #4987, #4989, #5000, #4998, #4995
 	</changelog>
 	<depends>
+		<module>framework ge 12.0.1alpha37</module>
 		<version>12.0.1alpha10</version>
 	</depends>
 	<requirements>

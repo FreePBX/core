@@ -6685,7 +6685,7 @@ function core_get_config($engine) {
 
 										// TODO: sqlite_last_insert_rowid() un-tested and php5 ???
 										//
-										$route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
+										$route_id = $db->last_id();
 
 										core_routing_updatepatterns($route_id, $patterns);
 										core_routing_updatetrunks($route_id, $trunks);
