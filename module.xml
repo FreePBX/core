@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha18</version>
+	<version>12.0.1alpha19</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha19* Use the correct method call
 		*12.0.1alpha18* FREEPBX-7164 add log message to help fail2ban catch dialthrough
 		*12.0.1alpha17* Use Framework new wrapper function for last_id
 		*12.0.1alpha16* Tidy up ancient checks in macro-user-callerid, add minor Device User Mode fix
