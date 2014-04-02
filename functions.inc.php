@@ -6681,7 +6681,11 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
     VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id, '$dest')";
   sql($sql);
 
-  $route_id = $db->insert_id();
+  if(method_exists($db,'insert_id')) {
+	  $route_id = $db->insert_id();
+  } else {
+	  $route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
+  }
 
   core_routing_updatepatterns($route_id, $patterns);
   core_routing_updatetrunks($route_id, $trunks);
