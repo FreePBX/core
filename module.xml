@@ -6,6 +6,7 @@
 	<version>2.11.0.21</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
+	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
