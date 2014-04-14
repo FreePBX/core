@@ -6238,6 +6238,8 @@ function core_get_config($engine) {
 									}
 
 									function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
+										global $db;
+										$reg = $db->escapeSimple(trim($reg));
 										sql("INSERT INTO $tech (id, keyword, data, flags) values ('tr-reg-$trunknum','register','$reg','$disable_flag')");
 									}
 
