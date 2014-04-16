@@ -3,24 +3,9 @@
 /* $Id$ */
 
 // SQL Abstraction Layer for AGI Applications
-// Original Release by Rob Thomas (xrobau@gmail.com)
-// Copyright Rob Thomas (2009)
-//
-//    This program is part of FreePBX
-//
-//    FreePBX is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU Affero General Public License as
-//    published by the Free Software Foundation, either version 3 of the
-//    License, or (at your option) any later version.
-//
-//    FreePBX is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU Affero General Public License for more details.
-//
-//    You should have received a copy of the GNU Affero General Public License
-//    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
-//
+//	License for all code of this FreePBX module can be found in the license file inside the module directory
+//	Copyright 2013 Schmooze Com Inc.
+//  Copyright Rob Thomas (2009)
 //
 //  -- Usage --
 //  Simply include this file in any AGI scripts that require database access.
