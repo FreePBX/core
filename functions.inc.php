@@ -2,8 +2,7 @@
 // vim: :set filetype=php tabstop=4 shiftwidth=4 autoindent smartindent:
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
-//	Copyright 2013 Schmooze Com Inc.
-//    Copyright 2007 Philippe Lindheimer
+//	Copyright 2006-2014 Schmooze Com Inc.
 //
 
 class core_conf {

@@ -1,8 +1,7 @@
 #!/usr/bin/php -q
 <?php
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
-//	  Copyright 2013 Schmooze Com Inc.
-//    Copyright (C) 2005 Greg MacLellan (greg@mtechsolutions.ca)
+//	Copyright 2006-2014 Schmooze Com Inc.
 //
 /* --------WARNING---------
  * 
