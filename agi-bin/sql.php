@@ -5,7 +5,6 @@
 // SQL Abstraction Layer for AGI Applications
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	Copyright 2013 Schmooze Com Inc.
-//  Copyright Rob Thomas (2009)
 //
 //  -- Usage --
 //  Simply include this file in any AGI scripts that require database access.
