@@ -19,7 +19,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 
 <div class="rnav">
-<?php 
+<?php
 $extens = core_users_list();
 $description = _("Extension");
 drawListMenu($extens, $skip, $type, $display, $extdisplay, $description);

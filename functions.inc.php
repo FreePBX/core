@@ -7092,8 +7092,7 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
-		$default = (empty($_REQUEST['extdisplay'])) ? 'chan_'.$deviceInfo['tech'] : (($sipdriver == 'both') ? 'chan_pjsip' : $sipdriver);
-		$tmparr['sipdriver'] = array('hidden' => true, 'value' => $default, 'level' => 0);
+		$tmparr['sipdriver'] = array('hidden' => false, 'value' => 'chan_'.strtolower($deviceInfo['tech']), 'level' => 0);
 
 		//Inverted Driver, only allow the change if in certain modes
 		if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
@@ -7267,12 +7266,13 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		$currentcomponent->addjsfunc('changeDriver()',"
-			if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver (The Page will save and refresh)?')."')) {
+			if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit save when you are done to propagate the new settings)')."')) {
 				if($('#devinfo_sipdriver').val() == 'chan_sip') {
 					$('#devinfo_sipdriver').val('chan_pjsip');
 				} else {
 					$('#devinfo_sipdriver').val('chan_sip');
 				}
+				$('form[name=frm_".$dispnum."]').append('<input type=\"hidden\" name=\"changesipdriver\" value=\"yes\">');
 				$('form[name=frm_".$dispnum."]').submit();
 			}
 		",0);
@@ -7534,12 +7534,26 @@ function core_devices_configprocess() {
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				//delete then re add, insanity.
 				core_devices_del($extdisplay,true);
-				if(!empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
+				//PJSIP <--> CHAN_SIP Switcher :-)
+				if(isset($_REQUEST['changesipdriver']) && !empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
 					$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
 					$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
 					$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
+					$flag = 2;
+					$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
+					$settings = array(
+						"dial" => array("value" => $devinfo_dial),
+						"devicetype" => array("value" => $devicetype),
+						"user" => array("value" => $deviceuser),
+						"description" => array("value" => $description),
+						"emergency_cid" => array("value" => $emergency_cid)
+					);
+					$settings = array_merge($settings,$fields);
+					return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
+				} else {
+					core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				}
-				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
+
 				needreload();
 				redirect_standard_continue('extdisplay');
 			}
