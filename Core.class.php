@@ -11,6 +11,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			include(__DIR__.'/functions.inc/PJSip.class.php');
 			$this->FreePBX->PJSip = new PJSip($this->FreePBX);
 		}
+		$this->database = $freepbx->Database;
+		$this->config = $freepbx->Config;
 	}
 
 	public function install() {
@@ -140,7 +142,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		//insert into devices table
 		$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (?,?,?,?,?,?,?)";
-		$sth = FreePBX::Database()->prepare($sql);
+		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value']));
 		} catch(\Exception $e) {
@@ -187,7 +189,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 
 		} else {
-			die_freepbx("Cannot connect to Asterisk Manager with ".FreePBX::Config()->get('AMPMGRUSER')."/".FreePBX::Config()->get('AMPMGRPASS'));
+			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
 		}
 
 		// create a voicemail symlink if needed
@@ -200,7 +202,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 
 			//voicemail symlink
-			$spooldir = FreePBX::Config()->get('ASTSPOOLDIR');
+			$spooldir = $this->config->get('ASTSPOOLDIR');
 			exec("rm -f ".$spooldir."/voicemail/device/".$id);
 			exec("/bin/ln -s ".$spooldir."/voicemail/".$vmcontext."/".$settings['user']['value']."/ ".$spooldir."/voicemail/device/".$id);
 		}
@@ -223,7 +225,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			case 'pjsip':
 			case 'sip':
 				$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
-				$sth = $this->FreePBX->Database->prepare($sql);
+				$sth = $this->database->prepare($sql);
 				foreach($settings as $key => $setting) {
 					try {
 						$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
@@ -234,7 +236,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 			case 'iax2':
 				$sql = 'INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)';
-				$sth = $this->FreePBX->Database->prepare($sql);
+				$sth = $this->database->prepare($sql);
 				foreach($settings as $key => $setting) {
 					try {
 						$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
@@ -245,7 +247,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 			case 'zap':
 				$sql = 'INSERT INTO zap (id, keyword, data) values (?,?,?)';
-				$sth = $this->FreePBX->Database->prepare($sql);
+				$sth = $this->database->prepare($sql);
 				foreach($settings as $key => $setting) {
 					try {
 						$sth->execute(array($id,$key,$setting['value']));
@@ -256,7 +258,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 			case 'dahdi':
 				$sql = 'INSERT INTO dahdi (id, keyword, data) values (?,?,?)';
-				$sth = $this->FreePBX->Database->prepare($sql);
+				$sth = $this->database->prepare($sql);
 				foreach($settings as $key => $setting) {
 					try {
 						$sth->execute(array($id,$key,$setting['value']));
@@ -308,19 +310,19 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 			//delete from devices table
 			$sql = "DELETE FROM devices WHERE id = ?";
-			$sth = $this->FreePBX->Database->prepare($sql);
+			$sth = $this->database->prepare($sql);
 			try {
 				$sth->execute(array($account));
 			} catch(\Exception $e) {
 			}
 
 			//voicemail symlink
-			$spooldir = FreePBX::Config()->get('ASTSPOOLDIR');
+			$spooldir = $this->config->get('ASTSPOOLDIR');
 			if(file_exists($spooldir."/voicemail/device/".$account)) {
 				exec("rm -f ".$spooldir."/voicemail/device/".$account);
 			}
 		} else {
-			die_freepbx("Cannot connect to Asterisk Manager with ".FreePBX::Config()->get("AMPMGRUSER")."/".FreePBX::Config()->get("AMPMGRPASS"));
+			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
 		}
 
 		switch($devinfo['tech']) {
@@ -342,7 +344,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 		}
 		$sql = "DELETE FROM ".$type." WHERE id = ?";
-		$sth = $this->FreePBX->Database->prepare($sql);
+		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
 		} catch(\Exception $e) {
@@ -353,7 +355,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function getDevice($account) {
 		$sql = "SELECT * FROM devices WHERE id = ?";
-		$sth = $this->FreePBX->Database->prepare($sql);
+		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
 			$device = $sth->fetch(PDO::FETCH_ASSOC);
@@ -384,7 +386,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 		}
 		$sql = "SELECT keyword,data FROM ".$type." WHERE id = ?";
-		$sth = $this->FreePBX->Database->prepare($sql);
+		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
 			$tech = $sth->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);

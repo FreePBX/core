@@ -3,12 +3,13 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha19</version>
+	<version>12.0.1alpha20</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv2+</license>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha20* Refactor Device Management for driver switching fixes
 		*12.0.1alpha19* Use the correct method call
 		*12.0.1alpha18* FREEPBX-7164 add log message to help fail2ban catch dialthrough
 		*12.0.1alpha17* Use Framework new wrapper function for last_id
@@ -96,8 +97,7 @@
 		*2.9.0rc1.0* #4987, #4989, #5000, #4998, #4995
 	</changelog>
 	<depends>
-		<module>framework ge 12.0.1alpha37</module>
-		<version>12.0.1alpha10</version>
+		<version>12.0.1alpha45</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>
