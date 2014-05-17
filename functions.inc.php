@@ -4581,93 +4581,151 @@ function core_get_config($engine) {
 									}
 
 									function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
-										global $amp_conf;
-										global $astman;
-										global $db;
-
-										if ($tech == '' || trim($tech) == 'virtual') {
-											return true;
+										$flag = 2;
+										$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
+										$settings = array(
+											"dial" => array("value" => $dial),
+											"devicetype" => array("value" => $devicetype),
+											"user" => array("value" => $user),
+											"description" => array("value" => $description),
+											"emergency_cid" => array("value" => $emergency_cid)
+										);
+										$settings = array_merge($settings,$fields);
+										// Asterisk treats no CallerID from an IAX device as 'hide CallerID', and ignores the CallerID
+										// set in iax.conf. As we rely on this for pretty much everything, we need to specify the
+										// CallerID as a variable which gets picked up in macro-callerid.
+										// Ref - http://bugs.digium.com/view.php?id=456
+										if($tech == 'iax2') {
+											$settings['setvar'] = array("value" => "REALCALLERIDNUM=$account", "flag" => $flag++);
 										}
+										return FreePBX::Core()->addDevice($id,$tech,$settings,$editmode);
+									}
 
-										$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
+									function core_devices_del($account,$editmode=false){
+										return FreePBX::Core()->delDevice($account,$editmode=false);
+									}
 
-										if (trim($id) == '' ) {
-											if ($display != 'extensions') {
-												echo "<script>javascript:alert('"._("You must put in a device id")."');</script>";
-											}
-											return false;
-										}
+									function core_devices_get($account){
+										return FreePBX::Core()->getDevice($account);
+									}
 
-										//ensure this id is not already in use
-										$devices = core_devices_list();
-										if (is_array($devices)) {
-											foreach($devices as $device) {
-												if ($device[0] === $id) {
-													if ($display <> 'extensions') echo "<script>javascript:alert('"._("This device id is already in use")."');</script>";
-													return false;
-												}
-											}
-										}
-										//unless defined, $dial is TECH/id
-										if ($dial == '') {
-											//zap, dahdi are exceptions
-											if (strtolower($tech) == "zap" || strtolower($tech) == 'dahdi') {
-												$thischan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
-												$dial = strtoupper($tech).'/'.$thischan;
-												//-------------------------------------------------------------------------------------------------
-												// Added to enable the unsupported misdn module
-												//
-											} else if (strtolower($tech) == "misdn") {
-												$dial = $_REQUEST['devinfo_port'].'/'.($_REQUEST['devinfo_msn'] ? $_REQUEST['devinfo_msn'] : $id);
-												//-------------------------------------------------------------------------------------------------
-											} else {
-												$dial = strtoupper($tech)."/".$id;
-											}
-										}
+									//I dont wanna talk about it.
+									function core_devices_addpjsip($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
 
-										//check to see if we are requesting a new user
-										if ($user == "new") {
-											$user = $id;
-											$jump = true;
-										}
+									//add to sip table
+									function core_devices_addsip($account,$tech='SIP') {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
 
-										$emergency_cid = trim($emergency_cid);
-										if(!get_magic_quotes_gpc()) {
-											if(!empty($emergency_cid))
-												$emergency_cid = $db->escapeSimple($emergency_cid);
-											if(!empty($description))
-												$description = $db->escapeSimple($description);
-										}
+									//add to iax table
+									function core_devices_addiax2($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
 
-										//insert into devices table
-										$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (\"$id\",\"$tech\",\"$dial\",\"$devicetype\",\"$user\",\"$description\",\"$emergency_cid\")";
-										sql($sql);
+									function core_devices_addzap($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
 
-										//add details to astdb
-										if ($astman) {
-											// if adding or editting a fixed device, user property should always be set
-											if ($devicetype == 'fixed' || !$editmode) {
-												$astman->database_put("DEVICE",$id."/user",$user);
-											}
-											// If changing from a fixed to an adhoc, the user property should be intialized
-											// to the new default, not remain as the previous fixed user
-											if ($editmode) {
-												$previous_type = $astman->database_get("DEVICE",$id."/type");
-												if ($previous_type == 'fixed' && $devicetype == 'adhoc') {
-													$astman->database_put("DEVICE",$id."/user",$user);
-												}
-											}
+									function core_devices_adddahdi($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_deliax2($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_delzap($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_deldahdi($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_delpjsip($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_delsip($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_getiax2($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_getzap($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_getdahdi($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_getpjsip($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+
+									function core_devices_getsip($account) {
+										$trace = debug_backtrace();
+										$function = $trace[0]['function'];
+										die_freepbx("function: $function has been deprecated and removed");
+									}
+									/* end page.devices.php functions */
+
+								// this function rebuilds the astdb based on device table contents
+								// used on devices.php if action=resetall
+								function core_devices2astdb(){
+									global $astman;
+									global $amp_conf;
+
+									$sql = "SELECT * FROM devices";
+									$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
+									//add details to astdb
+									if ($astman) {
+										$astman->database_deltree("DEVICE");
+										foreach ($devresults as $dev) {
+											extract($dev);
 											$astman->database_put("DEVICE",$id."/dial",$dial);
 											$astman->database_put("DEVICE",$id."/type",$devicetype);
+											$astman->database_put("DEVICE",$id."/user",$user);
 											$astman->database_put("DEVICE",$id."/default_user",$user);
-											if($emergency_cid != '') {
+											if(trim($emergency_cid) != '') {
 												$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
-											} else {
-												$astman->database_del("DEVICE",$id."/emergency_cid");
 											}
-
-											$apparent_connecteduser = ($editmode && $user != "none") ? $astman->database_get("DEVICE",$id."/user") : $user;
-											if ($user != "none" && $apparent_connecteduser == $user)  {
+											// If a user is selected, add this device to the user
+											if ($user != "none") {
 												$existingdevices = $astman->database_get("AMPUSER",$user."/device");
 												if (empty($existingdevices)) {
 													$astman->database_put("AMPUSER",$user."/device",$id);
@@ -4681,537 +4739,56 @@ function core_get_config($engine) {
 												}
 											}
 
-										} else {
-											die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
-										}
 
-										// create a voicemail symlink if needed
-										$thisUser = core_users_get($user);
-										if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
-											if(empty($thisUser['voicemail'])) {
-												$vmcontext = "default";
-											} else {
-												$vmcontext = $thisUser['voicemail'];
+											// create a voicemail symlink if needed
+											$thisUser = core_users_get($user);
+											if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
+												if(empty($thisUser['voicemail']))
+													$vmcontext = "default";
+												else
+													$vmcontext = $thisUser['voicemail'];
+												//voicemail symlink
+												exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
+												exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
 											}
-
-											//voicemail symlink
-											exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
-											exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
-										}
-
-										//take care of sip/iax/zap config
-										$funct = "core_devices_add".strtolower($tech);
-
-										// before calling device specifc funcitions, get rid of any bogus fields in the REQUEST array
-										//
-										if (isset($_REQUEST['devinfo_secret_origional'])) {
-											unset($_REQUEST['devinfo_secret_origional']);
-										}
-										if(function_exists($funct)){
-											$funct($id);
-										}
-
-										/*	if($user != "none") {
-											core_hint_add($user);
-											}*/
-
-										//if we are requesting a new user, let's jump to users.php
-										if (isset($jump)) {
-											echo("<script language=\"JavaScript\">window.location=\"config.php?display=users&extdisplay={$id}&name={$description}\";</script>");
 										}
 										return true;
+									} else {
+										return false;
+									}
+								}
+
+								// this function rebuilds the astdb based on users table contents
+								// used on devices.php if action=resetall
+								function core_users2astdb(){
+									global $amp_conf;
+									global $astman;
+									global $db;
+
+									$sql = "SELECT * FROM users";
+									$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+
+									//add details to astdb
+									if ($astman) {
+										foreach($userresults as $usr) {
+											extract($usr);
+											$astman->database_put("AMPUSER",$extension."/password",$password);
+											$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
+											$astman->database_put("AMPUSER",$extension."/noanswer",$noanswer);
+											$astman->database_put("AMPUSER",$extension."/recording",$recording);
+											$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$db->escapeSimple($outboundcid)."\"");
+											$astman->database_put("AMPUSER",$extension."/cidname","\"".$db->escapeSimple($name)."\"");
+											$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
+										}
+										return true;
+									} else {
+										return false;
 									}
 
-									function core_devices_del($account,$editmode=false){
-										global $amp_conf;
-										global $astman;
-
-										//get all info about device
-										$devinfo = core_devices_get($account);
-										if (empty($devinfo)) {
-											return true;
-										}
-
-										//delete details to astdb
-										if ($astman) {
-											// If a user was selected, remove this device from the user
-											$deviceuser = $astman->database_get("DEVICE",$account."/user");
-											if (isset($deviceuser) && $deviceuser != "none") {
-												// Remove the device record from the user's device list
-												$userdevices = $astman->database_get("AMPUSER",$deviceuser."/device");
-
-												// We need to remove just this user and leave the rest alone
-												$userdevicesarr = explode("&", $userdevices);
-												$userdevicesarr_hash = array_flip($userdevicesarr);
-												unset($userdevicesarr_hash[$account]);
-												$userdevicesarr = array_flip($userdevicesarr_hash);
-												$userdevices = implode("&", $userdevicesarr);
-
-												if (empty($userdevices)) {
-													$astman->database_del("AMPUSER",$deviceuser."/device");
-												} else {
-													$astman->database_put("AMPUSER",$deviceuser."/device",$userdevices);
-												}
-											}
-											if (! $editmode) {
-												$astman->database_del("DEVICE",$account."/dial");
-												$astman->database_del("DEVICE",$account."/type");
-												$astman->database_del("DEVICE",$account."/user");
-												$astman->database_del("DEVICE",$account."/default_user");
-												$astman->database_del("DEVICE",$account."/emergency_cid");
-											}
-
-											//delete from devices table
-											$sql="DELETE FROM devices WHERE id = \"$account\"";
-											sql($sql);
-
-											//voicemail symlink
-											exec("rm -f /var/spool/asterisk/voicemail/device/".$account);
-										} else {
-											die_freepbx("Cannot connect to Asterisk Manager with ".$amp_conf["AMPMGRUSER"]."/".$amp_conf["AMPMGRPASS"]);
-										}
-
-										//take care of sip/iax/zap config
-										$funct = "core_devices_del".strtolower($devinfo['tech']);
-										if(function_exists($funct)){
-											$funct($account);
-										}
-									}
-
-									function core_devices_get($account){
-										//get all the variables for the meetme
-										$sql = "SELECT * FROM devices WHERE id = '$account'";
-										$results = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
-										if (empty($results)) {
-											return array();
-										}
-
-										//take care of sip/iax/zap config
-										$funct = "core_devices_get".strtolower($results['tech']);
-										if (!empty($results['tech']) && function_exists($funct)) {
-											$devtech = $funct($account);
-											if (is_array($devtech)){
-												$results = array_merge($results,$devtech);
-											}
-										}
-
-										return $results;
-									}
-
-									// this function rebuilds the astdb based on device table contents
-									// used on devices.php if action=resetall
-									function core_devices2astdb(){
-										global $astman;
-										global $amp_conf;
-
-										$sql = "SELECT * FROM devices";
-										$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-
-										//add details to astdb
-										if ($astman) {
-											$astman->database_deltree("DEVICE");
-											foreach ($devresults as $dev) {
-												extract($dev);
-												$astman->database_put("DEVICE",$id."/dial",$dial);
-												$astman->database_put("DEVICE",$id."/type",$devicetype);
-												$astman->database_put("DEVICE",$id."/user",$user);
-												$astman->database_put("DEVICE",$id."/default_user",$user);
-												if(trim($emergency_cid) != '') {
-													$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
-												}
-												// If a user is selected, add this device to the user
-												if ($user != "none") {
-													$existingdevices = $astman->database_get("AMPUSER",$user."/device");
-													if (empty($existingdevices)) {
-														$astman->database_put("AMPUSER",$user."/device",$id);
-													} else {
-														$existingdevices_array = explode('&',$existingdevices);
-														if (!in_array($id, $existingdevices_array)) {
-															$existingdevices_array[]=$id;
-															$existingdevices = implode('&',$existingdevices_array);
-															$astman->database_put("AMPUSER",$user."/device",$existingdevices);
-														}
-													}
-												}
-
-
-												// create a voicemail symlink if needed
-												$thisUser = core_users_get($user);
-												if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
-													if(empty($thisUser['voicemail']))
-														$vmcontext = "default";
-													else
-														$vmcontext = $thisUser['voicemail'];
-													//voicemail symlink
-													exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
-													exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
-												}
-											}
-											return true;
-										} else {
-											return false;
-										}
-									}
-
-									// this function rebuilds the astdb based on users table contents
-									// used on devices.php if action=resetall
-									function core_users2astdb(){
-										global $amp_conf;
-										global $astman;
-										global $db;
-
-										$sql = "SELECT * FROM users";
-										$userresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-
-										//add details to astdb
-										if ($astman) {
-											foreach($userresults as $usr) {
-												extract($usr);
-												$astman->database_put("AMPUSER",$extension."/password",$password);
-												$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
-												$astman->database_put("AMPUSER",$extension."/noanswer",$noanswer);
-												$astman->database_put("AMPUSER",$extension."/recording",$recording);
-												$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$db->escapeSimple($outboundcid)."\"");
-												$astman->database_put("AMPUSER",$extension."/cidname","\"".$db->escapeSimple($name)."\"");
-												$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
-											}
-											return true;
-										} else {
-											return false;
-										}
-
-										//	TODO: this was...
-										// 	return $astman->disconnect();
-										//	is "true" the correct value...?
-									}
-
-									//I dont wanna talk about it.
-									function core_devices_addpjsip($account) {
-										core_devices_addsip($account,'PJSIP');
-									}
-
-									//add to sip table
-									function core_devices_addsip($account,$tech='SIP') {
-										global $db;
-										global $amp_conf;
-
-										$flag = 2;
-
-										foreach ($_REQUEST as $req=>$data) {
-											if ( substr($req, 0, 8) == 'devinfo_' ) {
-												$keyword = substr($req, 8);
-												$data = trim($data);
-												if ( $keyword == 'dial' && $data == '' ) {
-													$sipfields[] = array($account, $keyword, $tech.'/'.$account, $flag++);
-												} elseif ($keyword == 'mailbox' && $data == '') {
-													$sipfields[] = array($account,'mailbox',$account.'@device', $flag++);
-												} elseif ($keyword == 'vmexten' && $data == '') {
-													// don't add it
-												} else {
-													$sipfields[] = array($account, $keyword, $data, $flag++);
-												}
-											}
-										}
-
-										if ( !is_array($sipfields) ) { // left for compatibilty....lord knows why !
-
-											$sipfields[] = array($account,'accountcode',(isset($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++);
-											$sipfields[] = array($account,'sipdriver',(isset($_REQUEST['sipdriver'])?$_REQUEST['sipdriver']:'chan_sip'),$flag++);
-											$sipfields[] = array($account,'secret',(isset($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++);
-											$sipfields[] = array($account,'canreinvite',(isset($_REQUEST['canreinvite'])?$_REQUEST['canreinvite']:$amp_conf['DEVICE_SIP_CANREINVITE']),$flag++);
-											$sipfields[] = array($account,'trustrpid',(isset($_REQUEST['trustrpid'])?$_REQUEST['trustrpid']:$amp_conf['DEVICE_SIP_TRUSTRPID']),$flag++);
-											$sipfields[] = array($account,'sendrpid',(isset($_REQUEST['sendrpid'])?$_REQUEST['sendrpid']:$amp_conf['DEVICE_SIP_SENDRPID']),$flag++);
-											$sipfields[] = array($account,'context',(isset($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),$flag++);
-											$sipfields[] = array($account,'dtmfmode',(isset($_REQUEST['dtmfmode'])?$_REQUEST['dtmfmode']:''),$flag++);
-											$sipfields[] = array($account,'host',(isset($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),$flag++);
-											$sipfields[] = array($account,'type',(isset($_REQUEST['type'])?$_REQUEST['type']:'friend'),$flag++);
-											$sipfields[] = array($account,'mailbox',(isset($_REQUEST['mailbox']) && !empty($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),$flag++);
-											$sipfields[] = array($account,'username',(isset($_REQUEST['username'])?$_REQUEST['username']:$account),$flag++);
-											$sipfields[] = array($account,'nat',(isset($_REQUEST['nat'])?$_REQUEST['nat']:$amp_conf['DEVICE_SIP_NAT']),$flag++);
-											$sipfields[] = array($account,'port',(isset($_REQUEST['port'])?$_REQUEST['port']:'5060'),$flag++);
-											$sipfields[] = array($account,'qualify',(isset($_REQUEST['qualify'])?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++);
-											if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
-												$sipfields[] = array($account,'qualifyfreq',(isset($_REQUEST['qualifyfreq'])?$_REQUEST['qualifyfreq']:$amp_conf['DEVICE_SIP_QUALIFYFREQ']),$flag++);
-											}
-											if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
-												$sipfields[] = array($account,'transport',(isset($_REQUEST['transport'])?$_REQUEST['transport']:'udp'),$flag++);
-												$sipfields[] = array($account,'encryption',(isset($_REQUEST['encryption'])?$_REQUEST['encryption']:$amp_conf['DEVICE_SIP_ENCRYPTION']),$flag++);
-											}
-											$sipfields[] = array($account,'callgroup',(isset($_REQUEST['callgroup'])?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP']),$flag++);
-											$sipfields[] = array($account,'pickupgroup',(isset($_REQUEST['pickupgroup'])?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP']),$flag++);
-											$sipfields[] = array($account,'deny',(isset($_REQUEST['deny'])?$_REQUEST['deny']:''),$flag++);
-											$sipfields[] = array($account,'permit',(isset($_REQUEST['permit'])?$_REQUEST['permit']:''),$flag++);
-											$sipfields[] = array($account,'disallow',(isset($_REQUEST['disallow'])?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++);
-											$sipfields[] = array($account,'allow',(isset($_REQUEST['allow'])?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++);
-
-											if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
-												$sipfields[] = array($account,'avpf',(isset($_REQUEST['avpf'])?$_REQUEST['avpf']:'no'),$flag++);
-												$sipfields[] = array($account,'icesupport',(isset($_REQUEST['icesupport'])?$_REQUEST['icesupport']:'no'),$flag++);
-											}
-
-											$vmexten = isset($_REQUEST['vmexten'])?trim($_REQUEST['vmexten']):'';
-											if ($vmexten != '') {
-												$sipfields[] = array($account,'vmexten',$vmexten,$flag++);
-											}
-										}
-
-										// Very bad
-										$sipfields[] = array($account,'account',$account,$flag++);
-										$sipfields[] = array($account,'callerid',(isset($_REQUEST['description']) && $_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>',$flag++);
-
-										$compiled = $db->prepare('INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)');
-										$result = $db->executeMultiple($compiled,$sipfields);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getDebugInfo()."<br><br>".'error adding to SIP table');
-										}
-									}
-
-									function core_devices_delpjsip($account) {
-										core_devices_delsip($account);
-									}
-
-									function core_devices_delsip($account) {
-										global $db;
-
-										$sql = "DELETE FROM sip WHERE id = '$account'";
-										$result = $db->query($sql);
-
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage().$sql);
-										}
-									}
-
-									function core_devices_getpjsip($account) {
-										return core_devices_getsip($account);
-									}
-
-									function core_devices_getsip($account) {
-										global $db;
-										$sql = "SELECT keyword,data FROM sip WHERE id = '$account'";
-										$results = $db->getAssoc($sql);
-										if(DB::IsError($results)) {
-											$results = null;
-										}
-
-										return $results;
-									}
-
-									//add to iax table
-									function core_devices_addiax2($account) {
-										global $db;
-										global $amp_conf;
-
-										$flag = 2;
-										foreach ($_REQUEST as $req=>$data) {
-											if ( substr($req, 0, 8) == 'devinfo_' ) {
-												$keyword = substr($req, 8);
-												if ( $keyword == 'dial' && $data == '' ) {
-													$iaxfields[] = array($account, $keyword, 'IAX2/'.$account, $flag++);
-												} elseif ($keyword == 'mailbox' && $data == '') {
-													$iaxfields[] = array($account,'mailbox',$account.'@device', $flag++);
-												} else {
-													$iaxfields[] = array($account, $keyword, $data, $flag++);
-												}
-											}
-										}
-
-										if ( !is_array($iaxfields) ) { // left for compatibilty....lord knows why !
-											$iaxfields = array(
-													array($account,'secret',$db->escapeSimple(($_REQUEST['secret'])?$_REQUEST['secret']:''),$flag++),
-													array($account,'transfer',$db->escapeSimple(($_REQUEST['transfer'])?$_REQUEST['transfer']:'yes'),$flag++),
-													array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal'),$flag++),
-													array($account,'host',$db->escapeSimple(($_REQUEST['host'])?$_REQUEST['host']:'dynamic'),$flag++),
-													array($account,'type',$db->escapeSimple(($_REQUEST['type'])?$_REQUEST['type']:'friend'),$flag++),
-													array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device'),$flag++),
-													array($account,'username',$db->escapeSimple(($_REQUEST['username'])?$_REQUEST['username']:$account),$flag++),
-													array($account,'port',$db->escapeSimple(($_REQUEST['port'])?$_REQUEST['port']:'4569'),$flag++),
-													array($account,'qualify',$db->escapeSimple(($_REQUEST['qualify'])?$_REQUEST['qualify']:$amp_conf['DEVICE_QUALIFY']),$flag++),
-													array($account,'deny',$db->escapeSimple((isset($_REQUEST['deny']))?$_REQUEST['deny']:''),$flag++),
-													array($account,'permit',$db->escapeSimple((isset($_REQUEST['permit']))?$_REQUEST['permit']:''),$flag++),
-													array($account,'disallow',$db->escapeSimple(($_REQUEST['disallow'])?$_REQUEST['disallow']:$amp_conf['DEVICE_DISALLOW']),$flag++),
-													array($account,'allow',$db->escapeSimple(($_REQUEST['allow'])?$_REQUEST['allow']:$amp_conf['DEVICE_ALLOW']),$flag++),
-													array($account,'accountcode',$db->escapeSimple(($_REQUEST['accountcode'])?$_REQUEST['accountcode']:''),$flag++),
-													array($account,'requirecalltoken',$db->escapeSimple(($_REQUEST['requirecalltoken'])?$_REQUEST['requirecalltoken']:''),$flag++)
-													);
-										}
-
-										// Very bad
-										$iaxfields[] = array($account,'account',$db->escapeSimple($account),$flag++);
-										$iaxfields[] = array($account,'callerid',$db->escapeSimple((isset($_REQUEST['description']) && $_REQUEST['description'] != '')?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'),$flag++);
-										// Asterisk treats no CallerID from an IAX device as 'hide CallerID', and ignores the CallerID
-										// set in iax.conf. As we rely on this for pretty much everything, we need to specify the
-										// CallerID as a variable which gets picked up in macro-callerid.
-										// Ref - http://bugs.digium.com/view.php?id=456
-										$iaxfields[] = array($account,'setvar',$db->escapeSimple("REALCALLERIDNUM=$account"),$flag++);
-
-										$compiled = $db->prepare('INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)');
-										$result = $db->executeMultiple($compiled,$iaxfields);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage()."<br><br>error adding to IAX table");
-										}
-									}
-
-									function core_devices_deliax2($account) {
-										global $db;
-
-										$sql = "DELETE FROM iax WHERE id = '$account'";
-										$result = $db->query($sql);
-
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage().$sql);
-										}
-									}
-
-									function core_devices_getiax2($account) {
-										global $db;
-										$sql = "SELECT keyword,data FROM iax WHERE id = '$account'";
-										$results = $db->getAssoc($sql);
-										if(DB::IsError($results)) {
-											$results = null;
-										}
-
-										return $results;
-									}
-
-									function core_devices_addzap($account) {
-										global $db;
-										global $amp_conf;
-
-										foreach ($_REQUEST as $req=>$data) {
-											if ( substr($req, 0, 8) == 'devinfo_' ) {
-												$keyword = substr($req, 8);
-												if ( $keyword == 'dial' && $data == '' ) {
-													$zapchan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
-													$zapfields[] = array($account, $keyword, 'ZAP/'.$zapchan);
-												} elseif ($keyword == 'mailbox' && $data == '') {
-													$zapfields[] = array($account,'mailbox',$account.'@device');
-												} else {
-													$zapfields[] = array($account, $keyword, $data);
-												}
-											}
-										}
-
-										if ( !is_array($zapfields) ) { // left for compatibilty....lord knows why !
-											$zapfields = array(
-													array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
-													array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device')),
-													array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
-													array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
-													array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
-													array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
-													array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
-													array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
-													array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
-													array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
-													array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
-													array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP'])),
-													array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP'])),
-													array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
-													);
-										}
-
-										// Very bad
-										$zapfields[] = array($account,'account',$db->escapeSimple($account));
-										$zapfields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
-
-										$compiled = $db->prepare('INSERT INTO zap (id, keyword, data) values (?,?,?)');
-										$result = $db->executeMultiple($compiled,$zapfields);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage()."<br><br>error adding to ZAP table");
-										}
-									}
-
-									function core_devices_adddahdi($account) {
-										global $db;
-										global $amp_conf;
-
-										foreach ($_REQUEST as $req=>$data) {
-											if ( substr($req, 0, 8) == 'devinfo_' ) {
-												$keyword = substr($req, 8);
-												if ( $keyword == 'dial' && $data == '' ) {
-													$dahdichan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
-													$dahdifields[] = array($account, $keyword, 'DAHDI/'.$dahdichan);
-												} elseif ($keyword == 'mailbox' && $data == '') {
-													$dahdifields[] = array($account,'mailbox',$account.'@device');
-												} else {
-													$dahdifields[] = array($account, $keyword, $data);
-												}
-											}
-										}
-
-										if ( !is_array($dahdifields) ) { // left for compatibilty....lord knows why !
-											$dahdifields = array(
-													array($account,'context',$db->escapeSimple(($_REQUEST['context'])?$_REQUEST['context']:'from-internal')),
-													array($account,'mailbox',$db->escapeSimple(($_REQUEST['mailbox'])?$_REQUEST['mailbox']:$account.'@device')),
-													array($account,'immediate',$db->escapeSimple(($_REQUEST['immediate'])?$_REQUEST['immediate']:'no')),
-													array($account,'signalling',$db->escapeSimple(($_REQUEST['signalling'])?$_REQUEST['signalling']:'fxo_ks')),
-													array($account,'echocancel',$db->escapeSimple(($_REQUEST['echocancel'])?$_REQUEST['echocancel']:'yes')),
-													array($account,'echocancelwhenbridged',$db->escapeSimple(($_REQUEST['echocancelwhenbridged'])?$_REQUEST['echocancelwhenbridged']:'no')),
-													array($account,'echotraining',$db->escapeSimple(($_REQUEST['echotraining'])?$_REQUEST['echotraining']:'800')),
-													array($account,'busydetect',$db->escapeSimple(($_REQUEST['busydetect'])?$_REQUEST['busydetect']:'no')),
-													array($account,'busycount',$db->escapeSimple(($_REQUEST['busycount'])?$_REQUEST['busycount']:'7')),
-													array($account,'callprogress',$db->escapeSimple(($_REQUEST['callprogress'])?$_REQUEST['callprogress']:'no')),
-													array($account,'accountcode',$db->escapeSimple((isset($_REQUEST['accountcode']))?$_REQUEST['accountcode']:'')),
-													array($account,'callgroup',$db->escapeSimple((isset($_REQUEST['callgroup']))?$_REQUEST['callgroup']:$amp_conf['DEVICE_CALLGROUP'])),
-													array($account,'pickupgroup',$db->escapeSimple((isset($_REQUEST['pickupgroup']))?$_REQUEST['pickupgroup']:$amp_conf['DEVICE_PICKUPGROUP'])),
-													array($account,'channel',$db->escapeSimple(($_REQUEST['channel'])?$_REQUEST['channel']:''))
-													);
-										}
-
-										// Very bad
-										$dahdifields[] = array($account,'account',$db->escapeSimple($account));
-										$dahdifields[] = array($account,'callerid',$db->escapeSimple(($_REQUEST['description'])?$_REQUEST['description']." <".$account.'>':'device'." <".$account.'>'));
-
-										$compiled = $db->prepare('INSERT INTO dahdi (id, keyword, data) values (?,?,?)');
-										$result = $db->executeMultiple($compiled,$dahdifields);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage()."<br><br>error adding to DAHDi table");
-										}
-									}
-
-									function core_devices_delzap($account) {
-										global $db;
-
-										$sql = "DELETE FROM zap WHERE id = '$account'";
-										$result = $db->query($sql);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage().$sql);
-										}
-									}
-
-									function core_devices_deldahdi($account) {
-										global $db;
-
-										$sql = "DELETE FROM dahdi WHERE id = '$account'";
-										$result = $db->query($sql);
-										if(DB::IsError($result)) {
-											die_freepbx($result->getMessage().$sql);
-										}
-									}
-
-									function core_devices_getzap($account) {
-										global $db;
-										$sql = "SELECT keyword,data FROM zap WHERE id = '$account'";
-										$results = $db->getAssoc($sql);
-										if(DB::IsError($results)) {
-											$results = null;
-										}
-										return $results;
-									}
-
-									function core_devices_getdahdi($account) {
-										global $db;
-										$sql = "SELECT keyword,data FROM dahdi WHERE id = '$account'";
-										$results = $db->getAssoc($sql);
-										if(DB::IsError($results)) {
-											$results = null;
-										}
-										return $results;
-									}
-									/* end page.devices.php functions */
-
-
-
+									//	TODO: this was...
+									// 	return $astman->disconnect();
+									//	is "true" the correct value...?
+								}
 
 									function core_hint_get($account){
 										global $astman;
@@ -7518,10 +7095,13 @@ function core_devices_configpageinit($dispnum) {
 		$default = (empty($_REQUEST['extdisplay'])) ? 'chan_'.$deviceInfo['tech'] : (($sipdriver == 'both') ? 'chan_pjsip' : $sipdriver);
 		$tmparr['sipdriver'] = array('hidden' => true, 'value' => $default, 'level' => 0);
 
-		$tt = _("Change the SIP Channel Driver.");
-		$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
-		$ttt = sprintf(_("Change To %s Driver"),$ndriver);
-		$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
+		//Inverted Driver, only allow the change if in certain modes
+		if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
+			$tt = _("Change the SIP Channel Driver.");
+			$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
+			$ttt = sprintf(_("Change To %s Driver"),$ndriver);
+			$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
+		}
 
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
@@ -7853,7 +7433,8 @@ function core_devices_configpageload() {
 		if ($devinfo_tech && $devinfo_tech != "virtual") {
 			$section = _("Device Options");
 
-			$device_uses = sprintf(_("This device uses %s technology."),$devinfo_tech).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
+			$devinfo_techd = ($devinfo_tech == 'sip') ? 'CHAN_SIP' : strtoupper($devinfo_tech);
+			$device_uses = sprintf(_("This device uses %s technology."),"<strong>".$devinfo_techd."</strong>").(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
 			$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
 			$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 			if (is_array($devopts)) {
@@ -7951,11 +7532,12 @@ function core_devices_configprocess() {
 		case "edit":  //just delete and re-add
 			// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+				//delete then re add, insanity.
 				core_devices_del($extdisplay,true);
 				if(!empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
 					$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
 					$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
-					$_REQUEST['devinfo_dial'] = $devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
+					$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
 				}
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
 				needreload();
@@ -7968,4 +7550,12 @@ function core_devices_configprocess() {
 		break;
 	}
 	return true;
+}
+
+function _core_backtrace() {
+	$trace = debug_backtrace();
+	$function = $trace[1]['function'];
+	$line = $trace[1]['line'];
+	$file = $trace[1]['file'];
+	freepbx_log(FPBX_LOG_WARNING,'Depreciated Function '.$function.' detected in '.$file.' on line '.$line);
 }
