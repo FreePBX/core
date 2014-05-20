@@ -5,7 +5,8 @@
 	<name>Core</name>
 	<version>12.0.1alpha20</version>
 	<publisher>FreePBX</publisher>
-	<license>GPLv2+</license>
+	<license>GPLv3+</license>
+	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
