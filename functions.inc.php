@@ -2277,6 +2277,7 @@ function core_get_config($engine) {
           }
           $ext->add($context, $exten, '', new ext_set("_NODEST",""));
           $ext->add($context, $exten, '', new ext_gosub('1','s','sub-record-check','out,${EXTEN},'));
+          $ext->add($context, $exten, '', new ext_setvar('__OUTBOUND_ROUTE_NAME',$route['name']));
 
           $password = $route['password'];
           foreach ($trunks as $trunk_id) {
