@@ -2217,7 +2217,7 @@ function core_get_config($engine) {
 													if ($fpattern['base_pattern'] != $exten) {
 														$ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT,EXTERNAL'));
 													}
-													$ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),$route['name']),1));
+													$ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),'${SET(OUTBOUND_ROUTE_NAME='.$route['name'].')}'),1));
 													if ($route['dest']) {
 														$ext->add($context, $exten, '', new ext_set("ROUTE_CIDSAVE",'${CALLERID(all)}'));
 													}
