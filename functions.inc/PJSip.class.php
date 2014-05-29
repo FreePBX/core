@@ -20,7 +20,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
-		$this->db = $this->Database;
+		$this->db = $freepbx->Database;
 	}
 
 	private function getAllDevs() {
