@@ -26,19 +26,7 @@ $(document).ready(function(){
   $("#dial-pattern-clear").click(function(){
     clearAllPatterns();
   });
-  $(".dpt-display").toggleVal({
-    populateFrom: "title",
-    changedClass: "text-normal",
-    focusClass: "text-normal"
-  });
-  $(".dpt-nodisplay").mouseover(function(){
-    $(this).toggleVal({
-      populateFrom: "title",
-      changedClass: "text-normal",
-      focusClass: "text-normal"
-    }).removeClass('dpt-nodisplay').addClass('dpt-display').unbind('mouseover');
-  });
-}); 
+});
 
 function patternsRemove(idx) {
   $("#prepend_digit_"+idx).parent().parent().remove();
@@ -76,11 +64,6 @@ function addCustomField(prepend_digit, pattern_prefix, pattern_pass, start_loc, 
 			</tr>\
 		').prev();
 
-		new_insert.find(".dpt-title").toggleVal({
-			populateFrom: "title",
-			changedClass: "text-normal",
-			focusClass: "text-normal"
-		});
 		if(scroll) {
 			$('.dialpatterns').animate({"scrollTop": $('.dialpatterns')[0].scrollHeight}, "fast");
 		}
@@ -100,11 +83,7 @@ function clearPatterns() {
 function clearAllPatterns() {
 
   $(".dpt-value").addClass('dpt-title dpt-nodisplay').removeClass('dpt-value').mouseover(function(){
-    $(this).toggleVal({
-      populateFrom: "title",
-      changedClass: "text-normal",
-      focusClass: "text-normal"
-    }).removeClass('dpt-nodisplay').addClass('dpt-display').unbind('mouseover');
+
   }).each(function(){
     $(this).val("");
   });
@@ -158,17 +137,6 @@ function validatePatterns() {
 
   if (culprit != undefined) {
 	  msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
-    // now we have to put it back...
-    // do I have to turn it off first though?
-    $(".dpt-display").each(function() {
-      if ($.trim($(this).val()) == '') {
-        $(this).toggleVal({
-          populateFrom: "title",
-          changedClass: "text-normal",
-          focusClass: "text-normal"
-        });
-      }
-    });
     return warnInvalid(culprit, msgInvalidDialPattern);
   } else {
     return true;
@@ -179,14 +147,14 @@ document.trunkEdit.trunk_name.focus();
 
 function trunkEdit_onsubmit(act) {
 	var theForm = document.trunkEdit;
-	
+
 	var tech = '<?php echo !empty($tech) ? strtolower($tech) : strtolower($_REQUEST['tech']) ?>';
 	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
 	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
 	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
 	var msgInvalidOutboundDialPrefix = "<?php echo _('The Outbound Dial Prefix contains non-standard characters. If these are intentional the press OK to continue.'); ?>";
 	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
-	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>"; 
+	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>";
 	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
 	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
 	var msgCIDValueRequired = "<?php echo _('You must define an Outbound CallerID when Choosing this CID Options value'); ?>";
@@ -208,24 +176,24 @@ function trunkEdit_onsubmit(act) {
 			}
 		}
 	}
-	
+
 	if (!isCallerID($('#trunkEdit input[name="outcid"]').val()))
 		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
-	
+
 	if (!isInteger($('#trunkEdit input[name="maxchans"]').val()))
 		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
-	
+
 	if (!isDialIdentifierSpecial($('#dialoutprefix').val())) {
 		if (confirm(msgInvalidOutboundDialPrefix) == false) {
 			$('#dialoutprefix').focus();
 			return false;
 		}
 	}
-	
+
 	if (isEmpty($.trim($('#trunkEdit input[name="trunk_name"]').val()))) {
 		return warnInvalid(theForm.trunk_name, msgInvalidTrunkName);
 	}
-	
+
 	if(tech == 'pjsip') {
 		console.log('OK');
 		if($('#configmode').val() == 'advanced') {
@@ -246,19 +214,19 @@ function trunkEdit_onsubmit(act) {
 			return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
 		}
 	}
-	
+
 	if(tech != 'enum' && tech != 'custom' && tech != 'dundi' && tech != 'pjsip') {
 		defaultEmptyOK = true;
 		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 			return warnInvalid(theForm.channelid, msgInvalidTrunkName);
-	
+
 		if (theForm.channelid.value == theForm.usercontext.value)
 			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	} else if (tech == 'custom' || tech == 'dundi') {
-		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value)) 
-			return warnInvalid(theForm.channelid, msgInvalidChannelName); 
+		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+			return warnInvalid(theForm.channelid, msgInvalidChannelName);
 
-		if (theForm.channelid.value == theForm.usercontext.value) 
+		if (theForm.channelid.value == theForm.usercontext.value)
 			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 	}
 
@@ -281,12 +249,12 @@ function trunkEdit_onsubmit(act) {
 function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)
     var i;
 
-    if (isEmpty(s)) 
+    if (isEmpty(s))
        if (isDialIdentifierSpecial.arguments.length == 1) return defaultEmptyOK;
        else return (isDialIdentifierSpecial.arguments[1] == true);
 
     for (i = 0; i < s.length; i++)
-    {   
+    {
         var c = s.charAt(i);
 
         if ( !isDialDigitChar(c) && (c != "w") && (c != "W") && (c != "q") && (c != "Q") && (c != "+") ) return false;
