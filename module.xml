@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.26* FREEPBX-7422 Fix Japan Country Indication Tones
 		*2.11.0.25* Set OUTBOUND_ROUTE_NAME to name of outbound route
 		*2.11.0.24* update license file
 		*2.11.0.21* #5698 #7317
