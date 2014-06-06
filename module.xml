@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.30</version>
+	<version>2.11.0.31</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.31* Part fix for #6923 language not being set.
 		*2.11.0.27* FREEPBX-6914 Notify user when the callrecording module is not installed so they know not to press star 1
 		*2.11.0.26* FREEPBX-7422 Fix Japan Country Indication Tones
 		*2.11.0.25* Set OUTBOUND_ROUTE_NAME to name of outbound route
