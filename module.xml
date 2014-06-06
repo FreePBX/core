@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha23</version>
+	<version>12.0.1alpha24</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha24* Part fix for #6923 language not being set.
 		*12.0.1alpha22* FREEPBX-6914 Add notification if callrecordings is not installed
 		*12.0.1aplha21* Fixed Rare Race Condition
 		*12.0.1alpha20* Refactor Device Management for driver switching fixes
@@ -33,71 +34,6 @@
 		*12.0.1alpha2* Bump Version Number and make release 12 branch
 		*2.12.0alpha1* PJSIP Support
 		*2.11.0.11* Added HTTP.conf to core
-		*2.11.0.10* #6915, #6318, #6902
-		*2.11.0.9* #6993 Add new toll-free route to wizard
-		*2.11.0.8* Dont generate SIP Secret if device was previously saved with no SIP Secret
-		*2.11.0.7* #6786, #6462, #6922, #6345
-		*2.11.0.6* #6522, #6758, #6750, #6753
-		*2.11.0.5* #6760
-		*2.11.0.4* #6732, #6766
-		*2.11.0.3* #6147, #6681, #6731
-		*2.11.0.2* #6654, #6639, #6366
-		*2.11.0.1* #6535, #6604, #6576
-		*2.11.0.0* 2.11.0 final
-		*2.11.0.0rc1.5* change dependency
-		*2.11.0.0rc1.4* #6366, #6541
-		*2.11.0.0rc1.3* Fixes to gui_drawselects re #6541
-		*2.11.0.0rc1.2* Fixes #6446, queue recording
-		*2.11.0.0rc1.1* at generation set rtp values if class is empty
-		*2.11.0.0rc1.0* rtp.conf cleanup, misc
-		*2.11.0.0beta2.7* Fixes #6459, #6237 call fails on internal pickup in ring group when call confirm is enabled
-		*2.11.0.0beta2.6* r15400
-		*2.11.0.0beta2.5* r15308
-		*2.11.0.0beta2.4* Move control of rtp.conf and rtp_additional.conf into core re #6397
-	    *2.11.0.0beta2.3* #5977, #6262, #6292, #6337
-	    *2.11.0.0beta2.2* #5828, #6263
-	    *2.11.0.0beta2.1* #6261
-	    *2.11.0.0beta2.0* more on #5782, #6141, beta2
-	    *2.11.0.0beta1.10* Regression #6068
-	    *2.11.0.0beta1.9* #6138
-	    *2.11.0.0beta1.8* #6140, #6141
-	    *2.11.0.0beta1.7* #6079, #6063, #6109, #6122, #6130
-	    *2.11.0.0beta1.6* #6012, #6134
-	    *2.11.0.0beta1.5* #6012
-		*2.11.0.0beta1.4* #5113
-		*2.11.0.0beta1.3* #6051
-		*2.11.0.0beta1.2* #6034, #6024 #6023, #6021, #6019, #6015, #6013, #6.12, #6001, #6002, #5998
-		*2.11.0.0beta1.1* #6001
-		*2.11.0.0beta1.0* bump to beta and #5998, #5999
-		*2.10.1.2* r15308
-		*2.10.1.1* #5904, #5981, #6109, #6122, #6130
-		*2.10.1.0* #5863
-		*2.10.0.8* #5816 (work around asterisk bug)
-		*2.10.0.7* #5783
-		*2.10.0.6* #5714, undefined variable fixes
-		*2.10.0.5* #5664 additional work
-		*2.10.0.4* #2939 and put back changes reverted in r13846 with fix for extension deletion
-		*2.10.0.3* revert back to r13742 until current issue can be debugged
-		*2.10.0.2* #5664, #5678
-		*2.10.0.1* #5385, #5381
-		*2.10.0.0* bump to final, minor tweaks
-		*2.10.0rc1.3* #5618, #5633
-		*2.10.0rc1.2* #5300, #5374, #5358, #4911, #4969, #5073
-		*2.10.0rc1.1* #5117, #5456
-		*2.10.0rc1.0* release candidate, remove unused hint
-		*2.10.0beta3.0* #5468, #5299, #5477, #5478
-		*2.10.0beta2.1* #5463, call recording bug fixes, generalize CC_RECALL, misc bug fixes
-		*2.10.0beta2.0* #5407, misc bug fixes
-		*2.10.0beta1.1* bug fixes
-		*2.10.0beta1.0* beta1 release, see svn log
-		*2.9.0.0* #5117
-		*2.9.0rc1.6* #5095, #5109
-		*2.9.0rc1.5* #5055
-		*2.9.0rc1.4* #5065, #5057
-		*2.9.0rc1.3* #4871 again
-		*2.9.0rc1.2* #4871, misc
-		*2.9.0rc1.1* #5011, #5017, #5033
-		*2.9.0rc1.0* #4987, #4989, #5000, #4998, #4995
 	</changelog>
 	<depends>
 		<version>12.0.1alpha45</version>
