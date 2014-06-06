@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha21</version>
+	<version>12.0.1alpha22</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha22* FREEPBX-6914 Add notification if callrecordings is not installed
 		*12.0.1aplha21* Fixed Rare Race Condition
 		*12.0.1alpha20* Refactor Device Management for driver switching fixes
 		*12.0.1alpha19* Use the correct method call
