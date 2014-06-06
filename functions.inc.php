@@ -985,6 +985,21 @@ function core_get_config($engine) {
 
 	$modulename = "core";
 
+	$callrecording = 'callrecording';
+	$callrecording_uid = 'MISSING_CALLRECORDINGS';
+	$getCallRecordingModInfo = module_getinfo($callrecording, MODULE_STATUS_ENABLED);
+	if (!isset($getCallRecordingModInfo[$callrecording]) || ($getCallRecordingModInfo[$callrecording]['status'] !== MODULE_STATUS_ENABLED)) {
+		if(!$nt->exists($modulename, $callrecording_uid)) {
+			$notifications =& notifications::create($db);
+			$notifications->add_notice($modulename, $callrecording_uid, _('Call Recording Module Not Enabled'), _('The Call Recording module is not enabled. Since this feature is required for call recording you may not be able to record calls until the module is installed and enabled.'), '', true, true);
+		}
+	} else {
+		if($nt->exists($modulename, $callrecording_uid)) {
+			$notifications =& notifications::create($db);
+			$notifications->delete($modulename, $callrecording_uid);
+		}
+	}
+
 	switch($engine) {
 		case "asterisk":
 
