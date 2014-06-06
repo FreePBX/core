@@ -1362,7 +1362,7 @@ function core_get_config($engine) {
 									// Simulate Inbound call
 									if ($fc_simu_pstn != '') {
 										$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
-										$ext->add('app-chanspy', $fc_simu_pstn, '', new ext_macro('user-callerid'));
+										$ext->add('ext-test', $fc_simu_pstn, '', new ext_macro('user-callerid'));
 										if (ctype_digit($fc_simu_pstn)) {
 											$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', '${EXTEN}', 'from-pstn'));
 										} else {
