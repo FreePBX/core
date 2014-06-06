@@ -1385,18 +1385,16 @@ function core_get_config($engine) {
 				$ext->add('app-chanspy', $fc_chanspy, '', new ext_hangup(''));
 			}
 
-			// Simulate options (ext-test)
+			// Simulate External call. (ext-test)
 			if ($fc_simu_pstn != '') {
 				$ext->addInclude('from-internal-additional', 'ext-test'); // Add the include from from-internal
+				$ext->add('ext-test', $fc_simu_pstn, '', new ext_macro('user-callerid'));
 
-				if ($fc_simu_pstn != '') {
-					if (ctype_digit($fc_simu_pstn)) {
-						$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', '${EXTEN}', 'from-pstn'));
-					} else {
-						$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', 's', 'from-pstn'));
-					}
+				if (ctype_digit($fc_simu_pstn)) {
+					$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', '${EXTEN}', 'from-pstn'));
+				} else {
+					$ext->add('ext-test', $fc_simu_pstn, '', new ext_goto('1', 's', 'from-pstn'));
 				}
-
 				$ext->add('ext-test', 'h', '', new ext_macro('hangupcall'));
 			}
 
