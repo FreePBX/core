@@ -7087,19 +7087,28 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
-		$tmparr['sipdriver'] = array('hidden' => false, 'value' => 'chan_'.strtolower($deviceInfo['tech']), 'level' => 0);
+		$tmparr['sipdriver'] = array('hidden' => true, 'value' => 'chan_'.strtolower($deviceInfo['tech']), 'level' => 0);
 
 		//Inverted Driver, only allow the change if in certain modes
+		if ($deviceInfo['tech'] == "sip") {
+			$mydriver = "CHAN_SIP";
+			$otherdriver = "CHAN_PJSIP";
+		} else {
+			$mydriver = "CHAN_PJSIP";
+			$otherdriver = "CHAN_SIP";
+		}
+		$ttt = sprintf(_("Change To %s Driver"),$otherdriver);
 		if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
-			$tt = _("Change the SIP Channel Driver.");
-			$ndriver = ($deviceInfo['tech'] == 'sip') ? 'CHAN_PJSIP' : 'CHAN_SIP';
-			$ttt = sprintf(_("Change To %s Driver"),$ndriver);
+			$tt = _("Change the SIP Channel Driver to use $otherdriver.");
 			$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
+		} else {
+			$tt = _("You cannot change to $otherdriver as it is not enabled. Please enable $otherdriver in Advanced Settings");
+			$tmparr['changecdriver'] = array('text' => _("Changing SIP Driver unavailable"), 'prompttext' => $ttt, 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'disable' => true);
 		}
 
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
-		unset($tt, $ttt, $ndriver);
+		unset($tt, $ttt, $mydriver, $otherdriver);
 
 		$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
 		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
