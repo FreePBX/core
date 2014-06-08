@@ -7440,6 +7440,24 @@ function core_devices_configpageload() {
 			$devinfo_techd = ($devinfo_tech == 'sip') ? 'CHAN_SIP' : strtoupper($devinfo_tech);
 			$device_uses = sprintf(_("This device uses %s technology."),"<strong>".$devinfo_techd."</strong>").(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
 			$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
+			// We need to scream loudly if this device is using a channel driver that's disabled.
+			if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
+				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
+				if ($sipdriver != "both") {
+					// OK, one is disabled.
+					if ($devinfo_tech == "sip") {
+						$iwant = "chan_sip";
+					} else {
+						$iwant = "chan_pjsip";
+					}
+
+					if ($iwant != $sipdriver) {
+						// Poot.
+						$err = sprintf(_("<strong>CRITICAL ERROR!</strong> Required Service %s is disabled! This device is unusable!"), strtoupper($iwant));
+						$currentcomponent->addguielem($section, new gui_label('techerrlabel', $err),3);
+					}
+				}
+			}
 			$devopts = $currentcomponent->getgeneralarrayitem('devtechs', $devinfo_tech);
 			if (is_array($devopts)) {
 				foreach ($devopts as $devopt=>$devoptarr) {
