@@ -83,6 +83,7 @@ foreach ($conf as $c){
 
 	$row++;
 	$dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
+	$dv = $c['type'] == CONF_TYPE_TEXTAREA ? nl2br($c['defaultval']) : $c['defaultval'];
 	$default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
 	if ($c['emptyok'] && $c['type'] != CONF_TYPE_BOOL && $c['type'] != CONF_TYPE_SELECT && $c['type'] != CONF_TYPE_FSELECT) {
 		$default_val.= ', '._("field can be left blank");
@@ -104,6 +105,11 @@ foreach ($conf as $c){
 		case CONF_TYPE_INT:
 			$readonly = !$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden'] ? '' : 'readonly="readonly"';
 			echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.htmlspecialchars($amp_conf[$c['keyword']]).'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>';
+			break;
+		case CONF_TYPE_TEXTAREA:
+			$readonly = !$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden'] ? '' : 'readonly="readonly"';
+			echo '<textarea class="valueinput" id="'.$c['keyword'].'" type="text" rows="5" cols="58" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>'.htmlspecialchars($amp_conf[$c['keyword']]).'</textarea>';
+			break;
 			break;
 		case CONF_TYPE_SELECT:
 			echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
