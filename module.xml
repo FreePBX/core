@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha25</version>
+	<version>12.0.1alpha26</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha26* VmX locator dialplan additions
 		*12.0.1alpha25* Added display of new textarea settings type
 		*12.0.1alpha24* Part fix for #6923 language not being set.
 		*12.0.1alpha22* FREEPBX-6914 Add notification if callrecordings is not installed
