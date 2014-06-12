@@ -3471,7 +3471,9 @@ function core_get_config($engine) {
 											$ext->add('macro-vm','vmx', '', new ext_setvar("MMODE", '${ARG2}'));
 											$ext->add('macro-vm','vmx', '', new ext_setvar("RETVM", '${ARG3}'));
 											$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
-
+											$ext->add('macro-vm','vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));
+											$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]?temp:${MODE})}'));
+											$ext->add('macro-vm','vmx', '', new ext_noop('MODE IS: ${MODE}'));
 											// If this use has individual option set for playing standardized message, then override the global option
 											// but only if the vmx state is 'enabled'
 											//
@@ -3492,18 +3494,24 @@ function core_get_config($engine) {
 											// If 1.4 or above, use the STAT function to check for the file. Prior to 1.4, use the AGI script since the System() command tried
 											// in the past had errors.
 											//
-											$ext->add('macro-vm', 'vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));
+
 											//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.[wW][aA][vV]'));
 											if ($ast_ge_14) {
-												$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+												//$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
 												$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
 											} else {
 												$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp'));
-												$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
+												//$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
 												$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}'));
 												$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
 											}
 
+											$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
+											$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
+											$loops = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_LOOPS'", "getOne");
+											$ext->add('macro-vm','vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 2)));
+											$ext->add('macro-vm','vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 1)));
+											$ext->add('macro-vm','vmx', '', new ext_set("VMX_LOOPS", (isset($loops) ? $loops : 1)));
 											$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));
 											/* Replaced
 											   $ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "0"]','vmxtime'));
@@ -3566,7 +3574,7 @@ function core_get_config($engine) {
 											// Got invalid option loop until the max
 											//
 											$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
-											$ext->add('macro-vm','vmx', '', new ext_gotoif('$[${LOOPCOUNT} > ${VMX_LOOPS}]','toomany'));
+											$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${LOOPCOUNT}" > "${VMX_LOOPS}"]','toomany'));
 											$ext->add('macro-vm','vmx','',new ext_playback('pm-invalid-option&please-try-again'));
 											$ext->add('macro-vm','vmx','',new ext_goto('loopstart'));
 
