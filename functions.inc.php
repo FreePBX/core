@@ -367,7 +367,6 @@ class core_conf {
 		foreach ($results as $result) {
 			$account = $result['data'];
 			$id = $result['id'];
-			$output .= "[$account]\n";
 
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
@@ -400,6 +399,7 @@ class core_conf {
 			}
 			unset($results2_pre);
 
+			$output .= "[$account]\n";
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
@@ -977,7 +977,7 @@ function core_get_config($engine) {
 	switch($engine) {
 		case "asterisk":
 
-			$ast_ge_14 = version_compare($version, '1.4', 'ge');
+		$ast_ge_14 = version_compare($version, '1.4', 'ge');
 		$ast_lt_16 = version_compare($version, '1.6', 'lt');
 		$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
 		$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
@@ -985,8 +985,8 @@ function core_get_config($engine) {
 
 		// Now add to sip_general_addtional.conf
 		//
-		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 
+		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 			$core_conf->addSipGeneral('disallow','all');
 			$core_conf->addSipGeneral('allow','ulaw');
 			$core_conf->addSipGeneral('allow','alaw');
