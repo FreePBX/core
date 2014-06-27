@@ -1,7 +1,7 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
-
-class PJSip extends FreePBX_Helpers implements BMO {
+namespace FreePBX\modules\Core;
+class PJSip extends \FreePBX_Helpers implements \BMO {
 
 	private $codecs = array(
 		"g722" => false,
@@ -24,7 +24,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	}
 
 	private function getAllDevs() {
-		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",PDO::FETCH_ASSOC);
+		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
 		$devlist = array();
 		foreach($alldevices as $device) {
 			$id = $device['id'];
@@ -32,7 +32,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
 
 			$q->execute(array(":id" => $id));
-			$data = $q->fetchAll(PDO::FETCH_ASSOC);
+			$data = $q->fetchAll(\PDO::FETCH_ASSOC);
 
 			$devlist[$id] = $device;
 
@@ -46,7 +46,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	// Return an array consisting of all SIP devices, Trunks, or both.
 	private function getAllOld($type = null) {
 		$allkeys = $this->db->query("SELECT DISTINCT(`id`) FROM `sip`");
-		$out = $allkeys->fetchAll(PDO::FETCH_ASSOC);
+		$out = $allkeys->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($out as $res) {
 			if (strpos($res['id'], "tr-") === false) {
 				// This isn't a trunk.
@@ -61,7 +61,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 						$retarr['trunk'][] = $output[1];
 					}
 				} else {
-					throw new Exception("I have no idea what ".$res['id']." is.");
+					throw new \Exception("I have no idea what ".$res['id']." is.");
 				}
 			}
 		}
@@ -77,7 +77,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 
 		// Careful - 0 is, sorta kinda, a valid device.
 		if ($ext === null)
-			throw new Exception("No Device given to getExtOld");
+			throw new \Exception("No Device given to getExtOld");
 
 		// Have we already prepared our query?
 		if (!isset($this->getExtOldQuery)) {
@@ -85,7 +85,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 		}
 
 		$this->getExtOldQuery->execute(array(":id" => $ext));
-		$output = $this->getExtOldQuery->fetchAll(PDO::FETCH_ASSOC);
+		$output = $this->getExtOldQuery->fetchAll(\PDO::FETCH_ASSOC);
 
 		// Tidy up the return
 		foreach ($output as $entry) {
@@ -96,7 +96,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			return $retarr;
 		} else {
 			// return array();
-			throw new Exception("Old SIP Device $ext not found");
+			throw new \Exception("Old SIP Device $ext not found");
 		}
 	}
 
@@ -431,7 +431,8 @@ class PJSip extends FreePBX_Helpers implements BMO {
 				'disallow' => 'all',
 				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
 				'outbound_auth' => $tn,
-				'aors' => $tn
+				'aors' => $tn,
+				'message_context' => 'sms-incoming'
 			);
 
 			$conf['pjsip.identify.conf'][$tn] = array(
@@ -455,8 +456,8 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	public function writeConfig($conf) {
 		//TODO: Rob please remove this global
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		global $astman,$version;
-		$nt = notifications::create($db);
+		global $version;
+		$nt = \notifications::create($db);
 
 		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
 		if(version_compare($version, '12', 'ge')) {
@@ -529,7 +530,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 	public function getAllTrunks() {
 		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
 		$get->execute();
-		$result = $get->fetchAll(PDO::FETCH_ASSOC);
+		$result = $get->fetchAll(\PDO::FETCH_ASSOC);
 		$final = array();
 		foreach($result as $values) {
 			$final[$values['id']][$values['keyword']] = $values['data'];
@@ -554,7 +555,7 @@ class PJSip extends FreePBX_Helpers implements BMO {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
 			$get->bindParam(':id', str_replace('OUT_','',$trunkid));
 			$get->execute();
-			$result = $get->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+			$result = $get->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
 			foreach($result as $key => $val) {
 				$dispvars[$key] = $val[0];
 			}
