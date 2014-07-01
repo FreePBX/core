@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1alpha26</version>
+	<version>12.0.1alpha27</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1alpha27* Remove registrations if there are no registrations (for PJSIP)
 		*12.0.1alpha26* VmX locator dialplan additions
 		*12.0.1alpha25* Added display of new textarea settings type
 		*12.0.1alpha24* Part fix for #6923 language not being set.
@@ -38,7 +39,7 @@
 		*2.11.0.11* Added HTTP.conf to core
 	</changelog>
 	<depends>
-		<version>12.0.1alpha45</version>
+		<version>12.0.1beta11</version>
 	</depends>
 	<requirements>
 		<file>/usr/sbin/asterisk</file>

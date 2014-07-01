@@ -15,6 +15,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->config = $freepbx->Config;
 	}
 
+
 	public function install() {
 	}
 
@@ -268,6 +269,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 		}
+
 		return true;
 	}
 

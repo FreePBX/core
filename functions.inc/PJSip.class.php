@@ -378,6 +378,8 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		$trunks = $this->getAllTrunks();
 
+		//clear before write just in case all trunks have been deleted
+		$conf['pjsip.registration.conf'] = '';
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
@@ -431,8 +433,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				'disallow' => 'all',
 				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
 				'outbound_auth' => $tn,
-				'aors' => $tn,
-				'message_context' => 'sms-incoming'
+				'aors' => $tn
 			);
 
 			$conf['pjsip.identify.conf'][$tn] = array(
@@ -450,6 +451,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$conf['pjsip_notify.conf'] = "\n#include sip_notify_custom.conf\n#include sip_notify_additional.conf\n";
 		}
 
+		$conf = $this->FreePBX->Hooks->processHooks($conf);
 		return $conf;
 	}
 
