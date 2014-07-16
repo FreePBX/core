@@ -297,7 +297,7 @@ class core_conf {
 
 		$table_name = "sip";
 		$additional = "";
-		$output = "";
+		$finaloutput = "";
 
 		// Asterisk 1.4 requires call-limit be set for hints to work properly
 		//
@@ -363,8 +363,8 @@ class core_conf {
 			die($results->getMessage());
 		}
 
-		$finaloutput .= $output;
 		foreach ($results as $result) {
+			$output = "";
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= "[$account]\n";
