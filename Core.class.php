@@ -1,7 +1,7 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
-
-class Core extends FreePBX_Helpers implements BMO  {
+namespace FreePBX\modules;
+class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function __construct($freepbx = null) {
 
@@ -9,11 +9,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 		//Hackery-Jackery for Core only really
 		if(!class_exists('PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
 			include(__DIR__.'/functions.inc/PJSip.class.php');
-			$this->FreePBX->PJSip = new PJSip($this->FreePBX);
+			$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
 		}
 		$this->database = $freepbx->Database;
 		$this->config = $freepbx->Config;
 	}
+
 
 	public function install() {
 	}
@@ -268,6 +269,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 			break;
 		}
+
 		return true;
 	}
 
@@ -358,7 +360,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
-			$device = $sth->fetch(PDO::FETCH_ASSOC);
+			$device = $sth->fetch(\PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			return array();
 		}
@@ -389,7 +391,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
-			$tech = $sth->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
 			//reformulate into what is expected
 			//This is in the try catch just for organization
 			foreach($tech as &$value) {

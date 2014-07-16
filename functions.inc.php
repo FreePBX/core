@@ -367,7 +367,6 @@ class core_conf {
 			$output = "";
 			$account = $result['data'];
 			$id = $result['id'];
-			$output .= "[$account]\n";
 
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
@@ -400,6 +399,7 @@ class core_conf {
 			}
 			unset($results2_pre);
 
+			$output .= "[$account]\n";
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
@@ -977,7 +977,7 @@ function core_get_config($engine) {
 	switch($engine) {
 		case "asterisk":
 
-			$ast_ge_14 = version_compare($version, '1.4', 'ge');
+		$ast_ge_14 = version_compare($version, '1.4', 'ge');
 		$ast_lt_16 = version_compare($version, '1.6', 'lt');
 		$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
 		$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
@@ -985,8 +985,8 @@ function core_get_config($engine) {
 
 		// Now add to sip_general_addtional.conf
 		//
-		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 
+		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 			$core_conf->addSipGeneral('disallow','all');
 			$core_conf->addSipGeneral('allow','ulaw');
 			$core_conf->addSipGeneral('allow','alaw');
@@ -7446,8 +7446,22 @@ function core_devices_configpageload() {
 			$section = _("Device Options");
 
 			$devinfo_techd = ($devinfo_tech == 'sip') ? 'CHAN_SIP' : strtoupper($devinfo_tech);
-			$device_uses = sprintf(_("This device uses %s technology."),"<strong>".$devinfo_techd."</strong>").(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
-			$currentcomponent->addguielem($section, new gui_label('techlabel', $device_uses),4);
+			if(function_exists('sipsettings_get') && $devinfo_techd == 'CHAN_SIP') {
+				$out = sipsettings_get();
+				$pport = $out['bindaddr'].':'.$out['bindport'];
+			} elseif(method_exists(FreePBX::Sipsettings(),'getBinds') && $devinfo_techd == 'PJSIP') {
+				$out = FreePBX::Sipsettings()->getBinds();
+				foreach($out as $o) {
+					$pport .= $o.', ';
+				}
+				$pport = rtrim($pport,", ");
+			} else {
+				$pport = '';
+			}
+
+			$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
+			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$devinfo_techd."</strong>",$extrac).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
+			$currentcomponent->addguielem($section, new gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4);
 			// We need to scream loudly if this device is using a channel driver that's disabled.
 			if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
 				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
