@@ -6599,7 +6599,7 @@ function core_get_config($engine) {
 
 										} else {
 
-											$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+											$delURL = '?'.$_SERVER['QUERY_STRING'].'&action=del';
 
 											if ( is_string($extdisplay) ) {
 
@@ -6717,7 +6717,7 @@ if ($display == 'users' && trim($extdisplay != '')) {
 	$link_count = 0;
 	foreach ($device_list as $device_item) {
 		if ($device_item['user'] == $extdisplay) {
-			$editURL = $_SERVER['PHP_SELF'].'?display=devices&skip=0&extdisplay='.$device_item['id'];
+			$editURL = '?display=devices&skip=0&extdisplay='.$device_item['id'];
 			$device_icon = ($device_item['devicetype'] == 'fixed') ? 'images/telephone_key.png' : 'images/telephone_edit.png';
 			$device_label  = '&nbsp;';
 			$device_label .=  _("Edit:");
@@ -6782,7 +6782,7 @@ foreach ($dids as $did) {
 
 		$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
-		$addURL = $_SERVER['PHP_SELF'].'?display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
+		$addURL = '?display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
 		$did_icon = 'images/email_edit.png';
 		$did_label = trim($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
 		if (trim($did['cidnum']) != '') {
@@ -7377,13 +7377,13 @@ function core_devices_configpageload() {
 			if ( $display != 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
-				$delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'&action=del';
+				$delURL = '?'.$_SERVER['QUERY_STRING'].'&action=del';
 				$tlabel = sprintf(_("Delete Device %s"),$extdisplay);
 				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/telephone_delete.png"/>&nbsp;'.$tlabel.'</span>';
 				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
 				if ($deviceInfo['device_user'] != 'none') {
-					$editURL = $_SERVER['PHP_SELF'].'?display=users&skip=0&extdisplay='.$deviceInfo['user'];
+					$editURL = '?display=users&skip=0&extdisplay='.$deviceInfo['user'];
 					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);

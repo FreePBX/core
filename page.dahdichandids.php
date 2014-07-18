@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
 $display = 'dahdichandids';
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] :  'setup';
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] :  '';
-if (isset($_REQUEST['delete'])) $action = 'delete'; 
+if (isset($_REQUEST['delete'])) $action = 'delete';
 
 
 $extdisplay  = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '';
@@ -34,10 +34,10 @@ switch ($action) {
 }
 
 
-?> 
+?>
 
 <div class="rnav"><ul>
-<?php 
+<?php
 
 echo '<li><a href="config.php?display='.$display.'&type='.$type.'">'._('Add Channel').'</a></li>';
 
@@ -53,7 +53,7 @@ foreach (core_dahdichandids_list() as $row) {
 if ($extdisplay != '') {
 	// load
 	$row = core_dahdichandids_get($extdisplay);
-	
+
 	$description = $row['description'];
 	$channel     = $row['channel'];
 	$did         = $row['did'];
@@ -66,7 +66,7 @@ if ($extdisplay != '') {
 $helptext = _("DAHDI Channel DIDs allow you to assign a DID to specific DAHDI Channels. You can supply the same DID to multiple channels. This would be a common scenario if you have multiple POTS lines that are on a hunt group from your provider. You MUST assign the channel's context to from-analog for these settings to have effect. It will be a line that looks like:<br /><br />context = from-analog<br /><br />in your chan_dahdi.conf configuration effecting the specified channel(s). Once you have assigned DIDs you can use standard Inbound Routes with the specified DIDs to route your calls.");
 echo "<p>".$helptext."</p>\n";
 ?>
-<form name="editDAHDIchandid" action="<?php  $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return checkDAHDIchandid(editDAHDIchandid);">
+<form name="editDAHDIchandid" action="" method="post" onsubmit="return checkDAHDIchandid(editDAHDIchandid);">
 	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay; ?>">
 	<input type="hidden" name="channel" value="<?php echo $extdisplay; ?>">
 	<input type="hidden" name="action" value="<?php echo ($extdisplay != '' ? 'edit' : 'add'); ?>">
@@ -94,13 +94,13 @@ echo "<p>".$helptext."</p>\n";
 	<tr>
 		<td colspan="2"><br><input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
 			<?php if ($extdisplay != '') { echo '&nbsp;<input name="delete" type="submit" onclick="actionDelete=true;" value="'._("Delete").'">'; } ?>
-		</td>		
+		</td>
 
 	</tr>
 	</table>
 </form>
-			
-			
+
+
 <script language="javascript">
 <!--
 

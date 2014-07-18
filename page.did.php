@@ -76,7 +76,7 @@ $toggle_sort = _(" (toggle sort)");
 	<li><a <?php echo ($didfilter=='directdid' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='directdid'?$display_link_current:$display_link).'&didfilter=directdid'?>"><?php echo _("User DIDs").($didfilter=='directdid'?$toggle_sort:"")?></a></li>
 	<li><a <?php echo ($didfilter=='incoming' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='incoming'?$display_link_current:$display_link).'&didfilter=incoming'?>"><?php echo _("General DIDs").($didfilter=='incoming'?$toggle_sort:"")?></a></li>
 	<li><a <?php echo ($didfilter=='unassigned' ? 'class="current"':'') ?> href="<?php echo ($didfilter=='unassigned'?$display_link_current:$display_link).'&didfilter=unassigned'?>"><?php echo _("Unused DIDs").($didfilter=='unassigned'?$toggle_sort:"")?></a></li><hr>
-<?php 
+<?php
 //get unique incoming routes
 $inroutes = core_did_list($rnavsort);
 switch ($didfilter) {
@@ -117,13 +117,13 @@ if (isset($inroutes)) {
 </ul>
 </div>
 
-<?php 
+<?php
 	if ($action == 'delIncoming') {
 		echo '<br><h3>Route '.$extdisplay.' '._("deleted").'!</h3><br><br><br><br><br><br><br><br>';
 	} else {
 ?>
-<?php 
-    if ($extdisplay) {	
+<?php
+    if ($extdisplay) {
       //create variables for the selected route's settings
       $extarray=explode('/',$extdisplay,2);
       $ininfo=core_did_get($extarray[0],$extarray[1]);
@@ -150,7 +150,7 @@ if (isset($inroutes)) {
       }
 
     if ($delete_url) {
-		  $delURL = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
+		  $delURL = '?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
 		  $tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
 		  $label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 		  echo "<p><a href=".$delURL.">".$label."</a></p>";
@@ -161,11 +161,11 @@ if (isset($inroutes)) {
 		if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 
 			if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
-				$editURL = $_SERVER['PHP_SELF'].'?display=users&extdisplay='.$did_dest[1];
+				$editURL = '?display=users&extdisplay='.$did_dest[1];
 				$EXTorUSER = _("User");
 			}
 			else {
-				$editURL = $_SERVER['PHP_SELF'].'?display=extensions&extdisplay='.$did_dest[1];
+				$editURL = '?display=extensions&extdisplay='.$did_dest[1];
 				$EXTorUSER = _("Extension");
 			}
 				$result = core_users_get($did_dest[1]);
@@ -173,14 +173,14 @@ if (isset($inroutes)) {
 			echo "<p><a href=".$editURL.">".$label."</a></p>";
 		}
 ?>
-<?php 
+<?php
 	} else {
 ?>
     <h2><?php echo _("Add Incoming Route")?></h2>
-<?php 
-	} 
+<?php
+	}
 ?>
-		<form name="editGRP" action="<?php $_SERVER['PHP_SELF'] ?>" method="post" onsubmit="return editGRP_onsubmit();">
+		<form name="editGRP" action="" method="post" onsubmit="return editGRP_onsubmit();">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -226,13 +226,13 @@ if (isset($inroutes)) {
 //					echo '<option value="none">'._("No Music")."</option>";
 					if (isset($tresults[0])) {
 						foreach ($tresults as $tresult) {
-							($tresult == 'none' ? $ttext = _("No Music") : $ttext = $tresult); 
+							($tresult == 'none' ? $ttext = _("No Music") : $ttext = $tresult);
 	    						($tresult == 'default' ? $ttext = _("Default") : $ttext = $tresult);
 							echo '<option value="'.$tresult.'"'.($tresult == $cur ? ' SELECTED' : '').'>'._($ttext)."</option>\n";
 						}
 					}
-				?>		
-				</select>		
+				?>
+				</select>
 			</td>
 		</tr>
 <?php } ?>
@@ -266,9 +266,9 @@ if (isset($inroutes)) {
 							echo '<option value="'.$i.'"'.($pmmaxretries == $i ? 'SELECTED' : '').' >'.$i.'</option>';
 						}
 					?>
-				</select> 
+				</select>
 			</td>
-		</tr>	
+		</tr>
 		<tr class="pm_opts" <?php echo $privacyman == '0' ? 'style="display:none"':''?>>
 			<td><a href="#" class="info"><?php echo _("Min Length")?><span><?php echo _('Minimum amount of digits CallerID needs to contain in order to be considered valid')?></span></a>:</td>
 			<td>
@@ -279,9 +279,9 @@ if (isset($inroutes)) {
 							echo '<option value="'.$i.'"'.($pmminlength == $i ? 'SELECTED' : '').' >'.$i.'</option>';
 						}
 					?>
-				</select> 
+				</select>
 			</td>
-		</tr>	
+		</tr>
 <?php
 	// implementation of module hook
 	// object was initialized in config.php
@@ -289,7 +289,7 @@ if (isset($inroutes)) {
 ?>
 		<tr><td colspan="2"><h5><?php echo _("Set Destination")?><hr></h5></td></tr>
 
-<?php 
+<?php
 //draw goto selects
 echo drawselects(isset($destination)?$destination:null,0);
 ?>
@@ -297,7 +297,7 @@ echo drawselects(isset($destination)?$destination:null,0);
 			<td colspan="2">
 				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>" tabindex="<?php echo ++$tabindex;?>">&nbsp;&nbsp;
 				<input name="submitclear" type="submit" value="<?php echo _("Clear Destination & Submit")?>" ></h6>
-			</td>		
+			</td>
 		</tr>
 		</table>
 <script language="javascript">
@@ -317,16 +317,16 @@ function editGRP_onsubmit() {
 	var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number or for advanced users, a valid Asterisk Dial Pattern\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
 	var msgConfirmDIDNoSlash = "<?php echo _('A Slash (\'/\') is never a valid DID. Please remove it and try again'); ?>";
 	var msgInvalidGrpPrefix = "<?php echo _('Invalid CallerID prefix.'); ?>";
-	
+
 	setDestinations(theForm,1);
-	
+
 	defaultEmptyOK = true;
 	if (!isDialpattern(theForm.extension.value)) {
 		// warn the user that DID is normally numbers
 		if (!confirm(msgConfirmDIDNonStd))
 			return false;
 	}
-	
+
 	if (isInside(theForm.extension.value, "/")) {
 		warnInvalid(theForm.extension, msgConfirmDIDNoSlash);
 		return false;
@@ -335,13 +335,13 @@ function editGRP_onsubmit() {
 	var mycid = theForm.cidnum.value.toLowerCase();
 	if (!isDialpattern(mycid) && mycid.substring(0,4) != "priv" && mycid.substring(0,5) != "block" && mycid != "unknown" && mycid.substring(0,8) != "restrict" && mycid.substring(0,7) != "unavail" && mycid.substring(0,6) != "anonym" && mycid.substring(0,7) != "withheld")
 		return warnInvalid(theForm.cidnum, msgInvalidCIDNum);
-	
+
 	if (!isInteger(theForm.delay_answer.value))
 		return warnInvalid(theForm.delay_answer, msgInvalidPauseBefore);
-	
+
 	if (!validateDestinations(theForm,1,true))
 		return false;
-	
+
 	// warning about 'any DID / any CID'
 	if (theForm.extension.value == "" && theForm.cidnum.value == "" && theForm.channel.value == "" ) {
 		if (!confirm(msgConfirmDIDCIDBlank))
@@ -350,7 +350,7 @@ function editGRP_onsubmit() {
 	defaultEmptyOK = true;
 	if (!isCallerID(theForm.grppre.value))
 		return warnInvalid(theForm.grppre, msgInvalidGrpPrefix);
-	
+
 	return true;
 }
 
@@ -365,7 +365,7 @@ $(document).ready(function() {
 //-->
 </script>
 		</form>
-<?php 		
+<?php
 	} //end if action == delGRP
 
 ?>
