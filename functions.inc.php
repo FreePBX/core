@@ -434,6 +434,9 @@ class core_conf {
 						case 'context':
 							$context = $result2['data'];
 							//fall-through
+						case 'secret_origional':
+							//stupidness coming through
+						break;
 						default:
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
