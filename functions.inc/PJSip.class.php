@@ -18,97 +18,298 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
 
-	public $_endpoint = array();
+	private $_endpoint = array();
 	private $_auth = array();
 	private $_aor = array();
+	private $_global = array();
+	private $_registration = array();
+	private $_identify = array();
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->db = $freepbx->Database;
 	}
 
-	private function getAllDevs() {
-		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
-		$devlist = array();
-		foreach($alldevices as $device) {
-			$id = $device['id'];
-			// Have we already prepared our query?
-			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
-
-			$q->execute(array(":id" => $id));
-			$data = $q->fetchAll(\PDO::FETCH_ASSOC);
-
-			$devlist[$id] = $device;
-
-			foreach($data as $setting) {
-				$devlist[$id][$setting['keyword']] = $setting['data'];
-			}
-		}
-		return $devlist;
+	/* Assorted stubs to validate the BMO Interface */
+	public function install() {
+	}
+	public function uninstall() {
+	}
+	public function backup() {
+	}
+	public function restore($config) {
 	}
 
-	// Return an array consisting of all SIP devices, Trunks, or both.
-	private function getAllOld($type = null) {
-		$allkeys = $this->db->query("SELECT DISTINCT(`id`) FROM `sip`");
-		$out = $allkeys->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($out as $res) {
-			if (strpos($res['id'], "tr-") === false) {
-				// This isn't a trunk.
-				// Do we want stuff that's not a trunk?
-				if (!$type || $type == "devices") {
-					$retarr['device'][] = $res['id'];
-				}
-			} else {
-				// This IS a trunk
-				if (preg_match("/^tr-.+-(\d+)/", $res['id'], $output)) {
-					if (!$type || $type == "trunks") {
-						$retarr['trunk'][] = $output[1];
+	/**
+	* Hook definitions
+	* @param {string} $filename
+	* @param {string} &$text
+	*/
+	public function doGuiIntercept($filename, &$text) {
+		if ($filename == "modules/sipsettings/page.sipsettings.php") {
+			// $this->doPage("page.sipsettings.php", $text);
+		}
+	}
+
+	/**
+	* Hook Definitions
+	*/
+	public function doGuiHook(&$currentconfig) {
+		return true;
+	}
+
+	/**
+	* Do Config Page Init
+	* @param {[type]} $page [description]
+	*/
+	public function doConfigPageInit($page) {
+		if (isset($_REQUEST['tech']) && strtoupper($_REQUEST['tech']) == 'PJSIP') {
+			//print "PJSip was called with $page<br />";
+			//print_r($_REQUEST);
+		}
+	}
+
+	/**
+	* Hook Definitions
+	*/
+	public function genConfig() {
+
+		$conf = $this->generateEndpoints();
+
+		// Generate includes
+		$pjsip = "#include pjsip.custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
+		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.manualtrunks.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
+		$conf['pjsip.conf'][] = $pjsip;
+
+		// Transports are a multi-dimensional array, because
+		// we use it earlier to match extens with transports
+		// So we need to flatten it to something that can be
+		// written to a file.
+		$transports = $this->getTransportConfigs();
+		foreach ($transports as $transport => $entries) {
+			$tmparr = array();
+			foreach ($entries as $key => $val) {
+				// Check for multiple defintions of the same var (eg, local_net)
+				if (is_array($val)) {
+					foreach ($val as $line) {
+						$tmparr[] = "$key=$line";
 					}
 				} else {
-					throw new \Exception("I have no idea what ".$res['id']." is.");
+					$tmparr[] = "$key=$val";
+				}
+			}
+			$conf['pjsip.transports.conf'][$transport] = $tmparr;
+		}
+
+		//TODO: Rob can we fix this please?
+		global $version;
+		$conf['pjsip.conf']['global'] = array(
+			'type=global',
+			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
+		);
+		if(!empty($this->_global)) {
+			foreach($this->_global as $el) {
+				$conf['pjsip.conf']['global'][] = "{$el['key']}={$el['value']}";
+			}
+		}
+
+		$trunks = $this->getAllTrunks();
+
+		//clear before write just in case all trunks have been deleted
+		$conf['pjsip.registration.conf'] = '';
+		foreach($trunks as $trunk) {
+			$tn = $trunk['trunk_name'];
+			//prevent....special people
+			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
+			$conf['pjsip.registration.conf'][$tn] = array(
+				'type' => 'registration',
+				'transport' => $trunk['transport'],
+				'outbound_auth' => $tn,
+				'retry_interval' => $trunk['retry_interval'],
+				'expiration' => $trunk['expiration'],
+				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
+			);
+			if(!empty($trunk['contact_user'])) {
+				$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
+			}
+
+			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
+				if(empty($trunk['sip_server'])) {
+					throw new Exception('Asterisk will crash if sip_server is blank!');
+				}
+				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			} else {
+				if(empty($trunk['server_uri']) || $trunk['client_uri']) {
+					throw new Exception('Asterisk will crash if server_uri or client_uri is blank!');
+				}
+				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
+				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
+			}
+
+			if(!empty($this->_registration[$tn])) {
+				foreach($this->_registration[$tn] as $el) {
+					$retarr["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				}
+			}
+
+			$conf['pjsip.auth.conf'][$tn] = array(
+				'type' => 'auth',
+				'auth_type' => 'userpass',
+				'password' => $trunk['secret'],
+				'username' => $trunk['username']
+			);
+
+			$conf['pjsip.aor.conf'][$tn] = array(
+				'type' => 'aor',
+				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
+			);
+			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
+				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			} else {
+				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
+			}
+
+			$conf['pjsip.endpoint.conf'][$tn] = array(
+				'type' => 'endpoint',
+				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
+				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
+				'disallow' => 'all',
+				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
+				'outbound_auth' => $tn,
+				'aors' => $tn
+			);
+
+			$conf['pjsip.identify.conf'][$tn] = array(
+				'type' => 'identify',
+				'endpoint' => $tn,
+				'match' => $trunk['sip_server']
+			);
+
+			if(!empty($this->_identify[$tn])) {
+				foreach($this->_identify[$tn] as $el) {
+					$retarr["pjsip.identify.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
 			}
 		}
-		if (isset($retarr)) {
-			return $retarr;
-		} else {
-			return array();
+
+		//if we have an additional and custom file for sip_notify, write a pjsip_notify.conf
+		$ast_etc_dir = $this->FreePBX->Config->get_conf_setting('ASTETCDIR');
+		$ast_sip_notify_additional_conf = $ast_etc_dir . "/sip_notify_additional.conf";
+		$ast_sip_notify_custom_conf = $ast_etc_dir . "/sip_notify_custom.conf";
+		if (file_exists($ast_sip_notify_additional_conf) && file_exists($ast_sip_notify_custom_conf)) {
+			$conf['pjsip_notify.conf'] = "\n#include sip_notify_custom.conf\n#include sip_notify_additional.conf\n";
 		}
+
+		$conf = $this->FreePBX->Hooks->processHooks($conf);
+		return $conf;
 	}
 
-	// Grab an Old Extension from the existing database
-	private function getExtOld($ext = null) {
+	/**
+	* Hook Definitions
+	* @param {string} $conf The Configuration being passed through
+	*/
+	public function writeConfig($conf) {
+		//TODO: Rob please remove this global
+		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
+		global $version;
+		$nt = \notifications::create($db);
 
-		// Careful - 0 is, sorta kinda, a valid device.
-		if ($ext === null)
-			throw new \Exception("No Device given to getExtOld");
-
-		// Have we already prepared our query?
-		if (!isset($this->getExtOldQuery)) {
-			$this->getExtOldQuery = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
-		}
-
-		$this->getExtOldQuery->execute(array(":id" => $ext));
-		$output = $this->getExtOldQuery->fetchAll(\PDO::FETCH_ASSOC);
-
-		// Tidy up the return
-		foreach ($output as $entry) {
-			$retarr[$entry['keyword']] = $entry['data'];
-		}
-
-		if (isset($retarr)) {
-			return $retarr;
+		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
+		if(version_compare($version, '12', 'ge')) {
+			if($ast_sip_driver == 'both') {
+				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
+				foreach ($this->PJSipModules as $mod) {
+					$this->FreePBX->ModulesConf->removenoload($mod);
+				}
+			} elseif($ast_sip_driver == 'chan_pjsip') {
+				$this->enablePJSipModules();
+			} elseif($ast_sip_driver == 'chan_sip') {
+				$this->disablePJSipModules();
+			}
 		} else {
-			// return array();
-			throw new \Exception("Old SIP Device $ext not found");
+			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
+				$sip_missing = _("PJSIP Not Supported");
+				$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
+				$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$ast_sip_driver));
+				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
+				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
+			}
 		}
+
+		$this->FreePBX->WriteConfig($conf);
 	}
 
+	/**
+	 * External Hook to Add settings to the Endpoint Section
+	 * Works like Core Conf
+	 * @param {string} $section The section to be adding information to
+	 * @param {string} $key     The Key
+	 * @param {string} $value   The Value
+	 */
+	public function addEndpoint($section, $key, $value) {
+		$this->_endpoint[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	* External Hook to Add settings to the AOR Section
+	* Works like Core Conf
+	* @param {string} $section The section to be adding information to
+	* @param {string} $key     The Key
+	* @param {string} $value   The Value
+	*/
+	public function addAor($section, $key, $value) {
+		$this->_aor[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	* External Hook to Add settings to the Auth Section
+	* Works like Core Conf
+	* @param {string} $section The section to be adding information to
+	* @param {string} $key     The Key
+	* @param {string} $value   The Value
+	*/
+	public function addAuth($section, $key, $value) {
+		$this->_auth[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	* External Hook to Add settings to the Global Section
+	* Works like Core Conf
+	* @param {string} $section The section to be adding information to
+	* @param {string} $key     The Key
+	* @param {string} $value   The Value
+	*/
+	public function addGlobal($key, $value) {
+		$this->_global[] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	* External Hook to Add settings to the Registration Section
+	* Works like Core Conf
+	* @param {string} $section The section to be adding information to
+	* @param {string} $key     The Key
+	* @param {string} $value   The Value
+	*/
+	public function addRegistration($section, $key, $value) {
+		$this->_registration[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	* External Hook to Add settings to the Identify Section
+	* Works like Core Conf
+	* @param {string} $section The section to be adding information to
+	* @param {string} $key     The Key
+	* @param {string} $value   The Value
+	*/
+	public function addIdentify($section, $key, $value) {
+		$this->_identify[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	/**
+	 * Get Transport Configs from SIPSettings module
+	 */
 	public function getTransportConfigs() {
-		//
-		// Grab settings from sipsettings module.
-		//
-
 		// Cache
 		if (isset($this->TransportConfigCache))
 			return $this->TransportConfigCache;
@@ -150,21 +351,32 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		return $transport;
 	}
 
-	public function addEndpoint($section, $key, $value) {
-		$this->_endpoint[$section][] = array('key' => $key, 'value' => $value);
+	/**
+	 * Get Default SIP Codecs
+	 */
+	public function getDefaultSIPCodecs() {
+		// Grab the default Codecs from the sipsettings module.
+		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
+
+		if (!$codecs) {
+			// Sipsettings doesn't have any codecs yet.
+			// Grab the default codecs from BMO
+			foreach ($this->FreePBX->Codecs->getAudio(true) as $c => $en) {
+				if ($en) {
+					$codecs[$c] = $en;
+				}
+			}
+		}
+
+		$this->DefaultSipCodecs = join(",", array_keys($codecs));
+		return $this->DefaultSipCodecs;
 	}
 
-	public function addAor($section, $key, $value) {
-		$this->_aor[$section][] = array('key' => $key, 'value' => $value);
-	}
-
-	public function addAuth($section, $key, $value) {
-		$this->_auth[$section][] = array('key' => $key, 'value' => $value);
-	}
-
+	/**
+	 * Generate Endpoints
+	 */
 	private function generateEndpoints() {
 		// More Efficent Function here.
-
 		foreach ($this->getAllDevs() as $dev) {
 			$this->generateEndpoint($dev, $retarr);
 		}
@@ -176,8 +388,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$endpoint[] = "type=endpoint";
 			// Do we have a custom contet for anon calls to go to?
 			$context = $this->db->getOne('SELECT `data` FROM `sipsettings` WHERE `keyword`="context"');
-			if (empty($context))
+			if (empty($context)) {
 				$context = "from-sip-external";
+			}
 			$endpoint[] = "context=$context";
 			$endpoint[] = "allow=all";
 			$endpoint[] = "transport=udp,tcp,ws,wss";
@@ -187,6 +400,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		return $retarr;
 	}
 
+	/**
+	 * Generate Individual Endpoint
+	 * @param {string} $config  configuration
+	 * @param {array} &$retarr Returned Array
+	 */
 	private function generateEndpoint($config, &$retarr) {
 		// Validate $config array
 		$this->validateEndpoint($config);
@@ -292,7 +510,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 		$retarr["pjsip.auth.conf"][$authname] = $auth;
 		if(!empty($this->_auth[$authname])) {
-			foreach($this->_endpoint[$authname] as $el) {
+			foreach($this->_auth[$authname] as $el) {
 				$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
 			}
 		}
@@ -302,14 +520,17 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 		$retarr["pjsip.aor.conf"][$aorname] = $aor;
 		if(!empty($this->_aor[$aorname])) {
-			foreach($this->_endpoint[$aorname] as $el) {
+			foreach($this->_aor[$aorname] as $el) {
 				$retarr["pjsip.aor.conf"][$aorname][] = "{$el['key']}={$el['value']}";
 			}
 		}
 	}
 
+	/**
+	 * Validate Endpoint
+	 * @param {string} &$config Configuration to be passed back
+	 */
 	private function validateEndpoint(&$config) {
-
 		// Currently unported:
 		//   accountcode, callgroup,
 
@@ -325,205 +546,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		if (empty($config['allow'])) {
 			$config['allow'] = $this->getDefaultSIPCodecs();
 		}
-
 	}
 
-	public function getDefaultSIPCodecs() {
-		// Grab the default Codecs from the sipsettings module.
-		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
-
-		if (!$codecs) {
-			// Sipsettings doesn't have any codecs yet.
-			// Grab the default codecs from BMO
-			foreach ($this->FreePBX->Codecs->getAudio(true) as $c => $en) {
-				if ($en) {
-					$codecs[$c] = $en;
-				}
-			}
-		}
-
-		$this->DefaultSipCodecs = join(",", array_keys($codecs));
-		return $this->DefaultSipCodecs;
-	}
-
-	/* Assorted stubs to validate the BMO Interface */
-	public function install() {
-	}
-	public function uninstall() {
-	}
-	public function backup() {
-	}
-	public function restore($config) {
-	}
-
-	/* Hook definitions */
-	// public static function myGuiHooks() { return array("core", "INTERCEPT" => "modules/sipsettings/page.sipsettings.php"); }
-	// public static function myConfigPageInits() { return array("trunks"); }
-
-	/* Hook Callbacks */
-	public function doGuiIntercept($filename, &$text) {
-		if ($filename == "modules/sipsettings/page.sipsettings.php") {
-			// $this->doPage("page.sipsettings.php", $text);
-		}
-	}
-
-	public function doGuiHook(&$currentconfig) {
-		return true;
-	}
-
-	public function doConfigPageInit($page) {
-		if (isset($_REQUEST['tech']) && strtoupper($_REQUEST['tech']) == 'PJSIP') {
-			//print "PJSip was called with $page<br />";
-			//print_r($_REQUEST);
-		}
-	}
-
-	public function genConfig() {
-
-		$conf = $this->generateEndpoints();
-
-		// Generate includes
-		$pjsip = "#include pjsip.custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
-		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.manualtrunks.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
-		$conf['pjsip.conf'][] = $pjsip;
-
-		// Transports are a multi-dimensional array, because
-		// we use it earlier to match extens with transports
-		// So we need to flatten it to something that can be
-		// written to a file.
-		$transports = $this->getTransportConfigs();
-		foreach ($transports as $transport => $entries) {
-			$tmparr = array();
-			foreach ($entries as $key => $val) {
-				// Check for multiple defintions of the same var (eg, local_net)
-				if (is_array($val)) {
-					foreach ($val as $line) {
-						$tmparr[] = "$key=$line";
-					}
-				} else {
-					$tmparr[] = "$key=$val";
-				}
-			}
-			$conf['pjsip.transports.conf'][$transport] = $tmparr;
-		}
-
-		//TODO: Rob can we fix this please?
-		global $version;
-		$conf['pjsip.conf']['global'] = array(
-			'type=global',
-			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
-		);
-
-		$trunks = $this->getAllTrunks();
-
-		//clear before write just in case all trunks have been deleted
-		$conf['pjsip.registration.conf'] = '';
-		foreach($trunks as $trunk) {
-			$tn = $trunk['trunk_name'];
-			//prevent....special people
-			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
-			$conf['pjsip.registration.conf'][$tn] = array(
-				'type' => 'registration',
-				'transport' => $trunk['transport'],
-				'outbound_auth' => $tn,
-				'retry_interval' => $trunk['retry_interval'],
-				'expiration' => $trunk['expiration'],
-				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
-			);
-			if(!empty($trunk['contact_user']))
-				$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
-
-			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
-				if(empty($trunk['sip_server'])) {
-					throw new Exception('Asterisk will crash if sip_server is blank!');
-				}
-				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			} else {
-				if(empty($trunk['server_uri']) || $trunk['client_uri']) {
-					throw new Exception('Asterisk will crash if server_uri or client_uri is blank!');
-				}
-				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
-				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
-			}
-
-			$conf['pjsip.auth.conf'][$tn] = array(
-				'type' => 'auth',
-				'auth_type' => 'userpass',
-				'password' => $trunk['secret'],
-				'username' => $trunk['username']
-			);
-
-			$conf['pjsip.aor.conf'][$tn] = array(
-				'type' => 'aor',
-				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
-			);
-			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			} else {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
-			}
-
-			$conf['pjsip.endpoint.conf'][$tn] = array(
-				'type' => 'endpoint',
-				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
-				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
-				'disallow' => 'all',
-				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
-				'outbound_auth' => $tn,
-				'aors' => $tn
-			);
-
-			$conf['pjsip.identify.conf'][$tn] = array(
-				'type' => 'identify',
-				'endpoint' => $tn,
-				'match' => $trunk['sip_server']
-			);
-		}
-
-		//if we have an additional and custom file for sip_notify, write a pjsip_notify.conf
-		$ast_etc_dir = $this->FreePBX->Config->get_conf_setting('ASTETCDIR');
-		$ast_sip_notify_additional_conf = $ast_etc_dir . "/sip_notify_additional.conf";
-		$ast_sip_notify_custom_conf = $ast_etc_dir . "/sip_notify_custom.conf";
-		if (file_exists($ast_sip_notify_additional_conf) && file_exists($ast_sip_notify_custom_conf)) {
-			$conf['pjsip_notify.conf'] = "\n#include sip_notify_custom.conf\n#include sip_notify_additional.conf\n";
-		}
-
-		$conf = $this->FreePBX->Hooks->processHooks($conf);
-		return $conf;
-	}
-
-	public function writeConfig($conf) {
-		//TODO: Rob please remove this global
-		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		global $version;
-		$nt = \notifications::create($db);
-
-		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
-		if(version_compare($version, '12', 'ge')) {
-			if($ast_sip_driver == 'both') {
-				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
-				foreach ($this->PJSipModules as $mod) {
-					$this->FreePBX->ModulesConf->removenoload($mod);
-				}
-			} elseif($ast_sip_driver == 'chan_pjsip') {
-				$this->enablePJSipModules();
-			} elseif($ast_sip_driver == 'chan_sip') {
-				$this->disablePJSipModules();
-			}
-		} else {
-			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
-				$sip_missing = _("PJSIP Not Supported");
-				$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
-				$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$ast_sip_driver));
-				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
-			}
-		}
-
-		$this->FreePBX->WriteConfig($conf);
-	}
-
+	/**
+	 * Enable PJSip Modules through module.conf control
+	 */
 	private function enablePJSipModules() {
 		// We need to DISABLE chan_sip.so, and remove any noload lines for the pjsip stuff.
 		//
@@ -535,6 +562,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$m->removenoload($mod);
 	}
 
+	/**
+	 * Disable PJSip Modules through module.conf control
+	 */
 	private function disablePJSipModules() {
 		// We need to ENABLE chan_sip.so, and add all the noload lines for the pjsip stuff.
 		//
@@ -546,6 +576,10 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$m->noload($mod);
 	}
 
+	/**
+	 * Add PJSip Trunk
+	 * @param {int} $trunknum The Trunk Number
+	 */
 	public function addTrunk($trunknum) {
 		// These are the vars we DON'T care about that are being submitted from the PJSip page
 		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
@@ -567,6 +601,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		// TODO: prepend, pattern_prefix and pattern_pass
 	}
 
+	/**
+	 * Get All Trunks
+	 */
 	public function getAllTrunks() {
 		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
 		$get->execute();
@@ -578,6 +615,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		return $final;
 	}
 
+	/**
+	 * Get All Active Transports
+	 */
 	public function getActiveTransports() {
 		$tports = array(array("value" => "", "text" => "Auto"));
 
@@ -590,6 +630,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		return $tports;
 	}
 
+	/**
+	 * Get Display Variables
+	 * @param {int} $trunkid   Trunk ID
+	 * @param {array} &$dispvars Display Variables
+	 */
 	public function getDisplayVars($trunkid, &$dispvars) {
 		if(!empty($trunkid)) {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
@@ -627,5 +672,91 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());
+	}
+
+	/**
+	* Get All Devices
+	*/
+	private function getAllDevs() {
+		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
+		$devlist = array();
+		foreach($alldevices as $device) {
+			$id = $device['id'];
+			// Have we already prepared our query?
+			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
+
+			$q->execute(array(":id" => $id));
+			$data = $q->fetchAll(\PDO::FETCH_ASSOC);
+
+			$devlist[$id] = $device;
+
+			foreach($data as $setting) {
+				$devlist[$id][$setting['keyword']] = $setting['data'];
+			}
+		}
+		return $devlist;
+	}
+
+	/**
+	* Return an array consisting of all SIP devices, Trunks, or both.
+	* @param {[type]} $type = null Devices or Trunks
+	*/
+	private function getAllOld($type = null) {
+		$allkeys = $this->db->query("SELECT DISTINCT(`id`) FROM `sip`");
+		$out = $allkeys->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($out as $res) {
+			if (strpos($res['id'], "tr-") === false) {
+				// This isn't a trunk.
+				// Do we want stuff that's not a trunk?
+				if (!$type || $type == "devices") {
+					$retarr['device'][] = $res['id'];
+				}
+			} else {
+				// This IS a trunk
+				if (preg_match("/^tr-.+-(\d+)/", $res['id'], $output)) {
+					if (!$type || $type == "trunks") {
+						$retarr['trunk'][] = $output[1];
+					}
+				} else {
+					throw new \Exception("I have no idea what ".$res['id']." is.");
+				}
+			}
+		}
+		if (isset($retarr)) {
+			return $retarr;
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	* Grab an Old Extension from the existing database
+	* @param {string} $ext = null The extension/device id
+	*/
+	private function getExtOld($ext = null) {
+
+		// Careful - 0 is, sorta kinda, a valid device.
+		if ($ext === null)
+			throw new \Exception("No Device given to getExtOld");
+
+		// Have we already prepared our query?
+		if (!isset($this->getExtOldQuery)) {
+			$this->getExtOldQuery = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
+		}
+
+		$this->getExtOldQuery->execute(array(":id" => $ext));
+		$output = $this->getExtOldQuery->fetchAll(\PDO::FETCH_ASSOC);
+
+		// Tidy up the return
+		foreach ($output as $entry) {
+			$retarr[$entry['keyword']] = $entry['data'];
+		}
+
+		if (isset($retarr)) {
+			return $retarr;
+		} else {
+			// return array();
+			throw new \Exception("Old SIP Device $ext not found");
+		}
 	}
 }
