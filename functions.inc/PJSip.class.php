@@ -18,6 +18,10 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
 		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so");
 
+	public $_endpoint = array();
+	private $_auth = array();
+	private $_aor = array();
+
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->db = $freepbx->Database;
@@ -146,8 +150,21 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		return $transport;
 	}
 
+	public function addEndpoint($section, $key, $value) {
+		$this->_endpoint[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	public function addAor($section, $key, $value) {
+		$this->_aor[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	public function addAuth($section, $key, $value) {
+		$this->_auth[$section][] = array('key' => $key, 'value' => $value);
+	}
+
 	private function generateEndpoints() {
 		// More Efficent Function here.
+
 		foreach ($this->getAllDevs() as $dev) {
 			$this->generateEndpoint($dev, $retarr);
 		}
@@ -222,6 +239,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		if (!empty($config['icesupport']))
 			$endpoint[] = "ice_support=".$config['icesupport'];
 
+		if (!empty($config['media_use_received_transport']))
+			$endpoint[] = "media_use_received_transport=".$config['media_use_received_transport'];
+
 		if (!empty($config['trustrpid']))
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 
@@ -257,17 +277,35 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		if (!empty($config['qualifyfreq']))
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
-		if (isset($retarr["pjsip.endpoint.conf"][$endpointname]))
+		if (isset($retarr["pjsip.endpoint.conf"][$endpointname])) {
 			throw new Exception("Endpoint $endpointname already exists.");
+		}
 		$retarr["pjsip.endpoint.conf"][$endpointname] = $endpoint;
+		if(!empty($this->_endpoint[$endpointname])) {
+			foreach($this->_endpoint[$endpointname] as $el) {
+				$retarr["pjsip.endpoint.conf"][$endpointname][] = "{$el['key']}={$el['value']}";
+			}
+		}
 
-		if (isset($retarr["pjsip.auth.conf"][$authname]))
+		if (isset($retarr["pjsip.auth.conf"][$authname])) {
 			throw new Exception("Auth $authname already exists.");
+		}
 		$retarr["pjsip.auth.conf"][$authname] = $auth;
+		if(!empty($this->_auth[$authname])) {
+			foreach($this->_endpoint[$authname] as $el) {
+				$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
+			}
+		}
 
-		if (isset($retarr["pjsip.aor.conf"][$aorname]))
+		if (isset($retarr["pjsip.aor.conf"][$aorname])) {
 			throw new Exception("AOR $aorname already exists.");
+		}
 		$retarr["pjsip.aor.conf"][$aorname] = $aor;
+		if(!empty($this->_aor[$aorname])) {
+			foreach($this->_endpoint[$aorname] as $el) {
+				$retarr["pjsip.aor.conf"][$aorname][] = "{$el['key']}={$el['value']}";
+			}
+		}
 	}
 
 	private function validateEndpoint(&$config) {
