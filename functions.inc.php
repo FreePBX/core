@@ -431,12 +431,12 @@ class core_conf {
 						case 'mailbox':
 							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
 							break;
-						case 'context':
-							$context = $result2['data'];
-							//fall-through
 						case 'secret_origional':
 							//stupidness coming through
 						break;
+						case 'context':
+							$context = $result2['data'];
+							//fall-through
 						default:
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
