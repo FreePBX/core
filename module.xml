@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1beta3</version>
+	<version>12.0.1beta4</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1beta4* Allow adding in additional parameters into _additional pjsip files, context problem fixed as well
 		*12.0.1beta3* This fixes an issue were the sip_additional.conf file was filled with duplicate contexts
 		*12.0.1beta2* Let users know what port said device is listening on
 		*12.0.1beta1* Bump to beta
