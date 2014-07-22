@@ -3,12 +3,6 @@
 namespace FreePBX\modules\Core;
 class PJSip extends \FreePBX_Helpers implements \BMO {
 
-	private $codecs = array(
-		"g722" => false,
-		"ulaw" => true,
-		"alaw" => true,
-		"gsm" => false,
-	);
 	private $PJSipModules = array("chan_pjsip.so", "res_pjsip_endpoint_identifier_anonymous.so", "res_pjsip_messaging.so",
 		"res_pjsip_pidf.so", "res_pjsip_session.so", "func_pjsip_endpoint.so", "res_pjsip_endpoint_identifier_ip.so", "res_pjsip_mwi.so",
 		"res_pjsip_pubsub.so", "res_pjsip.so", "res_pjsip_acl.so", "res_pjsip_endpoint_identifier_user.so", "res_pjsip_nat.so",
@@ -24,10 +18,12 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	private $_global = array();
 	private $_registration = array();
 	private $_identify = array();
+	private $version = null;
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->db = $freepbx->Database;
+		$this->version = $freepbx->Config->get('ASTVERSION');
 	}
 
 	/* Assorted stubs to validate the BMO Interface */
@@ -102,10 +98,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 
 		//TODO: Rob can we fix this please?
-		global $version;
 		$conf['pjsip.conf']['global'] = array(
 			'type=global',
-			'user_agent='.$this->FreePBX->Config->get_conf_setting('SIPUSERAGENT') . '-' . getversion() . "($version)"
+			'user_agent='.$this->FreePBX->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
 		);
 		if(!empty($this->_global)) {
 			foreach($this->_global as $el) {
@@ -212,11 +207,10 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	public function writeConfig($conf) {
 		//TODO: Rob please remove this global
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		global $version;
 		$nt = \notifications::create($db);
 
 		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
-		if(version_compare($version, '12', 'ge')) {
+		if(version_compare($this->version, '12', 'ge')) {
 			if($ast_sip_driver == 'both') {
 				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
 				foreach ($this->PJSipModules as $mod) {
@@ -445,23 +439,29 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			   $endpoint[] = "transport=".$config['transport'];
 		   }
 		}
-		if (!empty($config['call_group']))
+		if (!empty($config['call_group'])) {
 			$endpoint[] = "call_group=".$config['callgroup'];
+		}
 
-		if (!empty($config['pickup_group']))
+		if (!empty($config['pickup_group'])) {
 			$endpoint[] = "pickup_group=".$config['pickupgroup'];
+		}
 
-		if (!empty($config['avpf']))
+		if (!empty($config['avpf'])) {
 			$endpoint[] = "use_avpf=".$config['avpf'];
+		}
 
-		if (!empty($config['icesupport']))
+		if (!empty($config['icesupport'])) {
 			$endpoint[] = "ice_support=".$config['icesupport'];
+		}
 
-		if (!empty($config['media_use_received_transport']))
+		if (!empty($config['media_use_received_transport']) && version_compare($this->version, "12.4.0", "ge")) {
 			$endpoint[] = "media_use_received_transport=".$config['media_use_received_transport'];
+		}
 
-		if (!empty($config['trustrpid']))
+		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
+		}
 
 		if (isset($config['sendrpid'])) {
 			if ($config['sendrpid'] == "yes" || $config['sendrpid'] == "both") {
@@ -585,7 +585,13 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
 		// We care about the arrays later
 
-		$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
+		//this is really BAD, why do we always have to set to the dang _REQUESTER argh!
+		if(empty($_REQUEST['codec'])) {
+			$defaultCodecs = $this->FreePBX->Sipsettings->getCodecs('audio');
+			$_REQUEST['codecs'] = implode(",",array_keys($defaultCodecs));
+		} else {
+			$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
+		}
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
 		foreach ($_REQUEST as $k => $v) {
 			// Skip this value if we don't care about it.
@@ -636,6 +642,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 * @param {array} &$dispvars Display Variables
 	 */
 	public function getDisplayVars($trunkid, &$dispvars) {
+		$sipSettingsCodecs = $this->FreePBX->Sipsettings->getCodecs('audio',true);
 		if(!empty($trunkid)) {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
 			$get->bindParam(':id', str_replace('OUT_','',$trunkid));
@@ -651,7 +658,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				$dispvars['codecs'][$codec] = true;
 			}
 
-			foreach($this->codecs as $codec => $state) {
+
+
+			foreach($sipSettingsCodecs as $codec => $state) {
 				if(!isset($dispvars['codecs'][$codec])) {
 					$dispvars['codecs'][$codec] = false;
 				}
@@ -667,7 +676,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				"max_retries" => 10,
 				"context" => "from-pstn",
 				"transport" => null,
-				"codecs" => $this->codecs,
+				"codecs" => $sipSettingsCodecs,
 				"qualify_frequency" => 60
 			);
 		}

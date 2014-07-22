@@ -9,6 +9,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//Hackery-Jackery for Core only really
 		if(!class_exists('PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
 			include(__DIR__.'/functions.inc/PJSip.class.php');
+			//Think about using BMO Inject here instead
 			$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
 		}
 		$this->database = $freepbx->Database;
@@ -69,6 +70,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		} // $page == "astmodules"
 	}
 
+	/**
+	 * Converts a request into an array that core wants.
+	 * @param {int} $account The Account Number
+	 * @param {string} $tech    The TECH type
+	 * @param {int} &$flag   The Flag Number
+	 */
 	public function convertRequest2Array($account,$tech,&$flag) {
 		$flag = !empty($flag) ? $flag : 2;
 		$fields = array();
@@ -101,6 +108,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $fields;
 	}
 
+	/**
+	 * Add Device
+	 * @param {int} $id               The Device Number
+	 * @param {string} $tech             The TECH type
+	 * @param {array} $settings=array() Array with all settings
+	 * @param {bool} $editmode=false   If edited, (this is so it doesnt destroy the AsteriskDB)
+	 */
 	public function addDevice($id,$tech,$settings=array(),$editmode=false) {
 		global $amp_conf;
 		global $astman;
@@ -273,6 +287,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/**
+	 * Delete a Device
+	 * @param {int} $account        The Device ID
+	 * @param {bool} $editmode=false If in edit mode (this is so it doesnt destroy the AsteriskDB)
+	 */
 	public function delDevice($account,$editmode=false) {
 		$astman = $this->FreePBX->astman;
 		//get all info about device
@@ -355,6 +374,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/**
+	 * Get Device Details
+	 * @param {int} $account The Device ID
+	 */
 	public function getDevice($account) {
 		$sql = "SELECT * FROM devices WHERE id = ?";
 		$sth = $this->database->prepare($sql);

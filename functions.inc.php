@@ -7271,15 +7271,17 @@ function core_devices_configpageinit($dispnum) {
 
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
-		$tt = _("Determines whether res_pjsip will use the media transport received in the offer SDP in the corresponding answer SDP.");
-		$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+		if (version_compare($amp_conf['ASTVERSION'],'12.4.0','ge')) {
+			//media_use_received_transport
+			$tt = _("Determines whether res_pjsip will use the media transport received in the offer SDP in the corresponding answer SDP.");
+			$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		}
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
 		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
-
-		//media_use_received_transport
 
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = FreePBX::create()->PJSip->getActiveTransports();
