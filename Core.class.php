@@ -76,7 +76,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {string} $tech    The TECH type
 	 * @param {int} &$flag   The Flag Number
 	 */
-	public function convertRequest2Array($account,$tech,&$flag) {
+	public function convertRequest2Array($account,$tech,&$flag = 2) {
 		$flag = !empty($flag) ? $flag : 2;
 		$fields = array();
 		$tech = strtoupper($tech);
@@ -161,7 +161,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		try {
 			$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value']));
 		} catch(\Exception $e) {
-
+			die_freepbx("Could Not Insert Device", $e->getMessage());
+			return false;
 		}
 
 		$astman = $this->FreePBX->astman;
