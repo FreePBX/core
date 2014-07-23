@@ -130,13 +130,13 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
 				if(empty($trunk['sip_server'])) {
-					throw new Exception('Asterisk will crash if sip_server is blank!');
+					throw new \Exception('Asterisk will crash if sip_server is blank!');
 				}
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			} else {
 				if(empty($trunk['server_uri']) || $trunk['client_uri']) {
-					throw new Exception('Asterisk will crash if server_uri or client_uri is blank!');
+					throw new \Exception('Asterisk will crash if server_uri or client_uri is blank!');
 				}
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
@@ -496,7 +496,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
 		if (isset($retarr["pjsip.endpoint.conf"][$endpointname])) {
-			throw new Exception("Endpoint $endpointname already exists.");
+			throw new \Exception("Endpoint $endpointname already exists.");
 		}
 		$retarr["pjsip.endpoint.conf"][$endpointname] = $endpoint;
 		if(!empty($this->_endpoint[$endpointname])) {
@@ -506,7 +506,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 
 		if (isset($retarr["pjsip.auth.conf"][$authname])) {
-			throw new Exception("Auth $authname already exists.");
+			throw new \Exception("Auth $authname already exists.");
 		}
 		$retarr["pjsip.auth.conf"][$authname] = $auth;
 		if(!empty($this->_auth[$authname])) {
@@ -516,7 +516,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 
 		if (isset($retarr["pjsip.aor.conf"][$aorname])) {
-			throw new Exception("AOR $aorname already exists.");
+			throw new \Exception("AOR $aorname already exists.");
 		}
 		$retarr["pjsip.aor.conf"][$aorname] = $aor;
 		if(!empty($this->_aor[$aorname])) {

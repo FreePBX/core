@@ -4,7 +4,7 @@
 //
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
-$display='trunks'; 
+$display='trunks';
 $extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
 $trunknum = ltrim($extdisplay,'OUT_');
 
@@ -124,7 +124,7 @@ if (!empty($csv_file)) {
     $prefix = '/^([^|]*)\|/';
     $match_pattern = '/([^/]*)/';
     $callerid = '/\/(.*)$/';
-	
+
 	$data = explode("\n",$_POST['bulk_patterns']);
 	foreach($data as $list) {
 		if (preg_match('/^\s*$/', $list)) {
@@ -189,7 +189,7 @@ switch ($action) {
 			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
 		}
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
-		
+
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert);
 		needreload();
 		redirect_standard();
@@ -199,22 +199,22 @@ switch ($action) {
 			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
 		}
 		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
-		
+
 		// this can rewrite too, so edit is the same
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
 		needreload();
 		redirect_standard('extdisplay');
 	break;
 	case "deltrunk":
-	
+
 		core_trunks_del($trunknum);
 		core_trunks_delete_dialrules($trunknum);
 		core_routing_trunk_delbyid($trunknum);
 		needreload();
 		redirect_standard();
 	break;
-	case "populatenpanxx7": 
-	case "populatenpanxx10": 
+	case "populatenpanxx7":
+	case "populatenpanxx10":
 		$dialpattern_array = $dialpattern_insert;
 		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
 			// first thing we do is grab the exch:
@@ -327,7 +327,7 @@ switch ($action) {
 			// what a horrible error message... :p
 			$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
 		}
-		
+
 		if (isset($errormsg)) {
 			echo "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>";
 			unset($errormsg);
@@ -396,7 +396,7 @@ if (!$tech && !$extdisplay) {
 		"DUNDI" => 'DUNDi',
 		"CUSTOM" => 'Custom'
 	);
-	
+
 	$sip = ($sipdriver == 'both' || $sipdriver == 'chan_sip') ? array("SIP" => sprintf(_('SIP (%s)'),'chan_sip')) : array();
 	$pjsip = ($sipdriver == 'both' || $sipdriver == 'chan_pjsip') ? array("PJSIP" => sprintf(_('SIP (%s)'),'chan_pjsip')) : array();
 
@@ -406,7 +406,7 @@ if (!$tech && !$extdisplay) {
 	if (function_exists('misdn_ports_list_trunks') && count(misdn_ports_list_trunks())) {
 		$trunk_types['MISDN'] = 'mISDN';
 	}
-	
+
 	$displayvars['trunk_types'] = $trunk_types;
 	show_view(dirname(__FILE__).'/views/trunks/main.php',$displayvars);
 } else {
@@ -432,18 +432,18 @@ if (!$tech && !$extdisplay) {
 
 			if ($tech!="custom" && $tech!="dundi") {  // custom trunks will not have user/peer details in database table
 				// load from db
-				if (empty($peerdetails)) {	
+				if (empty($peerdetails)) {
 					$peerdetails = core_trunks_getTrunkPeerDetails($trunknum);
 				}
-				if (empty($usercontext)) {	
+				if (empty($usercontext)) {
 					$usercontext = htmlentities($trunk_details['usercontext']);
 				}
 
-				if (empty($userconfig)) {	
+				if (empty($userconfig)) {
 					$userconfig = core_trunks_getTrunkUserConfig($trunknum);
 				}
 
-				if (empty($register)) {	
+				if (empty($register)) {
 					$register = core_trunks_getTrunkRegister($trunknum);
 				}
 			}
@@ -485,7 +485,7 @@ if (!$tech && !$extdisplay) {
 		$areacode = "";
 
 		$upper_tech = strtoupper($tech);
-	} 
+	}
 	if (!isset($dialpattern_array)) {
 		$dialpattern_array = array();
 	}
@@ -545,7 +545,7 @@ if (!$tech && !$extdisplay) {
 			if (function_exists('misdn_groups_ports')) {
 				show_view(dirname(__FILE__).'/views/trunks/misdn.php',$displayvars);
 			}
-			break; 
+			break;
 		//--------------------------------------------------------------------------------------
 		case "custom":
 			show_view(dirname(__FILE__).'/views/trunks/custom.php',$displayvars);
@@ -558,6 +558,7 @@ if (!$tech && !$extdisplay) {
 			FreePBX::create()->PJSip->getDisplayVars($extdisplay, $displayvars);
 			show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
 			break;
+		case "iax":
 		case "iax2":
 		case "sip":
 			$displayvars['peerdetails'] = $peerdetails;
