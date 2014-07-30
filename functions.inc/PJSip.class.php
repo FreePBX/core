@@ -144,7 +144,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 			if(!empty($this->_registration[$tn])) {
 				foreach($this->_registration[$tn] as $el) {
-					$retarr["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
+					$conf["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
 			}
 
@@ -164,6 +164,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			} else {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
 			}
+			if(!empty($this->_aor[$tn])) {
+				foreach($this->_aor[$tn] as $el) {
+					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				}
+			}
 
 			$conf['pjsip.endpoint.conf'][$tn] = array(
 				'type' => 'endpoint',
@@ -174,6 +179,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
+			if(!empty($this->_endpoint[$tn])) {
+				foreach($this->_endpoint[$tn] as $el) {
+					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				}
+			}
 
 			$conf['pjsip.identify.conf'][$tn] = array(
 				'type' => 'identify',
@@ -183,7 +193,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 			if(!empty($this->_identify[$tn])) {
 				foreach($this->_identify[$tn] as $el) {
-					$retarr["pjsip.identify.conf"][$tn][] = "{$el['key']}={$el['value']}";
+					$conf["pjsip.identify.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
 			}
 		}
@@ -196,7 +206,6 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$conf['pjsip_notify.conf'] = "\n#include sip_notify_custom.conf\n#include sip_notify_additional.conf\n";
 		}
 
-		$conf = $this->FreePBX->Hooks->processHooks($conf);
 		return $conf;
 	}
 
@@ -207,7 +216,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	public function writeConfig($conf) {
 		//TODO: Rob please remove this global
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		$nt = \notifications::create($db);
+		$nt = \notifications::create();
 
 		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
 		if(version_compare($this->version, '12', 'ge')) {
