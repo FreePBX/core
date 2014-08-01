@@ -343,7 +343,7 @@ function editGRP_onsubmit() {
 		return false;
 
 	// warning about 'any DID / any CID'
-	if (theForm.extension.value == "" && theForm.cidnum.value == "" && theForm.channel.value == "" ) {
+	if ($('form[name="editGRP"] input[name="extension"]').val() === "" && $('form[name="editGRP"] input[name="cidnum"]').val() === "" && ($('form[name="editGRP"] input[name="channel"]').val() === ""  || $('form[name="editGRP"] input[name="channel"]').val() === undefined)) {
 		if (!confirm(msgConfirmDIDCIDBlank))
 			return false;
 	}
