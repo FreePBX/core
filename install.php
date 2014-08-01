@@ -55,12 +55,18 @@ $fcc->setDefault('*12');
 $fcc->update();
 unset($fcc);
 
-$fcc = new featurecode('core', 'zapbarge');
-$fcc->setDescription('ZapBarge');
-$fcc->setDefault('888');
-$fcc->setProvideDest();
-$fcc->update();
-unset($fcc);
+global $version;
+if(version_compare($version, "12.5", "<")) {
+	$fcc = new featurecode('core', 'zapbarge');
+	$fcc->setDescription('ZapBarge');
+	$fcc->setDefault('888');
+	$fcc->setProvideDest();
+	$fcc->update();
+	unset($fcc);
+} else {
+	$fcc = new featurecode('core', 'zapbarge');
+	$fcc->delete();
+}
 
 $fcc = new featurecode('core', 'chanspy');
 $fcc->setDescription('ChanSpy');

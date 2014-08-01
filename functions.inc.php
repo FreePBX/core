@@ -318,6 +318,11 @@ class core_conf {
 			$faxdetect = "";
 			$ver16 = false;
 		}
+		if (version_compare($ast_version, "1.8", "ge")) {
+			$ver18 = true;
+		} else {
+			$ver18 = false;
+		}
 		if (version_compare($ast_version, "11.5", "ge")) {
 			$ver115 = true;
 		} else {
@@ -438,6 +443,14 @@ class core_conf {
 							break;
 						case 'secret_origional':
 							//stupidness coming through
+						break;
+						case 'username':
+							//http://issues.freepbx.org/browse/FREEPBX-7715
+							if($ver18) {
+								$output .= "defaultuser=".$result2['data']."\n";
+							} else {
+								$output .= "username=".$result2['data']."\n";
+							}
 						break;
 						case 'nat':
 							//http://issues.freepbx.org/browse/FREEPBX-6518
@@ -1085,9 +1098,12 @@ function core_get_config($engine) {
 		$fc_userlogoff = $fcc->getCodeActive();
 		unset($fcc);
 
-		$fcc = new featurecode($modulename, 'zapbarge');
-		$fc_zapbarge = $fcc->getCodeActive();
-		unset($fcc);
+		global $version;
+		if(version_compare($version, "12.5", "<")) {
+			$fcc = new featurecode($modulename, 'zapbarge');
+			$fc_zapbarge = $fcc->getCodeActive();
+			unset($fcc);
+		}
 
 		$fcc = new featurecode($modulename, 'chanspy');
 		$fc_chanspy = $fcc->getCodeActive();
@@ -1354,7 +1370,8 @@ function core_get_config($engine) {
 
 
 									// zap barge
-									if ($fc_zapbarge != '') {
+									global $version;
+									if (version_compare($version, "12.5", "<") && $fc_zapbarge != '') {
 										$ext->addInclude('from-internal-additional', 'app-zapbarge'); // Add the include from from-internal
 
 										$ext->add('app-zapbarge', $fc_zapbarge, '', new ext_macro('user-callerid'));
@@ -4171,11 +4188,7 @@ function core_get_config($engine) {
 												$ext->add($mcontext,$exten,'', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader', 'Alert-Info: ${ALERT_INFO}'));
 												//TODO: Do I need to  re-propagage anything from ${SIPADDHEADER} ?
 												$ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
-												if ($ast_ge_14) {
-													$ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
-												} else {
-													$ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'SetMusicOnHold', '${MOHCLASS}'));
-												}
+												$ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 												$ext->add($mcontext,$exten,'', new ext_gosubif('$["${QUEUEWAIT}"!=""]','qwait,1'));
 												$ext->add($mcontext,$exten,'', new ext_set('__CWIGNORE', '${CWIGNORE}'));
 												$ext->add($mcontext,$exten,'', new ext_set('__KEEPCID', 'TRUE'));
