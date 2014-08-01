@@ -318,6 +318,11 @@ class core_conf {
 			$faxdetect = "";
 			$ver16 = false;
 		}
+		if (version_compare($ast_version, "11.5", "ge")) {
+			$ver115 = true;
+		} else {
+			$ver115 = false;
+		}
 		// TODO: Temporary Kludge until CCSS is fixed
 		//
 		if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
@@ -433,6 +438,14 @@ class core_conf {
 							break;
 						case 'secret_origional':
 							//stupidness coming through
+						break;
+						case 'nat':
+							//http://issues.freepbx.org/browse/FREEPBX-6518
+							if($ver115 && ($result2['data'] == 'yes')) {
+								$output .= $result2['keyword']."=force_rport,comedia\n";
+							} else {
+								$output .= $result2['keyword']."=".$result2['data']."\n";
+							}
 						break;
 						case 'context':
 							$context = $result2['data'];
