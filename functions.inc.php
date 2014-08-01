@@ -323,6 +323,11 @@ class core_conf {
 		} else {
 			$ver18 = false;
 		}
+		if (version_compare($ast_version, "10", "ge")) {
+			$ver100 = true;
+		} else {
+			$ver100 = false;
+		}
 		if (version_compare($ast_version, "11.5", "ge")) {
 			$ver115 = true;
 		} else {
@@ -454,8 +459,51 @@ class core_conf {
 						break;
 						case 'nat':
 							//http://issues.freepbx.org/browse/FREEPBX-6518
-							if($ver115 && ($result2['data'] == 'yes')) {
-								$output .= $result2['keyword']."=force_rport,comedia\n";
+							if($ver115) {
+								$newval = "";
+								switch($result2['data']) {
+									case 'yes':
+										$newval = "force_rport,comedia";
+									break;
+									case 'route':
+										$newval = "force_rport";
+									break;
+									case 'never':
+										$newval = "no";
+									break;
+									default:
+										$newval = $result2['data'];
+									break;
+								}
+								$output .= $result2['keyword']."=".$newval."\n";
+							} elseif($ver100) {
+								$newval = "";
+								switch($result2['data']) {
+									case 'route':
+										$newval = "force_rport";
+									break;
+									case 'never':
+										$newval = "no";
+									break;
+									default:
+										$newval = $result2['data'];
+									break;
+								}
+								$output .= $result2['keyword']."=".$newval."\n";
+							} elseif($ver18) {
+								$newval = "";
+								switch($result2['data']) {
+									case 'route':
+										$newval = "force_rport";
+									break;
+									case 'never':
+										$newval = "no";
+									break;
+									default:
+										$newval = $result2['data'];
+									break;
+								}
+								$output .= $result2['keyword']."=".$newval."\n";
 							} else {
 								$output .= $result2['keyword']."=".$result2['data']."\n";
 							}
@@ -7204,10 +7252,23 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['type'] = array('prompttext' => _('Connection Type'),'value' => 'friend', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
-		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$select[] = array('value' => 'no', 'text' => _('No - RFC3581'));
-		$select[] = array('value' => 'never', 'text' => _('never - no RFC3581'));
-		$select[] = array('value' => 'route', 'text' => _('route - NAT no rport'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes - (force_rport,comedia)'));
+		$select[] = array('value' => 'no', 'text' => _('No - (no)'));
+
+		if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+			$select[] = array('value' => 'force_rport', 'text' => _('Force rport - (force_rport)'));
+			$select[] = array('value' => 'comedia', 'text' => _('comedia - (comedia)'));
+		}
+
+		if (version_compare($amp_conf['ASTVERSION'],'11.5','ge')) {
+			$select[] = array('value' => 'auto_force_rport,auto_comedia', 'text' => _('Automatic Force Both - (auto_force_rport,auto_comedia)'));
+			$select[] = array('value' => 'auto_force_rport', 'text' => _('Automatic Force rport - (auto_force_rport)'));
+			$select[] = array('value' => 'auto_comedia', 'text' => _('Automatic comedia - (auto_comedia)'));
+		}
+
+		$select[] = array('value' => 'never', 'text' => _('never - (no)'));
+		$select[] = array('value' => 'route', 'text' => _('route - (force_rport)'));
+
 		$tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.").'[nat]';
 		$tmparr['nat'] = array('prompttext' => _('NAT Mode'), 'value' => $amp_conf['DEVICE_SIP_NAT'], 'tt' => $tt, 'select' => $select, 'level' => 0);
 
