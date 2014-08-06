@@ -109,6 +109,287 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+	 * Generate the default settings when creating a device
+	 * TODO: This is beta, will be cleaned up in 13
+	 * @param {string} $tech        The TECH
+	 * @param {int} $number      The exten or device number
+	 * @param {string} $displayname The displayname
+	 */
+	public function generateDefaultDeviceSettings($tech,$number,$displayname,&$flag = 2) {
+		$flag = !empty($flag) ? $flag : 2;
+		$dial = '';
+		$settings = array();
+		switch($tech) {
+			case 'iax':
+				$dial = 'IAX2';
+				$settings  = array(
+					"transfer" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"host" => array(
+						"value" => "dynamic",
+						"flag" => $flag++
+					),
+					"type" => array(
+						"value" => "friend",
+						"flag" => $flag++
+					),
+					"port" => array(
+						"value" => "4569",
+						"flag" => $flag++
+					),
+					"qualify" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"disallow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"allow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"accountcode" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"requirecalltoken" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"setvar" => array(
+						"value" => "REALCALLERIDNUM=",
+						"flag" => $flag++
+					),
+				);
+			break;
+			case 'pjsip':
+				$dial = 'PJSIP';
+				$settings  = array(
+					"sipdriver" => array(
+						"value" => "chan_pjsip",
+						"flag" => $flag++
+					),
+					"secret" => array(
+						"value" => md5(uniqid()),
+						"flag" => $flag++
+					),
+					"dtmfmode" => array(
+						"value" => "rfc2833",
+						"flag" => $flag++
+					),
+					"trustrpid" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"sendpid" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"qualifyfreq" => array(
+						"value" => "60",
+						"flag" => $flag++
+					),
+					"transport" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"avpf" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"icesupport" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"callgroup" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"pickupgroup" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"disallow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"allow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"mailbox" => array(
+						"value" => $number."@device",
+						"flag" => $flag++
+					),
+					"max_contact" => array(
+						"value" => "1",
+						"flag" => $flag++
+					),
+					"max_contact" => array(
+						"value" => "1",
+						"flag" => $flag++
+					),
+					"media_use_received_transport" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"rtp_symmetric" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"rewrite_contact" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+				);
+			break;
+			case 'sip':
+				$dial = 'SIP';
+				$settings  = array(
+					"sipdriver" => array(
+						"value" => "chan_sip",
+						"flag" => $flag++
+					),
+					"dtmfmode" => array(
+						"value" => "rfc2833",
+						"flag" => $flag++
+					),
+					"canreinvite" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"host" => array(
+						"value" => "dynamic",
+						"flag" => $flag++
+					),
+					"trustpid" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"sendpid" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"type" => array(
+						"value" => "friend",
+						"flag" => $flag++
+					),
+					"nat" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"port" => array(
+						"value" => "5060",
+						"flag" => $flag++
+					),
+					"qualify" => array(
+						"value" => "yes",
+						"flag" => $flag++
+					),
+					"qualifyfreq" => array(
+						"value" => "60",
+						"flag" => $flag++
+					),
+					"transport" => array(
+						"value" => "upd,tcp,tls",
+						"flag" => $flag++
+					),
+					"avpf" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"force_avp" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"icesupport" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"encryption" => array(
+						"value" => "no",
+						"flag" => $flag++
+					),
+					"callgroup" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"pickupgroup" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"disallow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"allow" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"accountcode" => array(
+						"value" => "",
+						"flag" => $flag++
+					),
+					"deny" => array(
+						"value" => "0.0.0.0/0.0.0.0",
+						"flag" => $flag++
+					),
+					"permit" => array(
+						"value" => "0.0.0.0/0.0.0.0",
+						"flag" => $flag++
+					),
+				);
+			break;
+			default:
+				return array();
+			break;
+		}
+		$gsettings  = array(
+			"devicetype" => array(
+				"value" => "fixed"
+			),
+			"user" => array(
+				"value" => $number
+			),
+			"description" => array(
+				"value" => $displayname
+			),
+			"emergency_cid" => array(
+				"value" => $displayname,
+			),
+			"dial" => array(
+				"value" => $dial."/".$number,
+				"flag" => $flag++
+			),
+			"secret" => array(
+				"value" => md5(uniqid()),
+				"flag" => $flag++
+			),
+			"context" => array(
+				"value" => "from-internal",
+				"flag" => $flag++
+			),
+			"mailbox" => array(
+				"value" => $number."@device",
+				"flag" => $flag++
+			),
+			"account" => array(
+				"value" => $number,
+				"flag" => $flag++
+			),
+			"callerid" => array(
+				"value" => "device <".$number.">",
+				"flag" => $flag++
+			)
+		);
+
+		return array_merge($settings,$gsettings);
+	}
+
+	/**
 	 * Add Device
 	 * @param {int} $id               The Device Number
 	 * @param {string} $tech             The TECH type

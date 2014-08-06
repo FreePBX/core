@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1beta8</version>
+	<version>12.0.1beta9</version>
 	<publisher>FreePBX</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.1beta9* Generate default device settings function
 		*12.0.1beta8* Fixed javascript bug from 2.11
 		*12.0.1beta7* Remove ProcessHooks, not needed in this construct
 		*12.0.1beta6* Show IAX settings upon edit
