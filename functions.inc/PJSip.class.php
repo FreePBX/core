@@ -135,7 +135,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			} else {
-				if(empty($trunk['server_uri']) || $trunk['client_uri']) {
+				if(empty($trunk['server_uri']) || empty($trunk['client_uri'])) {
 					throw new \Exception('Asterisk will crash if server_uri or client_uri is blank!');
 				}
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
