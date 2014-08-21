@@ -1298,21 +1298,35 @@ if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
 //
 // CATEGORY: GUI Behavior
 //
-if(!$freepbx_conf->conf_setting_exists('ENABLEOLDDIALPATTERNS')) {
-	unset($set);
-	$set['module'] = '';
-	$set['category'] = 'GUI Behavior';
-	// HTTPENABLED
-	$set['value'] = false;
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'Enable The Old Style FreePBX Dial Patterns Textarea';
-	$set['description'] = 'If enabled the intuitive Dial Patterns boxes on the Routing and Trunks pages will be replaced with a text box which restores the functionality from FreePBX 2.7 and lower.';
-	$set['emptyok'] = 0;
-	$set['level'] = 1;
-	$set['readonly'] = 0;
-	$set['type'] = CONF_TYPE_BOOL;
-	$freepbx_conf->define_conf_setting('ENABLEOLDDIALPATTERNS',$set);
+unset($set);
+$set['module'] = '';
+$set['category'] = 'GUI Behavior';
+// HTTPENABLED
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'Enable The Old Style FreePBX Dial Patterns Textarea';
+$set['description'] = 'If enabled the intuitive Dial Patterns boxes on the Routing and Trunks pages will be replaced with a text box which restores the functionality from FreePBX 2.7 and lower.';
+$set['emptyok'] = 0;
+$set['level'] = 1;
+$set['readonly'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('ENABLEOLDDIALPATTERNS',$set);
+$freepbx_conf->commit_conf_settings();
 
-	$freepbx_conf->commit_conf_settings();
-}
+unset($set);
+// RSSFEEDS
+$set['category'] = 'System Setup';
+$set['value'] = "http://www.freepbx.org/rss.xml\nhttp://feeds.feedburner.com/InsideTheAsterisk";
+$set['defaultval'] = $set['value'];
+$set['name'] = 'RSS Feeds';
+$set['description'] = 'RSS Feeds that are displayed in UCP and Dashboard. Separate each feed by a new line';
+$set['hidden'] = 0;
+$set['emptyok'] = 1;
+$set['readonly'] = 0;
+$set['level'] = 0;
+$set['options'] = '';
+$set['module'] = '';
+$set['type'] = CONF_TYPE_TEXTAREA;
+$freepbx_conf->define_conf_setting('RSSFEEDS',$set);
+$freepbx_conf->commit_conf_settings();
