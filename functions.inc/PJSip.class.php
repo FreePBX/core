@@ -214,7 +214,6 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	* @param {string} $conf The Configuration being passed through
 	*/
 	public function writeConfig($conf) {
-		//TODO: Rob please remove this global
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
 		$nt = \notifications::create();
 
@@ -231,12 +230,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				$this->disablePJSipModules();
 			}
 		} else {
+			// We don't support pjsip. If we're trying to use it, don't. Note
+			// that if there are devices or trunks trying to use chan_pjsip, we
+			// complain loudly about it core_devices_configpageload
 			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
-				$sip_missing = _("PJSIP Not Supported");
-				$sip_missing_desc = _("Your SIP Channel Driver (ASTSIPDRIVER) was automatically changed from %s to chan_sip because chan_pjsip is not supported on your Asterisk installation");
-				$nt->add_notice('framework', 'ASTSIPDRIVERCHG', $sip_missing, sprintf($sip_missing_desc,$ast_sip_driver));
 				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-				$nt->delete('framework', 'ASTSIPDRIVERMISSING');
 			}
 		}
 
