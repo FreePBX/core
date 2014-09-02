@@ -973,7 +973,7 @@ function core_getdestinfo($dest) {
 /* 	Generates dialplan for "core" components (extensions & inbound routing)
 	We call this with retrieve_conf
 */
-function core_get_config($engine) {
+function core_do_get_config($engine) {
 	global $ext;  // is this the best way to pass this?
 	global $version;  // this is not the best way to pass this, this should be passetd together with $engine
 	global $engineinfo;
