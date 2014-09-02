@@ -77,6 +77,9 @@
 			<display>users</display>
 		</users>
  	</popovers>
+	<methods>
+		<get_config pri="480">core_do_get_config</get_config>
+	</methods>
 	<supported>
 		<version>12.0</version>
 	</supported>
