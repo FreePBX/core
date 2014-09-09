@@ -7492,6 +7492,7 @@ function core_devices_configpageload() {
 			}
 		} else {
 
+
 			$tmparr = explode('_', $tech_hardware);
 			$deviceInfo['tech'] = $tmparr[0];
 			$deviceInfo['hardware'] = $tmparr[1];

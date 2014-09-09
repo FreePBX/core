@@ -564,6 +564,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					}
 				}
 			break;
+			case 'custom':
+				return true;
+			break;
 		}
 
 		return true;
@@ -642,6 +645,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case 'dahdi':
 				$type = 'dahdi';
 			break;
+			case 'custom':
+				return true;
+			break;
 			default:
 				return false;
 			break;
@@ -688,12 +694,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case 'dahdi':
 				$type = 'dahdi';
 			break;
+			case 'custom':
+				$type = 'custom';
+			break;
 			default:
 				return array();
 			break;
 		}
 		$sql = "SELECT keyword,data FROM ".$type." WHERE id = ?";
 		$sth = $this->database->prepare($sql);
+		$tech = array();
 		try {
 			$sth->execute(array($account));
 			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
@@ -702,9 +712,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			foreach($tech as &$value) {
 				$value = $value[0];
 			}
-		} catch(\Exception $e) {
-			return array();
-		}
+		} catch(\Exception $e) {}
 
 		$results = array_merge($device,$tech);
 
