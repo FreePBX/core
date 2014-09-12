@@ -33,7 +33,7 @@ function did_migrate($incoming){
 		return false;
 	}
 	if (empty($existing)) {
-		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre')";
+		$sql="INSERT INTO incoming (cidnum,extension,destination,faxexten,faxemail,answer,wait,privacyman,alertinfo, ringing, reversal, mohclass, description, grppre) values ('$cidnum','$extension','$destination','$faxexten','$faxemail','$answer','$wait','$privacyman','$alertinfo', '$ringing', '$reversal', '$mohclass', '$description', '$grppre')";
 		sql($sql);
 		return true;
 	} else {
@@ -172,6 +172,7 @@ if(!DB::IsError($check)) {
 			$did_vars['privacyman']  = $direct_dids['privacyman'];
 			$did_vars['alertinfo']   = $direct_dids['didalert'];
 			$did_vars['ringing']     = '';
+			$did_vars['reversal']     = '';
 			$did_vars['mohclass']    = $direct_dids['mohclass'];
 			$did_vars['description'] = _("User: ").$direct_dids['extension'];
 			$did_vars['grppre']      = '';
@@ -245,6 +246,23 @@ if(DB::IsError($check)) {
 	if(DB::IsError($result)) {
 		out(_("fatal error"));
 		die_freepbx($result->getDebugInfo());
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}
+
+//FREEPBX-7950
+outn(_("checking for reversal field .."));
+$sql = "SELECT `reversal` FROM `incoming`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `incoming` ADD `reversal` VARCHAR(10) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error"));
+		die_freepbx($result->getDebugInfo()); 	
 	} else {
 		out(_("added"));
 	}

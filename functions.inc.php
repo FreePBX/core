@@ -1518,6 +1518,13 @@ function core_do_get_config($engine) {
 											if ($item['ringing'] === "CHECKED") {
 												$ext->add($context, $exten, '', new ext_ringing(''));
 											}
+											
+											//Block collect Calls
+											if ($item['reversal'] === "CHECKED") {
+												$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','TRUE'));
+											}
+											$ext->add($context, $exten, '',new ext_gotoif('$["${__REVERSAL_REJECT}"="TRUE" & "${CHANNEL(reversecharge)}"="1" ]','macro-hangupcall'));
+ 					
 											if ($item['delay_answer']) {
 												$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
 											}
@@ -4495,6 +4502,7 @@ function core_do_get_config($engine) {
 											$did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
 											$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
 											$did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
+											$did_create['reversal']     = isset($did_vars['reversal'])     ? $did_vars['reversal']     : '';
 											$did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
 											$did_create['description'] = isset($did_vars['description']) ? $did_vars['description'] : '';
 											$did_create['grppre']      = isset($did_vars['grppre'])      ? $did_vars['grppre']      : '';
@@ -4527,6 +4535,7 @@ function core_do_get_config($engine) {
 												case 'pmminlength':
 												case 'alertinfo':
 												case 'ringing':
+												case 'reversal':
 												case 'mohclass':
 												case 'description':
 												case 'grppre':
@@ -4562,7 +4571,7 @@ function core_do_get_config($engine) {
 											$cidnum = trim(str_replace($invalidDIDChars,"",$cidnum));
 
 											$destination= ($target) ? $target : ${$goto0.'0'};
-											$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
+											$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$reversal', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 											sql($sql);
 											return true;
 										} else {
@@ -5280,6 +5289,7 @@ function core_do_get_config($engine) {
 											$did_vars['privacyman']  = '';
 											$did_vars['alertinfo']   = '';
 											$did_vars['ringing']     = '';
+											$did_vars['reversal']     = '';
 											$did_vars['mohclass']    = 'default';
 											$did_vars['description'] = $newdid_name;
 											$did_vars['grppre']      = '';
