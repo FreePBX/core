@@ -572,7 +572,7 @@ if (!$tech && !$extdisplay) {
 			break;
 	}
 	// implementation of module hook
-	// object was initialized in config.php
+	$module_hook == moduleHook::create();
 	echo $module_hook->hookHtml;
 	show_view(dirname(__FILE__).'/views/trunks/trunk_footer.php',$displayvars);
 }

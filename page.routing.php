@@ -520,6 +520,7 @@ if ($extdisplay) { // editing
 			</td>
 		</tr>
 <?php
+	$module_hook = moduleHook::create();
 	if (!empty($module_hook->hookHtml)) {
 ?>
     <tr>

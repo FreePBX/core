@@ -284,7 +284,7 @@ if (isset($inroutes)) {
 		</tr>
 <?php
 	// implementation of module hook
-	// object was initialized in config.php
+	$module_hook = moduleHook::create();
 	echo $module_hook->hookHtml;
 ?>
 		<tr><td colspan="2"><h5><?php echo _("Set Destination")?><hr></h5></td></tr>
