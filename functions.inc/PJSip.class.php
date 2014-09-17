@@ -175,7 +175,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw',
+				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
 				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
@@ -426,10 +426,10 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
 
-		$endpoint[] = "allow=".$config['allow'];
+		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
 
 		if (!empty($config['disallow']))
-			$endpoint[] = "disallow=".$config['disallow'];
+			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
