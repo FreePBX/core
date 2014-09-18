@@ -329,6 +329,12 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 					$transport[$t]['bind'] = "$ip:$port";
 				}
 				$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
+
+				if (!$extip) {
+					// Is there a global extern setting?
+					$extip = $this->FreePBX->Sipsettings->getConfig("externip");
+				}
+
 				if ($extip) {
 					$transport[$t]['external_media_address'] = $extip;
 					$transport[$t]['external_signaling_address'] = $extip;
