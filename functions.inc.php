@@ -3076,7 +3076,7 @@ function core_do_get_config($engine) {
 												$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
 												$ext->add($context, $exten, '', new ext_set('TRYDIAL', '${CUT(DIALARR,%,1)}'));
 												$ext->add($context, $exten, '', new ext_set('DIALARR', '${CUT(DIALARR,%,2-)}'));
-												$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', '${DIAL_TRUNK_OPTIONS}'));
+												$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
 												// Now, if we're still here, that means the Dial failed for some reason.
 												// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
 												// different channel. If there's no more left, the dialloop tag will exit.

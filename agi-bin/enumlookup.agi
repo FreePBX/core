@@ -155,4 +155,3 @@ function get_var( $agi, $value)
 	else return '';
 }
 
-?>
