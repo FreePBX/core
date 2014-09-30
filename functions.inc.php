@@ -4327,6 +4327,15 @@ function core_do_get_config($engine) {
 /* begin page.ampusers.php functions */
 
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
+	global $db;
+
+	$username = $db->escapeSimple($username);
+	$password = $db->escapeSimple($password);
+	$extension_low = $db->escapeSimple($extension_low);
+	$extension_high = $db->escapeSimple($extension_high);
+	$deptname = $db->escapeSimple($deptname);
+	$sections = $db->escapeSimple(implode(";",$sections));
+
 	$sql = "INSERT INTO ampusers (username, password_sha1, extension_low, extension_high, deptname, sections) VALUES (";
 	$sql .= "'".$username."',";
 	if (strlen($password) == 40) {
@@ -4339,12 +4348,14 @@ function core_ampusers_add($username, $password, $extension_low, $extension_high
 	$sql .= "'".$extension_low."',";
 	$sql .= "'".$extension_high."',";
 	$sql .= "'".$deptname."',";
-	$sql .= "'".implode(";",$sections)."');";
+	$sql .= "'".$sections."');";
 
 	sql($sql,"query");
 }
 
 function core_ampusers_del($username) {
+	$username = $db->escapeSimple($username);
+	
 	$sql = "DELETE FROM ampusers WHERE username = '".$username."'";
 	sql($sql,"query");
 }
