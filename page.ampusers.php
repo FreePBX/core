@@ -66,8 +66,6 @@ if (isset($_REQUEST["sections"])) {
 switch ($action) {
 	case "addampuser":
 		core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections);
-		//indicate 'need reload' link in footer.php 
-		needreload();
 		redirect_standard();
 	break;
 	case "editampuser":
@@ -84,14 +82,10 @@ switch ($action) {
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
 			unset($_SESSION['AMP_user']);
 		}
-		//indicate 'need reload' link in footer.php 
-		needreload();
 		redirect_standard('userdisplay');
 	break;
 	case "delampuser":
 		core_ampusers_del($userdisplay);
-		//indicate 'need reload' link in footer.php 
-		needreload();
 		$userdisplay = ""; // go "add" screen
 		redirect_standard();
 	break;
