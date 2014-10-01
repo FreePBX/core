@@ -8,6 +8,7 @@ $dispnum = 'did'; //used for switch on config.php
 $account = isset($_REQUEST['account'])?$_REQUEST['account']:'';
 $goto = isset($_REQUEST['goto0'])?$_REQUEST['goto0']:'';
 $ringing = isset($_REQUEST['ringing'])?$_REQUEST['ringing']:'';
+$reversal = isset($_REQUEST['reversal'])?$_REQUEST['reversal']:'';
 $description = htmlspecialchars(isset($_REQUEST['description'])?$_REQUEST['description']:'');
 $privacyman = isset($_REQUEST['privacyman'])?$_REQUEST['privacyman']:'0';
 $pmmaxretries = isset($_REQUEST['pmmaxretries'])?$_REQUEST['pmmaxretries']:'';
@@ -239,6 +240,10 @@ if (isset($inroutes)) {
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Signal RINGING")?><span><?php echo _('Some devices or providers require RINGING to be sent before ANSWER. You\'ll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won\'t connect the call.')?></span></a>:</td>
 			<td><input type="checkbox" name="ringing" value="CHECKED" <?php echo $ringing ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
+		</tr>
+		<tr>
+			<td><a href="#" class="info"><?php echo _("Reject Reverse Charges")?><span><?php echo _('On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal')?></span></a>:</td>
+			<td><input type="checkbox" name="reversal" value="CHECKED" <?php echo $reversal ?>  tabindex="<?php echo ++$tabindex;?>"/></td>
 		</tr>
 		<tr>
 			<td><a href="#" class="info"><?php echo _("Pause Before Answer")?><span><?php echo _("An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.")?></span></a>:</td>
