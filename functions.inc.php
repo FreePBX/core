@@ -882,6 +882,7 @@ function core_destinations() {
 				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail', 'id' => 'voicemail');
 				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail', 'id' => 'voicemail');
 				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmi'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (instructions-only)', 'category' => 'Voicemail', 'id' => 'voicemail');
 			}
 		}
 	}
@@ -916,6 +917,7 @@ function core_destinations() {
 						$dests[] = 'ext-local,vmb'.$exten.',1';
 						$dests[] = 'ext-local,vmu'.$exten.',1';
 						$dests[] = 'ext-local,vms'.$exten.',1';
+						$dests[] = 'ext-local,vmi'.$exten.',1';
 
 						return $dests;
 						}
@@ -1673,6 +1675,8 @@ function core_do_get_config($engine) {
 												$ext->add('ext-local', 'vmu'.$exten['extension'], '', new ext_goto('1','vmret'));
 												$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_macro('vm',$vm.',NOMESSAGE,${IVR_RETVM}'));
 												$ext->add('ext-local', 'vms'.$exten['extension'], '', new ext_goto('1','vmret'));
+												$ext->add('ext-local', 'vmi'.$exten['extension'], '', new ext_macro('vm',$vm.',INSTRUCT,${IVR_RETVM}'));
+												$ext->add('ext-local', 'vmi'.$exten['extension'], '', new ext_goto('1','vmret'));
 											} else {
 												// If we return from teh macro, it means we are suppose to return to the IVR
 												//
@@ -3742,10 +3746,15 @@ function core_do_get_config($engine) {
 											$ext->add('macro-vm','s-BUSY', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
 											$ext->add('macro-vm','s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
 
-											$ext->add('macro-vm','s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
+											$ext->add('macro-vm','s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beep only) voicemail'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
+											
+											$ext->add('macro-vm','s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
+											$ext->add('macro-vm','s-INSTRUCT','',new ext_macro('get-vmcontext','${MEXTEN}'));
+											$ext->add('macro-vm','s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
+											$ext->add('macro-vm','s-INSTRUCT','',new ext_goto('1','exit-${VMSTATUS}'));
 
 											$ext->add('macro-vm','s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
 											$ext->add('macro-vm','s-DIRECTDIAL','',new ext_macro('get-vmcontext','${MEXTEN}'));
