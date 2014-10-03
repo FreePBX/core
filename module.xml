@@ -3,14 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>2.11.0.33</version>
+	<version>2.11.0.34</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-        *2.11.0.33* FREEPBX-8064 - escape values when adding or deleting adminstrative users, FREEPBX-7899 - get_config from core should be the last one called, as a result moving this to use a priority in module.xml with a high enough priority
+	        *2.11.0.33* FREEPBX-8064 - escape values when adding or deleting adminstrative users, FREEPBX-7899 - get_config from core should be the last one called, as a result moving this to use a priority in module.xml with a high enough priority
 		*2.11.0.32* #7899 - fix core_get_config priority
 		*2.11.0.31* Part fix for #6923 language not being set.
 		*2.11.0.27* FREEPBX-6914 Notify user when the callrecording module is not installed so they know not to press star 1

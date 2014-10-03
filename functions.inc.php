@@ -4354,6 +4354,8 @@ function core_ampusers_add($username, $password, $extension_low, $extension_high
 }
 
 function core_ampusers_del($username) {
+	global $db;
+
 	$username = $db->escapeSimple($username);
 	
 	$sql = "DELETE FROM ampusers WHERE username = '".$username."'";
