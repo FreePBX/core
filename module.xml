@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*2.11.0.34* Add global for db
 	        *2.11.0.33* FREEPBX-8064 - escape values when adding or deleting adminstrative users, FREEPBX-7899 - get_config from core should be the last one called, as a result moving this to use a priority in module.xml with a high enough priority
 		*2.11.0.32* #7899 - fix core_get_config priority
 		*2.11.0.31* Part fix for #6923 language not being set.
