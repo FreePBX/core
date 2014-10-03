@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1rc5</version>
+	<version>12.0.1rc6</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+	*12.0.1rc6* Add global db back into deleting admins
         *12.0.1rc5* FREEPBX-8064 - escape values when adding or deleting adminstrative users, FREEPBX-7899 - get_config from core should be the last one called, as a result moving this to use a priority in module.xml with a high enough priority
 		*12.0.1rc4* Redo module_hook calls to use static obj
 		*12.0.1rc3* Fixes for custom extensions not showing up in edit mode

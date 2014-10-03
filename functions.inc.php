@@ -4431,6 +4431,8 @@ function core_do_get_config($engine) {
 									}
 
 									function core_ampusers_del($username) {
+										global $db;
+										$username = $db->escapeSimple($username);
 										$sql = "DELETE FROM ampusers WHERE username = '".$username."'";
 										sql($sql,"query");
 									}
