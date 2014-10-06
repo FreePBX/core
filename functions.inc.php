@@ -4425,7 +4425,7 @@ function core_do_get_config($engine) {
 										$sql .= "'".$extension_low."',";
 										$sql .= "'".$extension_high."',";
 										$sql .= "'".$deptname."',";
-										$sql .= "'".implode(";",$sections)."');";
+										$sql .= "'".$sections."');";
 
 										sql($sql,"query");
 									}
