@@ -16,6 +16,35 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->config = $freepbx->Config;
 	}
 
+	public function getActionBar($request) {
+		$buttons = array();
+
+		switch($request['display']) {
+			case 'ampusers':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($_REQUEST['userdisplay'])) {
+					unset($buttons['delete']);
+				}
+			break;
+		}
+		return $buttons;
+	}
 
 	public function install() {
 	}

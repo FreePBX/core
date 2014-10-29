@@ -120,33 +120,27 @@ foreach ($tresults as $tresult) {
 		$extension_low = $user["extension_low"];
 		$deptname = $user["deptname"];
 		$sections = $user["sections"];
-		
-		$tlabel = sprintf(_("Delete User: %s"),$userdisplay);
-		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
-?>
-		<p><a href="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser"><?php echo $label ?></a></p>
-<?php 
 
 	} else {
 		// set defaults
 		$username = "";
 		$password = "";
 		$deptname = "";
-		
+
 		$extension_low = "";
 		$extension_high = "";
-		
+
 		$sections = array("*");
-		
-	
+
+
 		echo "<h2>"._("Add Administrator")."</h2>";
-	} 
+	}
 ?>
-	
-		<form autocomplete="off" name="ampuserEdit" action="config.php" method="get">
+
+		<form autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
-			<input type="hidden" name="action" value=""/>
+			<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
 			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
 			<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
 			<table>
@@ -235,14 +229,8 @@ foreach ($tresults as $tresult) {
 				echo "<option value=\"*\"";
 				if (in_array("*", $sections)) echo " SELECTED";
 				echo ">"._("ALL SECTIONS")."</option>\n";
-?>					
+?>
 					</select>
-				</td>
-			</tr>
-			
-			<tr>
-				<td colspan="2">
-					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')" tabindex="<?php echo ++$tabindex;?>"></h6>
 				</td>
 			</tr>
 			</table>
@@ -250,25 +238,23 @@ foreach ($tresults as $tresult) {
 
 <script language="javascript">
 <!--
+$('input[name=Submit]').click(function() {
+	var theForm = $('.fpbx-submit').attr('name'),
+		username = theForm.username.value,
+		deptname = theForm.deptname.value;
 
-function checkAmpUser(theForm, action) {
-	$username = theForm.username.value;
-	$deptname = theForm.deptname.value;
-	
-	if ($username == "") {
+	if (username == "") {
 		<?php echo "alert('"._("Username must not be blank")."')"?>;
-	} else if (!$username.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
+	} else if (!username.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
 		<?php echo "alert('"._("Username cannot start with a number, and can only contain letters and numbers")."')"?>;
-	} else if ($deptname == "default") {
+	} else if (deptname == "default") {
 		<?php echo "alert('"._("For security reasons, you cannot use the department name default")."')"?>;
-	} else if ($deptname != "" && !$deptname.match('^[a-zA-Z0-9]+$')) {
+	} else if (deptname != "" && !deptname.match('^[a-zA-Z0-9]+$')) {
 		<?php echo "alert('"._("Department name cannot have a space")."')"?>;
 	} else {
-		theForm.action.value = action;
-		theForm.submit();
+		return true;
 	}
-}
-
+	return false;
+});
 //-->
 </script>
-
