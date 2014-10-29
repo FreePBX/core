@@ -7,7 +7,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 <?php
 $extens = core_users_list();
 $description = _("Extension");
-drawListMenu($extens, $skip, $type, $display, $extdisplay, $description);
+drawListMenu($extens, null, null, $display, $extdisplay, $description);
 ?>
 	<br />
 </div>
@@ -27,3 +27,6 @@ if (!empty($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware'])) {
 	</script>
 <?php
 }
+
+global $currentcomponent;
+echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");

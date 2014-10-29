@@ -262,7 +262,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error"));
-		die_freepbx($result->getDebugInfo()); 	
+		die_freepbx($result->getDebugInfo());
 	} else {
 		out(_("added"));
 	}
@@ -300,7 +300,6 @@ function __sort_trunks($a,$b)  {
 }
 
 function __migrate_trunks_to_table() {
-
 	global $db;
 	global $amp_conf;
 
