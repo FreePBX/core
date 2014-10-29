@@ -2,6 +2,41 @@
 
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
+<style>
+.rnav {
+	/*
+		float:right;
+		position: relative;
+		margin-top:10px;
+		right: 1.5%;
+		margin-left: 2%;
+		*/
+	right: 1.5%;
+	position: absolute;
+	background-color: white;
+}
+.start {
+	width: 60%;
+}
+.fa.fa-question-circle {
+	color: #0070a3;
+	cursor: pointer;
+	height: 10px;
+	width: 10px;
+	font-size: small;
+	vertical-align: super;
+	display: inline-block;
+	text-align: center;
+	margin: 2px;
+	padding-right: 1.5px;
+	padding-top: 1px;
+	padding-left: 1px;
+	font-weight: normal;
+}
+.help-block {
+	display: none;
+}
+</style>
 
 <div class="rnav">
 <?php
@@ -28,5 +63,51 @@ if (!empty($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware'])) {
 <?php
 }
 
+$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
+$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+
 global $currentcomponent;
-echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
+if(empty($_REQUEST['extdisplay'])) {
+	?>
+	<br>
+	<div class="container pull-left start">
+		<form role="form">
+			<div class="form-group">
+				<label for="deviceselect"><h3><?php echo _("Please select your Device below then click Submit"); ?> <i class="fa fa-question-circle"></i></h3></label>
+				<select class="form-control" id="deviceselect">
+					<option><?php echo _("Generic PJSIP Device")?></option>
+					<option><?php echo _("Generic CHAN SIP Device")?></option>
+					<option><?php echo _("Generic IAX2 Device")?></option>
+					<option><?php echo _("Generic DAHDi Device")?></option>
+					<option><?php echo _("Other (Custom) Device")?></option>
+					<option><?php echo _("None (virtual exten)")?></option>
+				</select>
+				<span class="help-block">Help Text</span>
+			</div>
+		</form>
+	</div>
+	<script>
+		$(".container .fa.fa-question-circle").hover(function(){
+			var el = $(this).parents(".container").find(".help-block");
+			el.fadeIn("fast");
+		}, function(){
+			var el = $(this).parents(".container").find(".help-block");
+			var input = $(this).parents(".container").find(".form-control");
+			if(input.length && !input.is(":focus")) {
+				el.fadeOut("fast");
+			}
+		})
+		$(".container select").focus(function() {
+			var el = $(this).parents(".container").find(".help-block");
+			el.fadeIn("fast");
+		});
+		$(".container select").blur(function() {
+			var el = $(this).parents(".container").find(".help-block");
+			el.fadeOut("fast");
+		});
+	</script>
+<?php
+} else {
+	echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
+}

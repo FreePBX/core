@@ -7432,6 +7432,7 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		// Devices list
+		/*
 		if ($_SESSION["AMP_user"]->checkSection('999')) {
 			$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 			if($sipdriver == 'both') {
@@ -7450,7 +7451,7 @@ function core_devices_configpageinit($dispnum) {
 			$currentcomponent->addoptlistitem('devicelist', 'virtual', _("None (virtual exten)"));
 		}
 		$currentcomponent->setoptlistopts('devicelist', 'sort', false);
-
+		*/
 
 		// Option lists used by the gui
 		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', _("Fixed"));
@@ -7493,7 +7494,7 @@ function core_devices_configpageload() {
 			$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
-
+		/*
 		if ( $display != 'extensions') {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
 		} else {
@@ -7501,7 +7502,7 @@ function core_devices_configpageload() {
 		}
 		$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
 		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
-
+		*/
 	} else {
 
 		$deviceInfo = array();

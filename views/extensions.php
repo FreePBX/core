@@ -114,7 +114,7 @@
     var id = $(this).data("name");
     $("#" + id).removeClass("hidden");
   });
-  $(".fa.fa-question-circle").hover(function(){
+  $(".ext-container .fa.fa-question-circle").hover(function(){
     var el = $(this).parents(".row").find(".help-block");
     el.fadeIn("fast");
   }, function(){
