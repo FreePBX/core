@@ -6716,6 +6716,7 @@ function core_do_get_config($engine) {
 
 												if ( $display == 'extensions' ) {
 													$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
+													/*
 													if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 														$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
 														$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
@@ -6726,6 +6727,7 @@ function core_do_get_config($engine) {
 															$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
 														}
 													}
+													*/
 												} else {
 													$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 													if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
@@ -7598,7 +7600,7 @@ function core_devices_configpageload() {
 
 			$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
 			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$devinfo_techd."</strong>",$extrac).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
-			$currentcomponent->addguielem($section, new gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4);
+			$currentcomponent->addguielem($section, new gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4, null, "Advanced");
 			// We need to scream loudly if this device is using a channel driver that's disabled.
 			if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
 				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
@@ -7633,7 +7635,7 @@ function core_devices_configpageload() {
 
 					// We compare the existing secret against what might be in the put to detect changes when validating
 					if ($devopt == "secret") {
-						$currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
+						$currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, "Advanced");
 						if ($devoptcurrent == '' && empty($extdisplay)) {
 							$devoptcurrent = md5(uniqid());
 						}
@@ -7643,14 +7645,14 @@ function core_devices_configpageload() {
 						// Added optional selectbox to enable the unsupported misdn module
 						$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 						if ($type == 'select') {
-							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4, null, "Advanced");
 						} elseif($type == 'text') {
-							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4, null, "Advanced");
 						} elseif($type == 'button') {
-							$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4, null, "Advanced");
 						}
 					} else { // add so only basic
-						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4, null, "Advanced");
 					}
 				}
 			}
