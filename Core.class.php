@@ -42,6 +42,28 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 			break;
+			case 'dahdichandids':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($_REQUEST['extdisplay'])) {
+					unset($buttons['delete']);
+				}
+			break;
 		}
 		return $buttons;
 	}
