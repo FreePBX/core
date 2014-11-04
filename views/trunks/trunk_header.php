@@ -1,12 +1,5 @@
 <h2><?php echo sprintf(_("%s %s Trunk"),(empty($extdisplay) ? _('Add'): _('Edit')),$upper_tech)?></h2>
 <?php if(!empty($extdisplay)) {?>
-	<p>
-		<a href="config.php?display=trunks&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk">
-			<span>
-				<img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/><?php echo sprintf(_('Delete Trunk %s'),substr($trunk_name,0,20))?>
-			</span>
-		</a>
-	</p>
 	<?php if ($num_routes > 0) { ?>
 		<a href=# class="info"><?php echo _("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"))?>
 			<span>
@@ -27,7 +20,7 @@
 <?php if(!empty($helptext)) {?>
 	<div class="alert alert-warning"><?php echo $helptext?></div>
 <?php } ?>
-		<form enctype="multipart/form-data" name="trunkEdit" id="trunkEdit" action="config.php" method="post" onsubmit="return trunkEdit_onsubmit('<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>');">
+		<form enctype="multipart/form-data" class="fpbx-submit" name="trunkEdit" id="trunkEdit" action="config.php" method="post"  data-fpbx-delete="config.php?display=trunks&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" name="action" value="<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>"/>
@@ -45,14 +38,14 @@
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("Descriptive Name for this Trunk")?></span></a>: 
+					<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("Descriptive Name for this Trunk")?></span></a>:
 				</td><td>
 					<input type="text" size="30" name="trunk_name" value="<?php echo $trunk_name;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound CallerID")?><span><?php echo _("CallerID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound CallerID")?><span><?php echo _("CallerID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span></a>:
 				</td><td>
 					<input type="text" size="30" name="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -80,9 +73,9 @@
 				<td>
 <?php if ($tech == "sip" || substr($tech,0,3) == "iax") {
 		$pr_tech = ($tech == "iax") ? "iax2":$tech; ?>
-					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$pr_tech-$channelid":"from-trunk-[trunkname]"))?></span></a>: 
+					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf) Leave blank to specify no maximum."),((isset($channelid) && trim($channelid)!="")?"from-trunk-$pr_tech-$channelid":"from-trunk-[trunkname]"))?></span></a>:
 <?php } else { ?>
-					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo _("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. Inbound calls are not counted against the maximum. Leave blank to specify no maximum.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Maximum Channels")?><span><?php echo _("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. Inbound calls are not counted against the maximum. Leave blank to specify no maximum.")?></span></a>:
 <?php } ?>
 				</td><td>
 					<input type="text" size="3" name="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>" tabindex="<?php echo ++$tabindex;?>"/>
@@ -153,7 +146,7 @@
       <hr></h4></td>
     </tr>
 
-    
+
 <?php
   $pp_tit = _("prepend");
   $pf_tit = _("prefix");
@@ -171,11 +164,11 @@
 	    <tr>
 	      <td colspan="2">
 	        (<input placeholder="f<?php echo $pp_tit ?>" type="text" size="10" id="prepend_digit_<?php echo $idx?>" name="prepend_digit[<?php echo $idx?>]" class="dial-pattern <?php echo $dpt_class ?>" value="<?php echo $pattern['prepend_digits'] ?>" tabindex="<?php echo $tabindex++ ?>">) +
-	    <?php 
+	    <?php
 	    $dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
 		?>
 	        <input placeholder="<?php echo $pf_tit ?>" type="text" size="6" id="pattern_prefix_<?php echo $idx?>" name="pattern_prefix[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_prefix'] ?>" tabindex="<?php echo $tabindex++ ?>"> |
-	    <?php 
+	    <?php
 	   $dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
 		?>
 	    <input placeholder="<?php echo $mp_tit ?>" type="text" size="16" id="pattern_pass_<?php echo $idx?>" name="pattern_pass[<?php echo $idx?>]" class="<?php echo $dpt_class ?>" value="<?php echo $pattern['match_pattern_pass'] ?>" tabindex="<?php echo $tabindex++ ?>">
@@ -198,7 +191,7 @@
 
       </td>
     </tr>
-    <tr id="last_row"></tr> 
+    <tr id="last_row"></tr>
     </table>
 </div>
 <?php if(count($dialpattern_array) > 500) {?>
@@ -248,7 +241,7 @@
 				</td>
 			</tr>
 			<script language="javascript">
-			
+
 			function disable_field(field, field_enable) {
 			    if (field_enable.checked) {
 				field.style.backgroundColor = '#FFF';
@@ -272,15 +265,15 @@
 			}
 
 			function populateLookup(digits) {
-<?php 
+<?php
 	if (function_exists("curl_init")) { // curl is installed
-?>				
+?>
 				//var npanxx = prompt("What is your areacode + prefix (NPA-NXX)?", document.getElementById('areacode').value);
 				do {
 					var npanxx = <?php echo 'prompt("'._("What is your areacode + prefix (NPA-NXX)?\\n\\n(Note: this database contains North American numbers only, and is not guaranteed to be 100% accurate. You will still have the option of modifying results.)\\n\\nThis may take a few seconds.".'")')?>;
 					if (npanxx == null) return;
 				} while (!npanxx.match("^[2-9][0-9][0-9][-]?[2-9][0-9][0-9]$") && <?php echo '!alert("'._("Invalid NPA-NXX. Must be of the format \'NXX-NXX\'").'")'?>);
-				
+
 				document.getElementById('npanxx').value = npanxx;
 				if (digits == 10) {
 					document.trunkEdit.action.value = "populatenpanxx10";
@@ -289,21 +282,21 @@
 				}
         clearPatterns();
 				document.trunkEdit.submit();
-<?php  
+<?php
 	} else { // curl is not installed
 ?>
 				<?php echo 'alert("'._("Error: Cannot continue!\\n\\nPrefix lookup requires cURL support in PHP on the server. Please install or enable cURL support in your PHP installation to use this function. See http://www.php.net/curl for more information.").'")'?>;
-<?php 
+<?php
 	}
 ?>
 			}
-			
+
 			function populateAlwaysAdd() {
 				do {
           var localpattern = <?php echo 'prompt("'._("What is the local dialing pattern?\\n\\n(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"<?php echo _("NXXXXXX")?>");
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
-				
+
 				do {
 					var localprefix = <?php echo 'prompt("'._("What prefix should be added to the dialing pattern?\\n\\n(ie. for US/CAN, 1+areacode, ie, \'1613\')?").'")'?>;
 					if (localprefix == null) return;
@@ -311,18 +304,18 @@
 
         return addCustomField(localprefix,'',localpattern,$("#last_row"));
 			}
-			
+
 			function populateRemove() {
 				do {
 					var localprefix = <?php echo 'prompt("'._("What prefix should be removed from the number?\\n\\n(ie. for US/CAN, 1+areacode, ie, \'1613\')").'")'?>;
 					if (localprefix == null) return;
 				} while (!localprefix.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._('Invalid prefix. Only 0-9, #, *, Z, N, and X are allowed.').'")'?>);
-				
+
 				do {
           var localpattern = <?php echo 'prompt("'._("What is the dialing pattern for local numbers after")?> "+localprefix+"? \n\n<?php echo _("(ie. NXXNXXXXXX for US/CAN 10-digit dialing, NXXXXXX for 7-digit)").'"'?>,"<?php echo _("NXXXXXX")?>");
 					if (localpattern == null) return;
 				} while (!localpattern.match('^[0-9#*ZXN\.]+$') && <?php echo '!alert("'._("Invalid pattern. Only 0-9, #, *, Z, N, X and . are allowed.").'")'?>);
-				
+
         return addCustomField('',localprefix,localpattern,$("#last_row"));
 			}
 
@@ -336,10 +329,10 @@
         var localprepend = <?php echo 'prompt("'._("Number to dial when calling directory assistance on this trunk").'"'?>,"<?php echo '' ?>");
 					if (localprepend == null) return;
 				} while (!localprepend.match('^[0-9#*]+$') && <?php echo '!alert("'._('Invalid number. Only 0-9, #,  and * are allowed.').'")'?>);
-				
+
         return addCustomField(localprepend,localprefix,'',$("#last_row"));
 			}
-			
+
 			function changeAutoPop() {
         var idx = false;
         // hide the file box if nothing was set
@@ -382,7 +375,7 @@
 
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dial tone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Outbound Dial Prefix")?><span><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dial tone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span></a>:
 				</td><td>
 					<input type="text" size="8" name="dialoutprefix" id="dialoutprefix" value="<?php echo htmlspecialchars($dialoutprefix) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>

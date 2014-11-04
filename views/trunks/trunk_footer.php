@@ -1,12 +1,4 @@
-			<tr>
-				<td colspan="2">
-          <h6>
-            <input name="Submit" type="submit" value="<?php echo _("Submit Changes")?>" tabindex="<?php echo ++$tabindex;?>">
-            <input name="copytrunk" type="submit" value="<?php echo _("Duplicate Trunk");?>"/>
-            <!--input type="button" id="page_reload" value="<?php echo _("Refresh Page");?>"/-->
-          </h6>
-				</td>
-			</tr>
+
 			</table>
 
 <?php
@@ -145,106 +137,112 @@ function validatePatterns() {
 
 document.trunkEdit.trunk_name.focus();
 
-function trunkEdit_onsubmit(act) {
-	var theForm = document.trunkEdit;
+$(document).ready(function() {
+	$('#submit, #duplciate').click(function() {
+		var theForm = document.trunkEdit;
 
-	var tech = '<?php echo !empty($tech) ? strtolower($tech) : strtolower($_REQUEST['tech']) ?>';
-	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
-	var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
-	var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
-	var msgInvalidOutboundDialPrefix = "<?php echo _('The Outbound Dial Prefix contains non-standard characters. If these are intentional the press OK to continue.'); ?>";
-	var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
-	var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>";
-	var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
-	var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
-	var msgCIDValueRequired = "<?php echo _('You must define an Outbound CallerID when Choosing this CID Options value'); ?>";
-	var msgCIDValueEmpty = "<?php echo _('It is highly recommended that you define an Outbound CallerID on all trunks, undefined behavior can result when nothing is specified. The CID Options can control when this CID is used. Do you still want to continue?'); ?>";
-	var msgInvalidServerURI = "<?php echo _('You Must define a Server URI')?>";
-	var msgInvalidClientURI = "<?php echo _('You must defined a Client URI')?>";
-	var msgInvalidAORContact = "<?php echo _('You must define a(n) AOR Contact')?>";
-	var msgInvalidSIPServer = "<?php echo _('You must define a SIP Server')?>";
-	var msgInvalidSIPServerPort = "<?php echo _('You must define a SIP Port')?>";
+		var tech = '<?php echo !empty($tech) ? strtolower($tech) : strtolower($_REQUEST['tech']) ?>';
+		var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
+		var msgInvalidMaxChans = "<?php echo _('Invalid Maximum Channels'); ?>";
+		var msgInvalidDialRules = "<?php echo _('Invalid Dial Rules'); ?>";
+		var msgInvalidOutboundDialPrefix = "<?php echo _('The Outbound Dial Prefix contains non-standard characters. If these are intentional the press OK to continue.'); ?>";
+		var msgInvalidTrunkName = "<?php echo _('Invalid Trunk Name entered'); ?>";
+		var msgInvalidChannelName = "<?php echo _('Invalid Custom Dial String entered'); ?>";
+		var msgInvalidTrunkAndUserSame = "<?php echo _('Trunk Name and User Context cannot be set to the same value'); ?>";
+		var msgConfirmBlankContext = "<?php echo _('User Context was left blank and User Details will not be saved!'); ?>";
+		var msgCIDValueRequired = "<?php echo _('You must define an Outbound CallerID when Choosing this CID Options value'); ?>";
+		var msgCIDValueEmpty = "<?php echo _('It is highly recommended that you define an Outbound CallerID on all trunks, undefined behavior can result when nothing is specified. The CID Options can control when this CID is used. Do you still want to continue?'); ?>";
+		var msgInvalidServerURI = "<?php echo _('You Must define a Server URI')?>";
+		var msgInvalidClientURI = "<?php echo _('You must defined a Client URI')?>";
+		var msgInvalidAORContact = "<?php echo _('You must define a(n) AOR Contact')?>";
+		var msgInvalidSIPServer = "<?php echo _('You must define a SIP Server')?>";
+		var msgInvalidSIPServerPort = "<?php echo _('You must define a SIP Port')?>";
 
-	defaultEmptyOK = true;
+		defaultEmptyOK = true;
 
-	if (isEmpty($.trim($('#trunkEdit input[name="outcid"]').val()))) {
-		if ($('#trunkEdit input[name="keepcid"]').val() == 'on' || $('#trunkEdit input[name="keepcid"]').val() == 'all') {
-			return warnInvalid(theForm.outcid, msgCIDValueRequired);
-		} else {
-			if (confirm(msgCIDValueEmpty) == false) {
+		if (isEmpty($.trim($('#trunkEdit input[name="outcid"]').val()))) {
+			if ($('#trunkEdit input[name="keepcid"]').val() == 'on' || $('#trunkEdit input[name="keepcid"]').val() == 'all') {
+				return warnInvalid(theForm.outcid, msgCIDValueRequired);
+			} else {
+				if (confirm(msgCIDValueEmpty) == false) {
+					return false;
+				}
+			}
+		}
+
+		if (!isCallerID($('#trunkEdit input[name="outcid"]').val()))
+			return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
+
+		if (!isInteger($('#trunkEdit input[name="maxchans"]').val()))
+			return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
+
+		if (!isDialIdentifierSpecial($('#dialoutprefix').val())) {
+			if (confirm(msgInvalidOutboundDialPrefix) == false) {
+				$('#dialoutprefix').focus();
 				return false;
 			}
 		}
-	}
 
-	if (!isCallerID($('#trunkEdit input[name="outcid"]').val()))
-		return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
+		if (isEmpty($.trim($('#trunkEdit input[name="trunk_name"]').val()))) {
+			return warnInvalid(theForm.trunk_name, msgInvalidTrunkName);
+		}
 
-	if (!isInteger($('#trunkEdit input[name="maxchans"]').val()))
-		return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
+		if(tech == 'pjsip') {
+			console.log('OK');
+			if($('#configmode').val() == 'advanced') {
+				if (isEmpty($('#trunkEdit input[name="client_uri"]').val())) {
+					return warnInvalid(theForm.client_uri, msgInvalidClientURI);
+				}
+				if (isEmpty($('#trunkEdit input[name="server_uri"]').val())) {
+					return warnInvalid(theForm.server_uri, msgInvalidServerURI);
+				}
+				if (isEmpty($('#trunkEdit input[name="aor_contact"]').val())) {
+					return warnInvalid(theForm.aor_contact, msgInvalidAORContact);
+				}
+			}
+			if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
+				return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
+			}
+			if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
+				return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
+			}
+		}
 
-	if (!isDialIdentifierSpecial($('#dialoutprefix').val())) {
-		if (confirm(msgInvalidOutboundDialPrefix) == false) {
-			$('#dialoutprefix').focus();
+		if(tech != 'enum' && tech != 'custom' && tech != 'dundi' && tech != 'pjsip') {
+			defaultEmptyOK = true;
+			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+				return warnInvalid(theForm.channelid, msgInvalidTrunkName);
+
+			if (theForm.channelid.value == theForm.usercontext.value)
+				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+		} else if (tech == 'custom' || tech == 'dundi') {
+			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+				return warnInvalid(theForm.channelid, msgInvalidChannelName);
+
+			if (theForm.channelid.value == theForm.usercontext.value)
+				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+		}
+
+		if(tech == 'sip' || tech.substr(0,3) == 'iax') {
+			if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && (!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) && (theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
+				if (confirm(msgConfirmBlankContext) == false)
+				return false;
+			}
+		}
+
+		clearPatterns();
+		if (validatePatterns()) {
+			if ($(this).('name') === 'duplicate') {
+				theForm.action.value = 'copytrunk';
+			} else {
+				theForm.action.value = act;
+			}
+			return true;
+		} else {
 			return false;
 		}
-	}
-
-	if (isEmpty($.trim($('#trunkEdit input[name="trunk_name"]').val()))) {
-		return warnInvalid(theForm.trunk_name, msgInvalidTrunkName);
-	}
-
-	if(tech == 'pjsip') {
-		console.log('OK');
-		if($('#configmode').val() == 'advanced') {
-			if (isEmpty($('#trunkEdit input[name="client_uri"]').val())) {
-				return warnInvalid(theForm.client_uri, msgInvalidClientURI);
-			}
-			if (isEmpty($('#trunkEdit input[name="server_uri"]').val())) {
-				return warnInvalid(theForm.server_uri, msgInvalidServerURI);
-			}
-			if (isEmpty($('#trunkEdit input[name="aor_contact"]').val())) {
-				return warnInvalid(theForm.aor_contact, msgInvalidAORContact);
-			}
-		}
-		if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
-			return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
-		}
-		if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
-			return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
-		}
-	}
-
-	if(tech != 'enum' && tech != 'custom' && tech != 'dundi' && tech != 'pjsip') {
-		defaultEmptyOK = true;
-		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
-			return warnInvalid(theForm.channelid, msgInvalidTrunkName);
-
-		if (theForm.channelid.value == theForm.usercontext.value)
-			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-	} else if (tech == 'custom' || tech == 'dundi') {
-		if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
-			return warnInvalid(theForm.channelid, msgInvalidChannelName);
-
-		if (theForm.channelid.value == theForm.usercontext.value)
-			return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-	}
-
-	if(tech == 'sip' || tech.substr(0,3) == 'iax') {
-		if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && (!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) && (theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
-			if (confirm(msgConfirmBlankContext) == false)
-			return false;
-		}
-	}
-
-	clearPatterns();
-	if (validatePatterns()) {
-		theForm.action.value = act;
-		return true;
-	} else {
-		return false;
-	}
-}
+	});
+});
 
 function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)
     var i;
