@@ -93,8 +93,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Delete')
 					),
 					'duplicate' => array(
-						'name' => 'copyroute',
-						'id' => 'copyroute',
+						'name' => 'duplicate',
+						'id' => 'duplicate',
 						'value' => _('Duplicate')
 					),
 					'reset' => array(

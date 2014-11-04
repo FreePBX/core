@@ -413,12 +413,12 @@ foreach (core_trunks_listbyid() as $temp) {
 	$trunkstate[$temp['trunkid']] = $temp['disabled'];
 }
 
-$action = (empty($extdisplay) ? "addroute" : "editroute" );
+$formAction = (empty($extdisplay) ? "addroute" : "editroute" );
 ?>
-	<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="config.php?display=routing" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute" data-action=<?php echo $action ?>>
+	<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute">
 		<input type="hidden" name="display" value="<?php echo $display?>"/>
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
-		<input type="hidden" id="action" name="action" value=""/>
+		<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 
 		<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
 		<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
@@ -889,8 +889,8 @@ function showDisable(key) {
 	}
 }
 $(document).ready(function() {
-  $('#submit, #copyroute').click(function() {
-    var act = $('.fpbx-submit').data('action');
+  $('#submit, #duplicate').click(function() {
+
   	var msgInvalidRouteName = "<?php echo _('Route name is invalid, please try again'); ?>";
   	var msgInvalidRoutePwd = "<?php echo _('Route password must be numeric or leave blank to disable'); ?>";
   	var msgInvalidOutboundCID = "<?php echo _('Invalid Outbound CallerID'); ?>";
@@ -911,7 +911,9 @@ $(document).ready(function() {
   		return warnInvalid(theForm.dialpattern, msgInvalidDialPattern);
       */
 
-    theForm.action.value = act;
+    if ($(this).attr('name') === 'duplicate') {
+      theForm.action.value = 'copyroute';
+    }
 
     clearPatterns();
     return validatePatterns();
