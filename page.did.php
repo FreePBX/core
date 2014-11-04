@@ -150,12 +150,6 @@ if (isset($inroutes)) {
 <?php
       }
 
-    if ($delete_url) {
-		  $delURL = '?'.$_SERVER['QUERY_STRING']."&action=delIncoming&didfilter=$didfilter&rnavsort=$rnavsort";
-		  $tlabel = sprintf(_("Delete Route %s"),!empty($description)?$description:$extdisplay);
-		  $label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
-		  echo "<p><a href=".$delURL.">".$label."</a></p>";
-    }
 		// If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
 		//
 		$did_dest = explode(',',$destination);
@@ -181,7 +175,7 @@ if (isset($inroutes)) {
 <?php
 	}
 ?>
-		<form name="editGRP" action="" method="post" onsubmit="return editGRP_onsubmit();">
+		<form name="editGRP" class="fpbx-submit" action="" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
 		<input type="hidden" name="display" value="<?php echo $dispnum?>">
 		<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 		<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -298,12 +292,6 @@ if (isset($inroutes)) {
 //draw goto selects
 echo drawselects(isset($destination)?$destination:null,0);
 ?>
-		<tr>
-			<td colspan="2">
-				<h6><input name="Submit" type="submit" value="<?php echo _("Submit")?>" tabindex="<?php echo ++$tabindex;?>">&nbsp;&nbsp;
-				<input name="submitclear" type="submit" value="<?php echo _("Clear Destination & Submit")?>" ></h6>
-			</td>
-		</tr>
 		</table>
 <script language="javascript">
 <!--
@@ -311,8 +299,7 @@ echo drawselects(isset($destination)?$destination:null,0);
 var theForm = document.editGRP;
 
 theForm.extension.focus();
-
-function editGRP_onsubmit() {
+$('#submit').click(function() {
 	var msgInvalidDIDNumb = "<?php echo _('Please enter a valid DID Number'); ?>";
 	var msgInvalidCIDNum = "<?php echo _('Please enter a valid CallerID Number'); ?>";
 	var msgInvalidFaxEmail = "<?php echo _('Please enter a valid Fax Email or leave it empty to use the default'); ?>";

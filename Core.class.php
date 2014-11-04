@@ -63,6 +63,54 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($_REQUEST['extdisplay'])) {
 					unset($buttons['delete']);
 				}
+			case 'did':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($_REQUEST['extdisplay'])) {
+					unset($buttons['delete']);
+				}
+			break;
+			case 'routing':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'duplicate' => array(
+						'name' => 'copyroute',
+						'id' => 'copyroute',
+						'value' => _('Duplicate')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($_REQUEST['extdisplay'])) {
+					unset($buttons['delete'], $button['duplicate']);
+				}
 			break;
 		}
 		return $buttons;
