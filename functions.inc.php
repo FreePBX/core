@@ -1520,13 +1520,13 @@ function core_do_get_config($engine) {
 											if ($item['ringing'] === "CHECKED") {
 												$ext->add($context, $exten, '', new ext_ringing(''));
 											}
-											
+
 											//Block collect Calls
 											if ($item['reversal'] === "CHECKED") {
 												$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','TRUE'));
 											}
 											$ext->add($context, $exten, '',new ext_gotoif('$["${__REVERSAL_REJECT}"="TRUE" & "${CHANNEL(reversecharge)}"="1" ]','macro-hangupcall'));
- 					
+
 											if ($item['delay_answer']) {
 												$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
 											}
@@ -3757,7 +3757,7 @@ function core_do_get_config($engine) {
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
-											
+
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_macro('get-vmcontext','${MEXTEN}'));
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
@@ -6716,6 +6716,7 @@ function core_do_get_config($engine) {
 
 												if ( $display == 'extensions' ) {
 													$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
+													/*
 													if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 														$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
 														$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
@@ -6726,6 +6727,7 @@ function core_do_get_config($engine) {
 															$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
 														}
 													}
+													*/
 												} else {
 													$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 													if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
@@ -6763,16 +6765,18 @@ function core_do_get_config($engine) {
 
 											if ( $display == 'extensions' ) {
 												$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
+												$category = _("General");
 											} else {
 												$section = ($extdisplay ? _("Edit User") : _("Add User"));
+												$category = _("General");
 											}
 											if ( trim($extdisplay) != '' ) {
-												$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2);
+												$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2, null, $category);
 											} else {
-												$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, _("User Extension"), _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3);
+												$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, _("User Extension"), _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3, null, $category);
 											}
 											if ( $display != 'extensions' ) {
-												$currentcomponent->addguielem($section, new gui_password('password', $password, _("User Password"), _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true));
+												$currentcomponent->addguielem($section, new gui_password('password', $password, _("User Password"), _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true), $category);
 												// extra JS function check required for blank password warning -- call last in the onsubmit() function
 												$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 											}
@@ -6805,10 +6809,10 @@ if (!ajax_result) {
 	return false;
 }", 9);
 }
-$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '!isAlphanumeric() || isWhitespace()', $msgInvalidDispName, false));
+$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '!isAlphanumeric() || isWhitespace()', $msgInvalidDispName, false), $category);
 $cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
-$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false));
-$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")));
+$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false), "Advanced");
+$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")), "Advanced");
 
 // If user mode, list devices associated with this user
 //
@@ -6837,14 +6841,15 @@ if ($display == 'users' && trim($extdisplay != '')) {
 }
 
 $section = _("Extension Options");
-$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3);
+$category = _("Advanced");
+$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3, null, $category);
 $ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 
 $dialopts = isset($dialopts) ? $dialopts : false;
 $disable_dialopts = $dialopts === false;
-$currentcomponent->addguielem($section, new gui_textbox_check('dialopts', $dialopts, _("Asterisk Dial Options"), _("Cryptic Asterisk Dial Options, check to customize for this extension or un-check to use system defaults set in Advanced Options. These will not apply to trunk options which are configured with the trunk."), '', '', true, 0, $disable_dialopts, '<small>' . _("Override") . '</small>', $amp_conf['DIAL_OPTIONS'], true));
+$currentcomponent->addguielem($section, new gui_textbox_check('dialopts', $dialopts, _("Asterisk Dial Options"), _("Cryptic Asterisk Dial Options, check to customize for this extension or un-check to use system defaults set in Advanced Options. These will not apply to trunk options which are configured with the trunk."), '', '', true, 0, $disable_dialopts, '<small>' . _("Override") . '</small>', $amp_conf['DIAL_OPTIONS'], true), $category);
 
-$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in Advanced Settings. If no voicemail is configured this will be ignored."), false));
+$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in Advanced Settings. If no voicemail is configured this will be ignored."), false), $category);
 
 if (!isset($cfringtimer)) {
 	if ($amp_conf['CFRINGTIMERDEFAULT'] < 0 || ctype_digit($amp_conf['CFRINGTIMERDEFAULT'])) {
@@ -6853,7 +6858,7 @@ if (!isset($cfringtimer)) {
 		$cfringtimer = 0;
 	}
 }
-$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the current Ring Time. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false));
+$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the current Ring Time. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false), $category);
 if (!isset($callwaiting)) {
 	if ($amp_conf['ENABLECW']) {
 		$callwaiting = 'enabled';
@@ -6863,20 +6868,21 @@ if (!isset($callwaiting)) {
 }
 
 $concurrency_limit = isset($concurrency_limit) ? $concurrency_limit : $amp_conf['CONCURRENCYLIMITDEFAULT'];
-$currentcomponent->addguielem($section, new gui_selectbox('concurrency_limit', $currentcomponent->getoptlist('concurrency_limit'), $concurrency_limit, _("Outbound Concurrency Limit"), _("Maximum number of outbound simultaneous calls that an extension can make. This is also very useful as a Security Protection against a system that has been compromised. It will limit the number of simultaneous calls that can be made on the compromised extension."), false));
+$currentcomponent->addguielem($section, new gui_selectbox('concurrency_limit', $currentcomponent->getoptlist('concurrency_limit'), $concurrency_limit, _("Outbound Concurrency Limit"), _("Maximum number of outbound simultaneous calls that an extension can make. This is also very useful as a Security Protection against a system that has been compromised. It will limit the number of simultaneous calls that can be made on the compromised extension."), false), $category);
 
 $currentcomponent->addguielem($section, new gui_selectbox('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false));
 if (function_exists('paging_get_config')) {
 	$answermode = isset($answermode) ? $answermode : $amp_conf['DEFAULT_INTERNAL_AUTO_ANSWER'];
-	$currentcomponent->addguielem($section, new gui_selectbox('answermode', $currentcomponent->getoptlist('answermode'), $answermode, _("Internal Auto Answer"), _("When set to Intercom, calls to this extension/user from other internal users act as if they were intercom calls meaning they will be auto-answered if the endpoint supports this feature and the system is configured to operate in this mode. All the normal white list and black list settings will be honored if they are set. External calls will still ring as normal, as will certain other circumstances such as blind transfers and when a Follow Me is configured and enabled. If Disabled, the phone rings as a normal phone."), false));
+	$currentcomponent->addguielem($section, new gui_selectbox('answermode', $currentcomponent->getoptlist('answermode'), $answermode, _("Internal Auto Answer"), _("When set to Intercom, calls to this extension/user from other internal users act as if they were intercom calls meaning they will be auto-answered if the endpoint supports this feature and the system is configured to operate in this mode. All the normal white list and black list settings will be honored if they are set. External calls will still ring as normal, as will certain other circumstances such as blind transfers and when a Follow Me is configured and enabled. If Disabled, the phone rings as a normal phone."), false), $category);
 }
-$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their CallerID once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that CallerID. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerID."), false));
-$currentcomponent->addguielem($section, new gui_selectbox('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false));
+$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their CallerID once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that CallerID. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerID."), false), $category);
+$currentcomponent->addguielem($section, new gui_selectbox('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false), $category);
 
 $section = _("Assigned DID/CID");
-$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4);
-$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4);
-$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4);
+$category = _("Advanced");
+$currentcomponent->addguielem($section, new gui_textbox('newdid_name', $newdid_name, _("DID Description"), _("A description for this DID, such as \"Fax\"")), 4, null, $category);
+$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4, null, $category);
+$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4, null, $category);
 
 $dids = core_did_list('extension');
 $did_count = 0;
@@ -7428,6 +7434,7 @@ function core_devices_configpageinit($dispnum) {
 		unset($tmparr);
 
 		// Devices list
+		/*
 		if ($_SESSION["AMP_user"]->checkSection('999')) {
 			$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 			if($sipdriver == 'both') {
@@ -7446,7 +7453,7 @@ function core_devices_configpageinit($dispnum) {
 			$currentcomponent->addoptlistitem('devicelist', 'virtual', _("None (virtual exten)"));
 		}
 		$currentcomponent->setoptlistopts('devicelist', 'sort', false);
-
+		*/
 
 		// Option lists used by the gui
 		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', _("Fixed"));
@@ -7489,7 +7496,7 @@ function core_devices_configpageload() {
 			$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
-
+		/*
 		if ( $display != 'extensions') {
 			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
 		} else {
@@ -7497,7 +7504,7 @@ function core_devices_configpageload() {
 		}
 		$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
 		$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
-
+		*/
 	} else {
 
 		$deviceInfo = array();
@@ -7593,7 +7600,7 @@ function core_devices_configpageload() {
 
 			$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
 			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$devinfo_techd."</strong>",$extrac).(strtoupper($devinfo_tech) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
-			$currentcomponent->addguielem($section, new gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4);
+			$currentcomponent->addguielem($section, new gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4, null, "Advanced");
 			// We need to scream loudly if this device is using a channel driver that's disabled.
 			if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
 				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
@@ -7628,7 +7635,7 @@ function core_devices_configpageload() {
 
 					// We compare the existing secret against what might be in the put to detect changes when validating
 					if ($devopt == "secret") {
-						$currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4);
+						$currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, "Advanced");
 						if ($devoptcurrent == '' && empty($extdisplay)) {
 							$devoptcurrent = md5(uniqid());
 						}
@@ -7638,14 +7645,14 @@ function core_devices_configpageload() {
 						// Added optional selectbox to enable the unsupported misdn module
 						$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 						if ($type == 'select') {
-							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4, null, "Advanced");
 						} elseif($type == 'text') {
-							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4, null, "Advanced");
 						} elseif($type == 'button') {
-							$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4);
+							$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4, null, "Advanced");
 						}
 					} else { // add so only basic
-						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4);
+						$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4, null, "Advanced");
 					}
 				}
 			}
