@@ -63,7 +63,7 @@
 }
 </style>
 <div class="ext-container">
-  <form role="form">
+  <form class="popover-form fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="config.php?type=danger&display=extensions&extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&action=del" role="form">
     <?php foreach ( array_keys($top) as $sortorder ) {
             foreach ( array_keys($top[$sortorder]) as $idx ) {
               $elem = $top[$sortorder][$idx];
