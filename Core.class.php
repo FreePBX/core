@@ -112,6 +112,61 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete'], $button['duplicate']);
 				}
 			break;
+			case 'trunks':
+				$tmpButtons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'duplicate' => array(
+						'name' => 'duplicate',
+						'id' => 'duplicate',
+						'value' => _('Duplicate')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (!empty($_REQUEST['extdisplay'])) {
+					$buttons = $tmpButtons;
+				} else if (!empty($_REQUEST['tech'])) {
+					unset($tmpButtons['delete'], $tmpButtons['duplicate']);
+					$buttons = $tmpButtons;
+				}
+			break;
+			case 'extensions':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($_REQUEST['extdisplay'])) {
+					unset($buttons['delete']);
+				}
+				if (empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
+					$buttons = array();
+				}
+			break;
 		}
 		return $buttons;
 	}
