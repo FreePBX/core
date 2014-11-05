@@ -1520,13 +1520,13 @@ function core_do_get_config($engine) {
 											if ($item['ringing'] === "CHECKED") {
 												$ext->add($context, $exten, '', new ext_ringing(''));
 											}
-											
+
 											//Block collect Calls
 											if ($item['reversal'] === "CHECKED") {
 												$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','TRUE'));
 											}
 											$ext->add($context, $exten, '',new ext_gotoif('$["${__REVERSAL_REJECT}"="TRUE" & "${CHANNEL(reversecharge)}"="1" ]','macro-hangupcall'));
- 					
+
 											if ($item['delay_answer']) {
 												$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
 											}
@@ -3757,7 +3757,7 @@ function core_do_get_config($engine) {
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
 											$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
-											
+
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_macro('get-vmcontext','${MEXTEN}'));
 											$ext->add('macro-vm','s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
@@ -7724,7 +7724,7 @@ function core_devices_configprocess() {
 						"description" => array("value" => $description),
 						"emergency_cid" => array("value" => $emergency_cid)
 					);
-					$settings = array_merge($settings,$fields);
+					$settings = array_merge($fields,$settings);
 					return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
 				} else {
 					core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
