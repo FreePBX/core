@@ -7730,7 +7730,7 @@ function core_devices_configprocess() {
 					"description" => array("value" => $description),
 					"emergency_cid" => array("value" => $emergency_cid)
 				);
-				$settings = array_merge($settings,$fields);
+				$settings = array_merge($fields,$settings);
 				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
 			} else {
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
