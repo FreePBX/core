@@ -19,6 +19,8 @@ class Trunks extends Command {
 			new InputOption('enable', null, InputOption::VALUE_REQUIRED, 'Enable given trunk'),
 			new InputOption('disable', null, InputOption::VALUE_REQUIRED, 'Disable given trunk'),
 			new InputOption('list', null, InputOption::VALUE_NONE, 'list trunks'),
+			new InputOption('xml', null, InputOption::VALUE_NONE, 'format list as json'),
+			new InputOption('json', null, InputOption::VALUE_NONE, 'format list as xml'),
 			new InputArgument('args', InputArgument::IS_ARRAY, null, null),));
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
@@ -42,10 +44,18 @@ class Trunks extends Command {
 		}
 		if($input->getOption('list')){
 			$ARGUSED = True;
-			$table = new Table($output);
-			$table->setHeaders(array('ID','TECH','Channel ID', 'Disabled'));
-			$table->setRows($trunks);
-			$table->render();
+			if($input->getOption('json')){
+				$output->write(json_encode($trunks));
+			}elseif($input->getOption('xml')){
+				$xml = new \SimpleXMLElement('<trunks/>');
+				array_walk_recursive($trunks, array ($xml, 'addChild'));
+				$output->write($xml->asXML());
+			}else{
+				$table = new Table($output);
+				$table->setHeaders(array('ID','TECH','Channel ID', 'Disabled'));
+				$table->setRows($trunks);
+				$table->render();
+			}
 		}
 		if(!$ARGUSED){
 			$table = new Table($output);
