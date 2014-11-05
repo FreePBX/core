@@ -3,7 +3,7 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.1rc8</version>
+	<version>13.0.1alpha1</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
@@ -86,7 +86,7 @@
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
 	<supported>
-		<version>12.0</version>
+		<version>13.0</version>
 	</supported>
 	<location>release/2.11/core-2.11.0.7.tgz</location>
 	<md5sum>0fd1e869a8c4a2960e0894c202ba24fa</md5sum>
