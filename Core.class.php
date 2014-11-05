@@ -38,7 +38,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($_REQUEST['userdisplay'])) {
+				if (empty($request['userdisplay'])) {
 					unset($buttons['delete']);
 				}
 			break;
@@ -60,7 +60,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($_REQUEST['extdisplay'])) {
+				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
 			case 'did':
@@ -81,7 +81,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($_REQUEST['extdisplay'])) {
+				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
 			break;
@@ -108,7 +108,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($_REQUEST['extdisplay'])) {
+				if (empty($request['extdisplay'])) {
 					unset($buttons['delete'], $button['duplicate']);
 				}
 			break;
@@ -135,9 +135,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (!empty($_REQUEST['extdisplay'])) {
+				if (!empty($request['extdisplay'])) {
 					$buttons = $tmpButtons;
-				} else if (!empty($_REQUEST['tech'])) {
+				} else if (!empty($request['tech'])) {
 					unset($tmpButtons['delete'], $tmpButtons['duplicate']);
 					$buttons = $tmpButtons;
 				}
@@ -160,10 +160,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($_REQUEST['extdisplay'])) {
+				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
-				if (empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
+				if (empty($request['tech_hardware']) && empty($request['extdisplay'])) {
 					$buttons = array();
 				}
 			break;
