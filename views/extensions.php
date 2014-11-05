@@ -74,14 +74,14 @@
     <ul class="nav nav-tabs" role="tablist">
       <?php $c=1;foreach(array_keys($middle) as $category) { ?>
         <?php $active = ($c == 1); ?>
-        <li data-name="<?php echo $category?>" class="change-tab <?php echo $active ? 'active' : ''?>"><a href="#<?php echo $category?>"><?php echo $category?></a></li>
+        <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo $active ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>"><?php echo ucfirst($category)?></a></li>
       <?php $c++;} ?>
     </ul>
 
     <div class="display">
       <?php $c=1;foreach(array_keys($middle) as $category) { ?>
         <?php $active = ($c == 1); ?>
-        <div id="<?php echo $category?>" class="info-pane <?php echo $active ? '' : 'hidden'?>">
+        <div id="<?php echo strtolower($category)?>" class="info-pane <?php echo $active ? '' : 'hidden'?>">
           <div class="container-fluid">
             <?php foreach ( array_keys($middle[$category]) as $order ) {
                     foreach( array_keys($middle[$category][$order]) as $section) {
@@ -120,7 +120,7 @@
 </div>
 <script>
   var loc = window.location.hash.replace("#", "");
-  if(loc !== "") {
+  if(loc !== "" && $("#" + loc + ".info-pane").length > 0) {
     $(".info-pane").addClass("hidden");
     $(".change-tab").removeClass("active");
     $("#" + loc + ".info-pane").removeClass("hidden");
