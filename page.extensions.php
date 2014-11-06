@@ -11,6 +11,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 		right: 1.5%;
 		margin-left: 2%;
 		*/
+	float: none;
 	right: 1.5%;
 	position: absolute;
 	background-color: white;
@@ -39,58 +40,77 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	padding: 5px;
 	border-radius: 5px;
 }
-</style>
-
-<div class="rnav">
-<?php
-$extens = core_users_list();
-$description = _("Extension");
-drawListMenu($extens, null, null, $display, $extdisplay, $description);
-?>
-	<br />
-</div>
-<?php
-// If this is a popOver, we need to set it so the selection of device type does not result
-// in the popover closing because config.php thinks it was the process function. Maybe
-// the better way to do this would be to log an error or put some proper mechanism in place
-// since this is a bit of a kludge
-//
-if (!empty($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware'])) {
-?>
-	<script>
-		$(document).ready(function(){
-			$('[name="fw_popover_process"]').val('');
-			$('<input>').attr({type: 'hidden', name: 'fw_popover'}).val('1').appendTo('.popover-form');
-		});
-	</script>
-<?php
+.btn.device {
+	width: 200px;
+	margin-bottom: 5px;
 }
+.list-group {
+	max-height: 450px;
+	overflow-y: auto;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 95%;
+}
+.list-group-item:first-child {
+	border-top: none;
+	border-bottom: 1px solid #ddd;
+}
+.list-group-item:last-child {
+	border-top: 1px solid #ddd;
+	border-bottom: none;
+}
+.list-group-item {
+	border: none;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+a.list-group-item {
+	color: #555;
+}
+</style>
+<div class="container-fluid">
+  <div class="row">
+		<div class="col-sm-9">
+			<?php
+			// If this is a popOver, we need to set it so the selection of device type does not result
+			// in the popover closing because config.php thinks it was the process function. Maybe
+			// the better way to do this would be to log an error or put some proper mechanism in place
+			// since this is a bit of a kludge
+			//
+			if (!empty($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware'])) {
+			?>
+				<script>
+					$(document).ready(function(){
+						$('[name="fw_popover_process"]').val('');
+						$('<input>').attr({type: 'hidden', name: 'fw_popover'}).val('1').appendTo('.popover-form');
+					});
+				</script>
+			<?php
+			}
 
-$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
-$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+			$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
+			$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
+			$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 
-global $currentcomponent;
-if(empty($_REQUEST['extdisplay'])) {
-	$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
-	?>
-	<br>
-	<div class="container pull-left start">
-		<form role="form">
-			<div class="form-group">
-				<label for="deviceselect"><h3><?php echo _("Please select your Device below then click Submit"); ?> <i class="fa fa-question-circle"></i></h3></label>
-				<select class="form-control" id="deviceselect">
+			global $currentcomponent;
+			if(empty($_REQUEST['extdisplay'])) {
+				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
+				?>
+				<h2>Add an Extension</h2>
+				Please select your Device below
+				<br>
+				<div class="container pull-left start">
 					<?php if($sipdriver == "both" || $sipdriver == "chan_pjsip") {?>
-						<option><?php echo _("Generic PJSIP Device")?></option>
+						<a href="" class="btn device"><?php echo _("Generic PJSIP Device")?></a><br/>
 					<?php } ?>
 					<?php if($sipdriver == "both" || $sipdriver == "chan_sip") {?>
-						<option><?php echo _("Generic CHAN SIP Device")?></option>
+						<a href="" class="btn device"><?php echo _("Generic CHAN SIP Device")?></a><br/>
 					<?php } ?>
-					<option><?php echo _("Generic IAX2 Device")?></option>
-					<option><?php echo _("Generic DAHDi Device")?></option>
-					<option><?php echo _("Other (Custom) Device")?></option>
-					<option><?php echo _("None (virtual exten)")?></option>
-				</select>
+					<a href="" class="btn device"><?php echo _("Generic IAX2 Device")?></a><br/>
+					<a href="" class="btn device"><?php echo _("Generic DAHDi Device")?></a><br/>
+					<a href="" class="btn device"><?php echo _("Other (Custom) Device")?></a><br/>
+					<a href="" class="btn device"><?php echo _("None (virtual exten)")?></a><br/>
+				</div>
 				<span class="help-block">
 					<?php echo _("Select the type of device you'd like to create.")?><br/>
 					<ul>
@@ -106,30 +126,51 @@ if(empty($_REQUEST['extdisplay'])) {
 						<li><?php echo _("<strong>None (virtual exten)</strong>");?></li>
 					</ul>
 				</span>
+				<script>
+					$(".container .fa.fa-question-circle").hover(function(){
+						var el = $(this).parents(".container").find(".help-block");
+						el.fadeIn("fast");
+					}, function(){
+						var el = $(this).parents(".container").find(".help-block");
+						var input = $(this).parents(".container").find(".form-control");
+						if(input.length && !input.is(":focus")) {
+							el.fadeOut("fast");
+						}
+					})
+					$(".container select").focus(function() {
+						var el = $(this).parents(".container").find(".help-block");
+						el.fadeIn("fast");
+					});
+					$(".container select").blur(function() {
+						var el = $(this).parents(".container").find(".help-block");
+						el.fadeOut("fast");
+					});
+				</script>
+			<?php
+			} else {
+				echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
+			} ?>
+		</div>
+		<div class="col-sm-3">
+			<div class="list-group">
+				<a href="?display=extensions" class="list-group-item <?php echo $active?>"><?php echo _("Add Extension")?></a>
+				<?php
+					$extens = core_users_list();
+					$description = _("Extension");
+					$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+					foreach($extens as $ext) {
+						$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
+						?><a href="?display=extensions&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
+					}
+				?>
 			</div>
-		</form>
-	</div>
-	<script>
-		$(".container .fa.fa-question-circle").hover(function(){
-			var el = $(this).parents(".container").find(".help-block");
-			el.fadeIn("fast");
-		}, function(){
-			var el = $(this).parents(".container").find(".help-block");
-			var input = $(this).parents(".container").find(".form-control");
-			if(input.length && !input.is(":focus")) {
-				el.fadeOut("fast");
-			}
-		})
-		$(".container select").focus(function() {
-			var el = $(this).parents(".container").find(".help-block");
-			el.fadeIn("fast");
-		});
-		$(".container select").blur(function() {
-			var el = $(this).parents(".container").find(".help-block");
-			el.fadeOut("fast");
-		});
-	</script>
-<?php
-} else {
-	echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
-}
+			<?php
+			$extens = core_users_list();
+			$description = _("Extension");
+			//drawListMenu($extens, null, null, $display, $extdisplay, $description);
+			?>
+				<br />
+			</div>
+		</div>
+  </div>
+</div>

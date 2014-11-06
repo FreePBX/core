@@ -1,7 +1,7 @@
 <style>
 .ext-container {
-  width: 75%;
-  float: left;
+  /*width: 75%;
+  float: left;*/
 }
 .ext-container .display {
   border-bottom: 1px solid #ddd;
