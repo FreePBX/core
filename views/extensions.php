@@ -13,10 +13,9 @@
   margin-right: -1px;
 }
 .ext-container .row {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 .ext-container .help-block {
-  display:none;
   background-color: rgba(242, 242, 242, 0.47);
   padding: 5px;
   border-radius: 5px;
@@ -49,21 +48,27 @@
   padding-left: 1px;
   font-weight: normal;
 }
-.item-holder {
-  padding-left: 10px;
-  padding-right: 10px;
+.help-block {
+  display:none;
 }
-.item {
-  background-color: transparent;
-  overflow: auto;
-  padding-top: 1px;
+.help-block.active {
+  display:block;
+  opacity: 1;
+  animation: myfirst .5s;
+  -webkit-animation: myfirst .5s;
 }
-.item.active {
-  background-color: rgba(242, 242, 242, 0.47);
+/* Standard syntax */
+@keyframes myfirst {
+  0%   {opacity: 0}
+  100% {opacity: 1}
+}
+@-webkit-keyframes myfirst {
+  0%   {opacity: 0}
+  100% {opacity: 1}
 }
 </style>
 <div class="ext-container">
-  <form class="popover-form fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="config.php?type=danger&display=extensions&extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&action=del" role="form">
+  <form class="popover-form fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&action=del" role="form">
     <?php foreach ( array_keys($top) as $sortorder ) {
             foreach ( array_keys($top[$sortorder]) as $idx ) {
               $elem = $top[$sortorder][$idx];
@@ -89,23 +94,29 @@
                       foreach ( array_keys($middle[$category][$order][$section]) as $sortorder ) {
                         foreach ( array_keys($middle[$category][$order][$section][$sortorder]) as $idx ) {
                           $elem = $middle[$category][$order][$section][$sortorder][$idx];
-                          $h = !empty($elem->helptext) ? '<i class="fa fa-question-circle"></i>' : '';
+                          $h = !empty($elem->helptext) ? '<i class="fa fa-question-circle" data-id="'.$elem->_elemname.'"></i>' : '';
                           $html = '<div class="form-group"><div class="col-md-3"><label for="'.$elem->_elemname.'">'.$elem->prompttext." ".$h.'</label></div><div class="col-md-9">'.$elem->html_input.'</div></div>';
                           $pure = $elem->helptext.$elem->prompttext.$elem->html_input;
                           $help = "";
                           if(!empty($pure)) {
-                            $help = !empty($elem->helptext) ? '<div class="col-md-12"><span class="help-block">'.$elem->helptext.'</span></div>' : '';
+                            $help = !empty($elem->helptext) ? '<span id="'.$elem->_elemname.'-help" class="help-block">'.$elem->helptext.'</span>' : '';
                           } else {
                             if(!empty($elem->_html)) {
-                              $html = '<div class="col-md-12">'.$elem->_html.'</div>';
+                              $html = $elem->_htm;
                             } elseif(!empty($elem->html_text)) {
-                              $html = '<div class="col-md-12">'.$elem->html_text.'</div>';
+                              $html = $elem->html_text;
                             } else {
                               $html = "";
                             }
                           }
+
                           if(!empty($html)) {
-                            echo '<div class="row item-holder"><div class="item">'.$html .''.$help.'</div></div>';
+                            echo '<div class="row"><div class="col-md-12">';
+                            echo '<div class="row parent" data-id="'.$elem->_elemname.'"><div class="col-md-12">'.$html .'</div></div>';
+                            if(!empty($help)) {
+                              echo '<div class="row"><div class="col-md-12">'.$help.'</div></div>';
+                            }
+                            echo '</div></div>';
                           }
                         }
                       }
@@ -144,29 +155,18 @@
     event.preventDefault();
   });
   $(".ext-container .fa.fa-question-circle").hover(function(){
-    var el = $(this).parents(".row").find(".help-block");
-    var el2 = $(this).parents(".row").find(".item");
-    el.fadeIn("fast").css("display", "block");
-    el2.addClass("active");
+    var id = $(this).data('id');
+    $("#" + id + "-help").addClass("active");
   }, function(){
-    var el = $(this).parents(".row").find(".help-block");
-    var input = $(this).parents(".row").find(".form-control");
-    var el2 = $(this).parents(".row").find(".item");
-    if(input.length && !input.is(":focus")) {
-      el.fadeOut("fast");
-      el2.removeClass("active");
-    }
+    var id = $(this).data('id');
+    $("#" + id + "-help").removeClass("active");
   })
   $(".ext-container input, .ext-container select, .ext-container textarea").focus(function() {
-    var el = $(this).parents(".row").find(".help-block");
-    var el2 = $(this).parents(".row").find(".item");
-    el.fadeIn("fast").css("display", "block");
-    el2.addClass("active");
+    var id = $(this).parents(".parent").data("id");
+    $("#" + id + "-help").addClass("active");
   });
   $(".ext-container input, .ext-container select, .ext-container textarea").blur(function() {
-    var el = $(this).parents(".row").find(".help-block");
-    var el2 = $(this).parents(".row").find(".item");
-    el.fadeOut("fast");
-    el2.removeClass("active");
+    var id = $(this).parents(".parent").data("id");
+    $("#" + id + "-help").removeClass("active");
   });
 </script>
