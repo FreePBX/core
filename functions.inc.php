@@ -6434,13 +6434,11 @@ function core_users_configpageinit($dispnum) {
 
 	if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 		// Setup option list we need
-		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', _("On Demand"));
-		$currentcomponent->addoptlistitem('recordoptions', 'Always', _("Always"));
-		$currentcomponent->addoptlistitem('recordoptions', 'Never', _("Never"));
-		$currentcomponent->setoptlistopts('recordoptions', 'sort', false);
 
-		$currentcomponent->addoptlistitem('recording_options', 'always', _("Always"));
+		$currentcomponent->addoptlistitem('recording_options', 'force', _("Force"));
+		$currentcomponent->addoptlistitem('recording_options', 'yes', _("Yes"));
 		$currentcomponent->addoptlistitem('recording_options', 'dontcare', _("Don't Care"));
+		$currentcomponent->addoptlistitem('recording_options', 'no', _("No"));
 		$currentcomponent->addoptlistitem('recording_options', 'never', _("Never"));
 		$currentcomponent->setoptlistopts('recording_options', 'sort', false);
 
