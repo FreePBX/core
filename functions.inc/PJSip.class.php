@@ -70,12 +70,20 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	*/
 	public function genConfig() {
 
-		$conf = $this->generateEndpoints();
-
+		//clear before write.
+		$conf['pjsip.registration.conf'][] = '#include pjsip.registration_custom.conf';
+		$conf['pjsip.auth.conf'][] = '#include pjsip.auth_custom.conf';
+		$conf['pjsip.aor.conf'][] = '#include pjsip.aor_custom.conf';
+		$conf['pjsip.endpoint.conf'][] = '#include pjsip.endpoint_custom.conf';
+		$conf['pjsip.identify.conf'][] = '#include pjsip.identify_custom.conf';
+		$conf['pjsip.transports.conf'][] = '#include pjsip.transports_custom.conf';
+		//$conf['pjsip.notify.conf'][] = '#include pjsip.notify_custom.conf';
 		// Generate includes
-		$pjsip = "#include pjsip.custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
-		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.manualtrunks.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
+		$pjsip = "#include pjsip_custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
+		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
 		$conf['pjsip.conf'][] = $pjsip;
+
+		$conf = $this->generateEndpoints($conf);
 
 		// Transports are a multi-dimensional array, because
 		// we use it earlier to match extens with transports
@@ -97,7 +105,6 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
 
-		//TODO: Rob can we fix this please?
 		$conf['pjsip.conf']['global'] = array(
 			'type=global',
 			'user_agent='.$this->FreePBX->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
@@ -109,9 +116,6 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 
 		$trunks = $this->getAllTrunks();
-
-		//clear before write just in case all trunks have been deleted
-		$conf['pjsip.registration.conf'] = '';
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
@@ -382,7 +386,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	/**
 	 * Generate Endpoints
 	 */
-	private function generateEndpoints() {
+	private function generateEndpoints($retarr) {
 		// More Efficent Function here.
 		foreach ($this->getAllDevs() as $dev) {
 			$this->generateEndpoint($dev, $retarr);
