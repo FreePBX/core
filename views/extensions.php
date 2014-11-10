@@ -84,7 +84,7 @@
     </ul>
 
     <div class="display">
-      <?php $c=1;foreach(array_keys($middle) as $category) { ?>
+      <?php $hiddens=array();$c=1;foreach(array_keys($middle) as $category) { ?>
         <?php $active = ($c == 1); ?>
         <div id="<?php echo strtolower($category)?>" class="info-pane <?php echo $active ? '' : 'hidden'?>">
           <div class="container-fluid">
@@ -102,21 +102,24 @@
                             $help = !empty($elem->helptext) ? '<span id="'.$elem->_elemname.'-help" class="help-block">'.$elem->helptext.'</span>' : '';
                           } else {
                             if(!empty($elem->_html)) {
-                              $html = $elem->_htm;
+                              $html = $elem->_html;
                             } elseif(!empty($elem->html_text)) {
                               $html = $elem->html_text;
                             } else {
                               $html = "";
                             }
                           }
-
-                          if(!empty($html)) {
-                            echo '<div class="row"><div class="col-md-12">';
-                            echo '<div class="row parent" data-id="'.$elem->_elemname.'"><div class="col-md-12">'.$html .'</div></div>';
-                            if(!empty($help)) {
-                              echo '<div class="row"><div class="col-md-12">'.$help.'</div></div>';
+                          if($elem->type != "hidden") {
+                            if(!empty($html)) {
+                              echo '<div class="row"><div class="col-md-12">';
+                              echo '<div class="row parent" data-id="'.$elem->_elemname.'"><div class="col-md-12">'.$html .'</div></div>';
+                              if(!empty($help)) {
+                                echo '<div class="row"><div class="col-md-12">'.$help.'</div></div>';
+                              }
+                              echo '</div></div>';
                             }
-                            echo '</div></div>';
+                          } else {
+                            $hiddens .= $html;
                           }
                         }
                       }
@@ -127,6 +130,7 @@
         </div>
       <?php $c++;} ?>
     </div>
+    <?php echo $hiddens;?>
   </form>
 </div>
 <script>
@@ -169,4 +173,23 @@
     var id = $(this).parents(".parent").data("id");
     $("#" + id + "-help").removeClass("active");
   });
+  <?php
+  $formname = "frm_extensions";
+  if ( is_array($jsfuncs) ) {
+    foreach ( array_keys($jsfuncs) as $function ) {
+      // Functions
+      $htmlout .= "function ".$formname."_$function {\n";
+      foreach ( array_keys($jsfuncs[$function]) as $sortorder ) {
+        foreach ( array_keys($jsfuncs[$function][$sortorder]) as $idx ) {
+          $func = $jsfuncs[$function][$sortorder][$idx];
+          $htmlout .= ( isset($func) ) ? "$func" : '';
+        }
+      }
+      if ( $function == 'onsubmit()' ) {
+        $htmlout .= "\treturn true;\n";
+      }
+      $htmlout .= "}\n";
+      echo $htmlout;
+    }
+  }?>
 </script>
