@@ -294,7 +294,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						"flag" => $flag++
 					),
 					"transport" => array(
-						"value" => "upd,tcp,tls",
+						"value" => "udp,tcp,tls",
 						"flag" => $flag++
 					),
 					"avpf" => array(
