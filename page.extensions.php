@@ -16,9 +16,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	position: absolute;
 	background-color: white;
 }
-.start {
-	width: 60%;
-}
 .fa.fa-question-circle {
 	color: #0070a3;
 	cursor: pointer;
@@ -114,29 +111,35 @@ a.list-group-item {
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				$sipdriver = FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 				?>
-				<h2>Add an Extension</h2>
-				Please select the type you want to create below
-				<br>
-				<div class="container pull-left start">
-					<?php if($sipdriver == "both" || $sipdriver == "chan_pjsip") {?>
-						<a data-id="pjsip_generic" href="?display=extensions&amp;tech_hardware=pjsip_generic" class="btn device"><?php echo _("Generic PJSIP Device")?></a><i data-id="pjsip_generic" class="fa fa-question-circle"></i><br/>
-						<span id="pjsip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic PJSIP Device</strong>: A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality");?></span>
-					<?php } ?>
-					<?php if($sipdriver == "both" || $sipdriver == "chan_sip") {?>
-						<a data-id="sip_generic" href="?display=extensions&amp;tech_hardware=sip_generic" class="btn device"><?php echo _("Generic CHAN SIP Device")?></a><i data-id="sip_generic" class="fa fa-question-circle"></i><br/>
-						<span id="sip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic CHAN SIP Device</strong>: The legacy SIP channel driver in Asterisk");?></span>
-					<?php } ?>
-					<a data-id="iax2_generic" href="?display=extensions&amp;tech_hardware=iax2_generic" class="btn device"><?php echo _("Generic IAX2 Device")?></a><i data-id="iax2_generic" class="fa fa-question-circle"></i><br/>
-					<span id="iax2_generic-help" class="help-block  selection"><?php echo _("<strong>Generic IAX2 Device</strong>: Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices");?></span>
-					<a data-id="dahdi_generic" href="?display=extensions&amp;tech_hardware=dahdi_generic" class="btn device"><?php echo _("Generic DAHDi Device")?></a><i data-id="dahdi_generic" class="fa fa-question-circle"></i><br/>
-					<span id="dahdi_generic-help" class="help-block  selection"><?php echo _("<strong>Generic DAHDi Device</strong>: Short for 'Digium Asterisk Hardware Device Interface'");?></span>
-					<a data-id="custom_custom" href="?display=extensions&amp;tech_hardware=custom_custom" class="btn device"><?php echo _("Other (Custom) Device")?></a><i data-id="custom_custom" class="fa fa-question-circle"></i><br/>
-					<span id="custom_custom-help" class="help-block  selection"><?php echo _("<strong>Other (Custom) Device</strong>");?></span>
-					<a data-id="virtual" href="?display=extensions&amp;tech_hardware=virtual" class="btn device"><?php echo _("None (virtual exten)")?></a><i data-id="virtual" class="fa fa-question-circle"></i><br/>
-					<span id="virtual-help" class="help-block selection"><?php echo _("<strong>None (virtual exten)</strong>");?></span>
+				<div class="row">
+					<div class="col-sm-12">
+						<h2>Add an Extension</h2>
+						Please select the type you want to create below
+						<br>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12 types">
+							<?php if($sipdriver == "both" || $sipdriver == "chan_pjsip") {?>
+								<a data-id="pjsip_generic" href="?display=extensions&amp;tech_hardware=pjsip_generic" class="btn device"><?php echo _("Generic PJSIP Device")?></a><i data-id="pjsip_generic" class="fa fa-question-circle"></i><br/>
+								<span id="pjsip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic PJSIP Device</strong>: A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality");?></span>
+							<?php } ?>
+							<?php if($sipdriver == "both" || $sipdriver == "chan_sip") {?>
+								<a data-id="sip_generic" href="?display=extensions&amp;tech_hardware=sip_generic" class="btn device"><?php echo _("Generic CHAN SIP Device")?></a><i data-id="sip_generic" class="fa fa-question-circle"></i><br/>
+								<span id="sip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic CHAN SIP Device</strong>: The legacy SIP channel driver in Asterisk");?></span>
+							<?php } ?>
+							<a data-id="iax2_generic" href="?display=extensions&amp;tech_hardware=iax2_generic" class="btn device"><?php echo _("Generic IAX2 Device")?></a><i data-id="iax2_generic" class="fa fa-question-circle"></i><br/>
+							<span id="iax2_generic-help" class="help-block  selection"><?php echo _("<strong>Generic IAX2 Device</strong>: Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices");?></span>
+							<a data-id="dahdi_generic" href="?display=extensions&amp;tech_hardware=dahdi_generic" class="btn device"><?php echo _("Generic DAHDi Device")?></a><i data-id="dahdi_generic" class="fa fa-question-circle"></i><br/>
+							<span id="dahdi_generic-help" class="help-block  selection"><?php echo _("<strong>Generic DAHDi Device</strong>: Short for 'Digium Asterisk Hardware Device Interface'");?></span>
+							<a data-id="custom_custom" href="?display=extensions&amp;tech_hardware=custom_custom" class="btn device"><?php echo _("Other (Custom) Device")?></a><i data-id="custom_custom" class="fa fa-question-circle"></i><br/>
+							<span id="custom_custom-help" class="help-block  selection"><?php echo _("<strong>Other (Custom) Device</strong>");?></span>
+							<a data-id="virtual" href="?display=extensions&amp;tech_hardware=virtual" class="btn device"><?php echo _("None (virtual exten)")?></a><i data-id="virtual" class="fa fa-question-circle"></i><br/>
+							<span id="virtual-help" class="help-block selection"><?php echo _("<strong>None (virtual exten)</strong>");?></span>
+					</div>
 				</div>
 				<script>
-					$(".container .fa.fa-question-circle").hover(function(){
+					$(".types .fa.fa-question-circle").hover(function(){
 						var id = $(this).data('id');
 						$("#" + id + "-help").addClass("active");
 					}, function(){
