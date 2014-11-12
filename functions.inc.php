@@ -2082,174 +2082,6 @@ function core_do_get_config($engine) {
 		}
 	}
 
-	/*
-	; ARG1: type
-	;       exten, out, rg, q, conf
-	; ARG2: called_exten
-	; ARG3: action (if we know it)
-	;       always, never (note dontcare only applies to extensions, group, etc. must specify yes/no)
-	;
-	*/
-	$context = 'sub-record-cancel';
-	$exten = 's';
-
-	$ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE', '${REC_POLICY_MODE_SAVE}'));
-	$ext->add($context, $exten, '', new ext_execif('$["${REC_STATUS}"!="RECORDING"]','Return'));
-	$ext->add($context, $exten, '', new ext_stopmixmonitor());
-	$ext->add($context, $exten, '', new ext_set('__REC_STATUS',''));
-	$ext->add($context, $exten, '', new ext_set('MON_BASE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/'));
-	$ext->add($context, $exten, '', new ext_set('__MON_FMT','${IF($[${LEN(${MIXMON_FORMAT})}]?${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}:wav)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${CALLFILENAME})} & ${STAT(f,${MON_BASE}${CALLFILENAME}.${MON_FMT})}]','System','rm -f ${MON_BASE}${CALLFILENAME}.${MON_FMT}'));
-	$ext->add($context, $exten, '', new ext_set('__CALLFILENAME',''));
-	$ext->add($context, $exten, '', new ext_set('CDR(recordingfile)',''));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-
-	$context = 'sub-record-check';
-	$exten = 's';
-
-	$ext->add($context, $exten, '', new ext_set('REC_POLICY_MODE_SAVE','${REC_POLICY_MODE}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${BLINDTRANSFER}" = ""]', 'check'));
-	$ext->add($context, $exten, '', new ext_resetcdr(''));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}" != "RECORDING"]', 'check'));
-	$ext->add($context, $exten, '', new ext_set('AUDIOHOOK_INHERIT(MixMonitor)','yes'));
-	$ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','a','${MIXMON_POST}'));
-	$ext->add($context, $exten, 'check', new ext_set('__MON_FMT','${IF($["${MIXMON_FORMAT}"="wav49"]?WAV:${MIXMON_FORMAT})}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!="RECORDING"]', 'next'));
-	$ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-	$ext->add($context, $exten, 'next', new ext_execif('$[!${LEN(${ARG1})}]','Return'));
-	$ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"="" & "${ARG3}"!=""]','Set','__REC_POLICY_MODE=${ARG3}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${REC_STATUS}"!=""]','${ARG1},1'));
-	$ext->add($context, $exten, '', new ext_set('__REC_STATUS','INITIALIZED'));
-	$ext->add($context, $exten, '', new ext_set('NOW','${EPOCH}'));
-	$ext->add($context, $exten, '', new ext_set('__DAY','${STRFTIME(${NOW},,%d)}'));
-	$ext->add($context, $exten, '', new ext_set('__MONTH','${STRFTIME(${NOW},,%m)}'));
-	$ext->add($context, $exten, '', new ext_set('__YEAR','${STRFTIME(${NOW},,%Y)}'));
-	$ext->add($context, $exten, '', new ext_set('__TIMESTR','${YEAR}${MONTH}${DAY}-${STRFTIME(${NOW},,%H%M%S)}'));
-	$ext->add($context, $exten, '', new ext_set('__FROMEXTEN','${IF($[${LEN(${AMPUSER})}]?${AMPUSER}:${IF($[${LEN(${REALCALLERIDNUM})}]?${REALCALLERIDNUM}:unknown)})}'));
-	$ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${ARG1}-${ARG2}-${FROMEXTEN}-${TIMESTR}-${UNIQUEID}'));
-	$ext->add($context, $exten, '', new ext_goto('1','${ARG1}'));
-
-	$exten = 'rg';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${REC_POLICY_MODE},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'force';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${REC_POLICY_MODE},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'q';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','recq,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'out';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"=""]','Set','__REC_POLICY_MODE=${DB(AMPUSER/${FROMEXTEN}/recording/out/external)}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'exten,${ARG2},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'exten';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${REC_POLICY_MODE}"!=""]','callee'));
-	$ext->add($context, $exten, '', new ext_set('__REC_POLICY_MODE','${IF($[${LEN(${FROM_DID})}]?${DB(AMPUSER/${ARG2}/recording/in/external)}:${DB(AMPUSER/${ARG2}/recording/in/internal)})}'));
-	/* TODO: this appears to be a bug, ARG3 should never be set. This may be in here because of on-demand recording,
-	*       testing will have to tell. If it needs to be in here it probably was suppose to be REC_POLICY_MODE and
-	*       that should be tried. For now remove and do some testing to flush it out.
-	*
-	$ext->add($context, $exten, '', new ext_execif('$[!${LEN(${ARG3})}]','Return'));
-	*/
-
-	/* If callee doesn't care, then go to caller to make decision
-	* Otherwise, if caller doesn't care, the go to callee to make decision
-	* Otherwise, if relative priorities are equal, use the global REC_POLICY
-	* Otherwise, use whomever has a higher priority
-	*/
-	$ext->add($context, $exten, '', new ext_gotoif('$["${REC_POLICY_MODE}"="dontcare"]', 'caller'));
-	// If FROM_DID is set it's external so it's always the callee policy that rules
-	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}"="dontcare" | "${FROM_DID}"!=""]', 'callee'));
-
-	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${DB(AMPUSER/${FROMEXTEN}/recording/priority)})}]','Set','CALLER_PRI=${DB(AMPUSER/${FROMEXTEN}/recording/priority)}','Set','CALLER_PRI=0'));
-	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${DB(AMPUSER/${ARG2}/recording/priority)})}]','Set','CALLEE_PRI=${DB(AMPUSER/${ARG2}/recording/priority)}','Set','CALLEE_PRI=0'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${CALLER_PRI}"="${CALLEE_PRI}"]', '${REC_POLICY}','${IF($[${CALLER_PRI}>${CALLEE_PRI}]?caller:callee)}'));
-
-	$ext->add($context, $exten, 'callee', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-	$ext->add($context, $exten, 'caller', new ext_set('__REC_POLICY_MODE','${DB(AMPUSER/${FROMEXTEN}/recording/out/internal)}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','record,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	// For confernecing we will set the variables (since the actual meetme does the recording) in case an option were to exist to do on-demand recording
-	// of the conference which doesn't currenly seem like it is supported but might.
-	//
-	$exten = 'conf';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gosub('1','recconf',false,'${EXTEN},${ARG2},${ARG2}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'page';
-	$ext->add($context, $exten, '', new ext_noop_trace('Recording Check ${EXTEN} ${ARG2}'));
-	$ext->add($context, $exten, '', new ext_gosubif('$["${REC_POLICY_MODE}"="always"]','recconf,1',false,'${EXTEN},${ARG2},${FROMEXTEN}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'record';
-	$ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
-	$ext->add($context, $exten, '', new ext_set('AUDIOHOOK_INHERIT(MixMonitor)','yes'));
-	$ext->add($context, $exten, '', new ext_mixmonitor('${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MIXMON_FORMAT}','','${MIXMON_POST}'));
-	$ext->add($context, $exten, '', new ext_set('__REC_STATUS','RECORDING'));
-	$ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	/* Queue Recording Section */
-	$exten = 'recq';
-	$ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
-	$ext->add($context, $exten, '', new ext_set('AUDIOHOOK_INHERIT(MixMonitor)','yes'));
-	$ext->add($context, $exten, '', new ext_set('MONITOR_FILENAME','${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
-	$ext->add($context, $exten, '', new ext_mixmonitor('${MONITOR_FILENAME}.${MIXMON_FORMAT}','${MONITOR_OPTIONS}','${MIXMON_POST}'));
-	$ext->add($context, $exten, '', new ext_set('__REC_STATUS','RECORDING'));
-	$ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	$exten = 'recconf';
-	$ext->add($context, $exten, '', new ext_noop_trace('Setting up recording: ${ARG1}, ${ARG2}, ${ARG3}'));
-	if ($amp_conf['ASTCONFAPP'] == 'app_confbridge' && $ast_ge_10) {
-		$ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${CONFBRIDGE_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
-		$ext->add($context, $exten, '', new ext_execif('$[!${CONFBRIDGE_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
-		$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_file)','${MIXMON_DIR}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}.${MON_FMT}'));
-	} else {
-		// Conferencing must set the path to MIXMON_DIR explicitly since unlike other parts of Asterisk
-		// Meetme does not default to the defined monitor directory.
-		//
-		$ext->add($context, $exten, '', new ext_set('__CALLFILENAME','${IF($[${MEETME_INFO(parties,${ARG2})}]?${DB(RECCONF/${ARG2})}:${ARG1}-${ARG2}-${ARG3}-${TIMESTR}-${UNIQUEID})}'));
-		$ext->add($context, $exten, '', new ext_execif('$[!${MEETME_INFO(parties,${ARG2})}]','Set','DB(RECCONF/${ARG2})=${CALLFILENAME}'));
-		$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFILE','${IF($[${LEN(${MIXMON_DIR})}]?${MIXMON_DIR}:${ASTSPOOLDIR}/monitor/)}${YEAR}/${MONTH}/${DAY}/${CALLFILENAME}'));
-		$ext->add($context, $exten, '', new ext_set('MEETME_RECORDINGFORMAT','${MIXMON_FORMAT}'));
-	}
-	$ext->add($context, $exten, '', new ext_execif('$["${REC_POLICY_MODE}"!="always"]','Return'));
-	if ($amp_conf['ASTCONFAPP'] == 'app_confbridge' && $ast_ge_10) {
-		$ext->add($context, $exten, '', new ext_set('CONFBRIDGE(bridge,record_conference)','yes'));
-	}
-	$ext->add($context, $exten, '', new ext_set('__REC_STATUS','RECORDING'));
-	$ext->add($context, $exten, '', new ext_set('CDR(recordingfile)','${CALLFILENAME}.${MON_FMT}'));
-	$ext->add($context, $exten, '', new ext_return(''));
-
-	/* macro-one-touch-record */
-
-	$context = 'macro-one-touch-record';
-	$exten = 's';
-
-	$ext->add($context, $exten, '', new ext_set('ONETOUCH_REC_SCRIPT_STATUS', ''));
-	$ext->add($context, $exten, '', new ext_system($amp_conf['ASTVARLIBDIR'] . '/bin/one_touch_record.php ${CHANNEL(name)}'));
-	$ext->add($context, $exten, '', new ext_noop('ONETOUCH_REC_SCRIPT_STATUS: [${ONETOUCH_REC_SCRIPT_STATUS}]'));
-	$ext->add($context, $exten, '', new ext_noop_trace('ONETOUCH_REC: [${ONETOUCH_REC}] REC_STATUS: [${REC_STATUS}]'));
-	$ext->add($context, $exten, '', new ext_noop_trace('ONETOUCH_RECFILE: [${ONETOUCH_RECFILE}] CDR(recordingfile): [${CDR(recordingfile)}]'));
-	$ext->add($context, $exten, '', new ext_execif('$["${ONETOUCH_REC}"="RECORDING"]','Playback','beep'));
-	$ext->add($context, $exten, '', new ext_execif('$["${ONETOUCH_REC}"="PAUSED"]','Playback','beep&beep'));
-	$ext->add($context, $exten, '', new ext_macroexit());
-
 	/* macro-prepend-cid */
 	// prepend a cid and if set to replace previous prepends, do so, otherwise stack them
 	//
@@ -2349,7 +2181,6 @@ function core_do_get_config($engine) {
 				}
 			}
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
-			$ext->add($context, $exten, '', new ext_gosub('1','s','sub-record-check','out,${EXTEN},'));
 
 			$password = $route['password'];
 			foreach ($trunks as $trunk_id) {
@@ -6603,13 +6434,11 @@ function core_users_configpageinit($dispnum) {
 
 	if ( $dispnum == 'users' || $dispnum == 'extensions' ) {
 		// Setup option list we need
-		$currentcomponent->addoptlistitem('recordoptions', 'Adhoc', _("On Demand"));
-		$currentcomponent->addoptlistitem('recordoptions', 'Always', _("Always"));
-		$currentcomponent->addoptlistitem('recordoptions', 'Never', _("Never"));
-		$currentcomponent->setoptlistopts('recordoptions', 'sort', false);
 
-		$currentcomponent->addoptlistitem('recording_options', 'always', _("Always"));
+		$currentcomponent->addoptlistitem('recording_options', 'force', _("Force"));
+		$currentcomponent->addoptlistitem('recording_options', 'yes', _("Yes"));
 		$currentcomponent->addoptlistitem('recording_options', 'dontcare', _("Don't Care"));
+		$currentcomponent->addoptlistitem('recording_options', 'no', _("No"));
 		$currentcomponent->addoptlistitem('recording_options', 'never', _("Never"));
 		$currentcomponent->setoptlistopts('recording_options', 'sort', false);
 
