@@ -456,11 +456,12 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			   $endpoint[] = "transport=".$config['transport'];
 		   }
 		}
-		if (!empty($config['call_group'])) {
+
+		if (!empty($config['callgroup'])) {
 			$endpoint[] = "call_group=".$config['callgroup'];
 		}
 
-		if (!empty($config['pickup_group'])) {
+		if (!empty($config['pickupgroup'])) {
 			$endpoint[] = "pickup_group=".$config['pickupgroup'];
 		}
 

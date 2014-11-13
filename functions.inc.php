@@ -4271,7 +4271,10 @@ function core_do_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
 			$ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
 		}
-		$ext->add($mcontext,$exten,'godial', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+		//Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
+		//We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
+		$ext->add($mcontext,$exten,'godial', new ext_macro('dialout-one-predial-hook'));
+		$ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
 		$ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
 		$ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
