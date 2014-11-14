@@ -6448,6 +6448,7 @@ function core_users_configpageinit($dispnum) {
 
 		$currentcomponent->addoptlistitem('recording_ondemand_options', 'disabled', _("Disable"));
 		$currentcomponent->addoptlistitem('recording_ondemand_options', 'enabled', _("Enable"));
+		$currentcomponent->addoptlistitem('recording_ondemand_options', 'override', _("Override"));
 		$currentcomponent->setoptlistopts('recording_ondemand_options', 'sort', false);
 
 		$currentcomponent->addoptlistitem('callwaiting', 'enabled', _("Enable"));
@@ -6745,7 +6746,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_radio('recording_out_external', $currentcomponent->getoptlist('recording_options'), $recording_out_external, _('Outbound External Calls'), _("Recording of outbound calls to external sources.")));
 		$currentcomponent->addguielem($section, new gui_radio('recording_in_internal', $currentcomponent->getoptlist('recording_options'), $recording_in_internal, _('Inbound Internal Calls'), _("Recording of calls received from other extensions on the system.")));
 		$currentcomponent->addguielem($section, new gui_radio('recording_out_internal', $currentcomponent->getoptlist('recording_options'), $recording_out_internal, _('Outbound Internal Calls'), _("Recording of calls made to other extensions on the system.")));
-		$currentcomponent->addguielem($section, new gui_radio('recording_ondemand', $currentcomponent->getoptlist('recording_ondemand_options'), $recording_ondemand, _('On Demand Recording'), _("Enable or disable the ability to do on demand (one-touch) recording. The overall calling policy rules still apply and if calls are already being recorded they can not be paused.")));
+		$currentcomponent->addguielem($section, new gui_radio('recording_ondemand', $currentcomponent->getoptlist('recording_ondemand_options'), $recording_ondemand, _('On Demand Recording'), _("Enable or disable the ability to do on demand (one-touch) recording. The overall calling policy rules still apply and if calls are already being recorded by 'Force' or 'Never', the can not be paused unless 'Override' is selected..")));
 		$currentcomponent->addguielem($section, new gui_selectbox('recording_priority', $currentcomponent->getoptlist('recording_priority_options'), $recording_priority, _("Record Priority Policy"), _("Call recording policy priority relative to other extensions when there is a conflict between an extension wanting recording and the other not wanting it. The higher of the two determines the policy, on a tie the global policy (caller or callee) determines the policy."), false));
 
 		$section = _("Optional Destinations");
