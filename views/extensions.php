@@ -1,74 +1,5 @@
-<style>
-.ext-container {
-  /*width: 75%;
-  float: left;*/
-}
-.ext-container .display {
-  border-bottom: 1px solid #ddd;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  padding: 5px;
-  margin-right: -1px;
-}
-.ext-container .row {
-  margin-bottom: 3px;
-}
-.ext-container .help-block {
-  background-color: rgba(242, 242, 242, 0.47);
-  padding: 5px;
-  border-radius: 5px;
-}
-.section-title {
-  float: left;
-  padding-bottom: 5px;
-}
-.section-title h3 {
-  margin-bottom: 0px;
-}
-.section {
-  clear: both;
-  border: 1px solid #ddd;
-  padding: 5px;
-  border-radius: 5px;
-}
-.fa.fa-question-circle {
-  color: #0070a3;
-  cursor: pointer;
-  height: 10px;
-  width: 10px;
-  font-size: small;
-  vertical-align: super;
-  display: inline-block;
-  text-align: center;
-  margin: 2px;
-  padding-right: 1.5px;
-  padding-top: 1px;
-  padding-left: 1px;
-  font-weight: normal;
-}
-.help-block {
-  display:none;
-}
-.help-block.active {
-  display:block;
-  opacity: 1;
-  animation: myfirst .5s;
-  -webkit-animation: myfirst .5s;
-}
-/* Standard syntax */
-@keyframes myfirst {
-  0%   {opacity: 0}
-  100% {opacity: 1}
-}
-@-webkit-keyframes myfirst {
-  0%   {opacity: 0}
-  100% {opacity: 1}
-}
-</style>
 <div class="ext-container">
-  <form class="popover-form fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&action=del" role="form">
+  <form class="popover-form fpbx-submit" name="frm_extensions" action="<?php echo $action?>" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&amp;action=del" role="form">
     <?php foreach ( array_keys($top) as $sortorder ) {
             foreach ( array_keys($top[$sortorder]) as $idx ) {
               $elem = $top[$sortorder][$idx];
@@ -84,7 +15,7 @@
     </ul>
 
     <div class="display">
-      <?php $hiddens=array();$c=1;foreach(array_keys($middle) as $category) { ?>
+      <?php $hiddens='';$c=1;foreach(array_keys($middle) as $category) { ?>
         <?php $active = ($c == 1); ?>
         <div id="<?php echo strtolower($category)?>" class="info-pane <?php echo $active ? '' : 'hidden'?>">
           <div class="container-fluid">
@@ -92,27 +23,34 @@
                     foreach( array_keys($middle[$category][$order]) as $section) {
                       echo "<div class='section-title'><h3>".$section."</h3></div><div class='section'>";
                       foreach ( array_keys($middle[$category][$order][$section]) as $sortorder ) {
-                        foreach ( array_keys($middle[$category][$order][$section][$sortorder]) as $idx ) {
+                        if(!is_array($middle[$category][$order][$section][$sortorder])) {
+                          continue;
+                        }
+                        $keys = array_keys($middle[$category][$order][$section][$sortorder]);
+                        foreach ( $keys as $idx ) {
                           $elem = $middle[$category][$order][$section][$sortorder][$idx];
-                          $h = !empty($elem->helptext) ? '<i class="fa fa-question-circle" data-id="'.$elem->_elemname.'"></i>' : '';
-                          $html = '<div class="form-group"><div class="col-md-3"><label for="'.$elem->_elemname.'">'.$elem->prompttext." ".$h.'</label></div><div class="col-md-9">'.$elem->html_input.'</div></div>';
-                          $pure = $elem->helptext.$elem->prompttext.$elem->html_input;
+                          $helptext = $elem->get('helptext');
+                          $h = !empty($helptext) ? '<i class="fa fa-question-circle" data-id="'.$elem->get('_elemname').'"></i>' : '';
+                          $html = '<div class="form-group"><div class="col-md-3"><label class="control-label" for="'.$elem->get('_elemname').'">'.$elem->get('prompttext')." ".$h.'</label></div><div class="col-md-9">'.$elem->get('html_input').'</div></div>';
+                          $pure = $elem->get('helptext').$elem->get('prompttext').$elem->get('html_input');
                           $help = "";
                           if(!empty($pure)) {
-                            $help = !empty($elem->helptext) ? '<span id="'.$elem->_elemname.'-help" class="help-block">'.$elem->helptext.'</span>' : '';
+                            $help = !empty($helptext) ? '<span id="'.$elem->get('_elemname').'-help" class="help-block">'.$elem->get('helptext').'</span>' : '';
                           } else {
-                            if(!empty($elem->_html)) {
-                              $html = $elem->_html;
-                            } elseif(!empty($elem->html_text)) {
-                              $html = $elem->html_text;
+                            $_html = $elem->get('_html');
+                            $html_text = $elem->get('html_text');
+                            if(!empty($_html)) {
+                              $html = $_html;
+                            } elseif(!empty($html_text)) {
+                              $html = $html_text;
                             } else {
                               $html = "";
                             }
                           }
-                          if($elem->type != "hidden") {
+                          if($elem->get('type') != "hidden") {
                             if(!empty($html)) {
-                              echo '<div class="row"><div class="col-md-12">';
-                              echo '<div class="row parent" data-id="'.$elem->_elemname.'"><div class="col-md-12">'.$html .'</div></div>';
+                              echo '<div class="row"><div class="col-md-12 element-container" data-id="'.$elem->get('_elemname').'">';
+                              echo '<div class="row parent" data-id="'.$elem->get('_elemname').'"><div class="col-md-12">'.$html .'</div></div>';
                               if(!empty($help)) {
                                 echo '<div class="row"><div class="col-md-12">'.$help.'</div></div>';
                               }
@@ -134,51 +72,18 @@
   </form>
 </div>
 <script>
-  var loc = window.location.hash.replace("#", "");
-  if(loc !== "" && $("#" + loc + ".info-pane").length > 0) {
-    $(".info-pane").addClass("hidden");
-    $(".change-tab").removeClass("active");
-    $("#" + loc + ".info-pane").removeClass("hidden");
-    $(".change-tab[data-name='" + loc + "']").addClass("active");
-  }
-  $(".change-tab").click(function(event) {
-    var pos = document.body.scrollTop;
-    if($(this).hasClass("active")) {
-      event.stopPropagation();
-      event.preventDefault();
-      return true;
-    }
-    $(".info-pane").addClass("hidden");
-    $(".change-tab").removeClass("active");
-    $(this).addClass("active");
-    var id = $(this).data("name");
-    $("#" + id).removeClass("hidden");
-    location.hash = id;
-    document.body.scrollTop = document.documentElement.scrollTop = pos;
-    event.stopPropagation();
-    event.preventDefault();
-  });
-  $(".ext-container .fa.fa-question-circle").hover(function(){
-    var id = $(this).data('id');
-    $("#" + id + "-help").addClass("active");
-  }, function(){
-    var id = $(this).data('id');
-    $("#" + id + "-help").removeClass("active");
-  })
-  $(".ext-container input, .ext-container select, .ext-container textarea").focus(function() {
-    var id = $(this).parents(".parent").data("id");
-    $("#" + id + "-help").addClass("active");
-  });
-  $(".ext-container input, .ext-container select, .ext-container textarea").blur(function() {
-    var id = $(this).parents(".parent").data("id");
-    $("#" + id + "-help").removeClass("active");
-  });
+  var theForm = document.frm_extensions;
   <?php
   $formname = "frm_extensions";
+  $htmlout = '';
   if ( is_array($jsfuncs) ) {
     foreach ( array_keys($jsfuncs) as $function ) {
       // Functions
-      $htmlout .= "function ".$formname."_$function {\n";
+      if ( $function == 'onsubmit()' ) {
+        $htmlout .= "function ".$formname."_onsubmit(theForm) {\n";
+      } else {
+        $htmlout .= "function ".$formname."_$function {\n";
+      }
       foreach ( array_keys($jsfuncs[$function]) as $sortorder ) {
         foreach ( array_keys($jsfuncs[$function][$sortorder]) as $idx ) {
           $func = $jsfuncs[$function][$sortorder][$idx];
@@ -192,4 +97,7 @@
       echo $htmlout;
     }
   }?>
+  $("form").submit(function() {
+    return frm_extensions_onsubmit(this);
+  });
 </script>
