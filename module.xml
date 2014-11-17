@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.6.1</version>
+	<version>12.0.7</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.7* Call Recording changes
 		*12.0.6.1* PJSIP DTMF Errors causing endpoints to not be used
 		*12.0.5* FREEPBX-8191 Call Pickup groups not written to config
 		*12.0.4* FREEPBX-8204 trunk definition not deleted in PJSIP
