@@ -177,7 +177,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						"flag" => $flag++
 					),
 					"dtmfmode" => array(
-						"value" => "rfc2833",
+						"value" => "rfc4733",
 						"flag" => $flag++
 					),
 					"trustrpid" => array(

@@ -7225,11 +7225,15 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
 		unset($tt, $ttt, $mydriver, $otherdriver);
 
-		$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
+		if ($mydriver == "CHAN_PJSIP") {
+			$select[] = array('value' => 'rfc4733', 'text' => _('RFC 4733'));
+		} else {
+			$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
+			$select[] = array('value' => 'auto', 'text' => _('Auto'));
+			$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
+		}
 		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
-		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
-		$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
 		$tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.").' [dtmfmode]';
 		$tmparr['dtmfmode'] = array('prompttext' => _('DTMF Signaling'), 'value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
 		// $amp_conf['DEVICE_SIP_CANREINVITE']

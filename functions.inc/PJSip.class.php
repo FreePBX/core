@@ -443,6 +443,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
+		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
+		if ($config['dtmfmode'] != "rfc4733" && $config['dtmfmode'] != 'inband' && $config['dtmfmode'] != 'info'
+			&& $config['dtmfmode'] != 'none' ) {
+			$config['dtmfmode'] = "rtc4733";
+		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 		$endpoint[] = "mailboxes=".$config['mailbox'];
 		//check transport to make sure it's valid
