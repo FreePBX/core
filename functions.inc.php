@@ -7232,9 +7232,9 @@ function core_devices_configpageinit($dispnum) {
 			$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
 		}
 		unset($tt, $ttt, $mydriver, $otherdriver);
-		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
-		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
-		$tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.").' [dtmfmode]';
+		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay)'));
+		$select[] = array('value' => 'inband', 'text' => _('In band audio (Not recommended)'));
+		$tt = _("The DTMF signaling mode used by this device, usually RFC for most phones.").' [dtmfmode]';
 		$tmparr['dtmfmode'] = array('prompttext' => _('DTMF Signaling'), 'value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
 		// $amp_conf['DEVICE_SIP_CANREINVITE']
 		// $amp_conf['DEVICE_SIP_TRUSTRPID']
