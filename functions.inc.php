@@ -7223,7 +7223,6 @@ function core_devices_configpageinit($dispnum) {
 
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
-		unset($tt, $ttt, $mydriver, $otherdriver);
 
 		if ($mydriver == "CHAN_PJSIP") {
 			$select[] = array('value' => 'rfc4733', 'text' => _('RFC 4733'));
@@ -7232,6 +7231,7 @@ function core_devices_configpageinit($dispnum) {
 			$select[] = array('value' => 'auto', 'text' => _('Auto'));
 			$select[] = array('value' => 'shortinfo', 'text' => _('SIP INFO (application/dtmf)'));
 		}
+		unset($tt, $ttt, $mydriver, $otherdriver);
 		$select[] = array('value' => 'inband', 'text' => _('In band audio'));
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay'));
 		$tt = _("The DTMF signaling mode used by this device, usually rfc2833 for most phones.").' [dtmfmode]';
