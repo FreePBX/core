@@ -30,11 +30,11 @@ $(".ext-container .fa.fa-question-circle").hover(function() {
 	$("#" + id + "-help").removeClass("active");
 });
 $(".ext-container input, .ext-container select, .ext-container textarea").focus(function() {
-	var id = $(this).parents(".parent").data("id");
+	var id = $(this).parents(".form-group").data("id");
 	$("#" + id + "-help").addClass("active");
 });
 $(".ext-container input, .ext-container select, .ext-container textarea").blur(function() {
-	var id = $(this).parents(".parent").data("id");
+	var id = $(this).parents(".form-group").data("id");
 	$("#" + id + "-help").removeClass("active");
 });
 $(".types .fa.fa-question-circle").hover(function() {

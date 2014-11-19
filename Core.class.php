@@ -142,6 +142,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$buttons = $tmpButtons;
 				}
 			break;
+			case 'users':
+			case 'devices':
 			case 'extensions':
 				$buttons = array(
 					'delete' => array(
@@ -163,7 +165,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
-				if (empty($request['tech_hardware']) && empty($request['extdisplay'])) {
+				if ($request['display'] != "users" && empty($request['tech_hardware']) && empty($request['extdisplay'])) {
 					$buttons = array();
 				}
 			break;
