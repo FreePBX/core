@@ -29,18 +29,20 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			echo $currentcomponent->generateconfigpage(__DIR__."/views/users.php");
 			?>
 		</div>
-		<div class="col-sm-3 hidden-xs">
-			<div class="list-group">
-				<?php
-					$extens = core_users_list();
-					$description = _("user");
-					$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-					?><a href="?display=users" class="list-group-item <?php echo empty($extdisplay) ? "active" : ""?>"><?php echo _("Add user")?></a><?php
-					foreach($extens as $ext) {
-						$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
-						?><a href="?display=users&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
-					}
-				?>
+		<div class="bootnav">
+			<div class="col-sm-3 hidden-xs">
+				<div class="list-group">
+					<?php
+						$extens = core_users_list();
+						$description = _("user");
+						$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+						?><a href="?display=users" class="list-group-item <?php echo empty($extdisplay) ? "active" : ""?>"><?php echo _("Add user")?></a><?php
+						foreach($extens as $ext) {
+							$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
+							?><a href="?display=users&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
+						}
+					?>
+				</div>
 			</div>
 		</div>
 	</div>

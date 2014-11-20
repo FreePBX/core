@@ -1,4 +1,4 @@
-<div class="ext-container">
+<div class="currentcomponent-container">
   <form class="popover-form fpbx-submit" name="frm_devices" action="<?php echo $action?>" method="post" data-fpbx-delete="config.php?display=devices&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&amp;action=del" role="form">
     <?php foreach ( $html['top'] as $elem ) {
       echo $elem['html'];
