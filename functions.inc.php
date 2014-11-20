@@ -6565,6 +6565,7 @@ function core_users_configpageload() {
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
+					/*
 					$tlabel = sprintf(_("Delete User %s"),$extdisplay);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
@@ -6573,6 +6574,7 @@ function core_users_configpageload() {
 					if (!empty($usage_list)) {
 						$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
 					}
+					*/
 				}
 			}
 		} elseif ( $display != 'extensions' ) {
