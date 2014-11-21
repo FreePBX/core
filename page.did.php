@@ -305,9 +305,7 @@ echo drawselects(isset($destination)?$destination:null,0);
 			</td>
 		</tr>
 		</table>
-<script language="javascript">
-<!--
-
+<script>
 var theForm = document.editGRP;
 
 theForm.extension.focus();
@@ -357,7 +355,7 @@ function editGRP_onsubmit() {
 		return warnInvalid(theForm.grppre, msgInvalidGrpPrefix);
 
 	return true;
-}
+});
 
 $(document).ready(function() {
 	//show/hide privacy manager options
@@ -366,8 +364,6 @@ $(document).ready(function() {
 		if($(this).val()==1){$('.pm_opts').fadeIn();}
 	});
 });
-
-//-->
 </script>
 		</form>
 <?php
