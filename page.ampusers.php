@@ -136,106 +136,102 @@ foreach ($tresults as $tresult) {
 		echo "<h2>"._("Add Administrator")."</h2>";
 	}
 ?>
-
-		<form autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
-			<input type="hidden" name="display" value="<?php echo $display?>"/>
-			<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
-			<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
-			<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-			<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
-			<table>
-			<tr>
-				<td colspan="2">
-					<h4><?php echo _("General Settings")?></h4>
-				</td>
-			</tr>
-<?php if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { ?>
-			<tr>
-				<td colspan="2">
-	<?php echo '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ?><br /><br />
-				</td>
-			</tr>
-<?php } ?>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Username")?><span><?php echo _("Create a unique username for this user")?></span></a>:
-				</td><td>
-					<input type="text" size="20" name="username" value="<?php echo $username;?>" tabindex="<?php echo ++$tabindex;?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Password")?><span><?php echo _("Create a password for this new user")?></span></a>:
-				</td><td>
-					<input type="password" size="20" name="password" value="<?php echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<br>
-					<h4><?php echo _("Access Restrictions")?></h4>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Department Name")?><span><?php echo _("Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.")?></span></a>:
-				</td><td>
-					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>" tabindex="<?php echo ++$tabindex;?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href=# class="info"><?php echo _("Extension Range")?><span><?php echo _("Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.")?></span></a>:
-				</td><td>
-					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>" tabindex="<?php echo ++$tabindex;?>"/>
-					&nbsp;to
-					<input type="text" size="5" name="extension_high" value="<?php echo htmlspecialchars($extension_high);?>" tabindex="<?php echo ++$tabindex;?>"/>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top">
-					<a href=# class="info"><?php echo _("Admin Access")?><span><?php echo _("Select the Admin Sections this user should have access to.")?></span></a>:
-				</td><td>
-					<select multiple name="sections[]" tabindex="<?php echo ++$tabindex;?>" size="15">
-            <option></option>
+<div class = "container-fluid" >
+	<div class = "row">
+<form role="form" autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
+<input type="hidden" name="display" value="<?php echo $display?>"/>
+<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
+<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
+<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
+<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
+<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
+<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
+		<div class="col-xs-6 col-md-4">
+			<h4><?php echo _("General Settings")?></h4>
+		</div>
+		<div class = "col-xs-12 col-md-8"></div>
+	</div>
+			
 <?php
-				$prev_category = NULL;
-				foreach ($module_list as $key => $row) {
-					if ($row['category'] != $prev_category) {
-						if ($prev_category)
-							echo "</optgroup>\n";
-						echo "<optgroup label=\""._($row['category'])."\">\n";
-						$prev_category = $row['category'];
-					}
+if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { 
+	$out = '<div class = "row">';
+	$out .= '<div class = "col-xs-18 col-md-12">';
+	$out .= '<p class="bg-danger">';
+	$out .= '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ."<br />";
+	$out .= '</p>';
+	$out .= '</div>';
+	echo $out;
+	unset($out);
+}
+$out = '';
+$out .= '<div class = "row">';
+$out .= '<div class = "form-group">';
+$out .= '<label for = "username" class="col-sm-2 control-label">' . _("Username") . '  </label>';
+$out .= '<div class="col-sm-10">';
+$out .= '<input type = "text" name = "username" value = "' . $username . '" tabindex = "' . ++$tabindex . '"/>';
+$out .= '<a href=# class="info"><span>' . _("Create a unique username for this user") . '</span></a>';
+$out .= '</div>';
+$out .= '</div>';
+$out .= '<div class = "form-group">';
+$out .= '<label for = "username" class="col-sm-2 control-label">' .  _("Password") . '  </label>';
+$out .= '<div class="col-sm-10">';
+$out .= '<input type = "password" name = "password" value = "' . $password . '" tabindex = "' . ++$tabindex . '"/>';
+$out .= '<a href=# class="info"><span>' . _("Create a password for this new user") . '</span></a>';
+$out .= '</div>';
+$out .= '</div>';
+$out .= '</div>';
+$out .= '<div class = "row">';
+$out .= '<div class="col-xs-6 col-md-4">';
+$out .= '<h4>' . _("Access Restrictions") . '</h4>';
+$out .= '</div>';
+$out .= '<div class = "col-xs-12 col-md-8"></div>';
+$out .= '</div>';
+$out .= '<div class = "row">';
+$out .= '<div class = "form-group">';
+$out .= '<label for = "sections[]" class="col-sm-2 control-label">' . _("Admin Access") . '   </label>';
+$out .= '<a href=# class="info"><span>' .  _("Select the Admin Sections this user should have access to.") . '</span></a>'; 
+$out .= '<div class="col-sm-10">';
+$out .= '<select miltiple name = "sections[]" tabindex = "' . ++$tabindex . '" size = "15">';
+$prev_category = NULL;
+foreach ($module_list as $key => $row) {
+	if ($row['category'] != $prev_category) {
+		if ($prev_category)
+			$out .= "</optgroup>\n";
+		$out .= "<optgroup label=\""._($row['category'])."\">\n";
+		$prev_category = $row['category'];
+	}
 
-					echo "<option value=\"".$key."\"";
-					if (in_array($key, $sections)) echo " SELECTED";
-					$label = modgettext::_($row['name'],$row['rawname']);
-					echo ">"._($row['name'])."</option>\n";
-				}
-				echo "</optgroup>\n";
+	$out .= "<option value=\"".$key."\"";
+	if (in_array($key, $sections)) echo " SELECTED";
+	$label = modgettext::_($row['name'],$row['rawname']);
+	$out .= ">"._($row['name'])."</option>\n";
+}
+				$out .= "</optgroup>\n";
 
 				// Apply Changes Bar
-				echo "<option value=\"99\"";
-				if (in_array("99", $sections)) echo " SELECTED";
-				echo ">"._("Apply Changes Bar")."</option>\n";
+				$out .= "<option value=\"99\"";
+				if (in_array("99", $sections)) $out .= " SELECTED";
+				$out .= ">"._("Apply Changes Bar")."</option>\n";
 
 				// Apply Changes Bar
-				echo "<option value=\"999\"";
-				if (in_array("999", $sections)) echo " SELECTED";
-				echo ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
+				$out .= "<option value=\"999\"";
+				if (in_array("999", $sections)) $out .= " SELECTED";
+				$out .= ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
 
 				// All Sections
-				echo "<option value=\"*\"";
-				if (in_array("*", $sections)) echo " SELECTED";
-				echo ">"._("ALL SECTIONS")."</option>\n";
-?>
-					</select>
-				</td>
-			</tr>
-			</table>
-		</form>
+				$out .= "<option value=\"*\"";
+				if (in_array("*", $sections)) $out .= " SELECTED";
+				$out .= ">"._("ALL SECTIONS")."</option>\n";
 
+$out .= '</select>';
+$out .= '</div>';
+$out .= '</form>';
+$out .= '</div>';
+$out .= '</div>';
+$out .= '</div>';
+echo $out;
+?>
 <script language="javascript">
 <!--
 $('#submit').click(function() {
