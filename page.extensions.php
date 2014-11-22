@@ -1,8 +1,9 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
+	$popover = isset($_REQUEST['fw_popover']) ? "&amp;fw_popover=".$_REQUEST['fw_popover'] : '';
 ?>
 <div class="container-fluid">
-  <div class="row">
+	<div class="row">
 		<div class="col-sm-9">
 			<?php
 			// If this is a popOver, we need to set it so the selection of device type does not result
@@ -39,20 +40,20 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 				<div class="row">
 					<div class="col-sm-12 types">
 							<?php if($sipdriver == "both" || $sipdriver == "chan_pjsip") {?>
-								<a data-id="pjsip_generic" href="?display=extensions&amp;tech_hardware=pjsip_generic" class="btn device"><?php echo _("Generic PJSIP Device")?></a><i data-id="pjsip_generic" class="fa fa-question-circle"></i><br/>
+								<a data-id="pjsip_generic" href="?display=extensions&amp;tech_hardware=pjsip_generic<?php echo $popover?>" class="btn device"><?php echo _("Generic PJSIP Device")?></a><i data-id="pjsip_generic" class="fa fa-question-circle"></i><br/>
 								<span id="pjsip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic PJSIP Device</strong>: A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality");?></span>
 							<?php } ?>
 							<?php if($sipdriver == "both" || $sipdriver == "chan_sip") {?>
-								<a data-id="sip_generic" href="?display=extensions&amp;tech_hardware=sip_generic" class="btn device"><?php echo _("Generic CHAN SIP Device")?></a><i data-id="sip_generic" class="fa fa-question-circle"></i><br/>
+								<a data-id="sip_generic" href="?display=extensions&amp;tech_hardware=sip_generic<?php echo $popover?>" class="btn device"><?php echo _("Generic CHAN SIP Device")?></a><i data-id="sip_generic" class="fa fa-question-circle"></i><br/>
 								<span id="sip_generic-help" class="help-block  selection"><?php echo _("<strong>Generic CHAN SIP Device</strong>: The legacy SIP channel driver in Asterisk");?></span>
 							<?php } ?>
-							<a data-id="iax2_generic" href="?display=extensions&amp;tech_hardware=iax2_generic" class="btn device"><?php echo _("Generic IAX2 Device")?></a><i data-id="iax2_generic" class="fa fa-question-circle"></i><br/>
+							<a data-id="iax2_generic" href="?display=extensions&amp;tech_hardware=iax2_generic<?php echo $popover?>" class="btn device"><?php echo _("Generic IAX2 Device")?></a><i data-id="iax2_generic" class="fa fa-question-circle"></i><br/>
 							<span id="iax2_generic-help" class="help-block  selection"><?php echo _("<strong>Generic IAX2 Device</strong>: Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices");?></span>
-							<a data-id="dahdi_generic" href="?display=extensions&amp;tech_hardware=dahdi_generic" class="btn device"><?php echo _("Generic DAHDi Device")?></a><i data-id="dahdi_generic" class="fa fa-question-circle"></i><br/>
+							<a data-id="dahdi_generic" href="?display=extensions&amp;tech_hardware=dahdi_generic<?php echo $popover?>" class="btn device"><?php echo _("Generic DAHDi Device")?></a><i data-id="dahdi_generic" class="fa fa-question-circle"></i><br/>
 							<span id="dahdi_generic-help" class="help-block  selection"><?php echo _("<strong>Generic DAHDi Device</strong>: Short for 'Digium Asterisk Hardware Device Interface'");?></span>
-							<a data-id="custom_custom" href="?display=extensions&amp;tech_hardware=custom_custom" class="btn device"><?php echo _("Other (Custom) Device")?></a><i data-id="custom_custom" class="fa fa-question-circle"></i><br/>
+							<a data-id="custom_custom" href="?display=extensions&amp;tech_hardware=custom_custom<?php echo $popover?>" class="btn device"><?php echo _("Other (Custom) Device")?></a><i data-id="custom_custom" class="fa fa-question-circle"></i><br/>
 							<span id="custom_custom-help" class="help-block  selection"><?php echo _("<strong>Other (Custom) Device</strong>");?></span>
-							<a data-id="virtual" href="?display=extensions&amp;tech_hardware=virtual" class="btn device"><?php echo _("None (virtual exten)")?></a><i data-id="virtual" class="fa fa-question-circle"></i><br/>
+							<a data-id="virtual" href="?display=extensions&amp;tech_hardware=virtual<?php echo $popover?>" class="btn device"><?php echo _("None (virtual exten)")?></a><i data-id="virtual" class="fa fa-question-circle"></i><br/>
 							<span id="virtual-help" class="help-block selection"><?php echo _("<strong>None (virtual exten)</strong>");?></span>
 					</div>
 				</div>
@@ -61,21 +62,19 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 				echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
 			} ?>
 		</div>
-    <div class="bootnav">
-  		<div class="col-sm-3 hidden-xs">
-  			<div class="list-group">
-  				<?php
-  					$extens = core_users_list();
-  					$description = _("Extension");
-  					$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-  					?><a href="?display=extensions" class="list-group-item <?php echo empty($extdisplay) ? "active" : ""?>"><?php echo _("Add Extension")?></a><?php
-  					foreach($extens as $ext) {
-  						$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
-  						?><a href="?display=extensions&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
-  					}
-  				?>
-  			</div>
-  		</div>
-    </div>
+		<div class="col-sm-3 hidden-xs bootnav">
+			<div class="list-group">
+				<?php
+					$extens = core_users_list();
+					$description = _("Extension");
+					$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+					?><a href="?display=extensions" class="list-group-item <?php echo empty($extdisplay) ? "active" : ""?>"><?php echo _("Add Extension")?></a><?php
+					foreach($extens as $ext) {
+						$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
+						?><a href="?display=extensions&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
+					}
+				?>
+			</div>
+		</div>
 	</div>
 </div>
