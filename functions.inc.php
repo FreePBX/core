@@ -7320,6 +7320,7 @@ function core_devices_configpageload() {
 
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 	if ($tech_hardware == 'virtual') {
+		$currentcomponent->addguielem('_top', new gui_hidden('tech', "virtual"));
 		return true;
 	}
 
