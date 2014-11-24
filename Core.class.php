@@ -397,10 +397,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {bool} $editmode=false   If edited, (this is so it doesnt destroy the AsteriskDB)
 	 */
 	public function addDevice($id,$tech,$settings=array(),$editmode=false) {
-		global $amp_conf;
-		global $astman;
-		global $db;
-
 		if ($tech == '' || trim($tech) == 'virtual') {
 			return true;
 		}
@@ -660,6 +656,54 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			die_freepbx($e->getMessage().$sql);
 		}
 		return true;
+	}
+
+	public function getUser($extension) {
+		$sql = "SELECT * FROM users WHERE extension = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($extension));
+			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		
+		$astman = $this->FreePBX->astman;
+		if ($astman) {
+
+			if (function_exists('paging_get_config')) {
+				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
+				$results['answermode'] = (trim($answermode) == '') ? 'disabled' : $answermode;
+			}
+
+			$cw = $astman->database_get("CW",$extension);
+			$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
+			$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
+			$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
+
+			$call_screen=$astman->database_get("AMPUSER",$extension."/screen");
+			$results['call_screen'] = (trim($call_screen) != "")?$call_screen:'0';
+
+			$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
+			$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
+
+			$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
+
+			$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
+			$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
+
+			$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
+
+			$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
+			$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
+			$results['recording_in_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/internal"));
+			$results['recording_out_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/internal"));
+			$results['recording_ondemand'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/ondemand"));
+			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
+
+		} else {
+		}
+		return $results;
 	}
 
 	/**
