@@ -202,7 +202,7 @@ foreach ($module_list as $key => $row) {
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
 												</div>
 												<div class="col-md-9">
-													<input type="text" class="form-control" id="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
+													<input type="text" class="form-control" id="username" name="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
 												</div>
 											</div>
 										</div>
@@ -223,7 +223,7 @@ foreach ($module_list as $key => $row) {
 													<label class="control-label" for="password"><?php echo _("Password") ?></label>
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
 												</div>
-												<div class="col-md-9"><input type="password" class="form-control" id="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
+												<div class="col-md-9"><input type="password" class="form-control" id="password" name="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
 												</div>
 											</div>
 										</div>
