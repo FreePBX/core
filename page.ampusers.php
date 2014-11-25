@@ -7,6 +7,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
+$display = isset($_REQUEST['display'])?$_REQUEST['display']:'ampusers';
 
 $tabindex = 0;
 // populate some global variables from the request string
@@ -90,148 +91,179 @@ switch ($action) {
 		redirect_standard();
 	break;
 }
-
-?>
-<div class="rnav">
-<ul>
-	<li><a <?php  echo ($userdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add User")?></a></li>
-<?php
-//get existing trunk info
-$tresults = core_ampusers_list();
-
-foreach ($tresults as $tresult) {
-    echo "\t<li><a ".($userdisplay==$tresult[0] ? 'class="current"':'')." href=\"config.php?display=".urlencode($display)."&amp;userdisplay=".urlencode($tresult[0])."\">".$tresult[0]."</a></li>\n";
+//Generate bootnav
+$bootnav = '';
+if($userdisplay == ''){
+	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item active">' . _("Add User") .'</a>';	
+}else{
+	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item">' . _("Add User") .'</a>';	
 }
-?>
-</ul>
-</div>
-
-<?php
-
-	if ($userdisplay) {
-		echo "<h2>"._("Edit Administrator")."</h2>";
-
-		$user = getAmpUser($userdisplay);
-
-		$username = $user["username"];
-		$password = "******";
-		$password_sha1 = $user["password_sha1"];
-		$extension_high = $user["extension_high"];
-		$extension_low = $user["extension_low"];
-		$deptname = $user["deptname"];
-		$sections = $user["sections"];
-
-	} else {
-		// set defaults
-		$username = "";
-		$password = "";
-		$deptname = "";
-
-		$extension_low = "";
-		$extension_high = "";
-
-		$sections = array("*");
-
-
-		echo "<h2>"._("Add Administrator")."</h2>";
+//get existing users
+$tresults = core_ampusers_list();
+foreach ($tresults as $tresult) {
+	if($userdisplay == $tresult[0]){
+		$bootnav .= '<a href="config.php?display=' . urlencode($display) . '&amp;userdisplay=' . urlencode($tresult[0]) . '" class="list-group-item active">' . $tresult[0] .'</a>';
+	}else{
+		$bootnav .= '<a href="config.php?display=' . urlencode($display) . '&amp;userdisplay=' . urlencode($tresult[0]) . '" class="list-group-item">' . $tresult[0] .'</a>';
 	}
-?>
-<div class = "container-fluid" >
-	<div class = "row">
-<form role="form" autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
-<input type="hidden" name="display" value="<?php echo $display?>"/>
-<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
-<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
-<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
-<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
-<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
-<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
-		<div class="col-xs-6 col-md-4">
-			<h4><?php echo _("General Settings")?></h4>
-		</div>
-		<div class = "col-xs-12 col-md-8"></div>
-	</div>
-			
-<?php
+}
+if ($userdisplay) {
+	$title =  '<h2>' . _("Edit Administrator") . '</h2>';
+	$user = getAmpUser($userdisplay);
+	$username = $user["username"];
+	$password = "******";
+	$password_sha1 = $user["password_sha1"];
+	$extension_high = $user["extension_high"];
+	$extension_low = $user["extension_low"];
+	$deptname = $user["deptname"];
+	$sections = $user["sections"];
+
+} else {
+	// set defaults
+	$title = '<h2>' . _("Add Administrator") . '</h2>';
+	$username = "";
+	$password = "";
+	$deptname = "";
+
+	$extension_low = "";
+	$extension_high = "";
+
+	$sections = array("*");
+}
 if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { 
 	$out = '<div class = "row">';
-	$out .= '<div class = "col-xs-18 col-md-12">';
+	$out .= '<div class = "col-sm-12">';
 	$out .= '<p class="bg-danger">';
 	$out .= '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ."<br />";
 	$out .= '</p>';
 	$out .= '</div>';
-	echo $out;
+	$authtypewarn = $out;
 	unset($out);
 }
-$out = '';
-$out .= '<div class = "row">';
-$out .= '<div class = "form-group">';
-$out .= '<label for = "username" class="col-sm-2 control-label">' . _("Username") . '  </label>';
-$out .= '<div class="col-sm-10">';
-$out .= '<input type = "text" name = "username" value = "' . $username . '" tabindex = "' . ++$tabindex . '"/>';
-$out .= '<a href=# class="info"><span>' . _("Create a unique username for this user") . '</span></a>';
-$out .= '</div>';
-$out .= '</div>';
-$out .= '<div class = "form-group">';
-$out .= '<label for = "username" class="col-sm-2 control-label">' .  _("Password") . '  </label>';
-$out .= '<div class="col-sm-10">';
-$out .= '<input type = "password" name = "password" value = "' . $password . '" tabindex = "' . ++$tabindex . '"/>';
-$out .= '<a href=# class="info"><span>' . _("Create a password for this new user") . '</span></a>';
-$out .= '</div>';
-$out .= '</div>';
-$out .= '</div>';
-$out .= '<div class = "row">';
-$out .= '<div class="col-xs-6 col-md-4">';
-$out .= '<h4>' . _("Access Restrictions") . '</h4>';
-$out .= '</div>';
-$out .= '<div class = "col-xs-12 col-md-8"></div>';
-$out .= '</div>';
-$out .= '<div class = "row">';
-$out .= '<div class = "form-group">';
-$out .= '<label for = "sections[]" class="col-sm-2 control-label">' . _("Admin Access") . '   </label>';
-$out .= '<a href=# class="info"><span>' .  _("Select the Admin Sections this user should have access to.") . '</span></a>'; 
-$out .= '<div class="col-sm-10">';
-$out .= '<select miltiple name = "sections[]" tabindex = "' . ++$tabindex . '" size = "15">';
 $prev_category = NULL;
 foreach ($module_list as $key => $row) {
 	if ($row['category'] != $prev_category) {
 		if ($prev_category)
-			$out .= "</optgroup>\n";
-		$out .= "<optgroup label=\""._($row['category'])."\">\n";
+			$sectionOptions .= "</optgroup>\n";
+		$sectionOptions .= "<optgroup label=\""._($row['category'])."\">\n";
 		$prev_category = $row['category'];
 	}
 
-	$out .= "<option value=\"".$key."\"";
+	$sectionOptions .= "<option value=\"".$key."\"";
 	if (in_array($key, $sections)) echo " SELECTED";
 	$label = modgettext::_($row['name'],$row['rawname']);
-	$out .= ">"._($row['name'])."</option>\n";
+	$sectionOptions .= ">"._($row['name'])."</option>\n";
 }
-				$out .= "</optgroup>\n";
+				$sectionOptions .= "</optgroup>\n";
 
 				// Apply Changes Bar
-				$out .= "<option value=\"99\"";
-				if (in_array("99", $sections)) $out .= " SELECTED";
-				$out .= ">"._("Apply Changes Bar")."</option>\n";
+				$sectionOptions .= "<option value=\"99\"";
+				if (in_array("99", $sections)) $sectionOptions .= " SELECTED";
+				$sectionOptions .= ">"._("Apply Changes Bar")."</option>\n";
 
 				// Apply Changes Bar
-				$out .= "<option value=\"999\"";
-				if (in_array("999", $sections)) $out .= " SELECTED";
-				$out .= ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
+				$sectionOptions .= "<option value=\"999\"";
+				if (in_array("999", $sections)) $sectionOptions .= " SELECTED";
+				$sectionOptions .= ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
 
 				// All Sections
-				$out .= "<option value=\"*\"";
-				if (in_array("*", $sections)) $out .= " SELECTED";
-				$out .= ">"._("ALL SECTIONS")."</option>\n";
+				$sectionOptions .= "<option value=\"*\"";
+				if (in_array("*", $sections)) $sectionOptions .= " SELECTED";
+				$sectionOptions .= ">"._("ALL SECTIONS")."</option>\n";
 
-$out .= '</select>';
-$out .= '</div>';
-$out .= '</form>';
-$out .= '</div>';
-$out .= '</div>';
-$out .= '</div>';
-echo $out;
 ?>
+<div class="container-fluid">
+	<?php if($authtypewarn){ echo $authtypewarn; } ?>
+    <div class="row">
+        <div class="col-sm-9">
+			<?php echo $title ?>
+			<div class="section-title" data-for="general"><h3><i class="fa fa-minus"></i> <?php echo _("General Settings")?> </h3>
+			</div>
+			<form role="form" autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
+				<input type="hidden" name="display" value="<?php echo $display?>"/>
+				<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
+				<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
+				<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+				<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
+				<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
+				<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
+				<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
+				<div class="section" data-id="section1">
+					<div class="element-container">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-3">
+											<label class="control-label" for="username"><?php echo _("Username") ?></label>
+											<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
+										</div>
+										<div class="col-md-9"><input type="text" class="form-control" id="username" value = "<?php echo $username?>" tabindex = "<?php ++$tabindex?>">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<span id="username-help" class="help-block fpbx-help-block"><?php echo _("Create a unique username for this user") ?></span>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-3">
+											<label class="control-label" for="password"><?php echo _("Password") ?></label>
+											<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
+										</div>
+										<div class="col-md-9"><input type="password" class="form-control" id="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<span id="password-help" class="help-block fpbx-help-block"><?php echo _("Create a password for this new user") ?></span>
+							</div>
+						</div>
+					</div>
+					<div class="section-title" data-for="access"><h3><i class="fa fa-minus"></i> <?php echo _("Access Restrictions")?> </h3>
+					</div>
+						<div class="section" data-id="access">
+							<div class="element-container">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<div class="col-md-3">
+												<label class="control-label" for="sections[]"><?php echo _("Admin Access") ?></label>
+												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections[]"></i>
+											</div>
+											<div class="col-md-9">
+												<select multiple class="form-control" id="sections[]" tabindex = "<?php ++$tabindex?>">
+													<?php echo $sectionOptions?>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<span id="sections[]-help" class="help-block fpbx-help-block"><?php echo _("Select the Admin Sections this user should have access to.") ?></span>
+								</div>
+							</div>							
+						</div>
+					</div>
+				</div>
+			</form>
+		<div class="col-sm-3 hidden-xs bootnav">
+			<?php echo $bootnav ?>
+		</div>
+	</div>
+</div>
+
 <script language="javascript">
 <!--
 $('#submit').click(function() {
