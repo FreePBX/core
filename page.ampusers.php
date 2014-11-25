@@ -94,9 +94,9 @@ switch ($action) {
 //Generate bootnav
 $bootnav = '';
 if($userdisplay == ''){
-	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item active">' . _("Add User") .'</a>';	
+	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item active">' . _("Add User") .'</a>';
 }else{
-	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item">' . _("Add User") .'</a>';	
+	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item">' . _("Add User") .'</a>';
 }
 //get existing users
 $tresults = core_ampusers_list();
@@ -130,7 +130,7 @@ if ($userdisplay) {
 
 	$sections = array("*");
 }
-if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { 
+if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) {
 	$out = '<div class = "row">';
 	$out .= '<div class = "col-sm-12">';
 	$out .= '<p class="bg-danger">';
@@ -174,115 +174,117 @@ foreach ($module_list as $key => $row) {
 ?>
 <div class="container-fluid">
 	<?php if($authtypewarn){ echo $authtypewarn; } ?>
-    <div class="row">
-        <div class="col-sm-9">
-			<?php echo $title ?>
-			<div class="section-title" data-for="general"><h3><i class="fa fa-minus"></i> <?php echo _("General Settings")?> </h3>
-			</div>
-			<form role="form" autocomplete="off" class="fpbx-submit" name="ampuserEdit" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
-				<input type="hidden" name="display" value="<?php echo $display?>"/>
-				<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
-				<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
-				<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-				<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
-				<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
-				<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
-				<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
-				<div class="section" data-id="section1">
-					<div class="element-container">
-						<div class="row">
-							<div class="col-md-12">
+	<div class="row">
+		<div class="col-sm-9">
+			<div class="fpbx-container">
+				<?php echo $title ?>
+				<form role="form" autocomplete="off" class="fpbx-submit" name="ampuser" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
+					<input type="hidden" name="display" value="<?php echo $display?>"/>
+					<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
+					<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
+					<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+					<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
+					<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
+					<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
+					<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
+					<div class="display full-border">
+						<div class="section-title" data-for="general">
+							<h3><i class="fa fa-minus"></i> <?php echo _("General Settings")?></h3>
+						</div>
+						<div class="section" data-id="general">
+							<div class="element-container">
 								<div class="row">
-									<div class="form-group">
-										<div class="col-md-3">
-											<label class="control-label" for="username"><?php echo _("Username") ?></label>
-											<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
+									<div class="col-md-12">
+										<div class="row">
+											<div class="form-group">
+												<div class="col-md-3">
+													<label class="control-label" for="username"><?php echo _("Username") ?></label>
+													<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
+												</div>
+												<div class="col-md-9">
+													<input type="text" class="form-control" id="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
+												</div>
+											</div>
 										</div>
-										<div class="col-md-9"><input type="text" class="form-control" id="username" value = "<?php echo $username?>" tabindex = "<?php ++$tabindex?>">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<span id="username-help" class="help-block fpbx-help-block"><?php echo _("Create a unique username for this user") ?></span>
+									</div>
+								</div>
+							</div>
+							<div class="element-container">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="row">
+											<div class="form-group">
+												<div class="col-md-3">
+													<label class="control-label" for="password"><?php echo _("Password") ?></label>
+													<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
+												</div>
+												<div class="col-md-9"><input type="password" class="form-control" id="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
+												</div>
+											</div>
 										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<span id="password-help" class="help-block fpbx-help-block"><?php echo _("Create a password for this new user") ?></span>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<span id="username-help" class="help-block fpbx-help-block"><?php echo _("Create a unique username for this user") ?></span>
-							</div>
+						<div class="section-title" data-for="access">
+							<h3><i class="fa fa-minus"></i> <?php echo _("Access Restrictions")?></h3>
 						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<div class="row">
-									<div class="form-group">
-										<div class="col-md-3">
-											<label class="control-label" for="password"><?php echo _("Password") ?></label>
-											<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
-										</div>
-										<div class="col-md-9"><input type="password" class="form-control" id="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<span id="password-help" class="help-block fpbx-help-block"><?php echo _("Create a password for this new user") ?></span>
-							</div>
-						</div>
-					</div>
-					<div class="section-title" data-for="access"><h3><i class="fa fa-minus"></i> <?php echo _("Access Restrictions")?> </h3>
-					</div>
 						<div class="section" data-id="access">
 							<div class="element-container">
 								<div class="row">
 									<div class="col-md-12">
 										<div class="form-group">
 											<div class="col-md-3">
-												<label class="control-label" for="sections[]"><?php echo _("Admin Access") ?></label>
-												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections[]"></i>
+												<label class="control-label" for="sections"><?php echo _("Admin Access") ?></label>
+												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
 											</div>
 											<div class="col-md-9">
-												<select multiple class="form-control" id="sections[]" tabindex = "<?php ++$tabindex?>">
+												<select multiple class="form-control" id="sections" name="sections" tabindex = "<?php ++$tabindex?>">
 													<?php echo $sectionOptions?>
 												</select>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<span id="sections[]-help" class="help-block fpbx-help-block"><?php echo _("Select the Admin Sections this user should have access to.") ?></span>
+								<div class="row">
+									<div class="col-md-12">
+										<span id="sections-help" class="help-block fpbx-help-block"><?php echo _("Select the Admin Sections this user should have access to.") ?></span>
+									</div>
 								</div>
-							</div>							
+							</div>
 						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			</div>
+		</div>
 		<div class="col-sm-3 hidden-xs bootnav">
-			<?php echo $bootnav ?>
+			<div class="list-group">
+				<?php echo $bootnav ?>
+			</div>
 		</div>
 	</div>
 </div>
 
 <script language="javascript">
-<!--
-$('#submit').click(function() {
-	var theForm = $('.fpbx-submit').attr('name'),
-		username = theForm.username.value,
-		deptname = theForm.deptname.value;
+$('.fpbx-submit').submit(function() {
+	var theForm = document.ampuser,
+		username = theForm.username;
 
-	if (username == "") {
-		<?php echo "alert('"._("Username must not be blank")."')"?>;
-	} else if (!username.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
-		<?php echo "alert('"._("Username cannot start with a number, and can only contain letters and numbers")."')"?>;
-	} else if (deptname == "default") {
-		<?php echo "alert('"._("For security reasons, you cannot use the department name default")."')"?>;
-	} else if (deptname != "" && !deptname.match('^[a-zA-Z0-9]+$')) {
-		<?php echo "alert('"._("Department name cannot have a space")."')"?>;
-	} else {
-		return true;
+	if (username.value == "") {
+		return warnInvalid(username, "<?php echo _("Username must not be blank")?>");
+	} else if (!username.value.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
+		return warnInvalid(username, "<?php echo _("Username cannot start with a number, and can only contain letters and numbers")?>");
 	}
-	return false;
+	return true;
 });
-//-->
 </script>
