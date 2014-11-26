@@ -7,7 +7,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		parent::__construct($freepbx);
 		//Hackery-Jackery for Core only really
-		if(!class_exists('PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
+		if(!class_exists('\FreePBX\modules\Core\PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
 			include(__DIR__.'/functions.inc/PJSip.class.php');
 			//Think about using BMO Inject here instead
 			$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
@@ -823,7 +823,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		} catch(\Exception $e) {
 			return array();
 		}
-		
+
 		$astman = $this->FreePBX->astman;
 		if ($astman) {
 
