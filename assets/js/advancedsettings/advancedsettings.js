@@ -51,7 +51,7 @@ $(document).ready(function() {
 					mythis.fadeOut('normal', function(){
 						mythis.closest('tr').find('.savetd').hide();
 					});
-					
+
 					//hide retor to defualt if its we have reverted to defualt
 					//should not be nesesary -MB
 					/*
@@ -94,6 +94,16 @@ $(document).ready(function() {
 			}
 		})
 	}
+
+	$("#AMPEXTENSIONS").change(function(event) {
+		if ($(this).val() == "deviceanduser") {
+			if (!confirm(userdevicewarn)) {
+				$(this).val("extensions");
+				event.stopPropagation();
+			}
+		}
+
+	});
 	//set defualt values
 	$('.adv_set_default').click(function(){
 		switch ($(this).attr('data-type')) {
@@ -113,7 +123,7 @@ $(document).ready(function() {
 		var save = $(this).closest('tr').find('input.save');
 		var savetd = $(this).closest('tr').find('.savetd');
 		var adv_set_default = $(this).closest('tr').find('input.adv_set_default');
-		
+
 		//if the value was changed since the last page refresh
 		if($(this).val() != $(this).attr('data-valueinput-orig')){
 			if (savetd.is(':hidden')) {
@@ -131,7 +141,7 @@ $(document).ready(function() {
 				if (!savetd.is(':hidden')) {
 					savetd.hide();
 				}
-			}).off('click'); 
+			}).off('click');
 		}
 		if($(this).val() != adv_set_default.attr('data-default')){
 			if (adv_set_default.is(':hidden')) {
