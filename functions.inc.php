@@ -7586,3 +7586,11 @@ function _core_backtrace() {
 	$file = $trace[1]['file'];
 	freepbx_log(FPBX_LOG_WARNING,'Depreciated Function '.$function.' detected in '.$file.' on line '.$line);
 }
+
+function core_module_repo_parameters_callback($opts) {
+	$final = array();
+	if(\FreePBX::Config()->get('BROWSER_STATS')) {
+		$final['udmode'] = \FreePBX::Config()->get('AMPEXTENSIONS');
+	}
+	return $final;
+}
