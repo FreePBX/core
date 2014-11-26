@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.9</version>
+	<version>12.0.10</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.10* FREEPBX-8116 Regression: concurrency limit only allows max 2 calls
 		*12.0.9* FREEPBX-8019 missing macro-dialout-dundi-predial-hook at extensions.conf
 		*12.0.8* Allow getting User Info in BMO
 		*12.0.7* Call Recording changes
