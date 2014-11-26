@@ -31,6 +31,7 @@ if($var['action'] === 'setkey') {
 	exit;
 }
 echo '<script type="text/javascript">';
+echo 'userdevicewarn = "' . _("Device and User mode is unsupported by the development team. Are you sure you want to use this mode?") . '";';
 echo 'amportalconf_error = "' . _("You must run 'amportal restart' from the Linux command line before you can save setting here.") . '";';
 echo 'msgUnsavedChanges = "' . _("You have un-saved changes, press OK to disregard changes and reload page or Cancel to abort.") . '";';
 echo 'msgChangesRefresh = "' . _("Your Display settings have been changed, click on 'Refresh Page' to view the affects of your changes once you have saved other outstanding changes that are still un-confirmed.") . '";';
