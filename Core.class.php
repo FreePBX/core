@@ -616,7 +616,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_put("DEVICE",$id."/dial",$settings['dial']['value']);
 			$astman->database_put("DEVICE",$id."/type",$settings['devicetype']['value']);
 			$astman->database_put("DEVICE",$id."/default_user",$settings['user']['value']);
-			if($emergency_cid != '') {
+			if($settings['emergency_cid']['value'] != '') {
 				$astman->database_put("DEVICE",$id."/emergency_cid","\"".$settings['emergency_cid']['value']."\"");
 			} else {
 				$astman->database_del("DEVICE",$id."/emergency_cid");
