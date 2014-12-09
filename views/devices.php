@@ -8,12 +8,12 @@
     } ?>
     <ul class="nav nav-tabs" role="tablist">
       <?php foreach(array_keys($html['middle']) as $category) { ?>
-        <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>"><?php echo ucfirst($category)?></a></li>
+        <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo ucfirst($category)?></a></li>
       <?php $c++;} ?>
     </ul>
-    <div class="display">
+    <div class="tab-content display">
       <?php foreach($html['middle'] as $category => $sections) { ?>
-        <div id="<?php echo strtolower($category)?>" class="info-pane <?php echo ($active == strtolower($category)) ? '' : 'hidden'?>">
+        <div id="<?php echo strtolower($category)?>" class="tab-pane <?php echo ($active == strtolower($category)) ? 'active' : ''?>">
           <div class="container-fluid">
             <?php foreach($sections as $section => $elements) { ?>
               <div class="section-title" data-for="<?php echo strtolower($section)?>"><h3><i class="fa fa-minus"></i> <?php echo $section?></h3></div>
