@@ -25,13 +25,13 @@
                         <div class="col-md-12">
                           <div class="row">
                             <div class="form-group">
-                              <div class="col-md-3">
+                              <div class="col-md-4">
                                 <label class="control-label" for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
                                 <?php if(!empty($elem['helptext'])) { ?>
                                   <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
                                 <?php } ?>
                               </div>
-                              <div class="col-md-9"><?php echo $elem['html']?></div>
+                              <div class="col-md-8"><?php echo $elem['html']?></div>
                             </div>
                           </div>
                         </div>
