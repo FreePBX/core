@@ -25,8 +25,8 @@
                         <div class="col-md-12">
                           <div class="row">
                             <div class="form-group">
-                              <div class="col-md-4">
-                                <label class="control-label" for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
+                              <div class="col-md-4 control-label">
+                                <label for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
                                 <?php if(!empty($elem['helptext'])) { ?>
                                   <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
                                 <?php } ?>
