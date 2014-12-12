@@ -187,7 +187,7 @@ foreach ($module_list as $key => $row) {
 					<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
 					<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
 					<input type="hidden" name="deptname" value="<?php echo $deptname ?>"/>
-					<div class="display full-border">
+					<div class="display no-border">
 						<div class="section-title" data-for="general">
 							<h3><i class="fa fa-minus"></i> <?php echo _("General Settings")?></h3>
 						</div>
@@ -197,8 +197,8 @@ foreach ($module_list as $key => $row) {
 									<div class="col-md-12">
 										<div class="row">
 											<div class="form-group">
-												<div class="col-md-3">
-													<label class="control-label" for="username"><?php echo _("Username") ?></label>
+												<div class="col-md-3 control-label">
+													<label for="username"><?php echo _("Username") ?></label>
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
 												</div>
 												<div class="col-md-9">
@@ -219,8 +219,8 @@ foreach ($module_list as $key => $row) {
 									<div class="col-md-12">
 										<div class="row">
 											<div class="form-group">
-												<div class="col-md-3">
-													<label class="control-label" for="password"><?php echo _("Password") ?></label>
+												<div class="col-md-3 control-label">
+													<label for="password"><?php echo _("Password") ?></label>
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
 												</div>
 												<div class="col-md-9"><input type="password" class="form-control" id="password" name="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
@@ -244,8 +244,8 @@ foreach ($module_list as $key => $row) {
 								<div class="row">
 									<div class="col-md-12">
 										<div class="form-group">
-											<div class="col-md-3">
-												<label class="control-label" for="sections"><?php echo _("Admin Access") ?></label>
+											<div class="col-md-3 control-label">
+												<label for="sections"><?php echo _("Admin Access") ?></label>
 												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
 											</div>
 											<div class="col-md-9">
