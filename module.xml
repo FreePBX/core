@@ -3,15 +3,16 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.12</version>
+	<version>12.0.13</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.13* FREEPBX-8454 - Show dialoutprefix on the trunk page
 		*12.0.12* FREEPBX-8376 Warning - macro-user-callerid - ast_yyerror(): syntax error
- 	        *12.0.11* FREEPBX-8311 - Regression: emergency_cid not being written to astdb
+		*12.0.11* FREEPBX-8311 - Regression: emergency_cid not being written to astdb
 		*12.0.10* FREEPBX-8116 Regression: concurrency limit only allows max 2 calls
 		*12.0.9* FREEPBX-8019 missing macro-dialout-dundi-predial-hook at extensions.conf
 		*12.0.8* Allow getting User Info in BMO
