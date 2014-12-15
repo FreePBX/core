@@ -4778,22 +4778,8 @@ function core_hint_get($account){
 
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
-function core_users_list($get_all=false) {
-	$results = sql("SELECT extension,name,voicemail FROM users ORDER BY extension","getAll");
-
-	//only allow extensions that are within administrator's allowed range
-	foreach($results as $result){
-		if ($get_all || checkRange($result[0])){
-			$extens[] = array($result[0],$result[1],$result[2]);
-		}
-	}
-
-	if (isset($extens)) {
-		sort($extens);
-		return $extens;
-	} else {
-		return null;
-	}
+function core_users_list($get_all=false){
+	return FreePBX::Core()->usersList($get_all);
 }
 
 function core_check_extensions($exten=true) {

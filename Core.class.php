@@ -225,6 +225,30 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			} // foreach
 		} // $page == "astmodules"
 	}
+	
+	// get the existing extensions
+	// the returned arrays contain [0]:extension [1]:name
+	function usersList($get_all=false) {
+		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+		//only allow extensions that are within administrator's allowed range
+		foreach($results as $result){
+			if ($get_all || checkRange($result[0])){
+				$extens[] = array($result[0],$result[1],$result[2]);
+			}
+		}
+
+		if (isset($extens)) {
+			sort($extens);
+			return $extens;
+		} else {
+			return null;
+		}
+	}
+
+	
 
 	/**
 	 * Converts a request into an array that core wants.
