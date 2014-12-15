@@ -1,5 +1,5 @@
 <div class="fpbx-container">
-  <form class="popover-form fpbx-submit" name="frm_extensions" action="<?php echo $action?>" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&amp;action=del" role="form">
+  <form class="popover-form fpbx-submit" name="frm_extensions" action="config.php?display=extensions<?php echo isset($_REQUEST['extdisplay']) && trim($_REQUEST['extdisplay']) != '' ? '&amp;extdisplay='.$_REQUEST['extdisplay'] : '' ?>" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&amp;action=del" role="form">
     <?php foreach ( $html['top'] as $elem ) {
       echo $elem['html'];
     } ?>

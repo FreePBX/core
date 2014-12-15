@@ -342,7 +342,9 @@ $('#submit').click(function() {
 		return warnInvalid(theForm.grppre, msgInvalidGrpPrefix);
 
 	return true;
-}
+});
+
+
 
 $(document).ready(function() {
 	//show/hide privacy manager options
