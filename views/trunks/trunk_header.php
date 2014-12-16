@@ -133,18 +133,15 @@
 	?>
     <tr>
       <td colspan="2"><h4>
-      <a href=# class="info"><?php echo _("Dialed Number Manipulation Rules")?><span>
-      <?php echo _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occurred. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
-      <b>X</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
-      <b>Z</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
-      <b>N</b>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
-      <b>[1237-9]</b>&nbsp;   <?php echo _("matches any digit in the brackets (example: 1,2,3,7,8,9)")?><br />
-      <b>.</b>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more dialed digits")?> <br />
-      <b><?php echo _("prepend:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Digits to prepend upon a successful match. If the dialed number matches the patterns in the <b>prefix</b> and <b>match pattern</b> boxes, this will be prepended before sending to the trunk.")?><br />
-      <b><?php echo _("prefix:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("Prefix to remove upon a successful match. If the dialed number matches this plus the <b>match pattern</b> box, this prefix is removed before adding the optional <b>prepend</b> box and sending the results to the trunk.")?><br />
-      <b><?php echo _("match pattern:")?></b>&nbsp;&nbsp;&nbsp; <?php echo _("The dialed number will be compared against the <b>prefix</b> plus this pattern. Upon a match, this portion of the number will be sent to the trunks after removing the <b>prefix</b> and appending the <b>prepend</b> digits")?><br />
-	    <?php echo _("You can completely replace a number by matching on the <b>prefix</b> only, replacing it with a <b>prepend</b> and leaving the <b>match pattern</b> blank."); ?>
-      </span></a>
+      <a href=# class="info"><?php echo _("Dial Number Manipulation Rules")?><span><?php echo _("A Dial Rule controls how calls will be dialed on this trunk. It can be used to add or remove prefixes. Numbers that don't match any patterns defined here will be dialed as-is. Note that a pattern without a + or | (to add or remove a prefix) will not make any changes but will create a match. Only the first matched rule will be executed and the remaining rules will not be acted on.")?><br /><br /><b><?php echo _("Rules:")?></b><br />
+				<strong>X</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 0-9")?><br />
+				<strong>Z</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 1-9")?><br />
+				<strong>N</strong>&nbsp;&nbsp;&nbsp; <?php echo _("matches any digit from 2-9")?><br />
+				<strong>[1237-9]</strong>&nbsp;   <?php echo _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)")?><br />
+				<strong>.</strong>&nbsp;&nbsp;&nbsp; <?php echo _("wildcard, matches one or more characters (not allowed before a | or +)")?><br />
+				<strong>|</strong>&nbsp;&nbsp;&nbsp; <?php echo _("removes a dialing prefix from the number (for example, 613|NXXXXXX would match when some dialed \"6135551234\" but would only pass \"5551234\" to the trunk)")?>
+				<strong>+</strong>&nbsp;&nbsp;&nbsp; <?php echo _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)")?><br /><br />
+				<?php echo _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing."); ?></span></a>
       <hr></h4></td>
     </tr>
 <?php
