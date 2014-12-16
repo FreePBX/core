@@ -1,11 +1,11 @@
 #!/usr/bin/php -q
-<?php 
+<?php
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	  Copyright 2013 Schmooze Com Inc.
 //    Copyright (C) 2003 Zac Sprackett <zsprackett-asterisk@sprackett.com>
 
 /* --------WARNING---------
- * 
+ *
  * This script is auto-copied from an included module and will get overwritten.
  * If you modify it, you must change it to write only, in the agi-bin directory,
  * to keep it from getting changed.
@@ -69,7 +69,7 @@ $AGI->set_variable('__KEEPCID','TRUE');
 
 // Set to '' in case it was previously set
 //
-$AGI->set_variable('DIALSTATUS_CW','');						
+$AGI->set_variable('DIALSTATUS_CW','');
 
 $timer		= get_var( $AGI, "ARG1" );
 $dialopts	= get_var( $AGI, "ARG2" );
@@ -79,7 +79,7 @@ $rgmethod = trim($rgmethod);
 $alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
 	debug("Setting Alert-Info:  $alertinfo", 4);
-	$AGI->set_alertinfo($alertinfo);						
+	$AGI->set_alertinfo($alertinfo);
 }
 
 $sippheader = get_var( $AGI, "SIPADDHEADER" );
@@ -109,7 +109,7 @@ debug("RINGGROUP_INDEX:   '$ringgroup_index'", 5);
 if (empty($timer)) {
 	$timer		= 0;
 }
-if (empty($dialopts)) {	
+if (empty($dialopts)) {
 	$dialopts	= "";
 }
 if (empty($rgmethod)) {
@@ -170,7 +170,7 @@ while($arg = get_var($AGI,"ARG". $arg_cnt)) {
 		debug("get_variable got a \"noresponse\"!  Exiting",3);
 		exit($arg_cnt);
 	}
-	$extarray = preg_split( '/-/', $arg ); 
+	$extarray = preg_split( '/-/', $arg );
 	foreach ( $extarray as $k ) {
 		$ext[] = $k;
 		debug("Added extension $k to extension map", 3);
@@ -195,10 +195,10 @@ if ($rgmethod == "ringallv2" && $fmgrp != "") {
 
 	$fmgrp_primaryremoved = 0;
 
-	$fmgrp_prering  = $AGI->database_get('AMPUSER', $fmgrp."/followme/prering"); 
+	$fmgrp_prering  = $AGI->database_get('AMPUSER', $fmgrp."/followme/prering");
 	$fmgrp_prering  = $fmgrp_prering['data'] > 1 ? $fmgrp_prering['data'] : 2;
-		 
-	$fmgrp_grptime  = $AGI->database_get('AMPUSER', $fmgrp."/followme/grptime"); 
+
+	$fmgrp_grptime  = $AGI->database_get('AMPUSER', $fmgrp."/followme/grptime");
 	$fmgrp_grptime  = $fmgrp_grptime['data'];
 	debug("got fmgrp_prering: $fmgrp_prering, fmgrp_grptime: $fmgrp_grptime",4);
 
@@ -285,21 +285,21 @@ foreach ($ext as $k) {
 			    debug("Extension $k has call forward set to $cf", 1);
 			    $AGI->set_variable('DIALSTATUS','NOANSWER');
 		    } else {
-			    $ext[$count] = $cf.'#';  
+			    $ext[$count] = $cf.'#';
 			    debug("Extension $k has call forward set to $cf", 1);
 					// This only really needs to be set if we are setting Diversion Headers, but it's not worth the hassle of
 					// checking the amportal.conf settings here and there is no harm done in setting it other than minor overhead
 					//
           // Set DIVERSION_REASON only when rmethod is none, otherwise it's a ringgroup/findmefollow and
           // if we want to set diversion headers they should be set by the group.
-          // 
+          //
           // For CF timer, we change the timer value if rgmethod is none meaning a single extension is being called.
           // CFB and CFU are handled in macro-exten-vm for single extensions. (And this script is being phased out in
           // favor of macro-dial-one for single extensions when function EXTENSION_STATE is available).
           //
           if ($rgmethod == "none") {
             $AGI->set_variable('__DIVERSION_REASON','unconditional');
-            $cfrt = $AGI->database_get('AMPUSER',$k . '/cfringtimer'); 
+            $cfrt = $AGI->database_get('AMPUSER',$k . '/cfringtimer');
             $cfrt = $cfrt['data'];
             if (!empty($cfrt)) {
               $timer = $cfrt < 0 ? "" : $cfrt;
@@ -307,7 +307,7 @@ foreach ($ext as $k) {
             }
           }
 		    }
-  
+
 		    // if this is the primary extension and CF enabled, then cancel mastermode
 		    // whether it is or not, no need to check.
 		    //
@@ -342,7 +342,7 @@ foreach ( $ext as $k ) {
 		if (strlen($dnd) || $pr_dialstatus == "BUSY") {
 			debug("Extension $k has do not disturb enabled, or followme pre-ring returned busy", 2);
 			unset($ext[$count]);
-			$AGI->set_variable('DIALSTATUS','BUSY');						
+			$AGI->set_variable('DIALSTATUS','BUSY');
 			// if this is primary set skipremaining and figure out if needed below
 			//
 			if ($count == 0 && $mastermode) {
@@ -352,7 +352,7 @@ foreach ( $ext as $k ) {
 			if ($count == 0) {
 				$fmgrp_primaryremoved = 1;
 			}
-		} 
+		}
 		else {
 			debug("Extension $k do not disturb is disabled", 3);
 		}
@@ -397,7 +397,7 @@ foreach ( $ext as $k ) {
 		$extcfu    = $AGI->database_get('CFU', $extnum);// ? 1 : 0;
 		$extcfu    = $extcfu['data'];
  		$exthascfu = (strlen($extcfu) > 0) ? 1 : 0;
-	
+
 		// Dump details in level 4
 		debug("extnum $extnum has:  cw: $exthascw; hascfb: $exthascfb [$extcfb] hascfu: $exthascfu [$extcfu]",4);
 
@@ -440,7 +440,7 @@ foreach ( $ext as $k ) {
 			// get ExtensionState: 0-idle; 1-busy; 4-unavail; 8-ringing <--- these are unconfirmed
 			$extstate = is_ext_avail($extnum);
 			debug("Extension $extnum has ExtensionState: $extstate",1);
-	
+
 			// Ext has CFU and is Unavailable
 			if ( ($exthascfu == 1) && ($extstate == 4) ) {
 				// If part of a ring group, then just do what CF does, otherwise needs to
@@ -480,7 +480,7 @@ foreach ( $ext as $k ) {
 					} elseif ($exthascw == 0) {
 						debug("Extension $extnum has call waiting disabled",1);
 						$extnum = '';
-						$AGI->set_variable('DIALSTATUS','BUSY');						
+						$AGI->set_variable('DIALSTATUS','BUSY');
 						$AGI->set_variable('__DIVERSION_REASON','user-busy');
 					} else {
 						debug("Extension $extnum has call waiting enabled",1);
@@ -495,7 +495,7 @@ foreach ( $ext as $k ) {
 		} elseif ($rgmethod == "none" && $exthascw == 1 && $cwinusebusy) {
 			$extstate = is_ext_avail($extnum);
 			if ($extstate > 0 && $extstate != 4) {
-				$AGI->set_variable('DIALSTATUS_CW','BUSY');						
+				$AGI->set_variable('DIALSTATUS_CW','BUSY');
 				debug("Extension $extnum has call waiting enabled with state: $extstate",1);
 			}
 		// get ExtensionState: 0-idle; 1-busy; 4-unavail; 8-ringing <--- these are unconfirmed
@@ -507,7 +507,7 @@ foreach ( $ext as $k ) {
       if ($extstate != 0) {
 			  debug("Extension $extnum has call waiting enabled but blocked for hunt",1);
 			  $extnum = '';
-			  $AGI->set_variable('DIALSTATUS','BUSY');	
+			  $AGI->set_variable('DIALSTATUS','BUSY');
       }
 		} elseif ($rgmethod == 'firstavailable') {
 			$extstate = is_ext_avail($extnum);
@@ -516,11 +516,11 @@ foreach ( $ext as $k ) {
       if ($extstate == 4) {
 			  debug("Extension $extnum is unavailable so don't include in firstavailable hunt",1);
 			  $extnum = '';
-			  $AGI->set_variable('DIALSTATUS','BUSY');	
+			  $AGI->set_variable('DIALSTATUS','BUSY');
       }
 		}
 	}
-	
+
 	if ($extnum != '') {
 		// Still got an extension to be called?
 		// check if we already have a dial string for this extension
@@ -549,7 +549,7 @@ foreach ( $ext as $k ) {
 					debug("DbDel CALLTRACE/$k - Caller ID is not defined", 3);
 				}
 			} else {
-				$ext_hunt[$k]=$extds; // Need to have the extension HASH set with technology for hunt group ring 
+				$ext_hunt[$k]=$extds; // Need to have the extension HASH set with technology for hunt group ring
 			}
 		}
 	}
@@ -607,7 +607,7 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 // FollowMe Changes:
 //
 // We need to determine if the generated dialstring can be dialed as is. This will be the case if there are no
-// or is only a single extension to dial. 
+// or is only a single extension to dial.
 //
 // First, unset any blank fields so we know how many extensions there are to call.
 //
@@ -643,23 +643,23 @@ if ($rgmethod == 'ringallv2') {
 	} elseif (count($ext) == 1) {
 		$timer = $fmgrp_totalprering; // not sure what would trigger this ?
 	} else {
-		$timer = $fmgrp_totalprering; 
+		$timer = $fmgrp_totalprering;
 		$ds = "Local/FMPR-".array_shift($ext)."@from-internal&Local/FMGL-".implode('-',$ext)."@from-internal";
 
 		$fmgrp_fmunique = $AGI->request['agi_channel'];
-		$AGI->set_variable('_FMUNIQUE',$fmgrp_fmunique);						
-		$AGI->set_variable('_RingGroupMethod',"ringall");						
+		$AGI->set_variable('_FMUNIQUE',$fmgrp_fmunique);
+		$AGI->set_variable('_RingGroupMethod',"ringall");
 		$fmgrp_prering -= 2;
-		$AGI->set_variable('_FMPRERING',$fmgrp_prering);						
-		$AGI->set_variable('_FMREALPRERING',$fmgrp_realprering);						
-		$AGI->set_variable('_FMGRPTIME',$fmgrp_grptime);						
-		$AGI->set_variable('_FMPRIME',($recall_mastermode == "ringallv2")?"FALSE":"TRUE");						
+		$AGI->set_variable('_FMPRERING',$fmgrp_prering);
+		$AGI->set_variable('_FMREALPRERING',$fmgrp_realprering);
+		$AGI->set_variable('_FMGRPTIME',$fmgrp_grptime);
+		$AGI->set_variable('_FMPRIME',($recall_mastermode == "ringallv2")?"FALSE":"TRUE");
 
 		debug("FMUNIQUE: $fmgrp_fmunique, FMRERING: $fmgrp_prering, FMREALPRERING: $fmgrp_realprering, FMGRPTIME: $fmgrp_grptime",6);
 
 		if ($use_confirmation != 'FALSE') {
-			$AGI->set_variable('_USE_CONFIRMATION',$use_confirmation);						
-			$AGI->set_variable('_RINGGROUP_INDEX',$ringgroup_index);						
+			$AGI->set_variable('_USE_CONFIRMATION',$use_confirmation);
+			$AGI->set_variable('_RINGGROUP_INDEX',$ringgroup_index);
 			$use_confirmation = 'FALSE';
 		}
 	}
@@ -741,7 +741,7 @@ exit( 0 );
 // helper functions
 function get_var( $agi, $value) {
 	$r = $agi->get_variable( $value );
-	
+
 	if ($r['result'] == 1) {
 		$result = $r['data'];
 		return $result;
@@ -752,7 +752,7 @@ function get_var( $agi, $value) {
 function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 	global $chan_dahdi;
 	$dialstring = '';
-	
+
 	if (strpos($extnum,'#') != 0) {
 		// "#" used to identify external numbers in forwards and callgroups
 		// If using call confirmation, need to put the # back into the new dialstring
@@ -772,8 +772,8 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 		$device_str = sprintf("%s/device", $extnum);
 		$device = $agi->database_get('AMPUSER',$device_str);
 		$device = $device['data'];
-		
-		// a user can be logged into multipe devices, append the dial string for each		
+
+		// a user can be logged into multipe devices, append the dial string for each
 		$device_array = preg_split( '/&/', $device );
 		foreach ($device_array as $adevice) {
 			if (trim($use_confirmation) == "FALSE") {
@@ -782,7 +782,7 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 					$dialstring .= str_replace('ZAP/', 'DAHDI/', $dds['data']);
 				} else {
 					$dialstring .= $dds['data'];
-				}				
+				}
 				$dialstring .= '&';
 			} else {
 				$dialstring .= 'Local/LC-'.$adevice.'@from-internal&';
