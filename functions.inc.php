@@ -4779,7 +4779,7 @@ function core_hint_get($account){
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
 function core_users_list($get_all=false){
-	return FreePBX::Core()->usersList($get_all);
+	return FreePBX::Core()->listUsers($get_all);
 }
 
 function core_check_extensions($exten=true) {
