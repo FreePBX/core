@@ -684,14 +684,16 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		if (!$dynonly && empty($qcall)) {
 			$qcall = $qc;
-			$qmr = queues_get_static_members();
-			foreach ($qmr as $q => $qmg) {
-				foreach ($qmg as $qm) {
-					if (strtoupper(substr($qm,0,1)) == 'L') {
-						$tm = preg_replace("/[^0-9#\,*]/", "", $qm);
-						$tma = explode(',',$tm);
-						if (!isset($qcall[$tma[0]]) || !in_array($q, $qcall[$tma[0]])) {
-							$qcall[$tma[0]][] = $q;
+			if (function_exists('queues_get_static_members')) {
+				$qmr = queues_get_static_members();
+				foreach ($qmr as $q => $qmg) {
+					foreach ($qmg as $qm) {
+						if (strtoupper(substr($qm,0,1)) == 'L') {
+							$tm = preg_replace("/[^0-9#\,*]/", "", $qm);
+							$tma = explode(',',$tm);
+							if (!isset($qcall[$tma[0]]) || !in_array($q, $qcall[$tma[0]])) {
+								$qcall[$tma[0]][] = $q;
+							}
 						}
 					}
 				}
