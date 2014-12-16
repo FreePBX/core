@@ -157,7 +157,7 @@ if ($cwignore && $rgmethod != "ringallv2") {
 // Keep this code after the matermode check above, since they will at least get mastermode
 // if they set a -prim mode in one of the others
 //
-if ( ($use_confirmation != "FALSE") && ($rgmethod != "ringall") && ($rgmethod != "ringallv2") && ($rgmethod != "hunt") ) {
+if ( ($use_confirmation != "FALSE") && ($rgmethod != "ringall") && ($rgmethod != "ringallv2") && ($rgmethod != "hunt") && ($rgmethod != "random") ) {	// added condition for random strategy
 	debug("Unsupported RingMethod: '$rgmethod' resetting to ringall", 1);
 	$rgmethod	= "ringall";
 }
@@ -535,7 +535,7 @@ foreach ( $ext as $k ) {
 			 	$ds .= $extds . '&';
 			}
 			// Update Caller ID for calltrace application
-			if ((substr($k,-1)!='#') && (($rgmethod != "hunt") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) {
+			if ((substr($k,-1)!='#') && (($rgmethod != "hunt") && ($rgmethod != "random") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) { //added condition for random strategy
 				if ( isset($cidnum) && is_numeric($cidnum) ) {
 					$rc = $AGI->database_put('CALLTRACE', $k, $cidnum);
 					if ($rc['result'] == 1) {
@@ -567,16 +567,20 @@ $myhuntmember	= "";
  *  ${HuntMembers} set to the number of phones to ring
  *  ${HuntMemberN} set to the dial pattern that should be dialed. (N is 0, 1, 2 etc.)
  */
-if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
+if (($rgmethod == "hunt") || ($rgmethod == "random") || ($rgmethod == "memoryhunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
 	if ($cidnum) {
 		$AGI->set_variable('CALLTRACE_HUNT',$cidnum);
+	}
+	// Treatment of random strategy
+	if ($rgmethod == "random") {
+		shuffle($extarray);	   // shuffle the array
 	}
 	foreach ($extarray as $k ) {
 		// we loop through the original array to get the extensions in order of importance
 		if (isset($ext_hunt[$k]) && $ext_hunt[$k]) {
 			//If the original array is included in the extension hash then set variables
 			$myhuntmember="HuntMember"."$loops";
-			if (($rgmethod == "hunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
+			if (($rgmethod == "hunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
 				$AGI->set_variable($myhuntmember,$ext_hunt[$k]);
 			} elseif ($rgmethod == "memoryhunt") {
 				if ($loops==0) {
@@ -686,8 +690,8 @@ if (!strlen($ds)) {
 	} else {
 		$ds_seperator = '|';
 	}
-	
-	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) {
+
+	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
 		$ds = $ds_seperator;
 		if ($timer) {
 			$ds .= $timer;
