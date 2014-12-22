@@ -1,67 +1,144 @@
 <?php
 $mods = FreePBX::create()->ModulesConf();
-
-print "<h2>"._("Asterisk Modules")."<hr></h2>\n";
-print "<div>"._("Note that this is for ASTERISK modules, not FreePBX Modules.")."</div>\n";
-print "<div>"._("It is unlikely you'll need to change anything here.")."<br />\n";
-print _("Please be careful when adding or removing modules, as it is possible to stop Asterisk from starting with an incorrect configuration.")."<br />\n";
-print _("Deleting the modules.conf file will reset this to defaults.")."<br />\n</div>";
-print "<form method='post'>\n";
-print "<table>\n";
 $pc = $mods->ProcessedConfig['modules'];
-
-$sections = array ("noload", "preload", "load");
-
-foreach ($sections as $type) {
-	if ($type == "preload") {
-		$title = _("Preloaded Modules");
-	} elseif ($type == "noload") {
-		$title = _("Excluded Modules");
-	} elseif ($type == "load") {
-		$title= _("Manually Loaded Modules");
-	} else {
-		$title = _("Unknown Entry")." '$type'";
+$loadrows =
+$noloadrows = '';
+$preloadrows = '';
+if (isset($pc['noload'])) {
+	foreach($pc['noload'] as $mod){
+		$noloadrows .= <<<HERE
+<tr id = "row$mod">
+<td>$mod</td>
+<td>
+	<a href="#" id="del$mod" data-mod="$mod" >
+	<i class="fa fa-trash-o"></i></a></td>
+</tr>
+HERE;
 	}
-
-	print "<th colspan=2>$title</th>\n";
-	print "<input type='hidden' name='area' value='$type'>\n";
-
-	if (isset($pc[$type])) {
-		$files = $pc[$type];
-		if (is_array($files)) {
-			foreach($files as $file) {
-				showEntry($type, $file);
-			}
-		} else {
-			showEntry($type, $files);
-		}
-	}
-	print "<tr><td><input class='txt' name='new-$type' data-submit='add-$type' type='text' size=35 style='font-family: monospace'></td>\n";
-	print "<td><input type='submit' id='add-$type' name='add-$type' value='"._("Add")."' /></td></tr>\n";
 }
-
-print "</table>\n";
-print "</form>\n";
-
-function showEntry($type, $file) {
-	print "<tr><td><span style='font-family: monospace'>$file</span></td>\n";
-	print "<td><input type='submit' name='delete-$type-".base64_encode($file)."' value='"._("Delete")."' /></td></tr>\n";
+if (isset($pc['load'])) {
+	foreach($pc['load'] as $mod){
+		$loadrows .= <<<HERE
+<tr id = "row$mod">
+<td>$mod</td>
+<td>
+	<a href="#" id="del$mod" data-mod="$mod" >
+	<i class="fa fa-trash-o"></i></a></td>
+</tr>
+HERE;
+	}
+}
+if (isset($pc['preload'])) {
+	foreach($pc['preload'] as $mod){
+		$preloadrows .= <<<HERE
+<tr id = "row$mod">
+<td>$mod</td>
+<td>
+	<a href="#" id="del$mod" data-mod="$mod" >
+	<i class="fa fa-trash-o"></i></a></td>
+</tr>
+HERE;
+	}
 }
 ?>
 
-<script type="text/javascript">
-$(document).ready(function() {
-	$(".txt").keyup(function(e) {
-		console.log(e);
-		if (e.which == 13) {
-			var target = $(e.currentTarget).data('submit');
-			$("#"+target).click();
-		}
-	}).keydown(function(e) {
-		if (e.which == 13) {
-			e.preventDefault();
-		}
-	});
-});
-</script>
+<div class="container-fluid">
+	<h1><?php echo _("Asterisk Modules")?></h1>
+	<div class="well well-info">
+		<?php echo _("Note that this is for ASTERISK modules, not FreePBX Modules.")?>
+		<br/>
+		<?php echo _("It is unlikely you'll need to change anything here.")?>
+		<br/>
+		<?php echo _("Please be careful when adding or removing modules, as it is possible to stop Asterisk from starting with an incorrect configuration.")?>
+		<br/>
+		<?php echo _("Deleting the modules.conf file will reset this to defaults.")?>
+	</div>
+	<div class = "display full-border">
+		<div class="row">
+			<div class="col-sm-9">
+					<div class="fpbx-container">
+						<form class="fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="" role="form">
+							<ul class="nav nav-tabs" role="tablist">
+								<li role="presentation" data-name="amodnoload" class="active">
+									<a href="#amodnoload" aria-controls="amodnoload" role="tab" data-toggle="tab">
+										<?php echo _("Excluded Modules")?>
+									</a>
+								</li>
+								<li role="presentation" data-name="amodload" class="change-tab">
+									<a href="#amodload" aria-controls="amodload" role="tab" data-toggle="tab">
+										<?php echo _("Manually Loaded Modules")?>
+									</a>
+								</li>
+								<li role="presentation" data-name="amodpreload" class="change-tab">
+									<a href="#amodpreload" aria-controls="amodpreload" role="tab" data-toggle="tab">
+										<?php echo _("Preloaded Modules")?>
+									</a>
+								</li>
+							</ul>
+								<div class="tab-content display">
+									<div role=tabpanel" id="amodnoload" class="tab-pane active">
+										<div class="table-responsive"> 
+											<div class="col-sm-4">
+											<table class="table table-striped table-bordered" id="modnoload">
+												<thead>
+													<tr>
+														<th><?php echo _("Module") ?></th>
+														<th><?php echo _("Action") ?></th>
+													</tr>
+												</thead>
+												<tbody>
+													<?php echo $noloadrows ?>
+												</tbody>
+											</table>
+										</div>
+										</div>
+									</div>
+									<div role=tabpanel" id="amodload" class="tab-pane">
+										<div class="table-responsive">
+											<div class="col-sm-4"> 
+											<table class="table table-striped table-bordered" id="modload">
+												<thead>
+													<tr>
+														<th><?php echo _("Module") ?></th>
+														<th><?php echo _("Action") ?></th>
+													</tr>
+												</thead>
+												<tbody>
+													<?php echo $loadrows ?>
+												</tbody>
+											</table>
+										</div>		
+										</div>		
+									</div>
+									<div role=tabpanel" id="amodpreload" class="tab-pane">
+										<div class="table-responsive">
+											<div class="col-sm-4"> 
+											<table class="table table-striped table-bordered" id="modpreload">
+												<thead>
+													<tr>
+														<th><?php echo _("Module") ?></th>
+														<th><?php echo _("Action") ?></th>
+													</tr>
+												</thead>
+												<tbody>
+													<?php echo $preloadrows ?>
+												</tbody>
+											</table>
+											</div>
+										</div>	
+									</div>
+								</div>
+						</form>
+					</div>
+				</div>
+				<div class="col-sm-3 hidden-xs bootnav" id='addform'>	
+					<label class="control-label" for="module"><b><?php echo _("Add Module") ?></b></label>
+					<input type="text" class="form-control" id="module" name="module" value="">
+					<button class="btn btn-default" id="addmodule"><i class="fa fa-plus"></i> <?php echo _("Add")?></button>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 

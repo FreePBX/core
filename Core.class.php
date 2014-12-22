@@ -191,39 +191,47 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function doConfigPageInit($page) {
 		if ($page == "astmodules") {
-			foreach ($_REQUEST as $key => $var) {
-				// Do they want to delete something?
-				if (preg_match("/^delete-(.+)-(.+)$/", $key, $match)) {
-					// Note - we base64 encode, to ensure -, _ and . don't get mangled by the browser.
-					// print "You want to delete ".base64_decode($match[2])." from ".$match[1]."<br />\n";
-					if ($match[1] == "noload") {
-						$this->ModulesConf->removenoload(base64_decode($match[2]));
-					} elseif ($match[1] == "preload") {
-						$this->ModulesConf->removepreload(base64_decode($match[2]));
-					} else {
-						print "Unsupported section ".$match[1]."<br />\n";
+			$request = $_REQUEST;
+			$action = $request['action'];
+			$section = $request['section'];
+			$module = $request['module'];
+			switch($action){
+				case 'add':
+					switch($section){
+						case 'amodnoload':
+							$this->ModulesConf->noload($module);
+							return true;
+						break;
+						case 'amodpreload':
+							$this->ModulesConf->preload($module);
+							return true;
+						break;
+						default:
+							return false;
+						break;
 					}
-					// Or, they may want to add something..
-				} elseif (preg_match("/^add-(.+)$/", $key, $match)) {
-					$section = $match[1];
-					if (!isset($_REQUEST["new-$section"])) {
-						// Post was blank, or didn't exist at all.
-						return;
-					} else {
-						$add = $_REQUEST["new-$section"];
+				break;
+				case 'del':
+					switch($section){
+						case 'amodnoload':
+							$this->ModulesConf->removenoload($module);
+							return true;
+						break;
+						case 'amodpreload':
+							$this->ModulesConf->removepreload($module);
+							return true;
+						break;
+						default:
+							return false;
+						break;
 					}
-
-					// Now, actually add it.
-					if ($section == "noload") {
-						$this->ModulesConf->noload($add);
-					} elseif ($section == "preload") {
-						$this->ModulesConf->preload($add);
-					} else {
-						print "Unsupported section ".$section."<br />\n";
-					}
-				}
-			} // foreach
+				break;
+				default:
+				return false;
+				break;
+			}
 		} // $page == "astmodules"
+		
 	}
 
 	/**
