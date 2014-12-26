@@ -1333,6 +1333,8 @@ $freepbx_conf->commit_conf_settings();
 
 unset($set);
 // RSSFEEDS
+// This is here because conf type CONF_TYPE_TEXTAREA doesnt exist
+// if there is an upgrade from 2.11 to 12 until after framework is updated
 $set['category'] = 'System Setup';
 $set['value'] = "http://www.freepbx.org/rss.xml\nhttp://feeds.feedburner.com/InsideTheAsterisk";
 $set['defaultval'] = $set['value'];
