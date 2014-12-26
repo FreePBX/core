@@ -1,137 +1,21 @@
 <?php
+$view = $_REQUEST['view'];
 
-if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-
-$display = 'dahdichandids';
-$type = isset($_REQUEST['type']) ? $_REQUEST['type'] :  'setup';
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] :  '';
-if (isset($_REQUEST['delete'])) $action = 'delete';
-
-
-$extdisplay  = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '';
-$channel     = isset($_REQUEST['channel']) ? $_REQUEST['channel'] :  false;
-$description = isset($_REQUEST['description']) ? $_REQUEST['description'] :  '';
-$did         = isset($_REQUEST['did']) ? $_REQUEST['did'] :  '';
-
-switch ($action) {
-	case 'add':
-		if (core_dahdichandids_add($description, $channel, $did)) {
-			needreload();
-			redirect_standard();
-		}
+switch($view){
+	case "add":
+		if ($extdisplay != '') {
+			// load
+			$row = core_dahdichandids_get($extdisplay);
+			$description = $row['description'];
+			$channel     = $row['channel'];
+			$did         = $row['did'];
+			$action = 'edit';
+		}else{
+			$action = 'add';
+		}	
+		echo load_view(__DIR__."/views/dahdichandids/view.php", array('description' => $description, 'channel' => $channel, 'did' => $did, 'action' => $action));
 	break;
-	case 'edit':
-		if (core_dahdichandids_edit($description, $channel, $did)) {
-			needreload();
-			redirect_standard('extdisplay');
-		}
-	break;
-	case 'delete':
-		core_dahdichandids_delete($channel);
-		needreload();
-		redirect_standard();
+	default:
+		echo load_view(__DIR__."/views/dahdichandids/general.php");
 	break;
 }
-
-
-?>
-
-<div class="rnav"><ul>
-<?php
-
-echo '<li><a href="config.php?display='.$display.'&type='.$type.'">'._('Add Channel').'</a></li>';
-
-foreach (core_dahdichandids_list() as $row) {
-	echo '<li><a href="config.php?display='.$display.'&type='.$type.'&extdisplay='.$row['channel'].'" class="">'.$row['channel'].': '.$row['description'].'</a></li>';
-}
-
-?>
-</ul></div>
-
-<?php
-
-if ($extdisplay != '') {
-	// load
-	$row = core_dahdichandids_get($extdisplay);
-
-	$description = $row['description'];
-	$channel     = $row['channel'];
-	$did         = $row['did'];
-
-	echo "<h2>"._("Edit DAHDI Channel: ").$channel."</h2>";
-} else {
-	echo "<h2>"._("Add DAHDI Channel")."</h2>";
-}
-
-$helptext = _("DAHDI Channel DIDs allow you to assign a DID to specific DAHDI Channels. You can supply the same DID to multiple channels. This would be a common scenario if you have multiple POTS lines that are on a hunt group from your provider. You MUST assign the channel's context to from-analog for these settings to have effect. It will be a line that looks like:<br /><br />context = from-analog<br /><br />in your chan_dahdi.conf configuration effecting the specified channel(s). Once you have assigned DIDs you can use standard Inbound Routes with the specified DIDs to route your calls.");
-echo "<p>".$helptext."</p>\n";
-?>
-<form name="editDAHDIchandid" class="fpbx-submit" action="" method="post" data-fpbx-delete="config.php?display=dahdichandids&action=delete&channel=<?php echo $row['channel']; ?>">
-	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay; ?>">
-	<?php if ($action == 'add') { ?>
-	<input type="hidden" name="channel" value="<?php echo $extdisplay; ?>">
-	<?php } ?>
-	<input type="hidden" name="action" value="<?php echo ($extdisplay != '' ? 'edit' : 'add'); ?>">
-	<table>
-	<tr><td colspan="2"><h5><?php  echo ($extdisplay != '' ? _("Edit Channel").": ".$extdisplay : _("Add Channel")) ?><hr></h5></td></tr>
-<?php
-	if ($extdisplay == '') {
-?>
-	<tr>
-		<td><a href="#" class="info"><?php echo _("Channel")?>:<span><?php echo _("The DAHDI Channel number to map to a DID")?></span></a></td>
-		<td><input size="5" type="text" name="channel" value="<?php  echo $channel; ?>" tabindex="<?php echo ++$tabindex;?>"></td>
-	</tr>
-<?php
-	}
-?>
-	<tr>
-		<td><a href="#" class="info"><?php echo _("Description")?>:<span><?php echo _("A useful description describing this channel")?></span></a></td>
-		<td><input size="40" type="text" name="description" value="<?php  echo $description; ?>" tabindex="<?php echo ++$tabindex;?>"></td>
-	</tr>
-	<tr>
-		<td><a href="#" class="info"><?php echo _("DID")?>:<span><?php echo _("The DID that this channel represents. The incoming call on this channel will be treated as if it came in with this DID and can be managed with Inbound Routing on DIDs")?></span></a></td>
-		<td><input size="40" type="text" name="did" value="<?php echo $did; ?>"  tabindex="<?php echo ++$tabindex;?>"/></td>
-	</tr>
-	</table>
-</form>
-
-
-<script language="javascript">
-<!--
-$(document).ready(function() {
-	$('#submit').click(function() {
-		var channel = $('input[name=channel]').val(),
-			did = $('input[name=did]').val();
-		var msgInvalidChannel = "<?php echo _('Invalid Channel Number, must be numeric and not blank'); ?>";
-		var msgInvalidDID = "<?php echo _('Invalid DID, must be a non-blank DID'); ?>";
-		var msgConfirmDIDNonStd = "<?php echo _('DID information is normally just an incoming telephone number.\n\nYou have entered a non standard DID pattern.\n\nAre you sure this is correct?'); ?>";
-		var msgConfirmConvertDID = "<?php echo _('You appear to be using a converted DID in the form of zapchanNN that was automatically generated during an upgrade. You should consider assigning the DID that is normally associated with this channel to take full advantage of the inbound routing abilities. Changing the DID here will require you to make changes in the Inbound Routes tab. Do you want to continue?'); ?>";
-
-		// form validation
-
-	console.log(channel);
-	console.log(did);
-
-		defaultEmptyOK = false;
-		if (!isInteger(channel)) {
-			return warnInvalid(channel, msgInvalidChannel);
-		}
-		if (isEmpty(did)) {
-			return warnInvalid(did, msgInvalidDID);
-		}
-		if (did.substring(0,7) == "zapchan") {
-			if (!confirm(msgConfirmConvertDID)) {
-				return false;
-			}
-
-		} else if (!isDialpattern(did)) {
-			if (!confirm(msgConfirmDIDNonStd)) {
-				return false;
-			}
-		}
-
-		return true;
-	});
-});
-//-->
-</script>

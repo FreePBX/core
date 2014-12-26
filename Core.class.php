@@ -145,6 +145,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case 'users':
 			case 'devices':
 			case 'extensions':
+			case 'dahdichandids':
 				$buttons = array(
 					'delete' => array(
 						'name' => 'delete',
@@ -190,6 +191,39 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function doConfigPageInit($page) {
+		if ($page == "dahdichandids"){
+			if(!isset($_REQUEST['action'])){
+				return;
+			}
+			$request = $_REQUEST;
+			$type = isset($request['type']) ? $request['type'] :  'setup';
+			$action = isset($request['action']) ? $request['action'] :  '';
+			if (isset($request['delete'])) $action = 'delete';
+			$extdisplay  = isset($request['extdisplay']) ? $request['extdisplay'] : '';
+			$channel     = isset($request['channel']) ? $request['channel'] :  false;
+			$description = isset($request['description']) ? $request['description'] :  '';
+			$did         = isset($request['did']) ? $request['did'] :  '';
+			switch ($action) {
+				case 'add':
+					if (core_dahdichandids_add($description, $channel, $did)) {
+						needreload();
+						redirect_standard();
+					}
+				break;
+				case 'edit':
+					if (core_dahdichandids_edit($description, $channel, $did)) {
+						needreload();
+						redirect_standard('extdisplay');
+					}
+				break;
+				case 'delete':
+					core_dahdichandids_delete($channel);
+					needreload();
+					redirect_standard();
+				break;
+			}
+		}
+		
 		if ($page == "astmodules") {
 			$request = $_REQUEST;
 			$action = $request['action'];
