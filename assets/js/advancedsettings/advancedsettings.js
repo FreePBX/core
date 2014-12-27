@@ -1,176 +1,157 @@
 $(document).ready(function() {
-	//save settings
-	function savebinder(e) {
-		var mythis = $(this);
-		var mykey = $(this).attr('data-key');
-		switch ($(this).attr('data-type')) {
-			case 'BOOL':
-				var myval = $('input[name="' + mykey + '"]:checked').val();
-				break;
-			default:
-				var myval = $('#' + mykey).val();
-				break;
-		}
-		switch (mykey) {
-			case 'AMPMGRUSER':
-			case 'AMPMGRPASS':
-				var skipastman = 0;
-				break;
-			default:
-				var skipastman = 1;
-				break;
-		}
-		$.ajax({
-			type: 'POST',
-			url: location.href,
-			data: {
-					quietmode: 1,
-					skip_astman: skipastman,
-					restrictmods: 'core',
-					action: 'setkey',
-					keyword: mykey,
-					value: myval
-					},
-			beforeSend: function(XMLHttpRequest, set) {
-				mythis.attr({src: 'images/spinner.gif'})
-			},
-			dataType: 'json',
-			success: function(data, textStatus, XMLHttpRequest) {
-				//console.log(data);
-				mythis.attr({src: 'images/accept.png'});
-				if (!data.validated) {
-					alert(data.msg);
-				}
-				if (!data.validated && data.saved) {
-				  $('#' + mykey).val(data.saved_value);
-				}
-				if (data.saved) {
-					//remove save button
-					mythis.off('click');
-					mythis.data('isbound', false);
-					mythis.fadeOut('normal', function(){
-						mythis.closest('tr').find('.savetd').hide();
-					});
-
-					//hide retor to defualt if its we have reverted to defualt
-					//should not be nesesary -MB
-					/*
-					input = mythis.closest('tr').find('input.valueinput').val() ;
-					defval = mythis.closest('tr').find('input.adv_set_default').attr('data-default')
-					console.log(input, defval)
-					if(input == defval){
-						mythis.closest('tr').find('input.adv_set_default').fadeOut()
+	//On load mark things that are not default
+	$(".defset").each(function(){
+		var current = $(this).data('for');
+		var defval = $(this).data('defval');
+		var itype = $(this).data('type');
+		switch(itype){
+			case 'bool':
+				if(defval == 1){
+					if(!$('#'+current+"true").is(':checked')){
+						$(this).removeClass('hidden');	
 					}
-					*/
-					// If they changed the page layout
-					switch (mykey) {
-						case 'AS_DISPLAY_HIDDEN_SETTINGS':
-						case 'AS_DISPLAY_READONLY_SETTINGS':
-						case 'AS_DISPLAY_FRIENDLY_NAME':
-						case 'AS_OVERRIDE_READONLY':
-							if (page_reload_check()) {
-								location.href=location.href;
-							} else {
-								alert(msgChangesRefresh);
-							}
-							break;
-						default:
-  						toggle_reload_button('show');
-							break;
-						}
+				}else{
+					if($('#'+current+"true").is(':checked')){
+						$(this).removeClass('hidden');	
 					}
-				//reset data-valueinput-orig to new value
-				switch (mythis.attr('data-type')) {
-					case 'BOOL':
-						$('input[name="' + mykey + '"]').attr('data-valueinput-orig', mykey);
-						break;
-					default:
-						var myval = $('#' + mykey).attr('data-valueinput-orig', mykey);
-						break;
 				}
-			},
-			error: function(data, textStatus, XMLHttpRequest) {
-				alert('Ajax Web ERROR: When saving key ' + mykey + ': ' + textStatus);
-			}
-		})
+			break;
+			case 'int':
+			case 'text':
+			case 'textarea':
+			case 'select':
+				if($('#'+current).val() != defval){
+					$(this).removeClass('hidden');
+				}  
+			break;
+		}
+	});
+	//Act on read only
+	if($("#AS_DISPLAY_READONLY_SETTINGSfalse").is(':checked')){
+		$(".setro").each(function(){
+			$(this).addClass("hidden");
+		});
+	}else{
+		$(".setro").each(function(){
+			$(this).removeClass("hidden");
+		});		
 	}
-
-	$("#AMPEXTENSIONS").change(function(event) {
-		if ($(this).val() == "deviceanduser") {
-			if (!confirm(userdevicewarn)) {
-				$(this).val("extensions");
-				event.stopPropagation();
-			}
-		}
-
-	});
-	//set defualt values
-	$('.adv_set_default').click(function(){
-		switch ($(this).attr('data-type')) {
-		case 'BOOL':
-			$('input[name="' + $(this).attr('data-key')).removeAttr("checked");
-			$('input[name="' + $(this).attr('data-key') + '"]').filter('[value=' + $(this).attr('data-default') + ']').attr("checked","checked").trigger('change');
-			break;
-		default:
-			$('#'+$(this).attr('data-key')).val($(this).attr('data-default')).trigger('change');
-			break;
-		}
-		$(this).hide();
-	});
-
-	//show save button
-	$('.valueinput').bind('keyup keypress keydown paste change', function(){
-		var save = $(this).closest('tr').find('input.save');
-		var savetd = $(this).closest('tr').find('.savetd');
-		var adv_set_default = $(this).closest('tr').find('input.adv_set_default');
-
-		//if the value was changed since the last page refresh
-		if($(this).val() != $(this).attr('data-valueinput-orig')){
-			if (savetd.is(':hidden')) {
-				savetd.show();
-			}
-			save.stop(true, true).delay(100).fadeIn();
-			//only bind if not already bound
-			if (typeof(save.data("isbound")) == 'undefined' || !save.data('isbound')) {
-				save.data("isbound", true);
-				save.bind('click', savebinder);
-			}
-		} else {
-			save.data("isbound", false);
-			save.stop(true, true).delay(100).fadeOut('normal', function(){
-				if (!savetd.is(':hidden')) {
-					savetd.hide();
-				}
-			}).off('click');
-		}
-		if($(this).val() != adv_set_default.attr('data-default')){
-			if (adv_set_default.is(':hidden')) {
-				adv_set_default.show()
-			}
-		} else {
-			if (!adv_set_default.is(':hidden')) {
-				adv_set_default.fadeOut()
-			}
-		}
-	})
-
-	$("#page_reload").click(function(){
-		if (!page_reload_check()) {
-			if (!confirm(msgUnsavedChanges)) {
-				return false;
-			}
-		}
-		location.href=location.href;
-	});
+	if($("#AS_OVERRIDE_READONLYfalse").is(':checked')){
+		$(".setro").each(function(){
+			$(this).attr('readonly',true);
+		});
+	}else{
+		$(".setro").each(function(){
+			$(this).attr('readonly',false);
+		});		
+	}
+	//Act on hidden
+	if($("#AS_DISPLAY_HIDDEN_SETTINGSfalse").is(':checked')){
+		$(".sethidden").each(function(){
+			$(this).addClass("hidden");
+		});
+	}else{
+		$(".sethidden").each(function(){
+			$(this).removeClass("hidden");
+		});		
+	}
+});
+//visibility/ro updates
+$("input[name='AS_DISPLAY_READONLY_SETTINGS']").change(function(){
+	if($(this).val()){
+		$(".setro").each(function(){
+			$(this).attr('readonly',false);
+		});
+	}else{
+		$(".setro").each(function(){
+			$(this).attr('readonly',true);
+		});
+	}
 });
 
-function page_reload_check(msgUnsavedChanges) {
-	var reload = true;
-	$(".save").each(function() {
-		if ($(this).data("events") != undefined) {
-			reload = false;
-			return false;
-		}
-	});
-	return reload;
-}
+$("input[name='AS_OVERRIDE_READONLY']").change(function(){
+	if($(this).val()){
+		$(".setro").each(function(){
+			$(this).removeClass("hidden");
+		});
+	}else{
+		$(".setro").each(function(){
+			$(this).addClass("hidden");	
+		});
+	}
+});
+
+//Reset to default icon
+$(".defset").click(function(e){
+	e.preventDefault();
+	var current = $(this).data('for');
+	var defval = $(this).data('defval');
+	var itype = $(this).data('type');
+	switch(itype){
+		case 'bool':
+			console.log(defval);
+			if(defval){
+				$('#'+current+"true").prop('checked', true);
+				$('#'+current+"false").prop('checked', false);
+				$(this).addClass('hidden');
+			}else{
+				$('#'+current+"true").prop('checked', false);
+				$('#'+current+"false").prop('checked', true);
+				$(this).addClass('hidden');			
+			}
+		break;
+		case 'int':
+		case 'text':
+		case 'textarea':
+		case 'select':
+			$('#'+current).val(defval);
+			$(this).addClass('hidden');
+		break;
+	}
+});
+
+//Show the revert icon when changing input to a non-default state.
+$(':input').change(function(){
+	var itype = $(this).attr('type');
+	switch(itype){
+		case 'radio':
+			var vid = $(this).attr('name');
+			var vval = $("input[name="+vid+"]:checked").val();
+			var dval = $("#"+vid+"default").val();
+			if((vval == 'true' && dval == 1)||(vval == 'false' && dval == 0)){
+				$("a[data-for='"+vid+"']").addClass('hidden');
+			}else{
+				$("a[data-for='"+vid+"']").removeClass('hidden');
+			}
+		
+		break;
+		case 'number':
+		case 'text':
+		case 'textarea':
+			var vid = $(this).attr('name');
+			if($('#'+vid).val() == $('#'+vid+'default').val()){
+				$("a[data-for='"+vid+"']").addClass('hidden');
+			}else{
+				$("a[data-for='"+vid+"']").removeClass('hidden');
+			}
+		break;
+	}
+});
+//Show the revert icon when changing select to a non-default state.
+$('select').on('change', function() {
+	var sid = $(this).attr('name');
+	if($('#'+sid+'default').val() == $(this).val()){
+		$("a[data-for='"+sid+"']").addClass('hidden');
+	}else{
+		$("a[data-for='"+sid+"']").removeClass('hidden');
+	}
+});
+//Show the revert icon when changing ttextarea to a non-default state.
+$('textarea').on('change', function() {
+	var tid = $(this).attr('name');
+	if($('#'+tid+'default').val() == $(this).val()){
+		$("a[data-for='"+tid+"']").addClass('hidden');
+	}else{
+		$("a[data-for='"+tid+"']").removeClass('hidden');
+	}
+});

@@ -1,48 +1,6 @@
-<?php /* $Id */
-if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-
-$getvars = array('action', 'keyword', 'value');
-foreach ($getvars as $v){
-	$var[$v] = isset($_POST[$v]) ? $_POST[$v] : 0;
-}
-
-if($var['action'] === 'setkey') {
-	header("Content-type: application/json");
-	$keyword = $var['keyword'];
-	if ($freepbx_conf->conf_setting_exists($keyword)) {
-		//special cron manager detections
-		if($keyword == 'CRONMAN_UPDATES_CHECK') {
-			$cm =& cronmanager::create($db);
-			if($var['value']) {
-				$cm->enable_updates();
-			} else {
-				$cm->disable_updates();
-			}
-		}
-		$freepbx_conf->set_conf_values(array($keyword => trim($var['value'])),true,$amp_conf['AS_OVERRIDE_READONLY']);
-		$status = $freepbx_conf->get_last_update_status();
-		if ($status[$keyword]['saved']) {
-			freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$var['value']));
-			needreload();
-		}
-		echo json_encode($status[$keyword]);
-		exit;
-	}
-	exit;
-}
-echo '<script type="text/javascript">';
-echo 'userdevicewarn = "' . _("Device and User mode is unsupported by the development team. Are you sure you want to use this mode?") . '";';
-echo 'amportalconf_error = "' . _("You must run 'amportal restart' from the Linux command line before you can save setting here.") . '";';
-echo 'msgUnsavedChanges = "' . _("You have un-saved changes, press OK to disregard changes and reload page or Cancel to abort.") . '";';
-echo 'msgChangesRefresh = "' . _("Your Display settings have been changed, click on 'Refresh Page' to view the affects of your changes once you have saved other outstanding changes that are still un-confirmed.") . '";';
-echo '</script>';
-
-echo '<div id="main_page">';
-echo "<h2>"._("FreePBX Advanced Settings")."</h2>";
-echo '<p>'._("<b>IMPORTANT:</b> Use extreme caution when making changes!").'</p>'._("Some of these settings can render your system inoperable. You are urged to backup before making any changes. Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to true. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values if not set at default.");
-
+<?php
 $conf					= $freepbx_conf->get_conf_settings();
-
+$conf					= $freepbx_conf->get_conf_settings();
 $display_level			= 10; // TO confusing with multiple levels $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
 $display_hidden			= $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
 $display_readonly		= $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
@@ -50,113 +8,170 @@ $display_friendly_name	= $conf['AS_DISPLAY_FRIENDLY_NAME']['value'];
 
 $current_category		= '';
 $row					= 0;
-
-echo '<input type="image" src="images/spinner.gif" style="display:none">';
-echo '<table class="alt_table">';
+$inputhtmltop = <<<HERE
+	<div class="row">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-md-7">
+HERE;
+$inputhtmlmiddle = <<<HERE
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+HERE;
+$inputhtmlend = <<<HERE
+		</div>
+	</div>
+</div>
+HERE;
+$forminputs = '';
 foreach ($conf as $c){
-	if ($c['level'] > $display_level || $c['hidden'] && !$display_hidden || $c['readonly'] && !$display_readonly) {
-		continue;
+	if($c['category'] != $current_category && $current_category != '' ){
+		$forminputs .= '</div><br/>';		
 	}
-	if ($current_category != $c['category']) {
+	if($c['category'] != $current_category){
 		$current_category = $c['category'];
-
-		// TODO: Temp fix until someone much better at styling then me can actually properly fix this :)
-		//       it's only purpose is to get the headings so they are not shaded and so the stripped shading
-		//       starts consistent for each section.
-		//
-		if ($row % 2) {
-			echo '<tr></tr>';
-			$row++;
-		}
-		$current_category_loc = modgettext::_($current_category, $c['module']);
-		echo '<tr><td colspan="3"><br><h4 class="category">'._("$current_category_loc").'</h4></td></tr>';
-		$row++;
+		$catid = preg_replace('/\s+/', '', $current_category);
+		$forminputs .= '<div class="section-title" data-for="'.$catid.'">';
+		$forminputs .= '<h2><i class="fa fa-minus">'.$current_category.'</i></h2>';
+		$forminputs .= '</div>';
+		$forminputs .= '<div class="section" data-id="'.$catid.'">';	
 	}
-
-	$name_label_raw = $c['name'];
-	$description_raw = $c['description'];
-	$name_label = modgettext::_($name_label_raw, $c['module']);
-	$tt_description = modgettext::_($description_raw, $c['module']);
-	if (!$display_friendly_name) {
-		$tr_friendly_name = $name_label;
-		$name_label = $c['keyword'];
+	$type = $c['type'];
+	$iclasses = array('element-container');
+	if($c['hidden']){
+		$iclasses[] = 'sethidden';	
 	}
-
-	$row++;
-	$dv = $c['type'] == CONF_TYPE_BOOL ? ($c['defaultval'] ? _("True") : _("False")) : $c['defaultval'];
-	$dv = $c['type'] == CONF_TYPE_TEXTAREA ? nl2br($c['defaultval']) : $c['defaultval'];
-	$default_val = $dv == '' ? _("No Default Provided") : sprintf(_("Default Value: %s"),$dv);
-	if ($c['emptyok'] && $c['type'] != CONF_TYPE_BOOL && $c['type'] != CONF_TYPE_SELECT && $c['type'] != CONF_TYPE_FSELECT) {
-		$default_val.= ', '._("field can be left blank");
+	if($c['readonly']){
+		$iclasses[] = 'setro';	
 	}
-	if ($c['type'] == CONF_TYPE_INT && $c['options']) {
-		$range = explode(',',$c['options']);
-		$default_val .= '<br />'.sprintf(_("Acceptable Values: %s - %s"),$range[0],$range[1]);
+	switch($type){
+		case 'bool':
+			if($c['value']){
+			 $true = 'checked';	
+			 $false = '';	
+			}else{
+			 $true = '';	
+			 $false = 'checked';				
+			}
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 radioset text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<input type="radio" id="' . $c['keyword'] . 'true" name="' . $c['keyword'] . '" value="true" '.$true.'>';
+			$forminputs .= '<label for="'.$c['keyword'].'true">'._("Yes").'</label>';
+			$forminputs .= '<input type="radio" id="' . $c['keyword'] . 'false" name="' . $c['keyword'] . '" value="false" '.$false.'>';
+			$forminputs .= '<label for="'.$c['keyword'].'false">'._("No").'</label>';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
+			$forminputs .= $inputhtmlend;
+		break;
+		case 'int':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<input type="number" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
+			$forminputs .= $inputhtmlend;		
+		break;
+		case 'text':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<input type="text" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
+			$forminputs .= $inputhtmlend;	
+		break;
+		case 'select':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			$opt = explode(',',$c['options']);
+			foreach($opt as $o) {
+				$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
+				$forminputs .= '<option value="'.$o.'"'.$selected.'>'.$o.'</option>';
+			}
+			$forminputs .= '</select>';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
+			$forminputs .= $inputhtmlend;
+		break;
+		case 'textarea':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<textarea class="form-control" rows = "4" id="'.$c['keyword'].'" name="'.$c['keyword'].'">'.$c['value'].'</textarea>';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
+			$forminputs .= $inputhtmlend;
+		break;
 	}
-	if ($display_friendly_name) {
-		$default_val .= '<br />'.sprintf(_("Internal Name: %s"),$c['keyword']);
-	} else {
-		$default_val .= '<br />'.sprintf(_("Friendly Name: %s"),$tr_friendly_name);
-	}
-	echo '<tr><td><a href="javascript:void(null)" class="info">'.$name_label.'<span>'.$tt_description.'<br /><br >'.$default_val.'</span></a></td>';
-	echo '<td>';
-	switch ($c['type']) {
-		case CONF_TYPE_TEXT:
-		case CONF_TYPE_DIR:
-		case CONF_TYPE_INT:
-			$readonly = !$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden'] ? '' : 'readonly="readonly"';
-			echo '<input class="valueinput" id="'.$c['keyword'].'" type="text" size="60" value="'.htmlspecialchars($amp_conf[$c['keyword']]).'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>';
-			break;
-		case CONF_TYPE_TEXTAREA:
-			$readonly = !$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden'] ? '' : 'readonly="readonly"';
-			echo '<textarea class="valueinput" id="'.$c['keyword'].'" type="text" rows="5" cols="58" data-valueinput-orig="'.$amp_conf[$c['keyword']].'" '.$readonly.'/>'.htmlspecialchars($amp_conf[$c['keyword']]).'</textarea>';
-			break;
-			break;
-		case CONF_TYPE_SELECT:
-			echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
-				$opt = explode(',',$c['options']);
-				foreach($opt as $o) {
-					$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
-					echo '<option value="'.$o.'"'.$selected.'>'.$o.'</option>';
-				}
-			echo '</select>';
-			break;
-		case CONF_TYPE_FSELECT:
-			echo '<select class="valueinput" id="'.$c['keyword'].'" data-valueinput-orig="'.$amp_conf[$c['keyword']].'">';
-				$opt = $c['options'];
-				foreach($opt as $o => $l) {
-					$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
-					echo '<option value="'.$o.'"'.$selected.'>'.modgettext::_($l, $c['module']).'</option>';
-				}
-			echo '</select>';
-			break;
-		case CONF_TYPE_BOOL:
-?>
-			<span class="radioset"><input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-true" type="radio" name="<?php echo $c['keyword'] ?>" value="1" <?php echo $amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
-			<label for="<?php echo $c['keyword'] ?>-true"><?php echo _("True") ?></label>
-			<input class="valueinput" data-valueinput-orig="<?php echo $amp_conf[$c['keyword']] ? 1 : 0 ?>" id="<?php echo $c['keyword'] ?>-false" type="radio" name="<?php echo $c['keyword'] ?>" value="0" <?php echo !$amp_conf[$c['keyword']]?"checked=\"yes\"":""?>/>
-			<label for="<?php echo $c['keyword'] ?>-false"><?php echo _("False") ?></label></span>
-<?php
-			break;
-	}
-	echo '</td>';
-	if(!$c['readonly'] || $amp_conf['AS_OVERRIDE_READONLY'] && !$c['hidden']){
-		echo '<td><input type="image" class="adv_set_default" src="images/default-option.png" data-key="'.$c['keyword'].'" data-default="'.$c['defaultval'].'" title="'._('Revert to Default').'"'
-			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" '
-			. (($amp_conf[$c['keyword']] == $c['defaultval']) ? ' style="display:none" ' : '')
-			.'></td>';
-		echo '<td class="savetd"><input type="image" class="save" src="images/accept.png" data-key="'
-			. $c['keyword']
-			. '" title="' . _('Save') . '"'
-			. ' data-type="' . (($c['type'] == CONF_TYPE_BOOL) ? 'BOOL' : '') . '" '
-			. '></td>';
-	}
-	echo '</tr>';
 }
-echo '</table>';
-
-// Provide enough padding at the bottom (<br />) so that the tooltip from the last setting does not get cut off.
 ?>
-<br /><br /> <br />
-<input type="button" id="page_reload" value="<?php echo _("Refresh Page");?>"/>
-<br /><br /><br /><br /></div>
+
+<div class="container-fluid">
+	<h1><?php echo _("FreePBX Advanced Settings")?></h1>
+	<div class="well well-danger">
+		<?php echo _('<b>IMPORTANT:</b> Use extreme caution when making changes!')?>
+	</div>
+	<div class="well well-info">
+		<?php echo _("Some of these settings can render your system inoperable. You are urged to backup before making any changes. Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to true. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values if not set at default.");?>
+	</div>
+	<div class = "display full-border">
+		<div class="row">
+			<div class="col-sm-9">
+				<div class="fpbx-container">
+					<div class="display full-border">
+						<form class="fpbx-submit" name="submitSettings" action="" method="post">
+							<input type="hidden" name="action" value="setkey">
+						<?php echo $forminputs ?>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3 hidden-xs bootnav">
+			</div>
+		</div>
+	</div>
+</div>

@@ -42,6 +42,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 			break;
+			case 'advancedsettings':
+				$buttons = array(
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+			break;
 			case 'dahdichandids':
 				$buttons = array(
 					'delete' => array(
@@ -191,11 +205,44 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function doConfigPageInit($page) {
+		//Reassign $_REQUEST as it will be immutable in the future.
+		$request = $_REQUEST;
+		if ($page == "advancedsettings"){
+			$freepbx_conf = $this->Config;
+			$getvars = array('action', 'keyword', 'value');
+			foreach ($getvars as $v){
+				$var[$v] = isset($request[$v]) ? $request[$v] : 0;
+			}	
+			if($var['action'] === 'setkey') {
+				foreach($request as $K => $V){
+					$keyword = $K;
+					if ($freepbx_conf->conf_setting_exists($keyword)) {
+						//special cron manager detections
+						if($keyword == 'CRONMAN_UPDATES_CHECK') {
+							$cm = \cronmanager::create($db);
+							if($V) {
+								$cm->enable_updates();
+							} else {
+								$cm->disable_updates();
+							}
+						}
+						$freepbx_conf->set_conf_values(array($keyword => trim($V)),true,$amp_conf['AS_OVERRIDE_READONLY']);
+						$status = $freepbx_conf->get_last_update_status();
+						if ($status[$keyword]['saved']) {
+							freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$V));
+							needreload();
+						}
+						continue;
+					}
+				continue;
+				}
+			}
+			
+		}// $page == "advancedsettings"
 		if ($page == "dahdichandids"){
 			if(!isset($_REQUEST['action'])){
 				return;
 			}
-			$request = $_REQUEST;
 			$type = isset($request['type']) ? $request['type'] :  'setup';
 			$action = isset($request['action']) ? $request['action'] :  '';
 			if (isset($request['delete'])) $action = 'delete';
@@ -222,10 +269,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					redirect_standard();
 				break;
 			}
-		}
+		}// $page == "dahdichandids"
 		
 		if ($page == "astmodules") {
-			$request = $_REQUEST;
 			$action = $request['action'];
 			$section = $request['section'];
 			$module = $request['module'];
