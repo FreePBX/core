@@ -3,7 +3,7 @@
 
 $restrict_mods = array('queues' => true);
 if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
-    include_once('/etc/asterisk/freepbx.conf');
+	include_once('/etc/asterisk/freepbx.conf');
 }
 
 	require_once "phpagi.php";
@@ -25,7 +25,7 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 	 * as well as logging in the default user (if applicable) and set hints
 	 * accordingly
 	 */
-	
+
 	$agi = new AGI();
 
 	$astspooldir  = get_var( "ASTSPOOLDIR" );
@@ -160,7 +160,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
  		} else {
  			$user_event_body = "\"UserDeviceAdded|Data: {$user},{$device}\"";
  		}
- 
+
     $agi->exec("UserEvent", $user_event_body);
 
 		if ($fm_devstate) {
@@ -209,7 +209,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			cli_debug("remove_user: Setting user $current_user to devices $new_devices",5);
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
-			
+
 			if(version_compare(get_var("ASTVERSION"), "1.8.0", "ge")) {
 				$user_event_body = "\"UserDeviceRemoved,Data: {$current_user}\\\\,{$device}\"";
 			} else if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
@@ -219,9 +219,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
  			} else {
  				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user},{$device}\"";
  			}
- 
+
      	$agi->exec("UserEvent", $user_event_body);
-     	
+
 			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
 
 			cli_debug("Setting device $device states to INVALID before deleting them",5);
@@ -598,7 +598,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $agi;
 		$agi->verbose($string, $level);
 	}
-	
+
 	// Set States for queues
 	function set_queue_states($user,$device,$onoroff='on') {
 		global $agi;
@@ -684,14 +684,16 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		if (!$dynonly && empty($qcall)) {
 			$qcall = $qc;
-			$qmr = queues_get_static_members();
-			foreach ($qmr as $q => $qmg) {
-				foreach ($qmg as $qm) {
-					if (strtoupper(substr($qm,0,1)) == 'L') {
-						$tm = preg_replace("/[^0-9#\,*]/", "", $qm);
-						$tma = explode(',',$tm);
-						if (!isset($qcall[$tma[0]]) || !in_array($q, $qcall[$tma[0]])) {
-							$qcall[$tma[0]][] = $q;
+			if (function_exists('queues_get_static_members')) {
+				$qmr = queues_get_static_members();
+				foreach ($qmr as $q => $qmg) {
+					foreach ($qmg as $qm) {
+						if (strtoupper(substr($qm,0,1)) == 'L') {
+							$tm = preg_replace("/[^0-9#\,*]/", "", $qm);
+							$tma = explode(',',$tm);
+							if (!isset($qcall[$tma[0]]) || !in_array($q, $qcall[$tma[0]])) {
+								$qcall[$tma[0]][] = $q;
+							}
 						}
 					}
 				}
