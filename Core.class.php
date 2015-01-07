@@ -18,7 +18,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function getActionBar($request) {
 		$buttons = array();
-
+		debug(">>>>>>>>>>>>>>>>>>>>>>>>>>HERE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		switch($request['display']) {
 			case 'ampusers':
 				$buttons = array(
@@ -125,6 +125,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete'], $button['duplicate']);
 				}
+				if (empty($request['view'])){
+					//unset($buttons);
+				}
 			break;
 			case 'trunks':
 				$tmpButtons = array(
@@ -185,6 +188,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 		}
+		debug($buttons);
 		return $buttons;
 	}
 
@@ -270,6 +274,320 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 			}
 		}// $page == "dahdichandids"
+		
+		if ($page == "routing") {
+			$display='routing';
+			$extdisplay=isset($request['extdisplay'])?$request['extdisplay']:'';
+			$action = isset($request['action'])?$request['action']:'';
+			if (isset($request['copyroute'])) {
+				$action = 'copyroute';
+			}
+			$repotrunkdirection = isset($request['repotrunkdirection'])?$request['repotrunkdirection']:'';
+			//this was effectively the sequence, now it becomes the route_id and the value past will have to change
+			$repotrunkkey = isset($request['repotrunkkey'])?$request['repotrunkkey']:'';
+			// Check if they uploaded a CSV file for their route patterns
+			//
+			if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
+				$fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
+				if ($fh !== false) {
+					$csv_file = array();
+					$index = array();
+			
+					// Check first row, ingoring empty rows and get indices setup
+					//
+					while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+						if (count($row) == 1 && $row[0] == '') {
+							continue;
+						} else {
+							$count = count($row) > 4 ? 4 : count($row);
+							for ($i=0;$i<$count;$i++) {
+								switch (strtolower($row[$i])) {
+									case 'prepend':
+									case 'prefix':
+									case 'match pattern':
+									case 'callerid':
+										$index[strtolower($row[$i])] = $i;
+									break;
+									default:
+									break;
+								}
+							}
+							// If no headers then assume standard order
+							if (count($index) == 0) {
+								$index['prepend'] = 0;
+								$index['prefix'] = 1;
+								$index['match pattern'] = 2;
+								$index['callerid'] = 3;
+								if ($count == 4) {
+									$csv_file[] = $row;
+								}
+							}
+							break;
+						}
+					}
+					$row_count = count($index);
+					while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
+						if (count($row) == $row_count) {
+							$csv_file[] = $row;
+						}
+					}
+				}
+			}
+			// If we have a CSV file it replaces any existing patterns
+			//
+			if (!empty($csv_file)) {
+				foreach ($csv_file as $row) {
+					$this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
+					$this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
+					$this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
+					$this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
+			
+					if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
+						$dialpattern_insert[] = array(
+							'prepend_digits' => $this_prepend,
+							'match_pattern_prefix' => $this_prefix,
+							'match_pattern_pass' => $this_match_pattern,
+							'match_cid' => $this_callerid,
+						);
+					}
+				}
+			} else if (isset($request["prepend_digit"])) {
+				$prepend_digit = $request["prepend_digit"];
+				$pattern_prefix = $request["pattern_prefix"];
+				$pattern_pass = $request["pattern_pass"];
+				$match_cid = $request["match_cid"];
+			
+				foreach (array_keys($prepend_digit) as $key) {
+					if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
+			
+						$dialpattern_insert[] = array(
+							'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
+							'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
+							'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
+							'match_cid' => htmlspecialchars(trim($match_cid[$key])),
+						);
+					}
+				}
+			} else if (isset($request["bulk_patterns"])) {
+				$prepend = '/^([^+]*)\+/';
+				$prefix = '/^([^|]*)\|/';
+				$match_pattern = '/([^/]*)/';
+				$callerid = '/\/(.*)$/';
+			
+				$data = explode("\n",$request['bulk_patterns']);
+				foreach($data as $list) {
+					if (preg_match('/^\s*$/', $list)) {
+						continue;
+					}
+			
+					$this_prepend = $this_prefix = $this_callerid = '';
+			
+					if (preg_match($prepend, $list, $matches)) {
+						$this_prepend = $matches[1];
+						$list = preg_replace($prepend, '', $list);
+					}
+			
+					if (preg_match($prefix, $list, $matches)) {
+						$this_prefix = $matches[1];
+						$list = preg_replace($prefix, '', $list);
+					}
+			
+					if (preg_match($callerid, $list, $matches)) {
+						$this_callerid = $matches[1];
+						$list = preg_replace($callerid, '', $list);
+					}
+			
+					$dialpattern_insert[] = array(
+						'prepend_digits' => htmlspecialchars(trim($this_prepend)),
+						'match_pattern_prefix' => htmlspecialchars(trim($this_prefix)),
+						'match_pattern_pass' => htmlspecialchars(trim($list)),
+						'match_cid' => htmlspecialchars(trim($this_callerid)),
+					);
+			
+					$i++;
+				}
+			}
+			
+			if ( isset($request['reporoutedirection']) && $request['reporoutedirection'] != '' && isset($request['reporoutekey']) && $request['reporoutekey'] != '') {
+			  $request['route_seq'] = core_routing_setrouteorder($request['reporoutekey'], $request['reporoutedirection']);
+			}
+			
+			$trunkpriority = array();
+			if (isset($request["trunkpriority"])) {
+				$trunkpriority = $request["trunkpriority"];
+			
+				if (!$trunkpriority) {
+					$trunkpriority = array();
+				}
+			
+				// delete blank entries and reorder
+				foreach (array_keys($trunkpriority) as $key) {
+					if ($trunkpriority[$key] == '') {
+						// delete this empty
+						unset($trunkpriority[$key]);
+			
+					} else if (($key==($repotrunkkey-1)) && ($repotrunkdirection=="up")) {
+						// swap this one with the one before (move up)
+						$temptrunk = $trunkpriority[$key];
+						$trunkpriority[ $key ] = $trunkpriority[ $key+1 ];
+						$trunkpriority[ $key+1 ] = $temptrunk;
+			
+					} else if (($key==($repotrunkkey)) && ($repotrunkdirection=="down")) {
+						// swap this one with the one after (move down)
+						$temptrunk = $trunkpriority[ $key+1 ];
+						$trunkpriority[ $key+1 ] = $trunkpriority[ $key ];
+						$trunkpriority[ $key ] = $temptrunk;
+					}
+				}
+				unset($temptrunk);
+				$trunkpriority = array_unique(array_values($trunkpriority)); // resequence our numbers
+			  if ($action == '') {
+				$action = "updatetrunks";
+			  }
+			
+			}
+			$routename = isset($request['routename']) ? $request['routename'] : '';
+			$routepass = isset($request['routepass']) ? $request['routepass'] : '';
+			$emergency = isset($request['emergency']) ? $request['emergency'] : '';
+			$intracompany = isset($request['intracompany']) ? $request['intracompany'] : '';
+			$mohsilence = isset($request['mohsilence']) ? $request['mohsilence'] : '';
+			$outcid = isset($request['outcid']) ? $request['outcid'] : '';
+			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
+			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
+			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
+			
+			$goto = isset($request['goto0'])?$request['goto0']:'';
+			$dest = $goto ? $request[$goto . '0'] : '';
+			//if submitting form, update database
+			switch ($action) {
+				case 'ajaxroutepos':
+					$ret = core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
+					needreload();
+			
+					header("Content-type: application/json");
+					echo json_encode(array('position' => $ret));
+					exit;
+				break;
+				case "copyroute":
+					$routename .= "_copy_$extdisplay";
+					$extdisplay='';
+					$route_seq++;
+					// Fallthrough to addtrunk now...
+					//
+				case "addroute":
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					$request['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
+					needreload();
+					redirect_standard('extdisplay');
+				break;
+				case "editroute":
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					needreload();
+					redirect_standard('extdisplay');
+				break;
+				case "updatetrunks":
+					core_routing_updatetrunks($extdisplay, $trunkpriority, true);
+					needreload();
+				break;
+				case "delroute":
+					$ret = core_routing_delbyid($request['id']);
+					// re-order the routes to make sure that there are no skipped numbers.
+					// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
+					// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
+					// so we are left with 001-test1, 002-test3
+					needreload();
+					debug($ret);
+					header("Content-type: application/json");
+					echo json_encode($ret);
+					exit;
+				break;
+				case 'prioritizeroute':
+					needreload();
+				break;
+				case 'populatenpanxx':
+					$dialpattern_array = $dialpattern_insert;
+					if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
+						// first thing we do is grab the exch:
+						$ch = curl_init();
+						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+						curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
+						curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
+						$str = curl_exec($ch);
+						curl_close($ch);
+			
+						// quick 'n dirty - nabbed from PEAR
+						global $amp_conf;
+						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
+						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
+			
+						$xml = new xml_unserializer;
+						$xml->unserialize($str);
+						$xmldata = $xml->getUnserializedData();
+			
+						$hash_filter = array(); //avoid duplicates
+						if (isset($xmldata['lca-data']['prefix'])) {
+							// we do the loops separately so patterns are grouped together
+			
+							// match 1+NPA+NXX (dropping 1)
+							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+								if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
+									continue;
+								} else {
+									$hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
+								}
+								$dialpattern_array[] = array(
+									'prepend_digits' => '',
+									'match_pattern_prefix' => '1',
+									'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+									'match_cid' => '',
+									);
+							}
+							// match NPA+NXX
+							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+								if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
+									continue;
+								} else {
+									$hash_filter[$prefix['npa'].$prefix['nxx']] = true;
+								}
+								$dialpattern_array[] = array(
+									'prepend_digits' => '',
+									'match_pattern_prefix' => '',
+									'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+									'match_cid' => '',
+									);
+							}
+							// match 7-digits
+							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+								if (isset($hash_filter[$prefix['nxx']])) {
+									continue;
+								} else {
+									$hash_filter[$prefix['nxx']] = true;
+								}
+									$dialpattern_array[] = array(
+										'prepend_digits' => '',
+										'match_pattern_prefix' => '',
+										'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
+										'match_cid' => '',
+										);
+							}
+							unset($hash_filter);
+						} else {
+							$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
+						}
+					} else {
+						// what a horrible error message... :p
+						$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
+					}
+
+					if (isset($errormsg)) {
+						echo "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>";
+						unset($errormsg);
+					}
+				break;
+			}
+			
+		
+		}// $page == "routing"
 		
 		if ($page == "astmodules") {
 			$action = $request['action'];

@@ -6078,11 +6078,20 @@ function core_routing_setrouteorder($route_id, $seq) {
 // function core_routing_del($name)
 function core_routing_delbyid($route_id) {
 	global $db;
-	$route_id = q($db->escapeSimple($route_id));
-	sql('DELETE FROM `outbound_routes` WHERE `route_id` ='.$route_id);
-	sql('DELETE FROM `outbound_route_patterns` WHERE `route_id` ='.$route_id);
-	sql('DELETE FROM `outbound_route_trunks` WHERE `route_id` ='.$route_id);
-	sql('DELETE FROM `outbound_route_sequence` WHERE `route_id` ='.$route_id);
+	$ret = array();
+	$sql = 'DELETE FROM outbound_routes WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
+	$sql = 'DELETE FROM outbound_route_patterns WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
+	$sql = 'DELETE FROM outbound_route_trunks WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
+	$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
+	return $ret;
 }
 
 // function core_routing_trunk_del($trunknum)
