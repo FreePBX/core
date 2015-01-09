@@ -37,9 +37,8 @@ $routerows .= <<<HERE
 <tr id = "row$id"  data-id="$id" data-seq="$seq">
 <td><i class="fa fa-arrows"></i>&nbsp $name</td>
 <td>$outcid</td>
-<td>$dest</td>
 <td>$attributes</td>
-<td><a href="config.php?display=dahdichandids&view=add&extdisplay=$channel">
+<td><a href="config.php?display=routing&view=form&id=$id&extdisplay=$id">
 	<i class="fa fa-edit"></i></a>&nbsp;&nbsp;
 	<a href="#" id="del$id" data-id="$id" >
 	<i class="fa fa-trash-o"></i></a>&nbsp;&nbsp;
@@ -57,7 +56,6 @@ HERE;
 			<tr>
 				<th data-field="name" data-sortable="true"><?php echo _("Name") ?></th>
 				<th data-field="outboundcid" data-sortable="true"><?php echo _("Outbound CID") ?></th>
-				<th data-field="dest" data-sortable="true"><?php echo _("Destination") ?></th>
 				<th data-field="attrs"><?php echo _("Attributes") ?></th>
 				<th data-field="actions"><?php echo _("Actions") ?></th>
 			</tr>

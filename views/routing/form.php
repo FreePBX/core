@@ -1,6 +1,17 @@
 <?php
 global $amp_conf;
 $formAction = '';
+//If we are passed data we will throw it in here
+extract($viewinfo);
+//Set the page parameters...
+$request = $_REQUEST;
+$display = $request['display']?$request['display']:'routing';
+$extdisplay = $request['id']?$request['id']:'';
+if(!empty($request['id'])){
+	$formAction = 'editroute';
+}else{
+	$formAction = 'addroute';
+}
 //Optional elements
 if (function_exists('music_list')){
 	$optionalelems = load_view(__DIR__.'/moh.php');
@@ -157,6 +168,18 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '</td>';
 	$dpinput[] = '</tr>';
 	$dprows = implode(PHP_EOL, $dpinput);
+}else{
+	$dpinput = array();
+	$dpinput[] = '<textarea textarea name="bulk_patterns" class="form-control" id="bulk_patterns" rows="10" cols="70">';
+	foreach ($dialpattern_array as $pattern){
+		$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
+		$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
+		$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
+		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;	
+	}
+	$dpinput[] = '</textarea>';
+	$dprows = implode(PHP_EOL, $dpinput);
+
 }
 
 
@@ -168,9 +191,9 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 </ul>
 <div id="formtabs" class="tab-content">	
 	<div class="tab-pane active" id="routesettings">
-		<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="config.php" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&extdisplay=<?php echo urlencode($extdisplay) ?>&action=delroute">
+		<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
-			<input type="hidden" name="extdisplay" value="<?php echo $id ?>"/>
+			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 			<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
 			<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
@@ -284,7 +307,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routetype"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type='checkbox' name='intracompany' id="emergency" value='YES' <?php echo ($emergency ? "CHECKED" : "") ?>>
+									<input type='checkbox' name='emergency' id="emergency" value='YES' <?php echo ($emergency ? "CHECKED" : "") ?>>
 									<label for="emergency"><?php echo _("Emergency")?></label>
 									<input type='checkbox' name='intracompany' id="intracompany" value='YES' <?php echo ($intracompany ? "CHECKED" : "") ?>>
 									<label for="intracompany"><?php echo _("Intra-Company")?></label>
@@ -341,12 +364,84 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 				<br/>
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
-				<table class="table table-striped">
+				<table class="table table-striped" id="dptable">
 				<?php echo $dprows ?>
 				</table>
 			</div>
 			<!--END DIALPATTERN INPUT(s)-->
 	</form>
+	<!-- Dialplan Wizard-->
+	<div class="modal fade" id="dploading">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-3">
+							<i class="fa fa-spin fa-spinner fa-3x"></i>
+						</div>
+						<div class="col-md-8">
+							<h2><?php echo _("LOADING ROUTES")?></h2>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="dpwizard">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title"><?php echo _("Dial patterns wizards")?></h4>
+				</div>
+				<div class="modal-body">
+					<div class="well well-info">
+						<p><?php echo _("These options provide a quick way to add outbound dialing rules. Follow the prompts for each.")?></p>
+						<p></p>
+						<p><strong><?php echo _("Download local prefixes")?></strong> <?php echo _("This looks up your local number on www.localcallingguide.com (NA-only), and sets up so you can dial either 7, 10 or 11 digits (5551234, 6135551234, 16135551234) as selected below to access this route. Please note this requires internet access and may take some time")?></p>
+						<p><strong><?php echo _("Generate Buttons")?></strong><?php echo _("You may choose 7,10,11 digit patterns as your provider allows. If you do not choose 'Download' this will add a generic 7,10 or ll digit pattern")?></p>
+						<p><strong><?php echo _("Generic Patterns")?></strong><?php echo _("You may select to allow toll free calls such as 800,877 etc as well as Directory assistance, International dialing and long distance")?></p>
+					</div>
+					
+					<label for="lpwnpa">NPA</label>
+					<input type="tel" id='lpwnpa' class="form-control">
+					<label for="lpwnxx">NXX</label>
+					<input type="tel" id='lpwnxx' class="form-control">
+					<div class = "form-group radioset">
+					<input type="checkbox" id="fwdownload">
+					<label for="fwdownload"><?php echo _("Download Local Patterns");?></label>
+					</div>
+					<div class = "form-group radioset">			
+					<input type="checkbox" id="fw7" checked>
+					<label for="fw7"><?php echo _("7 Digit Patterns")?></label>
+					<input type="checkbox" id="fw10" checked>
+					<label for="fw10"><?php echo _("10 Digit Patterns")?></label>
+					<input type="checkbox" id="fw11">
+					<label for="fw11"><?php echo _("11 Digit Patterns")?></label>
+					</div>
+					<div class = "form-group radioset">
+					<input type="checkbox" id="fwtollfree">
+					<label for="fwtollfree"><?php echo _("US Toll Free Patterns")?></label>
+					<input type="checkbox" id="fwinfo">
+					<label for="fwinfo"><?php echo _("US Information")?></label>
+					<input type="checkbox" id="fwemergency" checked>
+					<label for="fwinfo"><?php echo _("US Emergency")?></label>
+					<input type="checkbox" id="fwint">
+					<label for="fwint"><?php echo _("US International")?></label>
+					<input type="checkbox" id="fwld">
+					<label for="fwld"><?php echo _("Long Distance")?></label>
+					</div>
+					<div id ="lpresults"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _("Close")?></button>
+					<button type="button" class="btn btn-primary" id="getlocalprefixes"><?php echo _("Generate Routes")?></button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	<!-- END Dialplan Wizard-->
+	
 </div>
 
 
