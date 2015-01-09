@@ -18,7 +18,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function getActionBar($request) {
 		$buttons = array();
-		debug(">>>>>>>>>>>>>>>>>>>>>>>>>>HERE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		switch($request['display']) {
 			case 'ampusers':
 				$buttons = array(
@@ -188,7 +187,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 		}
-		debug($buttons);
 		return $buttons;
 	}
 
@@ -216,7 +214,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$getvars = array('action', 'keyword', 'value');
 			foreach ($getvars as $v){
 				$var[$v] = isset($request[$v]) ? $request[$v] : 0;
-			}	
+			}
 			if($var['action'] === 'setkey') {
 				foreach($request as $K => $V){
 					$keyword = $K;
@@ -241,7 +239,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				continue;
 				}
 			}
-			
+
 		}// $page == "advancedsettings"
 		if ($page == "dahdichandids"){
 			if(!isset($_REQUEST['action'])){
@@ -274,7 +272,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 			}
 		}// $page == "dahdichandids"
-		
+
 		if ($page == "routing") {
 			$display='routing';
 			$extdisplay=isset($request['extdisplay'])?$request['extdisplay']:'';
@@ -292,7 +290,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if ($fh !== false) {
 					$csv_file = array();
 					$index = array();
-			
+
 					// Check first row, ingoring empty rows and get indices setup
 					//
 					while (($row = fgetcsv($fh, 5000, ",", "\"")) !== false) {
@@ -341,7 +339,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
 					$this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
 					$this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
-			
+
 					if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
 						$dialpattern_insert[] = array(
 							'prepend_digits' => $this_prepend,
@@ -356,10 +354,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$pattern_prefix = $request["pattern_prefix"];
 				$pattern_pass = $request["pattern_pass"];
 				$match_cid = $request["match_cid"];
-			
+
 				foreach (array_keys($prepend_digit) as $key) {
 					if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
-			
+
 						$dialpattern_insert[] = array(
 							'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
 							'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
@@ -373,65 +371,65 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$prefix = '/^([^|]*)\|/';
 				$match_pattern = '/([^/]*)/';
 				$callerid = '/\/(.*)$/';
-			
+
 				$data = explode("\n",$request['bulk_patterns']);
 				foreach($data as $list) {
 					if (preg_match('/^\s*$/', $list)) {
 						continue;
 					}
-			
+
 					$this_prepend = $this_prefix = $this_callerid = '';
-			
+
 					if (preg_match($prepend, $list, $matches)) {
 						$this_prepend = $matches[1];
 						$list = preg_replace($prepend, '', $list);
 					}
-			
+
 					if (preg_match($prefix, $list, $matches)) {
 						$this_prefix = $matches[1];
 						$list = preg_replace($prefix, '', $list);
 					}
-			
+
 					if (preg_match($callerid, $list, $matches)) {
 						$this_callerid = $matches[1];
 						$list = preg_replace($callerid, '', $list);
 					}
-			
+
 					$dialpattern_insert[] = array(
 						'prepend_digits' => htmlspecialchars(trim($this_prepend)),
 						'match_pattern_prefix' => htmlspecialchars(trim($this_prefix)),
 						'match_pattern_pass' => htmlspecialchars(trim($list)),
 						'match_cid' => htmlspecialchars(trim($this_callerid)),
 					);
-			
+
 					$i++;
 				}
 			}
-			
+
 			if ( isset($request['reporoutedirection']) && $request['reporoutedirection'] != '' && isset($request['reporoutekey']) && $request['reporoutekey'] != '') {
 			  $request['route_seq'] = core_routing_setrouteorder($request['reporoutekey'], $request['reporoutedirection']);
 			}
-			
+
 			$trunkpriority = array();
 			if (isset($request["trunkpriority"])) {
 				$trunkpriority = $request["trunkpriority"];
-			
+
 				if (!$trunkpriority) {
 					$trunkpriority = array();
 				}
-			
+
 				// delete blank entries and reorder
 				foreach (array_keys($trunkpriority) as $key) {
 					if ($trunkpriority[$key] == '') {
 						// delete this empty
 						unset($trunkpriority[$key]);
-			
+
 					} else if (($key==($repotrunkkey-1)) && ($repotrunkdirection=="up")) {
 						// swap this one with the one before (move up)
 						$temptrunk = $trunkpriority[$key];
 						$trunkpriority[ $key ] = $trunkpriority[ $key+1 ];
 						$trunkpriority[ $key+1 ] = $temptrunk;
-			
+
 					} else if (($key==($repotrunkkey)) && ($repotrunkdirection=="down")) {
 						// swap this one with the one after (move down)
 						$temptrunk = $trunkpriority[ $key+1 ];
@@ -444,7 +442,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			  if ($action == '') {
 				$action = "updatetrunks";
 			  }
-			
+
 			}
 			$routename = isset($request['routename']) ? $request['routename'] : '';
 			$routepass = isset($request['routepass']) ? $request['routepass'] : '';
@@ -455,7 +453,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
 			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
 			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
-			
+
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
 			//if submitting form, update database
@@ -463,7 +461,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				case 'ajaxroutepos':
 					$ret = core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
 					needreload();
-			
+
 					header("Content-type: application/json");
 					echo json_encode(array('position' => $ret));
 					exit;
@@ -514,20 +512,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
 						$str = curl_exec($ch);
 						curl_close($ch);
-			
+
 						// quick 'n dirty - nabbed from PEAR
 						global $amp_conf;
 						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
 						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
-			
+
 						$xml = new xml_unserializer;
 						$xml->unserialize($str);
 						$xmldata = $xml->getUnserializedData();
-			
+
 						$hash_filter = array(); //avoid duplicates
 						if (isset($xmldata['lca-data']['prefix'])) {
 							// we do the loops separately so patterns are grouped together
-			
+
 							// match 1+NPA+NXX (dropping 1)
 							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
 								if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
@@ -585,10 +583,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					}
 				break;
 			}
-			
-		
+
+
 		}// $page == "routing"
-		
+
 		if ($page == "astmodules") {
 			$action = $request['action'];
 			$section = $request['section'];
@@ -629,7 +627,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 			}
 		} // $page == "astmodules"
-		
+
 	}
 
 	/**
