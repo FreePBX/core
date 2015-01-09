@@ -18,7 +18,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function getActionBar($request) {
 		$buttons = array();
-		debug(">>>>>>>>>>>>>>>>>>>>>>>>>>HERE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		switch($request['display']) {
 			case 'ampusers':
 				$buttons = array(
@@ -122,11 +121,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($request['extdisplay'])) {
-					unset($buttons['delete'], $button['duplicate']);
+				if (empty($request['id'])) {
+					unset($buttons['delete'], $buttons['duplicate']);
 				}
 				if (empty($request['view'])){
-					//unset($buttons);
+					unset($buttons);
 				}
 			break;
 			case 'trunks':
@@ -188,7 +187,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 		}
-		debug($buttons);
 		return $buttons;
 	}
 
@@ -251,9 +249,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$action = isset($request['action']) ? $request['action'] :  '';
 			if (isset($request['delete'])) $action = 'delete';
 			$extdisplay  = isset($request['extdisplay']) ? $request['extdisplay'] : '';
-			$channel     = isset($request['channel']) ? $request['channel'] :  false;
+			$channel = isset($request['channel']) ? $request['channel'] :  false;
 			$description = isset($request['description']) ? $request['description'] :  '';
-			$did         = isset($request['did']) ? $request['did'] :  '';
+			$did = isset($request['did']) ? $request['did'] :  '';
 			switch ($action) {
 				case 'add':
 					if (core_dahdichandids_add($description, $channel, $did)) {
@@ -483,7 +481,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				case "editroute":
 					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 					needreload();
-					redirect_standard('extdisplay');
+					redirect('config.php?display=routing&view=form&id='.$extdisplay);
 				break;
 				case "updatetrunks":
 					core_routing_updatetrunks($extdisplay, $trunkpriority, true);
@@ -496,13 +494,41 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
 					// so we are left with 001-test1, 002-test3
 					needreload();
-					debug($ret);
-					header("Content-type: application/json");
-					echo json_encode($ret);
-					exit;
+					if($request['json']){
+						header("Content-type: application/json");
+						echo json_encode($ret);
+						exit;
+					} else{
+						redirect_standard();
+					}
 				break;
 				case 'prioritizeroute':
 					needreload();
+				break;
+				case 'getnpanxxjson':
+					try {
+						$npa = $request['npa'];
+						$nxx = $request['nxx'];
+						$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
+						$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
+						$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
+						$xml = new \SimpleXMLElement($data);
+						$pfdata = $xml->xpath('//lca-data/prefix');
+						$retdata = array();
+						foreach($pfdata as $item){
+							$inpa = (string)$item->npa;
+							$inxx = (string)$item->nxx;
+							$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
+						}
+						$ret = json_encode($retdata);
+						header("Content-type: application/json");
+						echo $ret;
+						exit;
+					}catch(Pest_NotFound $e){
+						header("Content-type: application/json");
+						echo json_encode(array('error' => $e));
+						exit;
+					}		
 				break;
 				case 'populatenpanxx':
 					$dialpattern_array = $dialpattern_insert;
@@ -661,7 +687,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	/**
 	 * Converts a request into an array that core wants.
 	 * @param {int} $account The Account Number
-	 * @param {string} $tech    The TECH type
+	 * @param {string} The TECH type
 	 * @param {int} &$flag   The Flag Number
 	 */
 	public function convertRequest2Array($account,$tech,&$flag = 2) {
@@ -699,8 +725,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	/**
 	 * Generate the default settings when creating a device
 	 * TODO: This is beta, will be cleaned up in 13
-	 * @param {string} $tech        The TECH
-	 * @param {int} $number      The exten or device number
+	 * @param {string} The TECH
+	 * @param {int} The exten or device number
 	 * @param {string} $displayname The displayname
 	 */
 	public function generateDefaultDeviceSettings($tech,$number,$displayname,&$flag = 2) {
@@ -979,8 +1005,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	/**
 	 * Add Device
-	 * @param {int} $id               The Device Number
-	 * @param {string} $tech             The TECH type
+	 * @param {int} The Device Number
+	 * @param {string} The TECH type
 	 * @param {array} $settings=array() Array with all settings
 	 * @param {bool} $editmode=false   If edited, (this is so it doesnt destroy the AsteriskDB)
 	 */
@@ -1158,7 +1184,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	/**
 	 * Delete a Device
-	 * @param {int} $account        The Device ID
+	 * @param {int} The Device ID
 	 * @param {bool} $editmode=false If in edit mode (this is so it doesnt destroy the AsteriskDB)
 	 */
 	public function delDevice($account,$editmode=false) {
