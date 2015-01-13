@@ -68,7 +68,17 @@ $("input[name='AS_DISPLAY_READONLY_SETTINGS']").change(function(){
 		});
 	}
 });
-
+$("input[name='AS_DISPLAY_HIDDEN_SETTINGS']").change(function(){
+	if($(this).val()){
+		$(".sethidden").each(function(){
+			$(this).removeClass("hidden");
+		});
+	}else{
+		$(".sethidden").each(function(){
+			$(this).addClass("hidden");
+		});
+	}
+});
 $("input[name='AS_OVERRIDE_READONLY']").change(function(){
 	if($(this).val()){
 		$(".setro").each(function(){

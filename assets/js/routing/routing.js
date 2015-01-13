@@ -13,7 +13,6 @@ $('#outbound_routes').sortable({
 			data: 'action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey='+id+'&repotrunkdirection='+seq,
 			dataType: 'json',
 			success: function(data) {
-				console.log(data);
 				toggle_reload_button('show');
 			}
 		});

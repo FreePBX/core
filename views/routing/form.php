@@ -188,6 +188,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
   <li role="presentation" class="active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
   <?php echo $hooktab ?>
   <li role="presentation"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
+  <li role="presentation"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
 </ul>
 <div id="formtabs" class="tab-content">	
 	<div class="tab-pane active" id="routesettings">
@@ -369,6 +370,57 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 				</table>
 			</div>
 			<!--END DIALPATTERN INPUT(s)-->
+			<!--IMPORT/EXPORT-->
+			<div class="tab-pane" id="importexport">
+				<div class="element-container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-3">
+										<label class="control-label" for="pattern_file"><?php echo _("Upload from CSV") ?></label>
+										<i class="fa fa-question-circle fpbx-help-icon" data-for="pattern_file"></i>
+									</div>
+									<div class="col-md-9">
+										<span class="btn btn-default btn-file">
+											<?php echo _("Choose File")?><input type="file" name="pattern_file" id="pattern_file" class="form-control" tabindex="<?php echo ++$tabindex;?>"/>
+										</span>
+										<span class="filename"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<span id="pattern_file-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 4 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s, %s and %s in the first row. If there are less then 4 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
+						</div>
+					</div>
+				</div>				
+				<div class="element-container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-3">
+										<label class="control-label" for="export_file"><?php echo _("Export Dialplans as CSV")?></label>
+										<i class="fa fa-question-circle fpbx-help-icon" data-for="export_file"></i>
+									</div>
+									<div class="col-md-9">
+										<input type="button" class="btn btn-default" onclick="parent.location='config.php?quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=core&amp;display=routing&amp;extdisplay=<?php echo $extdisplay;?>'" value="Export">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<span id="export_file-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Export patterns as a CSV file with headers listed as: %s, %s, %s and %s in the first row."),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
+						</div>
+					</div>
+				</div>				
+			</div>
+			<!--END IMPORT/EXPORT-->
 	</form>
 	<!-- Dialplan Wizard-->
 	<div class="modal fade" id="dploading">

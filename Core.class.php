@@ -209,34 +209,25 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
 		$request = $_REQUEST;
+		global $amp_conf;
 		if ($page == "advancedsettings"){
-			$freepbx_conf = $this->Config;
-			$getvars = array('action', 'keyword', 'value');
-			foreach ($getvars as $v){
-				$var[$v] = isset($request[$v]) ? $request[$v] : 0;
-			}
-			if($var['action'] === 'setkey') {
-				foreach($request as $K => $V){
-					$keyword = $K;
-					if ($freepbx_conf->conf_setting_exists($keyword)) {
-						//special cron manager detections
-						if($keyword == 'CRONMAN_UPDATES_CHECK') {
-							$cm = \cronmanager::create($db);
-							if($V) {
-								$cm->enable_updates();
-							} else {
-								$cm->disable_updates();
-							}
+			$freepbx_conf = $this->config;
+			foreach($request as $key => $val){
+				if ($freepbx_conf->conf_setting_exists($key)) {
+					if($keyword == 'CRONMAN_UPDATES_CHECK') {
+						$cm = \cronmanager::create($db);
+						if($V) {
+							$cm->enable_updates();
+						} else {
+							$cm->disable_updates();
 						}
-						$freepbx_conf->set_conf_values(array($keyword => trim($V)),true,$amp_conf['AS_OVERRIDE_READONLY']);
-						$status = $freepbx_conf->get_last_update_status();
-						if ($status[$keyword]['saved']) {
-							freepbx_log(FPBX_LOG_INFO,sprintf(_("Advanced Settings changed freepbx_conf setting: [$keyword] => [%s]"),$V));
-							needreload();
-						}
-						continue;
 					}
-				continue;
+					$freepbx_conf->set_conf_values(array($key => trim($val)),true,$amp_conf['AS_OVERRIDE_READONLY']);
+					$status = $freepbx_conf->get_last_update_status();
+					if ($status[$key]['saved']) {
+						debug(sprintf(_("Advanced Settings changed freepbx_conf setting: [$key] => [%s]"),$val));
+						needreload();
+					}
 				}
 			}
 

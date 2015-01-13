@@ -44,10 +44,12 @@ foreach ($conf as $c){
 	$type = $c['type'];
 	$iclasses = array('element-container');
 	if($c['hidden']){
-		$iclasses[] = 'sethidden';	
+		if(!$c['keyword'] == 'AS_DISPLAY_HIDDEN_SETTINGS'){
+			$iclasses[] = 'sethidden';	
+		}
 	}
 	if($c['readonly']){
-		$iclasses[] = 'setro';	
+		$iclasses[] = 'setro';
 	}
 	switch($type){
 		case 'bool':
