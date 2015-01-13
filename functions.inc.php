@@ -4229,19 +4229,7 @@ function core_do_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 		}
-		/* macro-dial-one */
-		
-		/*
-		;------------------------------------------------------------------------
-		; [macro-dialout-one-predial-hook]
-		;------------------------------------------------------------------------
-		; This is an empty context used for dialplan injection
-		;
-		*/
 
-		$mcontext = 'macro-dialout-one-predial-hook';
-		$exten = 's';
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 	}
 	break;
 }
