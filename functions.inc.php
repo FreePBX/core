@@ -4229,7 +4229,7 @@ function core_do_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 		}
-
+	}
 	break;
 }
 }
