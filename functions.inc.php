@@ -4241,7 +4241,7 @@ function core_do_get_config($engine) {
 
 		$mcontext = 'macro-dialout-one-predial-hook';
 		$exten = 's';
-		$ext->add($mcontext,$exten,'', new ext_return(''));
+		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 	}
 	break;
 }
