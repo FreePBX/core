@@ -525,6 +525,7 @@ if (!$tech && !$extdisplay) {
 		'failtrunk_enable' => $failtrunk_enable,
 		'failtrunk' => $failtrunk,
 		'dialpattern_array' => $dialpattern_array,
+		'dialoutprefix' => $dialoutprefix,
 		'num_routes' => $num_routes,
 		'routes' => $routes,
 		'helptext' => $helptext
