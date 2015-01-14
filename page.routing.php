@@ -70,6 +70,7 @@ switch($request['view']){
 							'formAction' => 'addroute',
 							'route_seq' => $route_seq,
 							'dialpattern_array' => $dialpattern_array,
+							'trunkpriority' => $trunkpriority,
 						);
 		}
 		$content = load_view(__DIR__.'/views/routing/form.php', $viewinfo);

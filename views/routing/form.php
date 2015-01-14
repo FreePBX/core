@@ -7,6 +7,8 @@ extract($viewinfo);
 $request = $_REQUEST;
 $display = $request['display']?$request['display']:'routing';
 $extdisplay = $request['id']?$request['id']:'';
+
+
 if(!empty($request['id'])){
 	$formAction = 'editroute';
 }else{
@@ -181,8 +183,61 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dprows = implode(PHP_EOL, $dpinput);
 
 }
+//trunk html
+foreach (core_trunks_listbyid() as $temp) {
+	$trunks[$temp['trunkid']] = $temp['name'];
+	$trunkstate[$temp['trunkid']] = $temp['disabled'];
+}
+$key = -1;
+$positions=count($trunkpriority);
+$trunkhtml .= '<table class = "table">';
+$trunkhtml .= '<tbody id="routetrunks">';
+foreach ($trunkpriority as $key=>$trunk) {
+			$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
+			$trunkhtml .= '<td>';
+			$trunkhtml .= '<div class="input-group">';			
+			$trunkhtml .= '<span class="input-group-addon" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+		    $trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
+			$trunkhtml .= '<option value=""></option>';
+			foreach ($trunks as $name=>$display_description) {
+				if ($trunkstate[$name] == 'off') {
+					$trunkhtml .= '<option id="trunk'.$key.'" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
+				} else {
+					$trunkhtml .= '<option id="trunk'.$key.'" class="text-danger" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
+				}
+			}
+			
+			$trunkhtml .= '</select>';
+			$trunkhtml .= '</div>';
+			$trunkhtml .= '</td>';
+			$trunkhtml .= '</tr>';
+}
+$key += 1;
+$name = "";
+$num_new_boxes = ($extdisplay ? 1 : ((count($trunks) > 3) ? 3 : count($trunks)));
+for ($i=0; $i < $num_new_boxes; $i++) {
 
-
+	$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
+	$trunkhtml .= '<td>';
+			$trunkhtml .= '<div class="input-group">';			
+			$trunkhtml .= '<span class="input-group-addon" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control">';
+	$trunkhtml .= '<option value="" SELECTED></option>';
+	foreach ($trunks as $name=>$display_description) {
+		if ($trunkstate[$name] == 'off') {
+			$trunkhtml .= '<option value="'.$name.'">'.str_replace('AMP:', '', $display_description).'</option>';
+		} else {
+			$trunkhtml .= '<option value="'.$name.'" class="text-danger" >*'.ltrim($display_description,"AMP:").'*</option>';
+		}
+	}
+	$trunkhtml .= '</select>';
+	$trunkhtml .= '</div>';
+	$trunkhtml .= '</td>';
+	$trunkhtml .= '</tr>';
+	$key++;
+}
+	$trunkhtml .= '</tbody>';
+	$trunkhtml .= '</table>';
 ?>
 <ul class="nav nav-tabs">
   <li role="presentation" class="active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
@@ -194,7 +249,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	<div class="tab-pane active" id="routesettings">
 		<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
-			<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
+			<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 			<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 			<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
 			<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
@@ -324,12 +379,13 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 				</div>
 			</div>
 			<!--END ROUTE TYPE-->
+
 			<!--OPTIONAL ELEMENTS-->
 			<?php echo $optionalelems?>
 			<!--END OPTIONAL ELEMENTS-->
 			<!--ROUTE POSITION-->
 			<div class="element-container">
-				<div class="row form-inline">
+				<div class="row">
 					<div class="col-md-12">
 						<div class="row">
 							<div class="form-group">
@@ -353,6 +409,54 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 				</div>
 			</div>
 			<!--END ROUTE POSITION-->	
+			<!--TRUNK PRIORITY-->
+			<div class="element-container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">
+									<label class="control-label" for="trunkwrap"><?php echo _("Trunk Sequence for Matched Routes") ?></label>
+									<i class="fa fa-question-circle fpbx-help-icon" data-for="trunkwrap"></i>
+								</div>
+								<div class="col-md-9">
+									<?php echo $trunkhtml ?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="trunkwrap-help" class="help-block fpbx-help-block"><?php echo _("The Trunk Sequence controls the order of trunks that will be used when the above Dial Patterns are matched. <br><br>For Dial Patterns that match long distance numbers, for example, you'd want to pick the cheapest routes for long distance (ie, VoIP trunks first) followed by more expensive routes (POTS lines).")?></span>
+					</div>
+				</div>
+			</div>
+			<!--END TRUNK PRIORITY-->
+			<!--CONGESTION DESTINATION-->
+			<div class="element-container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">
+									<label class="control-label" for="goto0"><?php echo _("Optional Destination on Congestion") ?></label>
+									<i class="fa fa-question-circle fpbx-help-icon" data-for="goto0"></i>
+								</div>
+								<div class="col-md-9">
+									<?php echo drawselects(!empty($dest)?$dest:null,0,false,true,_("Normal Congestion"),false);?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="goto0-help" class="help-block fpbx-help-block"><?php echo _("Optional Destination on Congestion") ?></span>
+					</div>
+				</div>
+			</div>
+			<!--END CONGESTION DESTINATION-->
 			</div>
 			<!--Hooks in the "Additional Settings tab -->
 			<div class="tab-pane" id="additionalsettings">
@@ -378,14 +482,14 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 							<div class="row">
 								<div class="form-group">
 									<div class="col-md-3">
-										<label class="control-label" for="pattern_file"><?php echo _("Upload from CSV") ?></label>
-										<i class="fa fa-question-circle fpbx-help-icon" data-for="pattern_file"></i>
+										<label class="control-label" for="importwrapper"><?php echo _("Upload from CSV") ?></label>
+										<i class="fa fa-question-circle fpbx-help-icon" data-for="importwrapper"></i>
 									</div>
 									<div class="col-md-9">
 										<span class="btn btn-default btn-file">
-											<?php echo _("Choose File")?><input type="file" name="pattern_file" id="pattern_file" class="form-control" tabindex="<?php echo ++$tabindex;?>"/>
+											<?php echo _("Choose File")?><input type="file" name="pattern_file" class="form-control" tabindex="<?php echo ++$tabindex;?>"/>
 										</span>
-										<span class="filename"></span>
+										<span class="filename"></span>										
 									</div>
 								</div>
 							</div>
@@ -393,7 +497,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 					</div>
 					<div class="row">
 						<div class="col-md-12">
-							<span id="pattern_file-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 4 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s, %s and %s in the first row. If there are less then 4 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
+							<span id="importwrapper-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 4 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s, %s and %s in the first row. If there are less then 4 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
 						</div>
 					</div>
 				</div>				

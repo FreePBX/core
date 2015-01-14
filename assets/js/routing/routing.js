@@ -17,7 +17,39 @@ $('#outbound_routes').sortable({
 			}
 		});
 	}
-})
+});
+$('#routetrunks').sortable({
+	containerSelector: 'tbody',
+	itemPath: 'tbody',
+	itemSelector: 'tr',
+	placeholder: '<tr class="placeholder"/>',
+	handle: '.fa-arrows',
+	update: function(event, ui){
+		var cur = 0;
+		var seq = [];
+		$("[id^='trunkpri']").each(function(){
+			var trunk = $(this).val();
+			if(trunk === ''){return;}
+			seq.push(trunk);
+		});
+		$.ajax({
+			type: 'POST',
+			url: location.href,
+			data: {
+				action:"updatetrunks", 
+				quietmode:"1", 
+				skip_astman:"1", 
+				restrictmods: "core",
+				trunkpriority:seq,
+				extdisplay:$("#extdisplay").val()
+				},
+			dataType: 'json',
+			success: function(data) {
+				toggle_reload_button('show');
+			}
+		});
+	}
+});
 
 $("a[id^='del']").click(function(){	
 	var id = $(this).data('id');
@@ -152,4 +184,30 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		break;
 		
 	}
+});
+
+$("[id^='trunkpri']:last").change(function(){
+	var id = /trunkpri([0-9]*)/.exec($(this).attr('id'));
+	var nextid = (Number(id[1]) +1);
+	if($("[id^='trunkpri']").length == 1){
+		return;
+	}
+	if($(this).val() == ''){
+		var curRow = $(this).closest('tr');
+		curRow.fadeOut(2000, function(){
+			$(this).remove();
+		});
+	}else{
+		var curRow = $(this).closest('tr');
+		var newRow = curRow.clone(true);
+		$(newRow).attr('id', 'trunkrow'+nextid);
+		var newinput = newRow.find("[id^='trunkpri']");
+		$(newinput).attr('id', 'trunkpri'+nextid);
+		$(newinput).attr('name', 'trunkpri['+nextid+']');
+		curRow.after(newRow);
+	}
+	
+});
+$("#duplicate").click(function(){
+	$("#action").val("copyroute");
 });

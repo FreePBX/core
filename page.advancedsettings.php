@@ -30,6 +30,8 @@ $inputhtmlend = <<<HERE
 HERE;
 $forminputs = '';
 foreach ($conf as $c){
+	unset($true);
+	unset($false);
 	if($c['category'] != $current_category && $current_category != '' ){
 		$forminputs .= '</div><br/>';		
 	}

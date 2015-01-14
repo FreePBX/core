@@ -225,7 +225,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$freepbx_conf->set_conf_values(array($key => trim($val)),true,$amp_conf['AS_OVERRIDE_READONLY']);
 					$status = $freepbx_conf->get_last_update_status();
 					if ($status[$key]['saved']) {
-						debug(sprintf(_("Advanced Settings changed freepbx_conf setting: [$key] => [%s]"),$val));
+						//debug(sprintf(_("Advanced Settings changed freepbx_conf setting: [$key] => [%s]"),$val));
 						needreload();
 					}
 				}
@@ -475,8 +475,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					redirect('config.php?display=routing&view=form&id='.$extdisplay);
 				break;
 				case "updatetrunks":
-					core_routing_updatetrunks($extdisplay, $trunkpriority, true);
+					$ret = core_routing_updatetrunks($extdisplay, $trunkpriority, true);
+					header("Content-type: application/json");
+					echo json_encode(array('result' => $ret));
 					needreload();
+					exit;
+					
 				break;
 				case "delroute":
 					$ret = core_routing_delbyid($request['id']);
