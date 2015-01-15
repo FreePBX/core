@@ -5,7 +5,7 @@
 </tr>
 <tr>
 	<td>
-		<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("Give this trunk a unique name.  Example: myiaxtel")?></span></a>: 
+		<a href=# class="info"><?php echo _("Trunk Name")?><span><?php echo _("A unique name for Asterisk to identify this trunk. This name must have no spaces or other special characters. This name is separate from the descriptive Trunk Name provided in General Settings.  Example: myiaxtel")?></span></a>: 
 	</td><td>
 		<input type="text" size="14" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
 	</td>
