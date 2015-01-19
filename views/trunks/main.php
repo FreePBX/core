@@ -1,9 +1,22 @@
-<h2><?php echo _("Add a Trunk")?></h2>
-<?php foreach($trunk_types as $type => $label) { ?>
-	<span>
-		<img width="16" height="16" border="0" title="<?php echo sprintf(_("Add %s Trunk"),$label)?>" alt="" src="images/core_add.png"/>
-	</span>
-	<a href="config.php?display=trunks&amp;tech=<?php echo $type?>"><?php echo sprintf(_("Add %s Trunk"),$label)?></a>
-	<br />
-	<br />
-<?php } ?>
+<div class="container-fluid">
+	<h1><?php echo _('Trunks')?></h1>
+	<div class="well well-info">
+		<?php echo _('This page is used to manage various system trunks')?>
+	</div>
+	<div class = "display full-border">
+		<div class="row">
+			<div class="col-sm-9">
+				<div class="fpbx-container">
+					<div class="display full-border">
+						<?php echo load_view(__DIR__.'/trunkgrid.php', array('trunks' => $trunks))?>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3 bootnav">
+				<div class="list-group">
+					<?php echo load_view(__DIR__.'/bootnav.php', array('trunk_types' => $trunk_types))?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

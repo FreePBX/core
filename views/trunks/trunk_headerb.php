@@ -2,22 +2,12 @@
 $pageheading = sprintf(_("%s %s Trunk"),(empty($extdisplay) ? _('Add'): _('Edit')),$upper_tech);
 if(!empty($extdisplay)){
 	if ($num_routes > 0){
-		$pageinfoinuse .= '<div class="panel panel-default" id="inusepanel">';
-		$pageinfoinuse .= '<div class="panel-heading">';
-		$pageinfoinuse .= '<h4>'._("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"));
-		$pageinfoinuse .= '<a  class="pull-right" data-toggle="collapse" data-target="#inusetable" href="#inusetable">';
-		$pageinfoinuse .= '<i class="fa fa-plus"></i>';
-		$pageinfoinuse .= '</a>';
-		$pageinfoinuse .= '</h4>';
-		$pageinfoinuse .= '</div>';
-		$pageinfoinuse .= '<div class="panel-body collapse" id="inusetable">';
-		$pageinfoinuse .= '<table class="table table-striped table-bordered">';
-		$pageinfoinuse .= '<tr><th>'._("Route").'</th><th>'._("Priority").'</th></tr>';
+		$pageinfoinuse .= '<div class="well well-info">';
+		$pageinfoinuse .= _("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"));
+		$pageinfoinuse .= '<br/>';
 		foreach($routes as $route=>$priority) {
-			$pageinfoinuse .= '<tr><td>'.$route.'</td><td>'.$priority.'</td></tr>';
+			$pageinfoinuse .= _("Route").'<b>'.$route.'</b>: '._("Sequence").' <b>'.$priority.'</b><br>';
 		}
-		$pageinfoinuse .= '</table>';
-		$pageinfoinuse .= '</div>';
 		$pageinfoinuse .= '</div>';
 	}else{
 		$pageinfoinuse .= '<div class="well well-info">';
@@ -55,14 +45,9 @@ if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_
 	$mtfhtml .= '						<i class="fa fa-question-circle fpbx-help-icon" data-for="failtrunk"></i>';
 	$mtfhtml .= '					</div>';
 	$mtfhtml .= '					<div class="col-md-9">';
-	if(!$failtrunk_enable){
-		$mtfenable = "disabled";
-	}else{
-		$mtfcheck = "CHECKED";
-	}
-	$mtfhtml .= '						<input type="text" class="form-control" name="failtrunk" id="failtrunk" '.$mtfenable.' value="'.htmlspecialchars($failtrunk).'"/>';
+	$mtfhtml .= '						<input'. (!$failtrunk_enable)?"disabled":"".' type="text" class="form-control" name="failtrunk" id="failtrunk" value="'.htmlspecialchars($failtrunk).'"/>';
 	$mtfhtml .= '						<span class="radioset">';
-	$mtfhtml .= '							<input type="checkbox" tabindex="'. ++$tabindex .'" name="failtrunk_enable" id="failtrunk_enable" value="1" '.$mtfcheck.' OnClick="disable_field(failtrunk,failtrunk_enable); return true;">';
+	$mtfhtml .= '							<input type="checkbox" tabindex="'. ++$tabindex .'" name="failtrunk_enable" id="failtrunk_enable" value="1" '. ($failtrunk_enable)?'CHECKED':''.' OnClick="disable_field(failtrunk,failtrunk_enable); return true;">';
 	$mtfhtml .= '							<label for="failtrunk_enable">'._("Enable").'</label>';
 	$mtfhtml .= '						</span>';
 	$mtfhtml .= '					</div>';
@@ -205,35 +190,21 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 		<div class="row">
 			<div class="col-sm-9">
 				<div class="fpbx-container">
-					<form enctype="multipart/form-data" class="fpbx-submit" name="trunkEdit" id="trunkEdit" action="config.php" method="post"  data-fpbx-delete="config.php?display=trunks&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk">
-						<input type="hidden" name="display" value="<?php echo $display?>"/>
-						<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
-						<input type="hidden" name="action"  id="action" value="<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>"/>
-						<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-						<input type="hidden" name="provider" value="<?php echo $provider?>"/>
-						<input type="hidden" name="sv_trunk_name" value="<?php echo $trunk_name?>"/>
-						<input type="hidden" name="sv_usercontext" value="<?php echo $usercontext?>"/>
-						<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
-						<input id="npanxx" name="npanxx" type="hidden" />
-						<ul class="nav nav-tabs" role="tablist">
-							<li role="presentation" data-name="tgeneral" class="active">
-								<a href="#tgeneral" aria-controls="tgeneral" role="tab" data-toggle="tab">
-									<?php echo _("General")?>
-								</a>
-							</li>
-							<li role="presentation" data-name="tdialplan" class="change-tab">
-								<a href="#tdialplan" aria-controls="tdialplan" role="tab" data-toggle="tab">
-									<?php echo _("Dialplan Manipulation Rules")?>
-								</a>
-							</li>
-							<li role="presentation" data-name="ttech" class="change-tab">
-								<a href="#ttech" aria-controls="ttech" role="tab" data-toggle="tab">
-									<?php echo $tech .' '. _("Settings")?>
-								</a>
-							</li>
-						</ul>
-						<div class="tab-content display">
-							<div role="tabpanel" id="tgeneral" class="tab-pane active">
+					<div class="display full-border">
+						<form enctype="multipart/form-data" class="fpbx-submit" name="trunkEdit" id="trunkEdit" action="config.php" method="post"  data-fpbx-delete="config.php?display=trunks&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk">
+							<input type="hidden" name="display" value="<?php echo $display?>"/>
+							<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>"/>
+							<input type="hidden" name="action" value="<?php echo ($extdisplay ? "edittrunk" : "addtrunk") ?>"/>
+							<input type="hidden" name="tech" value="<?php echo $tech?>"/>
+							<input type="hidden" name="provider" value="<?php echo $provider?>"/>
+							<input type="hidden" name="sv_trunk_name" value="<?php echo $trunk_name?>"/>
+							<input type="hidden" name="sv_usercontext" value="<?php echo $usercontext?>"/>
+							<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
+							<input id="npanxx" name="npanxx" type="hidden" />
+							<div class="section-title" data-for="genset">
+								<h3><i class="fa fa-minus"></i><?php echo _("General Settings") ?></h3>
+							</div>
+							<div class="section" data-id="genset">
 								<!--TRUNK NAME-->
 								<div class="element-container">
 									<div class="row">
@@ -266,7 +237,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="outcid"><?php echo _("Outbound CallerID") ?></label>
-															<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
+														<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
 													</div>
 													<div class="col-md-9">
 														<input type="text" class="form-control" name="outcid" id="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
@@ -376,7 +347,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<label class="control-label" for="continuew"><?php echo _("Continue if Busy") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="continuew"></i>
 													</div>
-													<div class="col-md-9 radioset">
+													<div class="col-md-9">
 														<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>" name='continue' id="continue" <?php if ($continue=="on") { echo 'CHECKED'; }?> >
 														<label for='continue'><?php echo _("Always try next trunk")?></label>
 													</div>
@@ -419,16 +390,19 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 								</div>
 								<!--END DISABLE TRUNK-->
 								<?php echo $mtfhtml ?>
+
 							</div>
-							<div role="tabpanel" id="tdialplan" class="tab-pane">
+							<div class="section-title" data-for="dnmr">
+								<h3><i class="fa fa-minus"></i><?php echo _("Dialed Number Manipulation Rules") ?></h3>
+							</div>
+							<div class="section" data-id="dnmr">
 								<br/>
 								<br/>
 								<h3><?php echo _("Dial Number Manipulation Rules")?></h3>
 								<?php echo $dpmrtop?>
 								<?php echo $dpmrhtml?>
 								<table class="table table-striped" id="dptable">
-									<?php echo $dprows ?>
+								<?php echo $dprows ?>
 								</table>
 							</div>
-							<div role="tabpanel" id="ttech" class="tab-pane">
 <!--End of trunk_header-->

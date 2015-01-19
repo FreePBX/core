@@ -1,39 +1,39 @@
 <?php /* $Id$ */
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
-//	Copyright 2006-2014 Schmooze Com Inc.
+//	Copyright 2006-2015 Schmooze Com Inc.
 //
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-
+$request = $_REQUEST;
 $display='trunks';
-$extdisplay=isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'';
+$extdisplay=isset($_REQUEST['extdisplay'])?$request['extdisplay']:'';
 $trunknum = ltrim($extdisplay,'OUT_');
 
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
+$action = isset($request['action'])?$request['action']:'';
 // Now check if the Copy Trunks submit button was pressed, in which case we duplicate the trunk
 //
-if (isset($_REQUEST['copytrunk'])) {
+if (isset($request['copytrunk'])) {
 	$action = 'copytrunk';
 }
 
-$tech         = strtolower(isset($_REQUEST['tech'])?htmlentities($_REQUEST['tech']):'');
-$outcid       = isset($_REQUEST['outcid'])?$_REQUEST['outcid']:'';
-$maxchans     = isset($_REQUEST['maxchans'])?$_REQUEST['maxchans']:'';
-$dialoutprefix= isset($_REQUEST['dialoutprefix'])?$_REQUEST['dialoutprefix']:'';
-$channelid    = isset($_REQUEST['channelid'])?$_REQUEST['channelid']:'';
-$peerdetails  = isset($_REQUEST['peerdetails'])?$_REQUEST['peerdetails']:'';
-$usercontext  = isset($_REQUEST['usercontext'])?$_REQUEST['usercontext']:'';
-$userconfig   = isset($_REQUEST['userconfig'])?$_REQUEST['userconfig']:'';
-$register     = isset($_REQUEST['register'])?$_REQUEST['register']:'';
-$keepcid      = isset($_REQUEST['keepcid'])?$_REQUEST['keepcid']:'off';
-$disabletrunk = isset($_REQUEST['disabletrunk'])?$_REQUEST['disabletrunk']:'off';
-$continue     = isset($_REQUEST['continue'])?$_REQUEST['continue']:'off';
-$provider     = isset($_REQUEST['provider'])?$_REQUEST['provider']:'';
-$trunk_name   = isset($_REQUEST['trunk_name'])?$_REQUEST['trunk_name']:'';
+$tech         = strtolower(isset($request['tech'])?htmlentities($request['tech']):'');
+$outcid       = isset($request['outcid'])?$request['outcid']:'';
+$maxchans     = isset($request['maxchans'])?$request['maxchans']:'';
+$dialoutprefix= isset($request['dialoutprefix'])?$request['dialoutprefix']:'';
+$channelid    = isset($request['channelid'])?$request['channelid']:'';
+$peerdetails  = isset($request['peerdetails'])?$request['peerdetails']:'';
+$usercontext  = isset($request['usercontext'])?$request['usercontext']:'';
+$userconfig   = isset($request['userconfig'])?$request['userconfig']:'';
+$register     = isset($request['register'])?$request['register']:'';
+$keepcid      = isset($request['keepcid'])?$request['keepcid']:'off';
+$disabletrunk = isset($request['disabletrunk'])?$request['disabletrunk']:'off';
+$continue     = isset($request['continue'])?$request['continue']:'off';
+$provider     = isset($request['provider'])?$request['provider']:'';
+$trunk_name   = isset($request['trunk_name'])?$request['trunk_name']:'';
 
-$failtrunk    = isset($_REQUEST['failtrunk'])?$_REQUEST['failtrunk']:'';
+$failtrunk    = isset($request['failtrunk'])?$request['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
-$dialopts     = isset($_REQUEST['dialopts'])?$_REQUEST['dialopts']:false;
+$dialopts     = isset($request['dialopts'])?$request['dialopts']:false;
 
 // Check if they uploaded a CSV file for their route patterns
 //
@@ -165,9 +165,9 @@ if (!empty($csv_file)) {
 //if submitting form, update database
 switch ($action) {
 	case "copytrunk":
-		$sv_channelid    = isset($_REQUEST['sv_channelid'])?$_REQUEST['sv_channelid']:'';
-		$sv_trunk_name    = isset($_REQUEST['sv_trunk_name'])?$_REQUEST['sv_trunk_name']:'';
-		$sv_usercontext    = isset($_REQUEST['sv_usercontext'])?$_REQUEST['sv_usercontext']:'';
+		$sv_channelid    = isset($request['sv_channelid'])?$request['sv_channelid']:'';
+		$sv_trunk_name    = isset($request['sv_trunk_name'])?$request['sv_trunk_name']:'';
+		$sv_usercontext    = isset($request['sv_usercontext'])?$request['sv_usercontext']:'';
 
 		if ($trunk_name == $sv_trunk_name) {
 		  $trunk_name .= ($trunk_name == '' ? '' : '_') . "copy_$trunknum";
@@ -186,7 +186,7 @@ switch ($action) {
 	//
 	case "addtrunk":
 		if($tech == 'pjsip') {
-			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
+			$channelid = !empty($request['trunk_name']) ? $request['trunk_name'] : '';
 		}
 		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 
@@ -196,7 +196,7 @@ switch ($action) {
 	break;
 	case "edittrunk":
 		if($tech == 'pjsip') {
-			$channelid = !empty($_REQUEST['trunk_name']) ? $_REQUEST['trunk_name'] : '';
+			$channelid = !empty($request['trunk_name']) ? $request['trunk_name'] : '';
 		}
 		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 
@@ -216,7 +216,7 @@ switch ($action) {
 	case "populatenpanxx7":
 	case "populatenpanxx10":
 		$dialpattern_array = $dialpattern_insert;
-		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
+		if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $request["npanxx"], $matches)) {
 			// first thing we do is grab the exch:
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -320,7 +320,7 @@ switch ($action) {
 				// check for duplicates, and re-sequence
 				unset($hash_filter);
 			} else {
-				$errormsg = _("Error fetching prefix list for: "). $_REQUEST["npanxx"];
+				$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
 			}
 
 		} else {
