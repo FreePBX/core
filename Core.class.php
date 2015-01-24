@@ -610,6 +610,65 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		}// $page == "routing"
 
+		if ($page == "did") {
+			$extdisplay= htmlspecialchars(isset($request['extdisplay'])?$request['extdisplay']:'');
+			$old_extdisplay = $extdisplay;
+			$dispnum = 'did'; //used for switch on config.php
+			$account = isset($request['account'])?$request['account']:'';
+			$action = isset($request['action'])?$request['action']:'';
+			$goto = isset($request['goto0'])?$request['goto0']:'';
+			$ringing = isset($request['ringing'])?$request['ringing']:'';
+			$reversal = isset($request['reversal'])?$request['reversal']:'';
+			$description = htmlspecialchars(isset($request['description'])?$request['description']:'');
+			$privacyman = isset($request['privacyman'])?$request['privacyman']:'0';
+			$pmmaxretries = isset($request['pmmaxretries'])?$request['pmmaxretries']:'';
+			$pmminlength = isset($request['pmminlength'])?$request['pmminlength']:'';
+			$alertinfo = htmlspecialchars(isset($request['alertinfo'])?$request['alertinfo']:'');
+			$mohclass = isset($request['mohclass'])?$request['mohclass']:'default';
+			$grppre = isset($request['grppre'])?$request['grppre']:'';
+			$delay_answer = isset($request['delay_answer'])&&$request['delay_answer']?$request['delay_answer']:'';
+			$pricid = isset($request['pricid'])?$request['pricid']:'';
+			$rnavsort = isset($request['rnavsort'])?$request['rnavsort']:'description';
+			$didfilter = isset($request['didfilter'])?$request['didfilter']:'';
+			if (isset($request['submitclear']) && isset($request['goto0'])) {
+				$request[$request['goto0'].'0'] = '';
+			}
+
+			if (isset($request['extension']) && isset($request['cidnum'])) {
+				$extdisplay = $request['extension']."/".$request['cidnum'];
+			}
+			if (isset($request['old_extension']) && isset($request['old_cidnum'])) {
+				$old_extdisplay = $request['old_extension']."/".$request['old_cidnum'];
+			}
+
+			//update db if submiting form
+			switch ($action) {
+				case 'addIncoming':
+					//create variables from request
+					extract($request);
+					//add details to the 'incoming' table
+					if (core_did_add($request)) {
+						needreload();
+						//redirect_standard('extdisplay', 'extension', 'cidnum', 'didfilter', 'rnavsort');
+					}
+				break;
+				case 'delIncoming':
+					$extarray=explode('/',$extdisplay,2);
+					core_did_del($extarray[0],$extarray[1]);
+					needreload();
+					redirect_standard('didfilter', 'rnavsort');
+				break;
+				case 'edtIncoming':
+					$extarray=explode('/',$old_extdisplay,2);
+					if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
+						needreload();
+						redirect_standard('extdisplay', 'view');
+					}
+				break;
+			}
+
+		}// $page == "did"
+
 		if ($page == "astmodules") {
 			$action = $request['action'];
 			$section = $request['section'];

@@ -4346,7 +4346,6 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 function core_did_create_update($did_vars) {
 	$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
 	$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
-
 	if (count(core_did_get($did_create['extension'], $did_create['$cidnum']))) {
 		return core_did_edit_properties($did_vars); //already exists so just edit properties
 	} else {
@@ -4373,7 +4372,6 @@ in conflict
 */
 function core_did_edit_properties($did_vars) {
 	global $db;
-
 	if (!is_array($did_vars)) {
 		return false;
 	}
@@ -4416,7 +4414,6 @@ function core_did_add($incoming,$target=false){
 	// Check to make sure the did is not being used elsewhere
 	//
 	$existing=core_did_get($extension,$cidnum);
-
 	if (empty($existing)) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
 		$invalidDIDChars = array('<','>');
