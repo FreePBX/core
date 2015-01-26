@@ -417,12 +417,15 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 * @param {array} &$retarr Returned Array
 	 */
 	private function generateEndpoint($config, &$retarr) {
+		dbug($config);
 		// Validate $config array
 		$this->validateEndpoint($config);
 
 		if($config['sipdriver'] != 'chan_pjsip') {
 			return false;
 		}
+
+		$endpoint = $auth = $aor = array();
 
 		// With pjsip, we need three sections.
 		$endpointname = $config['account'];
@@ -438,8 +441,9 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
 
-		if (!empty($config['disallow']))
+		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
+		}
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
@@ -449,17 +453,20 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$config['dtmfmode'] = "rtc4733";
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
+		//unsolicited mwi
 		$endpoint[] = "mailboxes=".$config['mailbox'];
+		//solicited mwi
+		$aor[] = "mailboxes=".$config['mailbox'];
 		//check transport to make sure it's valid
 		$trans = array_keys($this->getTransportConfigs());
 		if(!empty($config['transport'])) {
-		   if (!in_array($config['transport'],$trans)) {
-			   // throw new Exception('Invalid Transport Defined on device '.$endpointname);
-			   // Remove it, it's now autodetecting.
-			   unset($config['transport']);
-		   } else {
-			   $endpoint[] = "transport=".$config['transport'];
-		   }
+			if (!in_array($config['transport'],$trans)) {
+				// throw new Exception('Invalid Transport Defined on device '.$endpointname);
+				// Remove it, it's now autodetecting.
+				unset($config['transport']);
+			} else {
+				$endpoint[] = "transport=".$config['transport'];
+			}
 		}
 
 		if (!empty($config['callgroup'])) {

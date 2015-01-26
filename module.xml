@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.20</version>
+	<version>12.0.21</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.21* FREEPBX-8587 subscribed mailboxes not working for pjsip endpoints
 		*12.0.20* Move macro-dialout-one-predial-hook to extensions.conf so it can be overridden
 		*12.0.19* FREEPBX-8453 in a macro cant use return
 		*12.0.18* FREEPBX-3471 Additional special case for Caller ID Number, FREEPBX-8453 macro-dialout-one-predial-hook is not defined
