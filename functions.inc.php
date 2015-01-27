@@ -2613,6 +2613,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, '18', '', new ext_goto('1','s-NOANSWER'));
 		$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
 		$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '1', '', new ext_goto('1','s-INVALIDNMBR'));
 		$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
 		$ext->add($context, '_X', '', new ext_goto('1','continue'));
 		$ext->add($context, '_X.', '', new ext_goto('1','continue'));
@@ -2715,6 +2716,7 @@ function core_do_get_config($engine) {
 		$exten = 's-INVALIDNMBR';
 		/*
 		* HANGUPCAUSE 28 = Address Incomplete, or SIP 484 Address Incomplete
+		* HANGUPCAUSE 1 = Unallocated (unassigned) number
 		*/
 		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Address Incomplete - giving up'));
 		$ext->add($context, $exten, '', new ext_progress());
