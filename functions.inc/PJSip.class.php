@@ -417,7 +417,6 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 * @param {array} &$retarr Returned Array
 	 */
 	private function generateEndpoint($config, &$retarr) {
-		dbug($config);
 		// Validate $config array
 		$this->validateEndpoint($config);
 
