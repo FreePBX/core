@@ -212,17 +212,26 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		global $amp_conf;
 		if ($page == "advancedsettings"){
 			$freepbx_conf = $this->config;
+			$settings = $freepbx_conf->get_conf_settings();
 			foreach($request as $key => $val){
-				if ($freepbx_conf->conf_setting_exists($key)) {
-					if($keyword == 'CRONMAN_UPDATES_CHECK') {
+				if (isset($settings[$key])) {
+					if($key == 'CRONMAN_UPDATES_CHECK') {
 						$cm = \cronmanager::create($db);
-						if($V) {
+						if($val == 'true') {
 							$cm->enable_updates();
 						} else {
 							$cm->disable_updates();
 						}
 					}
-					$freepbx_conf->set_conf_values(array($key => trim($val)),true,$amp_conf['AS_OVERRIDE_READONLY']);
+					switch($settings[$key]['type']) {
+						case CONF_TYPE_BOOL:
+							$val = ($val == 'true') ? 1 : 0;
+						break;
+						default:
+							$val = trim($val);
+						break;
+					}
+					$freepbx_conf->set_conf_values(array($key => $val),true,$amp_conf['AS_OVERRIDE_READONLY']);
 					$status = $freepbx_conf->get_last_update_status();
 					if ($status[$key]['saved']) {
 						//debug(sprintf(_("Advanced Settings changed freepbx_conf setting: [$key] => [%s]"),$val));
@@ -480,7 +489,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					echo json_encode(array('result' => $ret));
 					needreload();
 					exit;
-					
+
 				break;
 				case "delroute":
 					$ret = core_routing_delbyid($request['id']);
@@ -523,7 +532,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						header("Content-type: application/json");
 						echo json_encode(array('error' => $e));
 						exit;
-					}		
+					}
 				break;
 				case 'populatenpanxx':
 					$dialpattern_array = $dialpattern_insert;

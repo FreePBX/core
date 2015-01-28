@@ -1,6 +1,5 @@
 <?php
 $conf					= $freepbx_conf->get_conf_settings();
-$conf					= $freepbx_conf->get_conf_settings();
 $display_level			= 10; // TO confusing with multiple levels $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
 $display_hidden			= $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
 $display_readonly		= $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
@@ -33,7 +32,7 @@ foreach ($conf as $c){
 	unset($true);
 	unset($false);
 	if($c['category'] != $current_category && $current_category != '' ){
-		$forminputs .= '</div><br/>';		
+		$forminputs .= '</div><br/>';
 	}
 	if($c['category'] != $current_category){
 		$current_category = $c['category'];
@@ -41,13 +40,13 @@ foreach ($conf as $c){
 		$forminputs .= '<div class="section-title" data-for="'.$catid.'">';
 		$forminputs .= '<h2><i class="fa fa-minus">'.$current_category.'</i></h2>';
 		$forminputs .= '</div>';
-		$forminputs .= '<div class="section" data-id="'.$catid.'">';	
+		$forminputs .= '<div class="section" data-id="'.$catid.'">';
 	}
 	$type = $c['type'];
 	$iclasses = array('element-container');
 	if($c['hidden']){
 		if(!$c['keyword'] == 'AS_DISPLAY_HIDDEN_SETTINGS'){
-			$iclasses[] = 'sethidden';	
+			$iclasses[] = 'sethidden';
 		}
 	}
 	if($c['readonly']){
@@ -56,11 +55,11 @@ foreach ($conf as $c){
 	switch($type){
 		case 'bool':
 			if($c['value']){
-			 $true = 'checked';	
-			 $false = '';	
+			 $true = 'checked';
+			 $false = '';
 			}else{
-			 $true = '';	
-			 $false = 'checked';				
+			 $true = '';
+			 $false = 'checked';
 			}
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
@@ -94,7 +93,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
-			$forminputs .= $inputhtmlend;		
+			$forminputs .= $inputhtmlend;
 		break;
 		case 'text':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
@@ -110,7 +109,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'.$c['description'].'</span>';
-			$forminputs .= $inputhtmlend;	
+			$forminputs .= $inputhtmlend;
 		break;
 		case 'select':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
