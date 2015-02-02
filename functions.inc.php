@@ -4540,7 +4540,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 }
 
 function core_devices_del($account,$editmode=false){
-	return FreePBX::Core()->delDevice($account,$editmode=false);
+	return FreePBX::Core()->delDevice($account,$editmode);
 }
 
 function core_devices_get($account){
