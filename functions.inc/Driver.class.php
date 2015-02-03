@@ -1,4 +1,7 @@
 <?php
+/**
+ * Base Core Driver class. Should be referenced by any extension driver
+ */
 namespace FreePBX\modules\Core;
 abstract class Driver {
 	protected $freepbx;

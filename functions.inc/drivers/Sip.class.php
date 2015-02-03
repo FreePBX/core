@@ -204,7 +204,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		unset($tmparr);
 		$tmparr = array();
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
-		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
+		$tmparr['secret'] = array('prompttext' => 'Secret', 'class' => 'password-meter', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
 		$section = _("Device Options");
 		$category = "advanced";

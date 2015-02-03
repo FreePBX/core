@@ -7016,6 +7016,8 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 				$text = isset($devoptarr['text']) ? $devoptarr['text'] : '';
 				$category = isset($devoptarr['category']) ? $devoptarr['category'] : 'advanced';
 				$sec = isset($devoptarr['section']) ? $devoptarr['section'] : $section;
+				$class = isset($devoptarr['class']) ? $devoptarr['class'] : '';
+				$autocomplete = false;
 
 				// We compare the existing secret against what might be in the put to detect changes when validating
 				if ($devopt == "secret") {
@@ -7029,11 +7031,11 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 					// Added optional selectbox to enable the unsupported misdn module
 					$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 					if ($type == 'select') {
-						$currentcomponent->addguielem($sec, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable, $class), 4, null, $category);
 					} elseif($type == 'text') {
-						$currentcomponent->addguielem($sec, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable, false, $class, $autocomplete), 4, null, $category);
 					} elseif($type == 'button') {
-						$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable, $class), 4, null, $category);
 					}
 				} else { // add so only basic
 					$currentcomponent->addguielem($sec, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);
