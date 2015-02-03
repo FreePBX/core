@@ -46,7 +46,7 @@
                         <?php } ?>
                       <?php } else { ?>
                         <div class="row">
-                          <div class="col-md-12 element-container"><?php echo $elem['html']?></div>
+                          <div class="col-md-12"><?php echo $elem['html']?></div>
                         </div>
                       <?php } ?>
                     </div>

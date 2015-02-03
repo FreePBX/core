@@ -5,12 +5,55 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 	public function getInfo() {
 		return array(
 			"rawName" => "dahdi",
+			"hardware" => "dahdi_generic",
 			"prettyName" => _("Generic DAHDi Driver"),
 			"description" => _("Short for 'Digium Asterisk Hardware Device Interface'"),
 			"asteriskSupport" => ">=1.0"
 		);
 	}
-	public function getDisplay($display, $deviceInfo, $currentcomponent) {
+
+	public function addDevice($id, $settings) {
+		$sql = 'INSERT INTO dahdi (id, keyword, data) values (?,?,?)';
+		$sth = $this->database->prepare($sql);
+		foreach($settings as $key => $setting) {
+			try {
+				$sth->execute(array($id,$key,$setting['value']));
+			} catch(\Exception $e) {
+				die_freepbx($e->getMessage()."<br><br>".'error adding to DAHDI table');
+			}
+		}
+		return true;
+	}
+
+	public function delDevice($id) {
+		$sql = "DELETE FROM dahdi WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($id));
+		} catch(\Exception $e) {
+			die_freepbx($e->getMessage().$sql);
+		}
+		return true;
+	}
+
+	public function getDevice($id) {
+		$sql = "SELECT keyword,data FROM dahdi WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		$tech = array();
+		try {
+			$sth->execute(array($id));
+			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
+			//reformulate into what is expected
+			//This is in the try catch just for organization
+			foreach($tech as &$value) {
+				$value = $value[0];
+			}
+		} catch(\Exception $e) {}
+
+		return $tech;
+	}
+
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent) {
 		$tmparr = array();
 		$tt = _("The DAHDi channel number for this port.");
 		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);

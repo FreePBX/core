@@ -5,12 +5,157 @@ class Sip extends \FreePBX\modules\Core\Driver {
 	public function getInfo() {
 		return array(
 			"rawName" => "sip",
+			"hardware" => "sip_generic",
 			"prettyName" => _("Generic CHAN SIP Driver"),
 			"description" => _("The legacy SIP channel driver in Asterisk"),
 			"asteriskSupport" => ">=1.0"
 		);
 	}
-	public function getDisplay($display, $deviceInfo, $currentcomponent) {
+
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		$dial = 'SIP';
+		$settings  = array(
+			"sipdriver" => array(
+				"value" => "chan_sip",
+				"flag" => $flag++
+			),
+			"dtmfmode" => array(
+				"value" => "rfc2833",
+				"flag" => $flag++
+			),
+			"canreinvite" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"host" => array(
+				"value" => "dynamic",
+				"flag" => $flag++
+			),
+			"trustpid" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"sendpid" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"type" => array(
+				"value" => "friend",
+				"flag" => $flag++
+			),
+			"nat" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"port" => array(
+				"value" => "5060",
+				"flag" => $flag++
+			),
+			"qualify" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"qualifyfreq" => array(
+				"value" => "60",
+				"flag" => $flag++
+			),
+			"transport" => array(
+				"value" => "udp,tcp,tls",
+				"flag" => $flag++
+			),
+			"avpf" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"force_avp" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"icesupport" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"encryption" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"callgroup" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"pickupgroup" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"disallow" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"allow" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"accountcode" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"deny" => array(
+				"value" => "0.0.0.0/0.0.0.0",
+				"flag" => $flag++
+			),
+			"permit" => array(
+				"value" => "0.0.0.0/0.0.0.0",
+				"flag" => $flag++
+			),
+		);
+		return array(
+			"dial" => $dial,
+			"settings" => $settings
+		);
+	}
+
+	public function addDevice($id, $settings) {
+		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
+		$sth = $this->database->prepare($sql);
+		foreach($settings as $key => $setting) {
+			try {
+				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
+			} catch(\Exception $e) {
+				die_freepbx($e->getMessage()."<br><br>".'error adding to SIP table');
+			}
+		}
+		return true;
+	}
+
+	public function delDevice($id) {
+		$sql = "DELETE FROM sip WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($id));
+		} catch(\Exception $e) {
+			die_freepbx($e->getMessage().$sql);
+		}
+		return true;
+	}
+
+	public function getDevice($id) {
+		$sql = "SELECT keyword,data FROM sip WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		$tech = array();
+		try {
+			$sth->execute(array($id));
+			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
+			//reformulate into what is expected
+			//This is in the try catch just for organization
+			foreach($tech as &$value) {
+				$value = $value[0];
+			}
+		} catch(\Exception $e) {}
+
+		return $tech;
+	}
+
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$section = _("Settings");
 		$category = "general";
 		$techd = ($deviceInfo['tech'] == 'sip') ? 'CHAN_SIP' : strtoupper($deviceInfo['tech']);
@@ -29,7 +174,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 
 		$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
 		$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac).(strtoupper($devinfo['tech']) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
-		$currentcomponent->addguielem($section, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),4, null, $category);
+		$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
 		// We need to scream loudly if this device is using a channel driver that's disabled.
 		if ($devinfo_tech == "pjsip" || $devinfo['tech'] == "sip") {
 			$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
@@ -44,7 +189,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				if ($iwant != $sipdriver) {
 					// Poot.
 					$err = sprintf(_("<strong>CRITICAL ERROR!</strong> Required Service %s is disabled! This device is unusable!"), strtoupper($iwant));
-					$currentcomponent->addguielem($section, new \gui_label('techerrlabel', $err),3, null, $category);
+					$currentcomponent->addguielem($primarySection, new \gui_label('techerrlabel', $err),3, null, $category);
 				}
 			}
 		}
@@ -59,7 +204,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		unset($tmparr);
 		$tmparr = array();
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
-		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category);
+		$tmparr['secret'] = array('prompttext' => 'Secret', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
 		$section = _("Device Options");
 		$category = "advanced";

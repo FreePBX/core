@@ -32,14 +32,142 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function getInfo() {
 		return array(
 			"rawName" => "pjsip",
+			"hardware" => "pjsip_generic",
 			"prettyName" => _("Generic PJSIP Device"),
 			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality"),
 			"asteriskSupport" => ">=12.0"
 		);
 	}
 
-	public function getDisplay($display, $deviceInfo, $currentcomponent) {
-		$tmparr = parent::getDisplay($display, $deviceInfo, $currentcomponent);
+	public function addDevice($id, $settings) {
+		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
+		$sth = $this->database->prepare($sql);
+		foreach($settings as $key => $setting) {
+			try {
+				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
+			} catch(\Exception $e) {
+				die_freepbx($e->getMessage()."<br><br>".'error adding to SIP table');
+			}
+		}
+		return true;
+	}
+
+	public function delDevice($id) {
+		$sql = "DELETE FROM sip WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($id));
+		} catch(\Exception $e) {
+			die_freepbx($e->getMessage().$sql);
+		}
+		return true;
+	}
+
+	public function getDevice($id) {
+		$sql = "SELECT keyword,data FROM sip WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		$tech = array();
+		try {
+			$sth->execute(array($id));
+			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
+			//reformulate into what is expected
+			//This is in the try catch just for organization
+			foreach($tech as &$value) {
+				$value = $value[0];
+			}
+		} catch(\Exception $e) {}
+
+		return $tech;
+	}
+
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		$dial = 'PJSIP';
+		$settings  = array(
+			"sipdriver" => array(
+				"value" => "chan_pjsip",
+				"flag" => $flag++
+			),
+			"secret" => array(
+				"value" => md5(uniqid()),
+				"flag" => $flag++
+			),
+			"dtmfmode" => array(
+				"value" => "rfc4733",
+				"flag" => $flag++
+			),
+			"trustrpid" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"sendpid" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"qualifyfreq" => array(
+				"value" => "60",
+				"flag" => $flag++
+			),
+			"transport" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"avpf" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"icesupport" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"callgroup" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"pickupgroup" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"disallow" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"allow" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"mailbox" => array(
+				"value" => $id."@device",
+				"flag" => $flag++
+			),
+			"max_contact" => array(
+				"value" => "1",
+				"flag" => $flag++
+			),
+			"max_contact" => array(
+				"value" => "1",
+				"flag" => $flag++
+			),
+			"media_use_received_transport" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"rtp_symmetric" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"rewrite_contact" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+		);
+		return array(
+			"dial" => $dial,
+			"settings" => $settings
+		);
+	}
+
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
+		$tmparr = parent::getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection);
 		unset($tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
 		$tt = _("Maximum number of Endpoints that can associate with this Device");
 		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);

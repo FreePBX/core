@@ -45,7 +45,7 @@
                       <?php } ?>
                     <?php } else { ?>
                       <div class="row">
-                        <div class="col-md-12 element-container" data-id="<?php echo $elem['name']?>"><?php echo $elem['html']?></div>
+                        <div class="col-md-12" data-id="<?php echo $elem['name']?>"><?php echo $elem['html']?></div>
                       </div>
                     <?php } ?>
                   </div>

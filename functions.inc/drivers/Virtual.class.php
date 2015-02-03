@@ -5,7 +5,8 @@ class Virtual extends \FreePBX\modules\Core\Driver {
 	public function getInfo() {
 		return array(
 			"rawName" => "virtual",
-			"prettyName" => _("Generic Custom Driver"),
+			"hardware" => "virtual",
+			"prettyName" => _("None (virtual exten)"),
 			"asteriskSupport" => ">=1.0"
 		);
 	}

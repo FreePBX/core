@@ -6636,7 +6636,7 @@ function core_users_configpageload() {
 				return false;
 			}", 9);
 		}
-		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '(typeof isCorrectLengthExtensions != "undefined") ? !isCorrectLengthExtensions() || !isAlphanumericDot() || isWhitespace() : !isAlphanumericDot() || isWhitespace()', $msgInvalidDispName, false), $category);
+		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '(typeof isCorrectLengthExtensions != "undefined") ? !isCorrectLengthExtensions() || !isAlphanumericDot() || isWhitespace() : !isAlphanumericDot() || isWhitespace()', $msgInvalidDispName, false), 3, null, $category);
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false), "advanced");
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")), "advanced");
@@ -6667,9 +6667,10 @@ function core_users_configpageload() {
 			}
 		}
 
+		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3, null, "general");
+
 		$section = _("Extension Options");
 		$category = "advanced";
-		$currentcomponent->addguielem($section, new gui_textbox('outboundcid', $outboundcid, _("Outbound CID"), _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.<br><br>Format: <b>\"caller name\" &lt;#######&gt;</b><br><br>Leave this field blank to disable the outbound CallerID feature for this user."), '!isCallerID()', $msgInvalidOutboundCID, true),3, null, "general");
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
 
 		$dialopts = isset($dialopts) ? $dialopts : false;
@@ -6988,8 +6989,15 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 			$secret_validation .= ' || (!isEmpty() && weakSecret())';
 		}
 
-		if(isset(FreePBX::Core()->drivers[$devinfo_tech])) {
-			$devopts = FreePBX::Core()->drivers[$devinfo_tech]->getDisplay($display, $deviceInfo, $currentcomponent);
+		if ( $display == 'extensions' ) {
+			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
+		} else {
+			$section = ($extdisplay ? _("Edit User") : _("Add User"));
+		}
+
+		$drivers = FreePBX::Core()->getAllDrivers();
+		if(isset($drivers[$devinfo_tech])) {
+			$devopts = $drivers[$devinfo_tech]->getDeviceDisplay($display, $deviceInfo, $currentcomponent, $section);
 		} else {
 			$devopts = array();
 		}
@@ -7007,10 +7015,11 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 				$type = isset($devoptarr['type']) ? $devoptarr['type'] : (isset($devoptarr['select']) ? 'select' : 'text');
 				$text = isset($devoptarr['text']) ? $devoptarr['text'] : '';
 				$category = isset($devoptarr['category']) ? $devoptarr['category'] : 'advanced';
+				$sec = isset($devoptarr['section']) ? $devoptarr['section'] : $section;
 
 				// We compare the existing secret against what might be in the put to detect changes when validating
 				if ($devopt == "secret") {
-					$currentcomponent->addguielem($section, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
+					$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
 					if ($devoptcurrent == '' && empty($extdisplay)) {
 						$devoptcurrent = md5(uniqid());
 					}
@@ -7020,14 +7029,14 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 					// Added optional selectbox to enable the unsupported misdn module
 					$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 					if ($type == 'select') {
-						$currentcomponent->addguielem($section, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable), 4, null, $category);
 					} elseif($type == 'text') {
-						$currentcomponent->addguielem($section, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable), 4, null, $category);
 					} elseif($type == 'button') {
-						$currentcomponent->addguielem($section, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4, null, $category);
+						$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable), 4, null, $category);
 					}
 				} else { // add so only basic
-					$currentcomponent->addguielem($section, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);
+					$currentcomponent->addguielem($sec, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);
 				}
 			}
 		}

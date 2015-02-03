@@ -3,7 +3,7 @@
 namespace FreePBX\modules;
 class Core extends \FreePBX_Helpers implements \BMO  {
 
-	public $drivers = array();
+	private $drivers = array();
 
 	public function __construct($freepbx = null) {
 
@@ -34,6 +34,28 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//other options
 		$this->database = $freepbx->Database;
 		$this->config = $freepbx->Config;
+		$this->freepbx = $freepbx;
+	}
+
+	public function getAllDrivers() {
+		return $this->drivers;
+	}
+
+	public function getAllDriversInfo() {
+		$final = array();
+		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+		foreach($this->drivers as $driver) {
+			$info = $driver->getInfo();
+			if($info['hardware'] == "pjsip_generic" && $sipdriver != "both" && $sipdriver != "chan_pjsip") {
+				continue;
+			}
+			if($info['hardware'] == "sip_generic" && $sipdriver != "both" && $sipdriver != "chan_sip") {
+				continue;
+			}
+			$rn = $info['rawName'];
+			$final[$rn] = $info;
+		}
+		return $final;
 	}
 
 	public function genConfig() {
@@ -834,233 +856,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$flag = !empty($flag) ? $flag : 2;
 		$dial = '';
 		$settings = array();
-		switch($tech) {
-			case 'iax':
-				$dial = 'IAX2';
-				$settings  = array(
-					"transfer" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"host" => array(
-						"value" => "dynamic",
-						"flag" => $flag++
-					),
-					"type" => array(
-						"value" => "friend",
-						"flag" => $flag++
-					),
-					"port" => array(
-						"value" => "4569",
-						"flag" => $flag++
-					),
-					"qualify" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"disallow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"allow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"accountcode" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"requirecalltoken" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"setvar" => array(
-						"value" => "REALCALLERIDNUM=",
-						"flag" => $flag++
-					),
-				);
-			break;
-			case 'pjsip':
-				$dial = 'PJSIP';
-				$settings  = array(
-					"sipdriver" => array(
-						"value" => "chan_pjsip",
-						"flag" => $flag++
-					),
-					"secret" => array(
-						"value" => md5(uniqid()),
-						"flag" => $flag++
-					),
-					"dtmfmode" => array(
-						"value" => "rfc4733",
-						"flag" => $flag++
-					),
-					"trustrpid" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"sendpid" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"qualifyfreq" => array(
-						"value" => "60",
-						"flag" => $flag++
-					),
-					"transport" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"avpf" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"icesupport" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"callgroup" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"pickupgroup" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"disallow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"allow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"mailbox" => array(
-						"value" => $number."@device",
-						"flag" => $flag++
-					),
-					"max_contact" => array(
-						"value" => "1",
-						"flag" => $flag++
-					),
-					"max_contact" => array(
-						"value" => "1",
-						"flag" => $flag++
-					),
-					"media_use_received_transport" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"rtp_symmetric" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"rewrite_contact" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-				);
-			break;
-			case 'sip':
-				$dial = 'SIP';
-				$settings  = array(
-					"sipdriver" => array(
-						"value" => "chan_sip",
-						"flag" => $flag++
-					),
-					"dtmfmode" => array(
-						"value" => "rfc2833",
-						"flag" => $flag++
-					),
-					"canreinvite" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"host" => array(
-						"value" => "dynamic",
-						"flag" => $flag++
-					),
-					"trustpid" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"sendpid" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"type" => array(
-						"value" => "friend",
-						"flag" => $flag++
-					),
-					"nat" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"port" => array(
-						"value" => "5060",
-						"flag" => $flag++
-					),
-					"qualify" => array(
-						"value" => "yes",
-						"flag" => $flag++
-					),
-					"qualifyfreq" => array(
-						"value" => "60",
-						"flag" => $flag++
-					),
-					"transport" => array(
-						"value" => "udp,tcp,tls",
-						"flag" => $flag++
-					),
-					"avpf" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"force_avp" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"icesupport" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"encryption" => array(
-						"value" => "no",
-						"flag" => $flag++
-					),
-					"callgroup" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"pickupgroup" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"disallow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"allow" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"accountcode" => array(
-						"value" => "",
-						"flag" => $flag++
-					),
-					"deny" => array(
-						"value" => "0.0.0.0/0.0.0.0",
-						"flag" => $flag++
-					),
-					"permit" => array(
-						"value" => "0.0.0.0/0.0.0.0",
-						"flag" => $flag++
-					),
-				);
-			break;
-			default:
+		if(isset($this->drivers[$tech])) {
+			$settings = $this->drivers[$tech]->getDefaultDeviceSettings($number, $displayname, $flag);
+			if(empty($settings)) {
 				return array();
-			break;
+			}
 		}
 		$gsettings  = array(
 			"devicetype" => array(
@@ -1076,7 +876,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"value" => $displayname,
 			),
 			"dial" => array(
-				"value" => $dial."/".$number,
+				"value" => $settings['dial']."/".$number,
 				"flag" => $flag++
 			),
 			"secret" => array(
@@ -1101,7 +901,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			)
 		);
 
-		return array_merge($settings,$gsettings);
+		return array_merge($settings['settings'],$gsettings);
 	}
 
 	/**
@@ -1229,55 +1029,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		//take care of sip/iax/zap config
 		$tech = strtolower($tech);
-		switch($tech) {
-			case 'pjsip':
-			case 'sip':
-				$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
-				$sth = $this->database->prepare($sql);
-				foreach($settings as $key => $setting) {
-					try {
-						$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
-					} catch(\Exception $e) {
-						die_freepbx($e->getMessage()."<br><br>".'error adding to SIP table');
-					}
-				}
-			break;
-			case 'iax2':
-				$sql = 'INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)';
-				$sth = $this->database->prepare($sql);
-				foreach($settings as $key => $setting) {
-					try {
-						$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
-					} catch(\Exception $e) {
-						die_freepbx($e->getMessage()."<br><br>".'error adding to IAX2 table');
-					}
-				}
-			break;
-			case 'zap':
-				$sql = 'INSERT INTO zap (id, keyword, data) values (?,?,?)';
-				$sth = $this->database->prepare($sql);
-				foreach($settings as $key => $setting) {
-					try {
-						$sth->execute(array($id,$key,$setting['value']));
-					} catch(\Exception $e) {
-						die_freepbx($e->getMessage()."<br><br>".'error adding to ZAP table');
-					}
-				}
-			break;
-			case 'dahdi':
-				$sql = 'INSERT INTO dahdi (id, keyword, data) values (?,?,?)';
-				$sth = $this->database->prepare($sql);
-				foreach($settings as $key => $setting) {
-					try {
-						$sth->execute(array($id,$key,$setting['value']));
-					} catch(\Exception $e) {
-						die_freepbx($e->getMessage()."<br><br>".'error adding to DAHDI table');
-					}
-				}
-			break;
-			case 'custom':
-				return true;
-			break;
+		if(isset($this->drivers[$tech])) {
+			return $this->drivers[$tech]->addDevice($id, $settings);
 		}
 
 		return true;
@@ -1342,33 +1095,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
 		}
 
-		switch($devinfo['tech']) {
-			case 'pjsip':
-			case 'sip':
-				$type = 'sip';
-			break;
-			case 'iax2':
-				$type = 'iax';
-			break;
-			case 'zap':
-				$type = 'zap';
-			break;
-			case 'dahdi':
-				$type = 'dahdi';
-			break;
-			case 'custom':
-				return true;
-			break;
-			default:
-				return false;
-			break;
-		}
-		$sql = "DELETE FROM ".$type." WHERE id = ?";
-		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($account));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
+		if(isset($this->drivers[$tech])) {
+			return $this->drivers[$tech]->delDevice($account);
 		}
 		return true;
 	}
@@ -1439,39 +1167,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array();
 		}
 
-		switch($device['tech']) {
-			case 'pjsip':
-			case 'sip':
-				$type = 'sip';
-			break;
-			case 'iax2':
-				$type = 'iax';
-			break;
-			case 'zap':
-				$type = 'zap';
-			break;
-			case 'dahdi':
-				$type = 'dahdi';
-			break;
-			case 'custom':
-				$type = 'custom';
-			break;
-			default:
-				return array();
-			break;
-		}
-		$sql = "SELECT keyword,data FROM ".$type." WHERE id = ?";
-		$sth = $this->database->prepare($sql);
+		$t = $device['tech'];
 		$tech = array();
-		try {
-			$sth->execute(array($account));
-			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
-			//reformulate into what is expected
-			//This is in the try catch just for organization
-			foreach($tech as &$value) {
-				$value = $value[0];
-			}
-		} catch(\Exception $e) {}
+		if(isset($this->drivers[$t])) {
+			$tech = $this->drivers[$t]->getDevice($account);
+		}
 
 		$results = array_merge($device,$tech);
 

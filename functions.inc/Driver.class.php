@@ -2,8 +2,11 @@
 namespace FreePBX\modules\Core;
 abstract class Driver {
 	protected $freepbx;
+	protected $database;
+
 	public function __construct($freepbx, $drivers) {
 		$this->freepbx = $freepbx;
+		$this->database = $freepbx->Database;
 	}
 
 	public function getInfo() {
@@ -14,7 +17,23 @@ abstract class Driver {
 		);
 	}
 
-	public function getDisplay($display, $deviceInfo, $currentcomponent) {
+	public function addDevice($id, $settings) {
+		return false;
+	}
+
+	public function delDevice($id) {
+		return true;
+	}
+
+	public function getDevice($id) {
+		return array();
+	}
+
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		return false;
+	}
+
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		return "";
 	}
 
