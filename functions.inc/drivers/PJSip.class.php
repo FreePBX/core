@@ -1,7 +1,10 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
-namespace FreePBX\modules\Core;
-class PJSip extends \FreePBX_Helpers implements \BMO {
+namespace FreePBX\modules\Core\Drivers;
+if(!class_exists("\\FreePBX\\Modules\\Core\\Drivers\\Sip")) {
+	include(__DIR__."/Sip.class.php");
+}
+class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 	private $PJSipModules = array("chan_pjsip.so", "res_pjsip_endpoint_identifier_anonymous.so", "res_pjsip_messaging.so",
 		"res_pjsip_pidf.so", "res_pjsip_session.so", "func_pjsip_endpoint.so", "res_pjsip_endpoint_identifier_ip.so", "res_pjsip_mwi.so",
@@ -26,43 +29,45 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		$this->version = $freepbx->Config->get('ASTVERSION');
 	}
 
-	/* Assorted stubs to validate the BMO Interface */
-	public function install() {
-	}
-	public function uninstall() {
-	}
-	public function backup() {
-	}
-	public function restore($config) {
+	public function getInfo() {
+		return array(
+			"rawName" => "pjsip",
+			"prettyName" => _("Generic PJSIP Device"),
+			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality"),
+			"asteriskSupport" => ">=12.0"
+		);
 	}
 
-	/**
-	* Hook definitions
-	* @param {string} $filename
-	* @param {string} &$text
-	*/
-	public function doGuiIntercept($filename, &$text) {
-		if ($filename == "modules/sipsettings/page.sipsettings.php") {
-			// $this->doPage("page.sipsettings.php", $text);
+	public function getDisplay($display, $deviceInfo, $currentcomponent) {
+		$tmparr = parent::getDisplay($display, $deviceInfo, $currentcomponent);
+		unset($tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
+		$tt = _("Maximum number of Endpoints that can associate with this Device");
+		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$select[] = array('value' => 'yes', 'text' => 'Yes');
+		$select[] = array('value' => 'no', 'text' => 'No');
+
+		if (version_compare($amp_conf['ASTVERSION'],'12.4.0','ge')) {
+			//media_use_received_transport
+			$tt = _("Determines whether res_pjsip will use the media transport received in the offer SDP in the corresponding answer SDP.");
+			$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		}
-	}
+		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
+		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
+		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
 
-	/**
-	* Hook Definitions
-	*/
-	public function doGuiHook(&$currentconfig) {
-		return true;
-	}
-
-	/**
-	* Do Config Page Init
-	* @param {[type]} $page [description]
-	*/
-	public function doConfigPageInit($page) {
-		if (isset($_REQUEST['tech']) && strtoupper($_REQUEST['tech']) == 'PJSIP') {
-			//print "PJSip was called with $page<br />";
-			//print_r($_REQUEST);
+		//Use the transport engine, don't cross migrate anymore, it just doesn't work
+		$transports = $this->getActiveTransports();
+		foreach($transports as $transport) {
+			$select[] = array('value' => $transport['value'], 'text' => $transport['text']);
 		}
+		$tmparr['transport']['select'] = $select;
+		$tmparr['transport']['level'] = 0;
+		unset($select);
+		return $tmparr;
 	}
 
 	/**
@@ -107,7 +112,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		$conf['pjsip.conf']['global'] = array(
 			'type=global',
-			'user_agent='.$this->FreePBX->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
+			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
 		);
 		if(!empty($this->_global)) {
 			foreach($this->_global as $el) {
@@ -203,7 +208,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		}
 
 		//if we have an additional and custom file for sip_notify, write a pjsip_notify.conf
-		$ast_etc_dir = $this->FreePBX->Config->get_conf_setting('ASTETCDIR');
+		$ast_etc_dir = $this->freepbx->Config->get_conf_setting('ASTETCDIR');
 		$ast_sip_notify_additional_conf = $ast_etc_dir . "/sip_notify_additional.conf";
 		$ast_sip_notify_custom_conf = $ast_etc_dir . "/sip_notify_custom.conf";
 		if (file_exists($ast_sip_notify_additional_conf) && file_exists($ast_sip_notify_custom_conf)) {
@@ -221,12 +226,12 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
 		$nt = \notifications::create();
 
-		$ast_sip_driver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
+		$ast_sip_driver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 		if(version_compare($this->version, '12', 'ge')) {
 			if($ast_sip_driver == 'both') {
-				$this->FreePBX->ModulesConf->removenoload("chan_sip.so");
+				$this->freepbx->ModulesConf->removenoload("chan_sip.so");
 				foreach ($this->PJSipModules as $mod) {
-					$this->FreePBX->ModulesConf->removenoload($mod);
+					$this->freepbx->ModulesConf->removenoload($mod);
 				}
 			} elseif($ast_sip_driver == 'chan_pjsip') {
 				$this->enablePJSipModules();
@@ -238,11 +243,11 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			// that if there are devices or trunks trying to use chan_pjsip, we
 			// complain loudly about it core_devices_configpageload
 			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
-				$this->FreePBX->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
+				$this->freepbx->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
 			}
 		}
 
-		$this->FreePBX->WriteConfig($conf);
+		$this->freepbx->WriteConfig($conf);
 	}
 
 	/**
@@ -316,27 +321,28 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 */
 	public function getTransportConfigs() {
 		// Cache
-		if (isset($this->TransportConfigCache))
+		if (isset($this->TransportConfigCache)) {
 			return $this->TransportConfigCache;
+		}
 
-		$binds = $this->FreePBX->Sipsettings->getConfig("binds");
+		$binds = $this->freepbx->Sipsettings->getConfig("binds");
 
 		foreach ($binds as $protocol => $arr) {
 			foreach ($arr as $ip => $on) {
 				$t = "$ip-$protocol";
 				$transport[$t]['type'] = "transport";
 				$transport[$t]['protocol'] = $protocol;
-				$port = $this->FreePBX->Sipsettings->getConfig($protocol."port-$ip");
+				$port = $this->freepbx->Sipsettings->getConfig($protocol."port-$ip");
 				if (!$port) {
 					$transport[$t]['bind'] = "$ip";
 				} else {
 					$transport[$t]['bind'] = "$ip:$port";
 				}
-				$extip = $this->FreePBX->Sipsettings->getConfig($protocol."extip-$ip");
+				$extip = $this->freepbx->Sipsettings->getConfig($protocol."extip-$ip");
 
 				if (!$extip) {
 					// Is there a global extern setting?
-					$extip = $this->FreePBX->Sipsettings->getConfig("externip");
+					$extip = $this->freepbx->Sipsettings->getConfig("externip");
 				}
 
 				if ($extip) {
@@ -345,13 +351,13 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				}
 
 				// Add the Generic localnet settings.
-				$localnets = $this->FreePBX->Sipsettings->getConfig('localnets');
+				$localnets = $this->freepbx->Sipsettings->getConfig('localnets');
 				foreach($localnets as $arr) {
 					$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
 				}
 
 				// If there's a specific local net for this interface, add it too.
-				$localnet = $this->FreePBX->Sipsettings->getConfig($protocol."localnet-$ip");
+				$localnet = $this->freepbx->Sipsettings->getConfig($protocol."localnet-$ip");
 				if ($localnet) {
 					$transport[$t]['local_net'][] =  $localnet;
 				}
@@ -367,12 +373,12 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 */
 	public function getDefaultSIPCodecs() {
 		// Grab the default Codecs from the sipsettings module.
-		$codecs = $this->FreePBX->Sipsettings->getConfig('voicecodecs');
+		$codecs = $this->freepbx->Sipsettings->getConfig('voicecodecs');
 
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
 			// Grab the default codecs from BMO
-			foreach ($this->FreePBX->Codecs->getAudio(true) as $c => $en) {
+			foreach ($this->freepbx->Codecs->getAudio(true) as $c => $en) {
 				if ($en) {
 					$codecs[$c] = $en;
 				}
@@ -394,7 +400,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		// Check to see if 'Allow Guest' is enabled in SIP Settings. If it is,
 		// we need to create the magic 'anonymous' endpoint.
-		$allowguest = $this->Sipsettings->getConfig('allowguest');
+		$allowguest = $this->freepbx->Sipsettings->getConfig('allowguest');
 		if ($allowguest == 'yes') {
 			$endpoint[] = "type=endpoint";
 			// Do we have a custom contet for anon calls to go to?
@@ -584,7 +590,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		// We need to DISABLE chan_sip.so, and remove any noload lines for the pjsip stuff.
 		//
 		// This is just to save typing. I'm lazy.
-		$m = $this->FreePBX->ModulesConf;
+		$m = $this->freepbx->ModulesConf;
 
 		$m->noload("chan_sip.so");
 		foreach ($this->PJSipModules as $mod)
@@ -598,7 +604,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 		// We need to ENABLE chan_sip.so, and add all the noload lines for the pjsip stuff.
 		//
 		// This is just to save typing. I'm lazy.
-		$m = $this->FreePBX->ModulesConf;
+		$m = $this->freepbx->ModulesConf;
 
 		$m->removenoload("chan_sip.so");
 		foreach ($this->PJSipModules as $mod)
@@ -616,7 +622,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 
 		//this is really BAD, why do we always have to set to the dang _REQUESTER argh!
 		if(empty($_REQUEST['codec'])) {
-			$defaultCodecs = $this->FreePBX->Sipsettings->getCodecs('audio');
+			$defaultCodecs = $this->freepbx->Sipsettings->getCodecs('audio');
 			$_REQUEST['codecs'] = implode(",",array_keys($defaultCodecs));
 		} else {
 			$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
@@ -671,7 +677,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 	 * @param {array} &$dispvars Display Variables
 	 */
 	public function getDisplayVars($trunkid, &$dispvars) {
-		$sipSettingsCodecs = $this->FreePBX->Sipsettings->getCodecs('audio',true);
+		$sipSettingsCodecs = $this->freepbx->Sipsettings->getCodecs('audio',true);
 		if(!empty($trunkid)) {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
 			$get->bindParam(':id', str_replace('OUT_','',$trunkid));

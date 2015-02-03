@@ -3,17 +3,55 @@
 namespace FreePBX\modules;
 class Core extends \FreePBX_Helpers implements \BMO  {
 
+	public $drivers = array();
+
 	public function __construct($freepbx = null) {
 
 		parent::__construct($freepbx);
 		//Hackery-Jackery for Core only really
 		if(!class_exists('\FreePBX\modules\Core\PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
-			include(__DIR__.'/functions.inc/PJSip.class.php');
+			//include(__DIR__.'/functions.inc/PJSip.class.php');
 			//Think about using BMO Inject here instead
-			$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
+			//$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
 		}
+		include(__DIR__."/functions.inc/Driver.class.php");
+		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
+		foreach(glob(__DIR__."/functions.inc/drivers/*.class.php") as $driver) {
+			if(preg_match("/\/([a-z1-9]*)\.class\.php$/i",$driver,$matches)) {
+				$name = $matches[1];
+				$class = $driverNamespace . "\\" . $name;
+				if(!class_exists($class)) {
+					include($driver);
+				}
+				if(class_exists($class)) {
+					$this->drivers[strtolower($name)] = new $class($freepbx);
+				} else {
+					throw new \Exception("Invalid Class inside the drivers folder");
+				}
+			}
+		}
+
+		//other options
 		$this->database = $freepbx->Database;
 		$this->config = $freepbx->Config;
+	}
+
+	public function genConfig() {
+		$conf = array();
+		foreach($this->drivers as $driver) {
+			$c = $driver->genConfig();
+			if(!empty($c)) {
+				$conf = array_merge($c, $conf);
+			}
+		}
+		return $conf;
+	}
+
+	public function writeConfig($config) {
+		foreach($this->drivers as $driver) {
+			$config = $driver->writeConfig($config);
+		}
+		return $config;
 	}
 
 	public function getActionBar($request) {
