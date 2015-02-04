@@ -1095,6 +1095,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
 		}
 
+		$tech = $devinfo['tech'];
 		if(isset($this->drivers[$tech])) {
 			return $this->drivers[$tech]->delDevice($account);
 		}
