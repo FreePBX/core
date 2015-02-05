@@ -187,6 +187,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
+		$select[] = array('value' => 'solicited', 'text' => 'Solicited');
+		$select[] = array('value' => 'unsolicited', 'text' => 'Unsolicited');
+		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Solicited is the default and should only be changed if you see errors in the Asterisk logs");
+		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
 		foreach($transports as $transport) {
@@ -586,10 +592,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$config['dtmfmode'] = "rtc4733";
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
-		//unsolicited mwi
-		$endpoint[] = "mailboxes=".$config['mailbox'];
-		//solicited mwi
-		$aor[] = "mailboxes=".$config['mailbox'];
+
+		//http://issues.freepbx.org/browse/FREEPBX-8643
+		if(empty($config['mwi_subscription']) || $config['mwi_subscription'] == 'solicited') {
+			//solicited mwi
+			$aor[] = "mailboxes=".$config['mailbox'];
+		} else {
+			//unsolicited mwi
+			$endpoint[] = "mailboxes=".$config['mailbox'];
+		}
+
 		//check transport to make sure it's valid
 		$trans = array_keys($this->getTransportConfigs());
 		if(!empty($config['transport'])) {
