@@ -3689,7 +3689,7 @@ function core_do_get_config($engine) {
 	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
 	$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
 	$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | "${ARG3}"="1" | "${ARG4}"="1" | "${ARG5}"="1"]?${RINGTIMER}:)}'));
-	$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},'));
+	$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},dontcare'));
 
 	// If paging module is not present, then what happens?
 	// TODO: test with no paging module
