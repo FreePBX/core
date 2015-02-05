@@ -244,6 +244,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						"value" => "yes",
 						"flag" => $flag++
 					),
+					"mwi_subscription" => array(
+						"value" => "solicited",
+						"flag" => $flag++
+					),
 				);
 			break;
 			case 'sip':
@@ -667,7 +671,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		} catch(\Exception $e) {
 			return array();
 		}
-		
+
 		$astman = $this->FreePBX->astman;
 		if ($astman) {
 
