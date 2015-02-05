@@ -159,6 +159,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "yes",
 				"flag" => $flag++
 			),
+			"mwi_subscription" => array(
+				"value" => "solicited",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
