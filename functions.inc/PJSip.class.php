@@ -452,10 +452,16 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$config['dtmfmode'] = "rtc4733";
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
-		//unsolicited mwi
-		$endpoint[] = "mailboxes=".$config['mailbox'];
-		//solicited mwi
-		$aor[] = "mailboxes=".$config['mailbox'];
+
+		//http://issues.freepbx.org/browse/FREEPBX-8643
+		if(empty($config['mwi_subscription']) || $config['mwi_subscription'] == 'solicited') {
+			//solicited mwi
+			$aor[] = "mailboxes=".$config['mailbox'];
+		} else {
+			//unsolicited mwi
+			$endpoint[] = "mailboxes=".$config['mailbox'];
+		}
+
 		//check transport to make sure it's valid
 		$trans = array_keys($this->getTransportConfigs());
 		if(!empty($config['transport'])) {
