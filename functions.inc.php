@@ -4017,20 +4017,6 @@ function core_do_get_config($engine) {
 
 	$ext->add($mcontext, $exten,'theend', new ext_hangup());
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
-	/*
-	$ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
-	$ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]', 'macro-one-touch-record,s,sstate', false, '${IF($["${EXTTOCALL}"!=""]?${EXTTOCALL}:${CUT(CALLFILENAME,-,2)})},NOT_INUSE'));
-	$ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"!="${CUT(CALLFILENAME,-,2)}"]','macro-one-touch-record,s,sstate',false,'${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
-	$ext->add($mcontext,$exten,'', new ext_noop_trace('ONETOUCH_REC: ${ONETOUCH_REC}',5));
-	*/
-
-	/* Now generate a clean DIALEDPEERNUMBER if ugly followme/ringgroup extensions dialplans were engaged
-	* doesn't seem like this is need with some of the NoCDRs() but leave for now and keep an eye on it
-	*
-	$ext->add($mcontext, $exten, '', new ext_execif('$["${CLEAN_DIALEDPEERNUMBER}"=""]','Set','CLEAN_DIALEDPEERNUMBER=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
-	$ext->add($mcontext, $exten, '', new ext_set('CDR(clean_dst)','${CLEAN_DIALEDPEERNUMBER}'));
-	*/
-
 
 	/* macro-hangupcall */
 
