@@ -85,7 +85,7 @@ $mp_tit = _("match pattern");
 $ci_tit = _("CallerID");
 //Dialpatterns Form field(s)
 $dpinput = array();
-if($amp_conf['ENABLEOLDDIALPATTERNS']) {
+if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	foreach ($dialpattern_array as $idx => $pattern) {
 		$tabindex++;
 		if ($idx == 50) {
