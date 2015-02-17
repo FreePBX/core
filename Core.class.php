@@ -1037,6 +1037,30 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+	* Get all the users
+	* @param {bool} $get_all=false Whether to get all of check in the range
+	*/
+	function listUsers($get_all=false) {
+		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+		//only allow extensions that are within administrator's allowed range
+		foreach($results as $result){
+			if ($get_all || checkRange($result[0])){
+				$extens[] = array($result[0],$result[1],$result[2]);
+			}
+		}
+
+		if (isset($extens)) {
+			sort($extens);
+			return $extens;
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Delete a Device
 	 * @param {int} The Device ID
 	 * @param {bool} $editmode=false If in edit mode (this is so it doesnt destroy the AsteriskDB)
