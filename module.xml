@@ -64,9 +64,6 @@
 	<depends>
 		<version>12.0.1rc16</version>
 	</depends>
-	<requirements>
-		<file>/usr/sbin/asterisk</file>
-	</requirements>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
