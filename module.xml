@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.23</version>
+	<version>12.0.24</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.24* Remove old depends
 		*12.0.23* Remove VM call me context and add it to Voicemail
 		*12.0.22* FREEPBX-8625 When saving device in adhoc mode, user gets logout automatically
 		*12.0.21* FREEPBX-8587 subscribed mailboxes not working for pjsip endpoints
@@ -80,9 +81,6 @@
 	<depends>
 		<version>12.0.1rc16</version>
 	</depends>
-	<requirements>
-		<file>/usr/sbin/asterisk</file>
-	</requirements>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
