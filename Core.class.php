@@ -725,13 +725,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$extarray=explode('/',$extdisplay,2);
 					core_did_del($extarray[0],$extarray[1]);
 					needreload();
-					redirect_standard('didfilter', 'rnavsort');
+					//redirect_standard('didfilter', 'rnavsort');
 				break;
 				case 'edtIncoming':
 					$extarray=explode('/',$old_extdisplay,2);
 					if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 						needreload();
-						redirect_standard('extdisplay', 'view');
+						//redirect_standard('extdisplay', 'view');
 					}
 				break;
 			}
