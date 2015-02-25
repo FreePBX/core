@@ -20,19 +20,19 @@ foreach($routelist as $route){
 	if($intracompany_route != ''){
 		$attributes .= '<i class="fa fa-lg  fa-building fa-border text-success" rel="Intra Company Route"></i>&nbsp;';
 	}else{
-		$attributes .= '<i class="fa fa-lg  fa-building fa-border text-muted" rel="Intra Company Route"></i>&nbsp;';		
+		$attributes .= '<i class="fa fa-lg  fa-building fa-border text-muted" rel="Intra Company Route"></i>&nbsp;';
 	}
 	if($password != ''){
 		$attributes .= '<i class="fa fa-lg fa-key fa-border text-success" rel="Password Set"></i>&nbsp;';
 	}else{
-		$attributes .= '<i class="fa fa-lg fa-key fa-border text-muted" rel="Password Set"></i>&nbsp;';		
+		$attributes .= '<i class="fa fa-lg fa-key fa-border text-muted" rel="Password Set"></i>&nbsp;';
 	}
 	if($time_group_id != ''){
 		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-success" rel="Time Group Assigned"></i>&nbsp;';
 	}else{
-		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-muted" rel="Time Group Assigned"></i>&nbsp;';		
+		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-muted" rel="Time Group Assigned"></i>&nbsp;';
 	}
-	
+
 $routerows .= <<<HERE
 <tr id = "row$id"  data-id="$id" data-seq="$seq">
 <td><i class="fa fa-arrows"></i>&nbsp $name</td>
@@ -44,13 +44,13 @@ $routerows .= <<<HERE
 	<i class="fa fa-trash-o"></i></a>&nbsp;&nbsp;
 </tr>
 HERE;
-	
+
 }
 ?>
 <style>
 .text-grey:
 </style>
-<div class="table-responsive"> 
+<div class="table-responsive">
 	<table class="table table-striped table-bordered" id="routes">
 		<thead>
 			<tr>
@@ -65,4 +65,3 @@ HERE;
 		</tbody>
 	</table>
 </div>
-

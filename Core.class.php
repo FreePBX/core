@@ -316,19 +316,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				case 'add':
 					if (core_dahdichandids_add($description, $channel, $did)) {
 						needreload();
-						redirect_standard();
+						$_REQUEST['extdisplay'] = $channel;
+						$this->freepbx->View->redirect_standard('extdisplay');
 					}
 				break;
 				case 'edit':
 					if (core_dahdichandids_edit($description, $channel, $did)) {
 						needreload();
-						redirect_standard('extdisplay');
 					}
 				break;
 				case 'delete':
 					core_dahdichandids_delete($channel);
 					needreload();
-					redirect_standard();
 				break;
 			}
 		}// $page == "dahdichandids"
@@ -534,14 +533,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					//
 				case "addroute":
 					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
-					$request['extdisplay'] = $extdisplay; //have not idea if this is needed or useful
+					$_REQUEST['id'] = $extdisplay;
 					needreload();
-					redirect_standard('extdisplay');
+					$this->freepbx->View->redirect_standard('id');
 				break;
 				case "editroute":
 					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 					needreload();
-					redirect('config.php?display=routing&view=form&id='.$extdisplay);
 				break;
 				case "updatetrunks":
 					$ret = core_routing_updatetrunks($extdisplay, $trunkpriority, true);
@@ -549,7 +547,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					echo json_encode(array('result' => $ret));
 					needreload();
 					exit;
-
 				break;
 				case "delroute":
 					$ret = core_routing_delbyid($request['id']);
@@ -561,10 +558,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					if($request['json']){
 						header("Content-type: application/json");
 						echo json_encode($ret);
-						exit;
-					} else{
-						redirect_standard();
 					}
+					exit;
 				break;
 				case 'prioritizeroute':
 					needreload();
@@ -718,20 +713,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					//add details to the 'incoming' table
 					if (core_did_add($request)) {
 						needreload();
-						//redirect_standard('extdisplay', 'extension', 'cidnum', 'didfilter', 'rnavsort');
+						$_REQUEST['extdisplay'] = $_REQUEST['extension']."/".$_REQUEST['cidnum'];
+						$this->freepbx->View->redirect_standard('extdisplay', 'didfilter', 'rnavsort');
 					}
 				break;
 				case 'delIncoming':
 					$extarray=explode('/',$extdisplay,2);
 					core_did_del($extarray[0],$extarray[1]);
 					needreload();
-					//redirect_standard('didfilter', 'rnavsort');
 				break;
 				case 'edtIncoming':
 					$extarray=explode('/',$old_extdisplay,2);
 					if (core_did_edit($extarray[0],$extarray[1],$_REQUEST)) {
 						needreload();
-						//redirect_standard('extdisplay', 'view');
 					}
 				break;
 			}

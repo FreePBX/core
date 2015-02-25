@@ -20,7 +20,7 @@ $n_idx = 0;
 $last_seq = count($routepriority)-1;
 if ($action == 'populatenpanxx') {
 	return true;
-} 
+}
 $pageinfo = '<div class="well well-info">';
 $pageinfo .= _('This page is used to manage your outbound routing.');
 $pageinfo .= '</div>';
@@ -80,7 +80,7 @@ switch($request['view']){
 		//$pageinfo = '';
 		$routelist = core_routing_list();
 		$content = load_view(__DIR__.'/views/routing/grid.php', array('routelist' => $routelist));
-	break;	
+	break;
 }
 ?>
 

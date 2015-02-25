@@ -7,7 +7,7 @@ abstract class Driver {
 	protected $freepbx;
 	protected $database;
 
-	public function __construct($freepbx, $drivers) {
+	public function __construct($freepbx) {
 		$this->freepbx = $freepbx;
 		$this->database = $freepbx->Database;
 	}

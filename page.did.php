@@ -1,6 +1,7 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $request = $_REQUEST;
+extract($request);
 $tabindex = 0;
 if($action == 'delIncoming'){
 	$message = 'Route '.$extdisplay.' '._("deleted").'!';
@@ -41,7 +42,7 @@ if($extdisplay){
 	if($description){
 		$heading .= $description . '</h2>';
 	}else{
-		$heading .= $extdisplay . '</h2>';	
+		$heading .= $extdisplay . '</h2>';
 	}
 
 

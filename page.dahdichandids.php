@@ -1,5 +1,6 @@
 <?php
 $view = $_REQUEST['view'];
+extract($_REQUEST);
 
 switch($view){
 	case "add":
@@ -12,7 +13,7 @@ switch($view){
 			$action = 'edit';
 		}else{
 			$action = 'add';
-		}	
+		}
 		echo load_view(__DIR__."/views/dahdichandids/view.php", array('description' => $description, 'channel' => $channel, 'did' => $did, 'action' => $action));
 	break;
 	default:

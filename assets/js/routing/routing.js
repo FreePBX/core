@@ -1,57 +1,59 @@
-$('#outbound_routes').sortable({
-	containerSelector: 'tbody',
-	itemPath: 'tbody',
-	itemSelector: 'tr',
-	placeholder: '<tr class="placeholder"/>',
-	handle: '.fa-arrows',
-	update: function(event, ui){
-		var id = ui.item.data('id');
-		var seq = ui.item.index()+1;
-		$.ajax({
-			type: 'POST',
-			url: location.href,
-			data: 'action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey='+id+'&repotrunkdirection='+seq,
-			dataType: 'json',
-			success: function(data) {
-				toggle_reload_button('show');
-			}
-		});
-	}
-});
-$('#routetrunks').sortable({
-	containerSelector: 'tbody',
-	itemPath: 'tbody',
-	itemSelector: 'tr',
-	placeholder: '<tr class="placeholder"/>',
-	handle: '.fa-arrows',
-	update: function(event, ui){
-		var cur = 0;
-		var seq = [];
-		$("[id^='trunkpri']").each(function(){
-			var trunk = $(this).val();
-			if(trunk === ''){return;}
-			seq.push(trunk);
-		});
-		$.ajax({
-			type: 'POST',
-			url: location.href,
-			data: {
-				action:"updatetrunks", 
-				quietmode:"1", 
-				skip_astman:"1", 
-				restrictmods: "core",
-				trunkpriority:seq,
-				extdisplay:$("#extdisplay").val()
-				},
-			dataType: 'json',
-			success: function(data) {
-				toggle_reload_button('show');
-			}
-		});
-	}
+$(function() {
+	$('#outbound_routes').sortable({
+		containerSelector: 'tbody',
+		itemPath: 'tbody',
+		itemSelector: 'tr',
+		placeholder: '<tr class="placeholder"/>',
+		handle: '.fa-arrows',
+		update: function(event, ui){
+			var id = ui.item.data('id');
+			var seq = ui.item.index()+1;
+			$.ajax({
+				type: 'POST',
+				url: location.href,
+				data: 'action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey='+id+'&repotrunkdirection='+seq,
+				dataType: 'json',
+				success: function(data) {
+					toggle_reload_button('show');
+				}
+			});
+		}
+	});
+	$('#routetrunks').sortable({
+		containerSelector: 'tbody',
+		itemPath: 'tbody',
+		itemSelector: 'tr',
+		placeholder: '<tr class="placeholder"/>',
+		handle: '.fa-arrows',
+		update: function(event, ui){
+			var cur = 0;
+			var seq = [];
+			$("[id^='trunkpri']").each(function(){
+				var trunk = $(this).val();
+				if(trunk === ''){return;}
+				seq.push(trunk);
+			});
+			$.ajax({
+				type: 'POST',
+				url: location.href,
+				data: {
+					action:"updatetrunks",
+					quietmode:"1",
+					skip_astman:"1",
+					restrictmods: "core",
+					trunkpriority:seq,
+					extdisplay:$("#extdisplay").val()
+					},
+				dataType: 'json',
+				success: function(data) {
+					toggle_reload_button('show');
+				}
+			});
+		}
+	});
 });
 
-$("a[id^='del']").click(function(){	
+$("a[id^='del']").click(function(){
 	var id = $(this).data('id');
 	$.ajax({
 		type: 'POST',
@@ -62,23 +64,23 @@ $("a[id^='del']").click(function(){
 			toggle_reload_button('show');
 			location.reload();
 		}
-	});		
+	});
 });
 $("a[id^='rowadd']").click(function(){
 	var curRow = $(this).closest('tr');
 	var newRow = curRow.clone(true);
 	curRow.after(newRow);
-});	
+});
 $("a[id^='rowdel']").click(function(){
 	var curRow = $(this).closest('tr');
 	curRow.fadeOut(2000, function(){
 		$(this).remove();
 	});
-});	
+});
 
 //DialPlan Wizard
 $("[id='getlocalprefixes']").click(function(){
-	var npa = $('#lpwnpa').val();	
+	var npa = $('#lpwnpa').val();
 	var nxx = $('#lpwnxx').val();
 	var patterns = [];
 	if ($('#fwdownload').prop('checked')){
@@ -94,7 +96,7 @@ $("[id='getlocalprefixes']").click(function(){
 		},
 		success: function(data) {
 			$.each(data,function(){
-				var npa = this.npa;	
+				var npa = this.npa;
 				var nxx = this.nxx;
 				if ($('#fw7').prop('checked')){
 					patterns.push(nxx+'XXXX');
@@ -155,7 +157,7 @@ $("[id='getlocalprefixes']").click(function(){
 		patterns.push('911');
 	}
 	if ($('#fwint').prop('checked')){
-		patterns.push('011.');	
+		patterns.push('011.');
 	}
 	if ($('#fwld').prop('checked')){
 		patterns.push('1NXXNXXXXXX');
@@ -171,7 +173,7 @@ $("[id='getlocalprefixes']").click(function(){
 	if($('#bulk_patterns').length){
 		$('#bulk_patterns').val(patterns.join("\r\n"));
 	}
-	$('#dploading').modal('hide');	
+	$('#dploading').modal('hide');
 });
 //tab specifics
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -182,7 +184,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		default:
 			$("#wizmenu").addClass('hidden');
 		break;
-		
+
 	}
 });
 
@@ -206,7 +208,7 @@ $("[id^='trunkpri']:last").change(function(){
 		$(newinput).attr('name', 'trunkpri['+nextid+']');
 		curRow.after(newRow);
 	}
-	
+
 });
 $("#duplicate").click(function(){
 	$("#action").val("copyroute");

@@ -43,7 +43,7 @@ if ($extdisplay == '' | $route_seq != $last_seq) {
 $module_hook = moduleHook::create();
 if (!empty($module_hook->hookHtml)) {
 	$hooktab = 	'<li role="presentation"><a href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
-	
+
 }
 //Dialpattern Help
 $dplabel = _("Dial Patterns that will use this Route");
@@ -110,7 +110,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';	
+		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 		$dpinput[] = '	</div>';
@@ -127,7 +127,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '</td>';
 		$dpinput[] = '</tr>';
 	}
-	//Always an empty row incase there are no patterns.... 
+	//Always an empty row incase there are no patterns....
 	$next_idx = count($dialpattern_array);
 	$idx = !empty($idx) ? $idx : $next_idx;
 	$tabindex++;
@@ -153,7 +153,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
-	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';	
+	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 	$dpinput[] = '	</div>';
@@ -177,7 +177,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
 		$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
 		$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
-		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;	
+		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;
 	}
 	$dpinput[] = '</textarea>';
 	$dprows = implode(PHP_EOL, $dpinput);
@@ -195,8 +195,8 @@ $trunkhtml .= '<tbody id="routetrunks">';
 foreach ($trunkpriority as $key=>$trunk) {
 			$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
 			$trunkhtml .= '<td>';
-			$trunkhtml .= '<div class="input-group">';			
-			$trunkhtml .= '<span class="input-group-addon" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+			$trunkhtml .= '<div class="input-group">';
+			$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
 		    $trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
 			$trunkhtml .= '<option value=""></option>';
 			foreach ($trunks as $name=>$display_description) {
@@ -206,7 +206,7 @@ foreach ($trunkpriority as $key=>$trunk) {
 					$trunkhtml .= '<option id="trunk'.$key.'" class="text-danger" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
 				}
 			}
-			
+
 			$trunkhtml .= '</select>';
 			$trunkhtml .= '</div>';
 			$trunkhtml .= '</td>';
@@ -219,8 +219,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 
 	$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
 	$trunkhtml .= '<td>';
-			$trunkhtml .= '<div class="input-group">';			
-			$trunkhtml .= '<span class="input-group-addon" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+			$trunkhtml .= '<div class="input-group">';
+			$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control">';
 	$trunkhtml .= '<option value="" SELECTED></option>';
 	foreach ($trunks as $name=>$display_description) {
@@ -245,7 +245,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
   <li role="presentation"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
   <li role="presentation"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
 </ul>
-<div id="formtabs" class="tab-content">	
+<div id="formtabs" class="tab-content">
 	<div class="tab-pane active" id="routesettings">
 		<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
@@ -408,7 +408,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 					</div>
 				</div>
 			</div>
-			<!--END ROUTE POSITION-->	
+			<!--END ROUTE POSITION-->
 			<!--TRUNK PRIORITY-->
 			<div class="element-container">
 				<div class="row">
@@ -489,7 +489,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 										<span class="btn btn-default btn-file">
 											<?php echo _("Choose File")?><input type="file" name="pattern_file" class="form-control" tabindex="<?php echo ++$tabindex;?>"/>
 										</span>
-										<span class="filename"></span>										
+										<span class="filename"></span>
 									</div>
 								</div>
 							</div>
@@ -500,7 +500,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 							<span id="importwrapper-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Upload patterns from a CSV file replacing existing entries. If there are no headers then the file must have 4 columns of patterns in the same order as in the GUI. You can also supply headers: %s, %s, %s and %s in the first row. If there are less then 4 recognized headers then the remaining columns will be blank"),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
 						</div>
 					</div>
-				</div>				
+				</div>
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
@@ -522,7 +522,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 							<span id="export_file-help" class="help-block fpbx-help-block"><?php echo sprintf(_("Export patterns as a CSV file with headers listed as: %s, %s, %s and %s in the first row."),'<strong>prepend</strong>','<strong>prefix</strong>','<strong>match pattern</strong>','<strong>callerid</strong>')?></span>
 						</div>
 					</div>
-				</div>				
+				</div>
 			</div>
 			<!--END IMPORT/EXPORT-->
 	</form>
@@ -558,7 +558,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 						<p><strong><?php echo _("Generate Buttons")?></strong><?php echo _("You may choose 7,10,11 digit patterns as your provider allows. If you do not choose 'Download' this will add a generic 7,10 or ll digit pattern")?></p>
 						<p><strong><?php echo _("Generic Patterns")?></strong><?php echo _("You may select to allow toll free calls such as 800,877 etc as well as Directory assistance, International dialing and long distance")?></p>
 					</div>
-					
+
 					<label for="lpwnpa">NPA</label>
 					<input type="tel" id='lpwnpa' class="form-control">
 					<label for="lpwnxx">NXX</label>
@@ -567,7 +567,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 					<input type="checkbox" id="fwdownload">
 					<label for="fwdownload"><?php echo _("Download Local Patterns");?></label>
 					</div>
-					<div class = "form-group radioset">			
+					<div class = "form-group radioset">
 					<input type="checkbox" id="fw7" checked>
 					<label for="fw7"><?php echo _("7 Digit Patterns")?></label>
 					<input type="checkbox" id="fw10" checked>
@@ -597,7 +597,5 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 	<!-- END Dialplan Wizard-->
-	
+
 </div>
-
-
