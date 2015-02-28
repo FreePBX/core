@@ -1550,12 +1550,10 @@ function core_do_get_config($engine) {
 					// note - the indirect table could go away as of 1.4.20 where it is fixed so that SetCallerPres can take
 					// the raw format.
 					//
-					if ($ast_lt_16) {
-						$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLINGPRES_${CALLINGPRES}}'));
-					} else {
-						$ext->add($context, $exten, '', new ext_setvar('__CALLINGPRES_SV','${CALLERPRES()}'));
-					}
-					$ext->add($context, $exten, '', new ext_setcallerpres('allowed_not_screened'));
+					$ext->add($context, $exten, '', new ext_setvar('__CALLINGNAMEPRES_SV','${CALLERID(name-pres)}'));
+					$ext->add($context, $exten, '', new ext_setvar('__CALLINGNUMPRES_SV','${CALLERID(num-pres)}'));
+					$ext->add($context, $exten, '', new ext_setcallernamepres('allowed_not_screened'));
+					$ext->add($context, $exten, '', new ext_setcallernumpres('allowed_not_screened'));
 				}
 				if (!empty($item['alertinfo'])) {
 					$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
@@ -1756,11 +1754,8 @@ function core_do_get_config($engine) {
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', $trunkgroup));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_'.$trunkprops['trunkid'].'}" = ""]', 'nomax'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT('.$trunkgroup.')} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-					if ($ast_lt_16) {
-						$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
-					} else {
-						$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
-					}
+					$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gosubif('$["${PREFIX_TRUNK_'.$trunkprops['trunkid'].'}" != ""]','sub-flp-'.$trunkprops['trunkid'].',s,1'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -1814,11 +1809,8 @@ function core_do_get_config($engine) {
 				$ext->add($tcontext,$tcustom,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
 				$ext->add($tcontext,$tcustom,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 				$ext->add($tcontext,$tcustom,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-				if ($ast_lt_16) {
-					$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
-				} else {
-					$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
-				}
+				$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+				$ext->add($tcontext,$tcustom,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
 				$ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 				$ext->add($tcontext,$tcustom,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
 				$ext->add($tcontext,$tcustom,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -1838,11 +1830,8 @@ function core_do_get_config($engine) {
 				$ext->add($tcontext,$texten,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
 				$ext->add($tcontext,$texten,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 				$ext->add($tcontext,$texten,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-				if ($ast_lt_16) {
-					$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
-				} else {
-					$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
-				}
+				$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+				$ext->add($tcontext,$texten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
 				$ext->add($tcontext,$texten,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 				$ext->add($tcontext,$texten,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
 				$ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -3030,11 +3019,8 @@ function core_do_get_config($engine) {
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 	//
-	if ($ast_lt_16) {
-		$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'SetCallerPres', '${CALLINGPRES_SV}'));
-	} else {
-		$ext->add($context, $exten, '', new ext_execif('$["${CALLINGPRES_SV}" != ""]', 'Set', 'CALLERPRES()=${CALLINGPRES_SV}'));
-	}
+	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
 
 	// Keep the original CallerID number, for failover to the next trunk.
 
