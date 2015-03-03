@@ -6962,7 +6962,7 @@ $currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $curr
 					}
 				}
 
-				if (!$hidden && ($devoptarr['level'] == 0 || $amp_conf['ALWAYS_SHOW_DEVICE_DETAILS'] && $devoptarr['level'] < 2 || $extdisplay != '')) { // editing to show advanced as well
+				if (!$hidden) { // editing to show advanced as well
 					// Added optional selectbox to enable the unsupported misdn module
 					$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
 					if ($type == 'select') {

@@ -8,8 +8,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 			"hardware" => "iax2_generic",
 			"prettyName" => _("Generic IAX2 Driver"),
 			"shortName" => "IAX2",
-			"description" => _("Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices"),
-			"asteriskSupport" => ">=1.0"
+			"description" => _("Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices")
 		);
 	}
 
@@ -130,11 +129,11 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 		$tt = _("Endpoint port number to use, usually 4569.");
 		$tmparr['port'] = array('value' => '4569', 'tt' => $tt, 'level' => 1);
 		$tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and considered unreachable. Can be set to a value which is the msec threshold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
-		$tmparr['qualify'] = array('value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
+		$tmparr['qualify'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_QUALIFY'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
-		$tmparr['disallow'] = array('value' => $amp_conf['DEVICE_DISALLOW'], 'tt' => $tt, 'level' => 1);
+		$tmparr['disallow'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_DISALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
-		$tmparr['allow'] = array('value' => $amp_conf['DEVICE_ALLOW'], 'tt' => $tt, 'level' => 1);
+		$tmparr['allow'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_ALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Accountcode for this device.");

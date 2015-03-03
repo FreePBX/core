@@ -43,13 +43,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function getAllDriversInfo() {
 		$final = array();
-		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+
 		foreach($this->drivers as $driver) {
 			$info = $driver->getInfo();
-			if($info['hardware'] == "pjsip_generic" && $sipdriver != "both" && $sipdriver != "chan_pjsip") {
-				continue;
-			}
-			if($info['hardware'] == "sip_generic" && $sipdriver != "both" && $sipdriver != "chan_sip") {
+			if($info === false) {
 				continue;
 			}
 			$rn = $info['rawName'];
@@ -242,7 +239,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
-				if ($request['display'] != "users" && empty($request['tech_hardware']) && empty($request['extdisplay'])) {
+				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
 					$buttons = array();
 				}
 			break;
@@ -1113,6 +1110,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			} catch(\Exception $e) {
 				return array();
 			}
+		}
+		return $results;
+	}
+
+	public function getAllUsers() {
+		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute();
+			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
 		}
 		return $results;
 	}

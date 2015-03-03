@@ -2,14 +2,22 @@
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
 class Sip extends \FreePBX\modules\Core\Driver {
+	public function __construct($freepbx) {
+		parent::__construct($freepbx);
+		$this->version = $freepbx->Config->get('ASTVERSION');
+	}
+
 	public function getInfo() {
+		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+		if(($sipdriver != "chan_sip" && $sipdriver != "both")) {
+			return false;
+		}
 		return array(
 			"rawName" => "sip",
 			"hardware" => "sip_generic",
 			"prettyName" => _("Generic CHAN SIP Driver"),
 			"shortName" => "Chan_SIP",
-			"description" => _("The legacy SIP channel driver in Asterisk"),
-			"asteriskSupport" => ">=1.0"
+			"description" => _("The legacy SIP channel driver in Asterisk")
 		);
 	}
 
@@ -242,17 +250,6 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'inband', 'text' => _('In band audio (Not recommended)'));
 		$tt = _("The DTMF signaling mode used by this device, usually RFC for most phones.").' [dtmfmode]';
 		$tmparr['dtmfmode'] = array('prompttext' => _('DTMF Signaling'), 'value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
-		// $amp_conf['DEVICE_SIP_CANREINVITE']
-		// $amp_conf['DEVICE_SIP_TRUSTRPID']
-		// $amp_conf['DEVICE_SIP_SENDRPID']
-		// $amp_conf['DEVICE_SIP_NAT']
-		// $amp_conf['DEVICE_SIP_ENCRYPTION']
-		// $amp_conf['DEVICE_SIP_QUALIFYFREQ']
-		// $amp_conf['DEVICE_QUALIFY']
-		// $amp_conf['DEVICE_DISALLOW']
-		// $amp_conf['DEVICE_ALLOW']
-		// $amp_conf['DEVICE_CALLGROUP']
-		// $amp_conf['DEVICE_PICKUPGROUP']
 
 		unset($select);
 		$tt = _("Re-Invite policy for this device, see Asterisk documentation for details.").' [canreinvite]';
@@ -260,7 +257,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'nonat', 'text' => 'nonat');
 		$select[] = array('value' => 'update', 'text' => 'update');
-		$tmparr['canreinvite'] = array('prompttext' => _('Can Reinvite'), 'value' => $amp_conf['DEVICE_SIP_CANREINVITE'], 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['canreinvite'] = array('prompttext' => _('Can Reinvite'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_CANREINVITE'), 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		$tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.").' [context]';
 		$tmparr['context'] = array('prompttext' => _('Context'), 'value' => 'from-internal', 'tt' => $tt, 'level' => 1);
@@ -272,17 +269,17 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Whether Asterisk should trust the RPID settings from this device. Usually should be yes for CONNECTEDLINE() functionality to work if supported by the endpoint.").'[trustrpid]';
-		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $amp_conf['DEVICE_SIP_TRUSTRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_TRUSTRPID'), 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Send Remote-Party-ID header'));
 
-		if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+		if (version_compare($this->version,'1.8','ge')) {
 			$select[] = array('value' => 'pai', 'text' => _('Send P-Asserted-Identity header'));
 		}
 		$tt = _("Whether Asterisk should send RPID (or PAI) info to the device. Usually should be enabled to the settings used by your device for CONNECTEDLINE() functionality to work if supported by the endpoint.").'[sendrpid]';
-		$tmparr['sendrpid'] = array('prompttext' => _('Send RPID'),'value' => $amp_conf['DEVICE_SIP_SENDRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['sendrpid'] = array('prompttext' => _('Send RPID'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_SENDRPID'), 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
 		$select[] = array('value' => 'friend', 'text' => 'friend');
@@ -295,12 +292,12 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'yes', 'text' => _('Yes - (force_rport,comedia)'));
 		$select[] = array('value' => 'no', 'text' => _('No - (no)'));
 
-		if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+		if (version_compare($this->version,'1.8','ge')) {
 			$select[] = array('value' => 'force_rport', 'text' => _('Force rport - (force_rport)'));
 			$select[] = array('value' => 'comedia', 'text' => _('comedia - (comedia)'));
 		}
 
-		if (version_compare($amp_conf['ASTVERSION'],'11.5','ge')) {
+		if (version_compare($this->version,'11.5','ge')) {
 			$select[] = array('value' => 'auto_force_rport,auto_comedia', 'text' => _('Automatic Force Both - (auto_force_rport,auto_comedia)'));
 			$select[] = array('value' => 'auto_force_rport', 'text' => _('Automatic Force rport - (auto_force_rport)'));
 			$select[] = array('value' => 'auto_comedia', 'text' => _('Automatic comedia - (auto_comedia)'));
@@ -310,34 +307,34 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'route', 'text' => _('route - (force_rport)'));
 
 		$tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.").'[nat]';
-		$tmparr['nat'] = array('prompttext' => _('NAT Mode'), 'value' => $amp_conf['DEVICE_SIP_NAT'], 'tt' => $tt, 'select' => $select, 'level' => 0);
+		$tmparr['nat'] = array('prompttext' => _('NAT Mode'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_NAT'), 'tt' => $tt, 'select' => $select, 'level' => 0);
 
 		$tt = _("Endpoint port number to use, usually 5060. Some 2 ports devices such as ATA may used 5061 for the second port.");
 		$tmparr['port'] = array('prompttext' => _('Port'),'value' => '5060', 'tt' => $tt, 'level' => 1);
 		$tt = _("Setting to yes (equivalent to 2000 msec) will send an OPTIONS packet to the endpoint periodically (default every minute). Used to monitor the health of the endpoint. If delays are longer then the qualify time, the endpoint will be taken offline and considered unreachable. Can be set to a value which is the msec threshhold. Setting to no will turn this off. Can also be helpful to keep NAT pinholes open.");
-		$tmparr['qualify'] = array('prompttext' => _('Qualify'), 'value' => $amp_conf['DEVICE_QUALIFY'], 'tt' => $tt, 'level' => 1);
-		if (version_compare($amp_conf['ASTVERSION'],'1.6','ge')) {
+		$tmparr['qualify'] = array('prompttext' => _('Qualify'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_QUALIFY'), 'tt' => $tt, 'level' => 1);
+		if (version_compare($this->version,'1.6','ge')) {
 			$tt = _("Frequency in seconds to send qualify messages to the endpoint.");
-			$tmparr['qualifyfreq'] = array('prompttext' => _('Qualify Frequency'), 'value' => $amp_conf['DEVICE_SIP_QUALIFYFREQ'], 'tt' => $tt, 'level' => 1);
+			$tmparr['qualifyfreq'] = array('prompttext' => _('Qualify Frequency'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_QUALIFYFREQ'), 'tt' => $tt, 'level' => 1);
 		}
-		if (version_compare($amp_conf['ASTVERSION'],'1.8','ge')) {
+		if (version_compare($this->version,'1.8','ge')) {
 			unset($select);
 			$select[] = array('value' => 'udp,tcp,tls', 'text' => _('All - UDP Primary'));
 			$select[] = array('value' => 'tcp,udp,tls', 'text' => _('All - TCP Primary'));
 			$select[] = array('value' => 'tls,udp,tcp', 'text' => _('All - TLS Primary'));
-			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			if (version_compare($this->version,'11','ge')) {
 				$select[] = array('value' => 'ws,udp,tcp,tls', 'text' => _('All - WS Primary'));
 			}
 			$select[] = array('value' => 'udp', 'text' => _('UDP Only'));
 			$select[] = array('value' => 'tcp', 'text' => _('TCP Only'));
 			$select[] = array('value' => 'tls', 'text' => _('TLS Only'));
-			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			if (version_compare($this->version,'11','ge')) {
 				$select[] = array('value' => 'ws', 'text' => _('WS Only'));
 			}
 			$tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured. If you are using websockets (such as WebRTC) then you must select an option that includes WS");
 			$tmparr['transport'] = array('prompttext' => _('Transport'), 'value' => 'Auto', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
-			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			if (version_compare($this->version,'11','ge')) {
 				unset($select);
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -345,7 +342,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$tmparr['avpf'] = array('prompttext' => _('Enable AVPF'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 			}
 
-			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			if (version_compare($this->version,'11','ge')) {
 				unset($select);
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -353,7 +350,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$tmparr['force_avp'] = array('prompttext' => _('Force AVP'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 			}
 
-			if (version_compare($amp_conf['ASTVERSION'],'11','ge')) {
+			if (version_compare($this->version,'11','ge')) {
 				unset($select);
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -365,17 +362,17 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$select[] = array('value' => 'no', 'text' => _('No'));
 			$select[] = array('value' => 'yes', 'text' => _('Yes (SRTP only)'));
 			$tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
-			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $amp_conf['DEVICE_SIP_ENCRYPTION'], 'tt' => $tt, 'select' => $select, 'level' => 1);
+			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_ENCRYPTION'), 'tt' => $tt, 'select' => $select, 'level' => 1);
 		}
 
 		$tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('prompttext' => _('Call Groups'),'value' => $amp_conf['DEVICE_CALLGROUP'], 'tt' => $tt, 'level' => 1);
+		$tmparr['callgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $amp_conf['DEVICE_PICKUPGROUP'], 'tt' => $tt, 'level' => 1);
+		$tmparr['pickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
-		$tmparr['disallow'] = array('prompttext' => _('Disallowed Codecs'), 'value' => $amp_conf['DEVICE_DISALLOW'], 'tt' => $tt, 'level' => 1);
+		$tmparr['disallow'] = array('prompttext' => _('Disallowed Codecs'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_DISALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
-		$tmparr['allow'] = array('prompttext' => _('Allowed Codecs'), 'value' => $amp_conf['DEVICE_ALLOW'], 'tt' => $tt, 'level' => 1);
+		$tmparr['allow'] = array('prompttext' => _('Allowed Codecs'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_ALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("How to dial this device, this should not be changed unless you know what you are doing.");
 		$tmparr['dial'] = array('prompttext' => _('Dial'), 'value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Accountcode for this device.");

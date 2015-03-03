@@ -7,8 +7,7 @@ class Virtual extends \FreePBX\modules\Core\Driver {
 			"rawName" => "virtual",
 			"hardware" => "virtual",
 			"prettyName" => _("None (virtual exten)"),
-			"shortName" => _("Virtual"),
-			"asteriskSupport" => ">=1.0"
+			"shortName" => _("Virtual")
 		);
 	}
 }

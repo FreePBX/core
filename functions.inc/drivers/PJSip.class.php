@@ -21,22 +21,23 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private $_global = array();
 	private $_registration = array();
 	private $_identify = array();
-	private $version = null;
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
-		$this->db = $freepbx->Database;
-		$this->version = $freepbx->Config->get('ASTVERSION');
+		$this->db = $this->database;
 	}
 
 	public function getInfo() {
+		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+		if(($sipdriver != "chan_pjsip" && $sipdriver != "both") || version_compare("12.0",$this->version,">")) {
+			return false;
+		}
 		return array(
 			"rawName" => "pjsip",
 			"hardware" => "pjsip_generic",
 			"prettyName" => _("Generic PJSIP Device"),
 			"shortName" => "PJSIP",
-			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality"),
-			"asteriskSupport" => ">=12.0"
+			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality")
 		);
 	}
 
@@ -181,7 +182,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
 
-		if (version_compare($amp_conf['ASTVERSION'],'12.4.0','ge')) {
+		if (version_compare($this->version,'12.4.0','ge')) {
 			//media_use_received_transport
 			$tt = _("Determines whether res_pjsip will use the media transport received in the offer SDP in the corresponding answer SDP.");
 			$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);

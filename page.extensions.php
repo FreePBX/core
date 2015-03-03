@@ -72,6 +72,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 		</div>
 		<div class="col-sm-3 hidden-xs bootnav">
 			<div class="list-group">
+				<a href="?display=extensions<?php echo $popover?>" class="list-group-item"><i class="fa fa-list"></i> <?php echo _('List Extensions')?></a>
 				<?php
 					foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {
 						?><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="list-group-item"><?php echo sprintf(_("Add New %s Extension"), $driver['shortName'])?></a><?php

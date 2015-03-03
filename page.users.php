@@ -1,7 +1,7 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
-<div class="container-fluid">
+<div class="fpbx-container container-fluid">
 	<div class="row">
 		<div class="col-sm-9">
 			<?php
@@ -24,24 +24,39 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
 			$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 			$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+			$view = isset($_REQUEST['view'])?$_REQUEST['view']:null;
 
 			global $currentcomponent;
-			echo $currentcomponent->generateconfigpage(__DIR__."/views/users.php");
-			?>
+			$page = $currentcomponent->generateconfigpage(__DIR__."/views/users.php");
+			if($view == "add" || (!is_null($extdisplay) && trim($extdisplay) != '')) {
+				echo $page;
+			} else { ?>
+				<div class="display no-border">
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" data-name="alldids" class="active">
+							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
+								<?php echo _("All Users")?>
+							</a>
+						</li>
+					</ul>
+					<div class="tab-content display">
+						<div role="tabpanel" id="alldids" class="tab-pane active">
+							<table class="table table-striped">
+								<tr><th><?php echo _('User')?></th><th><?php echo _('Name')?></th></tr>
+								<?php foreach(FreePBX::Core()->getAllUsers() as $user) { ?>
+									<tr><td><a href="?display=users&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td></tr>
+								<?php } ?>
+							</table>
+						</div>
+					</div>
+				</div>
+			<?php } ?>
 		</div>
 		<div class="bootnav">
 			<div class="col-sm-3 hidden-xs">
 				<div class="list-group">
-					<?php
-						$extens = core_users_list();
-						$description = _("user");
-						$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-						?><a href="?display=users" class="list-group-item <?php echo empty($extdisplay) ? "active" : ""?>"><?php echo _("Add user")?></a><?php
-						foreach($extens as $ext) {
-							$active = (trim($extdisplay) == trim($ext[0])) ? 'active' : '';
-							?><a href="?display=users&amp;extdisplay=<?php echo $ext[0]?>" class="list-group-item <?php echo $active?>"><?php echo $ext[1]?> &lt;<?php echo $ext[0]?>&gt;</a><?php
-						}
-					?>
+					<a href="?display=users" class="list-group-item"><i class="fa fa-list"></i> <?php echo _("List Users")?></a>
+					<a href="?display=users&amp;view=add" class="list-group-item"><?php echo _("Add User")?></a>
 				</div>
 			</div>
 		</div>
