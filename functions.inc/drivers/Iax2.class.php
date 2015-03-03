@@ -7,6 +7,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 			"rawName" => "iax2",
 			"hardware" => "iax2_generic",
 			"prettyName" => _("Generic IAX2 Driver"),
+			"shortName" => "IAX2",
 			"description" => _("Inter-Asterisk eXchange (IAX) is a communications protocol native to the Asterisk private branch exchange (PBX) software, and is supported by a few other softswitches, PBX systems, and softphones. It is used for transporting VoIP telephony sessions between servers and to terminal devices"),
 			"asteriskSupport" => ">=1.0"
 		);

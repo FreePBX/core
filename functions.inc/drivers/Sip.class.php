@@ -7,6 +7,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			"rawName" => "sip",
 			"hardware" => "sip_generic",
 			"prettyName" => _("Generic CHAN SIP Driver"),
+			"shortName" => "Chan_SIP",
 			"description" => _("The legacy SIP channel driver in Asterisk"),
 			"asteriskSupport" => ">=1.0"
 		);

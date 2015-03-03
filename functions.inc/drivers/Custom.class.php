@@ -7,7 +7,8 @@ class Custom extends \FreePBX\modules\Core\Driver {
 			"rawName" => "custom",
 			"hardware" => "custom_custom",
 			"prettyName" => _("Generic Custom Driver"),
-			"description" => _("Other (Custom) Device"),
+			"shortName" => _("Custom"),
+			"description" => _("Custom Device"),
 			"asteriskSupport" => ">=1.0"
 		);
 	}

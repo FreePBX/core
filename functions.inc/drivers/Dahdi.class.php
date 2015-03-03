@@ -7,6 +7,7 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 			"rawName" => "dahdi",
 			"hardware" => "dahdi_generic",
 			"prettyName" => _("Generic DAHDi Driver"),
+			"shortName" => "DAHDi",
 			"description" => _("Short for 'Digium Asterisk Hardware Device Interface'"),
 			"asteriskSupport" => ">=1.0"
 		);

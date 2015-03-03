@@ -1094,6 +1094,52 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	public function getAllDevicesByType($type="") {
+		if(empty($type)) {
+			$sql = "SELECT * FROM devices ORDER BY id";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute();
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			} catch(\Exception $e) {
+				return array();
+			}
+		} else {
+			$sql = "SELECT * FROM devices WHERE tech = ? ORDER BY id";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute(array($type));
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			} catch(\Exception $e) {
+				return array();
+			}
+		}
+		return $results;
+	}
+
+	public function getAllUsersByDeviceType($type="") {
+		if(empty($type)) {
+			$sql = "SELECT * FROM users LEFT JOIN devices ON users.extension = devices.id ORDER BY users.extension";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute();
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			} catch(\Exception $e) {
+				return array();
+			}
+		} else {
+			$sql = "SELECT * FROM users LEFT JOIN devices ON users.extension = devices.id WHERE devices.tech = ? ORDER BY users.extension";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute(array($type));
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			} catch(\Exception $e) {
+				return array();
+			}
+		}
+		return $results;
+	}
+
 	public function getUser($extension) {
 		$sql = "SELECT * FROM users WHERE extension = ?";
 		$sth = $this->database->prepare($sql);

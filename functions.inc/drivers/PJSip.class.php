@@ -34,6 +34,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"rawName" => "pjsip",
 			"hardware" => "pjsip_generic",
 			"prettyName" => _("Generic PJSIP Device"),
+			"shortName" => "PJSIP",
 			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality"),
 			"asteriskSupport" => ">=12.0"
 		);
