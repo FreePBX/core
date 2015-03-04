@@ -157,8 +157,10 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="pricidw"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="checkbox" name="pricid" id="pricid" value="CHECKED" <?php echo $pricid ?>  tabindex="<?php echo ++$tabindex;?>"/>
-									<label for="pricid"><?php echo _("Enable")?></label>
+									<input type="radio" name="pricid" id="pricidyes" value="CHECKED" <?php echo ($pricid == "CHECKED"?"CHECKED":"") ?>>
+									<label for="pricidyes"><?php echo _("Yes");?></label>
+									<input type="radio" name="pricid" id="pricidno" value="" <?php echo ($pricid == "CHECKED"?"":"CHECKED") ?>>
+									<label for="pricidno"><?php echo _("No");?></label>
 								</div>
 							</div>
 						</div>
@@ -253,12 +255,14 @@ echo $userlink
 						<div class="row">
 							<div class="form-group">
 								<div class="col-md-3">
-									<label class="control-label" for="ringingw"><?php echo _("Signal RINGING") ?></label>
-									<i class="fa fa-question-circle fpbx-help-icon" data-for="ringingw"></i>
+									<label class="control-label" for="ringing"><?php echo _("Signal RINGING") ?></label>
+									<i class="fa fa-question-circle fpbx-help-icon" data-for="ringing"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="checkbox" name="ringing" id="ringing" value="CHECKED" <?php echo $ringing ?>  tabindex="<?php echo ++$tabindex;?>"/>
-									<label for="ringing"><?php echo _("Enable")?></label>
+									<input type="radio" name="ringing" id="ringingwyes" value="CHECKED" <?php echo ($ringing == "CHECKED"?"CHECKED":"") ?>>
+									<label for="ringingwyes"><?php echo _("Yes");?></label>
+									<input type="radio" name="ringing" id="ringingwno" value="" <?php echo ($ringing == "CHECKED"?"":"CHECKED") ?>>
+									<label for="ringingwno"><?php echo _("No");?></label>
 								</div>
 							</div>
 						</div>
@@ -266,7 +270,7 @@ echo $userlink
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<span id="ringingw-help" class="help-block fpbx-help-block"><?php echo _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")?></span>
+						<span id="ringing-help" class="help-block fpbx-help-block"><?php echo _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")?></span>
 					</div>
 				</div>
 			</div>
@@ -282,8 +286,10 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="reversalw"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="checkbox" name="reversal" id="reversal" value="CHECKED" <?php echo $reversal ?>  tabindex="<?php echo ++$tabindex;?>"/>
-									<label for="reversal"><?php echo _("Enable")?></label>
+									<input type="radio" name="reversal" id="reversalyes" value="CHECKED" <?php echo ($reversal == "CHECKED"?"CHECKED":"") ?>>
+									<label for="reversalyes"><?php echo _("Yes");?></label>
+									<input type="radio" name="reversal" id="reversalno" value="" <?php echo ($reversal == "CHECKED"?"":"CHECKED") ?>>
+									<label for="reversalno"><?php echo _("No");?></label>
 								</div>
 							</div>
 						</div>
@@ -334,9 +340,9 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="privacyman"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="radio" name="privacyman" id="privacymanYES" value="1" <?php  echo ($privacyman == '1' ? 'CHECKED' : '')?>>
+									<input type="radio" name="privacyman" id="privacymanYES" value="1" <?php  echo ($privacyman === '1' ? 'CHECKED' : '')?>>
 									<label for="privacymanYES"><?php echo _("Yes")?></label>
-									<input type="radio" name="privacyman" id="privacymanNO" value="0" <?php  echo ($privacyman == '0' ? 'CHECKED' : '')?>>
+									<input type="radio" name="privacyman" id="privacymanNO" value="0" <?php  echo ($privacyman === '1' ? '' : 'CHECKED')?>>
 									<label for="privacymanNO"><?php echo _("No")?></label>
 								</div>
 							</div>
