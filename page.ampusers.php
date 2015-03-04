@@ -141,6 +141,7 @@ if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserve
 	unset($out);
 }
 $prev_category = NULL;
+/*
 foreach ($module_list as $key => $row) {
 	if ($row['category'] != $prev_category) {
 		if ($prev_category)
@@ -171,6 +172,33 @@ foreach ($module_list as $key => $row) {
 				if (in_array("*", $sections)) $sectionOptions .= " SELECTED";
 				$sectionOptions .= ">"._("ALL SECTIONS")."</option>\n";
 
+*/
+if(is_array($active_modules)){
+	$dis = ($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension");
+	$active_modules['au']['items'][] = array('name' => _("Apply Changes Bar"), 'display' => '99');
+	$active_modules['au']['items'][] = array('name' => $dis, 'display' => '999');
+
+	foreach($active_modules as $key => $module) {
+		//create an array of module sections to display
+		if (isset($module['items']) && is_array($module['items'])) {
+			foreach($module['items'] as $itemKey => $item) {
+				$listKey = (!empty($item['display']) ? $item['display'] : $itemKey);
+				$item['rawname'] = $module['rawname'];
+				$module_list[ $listKey ] = $item;
+			}
+		}
+	}
+}
+$selected = array();
+$unselected = array();
+foreach ($module_list as $key => $val) {
+	if(in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*' ){
+		$selected[] = '<li data-id="'.$key.'" class="label label-info" style="display:inline-block">'.$val['name'].'</li>';
+		$selected[] = '<input type="hidden" name="sections[]" value="'.$key.'">';
+	}else{
+		$unselected[] = '<li data-id="'.$key.'" class="label label-info" style="display:inline-block">'.$val['name'].'</li>';
+	}
+}
 ?>
 <div class="container-fluid">
 	<?php if($authtypewarn){ echo $authtypewarn; } ?>
@@ -178,7 +206,7 @@ foreach ($module_list as $key => $row) {
 		<div class="col-sm-9">
 			<div class="fpbx-container">
 				<?php echo $title ?>
-				<form role="form" autocomplete="off" class="fpbx-submit" name="ampuser" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
+				<form role="form" autocomplete="off" class="fpbx-submit" name="ampuser" id="ampuser" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">
 					<input type="hidden" name="display" value="<?php echo $display?>"/>
 					<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
 					<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
@@ -244,14 +272,46 @@ foreach ($module_list as $key => $row) {
 								<div class="row">
 									<div class="col-md-12">
 										<div class="form-group">
-											<div class="col-md-3 control-label">
+											<div class="col-md-2 control-label">
 												<label for="sections"><?php echo _("Admin Access") ?></label>
 												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
 											</div>
-											<div class="col-md-9">
+											<div class="col-md-10">
+												<!--
 												<select multiple class="form-control" id="sections" name="sections" tabindex = "<?php ++$tabindex?>">
 													<?php echo $sectionOptions?>
 												</select>
+											-->
+												<input type="hidden" name="sections[]" id="sections" value="">
+												<div class="row">
+													<div class="panel col-md-5">
+  														<div class="panel-heading">
+    														<h3 class="panel-title"><?php echo _("Selected")?></h3>
+  														</div>
+  														<div class="panel-body" style="height:500px;overflow-y: scroll;">
+															<ol id="selected" class="well">
+																<?php echo implode(PHP_EOL, $selected)?>
+															</ol>
+  														</div>
+													</div>
+													<div class="panel col-md-2">
+														<div class="panel-heading"><h3 class="panel-title"><?php echo _("Action")?> </h3></div>
+														<div class="panel-body" style="height:500px;">														
+															<button id="selectall"  type="button"><i class="fa fa-angle-double-left"></i></button><br/>
+															<button id="unselectall"  type="button"><i class="fa fa-angle-double-right"></i></button>
+														</div>
+													</div>
+													<div class="panel col-md-5">
+  														<div class="panel-heading">
+    														<h3 class="panel-title"><?php echo _("Not Selected")?></h3>
+  														</div>
+  														<div class="panel-body" style="height:500px;overflow-y: scroll;">
+															<ol id="unselected" class="well">
+																<?php echo implode(PHP_EOL, $unselected)?>
+															</ol>
+  														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -275,16 +335,3 @@ foreach ($module_list as $key => $row) {
 	</div>
 </div>
 
-<script language="javascript">
-$('.fpbx-submit').submit(function() {
-	var theForm = document.ampuser,
-		username = theForm.username;
-
-	if (username.value == "") {
-		return warnInvalid(username, "<?php echo _("Username must not be blank")?>");
-	} else if (!username.value.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
-		return warnInvalid(username, "<?php echo _("Username cannot start with a number, and can only contain letters and numbers")?>");
-	}
-	return true;
-});
-</script>
