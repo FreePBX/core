@@ -61,10 +61,14 @@ if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_
 		$mtfcheck = "CHECKED";
 	}
 	$mtfhtml .= '						<input type="text" class="form-control" name="failtrunk" id="failtrunk" '.$mtfenable.' value="'.htmlspecialchars($failtrunk).'"/>';
-	$mtfhtml .= '						<span class="radioset">';
-	$mtfhtml .= '							<input type="checkbox" tabindex="'. ++$tabindex .'" name="failtrunk_enable" id="failtrunk_enable" value="1" '.$mtfcheck.' OnClick="disable_field(failtrunk,failtrunk_enable); return true;">';
-	$mtfhtml .= '							<label for="failtrunk_enable">'._("Enable").'</label>';
-	$mtfhtml .= '						</span>';
+	$mtfhtml .=	'
+											<span class="radioset">
+											<input type="radio" name="failtrunk_enable" id="failtrunk_enableyes" value="1" '. ($failtrunk_enable == "1"?"CHECKED":"").'>
+											<label for="failtrunk_enableyes">'._("Yes").'</label>
+											<input type="radio" name="failtrunk_enable" id="failtrunk_enableno" value="0" '.($failtrunk_enable == "1"?"":"CHECKED") .'>
+											<label for="failtrunk_enableno">'. _("No").'</label>
+											</span>
+	';
 	$mtfhtml .= '					</div>';
 	$mtfhtml .= '				</div>';
 	$mtfhtml .= '			</div>';
@@ -245,7 +249,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="trunk_name"></i>
 													</div>
 													<div class="col-md-9">
-														<input type="text" class="form-control" name="trunk_name" id="trunk_name" value="<?php echo $trunk_name;?>" tabindex="<?php echo ++$tabindex;?>"/>
+														<input type="text" class="form-control" name="trunk_name" id="trunk_name" value="<?php echo $trunk_name;?>" />
 													</div>
 												</div>
 											</div>
@@ -269,7 +273,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 															<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
 													</div>
 													<div class="col-md-9">
-														<input type="text" class="form-control" name="outcid" id="outcid" value="<?php echo $outcid;?>" tabindex="<?php echo ++$tabindex;?>"/>
+														<input type="text" class="form-control" name="outcid" id="outcid" value="<?php echo $outcid;?>" />
 													</div>
 												</div>
 											</div>
@@ -292,16 +296,18 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<label class="control-label" for="keepcid"><?php echo _("CID Options") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="keepcid"></i>
 													</div>
-													<div class="col-md-9">
-														<select name="keepcid" id="keepcid" class="form-control" tabindex="<?php echo ++$tabindex;?>">
-													    <?php
+													<div class="col-md-9 radioset">
+														<?php
 														    $default = (isset($keepcid) ? $keepcid : 'off');
-														    echo '<option value="off"' . ($default == 'off'  ? ' SELECTED' : '').'>'._("Allow Any CID")."\n";
-														    echo '<option value="on"'  . ($default == 'on'   ? ' SELECTED' : '').'>'._("Block Foreign CIDs")."\n";
-														    echo '<option value="cnum"'. ($default == 'cnum' ? ' SELECTED' : '').'>'._("Remove CNAM")."\n";
-														    echo '<option value="all"' . ($default == 'all'  ? ' SELECTED' : '').'>'._("Force Trunk CID")."\n";
-													    ?>
-													    </select>
+														?>
+														<input type="radio" name="keepcid" id="keepcidoff" value="off" <?php echo ($default == "off"?"CHECKED":"") ?>>
+														<label for="keepcidoff"><?php echo _("Allow Any CID");?></label>
+														<input type="radio" name="keepcid" id="keepcidon" value="on" <?php echo ($default == "on"?"CHECKED":"") ?>>
+														<label for="keepcidon"><?php echo _("Block Foreign CIDs");?></label>
+														<input type="radio" name="keepcid" id="keepcidcnum" value="cnum" <?php echo ($default == "cnum"?"CHECKED":"") ?>>
+														<label for="keepcidcnum"><?php echo _("Remove CNAM");?></label>
+														<input type="radio" name="keepcid" id="keepcidall" value="all" <?php echo ($default == "all"?"CHECKED":"") ?>>
+														<label for="keepcidall"><?php echo _("Force Trunk CID");?></label>
 													</div>
 												</div>
 											</div>
@@ -325,7 +331,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="maxchans"></i>
 													</div>
 													<div class="col-md-9">
-														<input type="number" class="form-control" name="maxchans" id="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>" tabindex="<?php echo ++$tabindex;?>"/>
+														<input type="number" class="form-control" name="maxchans" id="maxchans" value="<?php echo htmlspecialchars($maxchans); ?>" />
 													</div>
 												</div>
 											</div>
@@ -349,10 +355,12 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="dialopts"></i>
 													</div>
 													<div class="col-md-9">
-														<input type="text" class="form-control" id="dialopts" name="dialopts" value="<?php echo $dialopts !== false?$dialopts:''?>" <?php echo $dialopts === false?'disabled':''?>>
+														<input type="text" class="form-control" id="dialopts" name="dialopts" value="<?php echo $dialopts !== false?$dialopts:''?>" <?php echo $dialopts === false?'disabled':''?> placeholder="<?php echo $amp_conf['TRUNK_OPTIONS']?>">
 														<span class="radioset">
-															<input type="checkbox" name="dialoutopts_cb" id="dialoutopts_cb" data-disabled="<?php echo $amp_conf['TRUNK_OPTIONS']?>"  >
-															<label for="dialoutopts_cb"><?php echo _('Override')?></label>
+														<input type="radio" name="dialoutopts_cb" id="dialoutopts_cbyes" value="or" <?php echo ($dialopts !== false?"CHECKED":"") ?>>
+														<label for="dialoutopts_cbyes"><?php echo _("Override");?></label>
+														<input type="radio" name="dialoutopts_cb" id="dialoutopts_cbno" value="sys" <?php echo ($dialopts !== false?"":"CHECKED") ?>>
+														<label for="dialoutopts_cbno"><?php echo _("System");?></label>
 														</span>
 													</div>
 												</div>
@@ -377,8 +385,10 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="continuew"></i>
 													</div>
 													<div class="col-md-9 radioset">
-														<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>" name='continue' id="continue" <?php if ($continue=="on") { echo 'CHECKED'; }?> >
-														<label for='continue'><?php echo _("Always try next trunk")?></label>
+														<input type="radio" name="continue" id="continueyes" value="on" <?php echo ($continue == "on"?"CHECKED":"") ?>>
+														<label for="continueyes"><?php echo _("Yes");?></label>
+														<input type="radio" name="continue" id="continueno" value="off" <?php echo ($continue == "on"?"":"CHECKED") ?>>
+														<label for="continueno"><?php echo _("No");?></label>
 													</div>
 												</div>
 											</div>
@@ -401,11 +411,11 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<label class="control-label" for="disabletrunkw"><?php echo _("Disable Trunk")?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="disabletrunkw"></i>
 													</div>
-													<div class="col-md-9">
-														<span class="radioset">
-															<input type='checkbox'  tabindex="<?php echo ++$tabindex;?>"name='disabletrunk' id="disabletrunk" <?php if ($disabletrunk=="on") { echo 'CHECKED'; }?> OnClick='disable_verify(disabletrunk); return true;'>
-															<label for='disabletrunk'><?php echo _("Disable")?></label>
-														</span>
+													<div class="col-md-9 radioset">
+															<input type="radio" name="disabletrunk" id="disabletrunkyes" value="on" <?php echo ($disabletrunk == "on"?"CHECKED":"") ?>>
+															<label for="disabletrunkyes"><?php echo _("Yes");?></label>
+															<input type="radio" name="disabletrunk" id="disabletrunkno" value="off" <?php echo ($disabletrunk == "on"?"":"CHECKED") ?>>
+															<label for="disabletrunkno"><?php echo _("No");?></label>
 													</div>
 												</div>
 											</div>
