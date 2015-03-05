@@ -314,8 +314,12 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid_mode_wrapper"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type='checkbox' name='outcid_mode' id="outcid_mode" value='override_extension' <?php if ($outcid_mode == 'override_extension') { echo 'CHECKED'; }?>>
-									<label for="outcid_mode"><?php echo _("Override")?></label>
+									<span class="radioset">
+									<input type="radio" name="outcid_mode" id="outcid_modeyes" value="override_extension" <?php echo ($outcid_mode == "override_extension"?"CHECKED":"") ?>>
+									<label for="outcid_modeyes"><?php echo _("Yes");?></label>
+									<input type="radio" name="outcid_mode" id="outcid_modeno" value="" <?php echo ($outcid_mode == "override_extension"?"":"CHECKED") ?>>
+									<label for="outcid_modeno"><?php echo _("No");?></label>
+									</span>
 								</div>
 							</div>
 						</div>
