@@ -29,6 +29,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			global $currentcomponent;
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
+				<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><?php echo _("Quick Create Extension");?></button>
 				<div class="display no-border">
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" data-name="alldids" class="active">
@@ -63,6 +64,43 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 								</table>
 							</div>
 						<?php } ?>
+					</div>
+				</div>
+				<div class="modal fade paged" id="quickCreate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-pages="<?php echo count(FreePBX::Core()->getQuickCreateDisplay())?>" data-currentpage="1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title" id="quickCreateLabel"><?php echo _("Quick Create Extension")?></h4>
+							</div>
+							<div class="modal-body">
+								<form>
+									<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+										<div class="page <?php echo ($page > 0) ? 'hidden' : ''?>" data-num="<?php echo $page + 1?>">
+											<?php foreach($data as $pageDisplay) { ?>
+												<?php echo $pageDisplay['html']?>
+											<?php } ?>
+										</div>
+									<?php } ?>
+								</form>
+							</div>
+							<script>
+								function validateQC() {
+									<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+										<?php foreach($data as $pageDisplay) { ?>
+											<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
+										<?php } ?>
+									<?php } ?>
+									return true;
+								}
+							</script>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _('Close')?></button>
+								<button type="button" class="btn btn-primary back hidden"><?php echo _('Back')?></button>
+								<button type="button" class="btn btn-primary next"><?php echo _('Next')?></button>
+								<button type="button" class="btn btn-primary create hidden"><?php echo _('Create')?></button>
+							</div>
+						</div>
 					</div>
 				</div>
 			<?php

@@ -6,14 +6,44 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	private $drivers = array();
 
 	public function __construct($freepbx = null) {
-
 		parent::__construct($freepbx);
-		//Hackery-Jackery for Core only really
-		if(!class_exists('\FreePBX\modules\Core\PJSip') && file_exists(__DIR__.'/functions.inc/PJSip.class.php')) {
-			//include(__DIR__.'/functions.inc/PJSip.class.php');
-			//Think about using BMO Inject here instead
-			//$this->FreePBX->PJSip = new \FreePBX\modules\Core\PJSip($this->FreePBX);
+		//other options
+		$this->database = $freepbx->Database;
+		$this->config = $freepbx->Config;
+		$this->freepbx = $freepbx;
+
+		//load drivers
+		$this->loadDrivers();
+	}
+
+	public function ajaxRequest($req, &$setting) {
+		$setting['authenticate'] = false;
+		$setting['allowremote'] = false;
+		switch($req) {
+			case "quickcreate":
+				return true;
+			break;
 		}
+		return false;
+	}
+
+	public function ajaxHandler() {
+		switch($_REQUEST['command']) {
+			case "quickcreate":
+				$settings = $this->generateDefaultDeviceSettings($_POST['tech'],$_POST['extension'],$_POST['name']);
+				$this->addDevice($_POST['extension'],$_POST['tech'],$settings);
+				$settings = $this->generateDefaultUserSettings($_POST['extension'],$_POST['name']);
+				$this->addUser($_POST['extension'], $settings);
+				return array("status" => true);
+			break;
+		}
+	}
+
+	public function getAllDrivers() {
+		return $this->drivers;
+	}
+
+	public function loadDrivers() {
 		include(__DIR__."/functions.inc/Driver.class.php");
 		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
 		foreach(glob(__DIR__."/functions.inc/drivers/*.class.php") as $driver) {
@@ -24,21 +54,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					include($driver);
 				}
 				if(class_exists($class)) {
-					$this->drivers[strtolower($name)] = new $class($freepbx);
+					$this->drivers[strtolower($name)] = new $class($this->freepbx);
 				} else {
 					throw new \Exception("Invalid Class inside the drivers folder");
 				}
 			}
 		}
-
-		//other options
-		$this->database = $freepbx->Database;
-		$this->config = $freepbx->Config;
-		$this->freepbx = $freepbx;
-	}
-
-	public function getAllDrivers() {
-		return $this->drivers;
 	}
 
 	public function getAllDriversInfo() {
@@ -53,6 +74,39 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$final[$rn] = $info;
 		}
 		return $final;
+	}
+
+	public function getQuickCreateDisplay() {
+		$devs = $this->getAllUsersByDeviceType();
+		$dev = end($devs);
+		$startExt = $dev['extension'] + 1;
+
+		$pages = array();
+		$pages[0][] = array(
+			'html' => load_view(__DIR__.'/views/quickCreate.php',array('startExt' => $startExt)),
+			'validate' => 'if($("#extension").val().trim() == "") {alert("'._("Extension can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {alert("'._("Extension already in use!").'");jumpPage(1,$("#quickCreate"));return false}if($("#name").val().trim() == "") {alert("'._("Display Name can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(!isEmail($("#email").val())) {alert("'._("Email must be valid!").'");jumpPage(1,$("#quickCreate"));return false}'
+		);
+		$modules = $this->freepbx->hooks->processHooks();
+		foreach($modules as $module) {
+			foreach($module as $page => $datas) {
+				foreach($datas as $html) {
+					$pages[$page][] = $html;
+				}
+			}
+		}
+		return $pages;
+	}
+
+	public function showQCDisplay() {
+
+	}
+
+	public function processQuickCreate() {
+
+	}
+
+	public function processQC() {
+
 	}
 
 	public function genConfig() {
@@ -810,6 +864,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $fields;
 	}
 
+	public function generateDefaultUserSettings($number,$displayname) {
+		return array(
+			"extension" => $number,
+			"name" => $displayname,
+			"outboundcid" => "",
+			"password" => "",
+			"sipname" => "",
+			"ringtimer" => 0,
+			"callwaiting" => "enabled",
+		);
+	}
+
 	/**
 	 * Generate the default settings when creating a device
 	 * TODO: This is beta, will be cleaned up in 13
@@ -882,13 +948,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		if (trim($id) == '' || empty($settings)) {
+			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
 		}
 
 		//ensure this id is not already in use
 		$dev = $this->getDevice($id);
 		if(!empty($dev)) {
-			return false;
+			throw new \Exception(_("This device id is already in use"));
 		}
 
 		//unless defined, $dial is TECH/id
@@ -966,7 +1033,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		// create a voicemail symlink if needed
-		$thisUser = core_users_get($settings['user']['value']);
+		$thisUser = $this->getUser($settings['user']['value']);
+		dbug($thisUser);
 		if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 			if(empty($thisUser['voicemail'])) {
 				$vmcontext = "default";
