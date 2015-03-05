@@ -53,7 +53,7 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 		return $tech;
 	}
 
-	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent) {
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = array();
 		$tt = _("The DAHDi channel number for this port.");
 		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);

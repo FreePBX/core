@@ -1149,6 +1149,240 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
+	public function addUser($extension, $settings, $editmode=false) {
+		if (trim($extension) == '' ) {
+			throw new \Exception(_("You must put in an extension (or user) number"));
+		}
+
+		//ensure this id is not already in use
+		//TODO: fix
+		$extens = $this->listUsers();
+		if(is_array($extens)) {
+			foreach($extens as $exten) {
+				if ($exten[0]===$extension) {
+					throw new \Exception(sprintf(_("This user/extension %s is already in use"),$extension));
+				}
+			}
+		}
+
+		$settings['newdid_name'] = isset($settings['newdid_name']) ? $settings['newdid_name'] : '';
+		$settings['newdid'] = isset($settings['newdid']) ? preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($settings['newdid'])) : '';
+		$settings['newdidcid'] = isset($settings['newdidcid']) ? trim($settings['newdidcid']) : '';
+
+		if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym|^withheld/',strtolower($newdidcid))) {
+			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
+		}
+
+		if ($settings['newdid'] != '' || $settings['newdidcid'] != '') {
+			//TODO: fix to use BMO
+			$existing = core_did_get($settings['newdid'], $settings['newdidcid']);
+			if (!empty($existing)) {
+				throw new \Exception(sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum']));
+			}
+		}
+
+		$settings['sipname'] = isset($settings['sipname']) ? preg_replace("/\s/" ,"", trim($settings['sipname'])) : '';
+		//TODO: fix to use BMO
+		if (! core_sipname_check($settings['sipname'], $extension)) {
+			throw new \Exception(_("This sipname: {$sipname} is already in use"));
+		}
+
+		// strip the ugly return of the gui radio funciton which comes back as "recording_out_internal=always" for example
+		// TODO this should be done with a hook
+		if (isset($settings['recording_in_external'])) {
+			$rec_tmp = explode('=',$settings['recording_in_external'],2);
+			$settings['recording_in_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+		} else {
+			$settings['recording_in_external'] = 'dontcare';
+		}
+		if (isset($settings['recording_out_external'])) {
+			$rec_tmp = explode('=',$recording_out_external,2);
+			$settings['recording_out_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+		} else {
+			$settings['recording_out_external'] = 'dontcare';
+		}
+		if (isset($settings['recording_in_internal'])) {
+			$rec_tmp = explode('=',$settings['recording_in_internal'],2);
+			$settings['recording_in_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+		} else {
+			$settings['recording_in_internal'] = 'dontcare';
+		}
+		if (isset($settings['recording_out_internal'])) {
+			$rec_tmp = explode('=',$settings['recording_out_internal'],2);
+			$settings['recording_out_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+		} else {
+			$settings['recording_out_internal'] = 'dontcare';
+		}
+		if (isset($settings['recording_ondemand'])) {
+			$rec_tmp = explode('=',$settings['recording_ondemand'],2);
+			$settings['recording_ondemand'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'disabled';
+		} else {
+			$settings['recording_ondemand'] = 'disabled';
+		}
+
+		//if voicemail is enabled, set the box@context to use
+		//havn't checked but why is voicemail needed on users anyway?  Doesn't exactly make it modular !
+		//TODO use a hook here
+		if ( function_exists('voicemail_mailbox_get') ) {
+			$vmbox = voicemail_mailbox_get($extension);
+			if ( $vmbox == null ) {
+				$settings['voicemail'] = "novm";
+			} else {
+				$settings['voicemail'] = $vmbox['vmcontext'];
+			}
+		}
+
+		$sql = "INSERT INTO users (extension,password,name,voicemail,ringtimer,noanswer,recording,outboundcid,sipname,noanswer_cid,busy_cid,chanunavail_cid,noanswer_dest,busy_dest,chanunavail_dest) " .
+						"VALUES (:extension, :password, :name, :voicemail, :ringtimer, :noanswer, :recording, :outboundcid, :sipname, :noanswer_cid, :busy_cid, :chanunavail_cid, :noanswer_dest, :busy_dest, :chanunavail_dest)";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array(
+				"extension" => $extension,
+				"password" => isset($settings['password']) ? $settings['password'] : '',
+				"name" => isset($settings['name']) ? preg_replace(array('/</','/>/'), array('(',')'), trim($settings['name'])) : '',
+				"voicemail" => isset($settings['voicemail']) ? $settings['voicemail'] : 'default',
+				"ringtimer" => isset($settings['ringtimer']) ? $settings['ringtimer'] : '',
+				"noanswer" => isset($settings['noanswer']) ? $settings['noanswer'] : '',
+				"recording" => isset($settings['recording']) ? $settings['recording'] : '',
+				"outboundcid" => isset($settings['outboundcid']) ? $settings['outboundcid'] : '',
+				"sipname" => isset($settings['sipname']) ? $settings['sipname'] : '',
+				"noanswer_cid" => isset($settings['noanswer_cid']) ? $settings['noanswer_cid'] : "",
+				"busy_cid" => isset($settings['busy_cid']) ? $settings['busy_cid'] : "",
+				"chanunavail_cid" => isset($settings['chanunavail_cid']) ? $settings['chanunavail_cid'] : "",
+				"noanswer_dest" => !empty($settings['noanswer_dest']) && $settings[$settings[$settings['noanswer_dest']].'0'] != '' ? $settings[$settings[$settings['noanswer_dest']].'0'] : "",
+				"busy_dest" => !empty($settings['busy_dest']) && $settings[$settings[$settings['busy_dest']].'1'] != '' ? $settings[$settings[$settings['busy_dest']].'1'] : "",
+				"chanunavail_dest" => !empty($settings['chanunavail_dest']) && $settings[$settings[$settings['chanunavail_dest']].'2'] != '' ? $settings[$settings[$settings['chanunavail_dest']].'2'] : ""
+			));
+		} catch(\Exception $e) {
+			throw new \Exception("Unable to insert into users: ".addSlashes($e->getMessage()));
+		}
+
+		//write to astdb
+		$astman = $this->FreePBX->astman;
+		if ($astman) {
+			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
+			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
+			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : 0);
+			$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($settings['concurrency_limit']) ? $settings['concurrency_limit'] : 0);
+			$astman->database_put("AMPUSER",$extension."/noanswer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
+			$astman->database_put("AMPUSER",$extension."/recording",isset($settings['recording']) ? $settings['recording'] : '');
+			$astman->database_put("AMPUSER",$extension."/outboundcid",isset($settings['outboundcid']) ? '"'.$settings['outboundcid'].'"' : '');
+			$astman->database_put("AMPUSER",$extension."/cidname",isset($settings['name']) ? '"'.$settings['name'].'"' : '');
+			$astman->database_put("AMPUSER",$extension."/cidnum",(isset($settings['cid_masquerade']) && trim($settings['cid_masquerade']) != "") ? trim($settings['cid_masquerade']) : $extension);
+			$astman->database_put("AMPUSER",$extension."/voicemail",'"'.(isset($settings['voicemail']) ? $settings['voicemail'] : '').'"');
+			$astman->database_put("AMPUSER",$extension."/answermode",'"'.(isset($settings['answermode']) ? $settings['answermode']: 'disabled').'"');
+
+			$astman->database_put("AMPUSER",$extension."/recording/in/external",'"'.$settings['recording_in_external'].'"');
+			$astman->database_put("AMPUSER",$extension."/recording/out/external",'"'.$settings['recording_out_external'].'"');
+			$astman->database_put("AMPUSER",$extension."/recording/in/internal",'"'.$settings['recording_in_internal'].'"');
+			$astman->database_put("AMPUSER",$extension."/recording/out/internal",'"'.$settings['recording_out_internal'].'"');
+			$astman->database_put("AMPUSER",$extension."/recording/ondemand",'"'.$settings['recording_ondemand'].'"');
+			$astman->database_put("AMPUSER",$extension."/recording/priority",'"'.(isset($settings['recording_priority']) ? $settings['recording_priority'] : '10').'"');
+
+			// If not set then we are using system default so delete the tree all-together
+			//
+			if (isset($settings['dialopts'])) {
+				$astman->database_put("AMPUSER",$extension."/dialopts", $settings['dialopts']);
+			} else {
+				$astman->database_del("AMPUSER",$extension."/dialopts");
+			}
+
+			$call_screen = isset($settings['call_screen']) ? $settings['call_screen'] : '0';
+			switch ($call_screen) {
+				case '0':
+					$astman->database_del("AMPUSER",$extension."/screen");
+				break;
+				case 'nomemory':
+					$astman->database_put("AMPUSER",$extension."/screen",'"nomemory"');
+				break;
+				case 'memory':
+					$astman->database_put("AMPUSER",$extension."/screen",'"memory"');
+				break;
+				default:
+				break;
+			}
+
+			if (!$editmode) {
+				$astman->database_put("AMPUSER",$extension."/device",'"'.((isset($settings['device'])) ? $settings['device'] : '').'"');
+			}
+
+			if (trim($settings['callwaiting']) == 'enabled') {
+				$astman->database_put("CW",$extension,"\"ENABLED\"");
+			} else if (trim($callwaiting) == 'disabled') {
+				$astman->database_del("CW",$extension);
+			}
+
+			if (trim($settings['pinless']) == 'enabled') {
+				$astman->database_put("AMPUSER",$extension."/pinless","\"NOPASSWD\"");
+			} else if (trim($pinless) == 'disabled') {
+				$astman->database_del("AMPUSER",$extension."/pinless");
+			}
+		} else {
+			die_freepbx("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
+		}
+
+		// OK - got this far, if they entered a new inbound DID/CID let's deal with it now
+		// remember - in the nice and ugly world of this old code, $vars has been extracted
+		// newdid and newdidcid
+
+		// Now if $newdid is set we need to add the DID to the routes
+		//
+		if ($settings['newdid'] != '' || $settings['newdidcid'] != '') {
+			$did_dest                = 'from-did-direct,'.$extension.',1';
+			$did_vars = array();
+			$did_vars['extension']   = $settings['newdid'];
+			$did_vars['cidnum']      = $settings['newdidcid'];
+			$did_vars['privacyman']  = '';
+			$did_vars['alertinfo']   = '';
+			$did_vars['ringing']     = '';
+			$did_vars['reversal']     = '';
+			$did_vars['mohclass']    = 'default';
+			$did_vars['description'] = $settings['newdid_name'];
+			$did_vars['grppre']      = '';
+			$did_vars['delay_answer']= '0';
+			$did_vars['pricid']= '';
+			core_did_add($did_vars, $did_dest);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete a User
+	 * @param int $extension The user extension
+	 * @param {bool} $editmode=false If in edit mode (this is so it doesnt destroy the AsteriskDB)
+	 */
+	public function delUser($extension, $editmode=false) {
+		global $db;
+		global $amp_conf;
+		global $astman;
+
+		//delete from devices table
+		$sql = "DELETE FROM users WHERE extension = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($extension));
+		} catch(\Exception $e) {
+			die_freepbx($e->getMessage().$sql);
+		}
+
+		//delete details to astdb
+		$astman = $this->FreePBX->astman;
+		if($astman)  {
+			$astman->database_del("AMPUSER",$extension."/screen");
+		}
+		if ($astman && !$editmode) {
+			// TODO just change this to delete everything
+			$astman->database_deltree("AMPUSER/".$extension);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get User Details
+	 * @param int $extension The user number (extension)
+	 */
 	public function getUser($extension) {
 		$sql = "SELECT * FROM users WHERE extension = ?";
 		$sth = $this->database->prepare($sql);
@@ -1193,6 +1427,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
 
 		} else {
+			throw new Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
 		}
 		return $results;
 	}

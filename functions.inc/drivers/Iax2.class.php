@@ -102,7 +102,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 			"settings" => $settings
 		);
 	}
-	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent) {
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = array();
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
 		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
