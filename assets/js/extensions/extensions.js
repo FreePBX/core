@@ -34,13 +34,20 @@ $("#quickCreate #extension, #quickCreate #name").on('keyup',function() {
 $("#quickCreate .modal-footer .create").click(function() {
 	if(validateQC()) {
 		var data = {};
-		$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
+		$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=password], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
 			data[$(this).prop('name')] = $(this).val();
 		});
 		$('#quickCreate .create').prop("disabled", true);
-		$.post("ajax.php?module=core&command=quickcreate", data, function(data,status){
-			console.log(data);
-			$('#quickCreate').modal('hide');
+		$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
+			if(d.status) {
+				var tech = data.tech;
+				$("#table-all").append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td><td>" + tech + "</td></tr>");
+				$("#table-" + tech).append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td></tr>");
+				$('#quickCreate').modal('hide');
+			} else {
+				alert(d.message);
+				$('#quickCreate .create').prop("disabled", false);
+			}
 		});
 
 	}
@@ -50,6 +57,7 @@ $('.modal.paged').on('hidden.bs.modal', function (e) {
 	jumpPage(1,$(this));
 	$(this).find("form")[0].reset();
 	$('#quickCreate .create').prop("disabled", false);
+	$('#quickCreate #extension').val(parseInt($('#quickCreate #extension').val()) + 1);
 });
 
 function changePage(direction, modal) {

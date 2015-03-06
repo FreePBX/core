@@ -47,7 +47,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					</ul>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
-							<table class="table table-striped">
+							<table class="table table-striped" id="table-all">
 								<tr><th>Extension</th><th>Name</th><th>Type</th></tr>
 								<?php foreach(FreePBX::Core()->getAllUsersByDeviceType() as $user) {?>
 									<tr><td><a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td><td><?php echo $user['tech']?></td></tr>
@@ -56,7 +56,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						</div>
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
-								<table class="table table-striped">
+								<table class="table table-striped" id="table-<?php echo $driver['rawName']?>">
 									<tr><th>Extension</th><th>Name</th></tr>
 									<?php foreach(FreePBX::Core()->getAllUsersByDeviceType($driver['rawName']) as $user) {?>
 										<tr><td><a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td></tr>

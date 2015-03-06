@@ -30,11 +30,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
 			case "quickcreate":
-				$settings = $this->generateDefaultDeviceSettings($_POST['tech'],$_POST['extension'],$_POST['name']);
-				$this->addDevice($_POST['extension'],$_POST['tech'],$settings);
-				$settings = $this->generateDefaultUserSettings($_POST['extension'],$_POST['name']);
-				$this->addUser($_POST['extension'], $settings);
-				return array("status" => true);
+				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
+				return $status;
 			break;
 		}
 	}
@@ -86,7 +83,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			'html' => load_view(__DIR__.'/views/quickCreate.php',array('startExt' => $startExt)),
 			'validate' => 'if($("#extension").val().trim() == "") {alert("'._("Extension can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {alert("'._("Extension already in use!").'");jumpPage(1,$("#quickCreate"));return false}if($("#name").val().trim() == "") {alert("'._("Display Name can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(!isEmail($("#email").val())) {alert("'._("Email must be valid!").'");jumpPage(1,$("#quickCreate"));return false}'
 		);
-		$modules = $this->freepbx->hooks->processHooks();
+		$modules = $this->freepbx->Hooks->processHooks();
 		foreach($modules as $module) {
 			foreach($module as $page => $datas) {
 				foreach($datas as $html) {
@@ -97,16 +94,33 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $pages;
 	}
 
-	public function showQCDisplay() {
+	public function processQuickCreate($tech, $extension, $data) {
+		if(!is_numeric($extension)) {
+			return array("status" => false, "message" => "Extension was not numeric!");
+		}
+		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name']);
+		try {
+			if(!$this->addDevice($extension,$tech,$settings)) {
+				return array("status" => false, "message" => "Device was not added!");
+			}
+		} catch(\Exception $e) {
+			return array("status" => false, "message" => $e->getMessage());
+		}
+		$settings = $this->generateDefaultUserSettings($extension,$data['name']);
+		try {
+			if(!$this->addUser($extension, $settings)) {
+				//cleanup
+				$this->delDevice($extension);
+				return array("status" => false, "message" => "User was not added!");
+			}
+		} catch(\Exception $e) {
+			//cleanup
+			$this->delDevice($extension);
+			return array("status" => false, "message" => $e->getMessage());
+		}
 
-	}
-
-	public function processQuickCreate() {
-
-	}
-
-	public function processQC() {
-
+		$modules = $this->freepbx->Hooks->processHooks($tech, $extension, $data);
+		return array("status" => true);
 	}
 
 	public function genConfig() {
@@ -864,6 +878,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $fields;
 	}
 
+	/**
+	 * Generate the default settings when creating a user
+	 * @param int $number      The exten or device number
+	 * @param string $displayname The displayname
+	 */
 	public function generateDefaultUserSettings($number,$displayname) {
 		return array(
 			"extension" => $number,
@@ -873,12 +892,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"sipname" => "",
 			"ringtimer" => 0,
 			"callwaiting" => "enabled",
+			"pinless" => "disabled"
 		);
 	}
 
 	/**
 	 * Generate the default settings when creating a device
-	 * TODO: This is beta, will be cleaned up in 13
 	 * @param {string} The TECH
 	 * @param {int} The exten or device number
 	 * @param {string} $displayname The displayname
@@ -887,6 +906,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$flag = !empty($flag) ? $flag : 2;
 		$dial = '';
 		$settings = array();
+		//Ask our tech if it has default settings
 		if(isset($this->drivers[$tech])) {
 			$settings = $this->drivers[$tech]->getDefaultDeviceSettings($number, $displayname, $flag);
 			if(empty($settings)) {
@@ -1033,19 +1053,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		// create a voicemail symlink if needed
-		$thisUser = $this->getUser($settings['user']['value']);
-		dbug($thisUser);
-		if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
-			if(empty($thisUser['voicemail'])) {
-				$vmcontext = "default";
-			} else {
-				$vmcontext = $thisUser['voicemail'];
-			}
-
-			//voicemail symlink
-			$spooldir = $this->config->get('ASTSPOOLDIR');
-			exec("rm -f ".$spooldir."/voicemail/device/".$id);
-			exec("/bin/ln -s ".$spooldir."/voicemail/".$vmcontext."/".$settings['user']['value']."/ ".$spooldir."/voicemail/device/".$id);
+		// TODO: This should be hooked from voicemail
+		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','setupMailboxSymlinks') ) {
+			$this->FreePBX->Voicemail->setupMailboxSymlinks($id);
 		}
 
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
@@ -1217,13 +1227,62 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
+	/**
+	 * Check if a SIP Name is in use
+	 * For SIP Alias/Direct SIP dialing
+	 * @param string $sipname   The SIP Name to check
+	 * @param int $extension The Extension to check against
+	 */
+	public function checkSipnameInUse($sipname, $extension) {
+		if (!isset($sipname) || trim($sipname)=='') {
+			return true;
+		}
+
+		$sql = "SELECT sipname FROM users WHERE sipname = ? AND extension != ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($sipname, $extension));
+		try {
+			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			die_freepbx($e->getMessage().$sql);
+		}
+
+		if (isset($results['sipname']) && trim($results['sipname']) == $sipname) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * Get Inbound Route (DID) based on extension (DID) or CID Number
+	 * @param int $extension Inbound Route DID
+	 * @param int $cidnum    The CID Number
+	 */
+	public function getDID($extension="",$cidnum="") {
+		$sql = "SELECT * FROM incoming WHERE cidnum = ? AND extension = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($cidnum, $extension));
+		try {
+			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		return $results;
+	}
+
+	/**
+	 * Add user (Part of Users/Devices)
+	 * @param int $extension The exten numer
+	 * @param array $settings  Array of settings to pass in
+	 * @param bool $editmode  If in edit mode (So that the AsteriskDB is not destroyed)
+	 */
 	public function addUser($extension, $settings, $editmode=false) {
 		if (trim($extension) == '' ) {
 			throw new \Exception(_("You must put in an extension (or user) number"));
 		}
 
 		//ensure this id is not already in use
-		//TODO: fix
 		$extens = $this->listUsers();
 		if(is_array($extens)) {
 			foreach($extens as $exten) {
@@ -1237,21 +1296,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$settings['newdid'] = isset($settings['newdid']) ? preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($settings['newdid'])) : '';
 		$settings['newdidcid'] = isset($settings['newdidcid']) ? trim($settings['newdidcid']) : '';
 
-		if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym|^withheld/',strtolower($newdidcid))) {
-			$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
+		if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym|^withheld/',strtolower($settings['newdidcid']))) {
+			$settings['newdidcid'] = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $settings['newdidcid']);
 		}
 
 		if ($settings['newdid'] != '' || $settings['newdidcid'] != '') {
-			//TODO: fix to use BMO
-			$existing = core_did_get($settings['newdid'], $settings['newdidcid']);
+			$existing = $this->getDID($settings['newdid'], $settings['newdidcid']);
 			if (!empty($existing)) {
 				throw new \Exception(sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum']));
 			}
 		}
 
 		$settings['sipname'] = isset($settings['sipname']) ? preg_replace("/\s/" ,"", trim($settings['sipname'])) : '';
-		//TODO: fix to use BMO
-		if (! core_sipname_check($settings['sipname'], $extension)) {
+		if (!$this->checkSipnameInUse($settings['sipname'], $extension)) {
 			throw new \Exception(_("This sipname: {$sipname} is already in use"));
 		}
 
@@ -1291,8 +1348,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//if voicemail is enabled, set the box@context to use
 		//havn't checked but why is voicemail needed on users anyway?  Doesn't exactly make it modular !
 		//TODO use a hook here
-		if ( function_exists('voicemail_mailbox_get') ) {
-			$vmbox = voicemail_mailbox_get($extension);
+		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','getMailbox') ) {
+			$vmbox = $this->FreePBX->Voicemail->getMailbox($extension);
 			if ( $vmbox == null ) {
 				$settings['voicemail'] = "novm";
 			} else {
@@ -1382,7 +1439,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 			if (trim($settings['pinless']) == 'enabled') {
 				$astman->database_put("AMPUSER",$extension."/pinless","\"NOPASSWD\"");
-			} else if (trim($pinless) == 'disabled') {
+			} else if (trim($settings['pinless']) == 'disabled') {
 				$astman->database_del("AMPUSER",$extension."/pinless");
 			}
 		} else {
