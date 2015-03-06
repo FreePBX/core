@@ -3573,6 +3573,10 @@ function core_do_get_config($engine) {
 	// as well to keep it consistant with the menu structure
 	//
 	$ext->add('macro-vm','a','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	//Dont allow (*) to be dialed to hack voicemail
+	//http://issues.freepbx.org/browse/FREEPBX-7757
+	$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/novmstar)}" = "1"]','s,1'));
+
 	$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
 	$ext->add('macro-vm','a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
 
