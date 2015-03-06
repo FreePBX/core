@@ -4237,10 +4237,8 @@ function core_did_list($order='extension'){
 }
 
 function core_did_get($extension="",$cidnum=""){
-	global $db;
-	$cidnum = $db->escapeSimple($cidnum);
-	$sql = "SELECT * FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
-	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
+	_core_backtrace();
+	return FreePBX::Core()->getDID($extension,$cidnum);
 }
 
 function core_did_del($extension,$cidnum){
@@ -4454,6 +4452,7 @@ function core_devices_get_user_mappings() {
 }
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
+	_core_backtrace();
 	$flag = 2;
 	$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
 	$settings = array(
@@ -4479,10 +4478,12 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 }
 
 function core_devices_del($account,$editmode=false){
+	_core_backtrace();
 	return FreePBX::Core()->delDevice($account,$editmode);
 }
 
 function core_devices_get($account){
+	_core_backtrace();
 	return FreePBX::Core()->getDevice($account);
 }
 
@@ -4716,6 +4717,7 @@ function core_hint_get($account){
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
 function core_users_list($get_all=false){
+	_core_backtrace();
 	return FreePBX::Core()->listUsers($get_all);
 }
 
@@ -4831,23 +4833,11 @@ function core_change_destination($old_dest, $new_dest) {
 
 
 function core_sipname_check($sipname, $extension) {
-	global $db;
-	if (!isset($sipname) || trim($sipname)=='')
-	return true;
-
-	$sql = "SELECT sipname FROM users WHERE sipname = '$sipname' AND extension != '$extension'";
-	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
-	if(DB::IsError($results)) {
-		die_freepbx($results->getMessage().$sql);
-	}
-
-	if (isset($results['sipname']) && trim($results['sipname']) == $sipname)
-	return false;
-	else
-	return true;
+	return FreePBX::Core()->checkSipnameInUse($sipname,$extension);
 }
 
 function core_users_add($vars, $editmode=false) {
+	_core_backtrace();
 	try {
 		return FreePBX::Core()->addUser($vars['extension'], $vars, $editmode);
 	} catch(Exception $e) {
@@ -4856,10 +4846,12 @@ function core_users_add($vars, $editmode=false) {
 }
 
 function core_users_get($extension){
+	_core_backtrace();
 	return FreePBX::Core()->getUser($extension);
 }
 
 function core_users_del($extension, $editmode=false){
+	_core_backtrace();
 	return FreePBX::Core()->delUser($extension,$editmode);
 }
 
