@@ -36,10 +36,17 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 	}
 
+	/**
+	 * Get all drivers from the private handler
+	 * this is so they cant be modified by some outside source
+	 */
 	public function getAllDrivers() {
 		return $this->drivers;
 	}
 
+	/**
+	 * Load all "core" drivers
+	 */
 	public function loadDrivers() {
 		include(__DIR__."/functions.inc/Driver.class.php");
 		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
@@ -59,6 +66,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 	}
 
+	/**
+	 * Get all information about all drivers
+	 */
 	public function getAllDriversInfo() {
 		$final = array();
 
@@ -73,6 +83,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $final;
 	}
 
+	/**
+	 * Quick Extension Create Display
+	 */
 	public function getQuickCreateDisplay() {
 		$devs = $this->getAllUsersByDeviceType();
 		$dev = end($devs);
@@ -94,6 +107,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $pages;
 	}
 
+	/**
+	 * Process the Quick Extension Create Display
+	 * @param string $tech      The tech type (provided by the driver)
+	 * @param int $extension The extension number
+	 * @param array $data      Data passed from $_POST on submit
+	 */
 	public function processQuickCreate($tech, $extension, $data) {
 		if(!is_numeric($extension)) {
 			return array("status" => false, "message" => "Extension was not numeric!");
@@ -123,6 +142,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return array("status" => true);
 	}
 
+	/**
+	 * Propagator for genConfig() from BMO that is passed on
+	 * to child drivers
+	 */
 	public function genConfig() {
 		$conf = array();
 		foreach($this->drivers as $driver) {
@@ -134,6 +157,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $conf;
 	}
 
+	/**
+	 * Propagator for writeConfig() from BMO that is passed on
+	 * to child drivers
+	 * @param array $config Config Array
+	 */
 	public function writeConfig($config) {
 		foreach($this->drivers as $driver) {
 			$config = $driver->writeConfig($config);
