@@ -14,13 +14,13 @@ use Symfony\Component\Console\Helper\Table;
 class Trunks extends Command {
 	protected function configure(){
 		$this->setName('trunks')
-		->setDescription('Unlock Session')
+		->setDescription(_('Enable and disable trunks from the command line'))
 		->setDefinition(array(
-			new InputOption('enable', null, InputOption::VALUE_REQUIRED, 'Enable given trunk'),
-			new InputOption('disable', null, InputOption::VALUE_REQUIRED, 'Disable given trunk'),
-			new InputOption('list', null, InputOption::VALUE_NONE, 'list trunks'),
-			new InputOption('xml', null, InputOption::VALUE_NONE, 'format list as json'),
-			new InputOption('json', null, InputOption::VALUE_NONE, 'format list as xml'),
+			new InputOption('enable', null, InputOption::VALUE_REQUIRED, _('Enable given trunk')),
+			new InputOption('disable', null, InputOption::VALUE_REQUIRED, _('Disable given trunk')),
+			new InputOption('list', null, InputOption::VALUE_NONE, _('list trunks')),
+			new InputOption('xml', null, InputOption::VALUE_NONE, _('format list as json')),
+			new InputOption('json', null, InputOption::VALUE_NONE, _('format list as xml')),
 			new InputArgument('args', InputArgument::IS_ARRAY, null, null),));
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
@@ -33,13 +33,13 @@ class Trunks extends Command {
 		if($input->getOption('disable')){
 			$ARGUSED = True;
 			$id = $input->getOption('disable');
-			$output->writeln('Disabling Trunk ' . $id);
+			$output->writeln(_('Disabling Trunk ') . $id);
 			$this->disableTrunk($id);
 		}
 		if($input->getOption('enable')){
 			$ARGUSED = True;
 			$id = $input->getOption('enable');
-			$output->writeln('Enabling Trunk ' . $id);
+			$output->writeln(_('Enabling Trunk ') . $id);
 			$this->enableTrunk($id);
 		}
 		if($input->getOption('list')){
@@ -61,16 +61,16 @@ class Trunks extends Command {
 			$table = new Table($output);
 			$table->setHeaders(array('ID','TECH','Channel ID', 'Disabled'));
 			$table->setRows($trunks);
-			$output->writeln('Choose an ID to enable/disable');
+			$output->writeln(_('Choose an ID to enable/disable'));
 			$helper = $this->getHelper('question');
 			$question = new ChoiceQuestion($table->render(),$trunkids,0);
 			$id = $helper->ask($input, $output, $question);
 			if($trunks[($id -1 )]['disabled'] == 'off'){
-				$output->writeln('Disabling Trunk ' . $id);
+				$output->writeln(_('Disabling Trunk ') . $id);
 				$this->disableTrunk($id);	
 			}
 			if($trunks[($id -1)]['disabled'] == 'on'){
-				$output->writeln('Enabling Trunk ' . $id);
+				$output->writeln(_('Enabling Trunk ') . $id);
 				$this->enableTrunk($id);
 			}
 		}
