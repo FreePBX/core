@@ -1,17 +1,17 @@
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" data-name="tab1" class="active">
-		<a href="#sipinset" aria-controls="sipinset" role="tab" data-toggle="tab">
-			<?php echo _("Incoming")?>
-		</a>
-	</li>
-	<li role="presentation" data-name="tab2" class="change-tab">
+	<li role="presentation" data-name="sipoutset" class="active">
 		<a href="#sipoutset" aria-controls="sipoutset" role="tab" data-toggle="tab">
 			<?php echo _("Outgoing")?>
 		</a>
 	</li>
+	<li role="presentation" data-name="sipinset" class="change-tab">
+		<a href="#sipinset" aria-controls="sipinset" role="tab" data-toggle="tab">
+			<?php echo _("Incoming")?>
+		</a>
+	</li>
 </ul>
 <div class="tab-content display">
-	<div role="tabpanel" id="sipinset" class="tab-pane active">
+	<div role="tabpanel" id="sipoutset" class="tab-pane active">
 		<!--Trunk Name-->
 		<div class="element-container">
 			<div class="row">
@@ -61,7 +61,7 @@
 		</div>
 		<!--END PEER Details-->
 	</div>
-	<div role="tabpanel" id="sipoutset" class="tab-pane">
+	<div role="tabpanel" id="sipinset" class="tab-pane">
 		<!--USER Context-->
 		<div class="element-container">
 			<div class="row">

@@ -34,7 +34,7 @@ foreach($trunks as $trunk) {
 	$trunkrows .= '<a href="config.php?display=trunks&tech='.$trunk['tresult']['tech'].'&extdisplay=OUT_'.$trunk['tresult']['trunkid'].'">';
 	$trunkrows .= '<i class="fa fa-edit"></i>&nbsp;&nbsp;';
 	$trunkrows .= '</a>';
-	$trunkrows .= '<a href="config.php?display=trunks&amp;extdisplay='.urlencode("OUT_".$trunk['tresult']['trunkid']).'&amp;action=deltrunk">';
+	$trunkrows .= '<a class="delAction" href="config.php?display=trunks&amp;extdisplay='.urlencode("OUT_".$trunk['tresult']['trunkid']).'&amp;action=deltrunk">';
 	$trunkrows .= '<i class="fa fa-trash"></i>';
 	$trunkrows .= '</a>';
 	$trunkrows .= '</td>';

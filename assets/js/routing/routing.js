@@ -164,6 +164,7 @@ $("[id='getlocalprefixes']").click(function(){
 	}
 	if($('#dptable').length){
 		$.each(patterns,function(){
+			console.log(this);
 			var lastRow = $('#dptable tr:last');
 			var newRow = lastRow.clone(true);
 			newRow.find("[id^='pattern_pass']").val(this);

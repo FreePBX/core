@@ -250,6 +250,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
+				if(!isset($request['view'])||$request['view'] == ''){
+					unset($buttons);
+				}
 			break;
 			case 'routing':
 				$buttons = array(
@@ -337,6 +340,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
 					$buttons = array();
+				}
+				if(empty($request['extdisplay']) && empty($request['tech_hardware'])){
+					unset($buttons);
 				}
 			break;
 		}
@@ -426,6 +432,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}// $page == "dahdichandids"
 
 		if ($page == "routing") {
+			debug($request);
 			$display='routing';
 			$extdisplay=isset($request['extdisplay'])?$request['extdisplay']:'';
 			$action = isset($request['action'])?$request['action']:'';
