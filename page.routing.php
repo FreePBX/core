@@ -2,8 +2,7 @@
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	Copyright 2006-2015 Schmooze Com Inc.
 //	Copyright (C) 2005 Ron Hartmann (rhartmann@vercomsystems.com)
-//
-
+debug($_POST);
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $request = $_REQUEST;
 if(!empty($request['id']) && $request['view'] == 'form'){
@@ -105,5 +104,3 @@ switch($request['view']){
 		</div>
 	</div>
 </div>
-<script src="modules/core/assets/js/routing/routing.js">
-</script>

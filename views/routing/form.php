@@ -91,19 +91,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		if ($idx == 50) {
 			$dpt_title_class = 'dpt-title dpt-nodisplay';
 		}
-		$dpinput[] = '<tr id = "row'.$idx.'">';
+		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
-		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
+		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'2">)</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
+		$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
@@ -111,19 +111,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
-		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
+		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
+		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '<td>';
-		$dpinput[] = '		<a href="#"  id="rowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-		$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+		$dpinput[] = '		<a href="#"  id="routerowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
+		$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
 		$dpinput[] = '</td>';
 		$dpinput[] = '</tr>';
 	}
@@ -134,19 +134,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	if ($idx == 50) {
 		$dpt_title_class = 'dpt-title dpt-nodisplay';
 	}
-	$dpinput[] = '<tr id = "row'.$idx.'">';
+	$dpinput[] = '<tr id = "dprow'.$idx.'">';
 	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
-	$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
+	$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control ' . $dpt_class.'" value="">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'2">)</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
 	$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
-	$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
+	$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix[]" class="form-control '.$dpt_class.'" value="" > ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
@@ -154,19 +154,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
-	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
+	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass[]" class="form-control '.$dpt_class.'" value=""> ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
 	$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
-	$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
+	$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid[]" class="form-control '.$dpt_class.'" value="">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '<td>';
-	$dpinput[] = '		<a href="#"  id="rowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-	$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+	$dpinput[] = '		<a href="#"  id="routerowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
+	$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
 	$dpinput[] = '</td>';
 	$dpinput[] = '</tr>';
 	$dprows = implode(PHP_EOL, $dpinput);
@@ -239,6 +239,14 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	$trunkhtml .= '</tbody>';
 	$trunkhtml .= '</table>';
 ?>
+<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
+	<input type="hidden" name="display" value="<?php echo $display?>"/>
+	<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
+	<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
+	<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
+	<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
+	<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
+	<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 <ul class="nav nav-tabs">
   <li role="presentation" class="active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
   <?php echo $hooktab ?>
@@ -247,14 +255,6 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 </ul>
 <div id="formtabs" class="tab-content">
 	<div class="tab-pane active" id="routesettings">
-		<form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
-			<input type="hidden" name="display" value="<?php echo $display?>"/>
-			<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
-			<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
-			<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
-			<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
-			<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
-			<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 			<!--ROUTE NAME-->
 			<div class="element-container">
 				<div class="row">
@@ -473,6 +473,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<br/>
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
+				<a href="#" class="list-group-item" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp; <?php echo _("Dial patterns wizards")?></i></a>
 				<table class="table table-striped" id="dptable">
 				<?php echo $dprows ?>
 				</table>
@@ -595,7 +596,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _("Close")?></button>
-					<button type="button" class="btn btn-primary" id="getlocalprefixes"><?php echo _("Generate Routes")?></button>
+					<button type="button" class="btn btn-primary" id="routinggetlocalprefixes"><?php echo _("Generate Routes")?></button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->

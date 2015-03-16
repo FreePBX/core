@@ -6,7 +6,6 @@
 			<div class="col-sm-3 hidden-xs bootnav">
 				<div class="list-group">
 					<a href="config.php?display=trunks" class="list-group-item"><i class="fa fa-list"></i>&nbsp;<?php echo _("Trunk List")?></a>
-					<a href="#" class="list-group-item hidden" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp; <?php echo _("Dial patterns wizards")?></i></a>
 				</div>
 			</div>
 		</div>
@@ -82,7 +81,7 @@ $mp_tit = _("match pattern");
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _("Close")?></button>
-					<button type="button" class="btn btn-primary" id="getlocalprefixes"><?php echo _("Generate Routes")?></button>
+					<button type="button" class="btn btn-primary" id="trunkgetlocalprefixes"><?php echo _("Generate Routes")?></button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->

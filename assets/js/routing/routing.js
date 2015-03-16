@@ -66,12 +66,46 @@ $("a[id^='del']").click(function(){
 		}
 	});
 });
-$("a[id^='rowadd']").click(function(){
-	var curRow = $(this).closest('tr');
-	var newRow = curRow.clone(true);
-	curRow.after(newRow);
+$("a[id^='routerowadd']").on('click',function(){
+	var curRow = $("tr[id^='dprow']").last();
+	var id = $("tr[id^='dprow']").length++;
+	var newhtml = '';
+	newhtml +='<tr id="dprow'+id+'">';
+	newhtml +=	'<td>';
+	newhtml +=	'	<div class="input-group">';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
+	newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="">';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
+	newhtml +=	'	</div>';
+	newhtml +=	'</td>';
+	newhtml +=	'<td>';
+	newhtml +=	'	<div class="input-group">';
+	newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value=""> ';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
+	newhtml +=	'	</div>';
+	newhtml +=	'</td>';
+	newhtml +=	'<td>';
+	newhtml +=	'	<div class="input-group">';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
+	newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="">';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
+	newhtml +=	'	</div>';
+	newhtml +=	'</td>';
+	newhtml +=	'<td>';
+	newhtml +=	'	<div class="input-group">';
+	newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="">';
+	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
+	newhtml +=	'	</div>';
+	newhtml +=	'</td><td>';
+	newhtml +=	'		<a href="#" id="routerowadd'+id+'"><i class="fa fa-plus"></i></a>';
+	newhtml +=	'		<a href="#" id="routerowdel'+id+'"><i class="fa fa-trash"></i></a>';
+	newhtml +=	'</td>';
+	newhtml +=	'</tr>';
+	curRow.parent().append(newhtml);
+
 });
-$("a[id^='rowdel']").click(function(){
+
+$("a[id^='routerowdel']").click(function(){
 	var curRow = $(this).closest('tr');
 	curRow.fadeOut(2000, function(){
 		$(this).remove();
@@ -79,7 +113,7 @@ $("a[id^='rowdel']").click(function(){
 });
 
 //DialPlan Wizard
-$("[id='getlocalprefixes']").click(function(){
+$("[id='routinggetlocalprefixes']").click(function(){
 	var npa = $('#lpwnpa').val();
 	var nxx = $('#lpwnxx').val();
 	var patterns = [];
@@ -163,12 +197,44 @@ $("[id='getlocalprefixes']").click(function(){
 		patterns.push('1NXXNXXXXXX');
 	}
 	if($('#dptable').length){
+		var idbase = ($("tr[id^='dprow']").length + $('#dptable').length);
 		$.each(patterns,function(){
-			console.log(this);
-			var lastRow = $('#dptable tr:last');
-			var newRow = lastRow.clone(true);
-			newRow.find("[id^='pattern_pass']").val(this);
-			lastRow.after(newRow);
+			var lastRow = $("tr[id^='dprow']").last();
+			var id = idbase++;
+			console.log(idbase);
+			var newhtml = '';
+			newhtml +='<tr id="dprow'+id+'">';
+			newhtml +=	'<td>';
+			newhtml +=	'	<div class="input-group">';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
+			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="">';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
+			newhtml +=	'	</div>';
+			newhtml +=	'</td>';
+			newhtml +=	'<td>';
+			newhtml +=	'	<div class="input-group">';
+			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value=""> ';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
+			newhtml +=	'	</div>';
+			newhtml +=	'</td>';
+			newhtml +=	'<td>';
+			newhtml +=	'	<div class="input-group">';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
+			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="'+this+'">';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
+			newhtml +=	'	</div>';
+			newhtml +=	'</td>';
+			newhtml +=	'<td>';
+			newhtml +=	'	<div class="input-group">';
+			newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="">';
+			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
+			newhtml +=	'	</div>';
+			newhtml +=	'</td><td>';
+			newhtml +=	'		<a href="#" id="routerowadd'+id+'"><i class="fa fa-plus"></i></a>';
+			newhtml +=	'		<a href="#" id="routerowdel'+id+'"><i class="fa fa-trash"></i></a>';
+			newhtml +=	'</td>';
+			newhtml +=	'</tr>';
+			lastRow.parent().append(newhtml);
 		});
 	}
 	if($('#bulk_patterns').length){
@@ -195,7 +261,7 @@ $("[id^='trunkpri']:last").change(function(){
 	if($("[id^='trunkpri']").length == 1){
 		return;
 	}
-	if($(this).val() == ''){
+	if($(this).val() === ''){
 		var curRow = $(this).closest('tr');
 		curRow.fadeOut(2000, function(){
 			$(this).remove();
