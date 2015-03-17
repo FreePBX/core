@@ -61,7 +61,11 @@ foreach ($conf as $c){
 			}
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
-			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';				
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
 			$forminputs .= '&nbsp';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
@@ -74,13 +78,21 @@ foreach ($conf as $c){
 			$forminputs .= '<label for="'.$c['keyword'].'false">'._("No").'</label>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
-			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendy Name: ").$c['name']."<br/>".$c['description'].'</span>';
+			}
 			$forminputs .= $inputhtmlend;
 		break;
 		case 'int':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
-			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
 			$forminputs .= '&nbsp';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
@@ -90,13 +102,21 @@ foreach ($conf as $c){
 			$forminputs .= '<input type="number" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
-			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+			}
 			$forminputs .= $inputhtmlend;
 		break;
 		case 'text':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
-			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
 			$forminputs .= '&nbsp';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
@@ -106,13 +126,21 @@ foreach ($conf as $c){
 			$forminputs .= '<input type="text" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
-			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+			}
 			$forminputs .= $inputhtmlend;
 		break;
 		case 'select':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
-			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
 			$forminputs .= '&nbsp';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
@@ -128,13 +156,21 @@ foreach ($conf as $c){
 			$forminputs .= '</select>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
-			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+			}
 			$forminputs .= $inputhtmlend;
 		break;
 		case 'textarea':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
-			$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+			}else{	
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
 			$forminputs .= '&nbsp';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
@@ -144,7 +180,11 @@ foreach ($conf as $c){
 			$forminputs .= '<textarea class="form-control" rows = "4" id="'.$c['keyword'].'" name="'.$c['keyword'].'">'.$c['value'].'</textarea>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
-			$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+			}
 			$forminputs .= $inputhtmlend;
 		break;
 	}
