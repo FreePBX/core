@@ -432,7 +432,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}// $page == "dahdichandids"
 
 		if ($page == "routing") {
-			debug($request);
 			$display='routing';
 			$extdisplay=isset($request['extdisplay'])?$request['extdisplay']:'';
 			$action = isset($request['action'])?$request['action']:'';
