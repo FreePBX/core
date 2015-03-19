@@ -44,6 +44,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$this->ModulesConf->removenoload(base64_decode($match[2]));
 					} elseif ($match[1] == "preload") {
 						$this->ModulesConf->removepreload(base64_decode($match[2]));
+					} elseif ($match[1] == "load") {
+						$this->ModulesConf->removeload(base64_decode($match[2]));
 					} else {
 						print "Unsupported section ".$match[1]."<br />\n";
 					}
@@ -62,6 +64,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$this->ModulesConf->noload($add);
 					} elseif ($section == "preload") {
 						$this->ModulesConf->preload($add);
+					} elseif ($section == "load") {
+						$this->ModulesConf->load($add);
 					} else {
 						print "Unsupported section ".$section."<br />\n";
 					}
