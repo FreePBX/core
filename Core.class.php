@@ -398,7 +398,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					}
 				}
 			}
-
 		}// $page == "advancedsettings"
 		if ($page == "dahdichandids"){
 			if(!isset($_REQUEST['action'])){
@@ -838,6 +837,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			switch($action){
 				case 'add':
 					switch($section){
+						case 'amodload':
+							$this->ModulesConf->load($module);
+							return true;
+						break;
 						case 'amodnoload':
 							$this->ModulesConf->noload($module);
 							return true;
