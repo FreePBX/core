@@ -48,16 +48,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * Load all "core" drivers
 	 */
 	public function loadDrivers() {
-		include(__DIR__."/functions.inc/Driver.class.php");
+		if(!class_exists("FreePBX\Modules\Core\Drivers",false)) {
+			include(__DIR__."/functions.inc/Driver.class.php");
+		}
 		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
 		foreach(glob(__DIR__."/functions.inc/drivers/*.class.php") as $driver) {
 			if(preg_match("/\/([a-z1-9]*)\.class\.php$/i",$driver,$matches)) {
 				$name = $matches[1];
 				$class = $driverNamespace . "\\" . $name;
-				if(!class_exists($class)) {
+				if(!class_exists($class,false)) {
 					include($driver);
 				}
-				if(class_exists($class)) {
+				if(class_exists($class,false)) {
 					$this->drivers[strtolower($name)] = new $class($this->freepbx);
 				} else {
 					throw new \Exception("Invalid Class inside the drivers folder");
