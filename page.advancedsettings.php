@@ -196,8 +196,8 @@ foreach ($conf as $c){
 	<div class="well well-danger">
 		<?php echo _('<b>IMPORTANT:</b> Use extreme caution when making changes!')?>
 	</div>
-	<div class="well well-info">
-		<?php echo _("Some of these settings can render your system inoperable. You are urged to backup before making any changes. Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to true. Once changed you must save the setting by checking the green check box that appears. You can restore the default setting by clicking on the icon to the right of the values if not set at default.");?>
+	<div class="well well-warning">
+		<?php echo _("Some of these settings can render your system inoperable. You are urged to backup before making any changes. Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to true. You can restore the default setting by clicking on the icon to the right of the values if not set at default. Unlike previous versions of this module you now save changes as a group.");?>
 	</div>
 	<div class = "display full-border">
 		<div class="row">
