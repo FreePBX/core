@@ -1208,6 +1208,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/**
+	 * Get all devices by type
+	 * @param string $type The device type
+	 */
 	public function getAllDevicesByType($type="") {
 		if(empty($type)) {
 			$sql = "SELECT * FROM devices ORDER BY id";
@@ -1231,6 +1235,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
+	/**
+	 * Get all Users
+	 */
 	public function getAllUsers() {
 		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
 		$sth = $this->database->prepare($sql);
@@ -1243,8 +1250,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
+	/**
+	 * Get all Users by Device Type
+	 * @param string $type A specific device type to get
+	 */
 	public function getAllUsersByDeviceType($type="") {
-		if(empty($type)) {
+		if(empty($type) || $type == "virtual") {
 			$sql = "SELECT * FROM users LEFT JOIN devices ON users.extension = devices.id ORDER BY users.extension";
 			$sth = $this->database->prepare($sql);
 			try {
@@ -1263,7 +1274,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				return array();
 			}
 		}
-		return $results;
+
+		//Virtual Extensions are strange
+		$final = array();
+		foreach($results as $result) {
+			if(empty($result['tech'])) {
+				$result['tech'] = 'virtual';
+			} elseif(!empty($result['tech']) && $type == "virtual") {
+				continue;
+			}
+			$final[] = $result;
+		}
+		return $final;
 	}
 
 	/**

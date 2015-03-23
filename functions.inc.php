@@ -6521,6 +6521,7 @@ function core_devices_configpageload() {
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 	if ($tech_hardware == 'virtual') {
 		$currentcomponent->addguielem('_top', new gui_hidden('tech', "virtual"));
+		$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Virtual Extension")), 0);
 		return true;
 	}
 
@@ -6535,158 +6536,149 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
 
 	} elseif ( $extdisplay == '' && $tech_hardware == '' ) { // Adding
-		/*
-		if ( $display != 'extensions') {
-		$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add Device")), 0);
-	} else {
-	$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Add an Extension")), 0);
-}
-$currentcomponent->addguielem('_top', new gui_label('instructions', _("Please select your Device below then click Submit")));
-$currentcomponent->addguielem('Device', new gui_selectbox('tech_hardware', $currentcomponent->getoptlist('devicelist'), '', _("Device"), '', false));
-*/
-} else {
-
-	$deviceInfo = array();
-	if ( $extdisplay ) { // Editing
-
-		$deviceInfo = core_devices_get($extdisplay);
-
-		if ( $display != 'extensions' ) {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
-
-			$delURL = '?'.$_SERVER['QUERY_STRING'].'&action=del';
-			$tlabel = sprintf(_("Delete Device %s"),$extdisplay);
-			$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/telephone_delete.png"/>&nbsp;'.$tlabel.'</span>';
-			$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
-
-			if ($deviceInfo['device_user'] != 'none') {
-				$editURL = '?display=users&skip=0&extdisplay='.$deviceInfo['user'];
-				$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
-				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
-				$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);
-			}
-		}
 	} else {
 
-
-		$tmparr = explode('_', $tech_hardware);
-		$deviceInfo['tech'] = $tmparr[0];
-		$deviceInfo['hardware'] = $tmparr[1];
-		unset($tmparr);
-
-		if ( $display != 'extensions' ) {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', sprintf(_("Add %s Device"), strtoupper($deviceInfo['tech'])) ), 0);
-		} else {
-			$currentcomponent->addguielem('_top', new gui_pageheading('title', sprintf(_("Add %s Extension"), strtoupper($deviceInfo['tech'])) ), 0);
-		}
-	}
-
-	// Ensure they exist before the extract
-	$devinfo_description = $devinfo_emergency_cid = null;
-	$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
-	$devinfo_tech = null;
-	if ( is_array($deviceInfo) ) {
-		extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
-	}
-
-	// Setup vars for use in the gui later on
-	$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
-	$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
-
-	$msgInvalidDevID = _("Please enter a device id.");
-	$msgInvalidDevDesc = _("Please enter a valid Description for this device");
-	$msgInvalidEmergCID = _("Please enter a valid Emergency CID");
-	$msgInvalidExtNum = _("Please enter a valid extension number.");
-
-	// Actual gui
-	$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
-	$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
-
-	if ( $display != 'extensions' ) {
-		$section = _("Device Info");
+		$deviceInfo = array();
 		if ( $extdisplay ) { // Editing
-			$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
-		} else { // Adding
-			$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenticate to the system."), '!isInteger()', $msgInvalidDevID, false));
-		}
-		$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The CallerID name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
-		$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID));
-		$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
-		$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
-	} else {
-		$section = _("Extension Options");
-		$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
-	}
-	$currentcomponent->addguielem('_top', new gui_hidden('tech', $devinfo_tech));
-	$currentcomponent->addguielem('_top', new gui_hidden('hardware', $devinfo_hardware));
 
-	if ($devinfo_tech && $devinfo_tech != "virtual") {
-		$section = _("Device Options");
+			$deviceInfo = core_devices_get($extdisplay);
 
-		$msgInvalidChannel = _("Please enter the channel for this device");
-		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
-		$msgInvalidSecret = _("Please enter a Secret for this device");
+			if ( $display != 'extensions' ) {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Device").": $extdisplay", false), 0);
 
-		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
-		if ($amp_conf['DEVICE_STRONG_SECRETS']) {
-			$secret_validation .= ' || (!isEmpty() && weakSecret())';
-		}
+				$delURL = '?'.$_SERVER['QUERY_STRING'].'&action=del';
+				$tlabel = sprintf(_("Delete Device %s"),$extdisplay);
+				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/telephone_delete.png"/>&nbsp;'.$tlabel.'</span>';
+				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
-		if ( $display == 'extensions' ) {
-			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
-		} else {
-			$section = ($extdisplay ? _("Edit User") : _("Add User"));
-		}
-
-		$drivers = FreePBX::Core()->getAllDrivers();
-		if(isset($drivers[$devinfo_tech])) {
-			$devopts = $drivers[$devinfo_tech]->getDeviceDisplay($display, $deviceInfo, $currentcomponent, $section);
-		} else {
-			$devopts = array();
-		}
-
-		if (is_array($devopts)) {
-			foreach ($devopts as $devopt => $devoptarr) {
-				$devopname = 'devinfo_'.$devopt;
-				$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
-				$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
-				$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
-				$devdisable = isset($devoptarr['disable']) ? $devoptarr['disable'] : false;
-				$devonchange = isset($devoptarr['onchange']) ? $devoptarr['onchange'] : '';
-				$prompttext = isset($devoptarr['prompttext']) ? $devoptarr['prompttext'] : $devopt;
-				$hidden =  isset($devoptarr['hidden']) ? $devoptarr['hidden'] : false;
-				$type = isset($devoptarr['type']) ? $devoptarr['type'] : (isset($devoptarr['select']) ? 'select' : 'text');
-				$text = isset($devoptarr['text']) ? $devoptarr['text'] : '';
-				$category = isset($devoptarr['category']) ? $devoptarr['category'] : 'advanced';
-				$sec = isset($devoptarr['section']) ? $devoptarr['section'] : $section;
-				$class = isset($devoptarr['class']) ? $devoptarr['class'] : '';
-				$autocomplete = false;
-
-				// We compare the existing secret against what might be in the put to detect changes when validating
-				if ($devopt == "secret") {
-					$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
-					if ($devoptcurrent == '' && empty($extdisplay)) {
-						$devoptcurrent = md5(uniqid());
-					}
+				if ($deviceInfo['device_user'] != 'none') {
+					$editURL = '?display=users&skip=0&extdisplay='.$deviceInfo['user'];
+					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
+					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
+					$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);
 				}
+			}
+		} else {
 
-				if (!$hidden) { // editing to show advanced as well
-					// Added optional selectbox to enable the unsupported misdn module
-					$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
-					if ($type == 'select') {
-						$currentcomponent->addguielem($sec, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable, $class), 4, null, $category);
-					} elseif($type == 'text') {
-						$currentcomponent->addguielem($sec, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable, false, $class, $autocomplete), 4, null, $category);
-					} elseif($type == 'button') {
-						$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable, $class), 4, null, $category);
+
+			$tmparr = explode('_', $tech_hardware);
+			$deviceInfo['tech'] = $tmparr[0];
+			$deviceInfo['hardware'] = $tmparr[1];
+			unset($tmparr);
+
+			if ( $display != 'extensions' ) {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', sprintf(_("Add %s Device"), strtoupper($deviceInfo['tech'])) ), 0);
+			} else {
+				$currentcomponent->addguielem('_top', new gui_pageheading('title', sprintf(_("Add %s Extension"), strtoupper($deviceInfo['tech'])) ), 0);
+			}
+		}
+
+		// Ensure they exist before the extract
+		$devinfo_description = $devinfo_emergency_cid = null;
+		$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
+		$devinfo_tech = null;
+		if ( is_array($deviceInfo) ) {
+			extract($deviceInfo, EXTR_PREFIX_ALL, 'devinfo');
+		}
+
+		// Setup vars for use in the gui later on
+		$fc_logon = featurecodes_getFeatureCode('core', 'userlogon');
+		$fc_logoff = featurecodes_getFeatureCode('core', 'userlogoff');
+
+		$msgInvalidDevID = _("Please enter a device id.");
+		$msgInvalidDevDesc = _("Please enter a valid Description for this device");
+		$msgInvalidEmergCID = _("Please enter a valid Emergency CID");
+		$msgInvalidExtNum = _("Please enter a valid extension number.");
+
+		// Actual gui
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
+
+		if ( $display != 'extensions' ) {
+			$section = _("Device Info");
+			if ( $extdisplay ) { // Editing
+				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
+			} else { // Adding
+				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenticate to the system."), '!isInteger()', $msgInvalidDevID, false));
+			}
+			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The CallerID name for this device will be set to this description until it is logged into."), '!isAlphanumeric() || isWhitespace()', $msgInvalidDevDesc, false));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID));
+			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
+			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
+		} else {
+			$section = _("Extension Options");
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
+		}
+		$currentcomponent->addguielem('_top', new gui_hidden('tech', $devinfo_tech));
+		$currentcomponent->addguielem('_top', new gui_hidden('hardware', $devinfo_hardware));
+
+		if ($devinfo_tech && $devinfo_tech != "virtual") {
+			$section = _("Device Options");
+
+			$msgInvalidChannel = _("Please enter the channel for this device");
+			$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
+			$msgInvalidSecret = _("Please enter a Secret for this device");
+
+			$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
+			if ($amp_conf['DEVICE_STRONG_SECRETS']) {
+				$secret_validation .= ' || (!isEmpty() && weakSecret())';
+			}
+
+			if ( $display == 'extensions' ) {
+				$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
+			} else {
+				$section = ($extdisplay ? _("Edit User") : _("Add User"));
+			}
+
+			$drivers = FreePBX::Core()->getAllDrivers();
+			if(isset($drivers[$devinfo_tech])) {
+				$devopts = $drivers[$devinfo_tech]->getDeviceDisplay($display, $deviceInfo, $currentcomponent, $section);
+			} else {
+				$devopts = array();
+			}
+
+			if (is_array($devopts)) {
+				foreach ($devopts as $devopt => $devoptarr) {
+					$devopname = 'devinfo_'.$devopt;
+					$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
+					$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
+					$devoptfailmsg = isset($devoptarr['failvalidationmsg']) ? $devoptarr['failvalidationmsg'] : '';
+					$devdisable = isset($devoptarr['disable']) ? $devoptarr['disable'] : false;
+					$devonchange = isset($devoptarr['onchange']) ? $devoptarr['onchange'] : '';
+					$prompttext = isset($devoptarr['prompttext']) ? $devoptarr['prompttext'] : $devopt;
+					$hidden =  isset($devoptarr['hidden']) ? $devoptarr['hidden'] : false;
+					$type = isset($devoptarr['type']) ? $devoptarr['type'] : (isset($devoptarr['select']) ? 'select' : 'text');
+					$text = isset($devoptarr['text']) ? $devoptarr['text'] : '';
+					$category = isset($devoptarr['category']) ? $devoptarr['category'] : 'advanced';
+					$sec = isset($devoptarr['section']) ? $devoptarr['section'] : $section;
+					$class = isset($devoptarr['class']) ? $devoptarr['class'] : '';
+					$autocomplete = false;
+
+					// We compare the existing secret against what might be in the put to detect changes when validating
+					if ($devopt == "secret") {
+						$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
+						if ($devoptcurrent == '' && empty($extdisplay)) {
+							$devoptcurrent = md5(uniqid());
+						}
 					}
-				} else { // add so only basic
-					$currentcomponent->addguielem($sec, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);
+
+					if (!$hidden) { // editing to show advanced as well
+						// Added optional selectbox to enable the unsupported misdn module
+						$tooltip = isset($devoptarr['tt']) ? $devoptarr['tt'] : '';
+						if ($type == 'select') {
+							$currentcomponent->addguielem($sec, new gui_selectbox($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable, $class), 4, null, $category);
+						} elseif($type == 'text') {
+							$currentcomponent->addguielem($sec, new gui_textbox($devopname, $devoptcurrent, $prompttext, $tooltip, $devoptjs, $devoptfailmsg, true, 0, $devdisable, false, $class, $autocomplete), 4, null, $category);
+						} elseif($type == 'button') {
+							$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable, $class), 4, null, $category);
+						}
+					} else { // add so only basic
+						$currentcomponent->addguielem($sec, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);
+					}
 				}
 			}
 		}
 	}
-}
 }
 
 function core_devices_configprocess() {

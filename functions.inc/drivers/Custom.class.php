@@ -8,57 +8,26 @@ class Custom extends \FreePBX\modules\Core\Driver {
 			"hardware" => "custom_custom",
 			"prettyName" => _("Generic Custom Driver"),
 			"shortName" => _("Custom"),
-			"description" => _("Custom Device"),
-			"asteriskSupport" => ">=1.0"
+			"description" => _("Custom Device")
 		);
 	}
 
 	public function addDevice($id, $settings) {
-		$sql = 'INSERT INTO custom (id, keyword, data) values (?,?,?)';
-		$sth = $this->database->prepare($sql);
-		foreach($settings as $key => $setting) {
-			try {
-				$sth->execute(array($id,$key,$setting['value']));
-			} catch(\Exception $e) {
-				die_freepbx($e->getMessage()."<br><br>".'error adding to DAHDI table');
-			}
-		}
 		return true;
 	}
 
 	public function delDevice($id) {
-		$sql = "DELETE FROM custom WHERE id = ?";
-		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($id));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
-		}
 		return true;
 	}
 
 	public function getDevice($id) {
-		$sql = "SELECT keyword,data FROM custom WHERE id = ?";
-		$sth = $this->database->prepare($sql);
-		$tech = array();
-		try {
-			$sth->execute(array($id));
-			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
-			//reformulate into what is expected
-			//This is in the try catch just for organization
-			foreach($tech as &$value) {
-				$value = $value[0];
-			}
-		} catch(\Exception $e) {}
-
-		return $tech;
+		return array();
 	}
 
-	public function getDisplay($display, $deviceInfo, $currentcomponent) {
+	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = array();
 		$tt = _("How to dial this device. This will be device specific. For example, a custom device which is really a remote SIP URI might be configured such as SIP/joe@somedomain.com");
-		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 0);
-		unset($tmparr);
+		$tmparr['dial'] = array('prompttext' => _("Dial"), 'value' => '', 'tt' => $tt, 'level' => 0);
 		$devopts = $tmparr;
 		return $devopts;
 	}
