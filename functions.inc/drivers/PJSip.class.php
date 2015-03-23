@@ -584,11 +584,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
 
-		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
-
 		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
 		}
+		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
