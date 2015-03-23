@@ -141,6 +141,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		$modules = $this->freepbx->Hooks->processHooks($tech, $extension, $data);
+		needreload();
 		return array("status" => true);
 	}
 

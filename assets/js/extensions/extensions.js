@@ -44,6 +44,7 @@ $("#quickCreate .modal-footer .create").click(function() {
 				$("#table-all").append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td><td>" + tech + "</td></tr>");
 				$("#table-" + tech).append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td></tr>");
 				$('#quickCreate').modal('hide');
+				toggle_reload_button("show");
 			} else {
 				alert(d.message);
 				$('#quickCreate .create').prop("disabled", false);
