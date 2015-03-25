@@ -1080,7 +1080,7 @@ $sql = "CREATE TABLE IF NOT EXISTS `pjsip` (
   `data` varchar(255) NOT NULL,
   `flags` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`keyword`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 	$db->query($sql);
 
 
