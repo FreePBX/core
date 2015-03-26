@@ -32,6 +32,11 @@ foreach ($conf as $c){
 	if($c['hidden']){
 		continue;
 	}
+	if(!empty($c['module'])) {
+		\modgettext::push_textdomain(strtolower($c['module']));
+	} else {
+		\modgettext::pop_textdomain();
+	}
 	unset($true);
 	unset($false);
 	if($c['category'] != $current_category && $current_category != '' ){
@@ -41,7 +46,7 @@ foreach ($conf as $c){
 		$current_category = $c['category'];
 		$catid = preg_replace('/\s+/', '', $current_category);
 		$forminputs .= '<div class="section-title" data-for="'.$catid.'">';
-		$forminputs .= '<h2><i class="fa fa-minus">'.$current_category.'</i></h2>';
+		$forminputs .= '<h2><i class="fa fa-minus">'._($current_category).'</i></h2>';
 		$forminputs .= '</div>';
 		$forminputs .= '<div class="section" data-id="'.$catid.'">';
 	}
@@ -62,7 +67,7 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
 			if($display_friendly_name == 1){
-				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';				
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
 			}else{
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
@@ -79,9 +84,9 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendy Name: ").$c['name']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendy Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
@@ -89,7 +94,7 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
 			if($display_friendly_name == 1){
-				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
 			}else{
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
@@ -103,9 +108,9 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
@@ -113,7 +118,7 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
 			if($display_friendly_name == 1){
-				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
 			}else{
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
@@ -127,9 +132,9 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
@@ -137,7 +142,7 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
 			if($display_friendly_name == 1){
-				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
 			}else{
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
@@ -151,15 +156,15 @@ foreach ($conf as $c){
 			$opt = explode(',',$c['options']);
 			foreach($opt as $o) {
 				$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
-				$forminputs .= '<option value="'.$o.'"'.$selected.'>'.$o.'</option>';
+				$forminputs .= '<option value="'.$o.'"'.$selected.'>'._($o).'</option>';
 			}
 			$forminputs .= '</select>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
@@ -167,8 +172,8 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
 			if($display_friendly_name == 1){
-				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['name'].'</label>';
-			}else{	
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
+			}else{
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
@@ -181,23 +186,24 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD: ").$c['keyword']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name: ").$c['name']."<br/>".$c['description'].'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
 	}
+	\modgettext::pop_textdomain();
 }
 ?>
 
 <div class="container-fluid">
 	<h1><?php echo _("FreePBX Advanced Settings")?></h1>
 	<div class="well well-danger">
-		<?php echo _('<b>IMPORTANT:</b> Use extreme caution when making changes!')?>
+		<?php echo "<b>"._('IMPORTANT:')."</b>". _('Use extreme caution when making changes!')?>
 	</div>
 	<div class="well well-warning">
-		<?php echo _("<strong>Some of these settings can render your system inoperable.</strong><br/> You are urged to backup before making any changes.<br/>Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to Yes.</br> You can restore the default setting by clicking on the <i class='fa fa-refresh'></i> icon to the left of the values if they are not set as default.<br/> Unlike previous versions of this module you now save changes as a group.");?>
+		<?php echo "<strong>"._("Some of these settings can render your system inoperable."). "</strong><br/>". _("You are urged to backup before making any changes.")."<br/>"._("Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to Yes.")."</br>".sprintf(_("You can restore the default setting by clicking on the %s icon to the left of the values if they are not set as default"),"<i class='fa fa-refresh'></i>")."<br/>"._("Unlike previous versions of this module you now save changes as a group.");?>
 	</div>
 	<div class = "display full-border">
 		<div class="row">
