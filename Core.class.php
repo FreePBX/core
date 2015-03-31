@@ -902,7 +902,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$fields[$keyword] = array("value" => $tech.'/'.$account, "flag" => $flag++);
 					}
 				} elseif ($keyword == 'mailbox' && $data == '') {
-					$fields['mailbox'] = array("value" => $account.'@device', "flag" => $flag++);
+					if($_REQUEST['vm'] == 'enabled') {
+						$fields['mailbox'] = array("value" => $account.'@device', "flag" => $flag++);
+					}
 				} elseif ($keyword == 'vmexten' && $data == '') {
 					// don't add it
 				} else {
