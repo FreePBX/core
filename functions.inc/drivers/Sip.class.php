@@ -232,7 +232,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$ttt = sprintf(_("Change To %s Driver"),$otherdriver);
 		if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
 			$tt = _("Change the SIP Channel Driver to use $otherdriver.");
-			$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$dispnum."_changeDriver();return false;");
+			$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_changeDriver();return false;");
 		} else {
 			$tt = _("You cannot change to $otherdriver as it is not enabled. Please enable $otherdriver in Advanced Settings");
 			$tmparr['changecdriver'] = array('text' => _("Changing SIP Driver unavailable"), 'prompttext' => $ttt, 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'disable' => true);
@@ -366,9 +366,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		}
 
 		$tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1);
+		$tmparr['callgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
 		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1);
+		$tmparr['pickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
 		$tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
 		$tmparr['disallow'] = array('prompttext' => _('Disallowed Codecs'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_DISALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
@@ -395,6 +395,23 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$('form[name=frm_".$display."]').append('<input type=\"hidden\" name=\"changesipdriver\" value=\"yes\">');
 			$('form[name=frm_".$display."]').submit();
 		}
+		",0);
+		$currentcomponent->addjsfunc('pickupGroup()',"
+		var val = $('#devinfo_pickupgroup').val();
+		if(isEmpty(val) && val != '0') {
+			return false;
+		}
+		var commas = $('#devinfo_pickupgroup').val().split(','), stop = false;
+		$.each(commas, function(i,v) {
+			var s = v.split('-');
+			$.each(s, function(i,v) {
+				if(parseInt(v) < 1 || parseInt(v) > 63) {
+					alert('"._("Value must be between 1 and 63")."')
+					stop = true;
+				}
+			});
+		});
+		return stop;
 		",0);
 		$devopts = $tmparr;
 
