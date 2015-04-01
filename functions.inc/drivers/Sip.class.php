@@ -324,12 +324,14 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$select[] = array('value' => 'tls,udp,tcp', 'text' => _('All - TLS Primary'));
 			if (version_compare($this->version,'11','ge')) {
 				$select[] = array('value' => 'ws,udp,tcp,tls', 'text' => _('All - WS Primary'));
+				$select[] = array('value' => 'wss,udp,tcp,tls', 'text' => _('All - WSS Primary'));
 			}
 			$select[] = array('value' => 'udp', 'text' => _('UDP Only'));
 			$select[] = array('value' => 'tcp', 'text' => _('TCP Only'));
 			$select[] = array('value' => 'tls', 'text' => _('TLS Only'));
 			if (version_compare($this->version,'11','ge')) {
 				$select[] = array('value' => 'ws', 'text' => _('WS Only'));
+				$select[] = array('value' => 'wss', 'text' => _('WSS Only'));
 			}
 			$tt = _("This sets the allowed transport settings for this device and the default (Primary) transport for outgoing. The default transport is only used for outbound messages until a registration takes place.  During the peer registration the transport type may change to another supported type if the peer requests so. In most common cases, this does not have to be changed as most devices register in conjunction with the host=dynamic setting. If you are using TCP and/or TLS you need to make sure the general SIP Settings are configured for the system to operate in those modes and for TLS, proper certificates have been generated and configured. If you are using websockets (such as WebRTC) then you must select an option that includes WS");
 			$tmparr['transport'] = array('prompttext' => _('Transport'), 'value' => 'Auto', 'tt' => $tt, 'select' => $select, 'level' => 1);
