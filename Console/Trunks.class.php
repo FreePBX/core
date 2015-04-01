@@ -24,7 +24,7 @@ class Trunks extends Command {
 			new InputArgument('args', InputArgument::IS_ARRAY, null, null),));
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
-		$args = $input->getArgument('args');	
+		$args = $input->getArgument('args');
 		$trunks = $this->listTrunks();
 		$trunkids = array();
 		foreach($trunks as $trunk){
@@ -52,14 +52,14 @@ class Trunks extends Command {
 				$output->write($xml->asXML());
 			}else{
 				$table = new Table($output);
-				$table->setHeaders(array('ID','TECH','Channel ID', 'Disabled'));
+				$table->setHeaders(array('ID',_('TECH'),_('Channel ID'), _('Disabled')));
 				$table->setRows($trunks);
 				$table->render();
 			}
 		}
 		if(!$ARGUSED){
 			$table = new Table($output);
-			$table->setHeaders(array('ID','TECH','Channel ID', 'Disabled'));
+			$table->setHeaders(array('ID',_('TECH'),_('Channel ID'), _('Disabled')));
 			$table->setRows($trunks);
 			$output->writeln(_('Choose an ID to enable/disable'));
 			$helper = $this->getHelper('question');
@@ -67,7 +67,7 @@ class Trunks extends Command {
 			$id = $helper->ask($input, $output, $question);
 			if($trunks[($id -1 )]['disabled'] == 'off'){
 				$output->writeln(_('Disabling Trunk ') . $id);
-				$this->disableTrunk($id);	
+				$this->disableTrunk($id);
 			}
 			if($trunks[($id -1)]['disabled'] == 'on'){
 				$output->writeln(_('Enabling Trunk ') . $id);
@@ -88,12 +88,12 @@ class Trunks extends Command {
 		$db = \FreePBX::Database();
 		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
 		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));	
+		return $ob->execute(array($id));
 	}
 	private function enableTrunk($id){
 		$db = \FreePBX::Database();
 		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
 		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));	
+		return $ob->execute(array($id));
 	}
 }
