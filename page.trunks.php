@@ -557,8 +557,11 @@ if (!$tech && !$extdisplay) {
 			break;
 		case "pjsip":
 			// displayvars is passed by reference, and may or may not be updated.
-			FreePBX::create()->PJSip->getDisplayVars($extdisplay, $displayvars);
-			show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
+			$pjsip = FreePBX::Core()->getDriver('pjsip');
+			if($pjsip !== false) {
+				$displayvars = $pjsip->getDisplayVars($extdisplay, $displayvars);
+				show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
+			}
 			break;
 		case "iax":
 		case "iax2":

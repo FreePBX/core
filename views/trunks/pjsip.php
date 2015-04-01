@@ -1,6 +1,6 @@
 <?php
 foreach($transports as $tp) {
-	$transportopts .= '<option value="'.$tp.'" '.($tp == $transport) ? 'selected' : ''.'>'.$tp.'</option>';
+	$transportopts .= '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
 }
 $seq = 1;
 $codechtml = '<ul class="sortable">';
@@ -27,7 +27,7 @@ $codechtml .= '</ul>';
 
 <h3><?php echo _("PJSIP Settings")?></h3>
 
-<ul class="nav nav-tabs" role="tablist">	
+<ul class="nav nav-tabs" role="tablist">
 	<li role="presentation" data-name="pjsgeneral" class="active">
 		<a href="#pjsgeneral" aria-controls="pjsgeneral" role="tab" data-toggle="tab">
 			<?php echo _("General")?>
@@ -48,151 +48,6 @@ $codechtml .= '</ul>';
 	<div role="tabpanel" id="pjsgeneral" class="tab-pane active">
 		<br/>
 		<br/>
-		<!--PERMINENT AUTH REJECTION-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="auth_rejection_permanentw"><?php echo _("Permanent Auth Rejection") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
-							</div>
-							<div class="col-md-9 radioset">
-								<input type="checkbox" name="auth_rejection_permanent" id="auth_rejection_permanent" <?php echo ($auth_rejection_permanent == 'on') ? 'checked' : ''?>/>
-								<label for="auth_rejection_permanent"><?php echo _("Enabled")?></label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="auth_rejection_permanentw-help" class="help-block fpbx-help-block"><?php echo _("Determines whether failed authentication challenges are treated as permanent failures.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END PERMINENT AUTH REJECTION-->
-		<!--RETRY INTERVAL-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="retry_interval"><?php echo _("Retry Interval")?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="retry_interval"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="retry_interval" id="retry_interval" value="<?php echo $retry_interval?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="retry_interval-help" class="help-block fpbx-help-block"><?php echo _("Maximum number of registration attempts.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END RETRY INTERVAL-->
-		<!--EXPIRATION-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="expiration"><?php echo _("Expiration") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="expiration"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="expiration" id="expiration" value="<?php echo $expiration?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="expiration-help" class="help-block fpbx-help-block"><?php echo _("Expiration time for registrations in seconds.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END EXPIRATION-->
-		<!--FORBIDDEN RETRY INTERVAL-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="forbidden_retry_interval"><?php echo _("Forbidden Retry Interval") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="forbidden_retry_interval"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="forbidden_retry_interval" id="forbidden_retry_interval" value="<?php echo $forbidden_retry_interval?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="forbidden_retry_interval-help" class="help-block fpbx-help-block"><?php echo _("Interval used when receiving a 403 Forbidden response.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END FORBIDDEN RETRY INTERVAL-->
-		<!--MAX RETRIES-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="max_retries"><?php echo _("Max Retries") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="max_retries"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="max_retries" id="max_retries" value="<?php echo $max_retries?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="max_retries-help" class="help-block fpbx-help-block"><?php echo _("Maximum number of registration attempts.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END MAX RETRIES-->
-		<!--QUALIFY FREQUENCY-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="qualify_frequency"><?php echo _("Qualify Frequency") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="qualify_frequency"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="qualify_frequency" id="qualify_frequency" value="<?php echo $qualify_frequency?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="qualify_frequency-help" class="help-block fpbx-help-block"><?php echo _("Interval at which to qualify.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END QUALIFY FREQUENCY-->
 		<!--USERNAME-->
 		<div class="element-container">
 			<div class="row">
@@ -289,54 +144,6 @@ $codechtml .= '</ul>';
 			</div>
 		</div>
 		<!--END SIP SERVER PORT-->
-		<!--OUTBOUND PROXY-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="outbound_proxy"><?php echo _("Outbound Proxy") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="outbound_proxy"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="text" class="form-control" name="outbound_proxy" id="outbound_proxy" value="<?php echo $outbound_proxy?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="outbound_proxy-help" class="help-block fpbx-help-block"><?php echo _("Outbound Proxy")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END OUTBOUND PROXY-->
-		<!--CONTACT USER-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="contact_user"><?php echo _("Contact User") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="contact_user"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="text" class="form-control" name="contact_user" id="contact_user" value="<?php echo $contact_user?>"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="contact_user-help" class="help-block fpbx-help-block"><?php echo _("Contact User to use in request.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END CONTACT USER-->
 		<!--CONTEXT-->
 		<div class="element-container">
 			<div class="row">
@@ -390,6 +197,245 @@ $codechtml .= '</ul>';
 	<div role="tabpanel" id="pjsadvanced" class="tab-pane">
 		<br/>
 		<br/>
+		<!--PERMINENT AUTH REJECTION-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="auth_rejection_permanentw"><?php echo _("Permanent Auth Rejection") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="checkbox" name="auth_rejection_permanent" id="auth_rejection_permanent" <?php echo ($auth_rejection_permanent == 'on') ? 'checked' : ''?>/>
+								<label for="auth_rejection_permanent"><?php echo _("Enabled")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="auth_rejection_permanentw-help" class="help-block fpbx-help-block"><?php echo _("Determines whether failed authentication challenges are treated as permanent failures.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END PERMINENT AUTH REJECTION-->
+		<!--FORBIDDEN RETRY INTERVAL-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="forbidden_retry_interval"><?php echo _("Forbidden Retry Interval") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="forbidden_retry_interval"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="forbidden_retry_interval" id="forbidden_retry_interval" value="<?php echo $forbidden_retry_interval?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="forbidden_retry_interval-help" class="help-block fpbx-help-block"><?php echo _("Interval used when receiving a 403 Forbidden response.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END FORBIDDEN RETRY INTERVAL-->
+		<!--RETRY INTERVAL-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="retry_interval"><?php echo _("General Retry Interval")?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="retry_interval"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="retry_interval" id="retry_interval" value="<?php echo $retry_interval?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="retry_interval-help" class="help-block fpbx-help-block"><?php echo _("Maximum number of registration attempts.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END RETRY INTERVAL-->
+		<!--EXPIRATION-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="expiration"><?php echo _("Expiration") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="expiration"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="expiration" id="expiration" value="<?php echo $expiration?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="expiration-help" class="help-block fpbx-help-block"><?php echo _("Expiration time for registrations in seconds.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END EXPIRATION-->
+		<!--MAX RETRIES-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="max_retries"><?php echo _("Max Retries") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="max_retries"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="max_retries" id="max_retries" value="<?php echo $max_retries?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="max_retries-help" class="help-block fpbx-help-block"><?php echo _("Maximum number of registration attempts.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END MAX RETRIES-->
+		<!--QUALIFY FREQUENCY-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="qualify_frequency"><?php echo _("Qualify Frequency") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="qualify_frequency"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="qualify_frequency" id="qualify_frequency" value="<?php echo $qualify_frequency?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="qualify_frequency-help" class="help-block fpbx-help-block"><?php echo _("Interval at which to qualify.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END QUALIFY FREQUENCY-->
+		<!--OUTBOUND PROXY-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="outbound_proxy"><?php echo _("Outbound Proxy") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="outbound_proxy"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="outbound_proxy" id="outbound_proxy" value="<?php echo $outbound_proxy?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="outbound_proxy-help" class="help-block fpbx-help-block"><?php echo _("Outbound Proxy")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END OUTBOUND PROXY-->
+		<!--CONTACT USER-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="contact_user"><?php echo _("Contact User") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="contact_user"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="contact_user" id="contact_user" value="<?php echo $contact_user?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="contact_user-help" class="help-block fpbx-help-block"><?php echo _("Contact User to use in request.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END CONTACT USER-->
+		<!--FROM DOMAIN-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="from_domain"><?php echo _("From Domain")?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_domain"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="from_domain" id="from_domain" value="<?php echo $from_domain?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="from_domain-help" class="help-block fpbx-help-block"><?php echo _("Domain to use in From header for requests to this trunk")?></span>
+				</div>
+			</div>
+		</div><!--END FROM DOMAIN-->
+		<!--FROM USER-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="from_user"><?php echo _("From User")?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_user"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="from_user" id="from_user" value="<?php echo $from_user?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="from_user-help" class="help-block fpbx-help-block"><?php echo _("Username to use in From header for requests to this trunk")?></span>
+				</div>
+			</div>
+		</div><!--END FROM USER-->
 		<!--CLIENT URI-->
 		<div class="element-container">
 			<div class="row">
@@ -409,11 +455,11 @@ $codechtml .= '</ul>';
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="client_uri-help" class="help-block fpbx-help-block"><?php echo  _("Client SIP URI used when attemping outbound registration")?></span>
+					<span id="client_uri-help" class="help-block fpbx-help-block"><?php echo  _("Client SIP URI used when attemping outbound registration. This setting is automatically generated by the PBX if left blank")?></span>
 				</div>
 			</div>
 		</div>
-		<!--END CLIENT URI-->					
+		<!--END CLIENT URI-->
 		<!--SERVER URI-->
 		<div class="element-container">
 			<div class="row">
@@ -433,11 +479,11 @@ $codechtml .= '</ul>';
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="server_uri-help" class="help-block fpbx-help-block"><?php echo _("SIP URI of the server to register against")?></span>
+					<span id="server_uri-help" class="help-block fpbx-help-block"><?php echo _("SIP URI of the server to register against. This setting is automatically generated by the PBX if left blank")?></span>
 				</div>
 			</div>
 		</div>
-		<!--END SERVERURI-->					
+		<!--END SERVERURI-->
 		<!--AOR CONTACT-->
 		<div class="element-container">
 			<div class="row">
@@ -457,10 +503,33 @@ $codechtml .= '</ul>';
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="aor_contact-help" class="help-block fpbx-help-block"><?php echo _("Permanent contacts assigned to AoR")?></span>
+					<span id="aor_contact-help" class="help-block fpbx-help-block"><?php echo _("Permanent contacts assigned to AoR. This setting is automatically generated by the PBX if left blank")?></span>
 				</div>
 			</div>
-		</div><!--END AOR CONTACT-->					
+		</div><!--END AOR CONTACT-->
+		<!--MATCH-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="match"><?php echo _("Match")?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="match"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="match" id="match" value="<?php echo $match?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="match-help" class="help-block fpbx-help-block"><?php echo _("IP addresses or networks to match against. The value is a comma-delimited list of IP addresses. IP addresses may have a subnet mask appended. The subnet mask may be written in either CIDR or dot-decimal notation. Separate the IP address and subnet mask with a slash ('/'). This setting is automatically generated by the PBX if left blank")?></span>
+				</div>
+			</div>
+		</div><!--MATCH-->
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
 		<br/>

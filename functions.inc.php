@@ -5186,7 +5186,10 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 		}
 		break;
 		case "pjsip":
-		FreePBX::create()->PJSip->addTrunk($trunknum);
+		$pjsip = FreePBX::Core()->getDriver('pjsip');
+		if($pjsip !== false) {
+			$displayvars = $pjsip->addTrunk($trunknum);
+		}
 		break;
 	}
 

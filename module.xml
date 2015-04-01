@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha10</version>
+	<version>13.0.1alpha11</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha11* FREEPBX-8929, FREEPBX-8930, FREEPBX-8974 Add additional settings to pjsip trunks, reorganize pjsip trunks, fix pjsip trunks so they work
 		*13.0.1alpha10* FREEPBX-8859 Add WSS Support to chan sip
 		*13.0.1alpha9* Dont hard set UTF8
 		*13.0.1alpha8* FREEPBX-8815 Ordering of allow/disallow in pjsip.endpoint.conf

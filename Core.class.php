@@ -44,6 +44,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $this->drivers;
 	}
 
+	public function getDriver($driver) {
+		return isset($this->drivers[$driver]) ? $this->drivers[$driver] : false;
+	}
+
 	/**
 	 * Load all "core" drivers
 	 */

@@ -277,18 +277,21 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
 			}
 
-			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
-				if(empty($trunk['sip_server'])) {
-					throw new \Exception('Asterisk will crash if sip_server is blank!');
-				}
-				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			} else {
-				if(empty($trunk['server_uri']) || empty($trunk['client_uri'])) {
-					throw new \Exception('Asterisk will crash if server_uri or client_uri is blank!');
-				}
+
+			if(empty($trunk['server_uri']) && empty($trunk['sip_server'])) {
+				throw new \Exception('Asterisk will crash if sip_server is blank!');
+			} else if(!empty($trunk['server_uri'])) {
 				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
+			} else {
+				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			}
+
+			if(empty($trunk['client_uri']) && empty($trunk['sip_server'])) {
+				throw new \Exception('Asterisk will crash if sip_server is blank!');
+			} else if(!empty($trunk['client_uri'])) {
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
+			} else {
+				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			}
 
 			if(!empty($this->_registration[$tn])) {
@@ -308,11 +311,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'type' => 'aor',
 				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
 			);
-			if(empty($trunk['configmode']) || $trunk['configmode'] == 'simple') {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			} else {
+
+			if(!empty($trunk['aor_contact'])) {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
+			} else {
+				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			}
+			
 			if(!empty($this->_aor[$tn])) {
 				foreach($this->_aor[$tn] as $el) {
 					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
@@ -328,6 +333,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
+			if(!empty($trunk['from_domain'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['from_domain'] = $trunk['from_domain'];
+			}
+			if(!empty($trunk['from_user'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
+			}
 			if(!empty($this->_endpoint[$tn])) {
 				foreach($this->_endpoint[$tn] as $el) {
 					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
@@ -337,7 +348,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$conf['pjsip.identify.conf'][$tn] = array(
 				'type' => 'identify',
 				'endpoint' => $tn,
-				'match' => $trunk['sip_server']
+				'match' => !empty($trunk['match']) ? $trunk['match'] : $trunk['sip_server']
 			);
 
 			if(!empty($this->_identify[$tn])) {
@@ -821,7 +832,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {int} $trunkid   Trunk ID
 	 * @param {array} &$dispvars Display Variables
 	 */
-	public function getDisplayVars($trunkid, &$dispvars) {
+	public function getDisplayVars($trunkid, $dispvars) {
 		$sipSettingsCodecs = $this->freepbx->Sipsettings->getCodecs('audio',true);
 		if(!empty($trunkid)) {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
@@ -861,6 +872,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());
+		return $dispvars;
 	}
 
 	/**
