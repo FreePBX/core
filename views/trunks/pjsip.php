@@ -28,7 +28,7 @@ $codechtml .= '</ul>';
 <h3><?php echo _("PJSIP Settings")?></h3>
 
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" data-name="pjsgeneral" class="active">
+	<li role="presentation" data-name="pjsgeneral" class="change-tab active">
 		<a href="#pjsgeneral" aria-controls="pjsgeneral" role="tab" data-toggle="tab">
 			<?php echo _("General")?>
 		</a>
