@@ -201,6 +201,33 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 			break;
+			case 'devices':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if (empty($request['extdisplay'])) {
+					unset($buttons['delete']);
+					//The edit page has extdisplay but not tech_hardware. The add page is the oppisite. If we have
+					//neither we assume we are on the gid page. 
+					if(empty($request['tech_hardware'])){
+						unset($buttons);
+					}
+				}
+			break;
 			case 'advancedsettings':
 				$buttons = array(
 					'reset' => array(
