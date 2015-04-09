@@ -6021,6 +6021,33 @@ function core_routing_getroutecid($route) {
 
 /* end of outbound routes */
 
+/**
+ * Get Database AMP User, used in Administrators
+ * @param string $username The username to get information about
+ */
+function core_getAmpUser($username) {
+	global $db;
+
+	$sql = "SELECT username, password_sha1, extension_low, extension_high, deptname, sections FROM ampusers WHERE username = '".$db->escapeSimple($username)."'";
+	$results = $db->getAll($sql);
+	if(DB::IsError($results)) {
+	   die_freepbx($sql."<br>\n".$results->getMessage());
+	}
+
+	if (count($results) > 0) {
+		$user = array();
+		$user["username"] = $results[0][0];
+		$user["password_sha1"] = $results[0][1];
+		$user["extension_low"] = $results[0][2];
+		$user["extension_high"] = $results[0][3];
+		$user["deptname"] = $results[0][4];
+		$user["sections"] = explode(";",$results[0][5]);
+		return $user;
+	} else {
+		return false;
+	}
+}
+
 function core_indications_get($zone=false) {
 	global $db;
 
