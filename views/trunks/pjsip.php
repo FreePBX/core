@@ -44,7 +44,7 @@ $codechtml .= '</ul>';
 		</a>
 	</li>
 </ul>
-<div class="tab-content display full-border">
+<div class="tab-content display">
 	<div role="tabpanel" id="pjsgeneral" class="tab-pane active">
 		<br/>
 		<br/>
