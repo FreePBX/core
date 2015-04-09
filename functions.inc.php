@@ -2497,7 +2497,8 @@ function core_do_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
 		}
 		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
-			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
+			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"!="hidden"]]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
+			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"="hidden"]]', 'Set', 'CONNECTEDLINE(name,i)=CID:(Hidden)${CALLERID(number)}'));
 		}
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
@@ -3040,8 +3041,9 @@ function core_do_get_config($engine) {
 	* an Emergency CID on an Emergency Route
 	*/
 	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
-	$ext->add($context, $exten, '', new ext_setcallernamepres('prohib_passed_screen'));
-	$ext->add($context, $exten, '', new ext_setcallernumpres('prohib_passed_screen'));
+	$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+	//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
+	$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
 	// $has_keepcid_cnum is checked and set when the globals are being generated above
 	//
 	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
