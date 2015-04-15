@@ -58,6 +58,7 @@ switch($request['view']){
 							'route_seq' => $route_seq,
 							'routename' => $routename,
 							'dest' => $dest,
+							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 							);
 		}else{
 			$route_seq = $last_seq+1;
@@ -69,6 +70,7 @@ switch($request['view']){
 							'route_seq' => $route_seq,
 							'dialpattern_array' => $dialpattern_array,
 							'trunkpriority' => $trunkpriority,
+							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 						);
 		}
 		$content = load_view(__DIR__.'/views/routing/form.php', $viewinfo);

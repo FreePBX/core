@@ -40,8 +40,9 @@ if ($extdisplay == '' | $route_seq != $last_seq) {
 	$routeseqopts .= '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
 }
 //Hooks....
-$module_hook = moduleHook::create();
-if (!empty($module_hook->hookHtml)) {
+//$module_hook = moduleHook::create();
+//if (!empty($module_hook->hookHtml)) {
+if (!empty($hooks['oldHooks'])) {
 	$hooktab = 	'<li role="presentation"><a href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
 
 }
@@ -249,9 +250,10 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 <ul class="nav nav-tabs">
   <li role="presentation" class="active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
-  <?php echo $hooktab ?>
   <li role="presentation"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
   <li role="presentation"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
+    <?php echo $hooks['hookTabs'] ?>
+  <?php echo $hooktab ?>
 </ul>
 <div id="formtabs" class="tab-content">
 	<div class="tab-pane active" id="routesettings">
@@ -462,11 +464,6 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			</div>
 			<!--END CONGESTION DESTINATION-->
 			</div>
-			<!--Hooks in the "Additional Settings tab -->
-			<div class="tab-pane" id="additionalsettings">
-				<?php echo $module_hook->hookHtml; ?>
-			</div>
-			<!--End Hooks -->
 			<!--Dial Patterns -->
 			<div class="tab-pane" id="dialpatterns">
 				<br/>
@@ -530,6 +527,12 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</div>
 			</div>
 			<!--END IMPORT/EXPORT-->
+			<!--Hooks in the "Additional Settings tab -->
+			<div class="tab-pane" id="additionalsettings">
+				<?php //echo $module_hook->hookHtml; ?>
+				<?php echo $hooks['oldHooks'] ?>
+			</div>
+			<!--End Hooks -->
 	</form>
 	<!-- Dialplan Wizard-->
 	<div class="modal fade" id="dploading">
