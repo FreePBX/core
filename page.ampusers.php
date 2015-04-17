@@ -95,7 +95,7 @@ switch ($action) {
 <div class="rnav">
 <ul>
 	<li><a <?php  echo ($userdisplay=='' ? 'class="current"':'') ?> href="config.php?display=<?php echo urlencode($display)?>"><?php echo _("Add User")?></a></li>
-<?php 
+<?php
 //get existing trunk info
 $tresults = core_ampusers_list();
 
@@ -106,13 +106,13 @@ foreach ($tresults as $tresult) {
 </ul>
 </div>
 
-<?php 
+<?php
 
 	if ($userdisplay) {
 		echo "<h2>"._("Edit Administrator")."</h2>";
-		
+
 		$user = getAmpUser($userdisplay);
-		
+
 		$username = $user["username"];
 		$password = "******";
 		$password_sha1 = $user["password_sha1"];
@@ -120,29 +120,29 @@ foreach ($tresults as $tresult) {
 		$extension_low = $user["extension_low"];
 		$deptname = $user["deptname"];
 		$sections = $user["sections"];
-		
+
 		$tlabel = sprintf(_("Delete User: %s"),$userdisplay);
 		$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/core_delete.png"/>&nbsp;'.$tlabel.'</span>';
 ?>
 		<p><a href="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser"><?php echo $label ?></a></p>
-<?php 
+<?php
 
 	} else {
 		// set defaults
 		$username = "";
 		$password = "";
 		$deptname = "";
-		
+
 		$extension_low = "";
 		$extension_high = "";
-		
+
 		$sections = array("*");
-		
-	
+
+
 		echo "<h2>"._("Add Administrator")."</h2>";
-	} 
+	}
 ?>
-	
+
 		<form autocomplete="off" name="ampuserEdit" action="config.php" method="get">
 			<input type="hidden" name="display" value="<?php echo $display?>"/>
 			<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
@@ -155,7 +155,7 @@ foreach ($tresults as $tresult) {
 					<h4><?php echo _("General Settings")?></h4>
 				</td>
 			</tr>
-<?php if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { ?>			
+<?php if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "webserver")) { ?>
 			<tr>
 				<td colspan="2">
 	<?php echo '<b>'._("NOTE:").'</b>'._("Authorization Type is not set to 'database' in Advanced Setting - note that this module is not currently providing access control, and changing passwords here or adding users will have no effect unless Authorization Type is set to 'database'.") ?><br /><br />
@@ -164,14 +164,14 @@ foreach ($tresults as $tresult) {
 <?php } ?>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Username")?><span><?php echo _("Create a unique username for this user")?></span></a>: 
+					<a href=# class="info"><?php echo _("Username")?><span><?php echo _("Create a unique username for this user")?></span></a>:
 				</td><td>
 					<input type="text" size="20" name="username" value="<?php echo $username;?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Password")?><span><?php echo _("Create a password for this new user")?></span></a>: 
+					<a href=# class="info"><?php echo _("Password")?><span><?php echo _("Create a password for this new user")?></span></a>:
 				</td><td>
 					<input type="password" size="20" name="password" value="<?php echo $password; ?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
@@ -184,14 +184,14 @@ foreach ($tresults as $tresult) {
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Department Name")?><span><?php echo _("Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Department Name")?><span><?php echo _("Restrict this user's view of Digital Receptionist menus and System Recordings to only those for this department.")?></span></a>:
 				</td><td>
 					<input type="text" size="20" name="deptname" value="<?php echo htmlspecialchars($deptname);?>" tabindex="<?php echo ++$tabindex;?>"/>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href=# class="info"><?php echo _("Extension Range")?><span><?php echo _("Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Extension Range")?><span><?php echo _("Restrict this user's view to only Extensions, Ring Groups, and Queues within this range.")?></span></a>:
 				</td><td>
 					<input type="text" size="5" name="extension_low" value="<?php echo htmlspecialchars($extension_low);?>" tabindex="<?php echo ++$tabindex;?>"/>
 					&nbsp;to
@@ -200,24 +200,27 @@ foreach ($tresults as $tresult) {
 			</tr>
 			<tr>
 				<td valign="top">
-					<a href=# class="info"><?php echo _("Admin Access")?><span><?php echo _("Select the Admin Sections this user should have access to.")?></span></a>: 
+					<a href=# class="info"><?php echo _("Admin Access")?><span><?php echo _("Select the Admin Sections this user should have access to.")?></span></a>:
 				</td><td>
 					<select multiple name="sections[]" tabindex="<?php echo ++$tabindex;?>" size="15">
             <option></option>
-<?php 
+<?php
 				$prev_category = NULL;
 				foreach ($module_list as $key => $row) {
 					if ($row['category'] != $prev_category) {
-						if ($prev_category)
+						if ($prev_category) {
 							echo "</optgroup>\n";
-						echo "<optgroup label=\""._($row['category'])."\">\n";
+						}
+						$catname = _(ucwords($row['category']));
+						$catname = ($catname != ucwords($row['category'])) ? $catname : modgettext::_(ucwords($row['category']),$row['rawname']);
+						echo "<optgroup label=\"".$catname."\">\n";
 						$prev_category = $row['category'];
 					}
 
 					echo "<option value=\"".$key."\"";
 					if (in_array($key, $sections)) echo " SELECTED";
 					$label = modgettext::_($row['name'],$row['rawname']);
-					echo ">"._($row['name'])."</option>\n";
+					echo ">".$label."</option>\n";
 				}
 				echo "</optgroup>\n";
 
@@ -235,11 +238,11 @@ foreach ($tresults as $tresult) {
 				echo "<option value=\"*\"";
 				if (in_array("*", $sections)) echo " SELECTED";
 				echo ">"._("ALL SECTIONS")."</option>\n";
-?>					
+?>
 					</select>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td colspan="2">
 					<h6><input name="Submit" type="button" value="<?php echo _("Submit Changes")?>" onclick="checkAmpUser(ampuserEdit, '<?php echo ($userdisplay ? "editampuser" : "addampuser") ?>')" tabindex="<?php echo ++$tabindex;?>"></h6>
@@ -254,7 +257,7 @@ foreach ($tresults as $tresult) {
 function checkAmpUser(theForm, action) {
 	$username = theForm.username.value;
 	$deptname = theForm.deptname.value;
-	
+
 	if ($username == "") {
 		<?php echo "alert('"._("Username must not be blank")."')"?>;
 	} else if (!$username.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
@@ -271,4 +274,3 @@ function checkAmpUser(theForm, action) {
 
 //-->
 </script>
-
