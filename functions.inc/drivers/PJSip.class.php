@@ -265,6 +265,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
 			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
+
+			// Checkboxes aren't saved if they're unchecked.
+			if (!isset($trunk['auth_rejection_permanent'])) {
+				$trunk['auth_rejection_permanent'] = 'off';
+			}
+
 			$conf['pjsip.registration.conf'][$tn] = array(
 				'type' => 'registration',
 				'transport' => $trunk['transport'],

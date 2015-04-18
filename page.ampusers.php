@@ -180,10 +180,8 @@ if(is_array($active_modules)){
 			foreach($module['items'] as $itemKey => $item) {
 				$listKey = (!empty($item['display']) ? $item['display'] : $itemKey);
 				$item['rawname'] = $module['rawname'];
-				modgettext::push_textdomain($module['rawname']);
-				$item['name'] = _($item['name']);
+				$item['name'] = modgettext::_($item['name'],$module['rawname']);
 				$module_list[ $listKey ] = $item;
-				modgettext::pop_textdomain();
 			}
 		}
 	}
