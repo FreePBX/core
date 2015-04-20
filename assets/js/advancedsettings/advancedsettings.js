@@ -1,4 +1,10 @@
 $(document).ready(function() {
+	var lang = $('#UIDEFAULTLANG').val();
+	$('form[name=submitSettings]').submit(function() {
+		if($('#UIDEFAULTLANG').val() != lang) {
+			$.cookie('lang', $('#UIDEFAULTLANG').val());
+		}
+	});
 	//On load mark things that are not default
 	$(".defset").each(function(){
 		var current = $(this).data('for');
@@ -8,11 +14,11 @@ $(document).ready(function() {
 			case 'bool':
 				if(defval == 1){
 					if(!$('#'+current+"true").is(':checked')){
-						$(this).removeClass('hidden');	
+						$(this).removeClass('hidden');
 					}
 				}else{
 					if($('#'+current+"true").is(':checked')){
-						$(this).removeClass('hidden');	
+						$(this).removeClass('hidden');
 					}
 				}
 			break;
@@ -22,7 +28,7 @@ $(document).ready(function() {
 			case 'select':
 				if($('#'+current).val() != defval){
 					$(this).removeClass('hidden');
-				}  
+				}
 			break;
 		}
 	});
@@ -34,7 +40,7 @@ $(document).ready(function() {
 	}else{
 		$(".setro").each(function(){
 			$(this).removeClass("hidden");
-		});		
+		});
 	}
 	if($("#AS_OVERRIDE_READONLYfalse").is(':checked')){
 		$(".setro").each(function(){
@@ -43,7 +49,7 @@ $(document).ready(function() {
 	}else{
 		$(".setro").each(function(){
 			$(this).attr('readonly',false);
-		});		
+		});
 	}
 	//Act on hidden
 	if($("#AS_DISPLAY_HIDDEN_SETTINGSfalse").is(':checked')){
@@ -53,7 +59,7 @@ $(document).ready(function() {
 	}else{
 		$(".sethidden").each(function(){
 			$(this).removeClass("hidden");
-		});		
+		});
 	}
 });
 //visibility/ro updates
@@ -86,7 +92,7 @@ $("input[name='AS_OVERRIDE_READONLY']").change(function(){
 		});
 	}else{
 		$(".setro").each(function(){
-			$(this).addClass("hidden");	
+			$(this).addClass("hidden");
 		});
 	}
 });
@@ -107,7 +113,7 @@ $(".defset").click(function(e){
 			}else{
 				$('#'+current+"true").prop('checked', false);
 				$('#'+current+"false").prop('checked', true);
-				$(this).addClass('hidden');			
+				$(this).addClass('hidden');
 			}
 		break;
 		case 'int':
@@ -133,7 +139,7 @@ $(':input').change(function(){
 			}else{
 				$("a[data-for='"+vid+"']").removeClass('hidden');
 			}
-		
+
 		break;
 		case 'number':
 		case 'text':
