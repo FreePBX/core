@@ -11,6 +11,9 @@ if($var['action'] === 'setkey') {
 	$keyword = $var['keyword'];
 	if ($freepbx_conf->conf_setting_exists($keyword)) {
 		//special cron manager detections
+		if($keyword == 'UIDEFAULTLANG') {
+			$_COOKIE['lang'] = trim($var['value']);
+		}
 		if($keyword == 'CRONMAN_UPDATES_CHECK') {
 			$cm =& cronmanager::create($db);
 			if($var['value']) {

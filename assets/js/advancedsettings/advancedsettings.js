@@ -12,6 +12,9 @@ $(document).ready(function() {
 				break;
 		}
 		switch (mykey) {
+			case 'UIDEFAULTLANG':
+				$.cookie('lang', myval);
+				break;
 			case 'AMPMGRUSER':
 			case 'AMPMGRPASS':
 				var skipastman = 0;
