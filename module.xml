@@ -110,9 +110,11 @@
 	<popovers>
 		<extensions>
 			<display>extensions</display>
+			<view>quick</view>
 		</extensions>
 		<users>
 			<display>users</display>
+			<view>add</view>
 		</users>
  	</popovers>
 	<methods>
