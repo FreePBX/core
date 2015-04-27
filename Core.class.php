@@ -1734,29 +1734,54 @@ public function hookTabs($page){
 	}
 
 	public function bulkhandlerValidate($type, $rawData) {
-		if (true) {
-			return array(
-				'status' => true,
-			);
-		} else {
-			return array(
-				'status' => false,
-				'message' => sprintf(_('%s records failed validation'), count($rawData))
-			);
+		$ret = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			if (true) {
+				$ret = array(
+					'status' => true,
+				);
+			} else {
+				$ret = array(
+					'status' => false,
+					'message' => sprintf(_('%s records failed validation'), count($rawData))
+				);
+			}
+			break;
 		}
+
+		return $ret;
 	}
 
 	public function bulkhandlerImport($type, $rawData) {
-		return array(
-			'status' => true,
-		);
+		$ret = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			$ret = array(
+				'status' => true,
+			);
+			break;
+		}
+
+		return $ret;
 	}
 
 	public function bulkhandlerExport($type) {
-		return array(
-			'extension' => '5000',
-			'description' => 'Export Test, 5000',
-			'type' => 'SIP'
-		);
+		$data = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			$users = $this->getAllUsersByDeviceType();
+			foreach ($users as $user) {
+				$device = $this->getDevice($user['extension']);
+				$data[] = array_merge($user, $device);
+			}
+
+			break;
+		}
+
+		return $data;
 	}
 }
