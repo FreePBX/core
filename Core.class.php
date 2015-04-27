@@ -1721,4 +1721,37 @@ public function hookTabs($page){
 	}
 	return array("hookTabs" => $hookTabs, "hookContent" => $hookcontent, "oldHooks" => $module_hook->hookHtml);
 	}
+
+	public function bulkhandlerGetTypes() {
+		return array(
+			'extensions' => _('Extensions')
+		);
+	}
+
+	public function bulkhandlerValidate($type, $rawData) {
+		if (true) {
+			return array(
+				'status' => true,
+			);
+		} else {
+			return array(
+				'status' => false,
+				'message' => sprintf(_('%s records failed validation'), count($rawData))
+			);
+		}
+	}
+
+	public function bulkhandlerImport($type, $rawData) {
+		return array(
+			'status' => true,
+		);
+	}
+
+	public function bulkhandlerExport($type) {
+		return array(
+			'extension' => '5000',
+			'description' => 'Export Test, 5000',
+			'type' => 'SIP'
+		);
+	}
 }
