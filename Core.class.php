@@ -1724,7 +1724,12 @@ public function hookTabs($page){
 
 	public function bulkhandlerGetTypes() {
 		return array(
-			'extensions' => _('Extensions')
+			'import' => array(
+				'extensions' => _('Extensions')
+			),
+			'export' => array(
+				'extensions' => _('Extensions')
+			)
 		);
 	}
 
