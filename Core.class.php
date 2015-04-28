@@ -1759,9 +1759,52 @@ public function hookTabs($page){
 
 		switch ($type) {
 		case 'extensions':
+			$data = $rawData['global'];
+
+			if (!is_numeric($data['extension'])) {
+				return array("status" => false);
+			}
+
+			$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
+			foreach ($settings as $key => $value) {
+				if (isset($data[$key])) {
+					/* Override default setting with our value. */
+					$settings[$key]['value'] = $value;
+				}
+			}
+
+			try {
+				if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
+					return array("status" => false);
+				}
+			} catch(\Exception $e) {
+				return array("status" => false);
+			}
+
+			$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
+			foreach ($settings as $key => $value) {
+				if (isset($data[$key])) {
+					/* Override default setting with our value. */
+					$settings[$key] = $value;
+				}
+			}
+
+			try {
+				if (!$this->addUser($data['extension'], $settings)) {
+					//cleanup
+					$this->delDevice($data['extension']);
+					return array("status" => false);
+				}
+			} catch(\Exception $e) {
+				//cleanup
+				$this->delDevice($data['extension']);
+				return array("status" => false);
+			}
+
 			$ret = array(
 				'status' => true,
 			);
+
 			break;
 		}
 
@@ -1770,13 +1813,14 @@ public function hookTabs($page){
 
 	public function bulkhandlerExport($type) {
 		$data = NULL;
+		$extensions = NULL;
 
 		switch ($type) {
 		case 'extensions':
 			$users = $this->getAllUsersByDeviceType();
 			foreach ($users as $user) {
 				$device = $this->getDevice($user['extension']);
-				$data[] = array_merge($user, $device);
+				$data[$user['extension']] = array_merge($user, $device);
 			}
 
 			break;
