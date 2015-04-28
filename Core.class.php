@@ -1748,11 +1748,20 @@ public function hookTabs($page){
 	public function bulkhandlerGetTypes() {
 		return array(
 			'import' => array(
-				'extensions' => _('Extensions')
+				'extensions' => array(
+					'name' => _('Extensions'),
+					'description' => _('Extensions')
+				)
 			),
 			'export' => array(
-				'extensions' => _('Extensions'),
-				'dids' => _('DIDs'),
+				'extensions' => array(
+					'name' => _('Extensions'),
+					'description' => _('Extensions')
+				),
+				/*'dids' => array(
+					'name' => _('DIDs'),
+					'description' => _('DIDs')
+				)*/
 			)
 		);
 	}
@@ -1783,52 +1792,51 @@ public function hookTabs($page){
 
 		switch ($type) {
 		case 'extensions':
-			$data = $rawData['global'];
-
-			if (!is_numeric($data['extension'])) {
-				return array("status" => false);
-			}
-
-			$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
-			foreach ($settings as $key => $value) {
-				if (isset($data[$key])) {
-					/* Override default setting with our value. */
-					$settings[$key]['value'] = $value;
-				}
-			}
-
-			try {
-				if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
+			foreach ($rawData as $data) {
+				if (!is_numeric($data['extension'])) {
 					return array("status" => false);
 				}
-			} catch(\Exception $e) {
-				return array("status" => false);
-			}
 
-			$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
-			foreach ($settings as $key => $value) {
-				if (isset($data[$key])) {
-					/* Override default setting with our value. */
-					$settings[$key] = $value;
+				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
+				foreach ($settings as $key => $value) {
+					if (isset($data[$key])) {
+						/* Override default setting with our value. */
+						$settings[$key]['value'] = $data[$key];
+					}
 				}
-			}
 
-			try {
-				if (!$this->addUser($data['extension'], $settings)) {
+				try {
+					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
+						return array("status" => false);
+					}
+				} catch(\Exception $e) {
+					return array("status" => false);
+				}
+
+				$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
+				foreach ($settings as $key => $value) {
+					if (isset($data[$key])) {
+						/* Override default setting with our value. */
+						$settings[$key] = $data[$key];
+					}
+				}
+
+				try {
+					if (!$this->addUser($data['extension'], $settings)) {
+						//cleanup
+						$this->delDevice($data['extension']);
+						return array("status" => false);
+					}
+				} catch(\Exception $e) {
 					//cleanup
 					$this->delDevice($data['extension']);
 					return array("status" => false);
 				}
-			} catch(\Exception $e) {
-				//cleanup
-				$this->delDevice($data['extension']);
-				return array("status" => false);
+
+				$ret = array(
+					'status' => true,
+				);
 			}
-
-			$ret = array(
-				'status' => true,
-			);
-
 			break;
 		}
 
