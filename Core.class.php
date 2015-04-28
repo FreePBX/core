@@ -1754,7 +1754,7 @@ public function hookTabs($page){
 				),
 				'dids' => array(
 					'name' => _('DIDs'),
-					'description' => _('DIDs')
+					'description' => _('DIDs / Inbound Routes')
 				)
 			),
 			'export' => array(
@@ -1764,7 +1764,7 @@ public function hookTabs($page){
 				),
 				'dids' => array(
 					'name' => _('DIDs'),
-					'description' => _('DIDs')
+					'description' => _('DIDs / Inbound Routes')
 				)
 			)
 		);
@@ -1798,7 +1798,7 @@ public function hookTabs($page){
 		case 'extensions':
 			foreach ($rawData as $data) {
 				if (!is_numeric($data['extension'])) {
-					return array("status" => false);
+					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
 
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
@@ -1811,10 +1811,10 @@ public function hookTabs($page){
 
 				try {
 					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
-						return array("status" => false);
+						return array("status" => false, "message" => _("Device could not be added."));
 					}
 				} catch(\Exception $e) {
-					return array("status" => false);
+					return array("status" => false, "message" => $e->getMessage());
 				}
 
 				$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
@@ -1829,19 +1829,20 @@ public function hookTabs($page){
 					if (!$this->addUser($data['extension'], $settings)) {
 						//cleanup
 						$this->delDevice($data['extension']);
-						return array("status" => false);
+						return array("status" => false, "message" => _("User could not be added."));
 					}
 				} catch(\Exception $e) {
 					//cleanup
 					$this->delDevice($data['extension']);
-					return array("status" => false);
+					return array("status" => false, "message" => $e->getMessage());
 				}
-
-				needreload();
-				$ret = array(
-					'status' => true,
-				);
 			}
+
+			needreload();
+			$ret = array(
+				'status' => true,
+			);
+
 			break;
 		}
 
