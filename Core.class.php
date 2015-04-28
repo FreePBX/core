@@ -1349,6 +1349,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 	}
 
+	/**
+	 * Get Inbound Routes (DIDs)
+	 * @param string $order Whether to order results by extension or description
+	 */
 	public function getAllDIDs($order='extension') {
 		switch ($order) {
 			case 'description':
@@ -1358,7 +1362,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			default:
 			$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
 		}
-		return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		try {
+			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		return $results;
 	}
 
 	/**
