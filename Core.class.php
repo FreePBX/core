@@ -1751,6 +1751,10 @@ public function hookTabs($page){
 				'extensions' => array(
 					'name' => _('Extensions'),
 					'description' => _('Extensions')
+				),
+				'dids' => array(
+					'name' => _('DIDs'),
+					'description' => _('DIDs')
 				)
 			),
 			'export' => array(
@@ -1758,10 +1762,10 @@ public function hookTabs($page){
 					'name' => _('Extensions'),
 					'description' => _('Extensions')
 				),
-				/*'dids' => array(
+				'dids' => array(
 					'name' => _('DIDs'),
 					'description' => _('DIDs')
-				)*/
+				)
 			)
 		);
 	}
@@ -1833,6 +1837,7 @@ public function hookTabs($page){
 					return array("status" => false);
 				}
 
+				needreload();
 				$ret = array(
 					'status' => true,
 				);
