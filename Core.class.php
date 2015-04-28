@@ -1349,6 +1349,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 	}
 
+	public function getAllDIDs($order='extension') {
+		switch ($order) {
+			case 'description':
+			$sql = "SELECT * FROM incoming ORDER BY description,extension,cidnum";
+			break;
+			case 'extension':
+			default:
+			$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
+		}
+		return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+	}
+
 	/**
 	 * Get Inbound Route (DID) based on extension (DID) or CID Number
 	 * @param int $extension Inbound Route DID
@@ -1728,7 +1740,8 @@ public function hookTabs($page){
 				'extensions' => _('Extensions')
 			),
 			'export' => array(
-				'extensions' => _('Extensions')
+				'extensions' => _('Extensions'),
+				'dids' => _('DIDs'),
 			)
 		);
 	}
@@ -1813,7 +1826,6 @@ public function hookTabs($page){
 
 	public function bulkhandlerExport($type) {
 		$data = NULL;
-		$extensions = NULL;
 
 		switch ($type) {
 		case 'extensions':
@@ -1823,6 +1835,9 @@ public function hookTabs($page){
 				$data[$user['extension']] = array_merge($user, $device);
 			}
 
+			break;
+		case 'dids':
+			$data = $this->getAllDIDs();
 			break;
 		}
 
