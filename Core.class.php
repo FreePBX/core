@@ -222,7 +222,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 					//The edit page has extdisplay but not tech_hardware. The add page is the oppisite. If we have
-					//neither we assume we are on the gid page. 
+					//neither we assume we are on the gid page.
 					if(empty($request['tech_hardware'])){
 						unset($buttons);
 					}
@@ -1157,10 +1157,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	* @param {bool} $get_all=false Whether to get all of check in the range
 	*/
 	function listUsers($get_all=false) {
-		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
-		$sth = $this->database->prepare($sql);
-		$sth->execute();
-		$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+		if (empty($this->listUsersCache)) {
+			$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+			$sth = $this->database->prepare($sql);
+			$sth->execute();
+			$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+			$this->listUsersCache = $results;
+		} else {
+			$results = $this->listUsersCache;
+		}
+
 		//only allow extensions that are within administrator's allowed range
 		foreach($results as $result){
 			if ($get_all || checkRange($result[0])){
@@ -1248,22 +1254,32 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 */
 	public function getAllDevicesByType($type="") {
 		if(empty($type)) {
-			$sql = "SELECT * FROM devices ORDER BY id";
-			$sth = $this->database->prepare($sql);
-			try {
-				$sth->execute();
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			} catch(\Exception $e) {
-				return array();
+			if (empty($this->deviceCache['full'])) {
+				$sql = "SELECT * FROM devices ORDER BY id";
+				$sth = $this->database->prepare($sql);
+				try {
+					$sth->execute();
+					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				} catch(\Exception $e) {
+					return array();
+				}
+				$this->deviceCache['full'] = $results;
+			} else {
+				$results = $this->deviceCache['full'];
 			}
 		} else {
-			$sql = "SELECT * FROM devices WHERE tech = ? ORDER BY id";
-			$sth = $this->database->prepare($sql);
-			try {
-				$sth->execute(array($type));
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			} catch(\Exception $e) {
-				return array();
+			if (empty($this->deviceCache[$type])) {
+				$sql = "SELECT * FROM devices WHERE tech = ? ORDER BY id";
+				$sth = $this->database->prepare($sql);
+				try {
+					$sth->execute(array($type));
+					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				} catch(\Exception $e) {
+					return array();
+				}
+				$this->deviceCache[$type] = $results;
+			} else {
+				$results = $this->deviceCache[$type];
 			}
 		}
 		return $results;
@@ -1273,13 +1289,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * Get all Users
 	 */
 	public function getAllUsers() {
-		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
-		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute();
-			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-		} catch(\Exception $e) {
-			return array();
+		if (empty($this->allUsersCache)) {
+			$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute();
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$this->allUsersCache = $results;
+			} catch(\Exception $e) {
+				return array();
+			}
+		} else {
+			$results = $this->allUsersCache;
 		}
 		return $results;
 	}
