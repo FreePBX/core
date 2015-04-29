@@ -545,6 +545,32 @@ foreach ($new_cols as $col) {
   }
 }
 
+$sql = "SHOW KEYS FROM devices WHERE Key_name='tech'";
+$check = $db->getOne($sql);
+if (empty($check)) {
+	$sql = "ALTER TABLE devices ADD KEY `id` (`id`), ADD KEY `tech` (`tech`)";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("Unable to add index to tech field in devices"));
+		freepbx_log(FPBX_LOG_ERROR, "Failed to add index to tech field in the devices table");
+	} else {
+		out(_("Adding index to tech field in the devices"));
+	}
+}
+
+$sql = "SHOW KEYS FROM users WHERE Key_name='extensions'";
+$check = $db->getOne($sql);
+if (empty($check)) {
+	$sql = "ALTER TABLE users ADD KEY `extension` (`extension`), ADD KEY `extension` (`extension`)";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("Unable to add index to extensions field in users"));
+		freepbx_log(FPBX_LOG_ERROR, "Failed to add index to extensions field in the users table");
+	} else {
+		out(_("Adding index to extensions field in the users"));
+	}
+}
+
 // The following are from General Settings that may need to be migrated.
 // We will first create them all, the define_conf_settings() method will
 // not change the value if already set. We will update the settings
