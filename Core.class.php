@@ -1393,6 +1393,25 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
+	public function addDID($settings) {
+		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
+		$invalidDIDChars = array('<', '>');
+		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
+		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
+
+		// Check to make sure the did is not being used elsewhere
+		//
+		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
+		if (empty($existing)) {
+			$sql="INSERT INTO incoming (cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array(':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * Get Inbound Route (DID) based on extension (DID) or CID Number
 	 * @param int $extension Inbound Route DID
@@ -1768,25 +1787,13 @@ public function hookTabs($page){
 
 	public function bulkhandlerGetTypes() {
 		return array(
-			'import' => array(
-				'extensions' => array(
-					'name' => _('Extensions'),
-					'description' => _('Extensions')
-				),
-				'dids' => array(
-					'name' => _('DIDs'),
-					'description' => _('DIDs / Inbound Routes')
-				)
+			'extensions' => array(
+				'name' => _('Extensions'),
+				'description' => _('Extensions')
 			),
-			'export' => array(
-				'extensions' => array(
-					'name' => _('Extensions'),
-					'description' => _('Extensions')
-				),
-				'dids' => array(
-					'name' => _('DIDs'),
-					'description' => _('DIDs / Inbound Routes')
-				)
+			'dids' => array(
+				'name' => _('DIDs'),
+				'description' => _('DIDs / Inbound Routes')
 			)
 		);
 	}
@@ -1857,6 +1864,17 @@ public function hookTabs($page){
 					$this->delDevice($data['extension']);
 					return array("status" => false, "message" => $e->getMessage());
 				}
+			}
+
+			needreload();
+			$ret = array(
+				'status' => true,
+			);
+
+			break;
+		case "dids":
+			foreach ($rawData as $data) {
+				$this->addDID($data);
 			}
 
 			needreload();

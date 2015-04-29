@@ -127,8 +127,8 @@
 		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler">
 			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes">bulkhandlerGetTypes</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="validate">bulkhandlerValidate</method>
-			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
-			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="import" priority="100">bulkhandlerImport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="export" priority="100">bulkhandlerExport</method>
 		</bulkhandler>
 	</hooks>
 	<location>release/2.11/core-2.11.0.7.tgz</location>
