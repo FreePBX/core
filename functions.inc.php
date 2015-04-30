@@ -4669,6 +4669,11 @@ function core_users2astdb(){
 
 function core_hint_get($account){
 	global $astman;
+	static $hintCache;
+
+	if (isset($hintCache[$account])) {
+		return $hintCache[$account];
+	}
 
 	$chan_dahdi = ast_with_dahdi();
 	// We should always check the AMPUSER in case they logged into a device
@@ -4706,6 +4711,7 @@ function core_hint_get($account){
 		}
 	}
 
+	$hintCache[$account] = $hint;
 	return $hint;
 }
 
