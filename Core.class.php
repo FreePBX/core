@@ -1599,11 +1599,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	protected $getUserCache = array();
 	/**
 	 * Get User Details
 	 * @param int $extension The user number (extension)
 	 */
 	public function getUser($extension) {
+		if (isset($this->getUserCache[$extension])) {
+			return $this->getUserCache[$extension];
+		}
 		$sql = "SELECT * FROM users WHERE extension = ?";
 		$sth = $this->database->prepare($sql);
 		try {
@@ -1649,6 +1653,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		} else {
 			throw new Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
 		}
+		$this->getUserCache[$extension] = $results;
 		return $results;
 	}
 
