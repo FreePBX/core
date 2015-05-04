@@ -41,11 +41,33 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					</ul>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
-							<table class="table table-striped">
-								<tr><th><?php echo _('User')?></th><th><?php echo _('Name')?></th></tr>
-								<?php foreach(FreePBX::Core()->getAllUsers() as $user) { ?>
-									<tr><td><a href="?display=users&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td></tr>
-								<?php } ?>
+							<div id="toolbar-users">
+								<button id="remove-user" class="btn btn-danger btn-remove" data-type="users" disabled>
+									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+								</button>
+							</div>
+							<table id="table-users" data-toolbar="#toolbar-users" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped">
+								<thead>
+									<tr>
+										<th data-checkbox="true"></th>
+										<th data-sortable="true" data-field="extension"><?php echo _('User')?></th>
+										<th data-sortable="true"><?php echo _('Name')?></th>
+										<th><?php echo _('Actions')?></th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach(FreePBX::Core()->getAllUsers() as $user) { ?>
+										<tr>
+											<td></td>
+											<td><?php echo $user['extension']?></td>
+											<td><?php echo $user['name']?></td>
+											<td class="actions">
+												<a href="?display=users&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
+												<i class="fa fa-times" data-id="<?php echo $user['id']?>"></i>
+											</td>
+										</tr>
+									<?php } ?>
+								</tbody>
 							</table>
 						</div>
 					</div>

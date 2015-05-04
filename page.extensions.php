@@ -47,20 +47,66 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					</ul>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
-							<table class="table table-striped" id="table-all">
-								<tr><th>Extension</th><th>Name</th><th>Type</th></tr>
-								<?php foreach(FreePBX::Core()->getAllUsersByDeviceType() as $user) {?>
-									<tr><td><a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td><td><?php echo $user['tech']?></td></tr>
-								<?php } ?>
+							<div id="toolbar-all">
+								<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
+									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+								</button>
+							</div>
+							<table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+								<thead>
+									<tr>
+										<th data-checkbox="true"></th>
+										<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
+										<th data-sortable="true"><?php echo _('Name')?></th>
+										<th data-sortable="true"><?php echo _('Type')?></th>
+										<th><?php echo _('Actions')?></th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach(FreePBX::Core()->getAllUsersByDeviceType() as $user) {?>
+										<tr id="<?php echo $user['extension']?>">
+											<td></td>
+											<td><?php echo $user['extension']?></td>
+											<td><?php echo $user['name']?></td>
+											<td><?php echo $user['tech']?></td>
+											<td class="actions">
+												<a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
+												<i class="fa fa-times" data-id="<?php echo $user['extension']?>" data-section="all"></i>
+											</td>
+										</tr>
+									<?php } ?>
+								</tbody>
 							</table>
 						</div>
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
-								<table class="table table-striped" id="table-<?php echo $driver['rawName']?>">
-									<tr><th>Extension</th><th>Name</th></tr>
-									<?php foreach(FreePBX::Core()->getAllUsersByDeviceType($driver['rawName']) as $user) {?>
-										<tr><td><a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><?php echo $user['extension']?></a></td><td><?php echo $user['name']?></td></tr>
-									<?php } ?>
+								<div id="toolbar-<?php echo $driver['rawName']?>">
+									<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
+										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+									</button>
+								</div>
+								<table data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-<?php echo $driver['rawName']?>">
+									<thead>
+										<tr>
+											<th data-checkbox="true"></th>
+											<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
+											<th data-sortable="true"><?php echo _('Name')?></th>
+											<th><?php echo _('Actions')?></th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php foreach(FreePBX::Core()->getAllUsersByDeviceType($driver['rawName']) as $user) {?>
+											<tr id="<?php echo $user['extension']?>">
+												<td></td>
+												<td><?php echo $user['extension']?></td>
+												<td><?php echo $user['name']?></td>
+												<td class="actions">
+													<a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
+													<i class="fa fa-times" data-id="<?php echo $user['extension']?>" data-section="<?php echo $driver['rawName']?>"></i>
+												</td>
+											</tr>
+										<?php } ?>
+									</tbody>
 								</table>
 							</div>
 						<?php } ?>

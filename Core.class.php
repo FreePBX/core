@@ -21,6 +21,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$setting['allowremote'] = false;
 		switch($req) {
 			case "quickcreate":
+			case "delete":
 				return true;
 			break;
 		}
@@ -29,6 +30,31 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
+			case "delete":
+			if(!empty($_POST['extensions'])) {
+					switch($_POST['type']) {
+						case "extensions":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delUser($ext);
+								$this->delDevice($ext);
+							}
+							return array("status" => true);
+						break;
+						case "users":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delUser($ext);
+							}
+							return array("status" => true);
+						break;
+						case "devices":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delDevice($ext);
+							}
+							return array("status" => true);
+						break;
+					}
+				}
+			break;
 			case "quickcreate":
 				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
 				return $status;
@@ -222,7 +248,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 					//The edit page has extdisplay but not tech_hardware. The add page is the oppisite. If we have
-					//neither we assume we are on the gid page. 
+					//neither we assume we are on the gid page.
 					if(empty($request['tech_hardware'])){
 						unset($buttons);
 					}
@@ -375,8 +401,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
 					$buttons = array();
 				}
-				if(empty($request['extdisplay']) && empty($request['tech_hardware'])){
-					unset($buttons);
+				if(empty($request['extdisplay']) && empty($request['tech_hardware']) && (!empty($request['view']) && $request['view'] != 'add')){
+					$buttons = array();
 				}
 			break;
 		}
