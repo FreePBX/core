@@ -3,11 +3,11 @@
 	<div class="well well-info">
 		<?php echo _('This page is used to manage various system trunks')?>
 	</div>
-	<div class = "display full-border">
+	<div class = "display no-border">
 		<div class="row">
 			<div class="col-sm-9">
 				<div class="fpbx-container">
-					<div class="display full-border">
+					<div class="display no-border">
 						<?php echo load_view(__DIR__.'/trunkgrid.php', array('trunks' => $trunks))?>
 					</div>
 				</div>

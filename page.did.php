@@ -7,29 +7,29 @@ if($action == 'delIncoming'){
 	$message = 'Route '.$extdisplay.' '._("deleted").'!';
 }
 $formdata = array('extdisplay' => $extdisplay,
-				'old_extdisplay' => $old_extdisplay,
-				'dispnum' => $dispnum,
-				'account' => $account,
-				'goto' => $goto,
-				'ringing' => $ringing,
-				'reversal' => $reversal,
-				'description' => $description,
-				'privacyman' => $privacyman,
-				'pmmaxretries' => $pmmaxretries,
-				'$pmminlength' => $pmminlength,
-				'alertinfo' => $alertinfo,
-				'mohclass' => $mohclass,
-				'grppre' => $grppre,
-				'delay_answer' => $delay_answer,
-				'pricid' => $pricid,
-				'rnavsort' => $rnavsort,
-				'didfilter' => $didfilter,
+				'old_extdisplay' => isset($old_extdisplay) ? $old_extdisplay : '',
+				'dispnum' => isset($dispnum) ? $dispnum : '',
+				'account' => isset($account) ? $account : '',
+				'goto' => isset($goto) ? $goto : '',
+				'ringing' => isset($ringing) ? $ringing : '',
+				'reversal' => isset($reversal) ? $reversal : '',
+				'description' => isset($description) ? $description : '',
+				'privacyman' => isset($privacyman) ? $privacyman : '',
+				'pmmaxretries' => isset($pmmaxretries) ? $pmmaxretries : '',
+				'pmminlength' => isset($pmminlength) ? $pmminlength : '',
+				'alertinfo' => isset($alertinfo) ? $alertinfo : '',
+				'mohclass' => isset($mohclass) ? $mohclass : '',
+				'grppre' => isset($grppre) ? $grppre : '',
+				'delay_answer' => isset($delay_answer) ? $delay_answer : '',
+				'pricid' => isset($pricid) ? $pricid : '',
+				'rnavsort' => isset($rnavsort) ? $rnavsort : '',
+				'didfilter' => isset($didfilter) ? $didfilter : '',
 				'heading' => '<h2>'._("Add Incoming Route").'</h2>',
 	);
 
 if($extdisplay){
 	$extarray=explode('/',$extdisplay,2);
-	$ininfo=\core_did_get($extarray[0],$extarray[1]);
+	$ininfo=core_did_get($extarray[0],$extarray[1]);
 	if (is_array($ininfo) && !empty($ininfo)) {
 		extract($ininfo);
 	}
@@ -64,8 +64,8 @@ if($extdisplay){
 	$formdata['pmminlength'] = $pmminlength;
 
 }else{
-	$extension = $extarray[0];
-	$cidnum    = $extarray[1];
+	$extension = isset($extarray[0]) ? $extarray[0] : '';
+	$cidnum    = isset($extarray[1]) ? $extarray[1] : '';
 	$extdisplay = '';
 	$heading = '<h2>'._("Add Incoming Route").'</h2>';
 
@@ -77,7 +77,7 @@ if($extdisplay){
 
 // If this is a direct did, e.g. from-did-direct,nnn,1 then make a link to the extension
 //
-$did_dest = explode(',',$destination);
+$did_dest = !empty($destination) ? explode(',',$destination) : array();
 if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 	if (isset($amp_conf["AMPEXTENSIONS"]) && ($amp_conf["AMPEXTENSIONS"] == "deviceanduser")) {
 		$editURL = '?display=users&extdisplay='.$did_dest[1];
@@ -91,7 +91,7 @@ if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 	$link= "<p><a href=".$editURL.">".$label."</a></p>";
 	$formdata['userlink'] = $link;
 }
-$view = $request['view'];
+$view = !empty($request['view']) ? $request['view'] : '';
 switch($view){
 	case "form":
 		$content = load_view(__DIR__.'/views/did/routeform.php', $formdata);
@@ -104,11 +104,11 @@ switch($view){
 ?>
 <div class="container-fluid">
 	<h1><?php echo _('Inbound Routes')?></h1>
-	<div class = "display full-border">
+	<div class = "display no-border">
 		<div class="row">
 			<div class="col-sm-9">
 				<div class="fpbx-container">
-					<div class="display full-border">
+					<div class="display no-border">
 						<?php echo $content ?>
 					</div>
 				</div>

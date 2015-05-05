@@ -1744,6 +1744,7 @@ public function hookTabs($page){
 			}
 		}
 	}
+	$hookTabs = $hookcontent = '';
 	foreach ($sections as $data) {
 		$hookTabs .= '<li role="presentation"><a href="#corehook'.$data['rawname'].'" aria-controls="corehook'.$data['rawname'].'" role="tab" data-toggle="tab">'.$data['title'].'</a></li>';
 		$hookcontent .= '<div role="tabpanel" class="tab-pane display" id="corehook'.$data['rawname'].'">';

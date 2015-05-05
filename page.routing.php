@@ -4,9 +4,11 @@
 //	Copyright (C) 2005 Ron Hartmann (rhartmann@vercomsystems.com)
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $request = $_REQUEST;
-if(!empty($request['id']) && $request['view'] == 'form'){
+$request['view'] = !empty($request['view']) ? $request['view'] : '';
+$subhead = '';
+if(!empty($request['id']) && !empty($request['view']) && $request['view'] == 'form'){
 	$subhead = _("Edit Route");
-} elseif(empty($request['id']) && $request['view'] == 'form'){
+} elseif(empty($request['id']) && !empty($request['view']) && $request['view'] == 'form'){
 	$subhead = _("Add Route");
 }
 $tabindex = 0;
@@ -15,7 +17,7 @@ $tabindex = 0;
 $dialpattern_insert = array();
 $p_idx = 0;
 $n_idx = 0;
-$last_seq = count($routepriority)-1;
+$last_seq = isset($request['routepriority']) ? count($request['routepriority'])-1 : 0;
 if ($action == 'populatenpanxx') {
 	return true;
 }
@@ -88,11 +90,11 @@ switch($request['view']){
 	<h1><?php echo _('Outbound Routes')?></h1>
 	<h3><?php echo $subhead ?></h3>
 	<?php echo $pageinfo?>
-	<div class = "display full-border">
+	<div class = "display no-border">
 		<div class="row">
 			<div class="col-sm-9">
 				<div class="fpbx-container">
-					<div class = "display full-border">
+					<div class = "display no-border">
 						<?php echo $content ?>
 					</div>
 				</div>

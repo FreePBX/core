@@ -2,7 +2,9 @@
 global $amp_conf;
 $formAction = '';
 //If we are passed data we will throw it in here
-extract($viewinfo);
+if(!empty($viewinfo) && is_array($viewinfo)) {
+	extract($viewinfo);
+}
 //Set the page parameters...
 $request = $_REQUEST;
 $display = $request['display']?$request['display']:'routing';
@@ -27,6 +29,7 @@ if ($route_seq != 0) {
 	$routeseqopts = '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
 }
 //Routing select box
+$routeseqopts = '';
 foreach ($routepriority as $key => $route) {
 	if ($key == 0 && $route_seq != 0) continue;
 	if ($key == ($route_seq+1)) continue;
@@ -255,7 +258,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
     <?php echo $hooks['hookTabs'] ?>
   <?php echo $hooktab ?>
 </ul>
-<div id="formtabs" class="tab-content">
+<div id="formtabs" class="tab-content display">
 	<div class="tab-pane active" id="routesettings">
 			<!--ROUTE NAME-->
 			<div class="element-container">

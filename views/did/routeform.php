@@ -3,6 +3,7 @@ if (function_exists('music_list')) {
 	$tresults = music_list();
 	$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
 	if (isset($tresults[0])) {
+		$mohopts = "";
 		foreach ($tresults as $tresult) {
 			($tresult == 'none' ? $ttext = _("No Music") : $ttext = $tresult);
 			($tresult == 'default' ? $ttext = _("Default") : $ttext = $tresult);
@@ -10,7 +11,7 @@ if (function_exists('music_list')) {
 		}
 	}
 	$mohlabel = _("Music On Hold");
-	$mohhelp = _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language."); 
+	$mohhelp = _("Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.");
 	$mohhtml = <<<HERE
 <!--Music On Hold-->
 <div class="element-container">
@@ -23,7 +24,7 @@ if (function_exists('music_list')) {
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="mohclass"></i>
 					</div>
 					<div class="col-md-9">
-						<select name="mohclass" class="form-control" tabindex="$tabindex">
+						<select name="mohclass" class="form-control">
 							$mohopts
 						</select>
 					</div>
@@ -44,7 +45,7 @@ echo $heading;
 echo $userlink
 ?>
 
-<form name="editGRP" class="fpbx-submit" action="config.php?display=did&view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
+<form name="editGRP" class="fpbx-submit" action="config.php?display=did&amp;view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
 	<input type="hidden" name="display" value="did">
 	<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
@@ -85,7 +86,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="description"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="description" name="description" value="<?php echo isset($description)?$description:''; ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="text" class="form-control" id="description" name="description" value="<?php echo isset($description)?$description:''; ?>" ">
 								</div>
 							</div>
 						</div>
@@ -109,7 +110,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="extension" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="text" class="form-control" id="extension" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" ">
 								</div>
 							</div>
 						</div>
@@ -133,7 +134,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="cidnum"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="cidnum" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="text" class="form-control" id="cidnum" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>" ">
 								</div>
 							</div>
 						</div>
@@ -184,7 +185,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="alertinfo"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="alertinfo" name="alertinfo" value="<?php echo $alertinfo ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="text" class="form-control" id="alertinfo" name="alertinfo" value="<?php echo $alertinfo ?>" ">
 								</div>
 							</div>
 						</div>
@@ -208,7 +209,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="grppre"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="grppre" name="grppre" value="<?php echo $grppre ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="text" class="form-control" id="grppre" name="grppre" value="<?php echo $grppre ?>" ">
 								</div>
 							</div>
 						</div>
@@ -313,7 +314,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="delay_answer"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="number" class="form-control" id="delay_answer" name="delay_answer" value="<?php echo ($delay_answer != '0')?$delay_answer:'' ?>" tabindex="<?php echo ++$tabindex;?>">
+									<input type="number" class="form-control" id="delay_answer" name="delay_answer" value="<?php echo ($delay_answer != '0')?$delay_answer:'' ?>" ">
 								</div>
 							</div>
 						</div>
@@ -392,8 +393,8 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="pmminlength"></i>
 								</div>
 								<div class="col-md-9">
-									<?php if(!isset($pmminlength)||$pmminlength==''){$pmminlength=10;}?>
-									<input type="number" min="1" max="16" class="form-control" id="pmminlength" name="pmminlength" value="<?php echo $$pmminlength ?>" <?php  echo ($privacyman == '0' ? 'disabled' : '')?>>
+									<?php if( !isset($pmminlength) || $pmminlength=='' ){ $pmminlength = 10; }?>
+									<input type="number" min="1" max="16" class="form-control" id="pmminlength" name="pmminlength" value="<?php echo $pmminlength ?>" <?php  echo ($privacyman == '0' ? 'disabled' : '')?>>
 								</div>
 							</div>
 						</div>

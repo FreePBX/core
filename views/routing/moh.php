@@ -1,6 +1,7 @@
 <?php
 $tresults = music_list();
 $cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
+$optionhtml = '';
  if (isset($tresults[0])) {
 	foreach ($tresults as $tresult) {
 		$ttext = $tresult;
@@ -22,7 +23,7 @@ $cur = (isset($mohsilence) && $mohsilence != "" ? $mohsilence : 'default');
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="mohsilence"></i>
 					</div>
 					<div class="col-md-9">
-						<select name="mohsilence" class="form-control" tabindex="<?php echo ++$tabindex;?>">
+						<select name="mohsilence" class="form-control">
 							<?php echo $optionhtml ?>
 						</select>
 					</div>

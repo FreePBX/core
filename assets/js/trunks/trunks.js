@@ -322,7 +322,7 @@ function validatePatterns() {
   }
 }
 
-document.trunkEdit.trunk_name.focus();
+//document.trunkEdit.trunk_name.focus();
 
 $(document).ready(function() {
 	$('#submit, #duplicate').click(function() {

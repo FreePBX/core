@@ -27,14 +27,14 @@ foreach ($inroutes as $key => $did_items) {
 $unassignedroutes = $inroutes;
 //All
 $allroutes = core_did_list('');
-
+$allrrows = $didrrows = $uarrows = $incrrows = '';
 foreach($allroutes as $route){
 	$dest = explode(',',$route['destination']);
 	$edis = urlencode($route['extension'].'/'.$route['cidnum']);
  	$displaydesc = ( (trim($route['description']) == "") ? _("None") : $route['description'] );
 	$displaydid = ( (trim($route['extension']) == "") ? _("any DID") : $route['extension'] );
  	$displaycid = ( (trim($route['cidnum']) == "") ? _("any CID") : $route['cidnum'] );
-	$allrrows .= '<tr><td><a href="config.php?display=did&view=form&extdisplay='.$edis.'">'.$displaydesc.'</a></td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td></tr>';
+	$allrrows .= '<tr><td>'.$displaydesc.'</td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td><td class="actions"><a href="config.php?display=did&view=form&extdisplay='.$edis.'"><i class="fa fa-pencil-square-o"></i></a><i class="fa fa-times"></i></td></tr>';
 }
 foreach($incomingroutes as $route){
 	$dest = explode(',',$route['destination']);
@@ -42,7 +42,7 @@ foreach($incomingroutes as $route){
  	$displaydesc = ( (trim($route['description']) == "") ? _("None") : $route['description'] );
 	$displaydid = ( (trim($route['extension']) == "") ? _("any DID") : $route['extension'] );
  	$displaycid = ( (trim($route['cidnum']) == "") ? _("any CID") : $route['cidnum'] );
-	$incrrows .= '<tr><td><a href="config.php?display=did&view=form&extdisplay='.$edis.'">'.$displaydesc.'</a></td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td></tr>';
+	$incrrows .= '<tr><td>'.$displaydesc.'</td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td><td class="actions"><a href="config.php?display=did&view=form&extdisplay='.$edis.'"><i class="fa fa-pencil-square-o"></i></a><i class="fa fa-times"></i></td></tr>';
 }
 foreach($unassignedroutes as $route){
 	$dest = explode(',',$route['destination']);
@@ -50,7 +50,7 @@ foreach($unassignedroutes as $route){
  	$displaydesc = ( (trim($route['description']) == "") ? _("None") : $route['description'] );
 	$displaydid = ( (trim($route['extension']) == "") ? _("any DID") : $route['extension'] );
  	$displaycid = ( (trim($route['cidnum']) == "") ? _("any CID") : $route['cidnum'] );
-	$uarrows .= '<tr><td><a href="config.php?display=did&view=form&extdisplay='.$edis.'">'.$displaydesc.'</a></td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td></tr>';
+	$uarrows .= '<tr><td>'.$displaydesc.'</td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td><td class="actions"><a href="config.php?display=did&view=form&extdisplay='.$edis.'"><i class="fa fa-pencil-square-o"></i></a><i class="fa fa-times"></i></td></tr>';
 }
 foreach($directdidroutes as $route){
 	$dest = explode(',',$route['destination']);
@@ -58,7 +58,7 @@ foreach($directdidroutes as $route){
  	$displaydesc = ( (trim($route['description']) == "") ? _("None") : $route['description'] );
 	$displaydid = ( (trim($route['extension']) == "") ? _("any DID") : $route['extension'] );
  	$displaycid = ( (trim($route['cidnum']) == "") ? _("any CID") : $route['cidnum'] );
-	$didrrows .= '<tr><td><a href="config.php?display=did&view=form&extdisplay='.$edis.'"> '.$displaydesc.'</a></td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td></tr>';
+	$didrrows .= '<tr><td>'.$displaydesc.'</td><td>'.$displaydid.'</td><td>'.$displaycid.'</td><td>'.$dest[1].'</td><td class="actions"><a href="config.php?display=did&view=form&extdisplay='.$edis.'"><i class="fa fa-pencil-square-o"></i></a><i class="fa fa-times"></i></td></tr>';
 }
 ?>
 <ul class="nav nav-tabs" role="tablist">
@@ -83,27 +83,81 @@ foreach($directdidroutes as $route){
 </ul>
 <div class="tab-content display">
 	<div role="tabpanel" id="alldids" class="tab-pane active">
-		<table class="table table-striped">
-			<tr><th>Description</th><th>DID</th><th>CID</th><th>Destination</th></tr>
-			<?php echo $allrrows ?>
+		<div id="toolbar-all">
+			<button id="remove-all" class="btn btn-danger btn-remove" data-type="all" disabled data-section="all">
+				<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+			</button>
+		</div>
+		<table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+			<thead>
+				<tr>
+					<th data-sortable="true"><?php echo _('Description')?></th>
+					<th data-sortable="true"><?php echo _('DID')?></th>
+					<th data-sortable="true"><?php echo _('CID')?></th>
+					<th data-sortable="true"><?php echo _('Destination')?></th>
+					<th><?php echo _('Actions')?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php echo $allrrows ?>
+			</tbody>
 		</table>
 	</div>
 	<div role="tabpanel" id="userdids" class="tab-pane">
-		<table class="table table-striped">
-			<tr><th>Description</th><th>DID</th><th>CID</th><th>Destination</th></tr>
+		<div id="toolbar-user">
+			<button id="remove-user" class="btn btn-danger btn-remove" data-type="user" disabled data-section="user">
+				<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+			</button>
+		</div>
+		<table data-toolbar="#toolbar-user" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+			<thead>
+				<tr>
+					<th data-sortable="true"><?php echo _('Description')?></th>
+					<th data-sortable="true"><?php echo _('DID')?></th>
+					<th data-sortable="true"><?php echo _('CID')?></th>
+					<th data-sortable="true"><?php echo _('Destination')?></th>
+					<th><?php echo _('Actions')?></th>
+				</tr>
+			</thead>
 			<?php echo $didrrows ?>
-		</table>	
+		</table>
 	</div>
 	<div role="tabpanel" id="generaldids" class="tab-pane">
-		<table class="table table-striped">
-			<tr><th>Description</th><th>DID</th><th>CID</th><th>Destination</th></tr>
+		<div id="toolbar-general">
+			<button id="remove-general" class="btn btn-danger btn-remove" data-type="general" disabled data-section="general">
+				<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+			</button>
+		</div>
+		<table data-toolbar="#toolbar-general" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+			<thead>
+				<tr>
+					<th data-sortable="true"><?php echo _('Description')?></th>
+					<th data-sortable="true"><?php echo _('DID')?></th>
+					<th data-sortable="true"><?php echo _('CID')?></th>
+					<th data-sortable="true"><?php echo _('Destination')?></th>
+					<th><?php echo _('Actions')?></th>
+				</tr>
+			</thead>
 			<?php echo $incrrows ?>
-		</table>		
+		</table>
 	</div>
 	<div role="tabpanel" id="unuseddids" class="tab-pane">
-		<table class="table table-striped">
-			<tr><th>Description</th><th>DID</th><th>CID</th><th>Destination</th></tr>
+		<div id="toolbar-unused">
+			<button id="remove-unused" class="btn btn-danger btn-remove" data-type="unused" disabled data-section="unused">
+				<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+			</button>
+		</div>
+		<table data-toolbar="#toolbar-unused" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+			<thead>
+				<tr>
+					<th data-sortable="true"><?php echo _('Description')?></th>
+					<th data-sortable="true"><?php echo _('DID')?></th>
+					<th data-sortable="true"><?php echo _('CID')?></th>
+					<th data-sortable="true"><?php echo _('Destination')?></th>
+					<th><?php echo _('Actions')?></th>
+				</tr>
+			</thead>
 			<?php echo $uarrows ?>
-		</table>		
+		</table>
 	</div>
 </div>
