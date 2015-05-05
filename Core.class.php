@@ -250,7 +250,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					//The edit page has extdisplay but not tech_hardware. The add page is the oppisite. If we have
 					//neither we assume we are on the gid page.
 					if(empty($request['tech_hardware'])){
-						unset($buttons);
+						$buttons = array();
 					}
 				}
 			break;
@@ -311,7 +311,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 				if(!isset($request['view'])||$request['view'] == ''){
-					unset($buttons);
+					$buttons = array();
 				}
 			break;
 			case 'routing':
@@ -341,7 +341,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete'], $buttons['duplicate']);
 				}
 				if (empty($request['view'])){
-					unset($buttons);
+					$buttons = array();
 				}
 			break;
 			case 'trunks':

@@ -1,4 +1,5 @@
 <?php
+$blrows = '';
 foreach (core_dahdichandids_list() as $item) {
 		$channel = $item['channel'];
 		$did = $item['did'];
@@ -16,7 +17,7 @@ $blrows .= <<<HERE
 HERE;
 }
 ?>
-<div class="table-responsive"> 
+<div class="table-responsive">
 	<table class="table table-striped table-bordered">
 		<thead>
 			<tr>

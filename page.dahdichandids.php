@@ -1,5 +1,5 @@
 <?php
-$view = $_REQUEST['view'];
+$view = !empty($_REQUEST['view']) ? $_REQUEST['view'] : '';
 extract($_REQUEST);
 
 switch($view){
