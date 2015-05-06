@@ -4231,15 +4231,8 @@ function core_ampusers_list() {
 /* begin page.did.php functions */
 
 function core_did_list($order='extension'){
-	switch ($order) {
-		case 'description':
-		$sql = "SELECT * FROM incoming ORDER BY description,extension,cidnum";
-		break;
-		case 'extension':
-		default:
-		$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
-	}
-	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+	_core_backtrace();
+	return FreePBX::Core()->getAllDIDs($order);
 }
 
 function core_did_get($extension="",$cidnum=""){
@@ -4676,6 +4669,11 @@ function core_users2astdb(){
 
 function core_hint_get($account){
 	global $astman;
+	static $hintCache;
+
+	if (isset($hintCache[$account])) {
+		return $hintCache[$account];
+	}
 
 	$chan_dahdi = ast_with_dahdi();
 	// We should always check the AMPUSER in case they logged into a device
@@ -4713,6 +4711,7 @@ function core_hint_get($account){
 		}
 	}
 
+	$hintCache[$account] = $hint;
 	return $hint;
 }
 

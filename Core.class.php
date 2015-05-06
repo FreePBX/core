@@ -1183,10 +1183,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	* @param {bool} $get_all=false Whether to get all of check in the range
 	*/
 	function listUsers($get_all=false) {
-		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
-		$sth = $this->database->prepare($sql);
-		$sth->execute();
-		$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+		if (empty($this->listUsersCache)) {
+			$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+			$sth = $this->database->prepare($sql);
+			$sth->execute();
+			$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+			$this->listUsersCache = $results;
+		} else {
+			$results = $this->listUsersCache;
+		}
+
 		//only allow extensions that are within administrator's allowed range
 		foreach($results as $result){
 			if ($get_all || checkRange($result[0])){
@@ -1274,22 +1280,32 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 */
 	public function getAllDevicesByType($type="") {
 		if(empty($type)) {
-			$sql = "SELECT * FROM devices ORDER BY id";
-			$sth = $this->database->prepare($sql);
-			try {
-				$sth->execute();
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			} catch(\Exception $e) {
-				return array();
+			if (empty($this->deviceCache['full'])) {
+				$sql = "SELECT * FROM devices ORDER BY id";
+				$sth = $this->database->prepare($sql);
+				try {
+					$sth->execute();
+					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				} catch(\Exception $e) {
+					return array();
+				}
+				$this->deviceCache['full'] = $results;
+			} else {
+				$results = $this->deviceCache['full'];
 			}
 		} else {
-			$sql = "SELECT * FROM devices WHERE tech = ? ORDER BY id";
-			$sth = $this->database->prepare($sql);
-			try {
-				$sth->execute(array($type));
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			} catch(\Exception $e) {
-				return array();
+			if (empty($this->deviceCache[$type])) {
+				$sql = "SELECT * FROM devices WHERE tech = ? ORDER BY id";
+				$sth = $this->database->prepare($sql);
+				try {
+					$sth->execute(array($type));
+					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				} catch(\Exception $e) {
+					return array();
+				}
+				$this->deviceCache[$type] = $results;
+			} else {
+				$results = $this->deviceCache[$type];
 			}
 		}
 		return $results;
@@ -1299,13 +1315,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * Get all Users
 	 */
 	public function getAllUsers() {
-		$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
-		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute();
-			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-		} catch(\Exception $e) {
-			return array();
+		if (empty($this->allUsersCache)) {
+			$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute();
+				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$this->allUsersCache = $results;
+			} catch(\Exception $e) {
+				return array();
+			}
+		} else {
+			$results = $this->allUsersCache;
 		}
 		return $results;
 	}
@@ -1372,6 +1393,48 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return false;
 		} else {
 			return true;
+		}
+	}
+
+	/**
+	 * Get Inbound Routes (DIDs)
+	 * @param string $order Whether to order results by extension or description
+	 */
+	public function getAllDIDs($order='extension') {
+		switch ($order) {
+			case 'description':
+			$sql = "SELECT * FROM incoming ORDER BY description,extension,cidnum";
+			break;
+			case 'extension':
+			default:
+			$sql = "SELECT * FROM incoming ORDER BY extension,cidnum";
+		}
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		try {
+			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		return $results;
+	}
+
+	public function addDID($settings) {
+		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
+		$invalidDIDChars = array('<', '>');
+		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
+		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
+
+		// Check to make sure the did is not being used elsewhere
+		//
+		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
+		if (empty($existing)) {
+			$sql="INSERT INTO incoming (cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array(':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -1752,5 +1815,188 @@ public function hookTabs($page){
 		$hookcontent .= '</div>';
 	}
 	return array("hookTabs" => $hookTabs, "hookContent" => $hookcontent, "oldHooks" => $module_hook->hookHtml);
+	}
+
+	public function bulkhandlerGetTypes() {
+		return array(
+			'extensions' => array(
+				'name' => _('Extensions'),
+				'description' => _('Extensions')
+			),
+			'dids' => array(
+				'name' => _('DIDs'),
+				'description' => _('DIDs / Inbound Routes')
+			)
+		);
+	}
+
+	public function bulkhandlerGetHeaders($type) {
+		switch ($type) {
+		case 'extensions':
+			$headers = array(
+				'extension' => array(
+					'required' => true,
+					'identifier' => _('Extension'),
+					'description' => _('Extension'),
+				),
+				'name' => array(
+					'identifier' => _('Name'),
+					'description' => _('Name'),
+				),
+				'description' => array(
+					'identifier' => _('Description'),
+					'description' => _('Description'),
+				),
+				'tech' => array(
+					'required' => true,
+					'identifier' => _('Device Technology'),
+					'description' => _('Device Technology'),
+				),
+			);
+
+			foreach($this->drivers as $driver) {
+				if (method_exists($driver, 'getDeviceHeaders')) {
+					$driverheaders = $driver->getDeviceHeaders();
+					if ($driverheaders) {
+						$headers = array_merge($headers, $driverheaders);
+					}
+				}
+			}
+
+			return $headers;
+
+			break;
+		case 'dids':
+			$headers = array(
+				'description' => array(
+					'identifier' => _('Description'),
+					'description' => _('Description'),
+				),
+				'extension' => array('description' => _('Incoming DID')),
+				'cidnum' => array('description' => _('Caller ID Number')),
+				'destination' => array(
+					'description' => _('The context, extension, priority to go to when this DID is matched. Example: app-daynight,0,1'),
+					'type' => 'destination',
+				),
+			);
+
+			return $headers;
+
+			break;
+		}
+	}
+	public function bulkhandlerValidate($type, $rawData) {
+		$ret = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			if (true) {
+				$ret = array(
+					'status' => true,
+				);
+			} else {
+				$ret = array(
+					'status' => false,
+					'message' => sprintf(_('%s records failed validation'), count($rawData))
+				);
+			}
+			break;
+		}
+
+		return $ret;
+	}
+
+	public function bulkhandlerImport($type, $rawData) {
+		$ret = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			foreach ($rawData as $data) {
+				if (!is_numeric($data['extension'])) {
+					return array("status" => false, "message" => _("Extension is not numeric."));
+				}
+
+				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
+				foreach ($settings as $key => $value) {
+					if (isset($data[$key])) {
+						/* Override default setting with our value. */
+						$settings[$key]['value'] = $data[$key];
+					}
+				}
+
+				try {
+					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
+						return array("status" => false, "message" => _("Device could not be added."));
+					}
+				} catch(\Exception $e) {
+					return array("status" => false, "message" => $e->getMessage());
+				}
+
+				$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
+				foreach ($settings as $key => $value) {
+					if (isset($data[$key])) {
+						/* Override default setting with our value. */
+						$settings[$key] = $data[$key];
+					}
+				}
+
+				try {
+					if (!$this->addUser($data['extension'], $settings)) {
+						//cleanup
+						$this->delDevice($data['extension']);
+						return array("status" => false, "message" => _("User could not be added."));
+					}
+				} catch(\Exception $e) {
+					//cleanup
+					$this->delDevice($data['extension']);
+					return array("status" => false, "message" => $e->getMessage());
+				}
+			}
+
+			needreload();
+			$ret = array(
+				'status' => true,
+			);
+
+			break;
+		case "dids":
+			foreach ($rawData as $data) {
+				$this->addDID($data);
+			}
+
+			needreload();
+			$ret = array(
+				'status' => true,
+			);
+
+			break;
+		}
+
+		return $ret;
+	}
+
+	public function bulkhandlerExport($type) {
+		$data = NULL;
+
+		switch ($type) {
+		case 'extensions':
+			$users = $this->getAllUsersByDeviceType();
+			foreach ($users as $user) {
+				$device = $this->getDevice($user['extension']);
+				if (isset($device['secret_origional'])) {
+					/* Don't expose our typo laden craziness to users.  We like our users! */
+					unset($device['secret_origional']);
+				}
+
+				$data[$user['extension']] = array_merge($user, $device);
+			}
+
+			break;
+		case 'dids':
+			$data = $this->getAllDIDs();
+			break;
+		}
+
+		return $data;
 	}
 }

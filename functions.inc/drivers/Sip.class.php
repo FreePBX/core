@@ -419,4 +419,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 
 		return $devopts;
 	}
+
+	public function getDeviceHeaders() {
+		return array(
+			'secret' => array('description' => _('Secret')),
+		);
+	}
 }
