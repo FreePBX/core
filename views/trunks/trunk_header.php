@@ -136,7 +136,7 @@
 			    </td>
 			</tr>
 <?php }
-	if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
+	if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	?>
     <tr>
       <td colspan="2"><h4>
