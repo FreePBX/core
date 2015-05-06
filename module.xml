@@ -125,7 +125,8 @@
 	</supported>
 	<hooks>
 		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler">
-			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes">bulkhandlerGetTypes</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes" priority="100">bulkhandlerGetTypes</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getHeaders" priority="100">bulkhandlerGetHeaders</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="validate">bulkhandlerValidate</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import" priority="100">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export" priority="100">bulkhandlerExport</method>

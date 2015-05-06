@@ -1798,6 +1798,61 @@ public function hookTabs($page){
 		);
 	}
 
+	public function bulkhandlerGetHeaders($type) {
+		switch ($type) {
+		case 'extensions':
+			$headers = array(
+				'extension' => array(
+					'required' => true,
+					'identifier' => _('Extension'),
+					'description' => _('Extension'),
+				),
+				'name' => array(
+					'identifier' => _('Name'),
+					'description' => _('Name'),
+				),
+				'description' => array(
+					'identifier' => _('Description'),
+					'description' => _('Description'),
+				),
+				'tech' => array(
+					'required' => true,
+					'identifier' => _('Device Technology'),
+					'description' => _('Device Technology'),
+				),
+			);
+
+			foreach($this->drivers as $driver) {
+				if (method_exists($driver, 'getDeviceHeaders')) {
+					$driverheaders = $driver->getDeviceHeaders();
+					if ($driverheaders) {
+						$headers = array_merge($headers, $driverheaders);
+					}
+				}
+			}
+
+			return $headers;
+
+			break;
+		case 'dids':
+			$headers = array(
+				'description' => array(
+					'identifier' => _('Description'),
+					'description' => _('Description'),
+				),
+				'extension' => array('description' => _('Incoming DID')),
+				'cidnum' => array('description' => _('Caller ID Number')),
+				'destination' => array(
+					'description' => _('The context, extension, priority to go to when this DID is matched. Example: app-daynight,0,1'),
+					'type' => 'destination',
+				),
+			);
+
+			return $headers;
+
+			break;
+		}
+	}
 	public function bulkhandlerValidate($type, $rawData) {
 		$ret = NULL;
 
@@ -1896,6 +1951,11 @@ public function hookTabs($page){
 			$users = $this->getAllUsersByDeviceType();
 			foreach ($users as $user) {
 				$device = $this->getDevice($user['extension']);
+				if (isset($device['secret_origional'])) {
+					/* Don't expose our typo laden craziness to users.  We like our users! */
+					unset($device['secret_origional']);
+				}
+
 				$data[$user['extension']] = array_merge($user, $device);
 			}
 
