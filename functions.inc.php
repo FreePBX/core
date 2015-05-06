@@ -4287,7 +4287,7 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 function core_did_create_update($did_vars) {
 	$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
 	$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
-	if (count(core_did_get($did_create['extension'], $did_create['$cidnum']))) {
+	if (count(core_did_get($did_create['extension'], $did_create['cidnum']))) {
 		return core_did_edit_properties($did_vars); //already exists so just edit properties
 	} else {
 		$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
