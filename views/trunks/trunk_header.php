@@ -89,7 +89,7 @@ $dpmrhtml .= '<strong>Z</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 
 $dpmrhtml .= '<strong>N</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 2-9") . '<br />';
 $dpmrhtml .= '<strong>[1237-9]</strong>&nbsp;'   . _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)").'<br />';
 $dpmrhtml .= '<strong>.</strong>&nbsp;&nbsp;&nbsp;' . _("wildcard, matches one or more characters (not allowed before a | or +)").'<br />';
-if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
+if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpmrtop = _("A Dial Rule controls how calls will be dialed on this trunk. It can be used to add or remove prefixes. Numbers that don't match any patterns defined here will be dialed as-is. Note that a pattern without a + or | (to add or remove a prefix) will not make any changes but will create a match. Only the first matched rule will be executed and the remaining rules will not be acted on.").'<br /><br />';
 	$dpmrhtml .= '<strong>|</strong>&nbsp;&nbsp;&nbsp;' . _("removes a dialing prefix from the number (for example, 613|NXXXXXX would match when some dialed \"6135551234\" but would only pass \"5551234\" to the trunk");
 	$dpmrhtml .= '<strong>+</strong>&nbsp;&nbsp;&nbsp;' . _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)").'<br /><br />';
@@ -128,7 +128,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';	
+		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 		$dpinput[] = '	</div>';
@@ -145,7 +145,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '</td>';
 		$dpinput[] = '</tr>';
 	}
-	//Always an empty row incase there are no patterns.... 
+	//Always an empty row incase there are no patterns....
 	$next_idx = count($dialpattern_array);
 	$idx = !empty($idx) ? $idx : $next_idx;
 	$tabindex++;
@@ -171,7 +171,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
-	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';	
+	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 	$dpinput[] = '	</div>';
@@ -195,7 +195,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
 		$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
 		$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
-		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;	
+		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;
 	}
 	$dpinput[] = '</textarea>';
 	$dprows = implode(PHP_EOL, $dpinput);
