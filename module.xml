@@ -121,6 +121,15 @@
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
+	<hooks>
+		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler">
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes" priority="100">bulkhandlerGetTypes</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getHeaders" priority="100">bulkhandlerGetHeaders</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="validate">bulkhandlerValidate</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="import" priority="100">bulkhandlerImport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="export" priority="100">bulkhandlerExport</method>
+		</bulkhandler>
+	</hooks>
 	<supported>
 		<version>13.0</version>
 	</supported>
