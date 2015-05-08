@@ -4,6 +4,7 @@ namespace FreePBX\modules;
 class Core extends \FreePBX_Helpers implements \BMO  {
 
 	private $drivers = array();
+	private $deviceCache = array();
 
 	public function __construct($freepbx = null) {
 		parent::__construct($freepbx);
