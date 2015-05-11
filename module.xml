@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha16</version>
+	<version>13.0.1alpha17</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha17* Return an array if empty not a null
 		*13.0.1alpha16* Dynamic hints phase 1, core speed up improvements			
 		*13.0.1alpha15* add sorting, mass delete and fixes FREEPBX-9193
 		*13.0.1alpha14* wrap in quotes to prevent an invalid syntax error on transfer if no ringtimer set

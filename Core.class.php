@@ -1205,7 +1205,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			sort($extens);
 			return $extens;
 		} else {
-			return null;
+			return array();
 		}
 	}
 

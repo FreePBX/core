@@ -196,25 +196,27 @@ $key = -1;
 $positions=count($trunkpriority);
 $trunkhtml .= '<table class = "table">';
 $trunkhtml .= '<tbody id="routetrunks">';
-foreach ($trunkpriority as $key=>$trunk) {
-			$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
-			$trunkhtml .= '<td>';
-			$trunkhtml .= '<div class="input-group">';
-			$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
-		    $trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
-			$trunkhtml .= '<option value=""></option>';
-			foreach ($trunks as $name=>$display_description) {
-				if ($trunkstate[$name] == 'off') {
-					$trunkhtml .= '<option id="trunk'.$key.'" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
-				} else {
-					$trunkhtml .= '<option id="trunk'.$key.'" class="text-danger" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
+if(!empty($trunkpriority) && is_array($trunkpriority)) {
+	foreach ($trunkpriority as $key=>$trunk) {
+				$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
+				$trunkhtml .= '<td>';
+				$trunkhtml .= '<div class="input-group">';
+				$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+			    $trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
+				$trunkhtml .= '<option value=""></option>';
+				foreach ($trunks as $name=>$display_description) {
+					if ($trunkstate[$name] == 'off') {
+						$trunkhtml .= '<option id="trunk'.$key.'" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
+					} else {
+						$trunkhtml .= '<option id="trunk'.$key.'" class="text-danger" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
+					}
 				}
-			}
 
-			$trunkhtml .= '</select>';
-			$trunkhtml .= '</div>';
-			$trunkhtml .= '</td>';
-			$trunkhtml .= '</tr>';
+				$trunkhtml .= '</select>';
+				$trunkhtml .= '</div>';
+				$trunkhtml .= '</td>';
+				$trunkhtml .= '</tr>';
+	}
 }
 $key += 1;
 $name = "";
