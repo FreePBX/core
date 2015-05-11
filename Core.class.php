@@ -79,7 +79,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * Load all "core" drivers
 	 */
 	public function loadDrivers() {
-		if(!class_exists("FreePBX\Modules\Core\Drivers",false)) {
+		if(!class_exists("FreePBX\Modules\Core\Driver",false)) {
 			include(__DIR__."/functions.inc/Driver.class.php");
 		}
 		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
