@@ -892,9 +892,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}// $page == "did"
 
 		if ($page == "astmodules") {
-			$action = $request['action'];
-			$section = $request['section'];
-			$module = $request['module'];
+			$action = !empty($request['action']) ? $request['action'] : '';
+			$section = !empty($request['section']) ? $request['section'] : '';
+			$module = !empty($request['module']) ? $request['module'] : '';
 			switch($action){
 				case 'add':
 					switch($section){

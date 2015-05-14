@@ -52,7 +52,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+							<table data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>

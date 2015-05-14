@@ -178,6 +178,9 @@ if(is_array($active_modules)){
 		//create an array of module sections to display
 		if (isset($module['items']) && is_array($module['items'])) {
 			foreach($module['items'] as $itemKey => $item) {
+				if(!isset($module['rawname'])) {
+					continue;
+				}
 				$listKey = (!empty($item['display']) ? $item['display'] : $itemKey);
 				$item['rawname'] = $module['rawname'];
 				$item['name'] = modgettext::_($item['name'],$module['rawname']);
@@ -189,7 +192,7 @@ if(is_array($active_modules)){
 $selected = array();
 $unselected = array();
 foreach ($module_list as $key => $val) {
-	if(in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*' ){
+	if(is_array($user['sections']) && (in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*')){
 		$selected[] = '<li data-id="'.$key.'" class="label label-info" style="display:inline-block">'.$val['name'].'</li>';
 		$selected[] = '<input type="hidden" name="sections[]" value="'.$key.'">';
 	}else{
@@ -273,11 +276,6 @@ foreach ($module_list as $key => $val) {
 												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
 											</div>
 											<div class="col-md-10">
-												<!--
-												<select multiple class="form-control" id="sections" name="sections" tabindex = "<?php ++$tabindex?>">
-													<?php echo $sectionOptions?>
-												</select>
-											-->
 												<input type="hidden" name="sections[]" id="sections" value="">
 												<div class="row">
 													<div class="panel col-md-5">
