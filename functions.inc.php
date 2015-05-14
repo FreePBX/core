@@ -3368,8 +3368,8 @@ function core_do_get_config($engine) {
 	$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
 	$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
 	$loops = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_LOOPS'", "getOne");
-	$ext->add('macro-vm','vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 2)));
-	$ext->add('macro-vm','vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 1)));
+	$ext->add('macro-vm','vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 2)));
+	$ext->add('macro-vm','vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 1)));
 	$ext->add('macro-vm','vmx', '', new ext_set("VMX_LOOPS", (isset($loops) ? $loops : 1)));
 	$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));
 	/* Replaced
