@@ -8,7 +8,7 @@ $c = 'func-set-sipheader'; // Context
 $e = 's'; // Exten
 
 $ext->add($c,$e,'', new ext_noop('Sip Add Header function called. Adding ${ARG1} = ${ARG2}'));
-$ext->add($c,$e,'', new ext_set('HASH(SIPHEADERS,${ARG1})', '${ARG2}'));
+$ext->add($c,$e,'', new ext_set('HASH(_SIPHEADERS,${ARG1})', '${ARG2}'));
 $ext->add($c,$e,'', new ext_return());
 
 /*

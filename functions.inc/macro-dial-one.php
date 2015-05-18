@@ -40,7 +40,7 @@ $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"="#"]','skiptrace
 $ext->add($mcontext,$exten,'', new ext_gosubif('$[${REGEX("^[\+]?[0-9]+$" ${CALLERID(number)})} = 1]','ctset,1','ctclear,1'));
 //TODO: do we need to check for anything beyond auto-blkvm in this call path?
 $ext->add($mcontext,$exten,'skiptrace', new ext_set('D_OPTIONS', '${IF($["${NODEST}"!="" & ${REGEX("(M[(]auto-blkvm[)])" ${ARG2})} != 1]?${ARG2}M(auto-blkvm):${ARG2})}'));
-$ext->add($mcontext,$exten,'', new ext_gosubif('$["${ALERT_INFO}"!=""]', 'func-set-sipheader,s,1(Alert-Info, ${ALERT_INFO})'));
+$ext->add($mcontext,$exten,'', new ext_gosubif('$["${ALERT_INFO}"!=""]', 'func-set-sipheader,s,1(Alert-Info,${ALERT_INFO})'));
 // This is now broken. SIPADDHEADER needs to be a hash. TODO figure out how to fix this
 // $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
 $ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
@@ -68,7 +68,7 @@ if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
 //Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
 //We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
 $ext->add($mcontext,$exten,'godial', new ext_macro('dialout-one-predial-hook'));
-$ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
+$ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}b(func-apply-sipheaders^s^1)'));
 $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
 $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
