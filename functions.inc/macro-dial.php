@@ -26,7 +26,7 @@ $ext->add($c,$s,'', new ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "
 // explicitly set a priority.
 $ext->_exts[$c][" s "][] = array('basetag' => 20, 'tag' => 'huntdial', 'addpri' => false, 'cmd' => new ext_noop('Returned from dialparties with hunt groups to dial '));
 
-$ext->add($c,$s,'', new ext_set('HuntLoop', 0));
+$ext->add($c,$s,'', new ext_set('HuntLoop', (string) '0')); // String zeros, to avoid php getting confused.
 $ext->add($c,$s,'a22', new ext_gotoif('$[${HuntMembers} >= 1]', 'a30')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_noop('Returning there are no members left in the hunt group to ring'));
 $ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'), 'n', 2);
@@ -35,7 +35,7 @@ $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoo
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
 $ext->add($c,$s,'', new ext_goto('a42', 's'));
 $ext->add($c,$s,'a35', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $["${RingGroupMethod}" = "memoryhunt" ]]', 'a36', 'a50'));
-$ext->add($c,$s,'a36', new ext_set('CTLoop', 0));
+$ext->add($c,$s,'a36', new ext_set('CTLoop', (string) '0')); // String zeros.
 $ext->add($c,$s,'a37', new ext_gotoif('$[${CTLoop} > ${HuntLoop}]', 'a42')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${CTLoop} + 1])}'));
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
@@ -45,7 +45,7 @@ $ext->add($c,$s,'a42', new ext_dial('${${HuntMember}}${ds}', ''));
 $ext->add($c,$s,'', new ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
 $ext->add($c,$s,'', new ext_gotoif('$[$[$["foo${RingGroupMethod}" != "foofirstavailable"] & $["foo${RingGroupMethod}" != "foofirstnotonphone"]] | $["foo${DialStatus}" = "fooBUSY"]]', 'a46'));
-$ext->add($c,$s,'', new ext_set('HuntMembers', (string) '0')); // PHP-ism. String a zero, just because.
+$ext->add($c,$s,'', new ext_set('HuntMembers', (string) '0')); // String zeros.
 $ext->add($c,$s,'a46', new ext_set('HuntMembers', '$[${HuntMembers} - 1]'));
 $ext->add($c,$s,'', new ext_goto('a22', 's'));
 $ext->add($c,$s,'a50', new ext_noop('Deleting: CALLTRACE/${CT_EXTEN} ${DB_DELETE(CALLTRACE/${CT_EXTEN})}'));
