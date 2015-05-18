@@ -11,7 +11,7 @@
  * before you change anything.
  */
 
-$c = "macro-dial-xxx";
+$c = "macro-dial";
 $s = "s";
 
 $ext->add($c,$s,'', new ext_gotoif('$["${MOHCLASS}" = ""]', 'dial'));
