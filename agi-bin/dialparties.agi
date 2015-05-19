@@ -789,7 +789,7 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 					$ds = get_var($agi, "PJSIP_DIAL_CONTACTS(".substr($ds, 6).")");
 					debug("Ended up with real PJSIP Dial string $ds", 3);
 				}
-				$dialstring .= "$ds&";
+				$dialstring .= $ds.'&';
 			} else {
 				$dialstring .= 'Local/LC-'.$adevice.'@from-internal&';
 			}
