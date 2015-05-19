@@ -5,6 +5,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	private $drivers = array();
 	private $deviceCache = array();
+	private $getUserCache = array();
+	private $listUsersCache = array();
 
 	public function __construct($freepbx = null) {
 		parent::__construct($freepbx);
@@ -892,9 +894,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}// $page == "did"
 
 		if ($page == "astmodules") {
-			$action = !empty($request['action']) ? $request['action'] : '';
-			$section = !empty($request['section']) ? $request['section'] : '';
-			$module = !empty($request['module']) ? $request['module'] : '';
+			$action = $request['action'];
+			$section = $request['section'];
+			$module = $request['module'];
 			switch($action){
 				case 'add':
 					switch($section){
@@ -1269,6 +1271,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		$tech = $devinfo['tech'];
+
+		//TODO should only delete the record for this device buuuutttt......
+		$this->deviceCache = array();
 		if(isset($this->drivers[$tech])) {
 			return $this->drivers[$tech]->delDevice($account);
 		}
@@ -1670,11 +1675,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//delete from devices table
 		$sql = "DELETE FROM users WHERE extension = ?";
 		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($extension));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
-		}
+		$sth->execute(array($extension));
 
 		//delete details to astdb
 		$astman = $this->FreePBX->astman;
@@ -1686,10 +1687,26 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_deltree("AMPUSER/".$extension);
 		}
 
+		//TODO: Should only delete it's reference
+		//but the array is multidimensional and sucks
+		//OUT > Array
+		//(
+		//    [0] => Array
+		//        (
+		//            [extension] => 1005
+		//            [0] => 1005
+		//            [name] => WTF
+		//            [1] => WTF
+		//            [voicemail] => novm
+		//            [2] => novm
+		//        )
+		//
+		//)
+		$this->listUsersCache = array();
+
 		return true;
 	}
 
-	protected $getUserCache = array();
 	/**
 	 * Get User Details
 	 * @param int $extension The user number (extension)
