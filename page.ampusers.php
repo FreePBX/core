@@ -137,38 +137,7 @@ if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "usermana
 	$authtypewarn = '<div class="alert alert-danger" role="alert"><b>'._("NOTE").':</b> '._("Authorization Type is set to 'usermanager' in Advanced Settings - note that this module is not currently providing full access control and is only used as a failover, stop-gap until this pane is fully migrated to User Manager. You will still be able to login with the users below as long as their username does not exist in User Manager").'</div>';
 }
 $prev_category = NULL;
-/*
-foreach ($module_list as $key => $row) {
-	if ($row['category'] != $prev_category) {
-		if ($prev_category)
-			$sectionOptions .= "</optgroup>\n";
-		$sectionOptions .= "<optgroup label=\""._($row['category'])."\">\n";
-		$prev_category = $row['category'];
-	}
 
-	$sectionOptions .= "<option value=\"".$key."\"";
-	if (in_array($key, $sections)) echo " SELECTED";
-	$label = modgettext::_($row['name'],$row['rawname']);
-	$sectionOptions .= ">"._($row['name'])."</option>\n";
-}
-				$sectionOptions .= "</optgroup>\n";
-
-				// Apply Changes Bar
-				$sectionOptions .= "<option value=\"99\"";
-				if (in_array("99", $sections)) $sectionOptions .= " SELECTED";
-				$sectionOptions .= ">"._("Apply Changes Bar")."</option>\n";
-
-				// Apply Changes Bar
-				$sectionOptions .= "<option value=\"999\"";
-				if (in_array("999", $sections)) $sectionOptions .= " SELECTED";
-				$sectionOptions .= ">".(($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))."</option>\n";
-
-				// All Sections
-				$sectionOptions .= "<option value=\"*\"";
-				if (in_array("*", $sections)) $sectionOptions .= " SELECTED";
-				$sectionOptions .= ">"._("ALL SECTIONS")."</option>\n";
-
-*/
 if(is_array($active_modules)){
 	$dis = ($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension");
 	$active_modules['au']['items'][] = array('name' => _("Apply Changes Bar"), 'display' => '99');
@@ -189,6 +158,20 @@ if(is_array($active_modules)){
 		}
 	}
 }
+$module_list[99] = array(
+	"name" => _("Apply Changes Bar")
+);
+$module_list[999] = array(
+	"name" => (($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension"))
+);
+$module_list['*'] = array(
+	"name" => _("ALL SECTIONS")
+);
+
+uasort($module_list, function($a, $b) {
+	return(strnatcmp($a['name'],$b['name']));
+});
+
 $selected = array();
 $unselected = array();
 foreach ($module_list as $key => $val) {

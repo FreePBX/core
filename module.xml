@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha19</version>
+	<version>13.0.1alpha20</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha20* Add missing sections back into admin
 		*13.0.1alpha19* Clear cache when deleting things
 		*13.0.1alpha18* Declare the correct namespace name
 		*13.0.1alpha17* Return an array if empty not a null
