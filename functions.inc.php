@@ -1184,6 +1184,9 @@ function core_do_get_config($engine) {
 			}
 		}
 
+		// FREEPBX-7280 - macro-dial
+		include 'functions.inc/macro-dial.php';
+
 		/* This needs to be before outbound-routes since they can have a wild-card in them
 		*
 		;------------------------------------------------------------------------
