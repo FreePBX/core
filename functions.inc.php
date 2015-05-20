@@ -3981,6 +3981,7 @@ function core_do_get_config($engine) {
 
 	/* macro-hangupcall */
 
+<<<<<<< HEAD
 	/*
 	; macro-dial-one
 	;
@@ -4176,6 +4177,10 @@ function core_do_get_config($engine) {
 			$ext->add($mcontext,$exten,'', new ext_return(''));
 		}
 	}
+=======
+	include 'functions.inc/macro-dial-one.php';
+	include 'functions.inc/func-sipheaders.php';
+>>>>>>> feature/FREEPBX-8860
 	break;
 }
 }

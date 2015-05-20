@@ -76,17 +76,25 @@ $dialopts	= get_var( $AGI, "ARG2" );
 $rgmethod	= get_var( $AGI, "RingGroupMethod" );
 $rgmethod = trim($rgmethod);
 
+// Get all headers
+$headers = array();
 $alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
 	debug("Setting Alert-Info:  $alertinfo", 4);
+	$headers['Alert-Info'] = $alertinfo;
 	$AGI->set_alertinfo($alertinfo);
 }
 
 $sippheader = get_var( $AGI, "SIPADDHEADER" );
 if ($sippheader) {
 	$fields = explode(':',$sippheader,2);
-	debug("Setting sipheader ".$fields[0].": ".$fields[1], 4);
-	$AGI->exec_sipaddheader($fields[0], $fields[1]);
+	$headers[$fields[0]] = $fields[1];
+}
+
+
+foreach ($headers as $h => $v) {
+	debug("Setting sipheader $h: $v", 4);
+	$AGI->set_variable("HASH(_SIPHEADERS,$h)", $v);
 }
 
 // Follow-Me is only one setting PR_DIALSTATUS so don't bother fetching if not a followme
