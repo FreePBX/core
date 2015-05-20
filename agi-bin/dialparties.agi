@@ -24,7 +24,6 @@ debug("Starting New Dialparties.agi", 1);
 // Get required channels variables that used to come from amportal.conf
 $cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
 $ast_version = get_var( $AGI, "ASTVERSION" );
-$chan_dahdi  = get_var( $AGI, "ASTCHANDAHDI" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
@@ -762,7 +761,6 @@ function get_var( $agi, $value) {
 }
 
 function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
-	global $chan_dahdi;
 	$dialstring = '';
 
 	if (strpos($extnum,'#') != 0) {
@@ -790,12 +788,16 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 		foreach ($device_array as $adevice) {
 			if (trim($use_confirmation) == "FALSE") {
 				$dds = $agi->database_get('DEVICE',$adevice.'/dial');
-				if ($chan_dahdi) {
-					$dialstring .= str_replace('ZAP/', 'DAHDI/', $dds['data']);
-				} else {
-					$dialstring .= $dds['data'];
+				// Check to see if this is a PJSIP device. If so, grab
+				// the correct dial string from PJSIP_DIAL_CONTACTS.
+
+				$ds = $dds['data'];
+				if (substr($ds, 0, 5) === "PJSIP") {
+					debug("Discovered PJSIP Endpoint $ds", 2);
+					$ds = get_var($agi, "PJSIP_DIAL_CONTACTS(".substr($ds, 6).")");
+					debug("Ended up with real PJSIP Dial string $ds", 3);
 				}
-				$dialstring .= '&';
+				$dialstring .= $ds.'&';
 			} else {
 				$dialstring .= 'Local/LC-'.$adevice.'@from-internal&';
 			}
