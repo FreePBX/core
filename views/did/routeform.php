@@ -42,7 +42,7 @@ if (function_exists('music_list')) {
 HERE;
 }
 echo $heading;
-echo $userlink
+echo isset($userlink)?$userlink:'';
 ?>
 
 <form name="editGRP" class="fpbx-submit" action="config.php?display=did&amp;view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
@@ -110,7 +110,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="extension" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" ">
+									<input type="text" class="form-control" id="extension" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" placeholder="<?php echo _("ANY")?>">
 								</div>
 							</div>
 						</div>
@@ -134,7 +134,7 @@ echo $userlink
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="cidnum"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="cidnum" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>" ">
+									<input type="text" class="form-control" id="cidnum" name="cidnum" value="<?php echo isset($cidnum)?$cidnum:'' ?>" placeholder="<?php echo _("ANY")?>">
 								</div>
 							</div>
 						</div>

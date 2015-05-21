@@ -1,2 +1,1 @@
 <a href="config.php?display=did" class="list-group-item"><i class="fa fa-list">&nbsp;<?php echo _("Inbound Routes List")?></i></a>
-<a href="config.php?display=did&view=form" class="list-group-item"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>

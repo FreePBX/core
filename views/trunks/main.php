@@ -5,16 +5,11 @@
 	</div>
 	<div class = "display no-border">
 		<div class="row">
-			<div class="col-sm-9">
+			<div class="col-sm-12">
 				<div class="fpbx-container">
 					<div class="display no-border">
-						<?php echo load_view(__DIR__.'/trunkgrid.php', array('trunks' => $trunks))?>
+						<?php echo load_view(__DIR__.'/trunkgrid.php', array('trunks' => $trunks, 'trunk_types' => $trunk_types))?>
 					</div>
-				</div>
-			</div>
-			<div class="col-sm-3 bootnav">
-				<div class="list-group">
-					<?php echo load_view(__DIR__.'/bootnav.php', array('trunk_types' => $trunk_types))?>
 				</div>
 			</div>
 		</div>

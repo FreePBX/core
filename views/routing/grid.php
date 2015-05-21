@@ -50,6 +50,8 @@ HERE;
 <style>
 .text-grey:
 </style>
+<a href="config.php?display=routing&amp;view=form" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp; <?php echo _("Add Outbound Route")?></a>
+<br/>
 <div class="table-responsive">
 	<table class="table table-striped table-bordered" id="routes">
 		<thead>

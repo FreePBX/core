@@ -13,6 +13,9 @@ switch($view){
 			$action = 'edit';
 		}else{
 			$action = 'add';
+			$description = '';
+			$channel = '';
+			$did = '';
 		}
 		echo load_view(__DIR__."/views/dahdichandids/view.php", array('description' => $description, 'channel' => $channel, 'did' => $did, 'action' => $action));
 	break;
