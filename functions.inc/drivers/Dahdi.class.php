@@ -54,6 +54,7 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 	}
 
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
+		$msgInvalidChannel = _("Please enter the channel for this device");
 		$tmparr = array();
 		$tt = _("The DAHDi channel number for this port.");
 		$tmparr['channel'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => 'isEmpty()', 'failvalidationmsg' => $msgInvalidChannel);

@@ -9,7 +9,7 @@
 		<?php echo _("Please select the type of device you want to create");?><br/>
 		<ul>
 		<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
-			<li><strong><?php echo $driver['shortName']?>:</strong> <?php echo $driver['description']?></li>
+			<li><strong><?php echo $driver['shortName']?>:</strong> <?php echo isset($driver['description'])?$driver['description']:''?></li>
 		<?php } ?>
 		</ul>
 	</span>
