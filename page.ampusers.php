@@ -175,7 +175,7 @@ uasort($module_list, function($a, $b) {
 $selected = array();
 $unselected = array();
 foreach ($module_list as $key => $val) {
-	if(is_array($user['sections']) && (in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*')){
+	if(!empty($user['sections']) && is_array($user['sections']) && (in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*')){
 		$selected[] = '<li data-id="'.$key.'" class="label label-info" style="display:inline-block">'.$val['name'].'</li>';
 		$selected[] = '<input type="hidden" name="sections[]" value="'.$key.'">';
 	}else{
@@ -194,7 +194,7 @@ foreach ($module_list as $key => $val) {
 					<input type="hidden" name="userdisplay" value="<?php echo $userdisplay ?>"/>
 					<input type="hidden" name="action" value="<?php echo ($userdisplay ? "editampuser" : "addampuser"); ?>"/>
 					<input type="hidden" name="tech" value="<?php echo $tech?>"/>
-					<input type="hidden" name="password_sha1" value="<?php echo $password_sha1 ?>"/>
+					<input type="hidden" name="password_sha1" value="<?php echo !empty($password_sha1) ? $password_sha1 : "" ?>"/>
 					<input type="hidden" name="extension_low" value="<?php echo $extension_low ?>"/>
 					<input type="hidden" name="extension_high" value="<?php echo $extension_high ?>"/>
 					<div class="display no-border">
