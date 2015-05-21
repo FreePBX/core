@@ -1,6 +1,7 @@
-
-<a href="config.php?display=did&view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
-<table id="didtable" data-url="ajax.php?module=core&command=getJSON&jdata=allDID" data-cache="false" data-pagination="true" data-search="true" data-toggle="table" class="table table-striped">
+<div id="toolbar-all">
+	<a href="config.php?display=did&view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
+</div>
+<table id="didtable" data-toolbar="#toolbar-all" data-url="ajax.php?module=core&command=getJSON&jdata=allDID" data-cache="false" data-pagination="true" data-search="true" data-toggle="table" class="table table-striped">
 	<thead>
 					<tr>
 					<th data-field="description" data-sortable="true"><?php echo _("Description")?></th>

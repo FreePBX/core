@@ -1,14 +1,16 @@
-<div class="btn-group">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-    <i class="fa fa-plus">&nbsp;</i><?php echo _("Add Trunk")?> <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu">
-		<?php
-		foreach($trunk_types as $type => $label) {
-			echo '<li><a href="config.php?display=trunks&amp;tech='.$type.'" ><i class="fa fa-plus"></i>&nbsp;<strong>'.sprintf(_("Add %s Trunk"),$label).'</strong></a></li>';
-		}
-		?>
-  </ul>
+<div id="toolbar-all">
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-plus">&nbsp;</i><?php echo _("Add Trunk")?> <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+  		<?php
+  		foreach($trunk_types as $type => $label) {
+  			echo '<li><a href="config.php?display=trunks&amp;tech='.$type.'" ><i class="fa fa-plus"></i>&nbsp;<strong>'.sprintf(_("Add %s Trunk"),$label).'</strong></a></li>';
+  		}
+  		?>
+    </ul>
+  </div>
 </div>
 <table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
 	<thead>
