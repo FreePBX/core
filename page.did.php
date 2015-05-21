@@ -95,9 +95,20 @@ $view = !empty($request['view']) ? $request['view'] : '';
 switch($view){
 	case "form":
 		$content = load_view(__DIR__.'/views/did/routeform.php', $formdata);
+		$mwidth = '9';
+		$bootnav = '
+		<div class="col-sm-3 hidden-xs bootnav">
+			<div class="list-group">';
+			$bootnav .=	load_view(__DIR__.'/views/did/rnav.php');
+		$bootnav .= '
+			</div>
+		</div>
+		';
 	break;
 	default:
 		$content = load_view(__DIR__.'/views/did/didgrid.php');
+		$bootnav = '';
+		$mwidth = '12';
 	break;
 }
 
@@ -106,18 +117,14 @@ switch($view){
 	<h1><?php echo _('Inbound Routes')?></h1>
 	<div class = "display no-border">
 		<div class="row">
-			<div class="col-sm-9">
+			<div class="col-sm-<?php echo $mwidth?>">
 				<div class="fpbx-container">
 					<div class="display no-border">
 						<?php echo $content ?>
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-3 hidden-xs bootnav">
-				<div class="list-group">
-					<?php show_view(__DIR__.'/views/did/rnav.php');?>
-				</div>
-			</div>
+			<?php echo $bootnav?>
 		</div>
 	</div>
 </div>

@@ -99,7 +99,7 @@ switch($request['view']){
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-3 hidden-xs bootnav">
+			<div class="col-sm-3 hidden-xs bootnav <?php echo !isset($_REQUEST['view'])?'hidden':''?>">
 				<div class="list-group">
 					<?php echo load_view(__DIR__.'/views/routing/bootnav.php');?>
 				</div>

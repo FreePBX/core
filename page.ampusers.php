@@ -119,10 +119,13 @@ if ($userdisplay) {
 
 } else {
 	// set defaults
+	$user = array(
+		'sections' => '',
+	);
 	$title = '<h2>' . _("Add Administrator") . '</h2>';
 	$username = "";
 	$password = "";
-
+	$password_sha1 ="";
 	$extension_low = "";
 	$extension_high = "";
 
@@ -186,7 +189,7 @@ foreach ($module_list as $key => $val) {
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-sm-9">
-			<?php if($authtypewarn){ echo $authtypewarn; } ?>
+			<?php if(isset($authtypewarn)){ echo $authtypewarn; } ?>
 			<div class="fpbx-container">
 				<?php echo $title ?>
 				<form role="form" autocomplete="off" class="fpbx-submit" name="ampuser" id="ampuser" action="config.php?display=ampusers" method="post" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&amp;userdisplay=<?php echo urlencode($userdisplay) ?>&amp;action=delampuser">

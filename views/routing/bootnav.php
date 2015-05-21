@@ -1,2 +1,1 @@
-<a href="config.php?display=routing" class="list-group-item <?php echo empty($_REQUEST['view']) ?'hidden':''?>"><i class="fa fa-list">&nbsp; List Routes</i></a>
-<a href="config.php?display=routing&amp;view=form" class="list-group-item <?php echo !empty($_REQUEST['view']) && $_REQUEST['view'] == 'form' ?'hidden':''?>"><i class="fa fa-plus">&nbsp; Add Outbound Route</i></a>
+<a href="config.php?display=routing" class="list-group-item <?php echo empty($_REQUEST['view']) ?'hidden':''?>"><i class="fa fa-list">&nbsp; <?php echo _("List Routes")?></i></a>

@@ -25,6 +25,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		switch($req) {
 			case "quickcreate":
 			case "delete":
+			case "getJSON":
 				return true;
 			break;
 		}
@@ -61,6 +62,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "quickcreate":
 				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
 				return $status;
+			break;
+			case "getJSON":
+				switch ($_REQUEST['jdata']) {
+					case 'allDID':
+						$dids = $this->getAllDIDs();
+						return array_values($dids);
+					break;
+				}
 			break;
 		}
 	}
@@ -1424,6 +1433,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		return $results;
 	}
+
 
 	public function addDID($settings) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI

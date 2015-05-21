@@ -9,7 +9,7 @@ if(!empty($viewinfo) && is_array($viewinfo)) {
 $request = $_REQUEST;
 $display = $request['display']?$request['display']:'routing';
 $extdisplay = $request['id']?$request['id']:'';
-
+$dpt_title_class = 'dpt-title';
 
 if(!empty($request['id'])){
 	$formAction = 'editroute';
@@ -30,6 +30,7 @@ if ($route_seq != 0) {
 }
 //Routing select box
 $routeseqopts = '';
+$last_seq = isset($last_seq)?$last_seq:'';
 foreach ($routepriority as $key => $route) {
 	if ($key == 0 && $route_seq != 0) continue;
 	if ($key == ($route_seq+1)) continue;
@@ -91,7 +92,6 @@ $ci_tit = _("CallerID");
 $dpinput = array();
 if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	foreach ($dialpattern_array as $idx => $pattern) {
-		$tabindex++;
 		if ($idx == 50) {
 			$dpt_title_class = 'dpt-title dpt-nodisplay';
 		}
@@ -100,14 +100,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
-		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
+		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" >';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'2">)</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
+		$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" > ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
@@ -115,14 +115,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
-		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
+		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" > ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
 		$dpinput[] = '<td>';
 		$dpinput[] = '	<div class="input-group">';
-		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
+		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid[]" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" >';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '<td>';
@@ -134,7 +134,6 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	//Always an empty row incase there are no patterns....
 	$next_idx = count($dialpattern_array);
 	$idx = !empty($idx) ? $idx : $next_idx;
-	$tabindex++;
 	if ($idx == 50) {
 		$dpt_title_class = 'dpt-title dpt-nodisplay';
 	}
@@ -194,7 +193,7 @@ foreach (core_trunks_listbyid() as $temp) {
 }
 $key = -1;
 $positions=count($trunkpriority);
-$trunkhtml .= '<table class = "table">';
+$trunkhtml = '<table class = "table">';
 $trunkhtml .= '<tbody id="routetrunks">';
 if(!empty($trunkpriority) && is_array($trunkpriority)) {
 	foreach ($trunkpriority as $key=>$trunk) {
@@ -405,7 +404,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="route_seq"></i>
 								</div>
 								<div class="col-md-9">
-									<select name="route_seq" class="form-control" tabindex="<?php echo ++$tabindex;?>">
+									<select name="route_seq" class="form-control">
 									<?php echo $routeseqopts ?>
 									</select>
 								</div>
@@ -494,7 +493,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									</div>
 									<div class="col-md-9">
 										<span class="btn btn-default btn-file">
-											<?php echo _("Choose File")?><input type="file" name="pattern_file" class="form-control" tabindex="<?php echo ++$tabindex;?>"/>
+											<?php echo _("Choose File")?><input type="file" name="pattern_file" class="form-control" />
 										</span>
 										<span class="filename"></span>
 									</div>

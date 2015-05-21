@@ -1,6 +1,6 @@
 <?php
 ?>
-<form name="editDAHDIchandid" autocomplete = "off" class="fpbx-submit" action="" method="post" data-fpbx-delete="config.php?display=dahdichandids&action=delete&channel=<?php echo $row['channel']; ?>">
+<form name="editDAHDIchandid" autocomplete = "off" class="fpbx-submit" action="" method="post" data-fpbx-delete="config.php?display=dahdichandids&action=delete&channel=<?php echo $channel ?>">
 <input type = "hidden" name = "action" value="<?php echo $action?>">
 <!--Channel-->
 <div class="element-container">
@@ -13,7 +13,7 @@
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" id="channel" name="channel" value="<?php  echo $channel; ?>" tabindex="<?php echo ++$tabindex;?>">
+						<input type="text" class="form-control" id="channel" name="channel" value="<?php  echo $channel; ?>">
 					</div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="description"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" id="description" name="description" value="<?php  echo $description; ?>" tabindex="<?php echo ++$tabindex;?>">
+						<input type="text" class="form-control" id="description" name="description" value="<?php  echo $description; ?>">
 					</div>
 				</div>
 			</div>
@@ -61,7 +61,7 @@
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="did"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" id="did" name="did" value="<?php  echo $did; ?>" tabindex="<?php echo ++$tabindex;?>">
+						<input type="text" class="form-control" id="did" name="did" value="<?php  echo $did; ?>">
 					</div>
 				</div>
 			</div>

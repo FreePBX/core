@@ -167,7 +167,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$section = _("Settings");
 		$category = "general";
+		$pport = '';
 		$techd = ($deviceInfo['tech'] == 'sip') ? 'CHAN_SIP' : strtoupper($deviceInfo['tech']);
+		$devinfo_tech = $deviceInfo['tech'];
 		if(function_exists('sipsettings_get') && $techd == 'CHAN_SIP') {
 			$out = sipsettings_get();
 			$pport = $out['bindaddr'].':'.$out['bindport'];
@@ -182,10 +184,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		}
 
 		$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
-		$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac).(strtoupper($devinfo['tech']) == 'ZAP' && ast_with_dahdi()?" ("._("Via DAHDi compatibility mode").")":"");
+		$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
 		$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
 		// We need to scream loudly if this device is using a channel driver that's disabled.
-		if ($devinfo_tech == "pjsip" || $devinfo['tech'] == "sip") {
+		if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
 			$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 			if ($sipdriver != "both") {
 				// OK, one is disabled.
@@ -212,6 +214,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		}
 		unset($tmparr);
 		$tmparr = array();
+		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
+		$msgInvalidSecret = _("Please enter a Secret for this device");
+		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
 		$tmparr['secret'] = array('prompttext' => 'Secret', 'class' => 'password-meter', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
