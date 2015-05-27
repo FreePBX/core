@@ -503,6 +503,10 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
 
+		if (!empty($config['mediaencryption'])) {
+			$endpoint[] = "media_encryption=".$config['mediaencryption'];
+		}
+
 		if (isset($config['sendrpid'])) {
 			if ($config['sendrpid'] == "yes" || $config['sendrpid'] == "both") {
 				$endpoint[] = "send_rpid=yes";
