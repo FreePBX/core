@@ -7053,6 +7053,13 @@ function core_devices_configpageinit($dispnum) {
 		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $amp_conf['DEVICE_SIP_TRUSTRPID'], 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
+		$select[] = array('value' => 'no', 'text' => _('None'));
+		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP'));
+		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP'));
+		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media-encryption]';
+		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+		unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Send Remote-Party-ID header'));
 
