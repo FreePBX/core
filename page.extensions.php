@@ -29,7 +29,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			global $currentcomponent;
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
-				<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><?php echo _("Quick Create Extension");?></button>
 				<div class="display no-border">
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" data-name="alldids" class="active">
@@ -48,6 +47,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
+								<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><i class="fa fa-bolt"></i> <?php echo _("Quick Create Extension");?></button>
 								<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
@@ -81,6 +81,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
 								<div id="toolbar-<?php echo $driver['rawName']?>">
+									<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo _('Add')?></a>
 									<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
 										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>

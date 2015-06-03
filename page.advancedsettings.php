@@ -46,7 +46,7 @@ foreach ($conf as $c){
 		$current_category = $c['category'];
 		$catid = preg_replace('/\s+/', '', $current_category);
 		$forminputs .= '<div class="section-title" data-for="'.$catid.'">';
-		$forminputs .= '<h2><i class="fa fa-minus">'._($current_category).'</i></h2>';
+		$forminputs .= '<h2><i class="fa fa-minus"></i> '._($current_category).'</h2>';
 		$forminputs .= '</div>';
 		$forminputs .= '<div class="section" data-id="'.$catid.'">';
 	}

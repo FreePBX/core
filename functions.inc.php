@@ -4154,7 +4154,13 @@ function core_did_edit_properties($did_vars) {
 
 function core_did_add($incoming,$target=false){
 	global $db;
-	foreach ($incoming as $key => $val) { ${$key} = $db->escapeSimple($val); } // create variables from request
+	foreach ($incoming as $key => $val) {
+		if(is_string($val)) {
+			${$key} = $db->escapeSimple($val);
+		} elseif(is_array($val)) {
+			${$key} = $db->escapeSimple(implode(",",$val));
+		}
+	}
 
 	// Check to make sure the did is not being used elsewhere
 	//
@@ -4165,7 +4171,9 @@ function core_did_add($incoming,$target=false){
 		$extension = trim(str_replace($invalidDIDChars,"",$extension));
 		$cidnum = trim(str_replace($invalidDIDChars,"",$cidnum));
 
-		$destination= ($target) ? $target : ${$goto0.'0'};
+		$destination= ($target) ? $target : (isset(${$goto0.'0'}) ? ${$goto0.'0'} : "");
+		$pmmaxretries = isset($pmmaxretries) ? $pmmaxretries : "";
+		$pmminlength = isset($pmminlength) ? $pmminlength : "";
 		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$reversal', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 		sql($sql);
 		return true;
