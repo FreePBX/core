@@ -193,11 +193,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
-		$select[] = array('value' => 'solicited', 'text' => 'Solicited');
-		$select[] = array('value' => 'unsolicited', 'text' => 'Unsolicited');
+		$select[] = array('value' => 'solicited', 'text' => _('Solicited'));
+		$select[] = array('value' => 'unsolicited', 'text' => _('Unsolicited'));
 		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Solicited is the default and should only be changed if you see errors in the Asterisk logs");
 		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
+
+		$select[] = array('value' => 'no', 'text' => _('None'));
+		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP'));
+		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP'));
+		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media-encryption]';
+		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
@@ -323,7 +329,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			} else {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			}
-			
+
 			if(!empty($this->_aor[$tn])) {
 				foreach($this->_aor[$tn] as $el) {
 					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
@@ -658,6 +664,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
+		}
+
+		if (!empty($config['mediaencryption'])) {
+			$endpoint[] = "media_encryption=".$config['mediaencryption'];
 		}
 
 		if (isset($config['sendrpid'])) {
