@@ -1,6 +1,6 @@
 <?php
 $conf					= $freepbx_conf->get_conf_settings();
-$display_level			= 10; // TO confusing with multiple levels $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
+$display_level			= 10; // TOO confusing with multiple levels $conf['AS_DISPLAY_DETAIL_LEVEL']['value'];
 $display_hidden			= $conf['AS_DISPLAY_HIDDEN_SETTINGS']['value'];
 $display_readonly		= $conf['AS_DISPLAY_READONLY_SETTINGS']['value'];
 $display_friendly_name	= $conf['AS_DISPLAY_FRIENDLY_NAME']['value'];
@@ -114,6 +114,7 @@ foreach ($conf as $c){
 			}
 			$forminputs .= $inputhtmlend;
 		break;
+		case 'dir':
 		case 'text':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
@@ -129,6 +130,35 @@ foreach ($conf as $c){
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
 			$forminputs .= '<input type="text" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			$forminputs .= '</div>';
+			$forminputs .= $inputhtmlmiddle;
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
+			}
+			$forminputs .= $inputhtmlend;
+		break;
+		case 'fselect':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5 text-right">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			foreach($c['options'] as $k => $o) {
+				$selected = ($amp_conf[$c['keyword']] == $k) ? ' selected ' : '';
+				$forminputs .= '<option value="'.$k.'"'.$selected.'>'._($o).'</option>';
+			}
+			$forminputs .= '</select>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
@@ -191,6 +221,9 @@ foreach ($conf as $c){
 				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
+		break;
+		default:
+			dbug($c);
 		break;
 	}
 	\modgettext::pop_textdomain();
