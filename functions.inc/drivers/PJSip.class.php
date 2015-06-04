@@ -515,8 +515,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 				// Add the Generic localnet settings.
 				$localnets = $this->freepbx->Sipsettings->getConfig('localnets');
-				foreach($localnets as $arr) {
-					$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
+				if ($localnets) {
+					foreach($localnets as $arr) {
+						$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
+					}
 				}
 
 				// If there's a specific local net for this interface, add it too.
