@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha22</version>
+	<version>13.0.1alpha23</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha23* Looping issue
 		*13.0.1alpha22* Fix advanced settings page display
 		*13.0.1alpha21* FREEPBX-7280 Dynamically generate extensions.conf, FREEPBX-8324 Ensure dialparties calls ALL the pjsip endpoints, FREEPBX-8860 - Add PJSIP Header support to macro-dial and macro-dial-one, FREEPBX-9164
 		*13.0.1alpha20* Add missing sections back into admin
