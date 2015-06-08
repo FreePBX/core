@@ -488,8 +488,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			return $this->TransportConfigCache;
 		}
 
+		//TODO: move this to \FreePBX::Sipsettings()->getBinds();
+		//Calling the config directly will return an array or false.
 		$binds = $this->freepbx->Sipsettings->getConfig("binds");
-
+		//false breaks the foreach loop FREEPBX-9419
+		$binds = is_array($binds)?$binds:array();
+		
 		foreach ($binds as $protocol => $arr) {
 			foreach ($arr as $ip => $on) {
 				$t = "$ip-$protocol";
