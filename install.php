@@ -41,7 +41,7 @@ function did_migrate($incoming){
 	}
 }
 
-$freepbx_conf =& freepbx_conf::create();
+$freepbx_conf = freepbx_conf::create();
 
 $fcc = new featurecode('core', 'userlogon');
 $fcc->setDescription('User Logon');
