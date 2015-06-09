@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha25</version>
+	<version>13.0.1alpha26</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha26* FREEPBX-9430 If user is empty don't return invalid data
 		*13.0.1alpha25* Fixes: FREEPBX-9419, FREEPBX-9359, FREEPBX-9427, FREEPBX-9426, FREEPBX-9428, FREEPBX-9431
 		*13.0.1alpha24* FREEPBX-9419 Fixes to looping over invalid arrays
 		*13.0.1alpha23* Looping issue

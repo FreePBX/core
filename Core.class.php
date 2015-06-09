@@ -1756,6 +1756,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array();
 		}
 
+		if(empty($results)) {
+			return array();
+		}
+
 		$astman = $this->FreePBX->astman;
 		if ($astman) {
 
