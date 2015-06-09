@@ -4091,7 +4091,8 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 function core_did_create_update($did_vars) {
 	$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
 	$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
-	if (count(core_did_get($did_create['extension'], $did_create['cidnum']))) {
+	$coredid = core_did_get($did_create['extension'], $did_create['cidnum']);
+	if (!empty($coredid) && count($coredid)) {
 		return core_did_edit_properties($did_vars); //already exists so just edit properties
 	} else {
 		$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
@@ -4154,7 +4155,13 @@ function core_did_edit_properties($did_vars) {
 
 function core_did_add($incoming,$target=false){
 	global $db;
-	foreach ($incoming as $key => $val) { ${$key} = $db->escapeSimple($val); } // create variables from request
+	foreach ($incoming as $key => $val) {
+		if(is_string($val)) {
+			${$key} = $db->escapeSimple($val);
+		} elseif(is_array($val)) {
+			${$key} = $db->escapeSimple(implode(",",$val));
+		}
+	}
 
 	// Check to make sure the did is not being used elsewhere
 	//
@@ -4165,7 +4172,10 @@ function core_did_add($incoming,$target=false){
 		$extension = trim(str_replace($invalidDIDChars,"",$extension));
 		$cidnum = trim(str_replace($invalidDIDChars,"",$cidnum));
 
-		$destination= ($target) ? $target : ${$goto0.'0'};
+		$destination= ($target) ? $target : (isset(${$goto0.'0'}) ? ${$goto0.'0'} : "");
+		$pmmaxretries = isset($pmmaxretries) ? $pmmaxretries : "";
+		$pmminlength = isset($pmminlength) ? $pmminlength : "";
+		$privacyman = isset($privacyman) ? $privacyman : "";
 		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$reversal', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
 		sql($sql);
 		return true;

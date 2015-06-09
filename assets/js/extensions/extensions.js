@@ -1,64 +1,13 @@
-$("#quickCreate .fa.fa-question-circle").hover(function() {
-	var id = $(this).data("id");
-	$("#" + id + "-help").addClass("active");
-}, function() {
-	var id = $(this).data("id");
-	$("#" + id + "-help").removeClass("active");
-});
-$("#quickCreate .form-control").focus(function() {
-	$(".help-block").removeClass("active");
-	var id = $(this).data("for");
-	$("#" + id + "-help").addClass("active");
-});
-$(".modal.paged .modal-footer .next").click(function() {
-	changePage("next",$("#quickCreate"));
-});
-$(".modal.paged .modal-footer .back").click(function() {
-	changePage("back",$("#quickCreate"));
-});
-
-$("#quickCreate #extension, #quickCreate #name").on('keyup',function() {
-	var name = $("#quickCreate #name").val(), ext = $("#quickCreate #extension").val();
-	if($(this).prop('id') == "extension") {
-		if(typeof extmap[ext] !== "undefined") {
-			$(this).parents('.form-group').addClass('has-warning');
-			$('#extension-help').append('<span class="warnMessage"><br/><strong>' + sprintf(_('In Use: %s'),extmap[ext]) + '</strong></span>');
-		} else {
-			$(this).parents('.form-group.has-warning').removeClass('has-warning');
-			$('#extension-help .warnMessage').remove();
-		}
-	}
-	$("#quickCreate #outboundcid").prop("placeholder",'"' + name + '" <' + ext + '>');
-});
-
 var deleteExts = [];
-$(".actions .fa-times").click(function() {
-	var id = $(this).data("id"), section = $(this).data("section");
-	if(confirm(_("Are you sure you wish to delete this extension?"))) {
-		$.post( "ajax.php", {command: "delete", module: "core", extensions: [id], type: "extensions"}, function(data) {
-			if(data.status) {
-				btn.find("span").text(_("Delete"));
-				$("#table-"+section).bootstrapTable('remove', {
-					field: "extension",
-					values: deleteExts
-				});
-			} else {
-				btn.find("span").text(_("Delete"));
-				btn.prop("disabled", true);
-				alert(data.message);
-			}
-		});
-	}
-});
 $(".btn-remove").click(function() {
-	var type = $(this).data("type"), btn = $(this), section = $(this).data("section");
+	var type = $(this).data("type"), btn = $(this);
 	if(confirm(_("Are you sure you wish to delete these extensions?"))) {
 		btn.find("span").text(_("Deleting..."));
 		btn.prop("disabled", true);
 		$.post( "ajax.php", {command: "delete", module: "core", extensions: deleteExts, type: type}, function(data) {
 			if(data.status) {
 				btn.find("span").text(_("Delete"));
-				$("#table-"+section).bootstrapTable('remove', {
+				$(".ext-list").bootstrapTable('remove', {
 					field: "extension",
 					values: deleteExts
 				});
@@ -69,6 +18,23 @@ $(".btn-remove").click(function() {
 			}
 		});
 	}
+});
+$("table").on("post-body.bs.table", function () {
+	$(this).find(".clickable.delete").click(function() {
+		var id = $(this).data("id");
+		if(confirm(_("Are you sure you wish to delete this extension?"))) {
+			$.post( "ajax.php", {command: "delete", module: "core", extensions: [id], type: "extensions"}, function(data) {
+				if(data.status) {
+					$(".ext-list").bootstrapTable('remove', {
+						field: "extension",
+						values: [id]
+					});
+				} else {
+					alert(data.message);
+				}
+			});
+		}
+	});
 });
 $("table").on("page-change.bs.table", function () {
 	$(".btn-remove").prop("disabled", true);
@@ -81,88 +47,3 @@ $("table").on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs
 		return row.extension;
   });
 });
-
-$("#quickCreate .modal-footer .create").click(function() {
-	if(validateQC()) {
-		var data = {};
-		$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=password], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
-			data[$(this).prop('name')] = $(this).val();
-		});
-		$('#quickCreate .create').prop("disabled", true);
-		$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
-			if(d.status) {
-				var tech = data.tech;
-				$("#table-all").append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td><td>" + tech + "</td></tr>");
-				$("#table-" + tech).append("<tr><td><a href='?display=extensions&amp;extdisplay=" + data.extension + "'>" + data.extension + "</a></td><td>" + data.name + "</td></tr>");
-				$('#quickCreate').modal('hide');
-				toggle_reload_button("show");
-			} else {
-				alert(d.message);
-				$('#quickCreate .create').prop("disabled", false);
-			}
-		});
-
-	}
-});
-
-$('.modal.paged').on('hidden.bs.modal', function (e) {
-	jumpPage(1,$(this));
-	$(this).find("form")[0].reset();
-	$('#quickCreate .create').prop("disabled", false);
-	$('#quickCreate #extension').val(parseInt($('#quickCreate #extension').val()) + 1);
-});
-
-function changePage(direction, modal) {
-	var totalPages = modal.data("pages"), currentPage = parseInt(modal.data("currentpage"));
-	if(direction == "back") {
-		if(currentPage == 1) {
-			return;
-		}
-		modal.find(".page[data-num=" + currentPage + "]").addClass("hidden");
-		currentPage--;
-		modal.find(".page[data-num=" + currentPage + "]").removeClass("hidden");
-		if(currentPage != totalPages) {
-			modal.find(".modal-footer .create").addClass("hidden");
-			modal.find(".modal-footer .next").removeClass("hidden");
-		}
-		if(currentPage == 1) {
-			modal.find(".modal-footer .next").removeClass("hidden");
-			modal.find(".modal-footer .back").addClass("hidden");
-		}
-	} else {
-		if(currentPage == totalPages) {
-			return;
-		}
-		modal.find(".page[data-num=" + currentPage + "]").addClass("hidden");
-		currentPage++;
-		modal.find(".page[data-num=" + currentPage + "]").removeClass("hidden");
-		if(currentPage == totalPages) {
-			modal.find(".modal-footer .create").removeClass("hidden");
-			modal.find(".modal-footer .next").addClass("hidden");
-			modal.find(".modal-footer .back").removeClass("hidden");
-		} else {
-			modal.find(".modal-footer .back").removeClass("hidden");
-		}
-	}
-	modal.data("currentpage",currentPage);
-}
-function jumpPage(page, modal) {
-	var totalPages = modal.data("pages"), currentPage = parseInt(modal.data("currentpage"));
-	if(page > totalPages) {
-		return;
-	}
-	modal.find(".page").addClass("hidden");
-	currentPage = page;
-	modal.find(".page[data-num=" + page + "]").removeClass("hidden");
-	if(page == 1) {
-		modal.find(".modal-footer .next").removeClass("hidden");
-		modal.find(".modal-footer .back").addClass("hidden");
-	} else if(page == totalPages) {
-		modal.find(".modal-footer .next").addClass("hidden");
-		modal.find(".modal-footer .back").removeClass("hidden");
-	} else {
-		modal.find(".modal-footer .next").removeClass("hidden");
-		modal.find(".modal-footer .back").removeClass("hidden");
-	}
-	modal.data("currentpage",currentPage);
-}

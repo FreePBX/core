@@ -44,6 +44,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function addDevice($id, $settings) {
 		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
 		$sth = $this->database->prepare($sql);
+		$settings = is_array($settings)?$settings:array();
 		foreach($settings as $key => $setting) {
 			try {
 				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
@@ -193,14 +194,21 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
-		$select[] = array('value' => 'solicited', 'text' => 'Solicited');
-		$select[] = array('value' => 'unsolicited', 'text' => 'Unsolicited');
+		$select[] = array('value' => 'solicited', 'text' => _('Solicited'));
+		$select[] = array('value' => 'unsolicited', 'text' => _('Unsolicited'));
 		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Solicited is the default and should only be changed if you see errors in the Asterisk logs");
 		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
+		$select[] = array('value' => 'no', 'text' => _('None'));
+		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP'));
+		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP'));
+		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media-encryption]';
+		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
+		$transports = is_array($transports)?$transports:array();
 		foreach($transports as $transport) {
 			$select[] = array('value' => $transport['value'], 'text' => $transport['text']);
 		}
@@ -235,8 +243,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// So we need to flatten it to something that can be
 		// written to a file.
 		$transports = $this->getTransportConfigs();
+		$transports = is_array($transports)?$transports:array();
 		foreach ($transports as $transport => $entries) {
 			$tmparr = array();
+			$entries = is_array($entries)?$entries:array();
 			foreach ($entries as $key => $val) {
 				// Check for multiple defintions of the same var (eg, local_net)
 				if (is_array($val)) {
@@ -254,13 +264,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			'type=global',
 			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
 		);
-		if(!empty($this->_global)) {
+		if(!empty($this->_global) && is_array($this->_global)) {
 			foreach($this->_global as $el) {
 				$conf['pjsip.conf']['global'][] = "{$el['key']}={$el['value']}";
 			}
 		}
 
 		$trunks = $this->getAllTrunks();
+		$trunks = is_array($trunks)?$trunks:array();
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
@@ -300,7 +311,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			}
 
-			if(!empty($this->_registration[$tn])) {
+			if(!empty($this->_registration[$tn]) && is_array($this->_registration[$tn])) {
 				foreach($this->_registration[$tn] as $el) {
 					$conf["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
@@ -323,8 +334,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			} else {
 				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 			}
-			
-			if(!empty($this->_aor[$tn])) {
+
+			if(!empty($this->_aor[$tn]) && is_array($this->_aor[$tn])) {
 				foreach($this->_aor[$tn] as $el) {
 					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
@@ -345,7 +356,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($trunk['from_user'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
 			}
-			if(!empty($this->_endpoint[$tn])) {
+			if(!empty($this->_endpoint[$tn]) && is_array($this->_endpoint[$tn])) {
 				foreach($this->_endpoint[$tn] as $el) {
 					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
@@ -357,7 +368,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'match' => !empty($trunk['match']) ? $trunk['match'] : $trunk['sip_server']
 			);
 
-			if(!empty($this->_identify[$tn])) {
+			if(!empty($this->_identify[$tn]) && is_array($this->_identify[$tn])) {
 				foreach($this->_identify[$tn] as $el) {
 					$conf["pjsip.identify.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
@@ -482,7 +493,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			return $this->TransportConfigCache;
 		}
 
+		//TODO: move this to \FreePBX::Sipsettings()->getBinds();
+		//Calling the config directly will return an array or false.
 		$binds = $this->freepbx->Sipsettings->getConfig("binds");
+		//false breaks the foreach loop FREEPBX-9419
+		$binds = is_array($binds)?$binds:array();
 
 		foreach ($binds as $protocol => $arr) {
 			foreach ($arr as $ip => $on) {
@@ -508,9 +523,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				// Add the Generic localnet settings.
+				//TODO: This should call a method and not the config direct.
 				$localnets = $this->freepbx->Sipsettings->getConfig('localnets');
-				foreach($localnets as $arr) {
-					$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
+				$localnets = is_array($localnets)?$localnets:array();
+				if ($localnets) {
+					foreach($localnets as $arr) {
+						$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
+					}
 				}
 
 				// If there's a specific local net for this interface, add it too.
@@ -660,6 +679,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
 
+		if (!empty($config['mediaencryption'])) {
+			$endpoint[] = "media_encryption=".$config['mediaencryption'];
+		}
+
 		if (isset($config['sendrpid'])) {
 			if ($config['sendrpid'] == "yes" || $config['sendrpid'] == "both") {
 				$endpoint[] = "send_rpid=yes";
@@ -696,7 +719,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			throw new \Exception("Endpoint $endpointname already exists.");
 		}
 		$retarr["pjsip.endpoint.conf"][$endpointname] = $endpoint;
-		if(!empty($this->_endpoint[$endpointname])) {
+		if(!empty($this->_endpoint[$endpointname]) && is_array($this->_endpoint[$endpointname]) ) {
 			foreach($this->_endpoint[$endpointname] as $el) {
 				$retarr["pjsip.endpoint.conf"][$endpointname][] = "{$el['key']}={$el['value']}";
 			}
@@ -706,7 +729,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			throw new \Exception("Auth $authname already exists.");
 		}
 		$retarr["pjsip.auth.conf"][$authname] = $auth;
-		if(!empty($this->_auth[$authname])) {
+		if(!empty($this->_auth[$authname]) && is_array($this->_auth[$authname])) {
 			foreach($this->_auth[$authname] as $el) {
 				$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
 			}
@@ -716,7 +739,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			throw new \Exception("AOR $aorname already exists.");
 		}
 		$retarr["pjsip.aor.conf"][$aorname] = $aor;
-		if(!empty($this->_aor[$aorname])) {
+		if(!empty($this->_aor[$aorname]) && is_array($this->_aor[$aorname])) {
 			foreach($this->_aor[$aorname] as $el) {
 				$retarr["pjsip.aor.conf"][$aorname][] = "{$el['key']}={$el['value']}";
 			}

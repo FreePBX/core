@@ -26,6 +26,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "quickcreate":
 			case "delete":
 			case "getJSON":
+			case "getGrid":
 				return true;
 			break;
 		}
@@ -34,6 +35,27 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
+			case "getGrid":
+				if($_REQUEST['type'] == "all") {
+					$devices = $this->getAllUsersByDeviceType();
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$device['extension'].'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$device['extension'].'"><i class="fa fa-times"></i></a>';
+					}
+					return $devices;
+				} else {
+					$devices = $this->getAllUsersByDeviceType($_REQUEST['type']);
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$device['extension'].'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$device['extension'].'"><i class="fa fa-times"></i></a>';
+					}
+					return $devices;
+				}
+			break;
 			case "delete":
 			if(!empty($_POST['extensions'])) {
 					switch($_POST['type']) {
@@ -138,7 +160,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$pages = array();
 		$pages[0][] = array(
 			'html' => load_view(__DIR__.'/views/quickCreate.php',array('startExt' => $startExt)),
-			'validate' => 'if($("#extension").val().trim() == "") {alert("'._("Extension can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {alert("'._("Extension already in use!").'");jumpPage(1,$("#quickCreate"));return false}if($("#name").val().trim() == "") {alert("'._("Display Name can not be blank!").'");jumpPage(1,$("#quickCreate"));return false}if(!isEmail($("#email").val())) {alert("'._("Email must be valid!").'");jumpPage(1,$("#quickCreate"));return false}'
+			'validate' => 'if($("#extension").val().trim() == "") {warnInvalid($("#extension"),"'._("Extension can not be blank!").'");return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {warnInvalid($("#extension"),"'._("Extension already in use!").'");return false}if($("#name").val().trim() == "") {warnInvalid($("#name"),"'._("Display Name can not be blank!").'");return false}if(!isEmail($("#email").val())) {warnInvalid($("#email"),"'._("Email must be valid!").'");return false}'
 		);
 		$modules = $this->freepbx->Hooks->processHooks();
 		foreach($modules as $module) {
@@ -1731,6 +1753,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth->execute(array($extension));
 			$results = $sth->fetch(\PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
+			return array();
+		}
+
+		if(empty($results)) {
 			return array();
 		}
 

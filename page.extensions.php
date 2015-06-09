@@ -29,7 +29,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			global $currentcomponent;
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
-				<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><?php echo _("Quick Create Extension");?></button>
 				<div class="display no-border">
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" data-name="alldids" class="active">
@@ -48,106 +47,85 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
+								<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><i class="fa fa-bolt"></i> <?php echo _("Quick Create Extension");?></button>
 								<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all">
+							<table data-url="ajax.php?module=core&amp;command=getGrid&amp;type=all" data-cache="false" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
 										<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
-										<th data-sortable="true"><?php echo _('Name')?></th>
-										<th data-sortable="true"><?php echo _('Type')?></th>
-										<th><?php echo _('Actions')?></th>
+										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+										<th data-sortable="true" data-field="tech"><?php echo _('Type')?></th>
+										<th data-field="actions"><?php echo _('Actions')?></th>
 									</tr>
 								</thead>
-								<tbody>
-									<?php foreach(FreePBX::Core()->getAllUsersByDeviceType() as $user) {?>
-										<tr id="<?php echo $user['extension']?>">
-											<td></td>
-											<td><?php echo $user['extension']?></td>
-											<td><?php echo $user['name']?></td>
-											<td><?php echo $user['tech']?></td>
-											<td class="actions">
-												<a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
-												<i class="fa fa-times" data-id="<?php echo $user['extension']?>" data-section="all"></i>
-											</td>
-										</tr>
-									<?php } ?>
-								</tbody>
 							</table>
 						</div>
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
 								<div id="toolbar-<?php echo $driver['rawName']?>">
+									<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo _('Add')?></a>
 									<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
 										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>
 								</div>
-								<table data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-<?php echo $driver['rawName']?>">
+								<table data-url="ajax.php?module=core&amp;command=getGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
 									<thead>
 										<tr>
 											<th data-checkbox="true"></th>
 											<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
-											<th data-sortable="true"><?php echo _('Name')?></th>
-											<th><?php echo _('Actions')?></th>
+											<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+											<th data-field="actions"><?php echo _('Actions')?></th>
 										</tr>
 									</thead>
-									<tbody>
-										<?php foreach(FreePBX::Core()->getAllUsersByDeviceType($driver['rawName']) as $user) {?>
-											<tr id="<?php echo $user['extension']?>">
-												<td></td>
-												<td><?php echo $user['extension']?></td>
-												<td><?php echo $user['name']?></td>
-												<td class="actions">
-													<a href="?display=extensions&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
-													<i class="fa fa-times" data-id="<?php echo $user['extension']?>" data-section="<?php echo $driver['rawName']?>"></i>
-												</td>
-											</tr>
-										<?php } ?>
-									</tbody>
+
 								</table>
 							</div>
 						<?php } ?>
 					</div>
 				</div>
+
 				<div class="modal fade paged" id="quickCreate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-pages="<?php echo count(FreePBX::Core()->getQuickCreateDisplay())?>" data-currentpage="1">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-								<h4 class="modal-title" id="quickCreateLabel"><?php echo _("Quick Create Extension")?></h4>
-							</div>
-							<div class="modal-body">
-								<form>
-									<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
-										<div class="page <?php echo ($page > 0) ? 'hidden' : ''?>" data-num="<?php echo $page + 1?>">
-											<?php foreach($data as $pageDisplay) { ?>
-												<?php echo $pageDisplay['html']?>
-											<?php } ?>
-										</div>
-									<?php } ?>
-								</form>
-							</div>
-							<script>
-								function validateQC() {
-									<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
-										<?php foreach($data as $pageDisplay) { ?>
-											<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
+					<form>
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title" id="quickCreateLabel"><?php echo _("Quick Create Extension")?></h4>
+								</div>
+								<div class="modal-body swMain" id="wizard">
+									<ul>
+										<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+											<li>
+												<a href="#step-<?php echo $page +1?>">
+													<label class="stepNumber"><?php echo $page +1?></label>
+													<span class="stepDesc">
+														Step 1<br />
+														<small>Step <?php echo $page +1?> description</small>
+													</span>
+												</a>
+											</li>
 										<?php } ?>
-									<?php } ?>
-									return true;
-								}
-							</script>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _('Close')?></button>
-								<button type="button" class="btn btn-primary back hidden"><?php echo _('Back')?></button>
-								<button type="button" class="btn btn-primary next"><?php echo _('Next')?></button>
-								<button type="button" class="btn btn-primary create hidden"><?php echo _('Create')?></button>
+									</ul>
+										<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+											<div id="step-<?php echo $page +1?>">
+													<div class="fpbx-container">
+														<h2 class="StepTitle">Step <?php echo $page +1?> Content</h2>
+														<div class="display">
+															<?php foreach($data as $pageDisplay) { ?>
+																<?php echo $pageDisplay['html']?>
+															<?php } ?>
+														</div>
+													</div>
+											</div>
+										<?php } ?>
+								</div>
 							</div>
 						</div>
-					</div>
+					</form>
 				</div>
 			<?php
 			} else {
@@ -168,3 +146,46 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 		</div>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+	$('#wizard').smartWizard({
+		onLeaveStep: function(obj, context) {
+			<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+				if(context.fromStep == <?php echo $page + 1?>) {
+					<?php foreach($data as $pageDisplay) { ?>
+						<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
+					<?php } ?>
+				}
+			<?php } ?>
+			return true;
+		},
+		onFinish: function(obj, context) {
+			<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+				<?php foreach($data as $pageDisplay) { ?>
+					<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
+				<?php } ?>
+			<?php } ?>
+			var data = {};
+			$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=password], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
+				data[$(this).prop('name')] = $(this).val();
+			});
+			$('#quickCreate .buttonFinish').addClass("buttonDisabled");
+			$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
+				console.log(d);
+				if(d.status) {
+					$('#quickCreate').modal('hide');
+					toggle_reload_button("show");
+					$("#quickCreate form")[0].reset();
+					$('#wizard').smartWizard('goToStep',1);
+					$('#table-all').bootstrapTable('refresh');
+					$('#table-' + data.tech).bootstrapTable('refresh');
+				} else {
+					$('#wizard').smartWizard('showMessage',d.message);
+					$('#quickCreate .buttonFinish').removeClass("buttonDisabled");
+				}
+			});
+		}
+	});
+})
+</script>
