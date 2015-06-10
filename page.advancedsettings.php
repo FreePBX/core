@@ -54,6 +54,9 @@ foreach ($conf as $c){
 	$iclasses = array('element-container');
 	if($c['readonly']){
 		$iclasses[] = 'setro';
+		if(!$display_readonly) {
+			continue;
+		}
 	}
 	switch($type){
 		case 'bool':

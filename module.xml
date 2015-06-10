@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha28</version>
+	<version>13.0.1alpha29</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha29* When in readonly mode in advanced settings dont just hide the rows, dont even put them in the dom
 		*13.0.1alpha28* FREEPBX-9439 After deleting extension, Quick Create thinks it still exists until reload
 		*13.0.1alpha27* Move features from extension settings into the table
 		*13.0.1alpha26* FREEPBX-9430 If user is empty don't return invalid data
