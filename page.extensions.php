@@ -184,8 +184,8 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 				});
 				$('#quickCreate .buttonFinish').addClass("buttonDisabled");
 				$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
-					console.log(d);
 					if(d.status) {
+						extmap[d.ext] = d.name;
 						$('#quickCreate').modal('hide');
 						toggle_reload_button("show");
 						$("#quickCreate form")[0].reset();

@@ -11,6 +11,9 @@ $(".btn-remove").click(function() {
 					field: "extension",
 					values: deleteExts
 				});
+				$.each(deleteExts, function (i,v) {
+					delete(extmap[v]);
+				})
 			} else {
 				btn.find("span").text(_("Delete"));
 				btn.prop("disabled", true);
@@ -25,6 +28,7 @@ $("table").on("post-body.bs.table", function () {
 		if(confirm(_("Are you sure you wish to delete this extension?"))) {
 			$.post( "ajax.php", {command: "delete", module: "core", extensions: [id], type: "extensions"}, function(data) {
 				if(data.status) {
+					delete(extmap[id]);
 					$(".ext-list").bootstrapTable('remove', {
 						field: "extension",
 						values: [id.toString()]
