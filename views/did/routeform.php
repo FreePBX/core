@@ -43,6 +43,8 @@ HERE;
 }
 echo $heading;
 echo isset($userlink)?$userlink:'';
+$hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
+dbug($hooks['hookTabs']);
 ?>
 
 <form name="editGRP" class="fpbx-submit" action="config.php?display=did&amp;view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
@@ -67,7 +69,8 @@ echo isset($userlink)?$userlink:'';
 				<?php echo _("Privacy")?>
 			</a>
 		</li>
-		<li role="presentation" data-name="didother" class="change-tab">
+		<?php echo $hooks['hookTabs']?>
+		<li role="presentation" data-name="didother" class="change-tab <?php echo (empty($hooks['oldHooks'])?'hidden':'')?>">
 			<a href="#didother" aria-controls="didother" role="tab" data-toggle="tab">
 				<?php echo _("Other")?>
 			</a>
@@ -409,12 +412,13 @@ echo isset($userlink)?$userlink:'';
 			<!--END Min Length-->
 
 		</div>
+		<?php echo $hooks['hookContent']?>
 		<div role="tabpanel" id="didother" class="tab-pane">
 			<div>
 				<!--HOOKS-->
 				<?php
 				$module_hook = moduleHook::create();
-				echo $module_hook->hookHtml;
+				echo $hooks['oldHooks'];
 				?>
 				<!--END HOOKS-->
 			</div>

@@ -1,7 +1,7 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $request = $_REQUEST;
-extract($request);
+extract($request, EXTR_SKIP);
 $tabindex = 0;
 if($action == 'delIncoming'){
 	$message = 'Route '.$extdisplay.' '._("deleted").'!';
