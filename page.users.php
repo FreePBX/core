@@ -46,28 +46,15 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table id="table-users" data-toolbar="#toolbar-users" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped">
+							<table data-url="ajax.php?module=core&amp;command=getUserGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-users" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-users">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
 										<th data-sortable="true" data-field="extension"><?php echo _('User')?></th>
-										<th data-sortable="true"><?php echo _('Name')?></th>
-										<th><?php echo _('Actions')?></th>
+										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+										<th data-field="actions"><?php echo _('Actions')?></th>
 									</tr>
 								</thead>
-								<tbody>
-									<?php foreach(FreePBX::Core()->getAllUsers() as $user) { ?>
-										<tr>
-											<td></td>
-											<td><?php echo $user['extension']?></td>
-											<td><?php echo $user['name']?></td>
-											<td class="actions">
-												<a href="?display=users&amp;extdisplay=<?php echo $user['extension']?>"><i class="fa fa-pencil-square-o"></i></a>
-												<i class="fa fa-times" data-id="<?php echo $user['id']?>"></i>
-											</td>
-										</tr>
-									<?php } ?>
-								</tbody>
 							</table>
 						</div>
 					</div>

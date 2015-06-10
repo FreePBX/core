@@ -1,13 +1,13 @@
 var deleteExts = [];
 $(".btn-remove").click(function() {
-	var type = $(this).data("type"), btn = $(this);
+	var btn = $(this);
 	if(confirm(_("Are you sure you wish to delete these users?"))) {
 		btn.find("span").text(_("Deleting..."));
 		btn.prop("disabled", true);
-		$.post( "ajax.php", {command: "delete", module: "core", extensions: deleteExts, type: type}, function(data) {
+		$.post( "ajax.php", {command: "delete", module: "core", extensions: deleteExts, type: "users"}, function(data) {
 			if(data.status) {
 				btn.find("span").text(_("Delete"));
-				$("#table-users").bootstrapTable('remove', {
+				$(".ext-list").bootstrapTable('remove', {
 					field: "extension",
 					values: deleteExts
 				});
@@ -18,6 +18,23 @@ $(".btn-remove").click(function() {
 			}
 		});
 	}
+});
+$("table").on("post-body.bs.table", function () {
+	$(this).find(".clickable.delete").click(function() {
+		var id = $(this).data("id");
+		if(confirm(_("Are you sure you wish to delete this user?"))) {
+			$.post( "ajax.php", {command: "delete", module: "core", extensions: [id], type: "users"}, function(data) {
+				if(data.status) {
+					$(".ext-list").bootstrapTable('remove', {
+						field: "extension",
+						values: [id.toString()]
+					});
+				} else {
+					alert(data.message);
+				}
+			});
+		}
+	});
 });
 $("table").on("page-change.bs.table", function () {
 	$(".btn-remove").prop("disabled", true);
