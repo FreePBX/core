@@ -697,6 +697,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		//rewrite_contact needs to be yes for NAT --mjordan, Digium
 		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['rewrite_contact'] : "rewrite_contact=yes";
 
+		if ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
+			$language = $this->freepbx->Soundlang->getLanguage();
+			if ($language != "") {
+				$endpoint[] = "language=" . $language;
+			}
+		}
+
 		// Auth
 		$auth[] = "auth_type=userpass";
 		$auth[] = "password=".$config['secret'];
