@@ -30,20 +30,26 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
 				<div class="display no-border">
-					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" data-name="alldids" class="active">
-							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
-								<?php echo _("All Extensions")?>
-							</a>
-						</li>
-						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
-							<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
-								<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
-									<?php echo sprintf(_("%s Extensions"),$driver['shortName'])?>
-								</a>
-							</li>
-						<?php } ?>
-					</ul>
+					<div class="nav-container">
+						<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+						<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+						<div class="wrapper">
+							<ul class="nav nav-tabs list" role="tablist">
+								<li role="presentation" data-name="alldids" class="active">
+									<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
+										<?php echo _("All Extensions")?>
+									</a>
+								</li>
+								<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
+									<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
+										<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
+											<?php echo sprintf(_("%s Extensions"),$driver['shortName'])?>
+										</a>
+									</li>
+								<?php } ?>
+							</ul>
+						</div>
+					</div>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
