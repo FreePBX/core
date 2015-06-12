@@ -66,7 +66,8 @@ $("a[id^='del']").click(function(){
 		}
 	});
 });
-$("a[id^='routerowadd']").on('click',function(){
+$(document).on('click',"a[id^='routerowadd']",function(e){
+	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
 	var id = $("tr[id^='dprow']").length++;
 	var newhtml = '';
