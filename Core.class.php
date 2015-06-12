@@ -132,6 +132,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				switch ($_REQUEST['jdata']) {
 					case 'allDID':
 						$dids = $this->getAllDIDs();
+						$dids = is_array($dids)?$dids:array();
+						foreach ($dids as $key => $value) {
+							$dids[$key]['cidnum'] = urlencode($value['cidnum']);
+							$dids[$key]['extension'] = urlencode($value['extension']);
+						}
 						return array_values($dids);
 					break;
 				}
@@ -944,7 +949,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			switch ($action) {
 				case 'addIncoming':
 					//create variables from request
-					extract($request);
+					extract($request, EXTR_SKIP);
 					//add details to the 'incoming' table
 					if (core_did_add($request)) {
 						needreload();

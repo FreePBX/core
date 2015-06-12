@@ -44,7 +44,6 @@ HERE;
 echo $heading;
 echo isset($userlink)?$userlink:'';
 $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
-dbug($hooks['hookTabs']);
 ?>
 
 <form name="editGRP" class="fpbx-submit" action="config.php?display=did&amp;view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
