@@ -593,7 +593,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 					<input type="checkbox" id="fwinfo">
 					<label for="fwinfo"><?php echo _("US Information")?></label>
 					<input type="checkbox" id="fwemergency" checked>
-					<label for="fwinfo"><?php echo _("US Emergency")?></label>
+					<label for="fwemergency"><?php echo _("US Emergency")?></label>
 					<input type="checkbox" id="fwint">
 					<label for="fwint"><?php echo _("US International")?></label>
 					<input type="checkbox" id="fwld">
