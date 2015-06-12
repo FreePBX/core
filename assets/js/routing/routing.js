@@ -255,28 +255,34 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 	}
 });
 
-$("[id^='trunkpri']:last").change(function(){
-	var id = /trunkpri([0-9]*)/.exec($(this).attr('id'));
-	var nextid = (Number(id[1]) +1);
-	if($("[id^='trunkpri']").length == 1){
-		return;
-	}
-	if($(this).val() === ''){
-		var curRow = $(this).closest('tr');
-		curRow.fadeOut(2000, function(){
-			$(this).remove();
-		});
-	}else{
-		var curRow = $(this).closest('tr');
-		var newRow = curRow.clone(true);
-		$(newRow).attr('id', 'trunkrow'+nextid);
-		var newinput = newRow.find("[id^='trunkpri']");
-		$(newinput).attr('id', 'trunkpri'+nextid);
-		$(newinput).attr('name', 'trunkpri['+nextid+']');
-		curRow.after(newRow);
-	}
 
-});
+bindToLast();
+function bindToLast() {
+	$("[id^='trunkpri']:last").one("change", function(){
+		var id = /trunkpri([0-9]*)/.exec($(this).attr('id')),
+				nextid = (Number(id[1]) +1),
+				curRow,
+				newRow,
+				newinput;
+
+		if($(this).val() === ''){
+			curRow = $(this).closest('tr');
+			curRow.fadeOut(2000, function(){
+				$(this).remove();
+			});
+		}else{
+			curRow = $(this).closest('tr');
+			newRow = curRow.clone(true);
+			$(newRow).attr('id', 'trunkrow'+nextid);
+			newinput = newRow.find("[id^='trunkpri']");
+			$(newinput).attr('id', 'trunkpri'+nextid);
+			$(newinput).attr('name', 'trunkpriority['+nextid+']');
+			curRow.after(newRow);
+		}
+		bindToLast();
+	});
+}
+
 $("#duplicate").click(function(){
 	$("#action").val("copyroute");
 });
