@@ -287,3 +287,13 @@ function bindToLast() {
 $("#duplicate").click(function(){
 	$("#action").val("copyroute");
 });
+$("#routeEdit").submit(function(){
+	var patlen = 0;
+	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
+	if(patlen === 0){
+		alert(_("You must complete the dial pattern tab before submitting"));
+		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
+		return false;
+	}
+	return true;
+});

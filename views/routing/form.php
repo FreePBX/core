@@ -272,7 +272,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routename"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo htmlspecialchars($routename);?>">
+									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo htmlspecialchars($routename);?>" required>
 								</div>
 							</div>
 						</div>

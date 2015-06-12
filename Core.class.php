@@ -799,7 +799,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						header("Content-type: application/json");
 						echo json_encode($ret);
 					}
-					exit;
+					$_REQUEST['id'] = NULL;
 				break;
 				case 'prioritizeroute':
 					needreload();
