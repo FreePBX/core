@@ -483,7 +483,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
 					$buttons = array();
 				}
-				if(empty($request['extdisplay']) && empty($request['tech_hardware']) && (!empty($request['view']) && $request['view'] != 'add')){
+				if(empty($request['extdisplay']) && empty($request['tech_hardware']) || (!empty($request['view']) && $request['view'] != 'add')){
 					$buttons = array();
 				}
 			break;
