@@ -226,7 +226,6 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 		$tmparr['sipdriver'] = array('hidden' => true, 'value' => 'chan_'.strtolower($deviceInfo['tech']), 'level' => 0);
 
-		//Inverted Driver, only allow the change if in certain modes
 		if ($deviceInfo['tech'] == "sip") {
 			$mydriver = "CHAN_SIP";
 			$otherdriver = "CHAN_PJSIP";
@@ -234,13 +233,17 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$mydriver = "CHAN_PJSIP";
 			$otherdriver = "CHAN_SIP";
 		}
-		$ttt = sprintf(_("Change To %s Driver"),$otherdriver);
-		if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
-			$tt = _("Change the SIP Channel Driver to use $otherdriver.");
-			$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_changeDriver();return false;");
-		} else {
-			$tt = _("You cannot change to $otherdriver as it is not enabled. Please enable $otherdriver in Advanced Settings");
-			$tmparr['changecdriver'] = array('text' => _("Changing SIP Driver unavailable"), 'prompttext' => $ttt, 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'disable' => true);
+
+		//Inverted Driver, only allow the change if in certain modes
+		if(isset($deviceInfo['id'])) {
+			$ttt = sprintf(_("Change To %s Driver"),$otherdriver);
+			if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
+				$tt = _("Change the SIP Channel Driver to use $otherdriver.");
+				$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_changeDriver();return false;");
+			} else {
+				$tt = _("You cannot change to $otherdriver as it is not enabled. Please enable $otherdriver in Advanced Settings");
+				$tmparr['changecdriver'] = array('text' => _("Changing SIP Driver unavailable"), 'prompttext' => $ttt, 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'disable' => true);
+			}
 		}
 
 		if ($mydriver == "CHAN_PJSIP") {

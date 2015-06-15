@@ -121,8 +121,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 												<a href="#step-<?php echo $page +1?>">
 													<label class="stepNumber"><?php echo $page +1?></label>
 													<span class="stepDesc">
-														Step 1<br />
-														<small>Step <?php echo $page +1?> description</small>
+														Step <?php echo $page +1?><br />
 													</span>
 												</a>
 											</li>
@@ -131,7 +130,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 										<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
 											<div id="step-<?php echo $page +1?>">
 													<div class="fpbx-container">
-														<h2 class="StepTitle">Step <?php echo $page +1?> Content</h2>
+														<h2 class="StepTitle">Step <?php echo $page +1?></h2>
 														<div class="display">
 															<?php foreach($data as $pageDisplay) { ?>
 																<?php echo $pageDisplay['html']?>
