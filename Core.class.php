@@ -30,6 +30,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "getExtensionGrid":
 			case "getDeviceGrid":
 			case "getUserGrid":
+			case "updateRoutes":
 				return true;
 			break;
 		}
@@ -38,6 +39,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
+			case "updateRoutes":
+				$order = $_REQUEST['data'];
+				array_shift($order);
+				return $this->setRouteOrder($order);
+			break;
 			case "getUserGrid":
 				$users = $this->getAllUsers();
 				if(empty($users)) {
@@ -2100,5 +2106,17 @@ public function hookTabs($page){
 		}
 
 		return $data;
+	}
+	public function setRouteOrder($routes){
+		$dbh = $this->database();
+		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
+		$stmt->execute();
+		$stmt = $dbh->prepare('INSERT INTO outbound_route_sequence (route_id, seq) VALUES (?,?)');
+		$ret = array();
+		foreach ($routes as $key => $value) {
+			$seq = ($key+1);
+			$ret[] = $stmt->execute(array($value,$seq));
+		}
+		return $ret;
 	}
 }

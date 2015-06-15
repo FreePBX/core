@@ -5,13 +5,14 @@ $(function() {
 		itemSelector: 'tr',
 		placeholder: '<tr class="placeholder"/>',
 		handle: '.fa-arrows',
-		update: function(event, ui){
-			var id = ui.item.data('id');
-			var seq = ui.item.index()+1;
+		stop: function(event, ui){
+			var rows = $('#routes').find('tr');
+			var routeorder = [];
+			$(rows).each(function(){routeorder.push($(this).data('id'))});
 			$.ajax({
 				type: 'POST',
-				url: location.href,
-				data: 'action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey='+id+'&repotrunkdirection='+seq,
+				url: 'ajax.php?module=core&command=updateRoutes',
+				data: {'data':routeorder},
 				dataType: 'json',
 				success: function(data) {
 					toggle_reload_button('show');

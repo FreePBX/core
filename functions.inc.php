@@ -5463,7 +5463,6 @@ function core_routing_list() {
 // function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)
 function core_routing_setrouteorder($route_id, $seq) {
 	global $db;
-
 	$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
 	$sequence = $db->getCol($sql);
 	if(DB::IsError($sequence)) {
