@@ -20,6 +20,65 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->loadDrivers();
 	}
 
+	public function search($query, &$results) {
+		if($this->freepbx->Config->get('AMPEXTENSIONS') == "extensions") {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Extension")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+		} else {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+
+			$sql = "SELECT * FROM users WHERE extension LIKE ? or name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("User")." ".$row['extension'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				} else {
+					$results[] = array("text" => $row['name']." (".$row['extension'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				}
+			}
+		}
+
+		if(!ctype_digit($query)) {
+			$sql = "SELECT * FROM outbound_routes WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
+			}
+
+			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
+			}
+		}
+
+	}
+
 	public function ajaxRequest($req, &$setting) {
 		$setting['authenticate'] = false;
 		$setting['allowremote'] = false;
