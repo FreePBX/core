@@ -111,7 +111,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		}
 		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td>';
+		$dpinput[] = '<td class="hidden-xs prepend">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
@@ -119,14 +119,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td>';
+		$dpinput[] = '<td class="prefix">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td>';
+		$dpinput[] = '<td class="match">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
@@ -134,7 +134,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td>';
+		$dpinput[] = '<td class="hidden-xs hidden-sm callerid">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
@@ -154,7 +154,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	}
 	$dpinput[] = '<tr id = "dprow'.$idx.'">';
 	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td>';
+	$dpinput[] = '<td class="hidden-xs prepend">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 	$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" tabindex="'.$tabindex++.'">';
@@ -162,14 +162,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
 	$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td>';
+	$dpinput[] = '<td class="prefix">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_prefix'].'" tabindex="'.$tabindex++.'"> ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
 	$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td>';
+	$dpinput[] = '<td class="match">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
 	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" name="pattern_pass['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" tabindex="'.$tabindex++.'"> ';
@@ -177,7 +177,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
 	$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td>';
+	$dpinput[] = '<td class="hidden-xs hidden-sm callerid">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" name="match_cid['.$idx.']" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" tabindex="'.$tabindex++.'">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
