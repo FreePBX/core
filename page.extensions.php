@@ -30,20 +30,26 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
 				<div class="display no-border">
-					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" data-name="alldids" class="active">
-							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
-								<?php echo _("All Extensions")?>
-							</a>
-						</li>
-						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
-							<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
-								<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
-									<?php echo sprintf(_("%s Extensions"),$driver['shortName'])?>
-								</a>
-							</li>
-						<?php } ?>
-					</ul>
+					<div class="nav-container">
+						<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+						<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+						<div class="wrapper">
+							<ul class="nav nav-tabs list" role="tablist">
+								<li role="presentation" data-name="alldids" class="active">
+									<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
+										<?php echo _("All Extensions")?>
+									</a>
+								</li>
+								<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
+									<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
+										<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
+											<?php echo sprintf(_("%s Extensions"),$driver['shortName'])?>
+										</a>
+									</li>
+								<?php } ?>
+							</ul>
+						</div>
+					</div>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
@@ -52,12 +58,18 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table data-url="ajax.php?module=core&amp;command=getGrid&amp;type=all" data-cache="false" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
+							<table data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
 										<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
 										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+										<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
+										<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
+										<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
+										<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
+										<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
+										<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
 										<th data-sortable="true" data-field="tech"><?php echo _('Type')?></th>
 										<th data-field="actions"><?php echo _('Actions')?></th>
 									</tr>
@@ -72,12 +84,18 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>
 								</div>
-								<table data-url="ajax.php?module=core&amp;command=getGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
+								<table data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
 									<thead>
 										<tr>
 											<th data-checkbox="true"></th>
 											<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
 											<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+											<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
+											<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
+											<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
+											<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
+											<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
+											<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
 											<th data-field="actions"><?php echo _('Actions')?></th>
 										</tr>
 									</thead>
@@ -103,8 +121,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 												<a href="#step-<?php echo $page +1?>">
 													<label class="stepNumber"><?php echo $page +1?></label>
 													<span class="stepDesc">
-														Step 1<br />
-														<small>Step <?php echo $page +1?> description</small>
+														Step <?php echo $page +1?><br />
 													</span>
 												</a>
 											</li>
@@ -113,7 +130,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 										<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
 											<div id="step-<?php echo $page +1?>">
 													<div class="fpbx-container">
-														<h2 class="StepTitle">Step <?php echo $page +1?> Content</h2>
+														<h2 class="StepTitle">Step <?php echo $page +1?></h2>
 														<div class="display">
 															<?php foreach($data as $pageDisplay) { ?>
 																<?php echo $pageDisplay['html']?>
@@ -148,44 +165,62 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 </div>
 
 <script>
-$(document).ready(function() {
-	$('#wizard').smartWizard({
-		onLeaveStep: function(obj, context) {
-			<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
-				if(context.fromStep == <?php echo $page + 1?>) {
+	$(document).ready(function() {
+		$('#wizard').smartWizard({
+			onLeaveStep: function(obj, context) {
+				<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+					if(context.fromStep == <?php echo $page + 1?>) {
+						<?php foreach($data as $pageDisplay) { ?>
+							<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
+						<?php } ?>
+					}
+				<?php } ?>
+				return true;
+			},
+			onFinish: function(obj, context) {
+				<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
 					<?php foreach($data as $pageDisplay) { ?>
 						<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
 					<?php } ?>
-				}
-			<?php } ?>
-			return true;
-		},
-		onFinish: function(obj, context) {
-			<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
-				<?php foreach($data as $pageDisplay) { ?>
-					<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
 				<?php } ?>
-			<?php } ?>
-			var data = {};
-			$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=password], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
-				data[$(this).prop('name')] = $(this).val();
-			});
-			$('#quickCreate .buttonFinish').addClass("buttonDisabled");
-			$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
-				console.log(d);
-				if(d.status) {
-					$('#quickCreate').modal('hide');
-					toggle_reload_button("show");
-					$("#quickCreate form")[0].reset();
-					$('#wizard').smartWizard('goToStep',1);
-					$('#table-all').bootstrapTable('refresh');
-					$('#table-' + data.tech).bootstrapTable('refresh');
-				} else {
-					$('#wizard').smartWizard('showMessage',d.message);
-					$('#quickCreate .buttonFinish').removeClass("buttonDisabled");
-				}
-			});
-		}
-	});
-})
+				var data = {};
+				$("#quickCreate form input[type=text], #quickCreate form input[type=number], #quickCreate form input[type=email], #quickCreate form input[type=password], #quickCreate form input[type=radio]:checked, #quickCreate form select").each(function() {
+					data[$(this).prop('name')] = $(this).val();
+				});
+				$('#quickCreate .buttonFinish').addClass("buttonDisabled");
+				$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
+					if(d.status) {
+						extmap[d.ext] = d.name;
+						$('#quickCreate').modal('hide');
+						toggle_reload_button("show");
+						$("#quickCreate form")[0].reset();
+						$('#wizard').smartWizard('goToStep',1);
+						$('#table-all').bootstrapTable('refresh');
+						$('#table-' + data.tech).bootstrapTable('refresh');
+					} else {
+						$('#wizard').smartWizard('showMessage',d.message);
+						$('#quickCreate .buttonFinish').removeClass("buttonDisabled");
+					}
+				});
+			}
+		});
+	})
+	function DNDIconFormatter(value, row) {
+		return row.settings.dnd ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Do Not Disturb is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Do Not Disturb is disabled")?>"></i>';
+	}
+	function CWIconFormatter(value, row) {
+		return row.settings.cw ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Waiting is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Waiting is disabled")?>"></i>';
+	}
+	function CFIconFormatter(value, row) {
+		return row.settings.cf ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding is disabled")?>"></i>';
+	}
+	function CFBIconFormatter(value, row) {
+		return row.settings.cfb ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Busy is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Busy is disabled")?>"></i>';
+	}
+	function CFUIconFormatter(value, row) {
+		return row.settings.cfu ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Unconditional is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Unconditional is disabled")?>"></i>';
+	}
+	function FMFMIconFormatter(value, row) {
+		return row.settings.fmfm ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Find Me/Follow Me is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Find Me/Follow Me is disabled")?>"></i>';
+	}
 </script>

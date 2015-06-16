@@ -1,4 +1,4 @@
-<div class="fpbx-container">
+<div class="display no-border">
   <form class="popover-form fpbx-submit" name="frm_extensions" action="config.php?display=extensions<?php echo isset($_REQUEST['extdisplay']) && trim($_REQUEST['extdisplay']) != '' ? '&amp;extdisplay='.$_REQUEST['extdisplay'] : '' ?>" method="post" data-fpbx-delete="config.php?display=extensions&amp;extdisplay=<?php echo $_REQUEST['extdisplay'] ?>&amp;action=del" role="form">
     <?php foreach ( $html['top'] as $elem ) {
       echo $elem['html'];
@@ -7,11 +7,17 @@
       echo $elem['html'];
     } ?>
     <div role="tabpanel">
-      <ul class="nav nav-tabs" role="tablist">
-        <?php foreach(array_keys($html['middle']) as $category) { ?>
-          <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a></li>
-        <?php } ?>
-      </ul>
+      <div class="nav-container">
+        <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+        <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+        <div class="wrapper">
+          <ul class="nav nav-tabs list" role="tablist">
+            <?php foreach(array_keys($html['middle']) as $category) { ?>
+              <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a></li>
+            <?php } ?>
+          </ul>
+        </div>
+      </div>
       <div class="tab-content display">
         <?php foreach($html['middle'] as $category => $sections) { ?>
           <div id="<?php echo strtolower($category)?>" role="tabpanel" class="tab-pane <?php echo ($active == strtolower($category)) ? 'active' : ''?>">

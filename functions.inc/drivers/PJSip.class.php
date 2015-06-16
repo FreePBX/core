@@ -200,11 +200,36 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$tt = _("When enabled, Asterisk condenses message waiting notifications from multiple mailboxes into a single NOTIFY. If it is disabled, individual NOTIFYs are sent for each mailbox.");
+		$tmparr['aggregate_mwi'] = array('prompttext' => _('Aggregate MWI'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
+
 		$select[] = array('value' => 'no', 'text' => _('None'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP'));
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP'));
-		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media-encryption]';
+		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media_encryption]';
 		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
+		
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';
+		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Media Encryption Optimistic'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+		//https://wiki.asterisk.org/wiki/display/AST/Asterisk+13+Configuration_res_pjsip_endpoint_identifier_ip
+		$tt = _("The value is a comma-delimited list of IP addresses. IP addresses may have a subnet mask appended. The subnet mask may be written in either CIDR or dot-decimal notation. Separate the IP address and subnet mask with a slash ('/')");
+		$tmparr['match'] = array('prompttext' => _('Match (Permit)'), 'value' => '', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Maximum time to keep an AoR");
+		$tmparr['maximum_expiration'] = array('prompttext' => _('Maximum Expiration'), 'value' => '7200', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Minimum time to keep an AoR");
+		$tmparr['minimum_expiration'] = array('prompttext' => _('Minimum Expiration'), 'value' => '60', 'tt' => $tt, 'level' => 1);
+		unset($select);
 
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
@@ -356,6 +381,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($trunk['from_user'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
 			}
+
+			if(!empty($trunk['dtmfmode'])) {
+				// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
+				if ($trunk['dtmfmode'] != "rfc4733" && $trunk['dtmfmode'] != 'inband' && $trunk['dtmfmode'] != 'info'
+					&& $trunk['dtmfmode'] != 'none' ) {
+					$trunk['dtmfmode'] = "rtc4733";
+				}
+				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
+			}
+
 			if(!empty($this->_endpoint[$tn]) && is_array($this->_endpoint[$tn])) {
 				foreach($this->_endpoint[$tn] as $el) {
 					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
@@ -606,12 +641,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			return false;
 		}
 
-		$endpoint = $auth = $aor = array();
+		$endpoint = $auth = $aor = $identify = array();
 
 		// With pjsip, we need three sections.
 		$endpointname = $config['account'];
 		$endpoint[] = "type=endpoint";
 		$authname = "$endpointname-auth";
+		$identifyname = "$endpointname-identify";
+		$identify[] = "type=identify";
 		$auth[] = "type=auth";
 		$aorname = "$endpointname";
 		$aor[] = "type=aor";
@@ -655,6 +692,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
+		$endpoint[] = "aggregate_mwi=".(isset($config['aggregate_mwi']) ? $config['aggregate_mwi'] : "yes");
+
 		if (!empty($config['callgroup'])) {
 			$endpoint[] = "call_group=".$config['callgroup'];
 		}
@@ -679,8 +718,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
 
+		if (!empty($config['match'])) {
+			$identify[] = "match=".$config['match'];
+		}
+
 		if (!empty($config['mediaencryption'])) {
 			$endpoint[] = "media_encryption=".$config['mediaencryption'];
+		}
+
+		if (!empty($config['mediaencryptionoptimistic'])) {
+			$endpoint[] = "media_encryption_optimistic=".$config['mediaencryptionoptimistic'];
 		}
 
 		if (isset($config['sendrpid'])) {
@@ -719,6 +766,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[]="remove_existing=no";
 		}
 
+		if(isset($config['maximum_expiration'])) {
+			$aor[] = "maximum_expiration=".$config['maximum_expiration'];
+		}
+
+		if(isset($config['minimum_expiration'])) {
+			$aor[] = "minimum_expiration=".$config['minimum_expiration'];
+		}
+
 		if (!empty($config['qualifyfreq']))
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
@@ -749,6 +804,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if(!empty($this->_aor[$aorname]) && is_array($this->_aor[$aorname])) {
 			foreach($this->_aor[$aorname] as $el) {
 				$retarr["pjsip.aor.conf"][$aorname][] = "{$el['key']}={$el['value']}";
+			}
+		}
+
+
+		if (isset($retarr["pjsip.identify.conf"][$identifyname])) {
+			throw new \Exception("Identify $aorname already exists.");
+		}
+		$retarr["pjsip.identify.conf"][$identifyname] = $aor;
+		if(!empty($this->_identify[$identifyname]) && is_array($this->_identify[$identifyname])) {
+			foreach($this->_identify[$identifyname] as $el) {
+				$retarr["pjsip.identify.conf"][$identifyname][] = "{$el['key']}={$el['value']}";
 			}
 		}
 	}
@@ -904,7 +970,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"context" => "from-pstn",
 				"transport" => null,
 				"codecs" => $sipSettingsCodecs,
-				"qualify_frequency" => 60
+				"qualify_frequency" => 60,
+				"dtmfmode" => "rfc4733"
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());

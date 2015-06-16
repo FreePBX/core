@@ -1,3 +1,62 @@
-.move {
-	cursor: move;
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+	padding-bottom: 7px;
+	line-height: inherit;
+	vertical-align: middle;
+	border-top: none;
+}
+
+/**
+ * Mainly fixes for webkit browsers and their stupid forced border-radius
+ * on select boxes
+ * might be a mac thing as well
+ * works fine in other broswsers
+ */
+.input-group {
+	.input-group-addon.move {
+		z-index: 3;
+		position: relative;
+		cursor: move;
+	}
+	select.form-control {
+		width: 101%;
+		left: -5px;
+	}
+}
+
+#dptable {
+	.input-group-addon:first-child {
+		position: relative;
+		left: 2px;
+	}
+	.input-group-addon:last-child {
+		position: relative;
+		right: 2px;
+	}
+
+	.input-group-addon {
+		padding: 6px 3px;
+	}
+
+	.prepend {
+		width: 120px;
+	}
+
+	.prefix {
+		width: 90px;
+	}
+
+	.match {
+	}
+
+	.callerid {
+		width: 105px;
+	}
+	> tbody > tr > td {
+		padding: 3px;
+	}
 }

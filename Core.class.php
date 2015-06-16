@@ -14,9 +14,69 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->database = $freepbx->Database;
 		$this->config = $freepbx->Config;
 		$this->freepbx = $freepbx;
+		$this->astman = $freepbx->astman;
 
 		//load drivers
 		$this->loadDrivers();
+	}
+
+	public function search($query, &$results) {
+		if($this->freepbx->Config->get('AMPEXTENSIONS') == "extensions") {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Extension")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+		} else {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+
+			$sql = "SELECT * FROM users WHERE extension LIKE ? or name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("User")." ".$row['extension'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				} else {
+					$results[] = array("text" => $row['name']." (".$row['extension'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				}
+			}
+		}
+
+		if(!ctype_digit($query)) {
+			$sql = "SELECT * FROM outbound_routes WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
+			}
+
+			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
+			}
+		}
+
 	}
 
 	public function ajaxRequest($req, &$setting) {
@@ -26,7 +86,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "quickcreate":
 			case "delete":
 			case "getJSON":
-			case "getGrid":
+			case "getExtensionGrid":
+			case "getDeviceGrid":
+			case "getUserGrid":
+			case "updateRoutes":
 				return true;
 			break;
 		}
@@ -35,14 +98,51 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
-			case "getGrid":
+			case "updateRoutes":
+				$order = $_REQUEST['data'];
+				array_shift($order);
+				return $this->setRouteOrder($order);
+			break;
+			case "getUserGrid":
+				$users = $this->getAllUsers();
+				if(empty($users)) {
+					return array();
+				}
+				foreach($users as &$user) {
+					$exten = $user['extension'];
+					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+				}
+				return $users;
+			break;
+			case "getExtensionGrid":
+			case "getDeviceGrid":
+				$ampuser = $this->astman->database_show("AMPUSER");
+				// Get all CW settings
+				$cwsetting = $this->astman->database_show("CW");
+				// get all CF settings
+				$cfsetting = $this->astman->database_show("CF");
+				// get all CFB settings
+				$cfbsetting = $this->astman->database_show("CFB");
+				// get all CFU settings
+				$cfusetting = $this->astman->database_show("CFU");
+				// get all DND settings
+				$dndsetting = $this->astman->database_show("DND");
 				if($_REQUEST['type'] == "all") {
 					$devices = $this->getAllUsersByDeviceType();
 					if(empty($devices)) {
 						return array();
 					}
 					foreach($devices as &$device) {
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$device['extension'].'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$device['extension'].'"><i class="fa fa-times"></i></a>';
+						$exten = $device['extension'];
+						$device['settings'] = array(
+							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+							'cf' => (isset($cfsetting['/CF/'.$exten])),
+							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
+							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
+						);
+						$device['actions'] = '<a href="?display='.($_REQUEST['command'] == "getExtensionGrid" ? "extensions" : "devices").'&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
 					}
 					return $devices;
 				} else {
@@ -51,7 +151,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						return array();
 					}
 					foreach($devices as &$device) {
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$device['extension'].'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$device['extension'].'"><i class="fa fa-times"></i></a>';
+						$exten = $device['extension'];
+						$device['settings'] = array(
+							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+							'cf' => (isset($cfsetting['/CF/'.$exten])),
+							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+							'cfu' => (isset($cfusetting['/CFU/'.$exten]))
+						);
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
 					}
 					return $devices;
 				}
@@ -89,6 +197,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				switch ($_REQUEST['jdata']) {
 					case 'allDID':
 						$dids = $this->getAllDIDs();
+						$dids = is_array($dids)?$dids:array();
+						foreach ($dids as $key => $value) {
+							$dids[$key]['cidnum'] = urlencode($value['cidnum']);
+							$dids[$key]['extension'] = urlencode($value['extension']);
+						}
 						return array_values($dids);
 					break;
 				}
@@ -206,7 +319,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		$modules = $this->freepbx->Hooks->processHooks($tech, $extension, $data);
 		needreload();
-		return array("status" => true);
+		return array("status" => true, "ext" => $extension, "name" => $data['name']);
 	}
 
 	/**
@@ -435,7 +548,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
 					$buttons = array();
 				}
-				if(empty($request['extdisplay']) && empty($request['tech_hardware']) && (!empty($request['view']) && $request['view'] != 'add')){
+				if(empty($request['extdisplay']) && empty($request['tech_hardware']) || (!empty($request['view']) && $request['view'] != 'add')){
 					$buttons = array();
 				}
 			break;
@@ -751,7 +864,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						header("Content-type: application/json");
 						echo json_encode($ret);
 					}
-					exit;
+					$_REQUEST['id'] = NULL;
 				break;
 				case 'prioritizeroute':
 					needreload();
@@ -901,7 +1014,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			switch ($action) {
 				case 'addIncoming':
 					//create variables from request
-					extract($request);
+					extract($request, EXTR_SKIP);
 					//add details to the 'incoming' table
 					if (core_did_add($request)) {
 						needreload();
@@ -2052,5 +2165,17 @@ public function hookTabs($page){
 		}
 
 		return $data;
+	}
+	public function setRouteOrder($routes){
+		$dbh = $this->database();
+		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
+		$stmt->execute();
+		$stmt = $dbh->prepare('INSERT INTO outbound_route_sequence (route_id, seq) VALUES (?,?)');
+		$ret = array();
+		foreach ($routes as $key => $value) {
+			$seq = ($key+1);
+			$ret[] = $stmt->execute(array($value,$seq));
+		}
+		return $ret;
 	}
 }

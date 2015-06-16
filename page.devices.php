@@ -29,20 +29,26 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
 				?>
 				<div class="display no-border">
-					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" data-name="alldids" class="active">
-							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
-								<?php echo _("All Devices")?>
-							</a>
-						</li>
-						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
-							<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
-								<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
-									<?php echo sprintf(_("%s Devices"),$driver['shortName'])?>
-								</a>
-							</li>
-						<?php } ?>
-					</ul>
+					<div class="nav-container">
+						<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+						<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+						<div class="wrapper">
+							<ul class="nav nav-tabs list" role="tablist">
+								<li role="presentation" data-name="alldids" class="active">
+									<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
+										<?php echo _("All Devices")?>
+									</a>
+								</li>
+								<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
+									<li role="presentation" data-name="<?php echo $driver['hardware']?>" class="">
+										<a href="#<?php echo $driver['hardware']?>" aria-controls="<?php echo $driver['hardware']?>" role="tab" data-toggle="tab">
+											<?php echo sprintf(_("%s Devices"),$driver['shortName'])?>
+										</a>
+									</li>
+								<?php } ?>
+							</ul>
+						</div>
+					</div>
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
@@ -50,30 +56,22 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-all" class="table table-striped">
+							<table data-url="ajax.php?module=core&amp;command=getDeviceGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
-										<th data-sortable="true" data-field="extension"><?php echo _('Device')?></th>
-										<th data-sortable="true"><?php echo _('Name')?></th>
-										<th data-sortable="true"><?php echo _('Type')?></th>
-										<th><?php echo _('Actions')?></th>
+										<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
+										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+										<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
+										<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
+										<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
+										<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
+										<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
+										<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
+										<th data-sortable="true" data-field="tech"><?php echo _('Type')?></th>
+										<th data-field="actions"><?php echo _('Actions')?></th>
 									</tr>
 								</thead>
-								<tbody>
-									<?php foreach(FreePBX::Core()->getAllDevicesByType() as $user) {?>
-										<tr>
-											<td></td>
-											<td><?php echo $user['id']?></td>
-											<td><?php echo $user['description']?></td>
-											<td><?php echo $user['tech']?></td>
-											<td class="actions">
-												<a href="?display=devices&amp;extdisplay=<?php echo $user['id']?>"><i class="fa fa-pencil-square-o"></i></a>
-												<i class="fa fa-times" data-id="<?php echo $user['id']?>"></i>
-											</td>
-										</tr>
-									<?php } ?>
-								</tbody>
 							</table>
 						</div>
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
@@ -83,28 +81,21 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 								</button>
 							</div>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
-								<table data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" id="table-<?php echo $driver['rawName']?>" class="table table-striped">
+								<table data-url="ajax.php?module=core&amp;command=getDeviceGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" id="table-<?php echo $driver['rawName']?>" class="table table-striped ext-list">
 									<thead>
 										<tr>
 											<th data-checkbox="true"></th>
-											<th data-sortable="true" data-field="extension"><?php echo _('Device')?></th>
-											<th data-sortable="true"><?php echo _('Name')?></th>
-											<th><?php echo _('Actions')?></th>
+											<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
+											<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+											<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
+											<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
+											<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
+											<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
+											<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
+											<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
+											<th data-field="actions"><?php echo _('Actions')?></th>
 										</tr>
 									</thead>
-									<tbody>
-										<?php foreach(FreePBX::Core()->getAllDevicesByType($driver['rawName']) as $user) {?>
-											<tr>
-												<td></td>
-												<td><?php echo $user['id']?></td>
-												<td><?php echo $user['description']?></td>
-												<td class="actions">
-													<a href="?display=devices&amp;extdisplay=<?php echo $user['id']?>"><i class="fa fa-pencil-square-o"></i></a>
-													<i class="fa fa-times" data-id="<?php echo $user['id']?>"></i>
-												</td>
-											</tr>
-										<?php } ?>
-									</tbody>
 								</table>
 							</div>
 						<?php } ?>
@@ -127,3 +118,23 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 		</div>
 	</div>
 </div>
+<script>
+	function DNDIconFormatter(value, row) {
+		return row.settings.dnd ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Do Not Disturb is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Do Not Disturb is disabled")?>"></i>';
+	}
+	function CWIconFormatter(value, row) {
+		return row.settings.cw ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Waiting is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Waiting is disabled")?>"></i>';
+	}
+	function CFIconFormatter(value, row) {
+		return row.settings.cf ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding is disabled")?>"></i>';
+	}
+	function CFBIconFormatter(value, row) {
+		return row.settings.cfb ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Busy is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Busy is disabled")?>"></i>';
+	}
+	function CFUIconFormatter(value, row) {
+		return row.settings.cfu ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Unconditional is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Unconditional is disabled")?>"></i>';
+	}
+	function FMFMIconFormatter(value, row) {
+		return row.settings.fmfm ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Find Me/Follow Me is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Find Me/Follow Me is disabled")?>"></i>';
+	}
+</script>

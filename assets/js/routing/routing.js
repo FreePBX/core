@@ -5,13 +5,14 @@ $(function() {
 		itemSelector: 'tr',
 		placeholder: '<tr class="placeholder"/>',
 		handle: '.fa-arrows',
-		update: function(event, ui){
-			var id = ui.item.data('id');
-			var seq = ui.item.index()+1;
+		stop: function(event, ui){
+			var rows = $('#routes').find('tr');
+			var routeorder = [];
+			$(rows).each(function(){routeorder.push($(this).data('id'))});
 			$.ajax({
 				type: 'POST',
-				url: location.href,
-				data: 'action=ajaxroutepos&quietmode=1&skip_astman=1&restrictmods=core&repotrunkkey='+id+'&repotrunkdirection='+seq,
+				url: 'ajax.php?module=core&command=updateRoutes',
+				data: {'data':routeorder},
 				dataType: 'json',
 				success: function(data) {
 					toggle_reload_button('show');
@@ -66,32 +67,33 @@ $("a[id^='del']").click(function(){
 		}
 	});
 });
-$("a[id^='routerowadd']").on('click',function(){
+$(document).on('click',"a[id^='routerowadd']",function(e){
+	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
 	var id = $("tr[id^='dprow']").length++;
 	var newhtml = '';
 	newhtml +='<tr id="dprow'+id+'">';
-	newhtml +=	'<td>';
+	newhtml +=	'<td class="hidden-xs prepend">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
 	newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
 	newhtml +=	'	</div>';
 	newhtml +=	'</td>';
-	newhtml +=	'<td>';
+	newhtml +=	'<td class="prefix">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value=""> ';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
 	newhtml +=	'	</div>';
 	newhtml +=	'</td>';
-	newhtml +=	'<td>';
+	newhtml +=	'<td class="match">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
 	newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
 	newhtml +=	'	</div>';
 	newhtml +=	'</td>';
-	newhtml +=	'<td>';
+	newhtml +=	'<td class="hidden-xs hidden-sm callerid">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
@@ -255,28 +257,44 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 	}
 });
 
-$("[id^='trunkpri']:last").change(function(){
-	var id = /trunkpri([0-9]*)/.exec($(this).attr('id'));
-	var nextid = (Number(id[1]) +1);
-	if($("[id^='trunkpri']").length == 1){
-		return;
-	}
-	if($(this).val() === ''){
-		var curRow = $(this).closest('tr');
-		curRow.fadeOut(2000, function(){
-			$(this).remove();
-		});
-	}else{
-		var curRow = $(this).closest('tr');
-		var newRow = curRow.clone(true);
-		$(newRow).attr('id', 'trunkrow'+nextid);
-		var newinput = newRow.find("[id^='trunkpri']");
-		$(newinput).attr('id', 'trunkpri'+nextid);
-		$(newinput).attr('name', 'trunkpri['+nextid+']');
-		curRow.after(newRow);
-	}
 
-});
+bindToLast();
+function bindToLast() {
+	$("[id^='trunkpri']:last").one("change", function(){
+		var id = /trunkpri([0-9]*)/.exec($(this).attr('id')),
+				nextid = (Number(id[1]) +1),
+				curRow,
+				newRow,
+				newinput;
+
+		if($(this).val() === ''){
+			curRow = $(this).closest('tr');
+			curRow.fadeOut(2000, function(){
+				$(this).remove();
+			});
+		}else{
+			curRow = $(this).closest('tr');
+			newRow = curRow.clone(true);
+			$(newRow).attr('id', 'trunkrow'+nextid);
+			newinput = newRow.find("[id^='trunkpri']");
+			$(newinput).attr('id', 'trunkpri'+nextid);
+			$(newinput).attr('name', 'trunkpriority['+nextid+']');
+			curRow.after(newRow);
+		}
+		bindToLast();
+	});
+}
+
 $("#duplicate").click(function(){
 	$("#action").val("copyroute");
+});
+$("#routeEdit").submit(function(){
+	var patlen = 0;
+	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
+	if(patlen === 0){
+		alert(_("You must complete the dial pattern tab before submitting"));
+		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
+		return false;
+	}
+	return true;
 });

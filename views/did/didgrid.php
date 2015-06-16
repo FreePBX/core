@@ -18,7 +18,7 @@ function DIDnumberFormatter(value){
 	if(value.length == 0){
 		return _("Any");
 	}else{
-		return value;
+		return decodeURIComponent(value);
 	}
 }
 function DIDdestFormatter(value){
