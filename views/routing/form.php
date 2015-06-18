@@ -25,11 +25,12 @@ if (function_exists('timeconditions_timegroups_drawgroupselect')){
 	$optionalelems .= load_view(__DIR__.'/timecond.php');
 }
 $routepriority = core_routing_list();
-if ($route_seq != 0) {
-	$routeseqopts = '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
-}
-//Routing select box
 $routeseqopts = '';
+//Routing select box
+if ($route_seq != 0) {
+	$routeseqopts .= '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
+}
+
 $last_seq = isset($last_seq)?$last_seq:'';
 foreach ($routepriority as $key => $route) {
 	if ($key == 0 && $route_seq != 0) continue;
