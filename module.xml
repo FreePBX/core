@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha33</version>
+	<version>13.0.1alpha34</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha34* Add Spanish prompts
 		*13.0.1alpha33* FREEPBX-9459 Dialpattern Field Display Issues
 		*13.0.1alpha32* FREEPBX-9461, FREEPBX-8823 Implement a few more features into PJSIP that were missing
 		*13.0.1alpha31* Add tab scrolls to devices
