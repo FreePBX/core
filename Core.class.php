@@ -90,6 +90,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "getDeviceGrid":
 			case "getUserGrid":
 			case "updateRoutes":
+			case "delroute":
 				return true;
 			break;
 		}
@@ -98,6 +99,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
+			case "delroute":
+				if (!function_exists('core_routing_delbyid')) {
+					if (file_exists(__DIR__."/functions.inc.php")) {
+						include __DIR__."/functions.inc.php";
+					}
+				}
+				$ret = core_routing_delbyid($_POST['id']);
+				// re-order the routes to make sure that there are no skipped numbers.
+				// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
+				// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
+				// so we are left with 001-test1, 002-test3
+				needreload();
+				return $ret;
+			break;
 			case "updateRoutes":
 				$order = $_REQUEST['data'];
 				array_shift($order);
@@ -852,19 +867,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					echo json_encode(array('result' => $ret));
 					needreload();
 					exit;
-				break;
-				case "delroute":
-					$ret = core_routing_delbyid($request['id']);
-					// re-order the routes to make sure that there are no skipped numbers.
-					// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
-					// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
-					// so we are left with 001-test1, 002-test3
-					needreload();
-					if($request['json']){
-						header("Content-type: application/json");
-						echo json_encode($ret);
-					}
-					$_REQUEST['id'] = NULL;
 				break;
 				case 'prioritizeroute':
 					needreload();

@@ -58,10 +58,11 @@ $("a[id^='del']").click(function(){
 	var id = $(this).data('id');
 	$.ajax({
 		type: 'POST',
-		url: location.href,
-		data: 'action=delroute&quietmode=1&skip_astman=1&json=true&restrictmods=core&id='+id,
+		url: "ajax.php",
+		data: 'module=core&command=delroute&id='+id,
 		dataType: 'json',
 		success: function(data) {
+			console.log(data);
 			toggle_reload_button('show');
 			location.reload();
 		}
