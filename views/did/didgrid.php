@@ -27,7 +27,7 @@ function DIDdestFormatter(value){
 		return _("No Destination");
 	}else{
 		if(typeof destinations[value] !== "undefined") {
-			return destinations[value].name + ": " + destinations[value].description;
+			return '<a href="' + destinations[value].edit_url + '">' + destinations[value].name + ": " + destinations[value].description + '</a>';
 		} else {
 			return value;
 		}
