@@ -27,7 +27,11 @@ function DIDdestFormatter(value){
 		return _("No Destination");
 	}else{
 		if(typeof destinations[value] !== "undefined") {
-			return '<a href="' + destinations[value].edit_url + '">' + destinations[value].name + ": " + destinations[value].description + '</a>';
+			if(typeof destinations[value].edit_url !== "undefined") {
+				return '<a href="' + destinations[value].edit_url + '">' + destinations[value].name + ": " + destinations[value].description + '</a>';
+			} else {
+				return destinations[value].name + ": " + destinations[value].description;
+			}
 		} else {
 			return value;
 		}
