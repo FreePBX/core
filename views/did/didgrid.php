@@ -1,7 +1,7 @@
 <div id="toolbar-all">
-	<a href="config.php?display=did&view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
+	<a href="config.php?display=did&amp;view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
 </div>
-<table id="didtable" data-toolbar="#toolbar-all" data-url="ajax.php?module=core&command=getJSON&jdata=allDID" data-cache="false" data-pagination="true" data-search="true" data-toggle="table" class="table table-striped">
+<table id="didtable" data-toolbar="#toolbar-all" data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allDID" data-cache="false" data-pagination="true" data-search="true" data-toggle="table" class="table table-striped">
 	<thead>
 					<tr>
 					<th data-field="description" data-sortable="true"><?php echo _("Description")?></th>
@@ -14,6 +14,7 @@
 </table>
 
 <script type="text/javascript">
+var destinations = <?php echo json_encode(FreePBX::Modules()->getDestinations())?>;
 function DIDnumberFormatter(value){
 	if(value.length == 0){
 		return _("Any");
@@ -25,8 +26,11 @@ function DIDdestFormatter(value){
 	if(value.length == 0){
 		return _("No Destination");
 	}else{
-		var dest = value.split(',');
-		return dest[0];
+		if(typeof destinations[value] !== "undefined") {
+			return destinations[value].name + ": " + destinations[value].description;
+		} else {
+			return value;
+		}
 	}
 }
 function DIDlinkFormatter(value, row){
@@ -34,5 +38,4 @@ function DIDlinkFormatter(value, row){
 	html += '&nbsp;<a href="?display=did&action=delIncoming&didfilter=&rnavsort=&extdisplay='+row['extension']+'%2F'+row['cidnum']+'" class="delAction"><i class="fa fa-trash"></i></a>';
 	return html;
 }
-
 </script>
