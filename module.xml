@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1alpha35* FREEPBX-9491 List specific destinations in inbound routes chart
 		*13.0.1alpha34* Add Spanish prompts
 		*13.0.1alpha33* FREEPBX-9459 Dialpattern Field Display Issues
 		*13.0.1alpha32* FREEPBX-9461, FREEPBX-8823 Implement a few more features into PJSIP that were missing
@@ -112,7 +113,7 @@
 		*2.12.0alpha1* PJSIP Support
 	</changelog>
 	<depends>
-		<version>13.0.1alpha2</version>
+		<version>13.0.1alpha72</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
