@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1alpha34</version>
+	<version>13.0.1beta1</version>
 	<publisher>Schmooze Com Inc</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1* Bump to beta. Prep for launch
 		*13.0.1alpha35* FREEPBX-9491 List specific destinations in inbound routes chart
 		*13.0.1alpha34* Add Spanish prompts
 		*13.0.1alpha33* FREEPBX-9459 Dialpattern Field Display Issues
