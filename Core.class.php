@@ -588,7 +588,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function doConfigPageInit($page) {
-		$this->freepbx->Modules->getDestinations();
 		//Reassign $_REQUEST as it will be immutable in the future.
 		$request = $_REQUEST;
 		global $amp_conf;

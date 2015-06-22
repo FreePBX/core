@@ -46,7 +46,7 @@ echo isset($userlink)?$userlink:'';
 $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 ?>
 
-<form name="editGRP" class="fpbx-submit" action="config.php?display=did&amp;view=form" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
+<form name="editGRP" class="fpbx-submit" action="config.php?display=did" method="post"  data-fpbx-delete="?display=did&amp;extdisplay=<?php echo $extdisplay; ?>&amp;action=delIncoming&amp;didfilter=<?php echo $didfilter; ?>&amp;rnavsort=<?php echo $rnavsort; ?>">
 	<input type="hidden" name="display" value="did">
 	<input type="hidden" name="action" value="<?php echo ($extdisplay ? 'edtIncoming' : 'addIncoming') ?>">
 	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
