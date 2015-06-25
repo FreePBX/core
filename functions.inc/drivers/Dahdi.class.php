@@ -16,11 +16,7 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 		$sql = 'INSERT INTO dahdi (id, keyword, data) values (?,?,?)';
 		$sth = $this->database->prepare($sql);
 		foreach($settings as $key => $setting) {
-			try {
-				$sth->execute(array($id,$key,$setting['value']));
-			} catch(\Exception $e) {
-				die_freepbx($e->getMessage()."<br><br>".'error adding to DAHDI table');
-			}
+			$sth->execute(array($id,$key,$setting['value']));
 		}
 		return true;
 	}
@@ -28,11 +24,7 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 	public function delDevice($id) {
 		$sql = "DELETE FROM dahdi WHERE id = ?";
 		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($id));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
-		}
+		$sth->execute(array($id));
 		return true;
 	}
 

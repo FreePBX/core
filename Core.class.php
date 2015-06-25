@@ -1162,7 +1162,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		if(empty($fields)) {
 			die_freepbx('Fields are empty');
 		}
-		$fields['account'] = array("value" => $account, "flag" => $flag++);
 		$fields['callerid'] = array("value" => (isset($_REQUEST['description']) && $_REQUEST['description']) ? $_REQUEST['description']." <".$account.'>' : 'device'." <".$account.'>', "flag" => $flag++);
 		return $fields;
 	}

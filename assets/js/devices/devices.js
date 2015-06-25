@@ -8,7 +8,7 @@ $(".btn-remove").click(function() {
 			if(data.status) {
 				btn.find("span").text(_("Delete"));
 				$(".ext-list").bootstrapTable('remove', {
-					field: "extension",
+					field: "id",
 					values: deleteExts
 				});
 			} else {
@@ -26,7 +26,7 @@ $("table").on("post-body.bs.table", function () {
 			$.post( "ajax.php", {command: "delete", module: "core", extensions: [id], type: "devices"}, function(data) {
 				if(data.status) {
 					$(".ext-list").bootstrapTable('remove', {
-						field: "extension",
+						field: "id",
 						values: [id.toString()]
 					});
 				} else {
@@ -44,6 +44,6 @@ $("table").on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs
 	var toolbar = $(this).data("toolbar"), button = $(toolbar).find(".btn-remove"), id = $(this).prop("id");
 	button.prop('disabled', !$("#"+id).bootstrapTable('getSelections').length);
 	deleteExts = $.map($("#"+id).bootstrapTable('getSelections'), function (row) {
-		return row.extension;
+		return row.id;
   });
 });

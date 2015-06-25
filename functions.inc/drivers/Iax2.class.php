@@ -16,11 +16,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 		$sql = 'INSERT INTO iax (id, keyword, data, flags) values (?,?,?,?)';
 		$sth = $this->database->prepare($sql);
 		foreach($settings as $key => $setting) {
-			try {
-				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
-			} catch(\Exception $e) {
-				die_freepbx($e->getMessage()."<br><br>".'error adding to IAX2 table');
-			}
+			$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
 		}
 		return true;
 	}
@@ -28,11 +24,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 	public function delDevice($id) {
 		$sql = "DELETE FROM iax WHERE id = ?";
 		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($id));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
-		}
+		$sth->execute(array($id));
 		return true;
 	}
 
@@ -106,7 +98,7 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
 		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
-		
+
 		$tmparr = array();
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
 		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);

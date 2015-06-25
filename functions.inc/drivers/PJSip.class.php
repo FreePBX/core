@@ -46,11 +46,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$sth = $this->database->prepare($sql);
 		$settings = is_array($settings)?$settings:array();
 		foreach($settings as $key => $setting) {
-			try {
-				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
-			} catch(\Exception $e) {
-				die_freepbx($e->getMessage()."<br><br>".'error adding to SIP table');
-			}
+			$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
 		}
 		return true;
 	}
@@ -58,11 +54,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function delDevice($id) {
 		$sql = "DELETE FROM sip WHERE id = ?";
 		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($id));
-		} catch(\Exception $e) {
-			die_freepbx($e->getMessage().$sql);
-		}
+		$sth->execute(array($id));
 		return true;
 	}
 
@@ -212,7 +204,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media_encryption]';
 		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
-		
+
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';

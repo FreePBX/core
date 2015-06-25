@@ -6597,11 +6597,11 @@ function core_devices_configprocess() {
 				$flag = 2;
 				$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
 				$settings = array(
-					"dial" => array("value" => $devinfo_dial),
-					"devicetype" => array("value" => $devicetype),
-					"user" => array("value" => $deviceuser),
-					"description" => array("value" => $description),
-					"emergency_cid" => array("value" => $emergency_cid)
+					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
+					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
+					"user" => array("value" => $deviceuser, "flag" => isset($fields['deviceuser']['flag']) ? $fields['deviceuser']['flag'] : $flag++),
+					"description" => array("value" => $description, "flag" => isset($fields['description']['flag']) ? $fields['description']['flag'] : $flag++),
+					"emergency_cid" => array("value" => $emergency_cid, "flag" => isset($fields['emergency_cid']['flag']) ? $fields['emergency_cid']['flag'] : $flag++)
 				);
 				$settings = array_merge($fields,$settings);
 				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
