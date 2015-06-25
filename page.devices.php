@@ -60,15 +60,11 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
-										<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
-										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
-										<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
-										<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
-										<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
-										<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
-										<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
-										<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
-										<th data-sortable="true" data-field="tech"><?php echo _('Type')?></th>
+										<th data-sortable="true" data-field="id"><?php echo _('Device')?></th>
+										<th data-sortable="true" data-field="description"><?php echo _('Description')?></th>
+										<th data-sortable="true" data-field="devicetype"><?php echo _('Device Type')?></th>
+										<th data-sortable="true" data-formatter="userLinkFormatter" data-field="user"><?php echo _('User')?></th>
+										<th data-sortable="true" data-field="tech"><?php echo _('Tech Type')?></th>
 										<th data-field="actions"><?php echo _('Actions')?></th>
 									</tr>
 								</thead>
@@ -85,14 +81,10 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<thead>
 										<tr>
 											<th data-checkbox="true"></th>
-											<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
-											<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
-											<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
-											<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
-											<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
-											<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
-											<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
-											<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
+											<th data-sortable="true" data-field="id"><?php echo _('Device')?></th>
+											<th data-sortable="true" data-field="description"><?php echo _('Description')?></th>
+											<th data-sortable="true" data-field="devicetype"><?php echo _('Device Type')?></th>
+											<th data-sortable="true" data-field="user"><?php echo _('User')?></th>
 											<th data-field="actions"><?php echo _('Actions')?></th>
 										</tr>
 									</thead>
@@ -119,22 +111,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	</div>
 </div>
 <script>
-	function DNDIconFormatter(value, row) {
-		return row.settings.dnd ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Do Not Disturb is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Do Not Disturb is disabled")?>"></i>';
-	}
-	function CWIconFormatter(value, row) {
-		return row.settings.cw ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Waiting is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Waiting is disabled")?>"></i>';
-	}
-	function CFIconFormatter(value, row) {
-		return row.settings.cf ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding is disabled")?>"></i>';
-	}
-	function CFBIconFormatter(value, row) {
-		return row.settings.cfb ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Busy is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Busy is disabled")?>"></i>';
-	}
-	function CFUIconFormatter(value, row) {
-		return row.settings.cfu ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Unconditional is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Unconditional is disabled")?>"></i>';
-	}
-	function FMFMIconFormatter(value, row) {
-		return row.settings.fmfm ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Find Me/Follow Me is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Find Me/Follow Me is disabled")?>"></i>';
+	function userLinkFormatter(value, row) {
+		return value.trim() !== "" ? "<a href='?display=users&extdisplay="+value+"'>"+value+"</a>" : null;
 	}
 </script>

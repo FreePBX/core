@@ -123,14 +123,32 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if(empty($users)) {
 					return array();
 				}
+				$ampuser = $this->astman->database_show("AMPUSER");
+				// Get all CW settings
+				$cwsetting = $this->astman->database_show("CW");
+				// get all CF settings
+				$cfsetting = $this->astman->database_show("CF");
+				// get all CFB settings
+				$cfbsetting = $this->astman->database_show("CFB");
+				// get all CFU settings
+				$cfusetting = $this->astman->database_show("CFU");
+				// get all DND settings
+				$dndsetting = $this->astman->database_show("DND");
 				foreach($users as &$user) {
 					$exten = $user['extension'];
+					$user['settings'] = array(
+						'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+						'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+						'cf' => (isset($cfsetting['/CF/'.$exten])),
+						'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+						'cfu' => (isset($cfusetting['/CFU/'.$exten])),
+						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
+					);
 					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
 				}
 				return $users;
 			break;
 			case "getExtensionGrid":
-			case "getDeviceGrid":
 				$ampuser = $this->astman->database_show("AMPUSER");
 				// Get all CW settings
 				$cwsetting = $this->astman->database_show("CW");
@@ -157,7 +175,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
 							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
 						);
-						$device['actions'] = '<a href="?display='.($_REQUEST['command'] == "getExtensionGrid" ? "extensions" : "devices").'&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
 					}
 					return $devices;
 				} else {
@@ -175,6 +193,29 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							'cfu' => (isset($cfusetting['/CFU/'.$exten]))
 						);
 						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+					}
+					return $devices;
+				}
+				break;
+			case "getDeviceGrid":
+				if($_REQUEST['type'] == "all") {
+					$devices = $this->getAllDevicesByType();
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['id'];
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+					}
+					return $devices;
+				} else {
+					$devices = $this->getAllDevicesByType($_REQUEST['type']);
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['id'];
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
 					}
 					return $devices;
 				}
