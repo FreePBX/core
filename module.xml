@@ -3,18 +3,19 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.31</version>
-	<publisher>Schmooze Com Inc</publisher>
+	<version>12.0.32</version>
+	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.32* Add media_encryption to PJSIP
 		*12.0.31* FREEPBX-8046 Don't set a ring timeout on calls with NODEST set.
 		*12.0.30* FREEPBX-9146 When using VMX Locator your unavailable greeting is played twice fix
 		*12.0.29* Add indexes to devices and users to speed up page loading
 		*12.0.28* Reset lang cookie if default lang changes
-		*12.0.27* FREEPBX-6860 fix text list in Admin > Administrators (better fix)
+		*12.0.27* FREEPBX-6860 fix text list in Admin &gt; Administrators (better fix)
 		*12.0.26* FREEPBX-8815 Ordering of allow/disallow in pjsip.endpoint.conf is wrong
 		*12.0.25* FREEPBX-8766 - Support 'load' tag in modules.conf
 		*12.0.24* Remove old depends
