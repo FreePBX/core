@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.4</version>
+	<version>13.0.1beta1.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.5* FREEPBX-9509 Cant enable recording external outbound calls from extension
 		*13.0.1beta1.4* FREEPBX-9544 fixes error when changing sip drivers
 		*13.0.1beta1.3* Fix device and user display to accurately reflect correct items
 		*13.0.1beta1.2* FREEPBX-9513 Core:Hangup in inbound routes table leads to 404 error, FREEPBX-9533 error

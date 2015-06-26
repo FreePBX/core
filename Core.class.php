@@ -1698,7 +1698,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$settings['recording_in_external'] = 'dontcare';
 		}
 		if (isset($settings['recording_out_external'])) {
-			$rec_tmp = explode('=',$recording_out_external,2);
+			$rec_tmp = explode('=',$settings['recording_out_external'],2);
 			$settings['recording_out_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
 		} else {
 			$settings['recording_out_external'] = 'dontcare';
