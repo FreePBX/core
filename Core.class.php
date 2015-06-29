@@ -1134,6 +1134,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {int} &$flag   The Flag Number
 	 */
 	public function convertRequest2Array($account,$tech,&$flag = 2) {
+		if(empty($account)) {
+			throw new \Exception("Account must be set!");
+		}
+		if(empty($tech)) {
+			throw new \Exception("tech must be set!");
+		}
 		$flag = !empty($flag) ? $flag : 2;
 		$fields = array();
 		$tech = strtoupper($tech);
@@ -1162,6 +1168,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		if(empty($fields)) {
 			die_freepbx('Fields are empty');
 		}
+		$fields['account'] = array("value" => $account, "flag" => $flag++);
 		$fields['callerid'] = array("value" => (isset($_REQUEST['description']) && $_REQUEST['description']) ? $_REQUEST['description']." <".$account.'>' : 'device'." <".$account.'>', "flag" => $flag++);
 		return $fields;
 	}

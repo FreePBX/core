@@ -6595,7 +6595,7 @@ function core_devices_configprocess() {
 				$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
 				$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
 				$flag = 2;
-				$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
+				$fields = FreePBX::Core()->convertRequest2Array($deviceid,$tech,$flag);
 				$settings = array(
 					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
 					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
