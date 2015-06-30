@@ -144,7 +144,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'cfu' => (isset($cfusetting['/CFU/'.$exten])),
 						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
 					);
-					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 				}
 				return $users;
 			break;
@@ -175,7 +175,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
 							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
 						);
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 					}
 					return $devices;
 				} else {
@@ -192,7 +192,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
 							'cfu' => (isset($cfusetting['/CFU/'.$exten]))
 						);
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 					}
 					return $devices;
 				}
@@ -205,7 +205,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					}
 					foreach($devices as &$device) {
 						$exten = $device['id'];
-						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 					}
 					return $devices;
 				} else {
@@ -215,7 +215,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					}
 					foreach($devices as &$device) {
 						$exten = $device['id'];
-						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-pencil-square-o"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-times"></i></a>';
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 					}
 					return $devices;
 				}
