@@ -38,7 +38,7 @@ function DIDdestFormatter(value){
 	}
 }
 function DIDlinkFormatter(value, row){
-	var html = '<a href="?display=did&view=form&extdisplay='+row['extension']+'%2F'+row['cidnum']+'"><i class="fa fa-pencil"></i></a>';
+	var html = '<a href="?display=did&view=form&extdisplay='+row['extension']+'%2F'+row['cidnum']+'"><i class="fa fa-edit"></i></a>';
 	html += '&nbsp;<a href="?display=did&action=delIncoming&didfilter=&rnavsort=&extdisplay='+row['extension']+'%2F'+row['cidnum']+'" class="delAction"><i class="fa fa-trash"></i></a>';
 	return html;
 }
