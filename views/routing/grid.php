@@ -40,7 +40,7 @@ $routerows .= <<<HERE
 <td>$attributes</td>
 <td><a href="config.php?display=routing&view=form&id=$id&extdisplay=$id">
 	<i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-	<a href="#" id="del$id" data-id="$id" >
+	<a href="#" id="del$id" data-id="$id" class="delAction">
 	<i class="fa fa-trash-o"></i></a>&nbsp;&nbsp;
 </tr>
 HERE;
