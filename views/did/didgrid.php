@@ -1,12 +1,22 @@
 <div id="toolbar-all">
 	<a href="config.php?display=did&amp;view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
 </div>
-<table id="didtable" data-toolbar="#toolbar-all" data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allDID" data-cache="false" data-pagination="true" data-search="true" data-toggle="table" class="table table-striped">
+<table id="didtable"
+ data-toolbar="#toolbar-all"
+ data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allDID"
+ data-cache="false"
+ data-cookie="true"
+ data-cookie-id-table="coredidgrid"
+ data-show-columns="true"
+ data-pagination="true"
+ data-search="true"
+ data-toggle="table"
+ class="table table-striped">
 	<thead>
 					<tr>
-					<th data-field="description" data-sortable="true"><?php echo _("Description")?></th>
-					<th data-field="cidnum" data-searchable="true" data-sortable="true" data-formatter="DIDnumberFormatter"><?php echo _("CID")?></th>
 					<th data-field="extension" data-sortable="true" data-searchable="true" data-formatter="DIDnumberFormatter"><?php echo _("DID")?></th>
+					<th data-field="cidnum" data-searchable="true" data-sortable="true" data-formatter="DIDnumberFormatter"><?php echo _("CID")?></th>
+					<th data-field="description" data-sortable="true"><?php echo _("Description")?></th>
 					<th data-field="destination" data-formatter="DIDdestFormatter"><?php echo _("Destination")?></th>
 					<th data-field="extension" data-formatter="DIDlinkFormatter"><?php echo _("Actions")?></th>
 			</tr>
