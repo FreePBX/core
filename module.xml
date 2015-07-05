@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*12.0.32* Add media_encryption to PJSIP
+		*12.0.32* FREEPBX-9517 max_retries not being written by pjsip
 		*12.0.31* FREEPBX-8046 Don't set a ring timeout on calls with NODEST set.
 		*12.0.30* FREEPBX-9146 When using VMX Locator your unavailable greeting is played twice fix
 		*12.0.29* Add indexes to devices and users to speed up page loading
