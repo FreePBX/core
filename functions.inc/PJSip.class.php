@@ -131,6 +131,7 @@ class PJSip extends \FreePBX_Helpers implements \BMO {
 				'transport' => $trunk['transport'],
 				'outbound_auth' => $tn,
 				'retry_interval' => $trunk['retry_interval'],
+				'max_retries' => $trunk['max_retries'],
 				'expiration' => $trunk['expiration'],
 				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 			);
