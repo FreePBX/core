@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.6</version>
+	<version>13.0.1beta1.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.7* Add DID, callerid, and destination to DID bulkhandler validation page
 		*13.0.1beta1.6* Add back missing account field
 		*13.0.1beta1.5* FREEPBX-9509 Cant enable recording external outbound calls from extension
 		*13.0.1beta1.4* FREEPBX-9544 fixes error when changing sip drivers
@@ -148,12 +149,12 @@
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
 	<hooks>
-		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler">
-			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes" priority="100">bulkhandlerGetTypes</method>
-			<method namespace="FreePBX\modules" class="Core" callingMethod="getHeaders" priority="100">bulkhandlerGetHeaders</method>
+		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler" priority="100">
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes">bulkhandlerGetTypes</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="getHeaders">bulkhandlerGetHeaders</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="validate">bulkhandlerValidate</method>
-			<method namespace="FreePBX\modules" class="Core" callingMethod="import" priority="100">bulkhandlerImport</method>
-			<method namespace="FreePBX\modules" class="Core" callingMethod="export" priority="100">bulkhandlerExport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
 	</hooks>
 	<supported>

@@ -2088,9 +2088,16 @@ public function hookTabs($page){
 					'identifier' => _('Description'),
 					'description' => _('Description'),
 				),
-				'extension' => array('description' => _('Incoming DID')),
-				'cidnum' => array('description' => _('Caller ID Number')),
+				'extension' => array(
+					'identifier' => _('Incoming DID'),
+					'description' => _('Incoming DID')
+				),
+				'cidnum' => array(
+					'identifier' => _('Caller ID'),
+					'description' => _('Caller ID Number')
+				),
 				'destination' => array(
+					'identifier' => _('Destination'),
 					'description' => _('The context, extension, priority to go to when this DID is matched. Example: app-daynight,0,1'),
 					'type' => 'destination',
 				),
