@@ -11,6 +11,7 @@ $(".btn-remove").click(function() {
 					field: "extension",
 					values: deleteExts
 				});
+				toggle_reload_button("show");
 			} else {
 				btn.find("span").text(_("Delete"));
 				btn.prop("disabled", true);
@@ -29,6 +30,7 @@ $("table").on("post-body.bs.table", function () {
 						field: "extension",
 						values: [id.toString()]
 					});
+					toggle_reload_button("show");
 				} else {
 					alert(data.message);
 				}

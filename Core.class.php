@@ -329,7 +329,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$pages = array();
 		$pages[0][] = array(
 			'html' => load_view(__DIR__.'/views/quickCreate.php',array('startExt' => $startExt)),
-			'validate' => 'if($("#extension").val().trim() == "") {warnInvalid($("#extension"),"'._("Extension can not be blank!").'");return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {warnInvalid($("#extension"),"'._("Extension already in use!").'");return false}if($("#name").val().trim() == "") {warnInvalid($("#name"),"'._("Display Name can not be blank!").'");return false}if(!isEmail($("#email").val())) {warnInvalid($("#email"),"'._("Email must be valid!").'");return false}'
+			'validate' => 'if($("#extension").val().trim() == "") {warnInvalid($("#extension"),"'._("Extension can not be blank!").'");return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {warnInvalid($("#extension"),"'._("Extension already in use!").'");return false}if($("#name").val().trim() == "") {warnInvalid($("#name"),"'._("Display Name can not be blank!").'");return false}'
 		);
 		$modules = $this->freepbx->Hooks->processHooks();
 		foreach($modules as $module) {
