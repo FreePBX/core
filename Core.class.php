@@ -578,7 +578,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 			case 'users':
-			case 'devices':
 			case 'extensions':
 			case 'dahdichandids':
 				$buttons = array(
@@ -601,12 +600,22 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (empty($request['extdisplay'])) {
 					unset($buttons['delete']);
 				}
-				if (($request['display'] == "users" && $request['view'] != 'add') && empty($request['tech_hardware']) && trim($request['extdisplay']) == "") {
-					$buttons = array();
+
+				// Are we in exten mode?
+				if ($request['display'] == "extensions") {
+					// If we have 'tech_hardware' then we're adding a user
+					if (empty($request['tech_hardware'])) {
+						$buttons = array();
+						break;
+					}
+				} elseif ($request['display'] == "users") { // Are we in device and user mode, showing users?
+					// If we're not adding or editing something, we don't need buttons
+					if ($request['view'] != "add" && empty($request['extdisplay'])) {
+						$buttons = array();
+						break;
+					}
 				}
-				if(empty($request['extdisplay']) && empty($request['tech_hardware']) || (!empty($request['view']) && $request['view'] != 'add')){
-					$buttons = array();
-				}
+				// Note 'devices' is handled further up.
 			break;
 		}
 		return $buttons;
