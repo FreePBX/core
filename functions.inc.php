@@ -898,10 +898,7 @@ class core_conf {
 			}
 		}
 
-		if (isset($extens))
 		return $extens;
-		else
-		return null;
 	}
 
 	function core_getdest($exten) {
