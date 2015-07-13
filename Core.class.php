@@ -430,6 +430,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 			break;
+			case 'users':
 			case 'devices':
 				$buttons = array(
 					'delete' => array(
@@ -448,13 +449,34 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($request['extdisplay'])) {
+				if($request['view'] == 'add' || !empty($request['tech_hardware'])) {
 					unset($buttons['delete']);
-					//The edit page has extdisplay but not tech_hardware. The add page is the oppisite. If we have
-					//neither we assume we are on the gid page.
-					if(empty($request['tech_hardware'])){
-						$buttons = array();
-					}
+				} elseif(!isset($request['extdisplay']) || trim($request['extdisplay']) == '') {
+					$buttons = array();
+				}
+			break;
+			case 'extensions':
+				$buttons = array(
+					'delete' => array(
+						'name' => 'delete',
+						'id' => 'delete',
+						'value' => _('Delete')
+					),
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+				if(!empty($request['tech_hardware'])) {
+					unset($buttons['delete']);
+				} elseif(!isset($request['extdisplay']) || trim($request['extdisplay']) == '') {
+					$buttons = array();
 				}
 			break;
 			case 'advancedsettings':
@@ -577,8 +599,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$buttons = $tmpButtons;
 				}
 			break;
-			case 'users':
-			case 'extensions':
 			case 'dahdichandids':
 				$buttons = array(
 					'delete' => array(
@@ -597,25 +617,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if (empty($request['extdisplay'])) {
+				if ($request['view'] == 'add') {
 					unset($buttons['delete']);
 				}
-
-				// Are we in exten mode?
-				if ($request['display'] == "extensions") {
-					// If we have 'tech_hardware' then we're adding a user
-					if (empty($request['tech_hardware'])) {
-						$buttons = array();
-						break;
-					}
-				} elseif ($request['display'] == "users") { // Are we in device and user mode, showing users?
-					// If we're not adding or editing something, we don't need buttons
-					if ($request['view'] != "add" && empty($request['extdisplay'])) {
-						$buttons = array();
-						break;
-					}
-				}
-				// Note 'devices' is handled further up.
 			break;
 		}
 		return $buttons;
