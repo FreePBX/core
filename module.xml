@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.9</version>
+	<version>13.0.1beta1.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.10* FREEPBX-9699 unable to save edits to extensions			
 		*13.0.1beta1.9* Fix missing buttons in Device and User mode reported in IRC
 		*13.0.1beta1.8* FREEPBX-9685 Dont require email address on quick create, FREEPBX-9684 show apply config after ajax delete
 		*13.0.1beta1.7* Add DID, callerid, and destination to DID bulkhandler validation page
