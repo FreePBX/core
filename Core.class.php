@@ -221,7 +221,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 			case "delete":
-			if(!empty($_POST['extensions'])) {
+				if(!empty($_POST['extensions'])) {
 					switch($_POST['type']) {
 						case "extensions":
 							foreach($_POST['extensions'] as $ext) {
@@ -1481,8 +1481,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//TODO should only delete the record for this device buuuutttt......
 		$this->deviceCache = array();
 		if(isset($this->drivers[$tech])) {
-			return $this->drivers[$tech]->delDevice($account);
+			$this->drivers[$tech]->delDevice($account);
 		}
+		$this->freepbx->Hooks->processHooks($account, $editmode);
 		return true;
 	}
 
@@ -1910,6 +1911,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//
 		//)
 		$this->listUsersCache = array();
+		$this->freepbx->Hooks->processHooks($extension, $editmode);
 
 		return true;
 	}
