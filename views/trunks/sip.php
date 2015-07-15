@@ -1,5 +1,5 @@
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" data-name="sipoutset" class="active">
+	<li role="presentation" data-name="sipoutset" class="change-tab active">
 		<a href="#sipoutset" aria-controls="sipoutset" role="tab" data-toggle="tab">
 			<?php echo _("Outgoing")?>
 		</a>

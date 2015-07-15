@@ -222,7 +222,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 						<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
 						<input id="npanxx" name="npanxx" type="hidden" />
 						<ul class="nav nav-tabs" role="tablist">
-							<li role="presentation" data-name="tgeneral" class="active">
+							<li role="presentation" data-name="tgeneral" class="change-tab active">
 								<a href="#tgeneral" aria-controls="tgeneral" role="tab" data-toggle="tab">
 									<?php echo _("General")?>
 								</a>
