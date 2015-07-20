@@ -130,6 +130,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"accountcode" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 			"mailbox" => array(
 				"value" => $id."@device",
 				"flag" => $flag++
@@ -168,6 +172,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = parent::getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection);
 		unset($tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
+		if (version_compare($this->version,'12.5.0','ge')) {
+			$tt = _("Account Code for this extension");
+			$tmparr['accountcode'] = array('prompttext' => _("Account Code"), 'value' => '', 'tt' => $tt, 'level' => 1);
+		}
 		$tt = _("Maximum number of Endpoints that can associate with this Device");
 		$tmparr['max_contacts'] = array('prompttext' => _('Max Contacts'), 'value' => '1', 'tt' => $tt, 'level' => 1);
 		unset($select);
@@ -674,7 +682,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$endpoint[] = "mailboxes=".$config['mailbox'];
 			}
 		}
-
+		if (version_compare($this->version,'12.5.0','ge') && isset($config['accountcode'])) {
+			$endpoint[] = "accountcode=".$config['accountcode'];
+		}
 		//check transport to make sure it's valid
 		$trans = array_keys($this->getTransportConfigs());
 		if(!empty($config['transport'])) {
