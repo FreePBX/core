@@ -142,6 +142,11 @@ $ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL}"=""]','skipset'));
 $ext->add($mcontext,$exten,'doset', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
 $ext->add($mcontext,$exten,'skipset', new ext_set('ITER', '$[${ITER}+1]'));
 $ext->add($mcontext,$exten,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]','begin'));
+
+// Does it NOT end with an ampersand? We can just return.
+$ext->add($mcontext,$exten,'', new ext_execif('$["${DSTRING:-1}"!="&"]', 'Return'));
+
+// It does, remove it, and hand it back.
 $ext->add($mcontext,$exten,'', new ext_set('DSTRING', '${DSTRING:0:$[${LEN(${DSTRING})}-1]}'));
 $ext->add($mcontext,$exten,'', new ext_return(''));
 
