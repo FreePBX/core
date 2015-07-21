@@ -1772,9 +1772,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"noanswer_cid" => isset($settings['noanswer_cid']) ? $settings['noanswer_cid'] : "",
 				"busy_cid" => isset($settings['busy_cid']) ? $settings['busy_cid'] : "",
 				"chanunavail_cid" => isset($settings['chanunavail_cid']) ? $settings['chanunavail_cid'] : "",
-				"noanswer_dest" => !empty($settings['noanswer_dest']) && $settings[$settings[$settings['noanswer_dest']].'0'] != '' ? $settings[$settings[$settings['noanswer_dest']].'0'] : "",
-				"busy_dest" => !empty($settings['busy_dest']) && $settings[$settings[$settings['busy_dest']].'1'] != '' ? $settings[$settings[$settings['busy_dest']].'1'] : "",
-				"chanunavail_dest" => !empty($settings['chanunavail_dest']) && $settings[$settings[$settings['chanunavail_dest']].'2'] != '' ? $settings[$settings[$settings['chanunavail_dest']].'2'] : ""
+				"noanswer_dest" => !empty($settings['noanswer_dest']) && !empty($settings[$settings[$settings['noanswer_dest']].'0']) && $settings[$settings[$settings['noanswer_dest']].'0'] != '' ? $settings[$settings[$settings['noanswer_dest']].'0'] : "",
+				"busy_dest" => !empty($settings['busy_dest']) && !empty($settings[$settings[$settings['busy_dest']].'1']) && $settings[$settings[$settings['busy_dest']].'1'] != '' ? $settings[$settings[$settings['busy_dest']].'1'] : "",
+				"chanunavail_dest" => !empty($settings['chanunavail_dest']) && !empty($settings[$settings[$settings['chanunavail_dest']].'2']) && $settings[$settings[$settings['chanunavail_dest']].'2'] != '' ? $settings[$settings[$settings['chanunavail_dest']].'2'] : ""
 			));
 		} catch(\Exception $e) {
 			throw new \Exception("Unable to insert into users: ".addSlashes($e->getMessage()));
@@ -1887,10 +1887,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		//delete details to astdb
 		$astman = $this->FreePBX->astman;
-		if($astman)  {
+		if($astman->connected())  {
 			$astman->database_del("AMPUSER",$extension."/screen");
 		}
-		if ($astman && !$editmode) {
+		if ($astman->connected() && !$editmode) {
 			// TODO just change this to delete everything
 			$astman->database_deltree("AMPUSER/".$extension);
 		}
@@ -1938,7 +1938,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		$astman = $this->FreePBX->astman;
-		if ($astman) {
+		if ($astman->connected()) {
 
 			if (function_exists('paging_get_config')) {
 				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
@@ -1971,7 +1971,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
 
 		} else {
-			throw new Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
+			throw new \Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
 		}
 		$this->getUserCache[$extension] = $results;
 		return $results;
