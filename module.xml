@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.35</version>
+	<version>12.0.36</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.36* FREEPBX-9760 - Don't break on empty PJSIP_DIAL_CONTACTS
 		*12.0.35* Revert FREEPBX-8046 to fix FREEPBX-9728
 		*12.0.34* FREEPBX-9517 max_retries not being written by pjsip
 		*12.0.32* Add media_encryption to PJSIP
