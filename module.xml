@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.14</version>
+	<version>13.0.1beta1.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.15* FREEPBX-9760 wrong dial string
 		*13.0.1beta1.14* FREEPBX-9753 add accountcode for pjsip 12.5.0, FREEPBX-8492 remove duplicated macro outisbusy
 		*13.0.1beta1.13* Revert FREEPBX-8046 to fix FREEPBX-9728
 		*13.0.1beta1.12* FREEPBX-9717 add correct classes to tabs
