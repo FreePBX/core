@@ -682,7 +682,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$endpoint[] = "mailboxes=".$config['mailbox'];
 			}
 		}
-		if (version_compare($this->version,'12.5.0','ge') && isset($config['accountcode'])) {
+		if (version_compare($this->version,'12.5.0','ge') && isset($config['accountcode']) && trim($config['accountcode']) != "") {
 			$endpoint[] = "accountcode=".$config['accountcode'];
 		}
 		//check transport to make sure it's valid

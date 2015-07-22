@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.17* FREEPBX-9806 Fix regression from FREEPBX-9753
 		*13.0.1beta1.16* FREEPBX-9450 fix misspelling on js
 		*13.0.1beta1.15* FREEPBX-9760 wrong dial string
 		*13.0.1beta1.14* FREEPBX-9753 add accountcode for pjsip 12.5.0, FREEPBX-8492 remove duplicated macro outisbusy
