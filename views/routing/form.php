@@ -48,7 +48,7 @@ if ($extdisplay == '' | $route_seq != $last_seq) {
 //$module_hook = moduleHook::create();
 //if (!empty($module_hook->hookHtml)) {
 if (!empty($hooks['oldHooks'])) {
-	$hooktab = 	'<li role="presentation"><a href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
+	$hooktab = 	'<li role="presentation" data-name="additionalsettings" class="change-tab"><a href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
 
 }
 //Dialpattern Help
@@ -254,9 +254,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
 	<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 <ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
-  <li role="presentation"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
-  <li role="presentation"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
+  <li role="presentation" data-name="routesettings" class="change-tab active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
+  <li role="presentation" data-name="dialpatterns" class="change-tab"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
+  <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
     <?php echo $hooks['hookTabs'] ?>
   <?php echo $hooktab ?>
 </ul>
