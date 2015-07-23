@@ -161,7 +161,7 @@ $("[id='routinggetlocalprefixes']").click(function(){
 			patterns.push('1NXXNXXXXXX');
 		}
 	}
-	if ($('#fwtollree').prop('checked')){
+	if ($('#fwtollfree').prop('checked')){
 		//800 since 1966
 		patterns.push('1800NXXXXXX');
 		//888 since 1996
