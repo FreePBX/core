@@ -257,8 +257,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$conf['pjsip.transports.conf'][] = '#include pjsip.transports_custom.conf';
 		//$conf['pjsip.notify.conf'][] = '#include pjsip.notify_custom.conf';
 		// Generate includes
-		$pjsip = "#include pjsip_custom.conf\n#include pjsip.transports.conf\n#include pjsip.endpoint.conf\n#include pjsip.aor.conf\n";
-		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.registration.conf\n#include pjsip.identify.conf\n";
+		$pjsip = "#include pjsip_custom.conf\n#include pjsip.transports.conf\n#include pjsip.transports_custom_post.conf\n#include pjsip.endpoint.conf\n#include pjsip.endpoint_custom_post.conf\n#include pjsip.aor.conf\n#include pjsip.aor_custom_post.conf\n";
+		$pjsip .= "#include pjsip.auth.conf\n#include pjsip.auth_custom_post.conf\n#include pjsip.registration.conf\n#include pjsip.registration_custom_post.conf\n#include pjsip.identify.conf\n#include pjsip.identify_custom_post.conf\n";
 		$conf['pjsip.conf'][] = $pjsip;
 
 		$conf = $this->generateEndpoints($conf);
