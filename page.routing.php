@@ -92,7 +92,7 @@ switch($request['view']){
 	<?php echo $pageinfo?>
 	<div class = "display no-border">
 		<div class="row">
-			<div class="col-sm-9">
+			<div class="col-sm-<?php echo !isset($_REQUEST['view'])?'12':'9'?>">
 				<div class="fpbx-container">
 					<div class = "display no-border">
 						<?php echo $content ?>

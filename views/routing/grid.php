@@ -62,10 +62,21 @@ HERE;
 <style>
 .text-grey:
 </style>
+<div id="toolbar-all">
 <a href="config.php?display=routing&amp;view=form" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp; <?php echo _("Add Outbound Route")?></a>
-<br/>
+</div>
 <div class="table-responsive">
-	<table class="table table-striped table-bordered" id="routes">
+<table id="routes"
+			data-url="<?php echo $dataurl?>"
+			data-cache="false"
+			data-cookie="true"
+			data-cookie-id-table="<must be a uniquely global name throughout all of freepbx>"
+			data-toolbar="#toolbar-all"
+			data-maintain-selected="true"
+			data-toggle="table"
+			data-pagination="true"
+			data-search="true"
+			class="table table-striped">
 		<thead>
 			<tr>
 				<th data-field="name" data-sortable="true"><?php echo _("Name") ?></th>
