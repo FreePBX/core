@@ -7390,13 +7390,11 @@ function core_devices_configpageload() {
 			$section = _("Device Options");
 
 			$devinfo_techd = ($devinfo_tech == 'sip') ? 'CHAN_SIP' : strtoupper($devinfo_tech);
-			if(function_exists('sipsettings_get') && $devinfo_techd == 'CHAN_SIP') {
-				$out = sipsettings_get();
-				$pport = $out['bindaddr'].':'.$out['bindport'];
-			} elseif(method_exists(FreePBX::Sipsettings(),'getBinds') && $devinfo_techd == 'PJSIP') {
-				$out = FreePBX::Sipsettings()->getBinds();
-				foreach($out as $o) {
-					$pport .= $o.', ';
+			if(method_exists($this->freepbx->Sipsettings,'getBinds')) {
+				$out = $this->freepbx->Sipsettings->getBinds();
+				foreach($out[$devinfo_tech] as $ip => $data1) {
+					foreach($data1 as $protocol => $port)
+					$pport .= $ip.":".$port.', ';
 				}
 				$pport = rtrim($pport,", ");
 			} else {
