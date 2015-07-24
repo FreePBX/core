@@ -162,13 +162,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$pport = '';
 		$techd = ($deviceInfo['tech'] == 'sip') ? 'CHAN_SIP' : strtoupper($deviceInfo['tech']);
 		$devinfo_tech = $deviceInfo['tech'];
-		if(function_exists('sipsettings_get') && $techd == 'CHAN_SIP') {
-			$out = sipsettings_get();
-			$pport = $out['bindaddr'].':'.$out['bindport'];
-		} elseif(method_exists($this->freepbx->Sipsettings,'getBinds') && $techd == 'PJSIP') {
+		if(method_exists($this->freepbx->Sipsettings,'getBinds')) {
 			$out = $this->freepbx->Sipsettings->getBinds();
-			foreach($out as $o) {
-				$pport .= $o.', ';
+			foreach($out[$devinfo_tech] as $ip => $data1) {
+				foreach($data1 as $protocol => $port)
+				$pport .= $ip.":".$port.', ';
 			}
 			$pport = rtrim($pport,", ");
 		} else {

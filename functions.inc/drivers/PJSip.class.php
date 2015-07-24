@@ -537,6 +537,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		foreach ($binds as $protocol => $arr) {
 			foreach ($arr as $ip => $on) {
+				if($on != "on") {
+					continue;
+				}
 				$t = "$ip-$protocol";
 				$transport[$t]['type'] = "transport";
 				$transport[$t]['protocol'] = $protocol;
