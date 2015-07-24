@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.17</version>
+	<version>13.0.1beta1.18</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.18* Use new getBinds format
 		*13.0.1beta1.17* FREEPBX-9806 Fix regression from FREEPBX-9753
 		*13.0.1beta1.16* FREEPBX-9450 fix misspelling on js
 		*13.0.1beta1.15* FREEPBX-9760 wrong dial string
