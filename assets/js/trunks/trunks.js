@@ -120,6 +120,10 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 	}
 	if ($('#fwemergency').prop('checked')){
 		patterns.push('911');
+		patterns.push('933');
+		patterns.push('1|911');
+		patterns.push('9|911');
+		patterns.push('91|911');
 	}
 	if ($('#fwint').prop('checked')){
 		patterns.push('011.');
