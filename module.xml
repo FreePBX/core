@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.19</version>
+	<version>13.0.1beta1.20</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.20* Fix faulty bug from core addition			
 		*13.0.1beta1.19* FREEPBX-9810 Add post include to most PJSIP files
 		*13.0.1beta1.18* Use new getBinds format
 		*13.0.1beta1.17* FREEPBX-9806 Fix regression from FREEPBX-9753
