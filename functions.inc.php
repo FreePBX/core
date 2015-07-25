@@ -7390,8 +7390,8 @@ function core_devices_configpageload() {
 			$section = _("Device Options");
 
 			$devinfo_techd = ($devinfo_tech == 'sip') ? 'CHAN_SIP' : strtoupper($devinfo_tech);
-			if(method_exists($this->freepbx->Sipsettings,'getBinds')) {
-				$out = $this->freepbx->Sipsettings->getBinds();
+			if(FreePBX::Modules()->moduleHasMethod("sipsettings","getBinds")) {
+				$out = FreePBX::Sipsettings()->getBinds();
 				foreach($out[$devinfo_tech] as $ip => $data1) {
 					foreach($data1 as $protocol => $port)
 					$pport .= $ip.":".$port.', ';
