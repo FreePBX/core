@@ -350,22 +350,23 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 */
 	public function processQuickCreate($tech, $extension, $data) {
 		if(!is_numeric($extension)) {
-			return array("status" => false, "message" => "Extension was not numeric!");
+			return array("status" => false, "message" => _("Extension was not numeric!"));
 		}
 		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name']);
 		try {
 			if(!$this->addDevice($extension,$tech,$settings)) {
-				return array("status" => false, "message" => "Device was not added!");
+				return array("status" => false, "message" => _("Device was not added!"));
 			}
 		} catch(\Exception $e) {
 			return array("status" => false, "message" => $e->getMessage());
 		}
 		$settings = $this->generateDefaultUserSettings($extension,$data['name']);
+		$settings['outboundcid'] = $data['outboundcid'];
 		try {
 			if(!$this->addUser($extension, $settings)) {
 				//cleanup
 				$this->delDevice($extension);
-				return array("status" => false, "message" => "User was not added!");
+				return array("status" => false, "message" => _("User was not added!"));
 			}
 		} catch(\Exception $e) {
 			//cleanup
@@ -373,7 +374,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array("status" => false, "message" => $e->getMessage());
 		}
 
-		$modules = $this->freepbx->Hooks->processHooks($tech, $extension, $data);
+		try {
+			$modules = $this->freepbx->Hooks->processHooks($tech, $extension, $data);
+		} catch(\Exception $e) {
+			//cleanup
+			$this->delDevice($extension);
+			$this->delUser($extension);
+			return array("status" => false, "message" => $e->getMessage());
+		}
 		needreload();
 		return array("status" => true, "ext" => $extension, "name" => $data['name']);
 	}

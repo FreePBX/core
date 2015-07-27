@@ -79,7 +79,7 @@
 						<label class="control-label" for="outboundcid"><?php echo _('Outbound Caller ID')?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="outboundcid"></i>
 					</div>
-					<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder="<?php echo _('Enter Caller ID')?>" data-for="outboundcid"></div>
+					<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder='"<?php echo _('Caller Name')?>" <#######>' data-for="outboundcid"></div>
 				</div>
 			</div>
 		</div>
@@ -99,7 +99,7 @@
 						<label class="control-label" for="email"><?php echo _('Email Address')?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="email"></i>
 					</div>
-					<div class="col-md-9"><input type="email" class="form-control" id="email" name="email" placeholder="<?php echo _('Enter email')?>" data-for="email"></div>
+					<div class="col-md-9"><input type="email" class="form-control" id="email" name="email" placeholder="<?php echo _('name@domain.tld')?>" data-for="email"></div>
 				</div>
 			</div>
 		</div>
