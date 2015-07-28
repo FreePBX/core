@@ -208,7 +208,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$msgInvalidSecret = _("Please enter a Secret for this device");
 		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
-		$tmparr['secret'] = array('prompttext' => 'Secret', 'class' => 'password-meter', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
+		$tmparr['secret'] = array('prompttext' => _('Secret'), 'class' => 'password-meter', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
 		$section = _("Device Options");
 		$category = "advanced";
@@ -229,7 +229,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$ttt = sprintf(_("Change To %s Driver"),$otherdriver);
 			if($sipdriver == 'both' || ($sipdriver == 'chan_sip' && $deviceInfo['tech'] == 'pjsip') || ($sipdriver == 'chan_pjsip' && $deviceInfo['tech'] == 'sip')) {
 				$tt = _("Change the SIP Channel Driver to use $otherdriver.");
-				$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => 'Change SIP Driver', 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_changeDriver();return false;");
+				$tmparr['changecdriver'] = array('text' => $ttt, 'prompttext' => _('Change SIP Driver'), 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_changeDriver();return false;");
 			} else {
 				$tt = _("You cannot change to $otherdriver as it is not enabled. Please enable $otherdriver in Advanced Settings");
 				$tmparr['changecdriver'] = array('text' => _("Changing SIP Driver unavailable"), 'prompttext' => $ttt, 'type' => 'button', 'value' => 'button', 'tt' => $tt, 'level' => 1, 'disable' => true);

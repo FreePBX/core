@@ -95,13 +95,16 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 		);
 	}
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
+		$section = _("Settings");
+		$category = "general";
+
 		$msgConfirmSecret = _("You have not entered a Secret for this device, although this is possible it is generally bad practice to not assign a Secret to a device. Are you sure you want to leave the Secret empty?");
 		$msgInvalidSecret = _("Please enter a Secret for this device");
 		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
 
 		$tmparr = array();
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.");
-		$tmparr['secret'] = array('value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret);
+		$tmparr['secret'] = array('prompttext' => _('Secret'), 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
 		unset($select);
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
