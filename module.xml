@@ -3,16 +3,17 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.22</version>
+	<version>13.0.1beta1.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.1beta1.22* FREEPBX-9869 Move IAX secret into main tab 
+		*13.0.1beta1.23* FREEPBX-9886 Bug in trying to disable call waiting and find me follow me grid display fixes
+		*13.0.1beta1.22* FREEPBX-9869 Move IAX secret into main tab
 		*13.0.1beta1.21* FREEPBX-9856 Use the CID if presented
-		*13.0.1beta1.20* Fix faulty bug from core addition			
+		*13.0.1beta1.20* Fix faulty bug from core addition
 		*13.0.1beta1.19* FREEPBX-9810 Add post include to most PJSIP files
 		*13.0.1beta1.18* Use new getBinds format
 		*13.0.1beta1.17* FREEPBX-9806 Fix regression from FREEPBX-9753

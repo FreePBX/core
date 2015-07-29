@@ -142,7 +142,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						'cf' => (isset($cfsetting['/CF/'.$exten])),
 						'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
 						'cfu' => (isset($cfusetting['/CFU/'.$exten])),
-						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
+						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
 					);
 					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 				}
@@ -173,7 +173,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							'cf' => (isset($cfsetting['/CF/'.$exten])),
 							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
 							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
-							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && ($ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT" || $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "EXTENSION"))
+							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
 						);
 						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 					}
@@ -1790,7 +1790,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		//write to astdb
 		$astman = $this->FreePBX->astman;
-		if ($astman) {
+		if ($astman->connected()) {
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
 			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : 0);
@@ -1839,7 +1839,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 			if (trim($settings['callwaiting']) == 'enabled') {
 				$astman->database_put("CW",$extension,"\"ENABLED\"");
-			} else if (trim($callwaiting) == 'disabled') {
+			} else if (trim($settings['callwaiting']) == 'disabled') {
 				$astman->database_del("CW",$extension);
 			}
 

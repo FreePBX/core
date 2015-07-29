@@ -186,24 +186,24 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (version_compare($this->version,'12.4.0','ge')) {
 			//media_use_received_transport
 			$tt = _("Determines whether res_pjsip will use the media transport received in the offer SDP in the corresponding answer SDP.");
-			$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+			$tmparr['media_use_received_transport'] = array('prompttext' => _('Media Use Received Transport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		}
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
-		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
-		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
 		$select[] = array('value' => 'solicited', 'text' => _('Solicited'));
 		$select[] = array('value' => 'unsolicited', 'text' => _('Unsolicited'));
 		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Solicited is the default and should only be changed if you see errors in the Asterisk logs");
-		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => 'solicited', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("When enabled, Asterisk condenses message waiting notifications from multiple mailboxes into a single NOTIFY. If it is disabled, individual NOTIFYs are sent for each mailbox.");
-		$tmparr['aggregate_mwi'] = array('prompttext' => _('Aggregate MWI'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['aggregate_mwi'] = array('prompttext' => _('Aggregate MWI'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
@@ -216,7 +216,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';
-		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Media Encryption Optimistic'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Media Encryption Optimistic'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		//https://wiki.asterisk.org/wiki/display/AST/Asterisk+13+Configuration_res_pjsip_endpoint_identifier_ip
 		$tt = _("The value is a comma-delimited list of IP addresses. IP addresses may have a subnet mask appended. The subnet mask may be written in either CIDR or dot-decimal notation. Separate the IP address and subnet mask with a slash ('/')");

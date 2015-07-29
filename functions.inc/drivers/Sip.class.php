@@ -255,7 +255,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$select[] = array('value' => 'nonat', 'text' => 'nonat');
 		$select[] = array('value' => 'update', 'text' => 'update');
-		$tmparr['canreinvite'] = array('prompttext' => _('Can Reinvite'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_CANREINVITE'), 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['canreinvite'] = array('prompttext' => _('Can Reinvite'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_CANREINVITE'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		$tt = _("Asterisk context this device will send calls to. Only change this is you know what you are doing.").' [context]';
 		$tmparr['context'] = array('prompttext' => _('Context'), 'value' => 'from-internal', 'tt' => $tt, 'level' => 1);
@@ -267,7 +267,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Whether Asterisk should trust the RPID settings from this device. Usually should be yes for CONNECTEDLINE() functionality to work if supported by the endpoint.").'[trustrpid]';
-		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_TRUSTRPID'), 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_TRUSTRPID'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -339,7 +339,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
 				$tt = _("Whether to Enable AVPF. Defaults to no. The WebRTC standard has selected AVPF as the audio video profile to use for media streams. This is not the default profile in use by Asterisk. As a result the following must be enabled to use WebRTC");
-				$tmparr['avpf'] = array('prompttext' => _('Enable AVPF'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+				$tmparr['avpf'] = array('prompttext' => _('Enable AVPF'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			}
 
 			if (version_compare($this->version,'11','ge')) {
@@ -347,7 +347,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
 				$tt = _("Force 'RTP/AVP', 'RTP/AVPF', 'RTP/SAVP', and 'RTP/SAVPF' to be used for media streams when appropriate, even if a DTLS stream is present.");
-				$tmparr['force_avp'] = array('prompttext' => _('Force AVP'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+				$tmparr['force_avp'] = array('prompttext' => _('Force AVP'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			}
 
 			if (version_compare($this->version,'11','ge')) {
@@ -355,14 +355,14 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
 				$tt = _("Whether to Enable ICE Support. Defaults to no. ICE (Interactive Connectivity Establishment) is a protocol for Network Address Translator(NAT) traversal for UDP-based multimedia sessions established with the offer/answer model. This option is commonly enabled in WebRTC setups");
-				$tmparr['icesupport'] = array('prompttext' => _('Enable ICE Support'),'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+				$tmparr['icesupport'] = array('prompttext' => _('Enable ICE Support'),'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			}
 
 			unset($select);
 			$select[] = array('value' => 'no', 'text' => _('No'));
 			$select[] = array('value' => 'yes', 'text' => _('Yes (SRTP only)'));
 			$tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
-			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_ENCRYPTION'), 'tt' => $tt, 'select' => $select, 'level' => 1);
+			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_ENCRYPTION'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		}
 
 		$tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
