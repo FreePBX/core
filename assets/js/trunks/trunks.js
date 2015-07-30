@@ -400,6 +400,25 @@ $(document).ready(function() {
 			return false;
 		}
 	});
+	var cidval = $("#outcid").val();
+	if(cidval.indexOf('hidden') > -1){
+		$("#outcid").parent().parent().addClass('hidden');
+		$("#hcidyes").attr('checked', true);
+		$("#outcid").data("oldval", $("#outcid").val());
+	}else{
+		$("#hcidno").attr('checked', true);
+	}
+	$('[name="hcid"]').on('change',function(){
+		if($(this).attr('id') == 'hcidyes'){
+			$("#outcid").parent().parent().addClass('hidden');
+			$("#outcid").data("oldval", $("#outcid").val());
+			$("#outcid").val("hidden");
+		}else{
+			$("#outcid").val($("#outcid").data("oldval"));
+			$("#outcid").parent().parent().removeClass('hidden');
+
+		}
+	});
 });
 
 function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e.g. fwdOUT)
