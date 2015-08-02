@@ -9,14 +9,10 @@ $current_category		= '';
 $row					= 0;
 $inputhtmltop = <<<HERE
 	<div class="row">
-		<div class="col-md-12">
-			<div class="row">
-				<div class="form-group">
-					<div class="col-md-7">
+		<div class="form-group">
+			<div class="col-md-7">
 HERE;
 $inputhtmlmiddle = <<<HERE
-				</div>
-			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -235,25 +231,19 @@ foreach ($conf as $c){
 
 <div class="container-fluid">
 	<h1><?php echo _("FreePBX Advanced Settings")?></h1>
-	<div class="well well-danger">
+	<div class="alert alert-warning">
 		<?php echo "<b>"._('IMPORTANT:')."</b>". _('Use extreme caution when making changes!')?>
 	</div>
-	<div class="well well-warning">
+	<div class="well">
 		<?php echo "<strong>"._("Some of these settings can render your system inoperable."). "</strong><br/>". _("You are urged to backup before making any changes.")."<br/>"._("Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to Yes.")."<br/>".sprintf(_("You can restore the default setting by clicking on the %s icon to the left of the values if they are not set as default"),"<i class='fa fa-refresh'></i>")."<br/>"._("Unlike previous versions of this module you now save changes as a group.");?>
 	</div>
 	<div class = "display full-border">
-		<div class="row">
-			<div class="col-sm-9">
-				<div class="fpbx-container">
-					<div class="display full-border">
-						<form class="fpbx-submit" name="submitSettings" action="" method="post">
-							<input type="hidden" name="action" value="setkey">
-						<?php echo $forminputs ?>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-3 hidden-xs bootnav">
+		<div class="fpbx-container">
+			<div class="display full-border">
+				<form class="fpbx-submit" name="submitSettings" action="" method="post">
+					<input type="hidden" name="action" value="setkey">
+				<?php echo $forminputs ?>
+				</form>
 			</div>
 		</div>
 	</div>
