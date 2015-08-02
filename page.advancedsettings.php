@@ -75,7 +75,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 radioset text-right">';
@@ -102,7 +102,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
@@ -127,7 +127,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
@@ -151,7 +151,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
@@ -180,7 +180,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
@@ -210,7 +210,7 @@ foreach ($conf as $c){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
 			}
 			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
-			$forminputs .= '&nbsp';
+			$forminputs .= '&nbsp;';
 			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
@@ -239,7 +239,7 @@ foreach ($conf as $c){
 		<?php echo "<b>"._('IMPORTANT:')."</b>". _('Use extreme caution when making changes!')?>
 	</div>
 	<div class="well well-warning">
-		<?php echo "<strong>"._("Some of these settings can render your system inoperable."). "</strong><br/>". _("You are urged to backup before making any changes.")."<br/>"._("Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to Yes.")."</br>".sprintf(_("You can restore the default setting by clicking on the %s icon to the left of the values if they are not set as default"),"<i class='fa fa-refresh'></i>")."<br/>"._("Unlike previous versions of this module you now save changes as a group.");?>
+		<?php echo "<strong>"._("Some of these settings can render your system inoperable."). "</strong><br/>". _("You are urged to backup before making any changes.")."<br/>"._("Readonly settings are usually more volatile, they can be changed by changing 'Override Readonly Settings' to Yes.")."<br/>".sprintf(_("You can restore the default setting by clicking on the %s icon to the left of the values if they are not set as default"),"<i class='fa fa-refresh'></i>")."<br/>"._("Unlike previous versions of this module you now save changes as a group.");?>
 	</div>
 	<div class = "display full-border">
 		<div class="row">
