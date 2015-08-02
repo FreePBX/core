@@ -227,6 +227,7 @@ foreach ($conf as $c){
 	}
 	\modgettext::pop_textdomain();
 }
+$forminputs .= "</div> <!-- close last element -->\n";
 ?>
 
 <div class="container-fluid">
@@ -242,7 +243,7 @@ foreach ($conf as $c){
 			<div class="display full-border">
 				<form class="fpbx-submit" name="submitSettings" action="" method="post">
 					<input type="hidden" name="action" value="setkey">
-				<?php echo $forminputs ?>
+					<?php echo $forminputs ?>
 				</form>
 			</div>
 		</div>
