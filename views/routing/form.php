@@ -22,7 +22,7 @@ if (function_exists('music_list')){
 }
 
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
-	$optionalelems .= load_view(__DIR__.'/timecond.php');
+	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id));
 }
 $routepriority = core_routing_list();
 $routeseqopts = '';
