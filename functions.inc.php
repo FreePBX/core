@@ -2784,6 +2784,10 @@ function core_do_get_config($engine) {
 
 	//$ext->add($context, $exten, '', new ext_noop('user-callerid: ${CALLERID(name)} ${CALLERID(number)}'));
 
+	// for i18n playback in multiple languages
+	$ext->add($context, 'lang-playback', '', new ext_gosubif('$[${DIALPLAN_EXISTS('.$context.',${CHANNEL(language)})}]', $context.',${CHANNEL(language)},${ARG1}', $context.',en,${ARG1}'));
+	$ext->add($context, 'lang-playback', '', new ext_return());
+
 	$ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 	// make sure AMPUSER is set if it doesn't get set below
 	$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
@@ -2822,11 +2826,11 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
 	$ext->add($context, $exten, '', new ext_answer());
 	$ext->add($context, $exten, '', new ext_wait('1'));
-	$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+	$ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_0'));
 	$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 	$ext->add($context, $exten, 'limit', new ext_answer());
 	$ext->add($context, $exten, '', new ext_wait('1'));
-	$ext->add($context, $exten, '', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
+	$ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_1'));
 	$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 	$ext->add($context, $exten, '', new ext_congestion(20));
 
@@ -2845,6 +2849,17 @@ function core_do_get_config($engine) {
 	}
 	$ext->add($context, $exten, '', new ext_noop_trace('Using CallerID ${CALLERID(all)}'));
 	$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+
+	$lang = 'en'; //English
+	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+	$ext->add($context, $lang, '', new ext_return());
+	$ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
+	$ext->add($context, $lang, '', new ext_return());
+	$lang = 'ja'; //Japanese
+	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&call-forwarding&jp-no&an-error-has-occured'));
+	$ext->add($context, $lang, '', new ext_return());
+	$ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&simul-call-limit-reached'));
+	$ext->add($context, $lang, '', new ext_return());
 
 	/*
 	* arg1 = trunk number, arg2 = number
