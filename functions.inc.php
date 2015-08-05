@@ -6507,7 +6507,7 @@ function core_devices_configpageload() {
 					if ($devopt == "secret") {
 						$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
 						if ($devoptcurrent == '' && empty($extdisplay)) {
-							$devoptcurrent = md5(uniqid());
+							$devoptcurrent = \FreePBX::Core()->generateSecret();
 						}
 					}
 

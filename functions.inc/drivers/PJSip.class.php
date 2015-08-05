@@ -83,7 +83,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"secret" => array(
-				"value" => md5(uniqid()),
+				"value" => \FreePBX::Core()->generateSecret(),
 				"flag" => $flag++
 			),
 			"dtmfmode" => array(

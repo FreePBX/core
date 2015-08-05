@@ -1343,6 +1343,22 @@ if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
 //
 // CATEGORY: GUI Behavior
 //
+// SIPSECRETSIZE
+//
+$set['value'] = 32;
+$set['defaultval'] =& $set['value'];
+$set['options'] = array(6,32);
+$set['readonly'] = 1;
+$set['hidden'] = 0;
+$set['level'] = 9;
+$set['module'] = '';
+$set['category'] = 'GUI Behavior';
+$set['emptyok'] = 0;
+$set['name'] = 'Size of generated sip secrets';
+$set['description'] = 'When creating a new sip extension this sets the max size of the generated secret. This generally should be default.';
+$set['type'] = CONF_TYPE_INT;
+$freepbx_conf->define_conf_setting('SIPSECRETSIZE',$set);
+
 unset($set);
 $set['module'] = '';
 $set['category'] = 'GUI Behavior';

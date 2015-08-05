@@ -1211,7 +1211,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"pinless" => "disabled"
 		);
 	}
-
+	/**
+	 * Generate a secret to be used as a password Up to the SIPSECRETSIZE
+	 *
+	 */
+	public function generateSecret(){
+		global $amp_conf;
+		$secret = md5(uniqid());//32 char
+		if(isset($amp_conf['SIPSECRETSIZE']) && $amp_conf['SIPSECRETSIZE'] < 32){
+				$secret = substr($secret, 0, $amp_conf['SIPSECRETSIZE']);
+		}
+		return $secret;
+	}
 	/**
 	 * Generate the default settings when creating a device
 	 * @param {string} The TECH
@@ -1247,7 +1258,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"flag" => $flag++
 			),
 			"secret" => array(
-				"value" => md5(uniqid()),
+				"value" => $this->generateSecret(),
 				"flag" => $flag++
 			),
 			"context" => array(
