@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.1beta1.25* FREEPBX-9913, FREEPBX-9985.
+		*13.0.1beta1.25* FREEPBX-9913 Timegroup view routing, FREEPBX-9985 Feature SIP Secret generated size, FREEPBX-9931 i18n Audio errors
 		*13.0.1beta1.24* Fix layout issue in Advanced Settings
 		*13.0.1beta1.23* FREEPBX-9886 Bug in trying to disable call waiting and find me follow me grid display fixes
 		*13.0.1beta1.22* FREEPBX-9869 Move IAX secret into main tab
