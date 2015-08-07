@@ -4,7 +4,7 @@ $(function() {
 		itemPath: 'tbody',
 		itemSelector: 'tr',
 		placeholder: '<tr class="placeholder"/>',
-		handle: '.fa-arrows',
+		handle: '.sort-handle',
 		stop: function(event, ui){
 			var rows = $('#routes').find('tr');
 			var routeorder = [];
@@ -52,22 +52,24 @@ $(function() {
 			});
 		}
 	});
-});
-
-$("a[id^='del']").click(function(){
-	var id = $(this).data('id');
-	$.ajax({
-		type: 'POST',
-		url: "ajax.php",
-		data: 'module=core&command=delroute&id='+id,
-		dataType: 'json',
-		success: function(data) {
-			console.log(data);
-			toggle_reload_button('show');
-			location.reload();
-		}
+	$("a[id^='del']").click(function(){
+		var id = $(this).data('id'),
+				curRow = $(this).closest('tr');
+		$.ajax({
+			type: 'POST',
+			url: "ajax.php",
+			data: 'module=core&command=delroute&id='+id,
+			dataType: 'json',
+			success: function(data) {
+				curRow.fadeOut("slow", function(){
+					$(this).remove();
+				});
+				toggle_reload_button('show');
+			}
+		});
 	});
 });
+
 $(document).on('click',"a[id^='routerowadd']",function(e){
 	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
@@ -106,13 +108,6 @@ $(document).on('click',"a[id^='routerowadd']",function(e){
 	newhtml +=	'</tr>';
 	curRow.parent().append(newhtml);
 
-});
-
-$("a[id^='routerowdel']").click(function(){
-	var curRow = $(this).closest('tr');
-	curRow.fadeOut(2000, function(){
-		$(this).remove();
-	});
 });
 
 //DialPlan Wizard
@@ -298,6 +293,10 @@ $("#duplicate").click(function(){
 });
 $("#routeEdit").submit(function(){
 	var patlen = 0;
+	if($("#outcid_modeyes").is(":checked") && $("#outcid").val().trim() === "") {
+		warnInvalid($("#outcid"), _("Route CID must be set if Override Extension is set to yes"));
+		return false;
+	}
 	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
 	if(patlen === 0){
 		alert(_("You must complete the dial pattern tab before submitting"));

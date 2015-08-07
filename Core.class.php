@@ -915,11 +915,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					//
 				case "addroute":
 					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
-					$_REQUEST['id'] = $extdisplay;
 					needreload();
-					$this->freepbx->View->redirect_standard('id');
 				break;
 				case "editroute":
+					$extdisplay = $_REQUEST['id'];
+					dbug("EDITING:".$extdisplay);
 					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 					needreload();
 				break;
