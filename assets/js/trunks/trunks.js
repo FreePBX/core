@@ -64,13 +64,13 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 				var npa = this.npa;
 				var nxx = this.nxx;
 				if ($('#fw7').prop('checked')){
-					patterns.push(nxx+'XXXX');
+					patterns.push({match:nxx+'XXXX'});
 				}
 				if ($('#fw10').prop('checked')){
-					patterns.push(npa+nxx+'XXXX');
+					patterns.push({match:npa+nxx+'XXXX'});
 				}
 				if ($('#fw11').prop('checked')){
-					patterns.push('1'+npa+nxx+'XXXX');
+					patterns.push({match:'1'+npa+nxx+'XXXX'});
 				}
 			});
 		},
@@ -80,88 +80,91 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 	});
 	}else{
 		if ($('#fw7').prop('checked')){
-			patterns.push('NXXXXXX');
+			patterns.push({match:'NXXXXXX'});
 		}
 		if ($('#fw10').prop('checked')){
-			patterns.push('NXXNXXXXXX');
+			patterns.push({match:'NXXNXXXXXX'});
 		}
 		if ($('#fw11').prop('checked')){
-			patterns.push('1NXXNXXXXXX');
+			patterns.push({match:'1NXXNXXXXXX'});
 		}
 	}
 	if ($('#fwtollfree').prop('checked')){
 		//800 since 1966
-		patterns.push('1800NXXXXXX');
+		patterns.push({match:'1800NXXXXXX'});
 		//888 since 1996
-		patterns.push('1888NXXXXXX');
+		patterns.push({match:'1888NXXXXXX'});
 		//877 since 1998
-		patterns.push('1877NXXXXXX');
+		patterns.push({match:'1877NXXXXXX'});
 		//866 Since 2000
-		patterns.push('1866NXXXXXX');
+		patterns.push({match:'1866NXXXXXX'});
 		//855 Since 2010
-		patterns.push('1855NXXXXXX');
+		patterns.push({match:'1855NXXXXXX'});
 		//844 Since 2013
-		patterns.push('1844NXXXXXX');
+		patterns.push({match:'1844NXXXXXX'});
 		//Future not implimented 833,822,880-887,889
 	}
 	if ($('#fwinfo').prop('checked')){
 		//Community Services
-		patterns.push('211');
+		patterns.push({match:'211'});
 		//Municipal services Non-Emergency
-		patterns.push('311');
+		patterns.push({match:'311'});
 		//Directory Assistance
-		patterns.push('411');
+		patterns.push({match:'411'});
 		//Traffic
-		patterns.push('511');
+		patterns.push({match:'511'});
 		//Telephone company repair
-		patterns.push('611');
+		patterns.push({match:'611'});
 		//TDD Relay
-		patterns.push('711');
+		patterns.push({match:'711'});
 	}
 	if ($('#fwemergency').prop('checked')){
-		patterns.push('911');
-		patterns.push('933');
-		patterns.push('1|911');
-		patterns.push('9|911');
-		patterns.push('91|911');
+		patterns.push({match:'911'});
+		patterns.push({match:'933'});
+		patterns.push({match:'911',prefix:'1'});
+		patterns.push({match:'911',prefix:'9'});
+		patterns.push({match:'911',prefix:'91'});
 	}
 	if ($('#fwint').prop('checked')){
-		patterns.push('011.');
+		patterns.push({match:'011.'});
 	}
 	if ($('#fwld').prop('checked')){
-		patterns.push('1NXXNXXXXXX');
+		patterns.push({match:'1NXXNXXXXXX'});
 	}
 	if($('#dptable').length){
 		var idbase = ($("tr[id^='dprow']").length + $('#dptable').length);
 		$.each(patterns,function(){
+			var match = (this.match)?this.match:'';
+			var prefix = (this.prefix)?this.prefix:'';
+			var cid = (this.cid)?this.cid:'';
+			var prepend = (this.prepend)?this.prepend:'';
 			var lastRow = $("tr[id^='dprow']").last();
 			var id = idbase++;
-			console.log(idbase);
 			var newhtml = '';
 			newhtml +='<tr id="dprow'+id+'">';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
-			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="">';
+			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="'+prepend+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
-			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value=""> ';
+			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value="'+prefix+'"> ';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
-			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="'+this+'">';
+			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="'+match+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
-			newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="">';
+			newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="'+cid+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td><td>';
