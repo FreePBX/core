@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.25</version>
+	<version>13.0.1beta1.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.26* FREEPBX-9939 can not delete outbound route
 		*13.0.1beta1.25* FREEPBX-9913 Timegroup view routing, FREEPBX-9985 Feature SIP Secret generated size, FREEPBX-9931 i18n Audio errors
 		*13.0.1beta1.24* Fix layout issue in Advanced Settings
 		*13.0.1beta1.23* FREEPBX-9886 Bug in trying to disable call waiting and find me follow me grid display fixes
