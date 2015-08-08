@@ -1,5 +1,5 @@
 <div id="toolbar-all">
-	<a href="config.php?display=did&amp;view=form" class="btn btn-default"><i class="fa fa-plus">&nbsp;<?php echo _("Add Inbound Route")?></i></a>
+	<a href="config.php?display=did&amp;view=form" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp;<?php echo _("Add Inbound Route")?></a>
 </div>
 <table id="didtable"
  data-toolbar="#toolbar-all"
