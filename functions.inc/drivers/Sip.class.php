@@ -386,7 +386,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
 		$tmparr['permit'] = array('prompttext' => _('Permit'), 'value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$currentcomponent->addjsfunc('changeDriver()',"
-		if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit save when you are done to propagate the new settings)')."')) {
+		if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit submit to resave the device when you are done to propagate the new settings)')."')) {
 			if($('#devinfo_sipdriver').val() == 'chan_sip') {
 				$('#devinfo_sipdriver').val('chan_pjsip');
 			} else {
