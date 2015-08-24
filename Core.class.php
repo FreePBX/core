@@ -2244,7 +2244,15 @@ public function hookTabs($page){
 					/* Don't expose our typo laden craziness to users.  We like our users! */
 					unset($device['secret_origional']);
 				}
-
+				$du = $this->freepbx->Config->get("AMPEXTENSIONS");
+				if($du != "deviceanduser") {
+					unset($device['password']);
+					unset($device['devicetype']);
+					unset($device['user']);
+					unset($device['id']);
+					unset($device['name']);
+					unset($device['account']);
+				}
 				$data[$user['extension']] = array_merge($user, $device);
 			}
 
