@@ -298,6 +298,9 @@ $("#routeEdit").submit(function(){
 		return false;
 	}
 	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
+	if($("[name='pattern_file']").val().length > 0){
+		patlen += 1;
+	}
 	if(patlen === 0){
 		alert(_("You must complete the dial pattern tab before submitting"));
 		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
