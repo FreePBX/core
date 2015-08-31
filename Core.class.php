@@ -2024,47 +2024,48 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		return $results;
 	}
-public function hookTabs($page){
-	$module_hook = \moduleHook::create();
-	$mods = $this->freepbx->Hooks->processHooks($page);
-	$sections = array();
-	foreach($mods as $mod => $contents) {
-		if(empty($contents)) {
-			continue;
-		}
 
-		if(is_array($contents)) {
-			foreach($contents as $content) {
-				if(!isset($sections[$content['rawname']])) {
-					$sections[$content['rawname']] = array(
-						"title" => $content['title'],
-						"rawname" => $content['rawname'],
-						"content" => $content['content']
+	public function hookTabs($page){
+		$module_hook = \moduleHook::create();
+		$mods = $this->freepbx->Hooks->processHooks($page);
+		$sections = array();
+		foreach($mods as $mod => $contents) {
+			if(empty($contents)) {
+				continue;
+			}
+
+			if(is_array($contents)) {
+				foreach($contents as $content) {
+					if(!isset($sections[$content['rawname']])) {
+						$sections[$content['rawname']] = array(
+							"title" => $content['title'],
+							"rawname" => $content['rawname'],
+							"content" => $content['content']
+						);
+					} else {
+						$sections[$content['rawname']]['content'] .= $content['content'];
+					}
+				}
+			} else {
+				if(!isset($sections[$mod])) {
+					$sections[$mod] = array(
+						"title" => ucfirst(strtolower($mod)),
+						"rawname" => $mod,
+						"content" => $contents
 					);
 				} else {
-					$sections[$content['rawname']]['content'] .= $content['content'];
+					$sections[$mod]['content'] .= $contents;
 				}
 			}
-		} else {
-			if(!isset($sections[$mod])) {
-				$sections[$mod] = array(
-					"title" => ucfirst(strtolower($mod)),
-					"rawname" => $mod,
-					"content" => $contents
-				);
-			} else {
-				$sections[$mod]['content'] .= $contents;
-			}
 		}
-	}
-	$hookTabs = $hookcontent = '';
-	foreach ($sections as $data) {
-		$hookTabs .= '<li role="presentation"><a href="#corehook'.$data['rawname'].'" aria-controls="corehook'.$data['rawname'].'" role="tab" data-toggle="tab">'.$data['title'].'</a></li>';
-		$hookcontent .= '<div role="tabpanel" class="tab-pane" id="corehook'.$data['rawname'].'">';
-		$hookcontent .=	 $data['content'];
-		$hookcontent .= '</div>';
-	}
-	return array("hookTabs" => $hookTabs, "hookContent" => $hookcontent, "oldHooks" => $module_hook->hookHtml);
+		$hookTabs = $hookcontent = '';
+		foreach ($sections as $data) {
+			$hookTabs .= '<li role="presentation"><a href="#corehook'.$data['rawname'].'" aria-controls="corehook'.$data['rawname'].'" role="tab" data-toggle="tab">'.$data['title'].'</a></li>';
+			$hookcontent .= '<div role="tabpanel" class="tab-pane" id="corehook'.$data['rawname'].'">';
+			$hookcontent .=	 $data['content'];
+			$hookcontent .= '</div>';
+		}
+		return array("hookTabs" => $hookTabs, "hookContent" => $hookcontent, "oldHooks" => $module_hook->hookHtml);
 	}
 
 	public function bulkhandlerGetTypes() {
