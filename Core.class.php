@@ -1914,6 +1914,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_deltree("AMPUSER/".$extension);
 		}
 
+		$astman->database_del("CW",$extension);
+
 		//TODO: Should only delete it's reference
 		//but the array is multidimensional and sucks
 		//OUT > Array
