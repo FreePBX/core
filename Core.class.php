@@ -1845,7 +1845,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 
 			if (!$editmode) {
-				$astman->database_put("AMPUSER",$extension."/device",'"'.((isset($settings['device'])) ? $settings['device'] : '').'"');
+				$astman->database_put("AMPUSER",$extension."/device",'"'.((isset($settings['device'])) ? $settings['device'] : $extension).'"');
 			}
 
 			if (trim($settings['callwaiting']) == 'enabled') {

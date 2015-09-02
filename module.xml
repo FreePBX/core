@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1beta1.27</version>
+	<version>13.0.1beta1.28</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1beta1.28* FREEPBX-10117 Quick Create Extensions not allowing you to dial between extensions
 		*13.0.1beta1.27* FREEPBX-10051 Outbound Route patterns, allow empty if there is a file on import
 		*13.0.1beta1.26* FREEPBX-9939 can not delete outbound route
 		*13.0.1beta1.25* FREEPBX-9913 Timegroup view routing, FREEPBX-9985 Feature SIP Secret generated size, FREEPBX-9931 i18n Audio errors
