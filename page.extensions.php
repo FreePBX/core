@@ -58,7 +58,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
-							<table data-cookie="true" data-cookie-id-table="extensions-all" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
+							<table data-state-save="true" data-state-save-id-table="extensions-all" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
 								<thead>
 									<tr>
 										<th data-checkbox="true"></th>
@@ -84,7 +84,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>
 								</div>
-								<table data-cookie="true" data-cookie-id-table="extensions-<?php echo $driver['rawName']?>" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
+								<table data-state-save="true" data-state-save-id-table="extensions-<?php echo $driver['rawName']?>" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
 									<thead>
 										<tr>
 											<th data-checkbox="true"></th>
