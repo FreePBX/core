@@ -71,6 +71,13 @@ $(function() {
 	});
 });
 
+$(document).on('click',"a[id^='routerowdel']",function(e){
+	e.preventDefault();
+	curRow = $(this).closest('tr');
+	curRow.fadeOut("slow", function(){
+		$(this).remove();
+	});
+});
 $(document).on('click',"a[id^='routerowadd']",function(e){
 	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
