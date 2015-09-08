@@ -1524,6 +1524,8 @@ function core_do_get_config($engine) {
 				//Block collect Calls
 				if ($item['reversal'] === "CHECKED") {
 					$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','TRUE'));
+				}else{
+					$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','FALSE'));
 				}
 				$ext->add($context, $exten, '',new ext_gotoif('$["${__REVERSAL_REJECT}"="TRUE" & "${CHANNEL(reversecharge)}"="1" ]','macro-hangupcall'));
 
