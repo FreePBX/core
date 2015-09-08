@@ -16,6 +16,7 @@ $(function() {
 				dataType: 'json',
 				success: function(data) {
 					toggle_reload_button('show');
+					fpbxToast(_('Route order updated. Press "Apply Config" button to write out changes.'),_('Updated'),'success');
 				}
 			});
 		}
