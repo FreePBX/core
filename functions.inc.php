@@ -1527,7 +1527,9 @@ function core_do_get_config($engine) {
 				}else{
 					$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','FALSE'));
 				}
-				$ext->add($context, $exten, '',new ext_gotoif('$["${__REVERSAL_REJECT}"="TRUE" & "${CHANNEL(reversecharge)}"="1" ]','macro-hangupcall'));
+				$ext->add($context, $exten, '', new ext_gotoif('$["${REVERSAL_REJECT}"="TRUE"]','post-reverse-charge'));
+				$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL(reversecharge)}"="1"]','macro-hangupcall'));
+				$ext->add($context, $exten, 'post-reverse-charge', new ext_noop());
 
 				if ($item['delay_answer']) {
 					$ext->add($context, $exten, '', new ext_wait($item['delay_answer']));
