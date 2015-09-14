@@ -15,7 +15,7 @@ if (isset($request['copytrunk'])) {
 	$action = 'copytrunk';
 }
 
-$tech         = strtolower(isset($request['tech'])?htmlentities($request['tech']):'');
+$tech         = strtolower(isset($request['tech'])?htmlentities($request['tech'],ENT_COMPAT | ENT_HTML401, "UTF-8"):'');
 $outcid       = isset($request['outcid'])?$request['outcid']:'';
 $maxchans     = isset($request['maxchans'])?$request['maxchans']:'';
 $dialoutprefix= isset($request['dialoutprefix'])?$request['dialoutprefix']:'';
@@ -413,22 +413,22 @@ if (!$tech && !$extdisplay) {
 	if ($extdisplay) {
 		$trunk_details = core_trunks_getDetails($trunknum);
 
-		$tech = htmlentities($trunk_details['tech']);
-		$outcid = htmlentities($trunk_details['outcid']);
-		$maxchans = htmlentities($trunk_details['maxchans']);
-		$dialoutprefix = htmlentities($trunk_details['dialoutprefix']);
-		$keepcid = htmlentities($trunk_details['keepcid']);
-		$failtrunk = htmlentities($trunk_details['failscript']);
+		$tech = htmlentities($trunk_details['tech'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$outcid = htmlentities($trunk_details['outcid'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$maxchans = htmlentities($trunk_details['maxchans'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$dialoutprefix = htmlentities($trunk_details['dialoutprefix'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$keepcid = htmlentities($trunk_details['keepcid'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$failtrunk = htmlentities($trunk_details['failscript'],ENT_COMPAT | ENT_HTML401, "UTF-8");
 		$failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
-		$disabletrunk = htmlentities($trunk_details['disabled']);
-		$continue = htmlentities($trunk_details['continue']);
+		$disabletrunk = htmlentities($trunk_details['disabled'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$continue = htmlentities($trunk_details['continue'],ENT_COMPAT | ENT_HTML401, "UTF-8");
 		$provider = $trunk_details['provider'];
-		$trunk_name = htmlentities($trunk_details['name']);
-		$dialopts = $trunk_details['dialopts'] === false ? false : htmlentities($trunk_details['dialopts']);
+		$trunk_name = htmlentities($trunk_details['name'],ENT_COMPAT | ENT_HTML401, "UTF-8");
+		$dialopts = $trunk_details['dialopts'] === false ? false : htmlentities($trunk_details['dialopts'],ENT_COMPAT | ENT_HTML401, "UTF-8");
 
 		if ($tech!="enum") {
 
-			$channelid = htmlentities($trunk_details['channelid']);
+			$channelid = htmlentities($trunk_details['channelid'],ENT_COMPAT | ENT_HTML401, "UTF-8");
 
 			if ($tech!="custom" && $tech!="dundi") {  // custom trunks will not have user/peer details in database table
 				// load from db
@@ -436,7 +436,7 @@ if (!$tech && !$extdisplay) {
 					$peerdetails = core_trunks_getTrunkPeerDetails($trunknum);
 				}
 				if (empty($usercontext)) {
-					$usercontext = htmlentities($trunk_details['usercontext']);
+					$usercontext = htmlentities($trunk_details['usercontext'],ENT_COMPAT | ENT_HTML401, "UTF-8");
 				}
 
 				if (empty($userconfig)) {

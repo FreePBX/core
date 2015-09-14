@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1RC1.1</version>
+	<version>13.0.1RC1.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1RC1.1* FREEPBX-10209 htmlentities need to use UTF-8
 		*13.0.1RC1.1* fix for the "Unknown or unavailable item requested: 'reversecharge'" warning which some users with non ISDN/PRI trunks have been seeing
 		*13.0.1RC1* Release Candidate 1
 		*13.0.1beta1.29* FREEPBX-10117 IPv6 updates, reverse charge add false, Add toast to inbound routes for order changes, FREEPBX-10138 fix delete dial rules in routing

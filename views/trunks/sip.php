@@ -23,7 +23,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="channelid"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="channelid" id="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>"/>
+								<input type="text" class="form-control" name="channelid" id="channelid" value="<?php echo $channelid ?>" tabindex="<?php echo ++$tabindex;?>"/>
 							</div>
 						</div>
 					</div>
@@ -47,7 +47,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="peerdetails"></i>
 							</div>
 							<div class="col-md-9">
-								<textarea rows="10" cols="40" name="peerdetails" id="peerdetails" class="form-control" tabindex="<?php echo ++$tabindex;?>"><?php echo htmlspecialchars($peerdetails) ?></textarea>
+								<textarea rows="10" cols="40" name="peerdetails" id="peerdetails" class="form-control" tabindex="<?php echo ++$tabindex;?>"><?php echo $peerdetails ?></textarea>
 							</div>
 						</div>
 					</div>
@@ -73,7 +73,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="usercontext"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" context="form-control" name="usercontext" id="usercontext" value="<?php echo htmlspecialchars($usercontext)  ?>" tabindex="<?php echo ++$tabindex;?>"/>
+								<input type="text" class="form-control" name="usercontext" id="usercontext" value="<?php echo $usercontext  ?>" tabindex="<?php echo ++$tabindex;?>"/>
 							</div>
 						</div>
 					</div>
@@ -97,7 +97,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="userconfig"></i>
 							</div>
 							<div class="col-md-9">
-								<textarea rows="10" cols="40" class="form-control" name="userconfig" id="userconfig" tabindex="<?php echo ++$tabindex;?>"><?php echo htmlspecialchars($userconfig); ?></textarea>
+								<textarea rows="10" cols="40" class="form-control" name="userconfig" id="userconfig" tabindex="<?php echo ++$tabindex;?>"><?php echo $userconfig; ?></textarea>
 							</div>
 						</div>
 					</div>
@@ -121,7 +121,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="register"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="register" id="register" value="<?php echo htmlspecialchars($register) ?>" tabindex="<?php echo ++$tabindex;?>" />
+								<input type="text" class="form-control" name="register" id="register" value="<?php echo $register ?>" tabindex="<?php echo ++$tabindex;?>" />
 							</div>
 						</div>
 					</div>

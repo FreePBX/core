@@ -1,5 +1,5 @@
 <!--ZAP-->
-<input type="hidden" name="usercontext" value="notneeded"/>	
+<input type="hidden" name="usercontext" value="notneeded"/>
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
@@ -10,7 +10,7 @@
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="channelid"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" id="channelid" name="channelid" value="<?php echo htmlspecialchars($channelid) ?>" tabindex="<?php echo ++$tabindex;?>">
+						<input type="text" class="form-control" id="channelid" name="channelid" value="<?php echo $channelid ?>" tabindex="<?php echo ++$tabindex;?>">
 					</div>
 				</div>
 			</div>
