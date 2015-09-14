@@ -468,6 +468,30 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<table class="table table-striped" id="dptable">
 									<?php echo $dprows ?>
 								</table>
+								<!--Outbound Dial Prefix-->
+								<div class="element-container">
+									<div class="row">
+										<div class="col-md-12">
+											<div class="row">
+												<div class="form-group">
+													<div class="col-md-3">
+														<label class="control-label" for="dialoutprefix"><?php echo _("Outbound Dial Prefix") ?></label>
+														<i class="fa fa-question-circle fpbx-help-icon" data-for="dialoutprefix"></i>
+													</div>
+													<div class="col-md-9">
+														<input type="text" class="form-control" id="dialoutprefix" name="dialoutprefix" value="<?php echo isset($dialoutprefix)?htmlentities($dialoutprefix,ENT_COMPAT | ENT_HTML401, "UTF-8"):''?>">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<span id="dialoutprefix-help" class="help-block fpbx-help-block"><?php echo _("The outbound dialing prefix is used to prefix a dialing string to all outbound calls placed on this trunk. For example, if this trunk is behind another PBX or is a Centrex line, then you would put 9 here to access an outbound line. Another common use is to prefix calls with 'w' on a POTS line that need time to obtain dial tone to avoid eating digits.<br><br>Most users should leave this option blank.")?></span>
+										</div>
+									</div>
+								</div>
+								<!--END Outbound Dial Prefix-->
 							</div>
 							<div role="tabpanel" id="ttech" class="tab-pane">
 <!--End of trunk_header-->
