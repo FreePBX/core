@@ -18,7 +18,7 @@ if(!empty($request['id'])){
 }
 //Optional elements
 if (function_exists('music_list')){
-	$optionalelems = load_view(__DIR__.'/moh.php');
+	$optionalelems = load_view(__DIR__.'/moh.php', array("mohsilence" => $mohsilence));
 }
 
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
