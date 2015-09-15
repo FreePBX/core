@@ -63,6 +63,7 @@ if($extdisplay){
 	$formdata['pmmaxretries'] = $pmmaxretries;
 	$formdata['pmminlength'] = $pmminlength;
 	$formdata['pmminlength'] = $pmminlength;
+	$formdata['mohclass'] = $mohclass;
 
 }else{
 	$extension = isset($extarray[0]) ? $extarray[0] : '';
