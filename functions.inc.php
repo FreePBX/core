@@ -2209,11 +2209,13 @@ function core_do_get_config($engine) {
 	$ext->add('app-blackhole', 'musiconhold', '', new ext_musiconhold());
 
 	$ext->add('app-blackhole', 'congestion', '', new ext_noop('Blackhole Dest: Congestion'));
+	$ext->add('app-blackhole', 'congestion', '', new ext_progress());
 	$ext->add('app-blackhole', 'congestion', '', new ext_playtones('congestion'));
 	$ext->add('app-blackhole', 'congestion', '', new ext_congestion());
 	$ext->add('app-blackhole', 'congestion', '', new ext_hangup());
 
 	$ext->add('app-blackhole', 'busy', '', new ext_noop('Blackhole Dest: Busy'));
+	$ext->add('app-blackhole', 'busy', '', new ext_progress());
 	$ext->add('app-blackhole', 'busy', '', new ext_busy());
 	$ext->add('app-blackhole', 'busy', '', new ext_hangup());
 
