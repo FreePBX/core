@@ -73,10 +73,15 @@ $(function() {
 
 $(document).on('click',"a[id^='routerowdel']",function(e){
 	e.preventDefault();
-	curRow = $(this).closest('tr');
-	curRow.fadeOut("slow", function(){
-		$(this).remove();
-	});
+	var rowCount = $('#dptable >tbody >tr').length;
+	var curRow = $(this).closest('tr');
+	if(rowCount > 1){
+		curRow.fadeOut("slow", function(){
+			$(this).remove();
+		});
+	}else{
+		curRow.find('input:text').each(function(){$(this).val('')});
+	}
 });
 $(document).on('click',"a[id^='routerowadd']",function(e){
 	e.preventDefault();

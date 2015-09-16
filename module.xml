@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.1RC1.6* FREEPBX-10227 "FREEPBX-10110 Add progress to blackhole destinations that don't answer"
+		*13.0.1RC1.6* FREEPBX-10227 FREEPBX-10110 Add progress to blackhole destinations that don't answer, FREEPBX-10252 keep atleast one dial pattern row 
 		*13.0.1RC1.5* FREEPBX-10227 in outbound routes as well
 		*13.0.1RC1.4* FREEPBX-10227 show mohclass on refresh
 		*13.0.1RC1.3* FREEPBX-10221 Add outbound dialprefix to dialplan manipulation tab
