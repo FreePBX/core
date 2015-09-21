@@ -314,6 +314,7 @@ $("#routeEdit").submit(function(){
 	if($("[name='pattern_file']").val().length > 0){
 		patlen += 1;
 	}
+	patlen += $('#bulk_patterns').val().length;
 	if(patlen === 0){
 		alert(_("You must complete the dial pattern tab before submitting"));
 		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
