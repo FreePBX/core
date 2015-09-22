@@ -46,28 +46,16 @@ $codechtml .= '</ul>';
 </ul>
 <div class="tab-content display">
 	<div role="tabpanel" id="pjsgeneral" class="tab-pane active">
-		<br/>
-		<br/>
 		<!--USERNAME-->
 		<div class="element-container">
 			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="username"><?php echo _("Username") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="text" class="form-control" name="username" id="username" value="<?php echo $username?>"/>
-							</div>
-						</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="username"><?php echo _("Username") ?></label>
 					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="username-help" class="help-block fpbx-help-block"><?php echo _("Username for this provider")?></span>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="username" id="username" value="<?php echo $username?>"/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -75,47 +63,71 @@ $codechtml .= '</ul>';
 		<!--SECRET-->
 		<div class="element-container">
 			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="secret"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="password" class="form-control" name="secret" id="secret" value="<?php echo $secret?>"/>
-							</div>
-						</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
 					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="secret-help" class="help-block fpbx-help-block"><?php echo _("Password for this provider")?></span>
+					<div class="col-md-9">
+						<input type="password" class="form-control" name="secret" id="secret" value="<?php echo $secret?>"/>
+					</div>
 				</div>
 			</div>
 		</div>
 		<!--END SECRET-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-3">
+					<label class="control-label" for="authentication"><?php echo _("Authentication") ?></label>
+					<i class="fa fa-question-circle fpbx-help-icon" data-for="authentication"></i>
+				</div>
+				<div class="col-md-9 radioset">
+					<input type="radio" name="authentication" id="authenticationon" value="on" <?php echo ($authentication == "on")?"CHECKED":"" ?>>
+					<label for="authenticationon"><?php echo _("On");?></label>
+					<input type="radio" name="authentication" id="authenticationinbound" value="inbound" <?php echo ($authentication == "inbound")?"CHECKED":"" ?>>
+					<label for="authenticationinbound"><?php echo _("Inbound");?></label>
+					<input type="radio" name="authentication" id="authenticationoutbound" value="outbound" <?php echo ($authentication == "outbound")?"CHECKED":"" ?>>
+					<label for="authenticationoutbound"><?php echo _("Outbound");?></label>
+					<input type="radio" name="authentication" id="authenticationoff" value="off" <?php echo ($authentication == "off")?"CHECKED":"" ?>>
+					<label for="authenticationoff"><?php echo _("None");?></label>
+				</div>
+				<div class="col-md-12">
+					<span id="authentication-help" class="help-block fpbx-help-block"><?php echo _("Usually, this will be set to 'On', which ensures calls going to, and coming from, the other server are legimate. There may be occasions where the remote peer can't accept, or, can't send authentication. If you select 'None', all calls from the SIP Server specified are accepted without authentication. <strong>Setting this to 'None' may be insecure!</strong>")?></span>
+                                </div>
+			</div>
+		</div>
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-3">
+					<label class="control-label" for="registration"><?php echo _("Registration") ?></label>
+					<i class="fa fa-question-circle fpbx-help-icon" data-for="registration"></i>
+				</div>
+				<div class="col-md-9 radioset">
+					<input type="radio" name="registration" id="registrationtx" value="send" <?php echo ($registration == "send")?"CHECKED":"" ?>>
+					<label for="registrationtx"><?php echo _("Send");?></label>
+					<input type="radio" name="registration" id="registrationrx" value="receive" <?php echo ($registration == "receive")?"CHECKED":"" ?>>
+					<label for="registrationrx"><?php echo _("Receive");?></label>
+					<input type="radio" name="registration" id="registrationnone" value="none" <?php echo ($registration == "none")?"CHECKED":"" ?>>
+					<label for="registrationnone"><?php echo _("None");?></label>
+				</div>
+				<div class="col-md-12">
+					<span id="registration-help" class="help-block fpbx-help-block"><?php echo _("You normally <strong>Send</strong> registration, which tells the remote server where to send your calls. If the other server is not on a fixed address, it will need to register to this server (<strong>Receive</strong>), so this server can send calls to it. You would select <strong>None</strong> if both machines have a fixed address and do not require registration.")."<br>"._("<strong>Warning:</strong> If you select 'None', registration attempts for the Username and Secret specified above will be rejected. Setting this incorrectly may result in firewall services detecting this as an attack and blocking the machine trying to register. Do not change this unless you control both servers, and are sure it is required!")?></span>
+                                </div>
+			</div>
+		</div>
 		<!--SIP SERVER-->
 		<div class="element-container">
 			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="sip_server"><?php echo _("SIP Server") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="text" class="form-control" name="sip_server" id="sip_server" value="<?php echo $sip_server?>"/>
-							</div>
-						</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="sip_server"><?php echo _("SIP Server") ?></label>
+						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="sip_server" id="sip_server" value="<?php echo $sip_server?>"/>
 					</div>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
-					<span id="sip_server-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Address.")?></span>
+					<span id="sip_server-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Address. This is ignored when Registration is set to 'Receive'.")?></span>
 				</div>
 			</div>
 		</div>
@@ -123,23 +135,17 @@ $codechtml .= '</ul>';
 		<!--SIP SERVER PORT-->
 		<div class="element-container">
 			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="sip_server_port"><?php echo _("SIP Server Port") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server_port"></i>
-							</div>
-							<div class="col-md-9">
-								<input type="number" class="form-control" name="sip_server_port" id="sip_server_port" value="<?php echo !empty($sip_server_port) ? $sip_server_port : '5060'?>"/>
-							</div>
-						</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="sip_server_port"><?php echo _("SIP Server Port") ?></label>
+						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server_port"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="number" class="form-control" name="sip_server_port" id="sip_server_port" value="<?php echo !empty($sip_server_port) ? $sip_server_port : '5060'?>"/>
 					</div>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
-					<span id="sip_server_port-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Port.")?></span>
+					<span id="sip_server_port-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Port. This is ignored when Registration is set to 'Receive'.")?></span>
 				</div>
 			</div>
 		</div>
@@ -587,4 +593,47 @@ function switch_view() {
 		$('.simplepjsip').hide();
 	}
 }
+
+$(document).ready(function() {
+	// When the document is loaded, check the auth/reg buttons and update the inputs as required.
+	checkAuthButtons();
+	// Also check them whenever the Auth input is clicked.
+	$("input[name=authentication]").click(function() { checkAuthButtons(); });
+});
+
+function checkAuthButtons() {
+	// If 'Authentication' is set to none, 'Registration' is set to none, and
+	// username/secret is disabled.
+	var a = $("input[name=authentication]:checked").val();
+	if (a === "off") {
+		if ($("#username").val().length) {
+			// It's set to something. Remove it.
+			$("#username").data("origval", $("#username").val());
+			$("#username").val("").prop("readonly", true);
+		}
+		if ($("#secret").val().length) {
+			// It's set to something. Remove it.
+			$("#secret").data("origval", $("#secret").val());
+			$("#secret").val("").prop("readonly", true);
+		}
+		$("#registrationnone").click();
+	} else {
+		// Make sure they're not readonly...
+		$("#username").prop("readonly", false);
+		$("#secret").prop("readonly", false);
+		// If they had anything previously, put them back.
+		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {
+			$("#username").val($("#username").data("origval"));
+			$("#username").data("origval", false);
+		}
+		if (typeof $("#secret").data("origval") !== "undefined" && $("#secret").data("origval") !== false) {
+			$("#secret").val($("#secret").data("origval"));
+			$("#secret").data("origval", false);
+		}
+	}
+}
+
+
+
+
 </script>

@@ -515,8 +515,8 @@ if (!$tech && !$extdisplay) {
 		'pr_tech' => $pr_tech,
 		'maxchans' => $maxchans,
 		'data' => $data,
-    'dialopts' => $dialopts,
-    'dialoutprefix' => $dialoutprefix,
+		'dialopts' => $dialopts,
+		'dialoutprefix' => $dialoutprefix,
 		'amp_conf' => $amp_conf,
 		'continue' => $continue,
 		'disabletrunk' => $disabletrunk,
@@ -554,9 +554,9 @@ if (!$tech && !$extdisplay) {
 			show_view(dirname(__FILE__).'/views/trunks/dundi.php',$displayvars);
 			break;
 		case "pjsip":
-			// displayvars is passed by reference, and may or may not be updated.
 			$pjsip = FreePBX::Core()->getDriver('pjsip');
 			if($pjsip !== false) {
+				// Mangle displayvars if needed.
 				$displayvars = $pjsip->getDisplayVars($extdisplay, $displayvars);
 				show_view(dirname(__FILE__).'/views/trunks/pjsip.php',$displayvars);
 			}

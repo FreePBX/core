@@ -959,8 +959,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$dispvars['codecs'][$codec] = true;
 			}
 
-
-
 			foreach($sipSettingsCodecs as $codec => $state) {
 				if(!isset($dispvars['codecs'][$codec])) {
 					$dispvars['codecs'][$codec] = false;
@@ -983,6 +981,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			);
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());
+
+		// Ensure we have a sane registration configuration on all trunks, new and old.
+		if (empty($dispvars['authentication'])) {
+			$dispvars['authentication'] = "on";
+		}
+		if (empty($dispvars['registration'])) {
+			$dispvars['registration'] = "send";
+		}
+
 		return $dispvars;
 	}
 

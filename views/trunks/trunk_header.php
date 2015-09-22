@@ -20,10 +20,9 @@ if(!empty($extdisplay)){
 		$pageinfoinuse .= '</div>';
 		$pageinfoinuse .= '</div>';
 	}else{
-		$pageinfoinuse .= '<div class="well well-info">';
-		$pageinfoinuse .= _("WARNING:");
-		$pageinfoinuse .= _("This trunk is not used by any routes!");
-		$pageinfoinuse .= _("This trunk will not be able to be used for outbound calls until a route is setup that uses it. Click on <b>Outbound Routes</b> to setup routing.");
+		$pageinfoinuse .= '<div class="alert alert-warning"><h3>'._("WARNING: This trunk is not used by any routes!").'</h3>';
+		$pageinfoinuse .= '<p>'._("This trunk will not be able to be used for outbound calls until a route is setup that uses it.").'</p>';
+		$pageinfoinuse .= '<p>'._("Click on <a href='?display=routing'>Outbound Routes</a> to setup routing.").'</p>';
 		$pageinfoinuse .= '</div>';
 	}
 }
