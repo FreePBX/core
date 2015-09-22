@@ -194,7 +194,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$prepend = ($pattern['prepend_digits'] != '') ? $pattern['prepend_digits'].'+' : '';
 		$match_pattern_prefix = ($pattern['match_pattern_prefix'] != '') ? $pattern['match_pattern_prefix'].'|' : '';
 		$match_cid = ($pattern['match_cid'] != '') ? '/'.$pattern['match_cid'] : '';
-		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid . PHP_EOL;
+		$dpinput[] = $prepend . $match_pattern_prefix . $pattern['match_pattern_pass'] . $match_cid;
 	}
 	$dpinput[] = '</textarea>';
 	$dprows = implode(PHP_EOL, $dpinput);
