@@ -296,7 +296,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 
 		$trunks = $this->getAllTrunks();
-		$trunks = is_array($trunks)?$trunks:array();
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
 			//prevent....special people
@@ -306,59 +305,74 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if (!isset($trunk['auth_rejection_permanent'])) {
 				$trunk['auth_rejection_permanent'] = 'off';
 			}
-
-			$conf['pjsip.registration.conf'][$tn] = array(
-				'type' => 'registration',
-				'transport' => $trunk['transport'],
-				'outbound_auth' => $tn,
-				'retry_interval' => $trunk['retry_interval'],
-				'max_retries' => $trunk['max_retries'],
-				'expiration' => $trunk['expiration'],
-				'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
-			);
-			if(!empty($trunk['contact_user'])) {
-				$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
+			// Ensure our registration and auth values are set sanely
+			if (!isset($trunk['registration'])) {
+				$trunk['registration'] = "send";
+			}
+			if (empty($trunk['authentication'])) {
+				$trunk['authentication'] = "outbound";
 			}
 
+			// Have we been asked to send registrations?
+			if ($trunk['registration'] === "send") {
+				$conf['pjsip.registration.conf'][$tn] = array(
+					'type' => 'registration',
+					'transport' => $trunk['transport'],
+					'outbound_auth' => $tn,
+					'retry_interval' => $trunk['retry_interval'],
+					'max_retries' => $trunk['max_retries'],
+					'expiration' => $trunk['expiration'],
+					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
+				);
+				if(!empty($trunk['contact_user'])) {
+					$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
+				}
+				if(empty($trunk['server_uri']) && empty($trunk['sip_server'])) {
+					throw new \Exception('Asterisk will crash if sip_server is blank!');
+				} else if(!empty($trunk['server_uri'])) {
+					$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
+				} else {
+					$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				}
 
-			if(empty($trunk['server_uri']) && empty($trunk['sip_server'])) {
-				throw new \Exception('Asterisk will crash if sip_server is blank!');
-			} else if(!empty($trunk['server_uri'])) {
-				$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
-			} else {
-				$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			}
-
-			if(empty($trunk['client_uri']) && empty($trunk['sip_server'])) {
-				throw new \Exception('Asterisk will crash if sip_server is blank!');
-			} else if(!empty($trunk['client_uri'])) {
-				$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
-			} else {
-				$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
-			}
-
-			if(!empty($this->_registration[$tn]) && is_array($this->_registration[$tn])) {
-				foreach($this->_registration[$tn] as $el) {
-					$conf["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				if(empty($trunk['client_uri']) && empty($trunk['sip_server'])) {
+					throw new \Exception('Asterisk will crash if sip_server is blank!');
+				} else if(!empty($trunk['client_uri'])) {
+					$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
+				} else {
+					$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				}
+				if(!empty($this->_registration[$tn]) && is_array($this->_registration[$tn])) {
+					foreach($this->_registration[$tn] as $el) {
+						$conf["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
+					}
 				}
 			}
 
-			$conf['pjsip.auth.conf'][$tn] = array(
-				'type' => 'auth',
-				'auth_type' => 'userpass',
-				'password' => $trunk['secret'],
-				'username' => $trunk['username']
-			);
+			// Are we doing authentication?
+			if ($trunk['authentication'] !== "none") {
+				$conf['pjsip.auth.conf'][$tn] = array(
+					'type' => 'auth',
+					'auth_type' => 'userpass',
+					'password' => $trunk['secret'],
+					'username' => $trunk['username']
+				);
+			}
 
 			$conf['pjsip.aor.conf'][$tn] = array(
 				'type' => 'aor',
 				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
 			);
 
-			if(!empty($trunk['aor_contact'])) {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
-			} else {
-				$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+			// We only have a contact if we're sending, or not using registrations
+			if ($trunk['registration'] == "send" || $trunk['registration'] == "none") {
+				if(!empty($trunk['aor_contact'])) {
+					$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
+				} else {
+					$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+				}
+			} elseif ($trunk['registration'] == "receive") {
+				$conf['pjsip.aor.conf'][$tn]['max_contacts'] = 1;
 			}
 
 			if(!empty($this->_aor[$tn]) && is_array($this->_aor[$tn])) {
@@ -373,9 +387,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
-				'outbound_auth' => $tn,
 				'aors' => $tn
 			);
+
+			if ($trunk['authentication'] == "outbound" || $trunk['authentication'] == "both") {
+				$conf['pjsip.endpoint.conf'][$tn]['outbound_auth'] = $tn;
+			}
+			if ($trunk['authentication'] == "inbound" || $trunk['authentication'] == "both") {
+				$conf['pjsip.endpoint.conf'][$tn]['auth'] = $tn;
+			}
 			if(!empty($trunk['from_domain'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_domain'] = $trunk['from_domain'];
 			}
