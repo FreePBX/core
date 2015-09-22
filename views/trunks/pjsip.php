@@ -81,17 +81,17 @@ $codechtml .= '</ul>';
 					<i class="fa fa-question-circle fpbx-help-icon" data-for="authentication"></i>
 				</div>
 				<div class="col-md-9 radioset">
-					<input type="radio" name="authentication" id="authenticationon" value="on" <?php echo ($authentication == "on")?"CHECKED":"" ?>>
-					<label for="authenticationon"><?php echo _("On");?></label>
-					<input type="radio" name="authentication" id="authenticationinbound" value="inbound" <?php echo ($authentication == "inbound")?"CHECKED":"" ?>>
-					<label for="authenticationinbound"><?php echo _("Inbound");?></label>
 					<input type="radio" name="authentication" id="authenticationoutbound" value="outbound" <?php echo ($authentication == "outbound")?"CHECKED":"" ?>>
 					<label for="authenticationoutbound"><?php echo _("Outbound");?></label>
+					<input type="radio" name="authentication" id="authenticationinbound" value="inbound" <?php echo ($authentication == "inbound")?"CHECKED":"" ?>>
+					<label for="authenticationinbound"><?php echo _("Inbound");?></label>
+					<input type="radio" name="authentication" id="authenticationboth" value="both" <?php echo ($authentication == "both")?"CHECKED":"" ?>>
+					<label for="authenticationboth"><?php echo _("Both");?></label>
 					<input type="radio" name="authentication" id="authenticationoff" value="off" <?php echo ($authentication == "off")?"CHECKED":"" ?>>
 					<label for="authenticationoff"><?php echo _("None");?></label>
 				</div>
 				<div class="col-md-12">
-					<span id="authentication-help" class="help-block fpbx-help-block"><?php echo _("Usually, this will be set to 'On', which ensures calls going to, and coming from, the other server are legimate. There may be occasions where the remote peer can't accept, or, can't send authentication. If you select 'None', all calls from the SIP Server specified are accepted without authentication. <strong>Setting this to 'None' may be insecure!</strong>")?></span>
+					<span id="authentication-help" class="help-block fpbx-help-block"><?php echo _("Usually, this will be set to 'Outbound', which authenticates calls going out, and allows unauthenticated calls in from the other server. If you select 'None', all calls from or to the specified SIP Server are unauthenticated. <strong>Setting this to 'None' may be insecure!</strong>")?></span>
                                 </div>
 			</div>
 		</div>
@@ -597,8 +597,19 @@ function switch_view() {
 $(document).ready(function() {
 	// When the document is loaded, check the auth/reg buttons and update the inputs as required.
 	checkAuthButtons();
+
 	// Also check them whenever the Auth input is clicked.
 	$("input[name=authentication]").click(function() { checkAuthButtons(); });
+
+	// If someone tries to set registration to 'send' or 'recieve' with no auth,
+	// don't let them.
+	$("input[name=registration]").click(function(e) {
+		if ($("input[name=authentication]:checked").val() == "off") {
+			if ($(e.target).val() !== "none") {
+				e.preventDefault();
+			}
+		}
+	});
 });
 
 function checkAuthButtons() {
@@ -606,15 +617,15 @@ function checkAuthButtons() {
 	// username/secret is disabled.
 	var a = $("input[name=authentication]:checked").val();
 	if (a === "off") {
+		$("#username").val("").prop("readonly", true);
+		$("#secret").val("").prop("readonly", true);
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
 			$("#username").data("origval", $("#username").val());
-			$("#username").val("").prop("readonly", true);
 		}
 		if ($("#secret").val().length) {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
-			$("#secret").val("").prop("readonly", true);
 		}
 		$("#registrationnone").click();
 	} else {
