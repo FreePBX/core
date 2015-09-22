@@ -617,8 +617,8 @@ function checkAuthButtons() {
 	// username/secret is disabled.
 	var a = $("input[name=authentication]:checked").val();
 	if (a === "off") {
-		$("#username").val("").prop("readonly", true);
-		$("#secret").val("").prop("readonly", true);
+		$("#username").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
+		$("#secret").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
 			$("#username").data("origval", $("#username").val());
@@ -627,11 +627,26 @@ function checkAuthButtons() {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
 		}
+		$("#username").val("").prop("readonly", true);
+		$("#secret").val("").prop("readonly", true);
 		$("#registrationnone").click();
+	} else if (a === "inbound" || a === "both") {
+		// Username is not settable, as it is the trunk name that is used for auth
+		$("#secret").attr('placeholder', '');
+		if ($("#username").val().length) {
+			// It's set to something. Remove it.
+			$("#username").data("origval", $("#username").val());
+		}
+		$("#username").attr('placeholder', '<?php echo _("Username is trunk name"); ?>').prop("readonly", true).val("");
+		$("#secret").prop("readonly", false).attr('placeholder', '');
+		if (typeof $("#secret").data("origval") !== "undefined" && $("#secret").data("origval") !== false) {
+			$("#secret").val($("#secret").data("origval"));
+			$("#secret").data("origval", false);
+		}
 	} else {
 		// Make sure they're not readonly...
-		$("#username").prop("readonly", false);
-		$("#secret").prop("readonly", false);
+		$("#username").prop("readonly", false).attr('placeholder', '');
+		$("#secret").prop("readonly", false).attr('placeholder', '');
 		// If they had anything previously, put them back.
 		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {
 			$("#username").val($("#username").data("origval"));
@@ -643,8 +658,5 @@ function checkAuthButtons() {
 		}
 	}
 }
-
-
-
 
 </script>
