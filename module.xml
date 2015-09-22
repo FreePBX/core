@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1RC1.9</version>
+	<version>13.0.1RC1.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1RC1.10* FREEPBX-10306 Fix trunk order updating in routing. Add toast to reflect success.
 		*13.0.1RC1.9* FREEPBX-8340 Allow PJSip trunks with or without reg/auth
 		*13.0.1RC1.8* Fix invalid js selector  and cleanup multiple rows in textarea
 		*13.0.1RC1.7* FREEPBX-10275 Account for bulk pattern box in routing validation.
