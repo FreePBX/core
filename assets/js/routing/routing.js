@@ -49,6 +49,7 @@ $(function() {
 				dataType: 'json',
 				success: function(data) {
 					toggle_reload_button('show');
+					fpbxToast(_('Trunk order updated. </br>Press "Apply Config" button to write out changes.'),_('Updated'),'success');
 				}
 			});
 		}

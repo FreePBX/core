@@ -5739,22 +5739,22 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
 	global $db;
-
-	$route_id = $db->escapeSimple($route_id);
+	$dbh = \FreePBX::Database();
 	$insert_trunk = array();
 	$seq = 0;
 	foreach ($trunks as $trunk) {
-		$insert_trunk[] = array ($db->escapeSimple($trunk), $seq);
+		$insert_trunk[] = array( $route_id,$trunk, $seq);
 		$seq++;
 	}
 	if ($delete) {
 		sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.q($route_id));
 	}
-	$compiled = $db->prepare("INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES ($route_id,?,?)");
-	$result = $db->executeMultiple($compiled,$insert_trunk);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_trunks');
+	$stmt = $dbh->prepare('INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
+	$ret = array();
+	foreach($insert_trunk as $t){
+		$ret[] = $stmt->execute($t);
 	}
+	return $ret;
 }
 
 /* callback to Time Groups Module so it can display usage information
