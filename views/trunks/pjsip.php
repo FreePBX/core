@@ -597,28 +597,45 @@ function switch_view() {
 $(document).ready(function() {
 	// When the document is loaded, check the auth/reg buttons and update the inputs as required.
 	checkAuthButtons();
+	checkRegButtons();
 
 	// Also check them whenever the Auth input is clicked.
 	$("input[name=authentication]").click(function() { checkAuthButtons(); });
 
 	// If someone tries to set registration to 'send' or 'recieve' with no auth,
 	// don't let them.
-	$("input[name=registration]").click(function(e) {
-		if ($("input[name=authentication]:checked").val() == "off") {
-			if ($(e.target).val() !== "none") {
+	$("input[name=registration]").click(function(e) { checkRegButtons(e); });
+});
+
+function checkRegButtons(e) {
+	var t;
+	if (typeof e === "undefined") {
+		t = $("input[name=registration]:checked");
+	} else {
+		t = $(e.target);
+	}
+
+	if ($("input[name=authentication]:checked").val() == "off") {
+		$("#sip_server,#sip_server_port").prop("readonly", false);
+		if (t.val() !== "none") {
+			if (typeof e !== "undefined") {
 				e.preventDefault();
 			}
 		}
-	});
-});
-
+	} else {
+		if (t.val() === "receive") {
+			$("#sip_server,#sip_server_port").prop("readonly", true);
+		} else {
+			$("#sip_server,#sip_server_port").prop("readonly", false);
+		}
+	}
+}
 function checkAuthButtons() {
 	// If 'Authentication' is set to none, 'Registration' is set to none, and
 	// username/secret is disabled.
 	var a = $("input[name=authentication]:checked").val();
 	if (a === "off") {
-		$("#username").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
-		$("#secret").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
+		$("#username,#secret").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
 			$("#username").data("origval", $("#username").val());
@@ -627,8 +644,7 @@ function checkAuthButtons() {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
 		}
-		$("#username").val("").prop("readonly", true);
-		$("#secret").val("").prop("readonly", true);
+		$("#username,#secret").val("").prop("readonly", true);
 		$("#registrationnone").click();
 	} else if (a === "inbound" || a === "both") {
 		// Username is not settable, as it is the trunk name that is used for auth
@@ -645,8 +661,7 @@ function checkAuthButtons() {
 		}
 	} else {
 		// Make sure they're not readonly...
-		$("#username").prop("readonly", false).attr('placeholder', '');
-		$("#secret").prop("readonly", false).attr('placeholder', '');
+		$("#username,#secret").prop("readonly", false).attr('placeholder', '');
 		// If they had anything previously, put them back.
 		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {
 			$("#username").val($("#username").data("origval"));

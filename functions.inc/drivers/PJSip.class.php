@@ -355,8 +355,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'type' => 'auth',
 					'auth_type' => 'userpass',
 					'password' => $trunk['secret'],
-					'username' => $trunk['username']
 				);
+				// If this is inbound or both auth, it's the trunk name
+				if ($trunk['authentication'] == "inbound" || $trunk['authentication'] == "both" || empty($trunk['username'])) {
+					$conf['pjsip.auth.conf'][$tn]['username'] = $tn;
+				} else {
+					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
+				}
 			}
 
 			$conf['pjsip.aor.conf'][$tn] = array(
@@ -1007,7 +1012,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		// Ensure we have a sane registration configuration on all trunks, new and old.
 		if (empty($dispvars['authentication'])) {
-			$dispvars['authentication'] = "on";
+			$dispvars['authentication'] = "outbound";
 		}
 		if (empty($dispvars['registration'])) {
 			$dispvars['registration'] = "send";

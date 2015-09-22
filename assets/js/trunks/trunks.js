@@ -375,12 +375,15 @@ $(document).ready(function() {
 
 			if (theForm.channelid.value == theForm.usercontext.value)
 				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
-		} else if(tech == 'pjsip') {
-			if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
-				return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
-			}
-			if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
-				return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
+		} else if (tech == 'pjsip') {
+			// If Registration is seto to 'Receive', we don't need a server definition
+			if ($("input[name=registration]:checked").val() !== "receive") {
+				if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
+					return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
+				}
+				if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
+					return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
+				}
 			}
 		}
 
