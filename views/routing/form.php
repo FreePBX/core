@@ -246,6 +246,10 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	$trunkhtml .= '</table>';
 ?>
 <form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="?display=routing" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
+	<div style="display: none;">
+		<input type="text" id="PreventChromeAutocomplete" name="PreventChromeAutocomplete" autocomplete="address-level4" aria-hidden="true" />
+		<input type="password" id="PreventChromeAutocomplete2" name="PreventChromeAutocomplete2" autocomplete="address-level4" aria-hidden="true"/>
+	</div>
 	<input type="hidden" id="id" name="id" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 	<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
