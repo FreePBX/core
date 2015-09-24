@@ -317,11 +317,11 @@ $("#routeEdit").submit(function(){
 	}
 	if($('#bulk_patterns').length) {
 		patlen += $('#bulk_patterns').val().length;
-		if(patlen === 0){
-			alert(_("You must complete the dial pattern tab before submitting"));
-			$('.nav-tabs a[href="#dialpatterns"]').tab('show');
-			return false;
-		}
+	}
+	if(patlen === 0){
+		alert(_("You must complete the dial pattern tab before submitting"));
+		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
+		return false;
 	}
 	return true;
 });
