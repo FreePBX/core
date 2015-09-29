@@ -1980,7 +1980,7 @@ function core_do_get_config($engine) {
 				$tech = 'DAHDI';
 			}
 			if ($tech == 'CUSTOM') {
-				$ext->addGlobal('OUT_'.$tid, 'AMP:'.$trunk['channelid']);
+				$ext->addGlobal('OUT_'.$tid, 'AMP:'.trim($trunk['channelid']));
 			} elseif ($tech != 'PJSIP') {
 				$ext->addGlobal('OUT_'.$tid, $tech."/".$trunk['channelid']);
 			} else {
