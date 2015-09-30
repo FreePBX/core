@@ -1355,7 +1355,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_put("DEVICE",$id."/type",$settings['devicetype']['value']);
 			$astman->database_put("DEVICE",$id."/default_user",$settings['user']['value']);
 			if($settings['emergency_cid']['value'] != '') {
-				$astman->database_put("DEVICE",$id."/emergency_cid","\"".$settings['emergency_cid']['value']."\"");
+				$astman->database_put("DEVICE",$id."/emergency_cid",$settings['emergency_cid']['value']);
 			} else {
 				$astman->database_del("DEVICE",$id."/emergency_cid");
 			}
@@ -1808,18 +1808,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($settings['concurrency_limit']) ? $settings['concurrency_limit'] : 0);
 			$astman->database_put("AMPUSER",$extension."/noanswer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
 			$astman->database_put("AMPUSER",$extension."/recording",isset($settings['recording']) ? $settings['recording'] : '');
-			$astman->database_put("AMPUSER",$extension."/outboundcid",isset($settings['outboundcid']) ? '"'.$settings['outboundcid'].'"' : '');
-			$astman->database_put("AMPUSER",$extension."/cidname",isset($settings['name']) ? '"'.$settings['name'].'"' : '');
+			$astman->database_put("AMPUSER",$extension."/outboundcid",isset($settings['outboundcid']) ? $settings['outboundcid'] : '');
+			$astman->database_put("AMPUSER",$extension."/cidname",isset($settings['name']) ? $settings['name'] : '');
 			$astman->database_put("AMPUSER",$extension."/cidnum",(isset($settings['cid_masquerade']) && trim($settings['cid_masquerade']) != "") ? trim($settings['cid_masquerade']) : $extension);
-			$astman->database_put("AMPUSER",$extension."/voicemail",'"'.(isset($settings['voicemail']) ? $settings['voicemail'] : '').'"');
-			$astman->database_put("AMPUSER",$extension."/answermode",'"'.(isset($settings['answermode']) ? $settings['answermode']: 'disabled').'"');
+			$astman->database_put("AMPUSER",$extension."/voicemail",isset($settings['voicemail']) ? $settings['voicemail'] : '');
+			$astman->database_put("AMPUSER",$extension."/answermode",isset($settings['answermode']) ? $settings['answermode']: 'disabled');
 
-			$astman->database_put("AMPUSER",$extension."/recording/in/external",'"'.$settings['recording_in_external'].'"');
-			$astman->database_put("AMPUSER",$extension."/recording/out/external",'"'.$settings['recording_out_external'].'"');
-			$astman->database_put("AMPUSER",$extension."/recording/in/internal",'"'.$settings['recording_in_internal'].'"');
-			$astman->database_put("AMPUSER",$extension."/recording/out/internal",'"'.$settings['recording_out_internal'].'"');
-			$astman->database_put("AMPUSER",$extension."/recording/ondemand",'"'.$settings['recording_ondemand'].'"');
-			$astman->database_put("AMPUSER",$extension."/recording/priority",'"'.(isset($settings['recording_priority']) ? $settings['recording_priority'] : '10').'"');
+			$astman->database_put("AMPUSER",$extension."/recording/in/external",$settings['recording_in_external']);
+			$astman->database_put("AMPUSER",$extension."/recording/out/external",$settings['recording_out_external']);
+			$astman->database_put("AMPUSER",$extension."/recording/in/internal",$settings['recording_in_internal']);
+			$astman->database_put("AMPUSER",$extension."/recording/out/internal",$settings['recording_out_internal']);
+			$astman->database_put("AMPUSER",$extension."/recording/ondemand",$settings['recording_ondemand']);
+			$astman->database_put("AMPUSER",$extension."/recording/priority",isset($settings['recording_priority']) ? $settings['recording_priority'] : '10');
 
 			// If not set then we are using system default so delete the tree all-together
 			//
@@ -1845,17 +1845,17 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 
 			if (!$editmode) {
-				$astman->database_put("AMPUSER",$extension."/device",'"'.((isset($settings['device'])) ? $settings['device'] : $extension).'"');
+				$astman->database_put("AMPUSER",$extension."/device",isset($settings['device'])) ? $settings['device'] : $extension);
 			}
 
 			if (trim($settings['callwaiting']) == 'enabled') {
-				$astman->database_put("CW",$extension,"\"ENABLED\"");
+				$astman->database_put("CW",$extension,"ENABLED");
 			} else if (trim($settings['callwaiting']) == 'disabled') {
 				$astman->database_del("CW",$extension);
 			}
 
 			if (trim($settings['pinless']) == 'enabled') {
-				$astman->database_put("AMPUSER",$extension."/pinless","\"NOPASSWD\"");
+				$astman->database_put("AMPUSER",$extension."/pinless","NOPASSWD");
 			} else if (trim($settings['pinless']) == 'disabled') {
 				$astman->database_del("AMPUSER",$extension."/pinless");
 			}

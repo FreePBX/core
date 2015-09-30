@@ -4437,7 +4437,7 @@ function core_devices2astdb(){
 			$astman->database_put("DEVICE",$id."/user",$user);
 			$astman->database_put("DEVICE",$id."/default_user",$user);
 			if(trim($emergency_cid) != '') {
-				$astman->database_put("DEVICE",$id."/emergency_cid","\"".$emergency_cid."\"");
+				$astman->database_put("DEVICE",$id."/emergency_cid",$emergency_cid);
 			}
 			// If a user is selected, add this device to the user
 			if ($user != "none") {
@@ -4491,9 +4491,9 @@ function core_users2astdb(){
 			$astman->database_put("AMPUSER",$extension."/ringtimer",$ringtimer);
 			$astman->database_put("AMPUSER",$extension."/noanswer",$noanswer);
 			$astman->database_put("AMPUSER",$extension."/recording",$recording);
-			$astman->database_put("AMPUSER",$extension."/outboundcid","\"".$db->escapeSimple($outboundcid)."\"");
-			$astman->database_put("AMPUSER",$extension."/cidname","\"".$db->escapeSimple($name)."\"");
-			$astman->database_put("AMPUSER",$extension."/voicemail","\"".$voicemail."\"");
+			$astman->database_put("AMPUSER",$extension."/outboundcid",$outboundcid);
+			$astman->database_put("AMPUSER",$extension."/cidname",$name);
+			$astman->database_put("AMPUSER",$extension."/voicemail",$voicemail);
 		}
 		return true;
 	} else {
