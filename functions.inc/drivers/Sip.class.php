@@ -287,22 +287,22 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tmparr['type'] = array('prompttext' => _('Connection Type'),'value' => 'friend', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
-		$select[] = array('value' => 'yes', 'text' => _('Yes - (force_rport,comedia)'));
-		$select[] = array('value' => 'no', 'text' => _('No - (no)'));
+		$select[] = array('value' => 'yes', 'text' => sprintf(_('Yes - (%s)'),'force_rport,comedia'));
+		$select[] = array('value' => 'no', 'text' => sprintf(_('No - (%s)'),'no'));
 
 		if (version_compare($this->version,'1.8','ge')) {
-			$select[] = array('value' => 'force_rport', 'text' => _('Force rport - (force_rport)'));
-			$select[] = array('value' => 'comedia', 'text' => _('comedia - (comedia)'));
+			$select[] = array('value' => 'force_rport', 'text' => sprintf(_('Force rport - (%s)'),'force_rport'));
+			$select[] = array('value' => 'comedia', 'text' => sprintf(_('comedia - (%s)'),'comedia'));
 		}
 
 		if (version_compare($this->version,'11.5','ge')) {
-			$select[] = array('value' => 'auto_force_rport,auto_comedia', 'text' => _('Automatic Force Both - (auto_force_rport,auto_comedia)'));
-			$select[] = array('value' => 'auto_force_rport', 'text' => _('Automatic Force rport - (auto_force_rport)'));
-			$select[] = array('value' => 'auto_comedia', 'text' => _('Automatic comedia - (auto_comedia)'));
+			$select[] = array('value' => 'auto_force_rport,auto_comedia', 'text' => sprintf(_('Automatic Force Both - (%s)'),"auto_force_rport,auto_comedia"));
+			$select[] = array('value' => 'auto_force_rport', 'text' => sprintf(_('Automatic Force rport - (%s)'),'auto_force_rport'));
+			$select[] = array('value' => 'auto_comedia', 'text' => sprintf(_('Automatic comedia - (%s)'),'auto_comedia'));
 		}
 
-		$select[] = array('value' => 'never', 'text' => _('never - (no)'));
-		$select[] = array('value' => 'route', 'text' => _('route - (force_rport)'));
+		$select[] = array('value' => 'never', 'text' => sprintf(_('Never - (%s)'),'no'));
+		$select[] = array('value' => 'route', 'text' => sprintf(_('Route - (%s)'),'force_rport'));
 
 		$tt = _("NAT setting, see Asterisk documentation for details. Yes usually works for both internal and external devices. Set to No if the device will always be internal.").'[nat]';
 		$tmparr['nat'] = array('prompttext' => _('NAT Mode'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_NAT'), 'tt' => $tt, 'select' => $select, 'level' => 0);
