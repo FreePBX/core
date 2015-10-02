@@ -5,6 +5,12 @@ $(document).ready(function() {
 			$.cookie('lang', $('#UIDEFAULTLANG').val());
 		}
 	});
+		$(".section").each(function(){
+			if($(this).find('input').length){
+				$(this).removeClass("hidden");
+				$(this).prev('div').removeClass('hidden');
+			}
+		});
 	//On load mark things that are not default
 	$(".defset").each(function(){
 		var current = $(this).data('for');

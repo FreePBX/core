@@ -41,10 +41,10 @@ foreach ($conf as $c){
 	if($c['category'] != $current_category){
 		$current_category = $c['category'];
 		$catid = preg_replace('/\s+/', '', $current_category);
-		$forminputs .= '<div class="section-title" data-for="'.$catid.'">';
+		$forminputs .= '<div class="section-title hidden" data-for="'.$catid.'">';
 		$forminputs .= '<h2><i class="fa fa-minus"></i> '._($current_category).'</h2>';
 		$forminputs .= '</div>';
-		$forminputs .= '<div class="section" data-id="'.$catid.'">';
+		$forminputs .= '<div class="section hidden" data-id="'.$catid.'">';
 	}
 	$type = $c['type'];
 	$iclasses = array('element-container');
