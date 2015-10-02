@@ -15,7 +15,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			?>
 				<script>
 					$(document).ready(function(){
-						$('[name="fw_popover_process"]').val('');
+						$('[name="fw_popover_process"]').val('true');
 						$('<input>').attr({type: 'hidden', name: 'fw_popover'}).val('1').appendTo('.popover-form');
 					});
 				</script>

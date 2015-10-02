@@ -6326,7 +6326,7 @@ function core_users_configprocess() {
 				$this_dest = core_getdest($_REQUEST['extension']);
 				fwmsg::set_dest($this_dest[0]);
 				needreload();
-				redirect_standard_continue();
+				//redirect_standard_continue();
 			} else {
 				// really bad hack - but if core_users_add fails, want to stop core_devices_add
 				// Comment, this does not help everywhere. Other hooks functions can hook before
@@ -6342,12 +6342,12 @@ function core_users_configprocess() {
 				findmefollow_del($extdisplay);
 			}
 			needreload();
-			redirect_standard_continue();
+			//redirect_standard_continue();
 			break;
 			case "edit":
 			if (core_users_edit($extdisplay,$_REQUEST)) {
 				needreload();
-				redirect_standard_continue('extdisplay');
+				//redirect_standard_continue('extdisplay');
 			} else {
 				// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 				$GLOBALS['abort'] = true;
@@ -6590,7 +6590,7 @@ function core_devices_configprocess() {
 			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 				needreload();
 				if ($deviceuser != 'new') {
-					redirect_standard_continue();
+					//redirect_standard_continue();
 				}
 			}
 		} else {
@@ -6603,7 +6603,7 @@ function core_devices_configprocess() {
 		case "del":
 		core_devices_del($extdisplay);
 		needreload();
-		redirect_standard_continue();
+		//redirect_standard_continue();
 		break;
 		case "edit":  //just delete and re-add
 		// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
@@ -6631,7 +6631,7 @@ function core_devices_configprocess() {
 			}
 
 			needreload();
-			redirect_standard_continue('extdisplay');
+			//redirect_standard_continue('extdisplay');
 		}
 		break;
 		case "resetall":  //form a url with this option to nuke the AMPUSER & DEVICE trees and start over.
