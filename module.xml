@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.1RC1.13* FREEPBX-10411 Hide empty categories in advanced settings, FREEPBX-10408 PJSIP Trunk advanced tooltips, other cleanup
+		*13.0.1RC1.13* FREEPBX-10411 Hide empty categories in advanced settings, FREEPBX-10408 PJSIP Trunk advanced tooltips, other cleanup, FREEPBX-10445 Fix array in routing
 		*13.0.1RC1.12* Fix saving of values
 		*13.0.1RC1.11* FREEPBX-100329 Fix validation for outbound routes
 		*13.0.1RC1.10* FREEPBX-10306 Fix trunk order updating in routing. Add toast to reflect success. FREEPBX-10318 attempt to circumvent browser autocomplete circumvention
