@@ -4,7 +4,7 @@ $('.fpbx-submit').submit(function() {
 
 	if (username.value === "") {
 		return warnInvalid(username, _("Username must not be blank"));
-	} else if (!username.value.match('^[a-zA-Z][a-zA-Z0-9]+$')) {
+	} else if (!username.value.match('^[a-zA-Z][a-zA-Z0-9\.]+$')) {
 		return warnInvalid(username, _("Username cannot start with a number, and can only contain letters and numbers"));
 	}
 	return true;
