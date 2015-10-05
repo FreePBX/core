@@ -188,6 +188,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 
 }
 //trunk html
+$trunks = array();
 foreach (core_trunks_listbyid() as $temp) {
 	$trunks[$temp['trunkid']] = $temp['name'];
 	$trunkstate[$temp['trunkid']] = $temp['disabled'];
@@ -225,8 +226,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 
 	$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
 	$trunkhtml .= '<td>';
-			$trunkhtml .= '<div class="input-group">';
-			$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
+	$trunkhtml .= '<div class="input-group">';
+	$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control">';
 	$trunkhtml .= '<option value="" SELECTED></option>';
 	foreach ($trunks as $name=>$display_description) {
