@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1RC1.14</version>
+	<version>13.0.1RC1.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1RC1.15* FREEPBX-10459 Fix maacro-dial-one to evaluate blank dialstrings.
 		*13.0.1RC1.14* FREEPBX-10382 Allow dot in usernames on administrators page.
 		*13.0.1RC1.13* FREEPBX-10411 Hide empty categories in advanced settings, FREEPBX-10408 PJSIP Trunk advanced tooltips, other cleanup, FREEPBX-10445 Fix array in routing
 		*13.0.1RC1.12* Fix saving of values
