@@ -132,12 +132,12 @@ if ($chan_dahdi) {
 // PJSip checks. Instead of just dialling PJSIP/xxx, always reference the function
 // PJSIP_DIAL_CONTACTS with the endpoint id. This may return 'PJSIP/xxx', or it may
 // return any number of strings that will be valid to pass to Dial().
-$ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL:0:5}"!="PJSIP"]', 'doset'));
+$ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL:0:5}"!="PJSIP"]', 'docheck'));
 $ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}, updating with PJSIP_DIAL_CONTACTS'));
 $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${PJSIP_DIAL_CONTACTS(${THISDIAL:6})}'));
 
 // If PJSIP_DIAL_CONTACTS returns nothing, then don't try to add it to the dial string.
-$ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL}"=""]','skipset'));
+$ext->add($mcontext,$exten,'docheck', new ext_gotoif('$["${THISDIAL}"=""]','skipset'));
 
 $ext->add($mcontext,$exten,'doset', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
 $ext->add($mcontext,$exten,'skipset', new ext_set('ITER', '$[${ITER}+1]'));
@@ -200,4 +200,3 @@ foreach (array('s-CHANUNAVAIL', 's-NOANSWER', 's-BUSY') as $exten) {
 	$ext->add($mcontext,$exten,'', new ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
 	$ext->add($mcontext,$exten,'', new ext_return(''));
 }
-
