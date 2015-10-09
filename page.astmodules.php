@@ -5,36 +5,39 @@ $loadrows =
 $noloadrows = '';
 $preloadrows = '';
 if (isset($pc['noload'])) {
-	foreach($pc['noload'] as $mod){
+	$noloads = is_array($pc['noload']) ? $pc['noload'] : array($pc['noload']);
+	foreach($noloads as $mod){
 		$noloadrows .= <<<HERE
 <tr id = "row$mod">
 <td>$mod</td>
 <td>
-	<a href="#" id="del$mod" data-mod="$mod" >
+	<a href="#" id="del$mod" data-mod="$mod">
 	<i class="fa fa-trash-o"></i></a></td>
 </tr>
 HERE;
 	}
 }
 if (isset($pc['load'])) {
-	foreach($pc['load'] as $mod){
+	$loads = is_array($pc['load']) ? $pc['load'] : array($pc['load']);
+	foreach($loads as $mod){
 		$loadrows .= <<<HERE
 <tr id = "row$mod">
 <td>$mod</td>
 <td>
-	<a href="#" id="del$mod" data-mod="$mod" >
+	<a href="#" id="del$mod" data-mod="$mod">
 	<i class="fa fa-trash-o"></i></a></td>
 </tr>
 HERE;
 	}
 }
 if (isset($pc['preload'])) {
-	foreach($pc['preload'] as $mod){
+	$preloads = is_array($pc['preload']) ? $pc['preload'] : array($pc['preload']);
+	foreach($preloads as $mod){
 		$preloadrows .= <<<HERE
 <tr id = "row$mod">
 <td>$mod</td>
 <td>
-	<a href="#" id="del$mod" data-mod="$mod" >
+	<a href="#" id="del$mod" data-mod="$mod">
 	<i class="fa fa-trash-o"></i></a></td>
 </tr>
 HERE;
@@ -131,14 +134,12 @@ HERE;
 						</form>
 					</div>
 				</div>
-				<div class="col-sm-3 hidden-xs bootnav" id='addform'>	
+				<div class="col-sm-3 hidden-xs bootnav" id='addform'>
 					<label class="control-label" for="module"><b><?php echo _("Add Module") ?></b></label>
 					<input type="text" class="form-control" id="module" name="module" value="">
 					<button class="btn btn-default" id="addmodule"><i class="fa fa-plus"></i> <?php echo _("Add")?></button>
-					
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-
