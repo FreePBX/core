@@ -91,6 +91,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "getUserGrid":
 			case "updateRoutes":
 			case "delroute":
+			case "getnpanxxjson":
+			case "populatenpanxx":
 				return true;
 			break;
 		}
@@ -260,6 +262,107 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						}
 						return array_values($dids);
 					break;
+				}
+			break;
+			case 'getnpanxxjson':
+				try {
+					$npa = $_REQUEST['npa'];
+					$nxx = $_REQUEST['nxx'];
+					$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
+					$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
+					$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
+					$xml = new \SimpleXMLElement($data);
+					$pfdata = $xml->xpath('//lca-data/prefix');
+					$retdata = array();
+					foreach($pfdata as $item){
+						$inpa = (string)$item->npa;
+						$inxx = (string)$item->nxx;
+						$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
+					}
+					return $retdata;
+
+				}catch(Pest_NotFound $e){
+					return array('error' => $e);
+				}
+			break;
+			case 'populatenpanxx':
+				$dialpattern_array = $dialpattern_insert;
+				if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
+					// first thing we do is grab the exch:
+					$ch = curl_init();
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
+					curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
+					$str = curl_exec($ch);
+					curl_close($ch);
+
+					// quick 'n dirty - nabbed from PEAR
+					global $amp_conf;
+					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
+					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
+
+					$xml = new xml_unserializer;
+					$xml->unserialize($str);
+					$xmldata = $xml->getUnserializedData();
+
+					$hash_filter = array(); //avoid duplicates
+					if (isset($xmldata['lca-data']['prefix'])) {
+						// we do the loops separately so patterns are grouped together
+
+						// match 1+NPA+NXX (dropping 1)
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
+							}
+							$dialpattern_array[] = array(
+								'prepend_digits' => '',
+								'match_pattern_prefix' => '1',
+								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_cid' => '',
+								);
+						}
+						// match NPA+NXX
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter[$prefix['npa'].$prefix['nxx']] = true;
+							}
+							$dialpattern_array[] = array(
+								'prepend_digits' => '',
+								'match_pattern_prefix' => '',
+								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_cid' => '',
+								);
+						}
+						// match 7-digits
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter[$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter[$prefix['nxx']] = true;
+							}
+								$dialpattern_array[] = array(
+									'prepend_digits' => '',
+									'match_pattern_prefix' => '',
+									'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
+									'match_cid' => '',
+									);
+						}
+						unset($hash_filter);
+					} else {
+						$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
+					}
+				} else {
+					// what a horrible error message... :p
+					$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
+				}
+
+				if (isset($errormsg)) {
+					return array('error' => "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>");
+					unset($errormsg);
 				}
 			break;
 		}

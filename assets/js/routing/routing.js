@@ -132,8 +132,8 @@ $("[id='routinggetlocalprefixes']").click(function(){
 	if ($('#fwdownload').prop('checked')){
 		$.ajax({
 		type: 'POST',
-		url: location.href,
-		data: 'action=getnpanxxjson&npa='+npa+'&nxx='+nxx,
+		url: 'ajax.php',
+		data: 'module=core&command=getnpanxxjson&npa='+npa+'&nxx='+nxx,
 		dataType: 'json',
 		async:false,
 		beforeSend: function(){
