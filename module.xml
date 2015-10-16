@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.1RC1.17</version>
+	<version>13.0.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.2* First stable release
 		*13.0.1RC1.17* FREEPBX-10528 Move dialpattern npa npx lookup to AJAX handler
 		*13.0.1RC1.16* FREEPBX-10484 Fix extension form validation
 		*13.0.1RC1.15* FREEPBX-10459 Fix macro-dial-one to evaluate blank dialstrings.
@@ -91,76 +92,9 @@
 		*13.0.1alpha4* Added load ability for Asterisk Modules
 		*13.0.1alpha3* Hide buttons in grid views on inbound routes and extensions, Adjust sip trunk labels, add confirmation to delete action in trunk grid.
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
-		*12.0.24* Remove old depends
-		*12.0.23* Remove VM call me context and add it to Voicemail
-		*12.0.22* FREEPBX-8625 When saving device in adhoc mode, user gets logout automatically
-		*12.0.21* FREEPBX-8587 subscribed mailboxes not working for pjsip endpoints
-		*12.0.20* Move macro-dialout-one-predial-hook to extensions.conf so it can be overridden
-		*12.0.19* FREEPBX-8453 in a macro cant use return
-		*12.0.18* FREEPBX-3471 Additional special case for Caller ID Number, FREEPBX-8453 macro-dialout-one-predial-hook is not defined
-		*12.0.17* FREEPBX-6754 Star 12 doesnt properly log a user out if queues is not installed
-		*12.0.16* FREEPBX-7384 Add new ring group strategy
-		*12.0.15* Better descriptions for old dialpatterns
-		*12.0.14* FREEPBX-8442 - in certain circumstances show old dial patterns would not work
-		*12.0.13* FREEPBX-8454 - Show dialoutprefix on the trunk page
-		*12.0.12* FREEPBX-8376 Warning - macro-user-callerid - ast_yyerror(): syntax error
-		*12.0.11* FREEPBX-8311 - Regression: emergency_cid not being written to astdb
-		*12.0.10* FREEPBX-8116 Regression: concurrency limit only allows max 2 calls
-		*12.0.9* FREEPBX-8019 missing macro-dialout-dundi-predial-hook at extensions.conf
-		*12.0.8* Allow getting User Info in BMO
-		*12.0.7* Call Recording changes
-		*12.0.6.1* PJSIP DTMF Errors causing endpoints to not be used
-		*12.0.5* FREEPBX-8191 Call Pickup groups not written to config
-		*12.0.4* FREEPBX-8204 trunk definition not deleted in PJSIP
-		*12.0.3* FREEPBX-8212 FREEPBX-8196 fix PJSIP to SIP conversion process
-		*12.0.2* Ensure PJSIP is fully disabled
-		*12.0.1rc7* FREEPBX-8064 - remove duplicate call to implode
-		*12.0.1rc6* Add global db back into deleting admins
-		*12.0.1rc5* FREEPBX-8064 - escape values when adding or deleting adminstrative users, FREEPBX-7899 - get_config from core should be the last one called, as a result moving this to use a priority in module.xml with a high enough priority
-		*12.0.1rc4* Redo module_hook calls to use static obj
-		*12.0.1rc3* Fixes for custom extensions not showing up in edit mode
-		*12.0.1rc2* Move priority of this to the end of everything
-		*12.0.1rc1* Bump core to RC status and localization changes
-		*12.0.1beta11* Move rssfeed setting into core
-		*12.0.1beta10* Check if empty, not if true or false
-		*12.0.1beta9* Generate default device settings function
-		*12.0.1beta8* Fixed javascript bug from 2.11
-		*12.0.1beta7* Remove ProcessHooks, not needed in this construct
-		*12.0.1beta6* Show IAX settings upon edit
-		*12.0.1beta5* Dont expose unsupported settings to pjsip, it gets upset
-		*12.0.1beta4* Allow adding in additional parameters into _additional pjsip files, context problem fixed as well
-		*12.0.1beta3* This fixes an issue were the sip_additional.conf file was filled with duplicate contexts
-		*12.0.1beta2* Let users know what port said device is listening on
-		*12.0.1beta1* Bump to beta
-		*12.0.1alpha27* Remove registrations if there are no registrations (for PJSIP)
-		*12.0.1alpha26* VmX locator dialplan additions
-		*12.0.1alpha25* Added display of new textarea settings type
-		*12.0.1alpha24* Part fix for #6923 language not being set.
-		*12.0.1alpha22* FREEPBX-6914 Add notification if callrecordings is not installed
-		*12.0.1aplha21* Fixed Rare Race Condition
-		*12.0.1alpha20* Refactor Device Management for driver switching fixes
-		*12.0.1alpha19* Use the correct method call
-		*12.0.1alpha18* FREEPBX-7164 add log message to help fail2ban catch dialthrough
-		*12.0.1alpha17* Use Framework new wrapper function for last_id
-		*12.0.1alpha16* Tidy up ancient checks in macro-user-callerid, add minor Device User Mode fix
-		*12.0.1alpha15* Cron Manager changes to allow changes from advanced settings page
-		*12.0.1alpha14* fixes for presence state
-		*12.0.1alpha13* Add option for displaying presence state in connectedline name
-		*12.0.1alpha12* Fix for incorrectly parsed http.conf migration settings
-		*12.0.1alpha11* Monitor Presence on extension hints
-		*12.0.1alpha10* FREEPBX-7077 Allow old style dial patterns for users with 1000s of Dial Patterns
-		*12.0.1alpha9* FREEPBX-7091 Added back ability to edit and add IAX2
-		*12.0.1alpha8* Added Asterisk HTTP Definitions
-		*12.0.1alpha7* Log out logged in user is they are changing the password
-		*12.0.1alpha6* Use PJSIP_DIAL_CONTACTS for PJSIP channels.
-		*12.0.1alpha5* Allow changing of SIP Driver on extensions
-		*12.0.1alpha4* Asterisk module management and fixes
-		*12.0.1alpha3* More work on PJSip in extensions
-		*12.0.1alpha2* Bump Version Number and make release 12 branch
-		*2.12.0alpha1* PJSIP Support
 	</changelog>
 	<depends>
-		<version>13.0.1alpha72</version>
+		<version>13.0.2</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
