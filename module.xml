@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.2</version>
+	<version>13.0.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.3* Use floating rnav style listings
 		*13.0.2* First stable release
 		*13.0.1RC1.17* FREEPBX-10528 Move dialpattern npa npx lookup to AJAX handler
 		*13.0.1RC1.16* FREEPBX-10484 Fix extension form validation
@@ -22,7 +23,7 @@
 		*13.0.1RC1.9* FREEPBX-8340 Allow PJSip trunks with or without reg/auth
 		*13.0.1RC1.8* Fix invalid js selector  and cleanup multiple rows in textarea
 		*13.0.1RC1.7* FREEPBX-10275 Account for bulk pattern box in routing validation.
-		*13.0.1RC1.6* FREEPBX-10227 FREEPBX-10110 Add progress to blackhole destinations that don't answer, FREEPBX-10252 keep atleast one dial pattern row 
+		*13.0.1RC1.6* FREEPBX-10227 FREEPBX-10110 Add progress to blackhole destinations that don't answer, FREEPBX-10252 keep atleast one dial pattern row
 		*13.0.1RC1.5* FREEPBX-10227 in outbound routes as well
 		*13.0.1RC1.4* FREEPBX-10227 show mohclass on refresh
 		*13.0.1RC1.3* FREEPBX-10221 Add outbound dialprefix to dialplan manipulation tab
@@ -94,7 +95,7 @@
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
 	</changelog>
 	<depends>
-		<version>13.0.2</version>
+		<version>13.0.4</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>

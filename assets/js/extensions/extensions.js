@@ -1,4 +1,11 @@
 var deleteExts = [];
+function coreSideTable(value, row, index) {
+	console.log(value);
+	return value;
+}
+$("#table-all-side").on("click-row.bs.table", function(row, $element) {
+	window.location = "?display=extensions&extdisplay="+$element.extension;
+});
 $(".btn-remove").click(function() {
 	var btn = $(this);
 	if(confirm(_("Are you sure you wish to delete these extensions?"))) {

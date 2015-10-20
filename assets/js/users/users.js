@@ -1,4 +1,7 @@
 var deleteExts = [];
+$("#table-all-users-side").on("click-row.bs.table", function(row, $element) {
+	window.location = "?display=users&extdisplay="+$element.extension;
+});
 $(".btn-remove").click(function() {
 	var btn = $(this);
 	if(confirm(_("Are you sure you wish to delete these users?"))) {

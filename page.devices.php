@@ -3,7 +3,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 <div class="fpbx-container container-fluid">
 	<div class="row">
-		<div class="col-sm-9">
+		<div class="col-sm-12">
 			<?php
 			// If this is a popOver, we need to set it so the selection of device type does not result
 			// in the popover closing because config.php thinks it was the process function. Maybe
@@ -97,16 +97,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			} else {
 				echo $currentcomponent->generateconfigpage(__DIR__."/views/devices.php");
 			} ?>
-		</div>
-		<div class="col-sm-3 hidden-xs bootnav">
-			<div class="list-group">
-				<a href="?display=devices<?php echo isset($popover)?$popover:''?>" class="list-group-item"><i class="fa fa-list"></i> <?php echo _('List Devices')?></a>
-				<?php
-					foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {
-						?><a href="?display=devices&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo isset($popover)?$popover:''?>" class="list-group-item"><?php echo sprintf(_("Add New %s Device"), $driver['shortName'])?></a><?php
-					}
-				?>
-			</div>
 		</div>
 	</div>
 </div>

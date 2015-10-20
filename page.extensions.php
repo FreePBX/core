@@ -4,7 +4,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 <div class="fpbx-container container-fluid">
 	<div class="row">
-		<div class="col-sm-9 <?php echo (isset($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) ? "hidden":""?>">
+		<div class="col-sm-12 <?php echo (isset($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) ? "hidden":""?>">
 			<?php
 			// If this is a popOver, we need to set it so the selection of device type does not result
 			// in the popover closing because config.php thinks it was the process function. Maybe
@@ -79,7 +79,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
 								<div id="toolbar-<?php echo $driver['rawName']?>">
-									<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo _('Add')?></a>
+									<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></a>
 									<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
 										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>
@@ -148,18 +148,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			} else {
 				echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php");
 			} ?>
-		</div>
-		<div class="col-sm-3 hidden-xs bootnav <?php echo (isset($_REQUEST['fw_popover']) && (!empty($_REQUEST['tech_hardware']) || !empty($_REQUEST['extdisplay']))) ? "hidden":""?>">
-			<div class="list-group">
-				<?php if (!isset($_REQUEST['fw_popover'])) { ?>
-					<a href="?display=extensions<?php echo $popover?>" class="list-group-item"><i class="fa fa-list"></i> <?php echo _('List Extensions')?></a>
-				<?php } ?>
-				<?php
-					foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {
-						?><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="list-group-item"><?php echo sprintf(_("Add New %s Extension"), $driver['shortName'])?></a><?php
-					}
-				?>
-			</div>
 		</div>
 	</div>
 </div>

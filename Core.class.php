@@ -79,6 +79,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	}
 
+	public function getRightNav($request) {
+		$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
+		return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display']));
+	}
+
 	public function ajaxRequest($req, &$setting) {
 		$setting['authenticate'] = false;
 		$setting['allowremote'] = false;

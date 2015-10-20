@@ -3,7 +3,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 <div class="fpbx-container container-fluid">
 	<div class="row">
-		<div class="col-sm-9">
+		<div class="col-sm-12">
 			<?php
 			// If this is a popOver, we need to set it so the selection of user type does not result
 			// in the popover closing because config.php thinks it was the process function. Maybe
@@ -66,14 +66,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					</div>
 				</div>
 			<?php } ?>
-		</div>
-		<div class="bootnav">
-			<div class="col-sm-3 hidden-xs">
-				<div class="list-group">
-					<a href="?display=users" class="list-group-item"><i class="fa fa-list"></i> <?php echo _("List Users")?></a>
-					<a href="?display=users&amp;view=add" class="list-group-item"><?php echo _("Add User")?></a>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>
