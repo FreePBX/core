@@ -1806,7 +1806,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		if (trim($extension) == '' ) {
 			throw new \Exception(_("You must put in an extension (or user) number"));
 		}
-
 		//ensure this id is not already in use
 		$extens = $this->listUsers();
 		if(is_array($extens)) {
@@ -1911,7 +1910,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$astman = $this->FreePBX->astman;
 		if ($astman->connected()) {
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
-			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
+			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : '');
 			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : 0);
 			$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($settings['concurrency_limit']) ? $settings['concurrency_limit'] : 0);
 			$astman->database_put("AMPUSER",$extension."/noanswer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
@@ -2283,7 +2282,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (!is_numeric($data['extension'])) {
 					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
-
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
 				foreach ($settings as $key => $value) {
 					if (isset($data[$key])) {
@@ -2291,7 +2289,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$settings[$key]['value'] = $data[$key];
 					}
 				}
-
 				try {
 					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
 						return array("status" => false, "message" => _("Device could not be added."));
