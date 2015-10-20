@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.3</version>
+	<version>13.0.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.4* FREEPBX-10496 run needreload when reordering routes
 		*13.0.3* Use floating rnav style listings
 		*13.0.2* First stable release
 		*13.0.1RC1.17* FREEPBX-10528 Move dialpattern npa npx lookup to AJAX handler

@@ -2385,6 +2385,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$seq = ($key+1);
 			$ret[] = $stmt->execute(array($value,$seq));
 		}
+		needreload();
 		return $ret;
 	}
 }
