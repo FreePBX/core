@@ -53,6 +53,14 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 					<div class="tab-content display">
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+									<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+									<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
+										<li><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></strong></a></li>
+									<?php } ?>
+								</ul>
 								<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><i class="fa fa-bolt"></i> <?php echo _("Quick Create Extension");?></button>
 								<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
