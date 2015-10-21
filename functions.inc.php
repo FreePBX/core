@@ -850,6 +850,7 @@ class core_conf {
 		$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
 		$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
 		$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
+		$extens[] = array('destination' => 'app-blackhole,no-service,1', 'description' => _("Play no service message"), 'category' => $category, 'id' => $ds_id);
 
 		//get the list of meetmes
 		$results = core_users_list();
@@ -1000,6 +1001,9 @@ class core_conf {
 		break;
 		case 'ring':
 		$description = 'Play ringtones to caller';
+		break;
+		case 'no-service':
+		$description = 'Play no service message';
 		break;
 		default:
 		$description = false;
@@ -2224,6 +2228,13 @@ function core_do_get_config($engine) {
 	$ext->add('app-blackhole', 'ring', '', new ext_playtones('ring'));
 	$ext->add('app-blackhole', 'ring', '', new ext_wait(300));
 	$ext->add('app-blackhole', 'ring', '', new ext_hangup());
+
+	$ext->add('app-blackhole', 'no-service', '', new ext_noop('Blackhole Dest: No service'));
+	$ext->add('app-blackhole', 'no-service', '', new ext_answer());
+	$ext->add('app-blackhole', 'no-service', '', new ext_wait('1'));
+	$ext->add('app-blackhole', 'no-service', '', new ext_zapateller());
+	$ext->add('app-blackhole', 'no-service', '', new ext_playback('ss-noservice'));
+	$ext->add('app-blackhole', 'no-service', '', new ext_hangup());
 
 	if ($amp_conf['AMPBADNUMBER'] !== false) {
 		$context = 'bad-number';
