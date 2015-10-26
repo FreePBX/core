@@ -3,11 +3,6 @@
 					</form>
 				</div>
 			</div>
-			<div class="col-sm-3 hidden-xs bootnav">
-				<div class="list-group">
-					<a href="config.php?display=trunks" class="list-group-item"><i class="fa fa-list"></i>&nbsp;<?php echo _("Trunk List")?></a>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

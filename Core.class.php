@@ -80,8 +80,21 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function getRightNav($request) {
-		$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
-		return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display']));
+		switch($request['display']){
+			case 'extensions':
+			case 'devices':
+				$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
+				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display']));
+			break;
+			case 'trunks':
+				if(isset($request['tech'])){
+					$html = load_view(__DIR__.'/views/trunks/bootnav.php', array('trunk_types' => \FreePBX::Core()->listTrunkTypes()));
+					return $html;
+				}
+			break;
+			//case 'did':
+			//case 'routing':
+		}
 	}
 
 	public function ajaxRequest($req, &$setting) {
@@ -266,6 +279,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							$dids[$key]['extension'] = urlencode($value['extension']);
 						}
 						return array_values($dids);
+					break;
+					case 'allTrunks':
+						return array_values($this->listTrunks());
 					break;
 				}
 			break;
@@ -1513,7 +1529,31 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		return true;
 	}
-
+	function listTrunks(){
+		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
+		$stmt = $this->database->prepare($sql);
+		$ret  = $stmt->execute();
+		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$trunk_list = array();
+		foreach ($result as $trunk) {
+			if ($trunk['name'] == '') {
+				$tech = strtoupper($trunk['tech']);
+				switch ($tech) {
+					case 'IAX':
+					$trunk['name'] = 'IAX2/'.$trunk['channelid'];
+					break;
+					case 'CUSTOM':
+					$trunk['name'] = 'AMP:'.$trunk['channelid'];
+					break;
+					default:
+					$trunk['name'] = $tech.'/'.$trunk['channelid'];
+					break;
+				}
+			}
+			$trunk_list[$trunk['trunkid']] = $trunk;
+		}
+		return $trunk_list;
+	}
 	/**
 	* Get all the users
 	* @param {bool} $get_all=false Whether to get all of check in the range
@@ -2384,5 +2424,24 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		needreload();
 		return $ret;
+	}
+	public function listTrunkTypes(){
+		$sipdriver = \FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
+		$default_trunk_types = array(
+			"DAHDI" => 'DAHDi',
+			"IAX2" => 'IAX2',
+			"ENUM" => 'ENUM',
+			"DUNDI" => 'DUNDi',
+			"CUSTOM" => 'Custom'
+		);
+
+		$sip = ($sipdriver == 'both' || $sipdriver == 'chan_sip') ? array("SIP" => sprintf(_('SIP (%s)'),'chan_sip')) : array();
+		$pjsip = ($sipdriver == 'both' || $sipdriver == 'chan_pjsip') ? array("PJSIP" => sprintf(_('SIP (%s)'),'chan_pjsip')) : array();
+		$trunk_types = $pjsip+$sip+$default_trunk_types;
+		// Added to enable the unsupported misdn module
+		if (function_exists('misdn_ports_list_trunks') && count(misdn_ports_list_trunks())) {
+			$trunk_types['MISDN'] = 'mISDN';
+		}
+		return $trunk_types;
 	}
 }

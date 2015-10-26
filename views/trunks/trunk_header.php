@@ -208,7 +208,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	<?php echo $pageinfohelp ?>
 	<div class = "display full-border">
 		<div class="row">
-			<div class="col-sm-9">
+			<div class="col-sm-12">
 				<div class="fpbx-container">
 					<form enctype="multipart/form-data" class="fpbx-submit" name="trunkEdit" id="trunkEdit" action="config.php" method="post"  data-fpbx-delete="config.php?display=trunks&amp;extdisplay=<?php echo urlencode($extdisplay) ?>&amp;action=deltrunk">
 						<input type="hidden" name="display" value="<?php echo $display?>"/>
