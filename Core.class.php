@@ -92,7 +92,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					return $html;
 				}
 			break;
-			//case 'did':
+			case 'did':
+				if(isset($request['view'])){
+					$html = load_view(__DIR__.'/views/did/rnav.php');
+					return $html;
+				}
+			break;
 			//case 'routing':
 		}
 	}

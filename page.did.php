@@ -119,14 +119,13 @@ switch($view){
 	<h1><?php echo _('Inbound Routes')?></h1>
 	<div class = "display no-border">
 		<div class="row">
-			<div class="col-sm-<?php echo $mwidth?>">
+			<div class="col-sm-12">
 				<div class="fpbx-container">
 					<div class="display no-border">
 						<?php echo $content ?>
 					</div>
 				</div>
 			</div>
-			<?php echo $bootnav?>
 		</div>
 	</div>
 </div>
