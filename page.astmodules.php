@@ -79,56 +79,56 @@ HERE;
 								</li>
 							</ul>
 								<div class="tab-content display">
-									<div role=tabpanel" id="amodnoload" class="tab-pane active">
-										<div class="table-responsive"> 
-											<div class="col-sm-4">
-											<table class="table table-striped table-bordered" id="modnoload">
+									<div role="tabpanel" id="amodnoload" class="tab-pane active">
+										<table id="modnoload"
+										 data-toggle="table"
+										 data-pagination="true"
+										 data-search="true"
+										 class="table table-striped">
 												<thead>
 													<tr>
-														<th><?php echo _("Module") ?></th>
-														<th><?php echo _("Action") ?></th>
+														<th data-sortable="true"><?php echo _("Module") ?></th>
+														<th class = "col-sm-2"><?php echo _("Action") ?></th>
 													</tr>
 												</thead>
 												<tbody>
 													<?php echo $noloadrows ?>
 												</tbody>
 											</table>
-										</div>
-										</div>
 									</div>
-									<div role=tabpanel" id="amodload" class="tab-pane">
-										<div class="table-responsive">
-											<div class="col-sm-4"> 
-											<table class="table table-striped table-bordered" id="modload">
+									<div role="tabpanel" id="amodload" class="tab-pane">
+												<table id="modload"
+												 data-toggle="table"
+												 data-pagination="true"
+												 data-search="true"
+												 class="table table-striped">
 												<thead>
 													<tr>
-														<th><?php echo _("Module") ?></th>
-														<th><?php echo _("Action") ?></th>
+														<th data-sortable="true"><?php echo _("Module") ?></th>
+														<th class = "col-sm-2"><?php echo _("Action") ?></th>
 													</tr>
 												</thead>
 												<tbody>
 													<?php echo $loadrows ?>
 												</tbody>
 											</table>
-										</div>		
-										</div>		
 									</div>
-									<div role=tabpanel" id="amodpreload" class="tab-pane">
-										<div class="table-responsive">
-											<div class="col-sm-4"> 
-											<table class="table table-striped table-bordered" id="modpreload">
+									<div role="tabpanel" id="amodpreload" class="tab-pane">
+												<table id="modpreload"
+												 data-toggle="table"
+												 data-pagination="true"
+												 data-search="true"
+												 class="table table-striped">
 												<thead>
 													<tr>
-														<th><?php echo _("Module") ?></th>
-														<th><?php echo _("Action") ?></th>
+														<th data-sortable="true"><?php echo _("Module") ?></th>
+														<th class = "col-sm-2"><?php echo _("Action") ?></th>
 													</tr>
 												</thead>
 												<tbody>
 													<?php echo $preloadrows ?>
 												</tbody>
 											</table>
-											</div>
-										</div>	
 									</div>
 								</div>
 						</form>
