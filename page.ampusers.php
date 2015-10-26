@@ -91,22 +91,7 @@ switch ($action) {
 		redirect_standard();
 	break;
 }
-//Generate bootnav
-$bootnav = '';
-if($userdisplay == ''){
-	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item active">' . _("Add User") .'</a>';
-}else{
-	$bootnav .= '<a href="config.php?display=' . urlencode($display) . '" class="list-group-item">' . _("Add User") .'</a>';
-}
-//get existing users
-$tresults = core_ampusers_list();
-foreach ($tresults as $tresult) {
-	if($userdisplay == $tresult[0]){
-		$bootnav .= '<a href="config.php?display=' . urlencode($display) . '&amp;userdisplay=' . urlencode($tresult[0]) . '" class="list-group-item active">' . $tresult[0] .'</a>';
-	}else{
-		$bootnav .= '<a href="config.php?display=' . urlencode($display) . '&amp;userdisplay=' . urlencode($tresult[0]) . '" class="list-group-item">' . $tresult[0] .'</a>';
-	}
-}
+
 if ($userdisplay) {
 	$title =  '<h2>' . _("Edit Administrator") . '</h2>';
 	$user = core_getAmpUser($userdisplay);
@@ -188,7 +173,7 @@ foreach ($module_list as $key => $val) {
 ?>
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-sm-9">
+		<div class="col-sm-12">
 			<?php if(isset($authtypewarn)){ echo $authtypewarn; } ?>
 			<div class="fpbx-container">
 				<?php echo $title ?>
@@ -307,10 +292,18 @@ foreach ($module_list as $key => $val) {
 				</form>
 			</div>
 		</div>
-		<div class="col-sm-3 hidden-xs bootnav">
-			<div class="list-group">
-				<?php echo $bootnav ?>
-			</div>
-		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	//make the boxes the same height
+	$(document).ready(function(){
+		var $boxes = $('ol');
+		var height = 0;
+		$boxes.each(function () {
+  		if ($(this).height() > height) {
+    		height = $(this).height();
+  		}
+		});
+		$boxes.height(height);
+	});
+</script>

@@ -110,6 +110,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					return $html;
 				}
 			break;
+			case 'ampusers':
+				$html = load_view(__DIR__.'/views/ampusers/bootnav.php');
+				return $html;
+			break;
 		}
 	}
 
@@ -304,6 +308,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					break;
 					case 'dahdichannels':
 						return array_values($this->listDahdiChannels());
+					break;
+					case 'ampusers':
+						return array_values($this->listAMPUsers('assoc'));
 					break;
 				}
 			break;
@@ -2462,6 +2469,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		needreload();
 		return $ret;
+	}
+	public function listAMPUsers($datatype = ''){
+		$sql = "SELECT username FROM ampusers ORDER BY username";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute();
+		switch ($datatype) {
+			case 'assoc':
+				return $stmt->fetchall(\PDO::FETCH_ASSOC);
+			break;
+			default:
+				return $stmt->fetchall(\PDO::FETCH_BOTH);
+			break;
+		}
 	}
 	public function listTrunkTypes(){
 		$sipdriver = \FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
