@@ -9,15 +9,12 @@ $helptext = _("DAHDI Channel DIDs allow you to assign a DID to specific DAHDI Ch
 	</div>
 	<div class = "display full-border">
 		<div class="row">
-			<div class="col-sm-9">
+			<div class="col-sm-12">
 				<div class="fpbx-container">
 					<div class="display full-border">
-						<?php echo load_view(__DIR__.'/didForm.php', array('did'=> $did, 'description' => $description, 'channel' => $channel, 'action'	=>	$action))?> 
+						<?php echo load_view(__DIR__.'/didForm.php', array('did'=> $did, 'description' => $description, 'channel' => $channel, 'action'	=>	$action))?>
 					</div>
 				</div>
-			</div>
-			<div class="col-sm-3 hidden-xs bootnav">
-				<?php echo load_view(__DIR__.'/bootnav.php', array('action' => $action))?>
 			</div>
 		</div>
 	</div>

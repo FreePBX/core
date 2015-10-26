@@ -1,4 +1,16 @@
-<div class="list-group">
-	<a href="config.php?display=dahdichandids" class="list-group-item <?php echo (!empty($action) && $action == '')? 'hidden':''?>"><i class="fa fa-list"></i>&nbsp; Dahdi DID List</a>
-	<a href="config.php?display=dahdichandids&amp;view=add" class="list-group-item <?php echo (!empty($action) && $action == 'add')? 'hidden':''?>"><i class = "fa fa-plus"></i>&nbsp;&nbsp;<?php echo _("Add DAHDI DID")?></a>
+<div id="dahdidid-rnav">
+<a href="?display=dahdichandids" class="btn btn-default"><i class="fa fa-list">&nbsp; <?php echo _("List DAHDi DIDs")?></i></a>
+<a href="config.php?display=dahdichandids&amp;view=add" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp; <?php echo _("Add DAHDi DID")?></a>
 </div>
+<table data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=dahdichannels" data-cache="false" data-toggle="table" data-search="true" data-toolbar="#dahdidid-rnav" class="table" id="dahdidid-side">
+    <thead>
+        <tr>
+            <th data-sortable="true" data-formatter="dahdididFormatter" data-field="channel"><?php echo _('DAHDI Channel/DID')?></th>
+        </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+  function dahdididFormatter(v,r){
+    return '<a href="?display=routing&view=add&extdisplay='+r['channel']+'">'+v+'/'+r['did']+'</a>';
+  }
+</script>

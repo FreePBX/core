@@ -104,6 +104,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					return $html;
 				}
 			break;
+			case 'dahdichandids':
+				if(isset($request['view'])){
+					$html = load_view(__DIR__.'/views/dahdichandids/bootnav.php');
+					return $html;
+				}
+			break;
 		}
 	}
 
@@ -295,6 +301,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					break;
 					case 'routingrnav':
 						return array_values($this->getAllRoutes());
+					break;
+					case 'dahdichannels':
+						return array_values($this->listDahdiChannels());
 					break;
 				}
 			break;
@@ -1541,6 +1550,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 
 		return true;
+	}
+	public function listDahdiChannels(){
+		$sql = "SELECT * FROM dahdichandids ORDER BY channel";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute();
+		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		return $results;
 	}
 	function listTrunks(){
 		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
