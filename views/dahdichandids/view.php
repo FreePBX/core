@@ -4,9 +4,7 @@ $helptext = _("DAHDI Channel DIDs allow you to assign a DID to specific DAHDI Ch
 
 <div class="container-fluid">
 	<h1><?php echo _('DAHDI Channel DIDs')?></h1>
-	<div class="well well-info">
-		<?php echo $helptext ?>
-	</div>
+	<?php echo show_help($helptext, _('Module Information'),true)?>
 	<div class = "display full-border">
 		<div class="row">
 			<div class="col-sm-12">
