@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.6</version>
+	<version>13.0.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.7* Slide out menus and cosmetic updates
 		*13.0.6* Combine buttons into a single dropdown button
 		*13.0.5* Add the possibility of terminating the call with the no service message
 		*13.0.4* FREEPBX-10496 run needreload when reordering routes
@@ -98,7 +99,7 @@
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
 	</changelog>
 	<depends>
-		<version>13.0.4</version>
+		<version>13.0.5</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
