@@ -11,6 +11,6 @@
 </table>
 <script type="text/javascript">
   function dahdididFormatter(v,r){
-    return '<a href="?display=routing&view=add&extdisplay='+r['channel']+'">'+v+'/'+r['did']+'</a>';
+    return '<a href="?display=dahdichandids&view=add&extdisplay='+r['channel']+'">'+v+'/'+r['did']+'</a>';
   }
 </script>
