@@ -5483,9 +5483,8 @@ function core_routing_get($route_id) {
 
 // function core_routing_getroutenames()
 function core_routing_list() {
-	$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
-	$routes = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	return $routes;
+	_core_backtrace();
+	return \FreePBX::Core()->getAllRoutes();
 }
 
 // function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)

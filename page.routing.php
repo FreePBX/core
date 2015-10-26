@@ -92,16 +92,11 @@ switch($request['view']){
 	<?php echo $pageinfo?>
 	<div class = "display no-border">
 		<div class="row">
-			<div class="col-sm-<?php echo !isset($_REQUEST['view'])?'12':'9'?>">
+			<div class="col-sm-12">
 				<div class="fpbx-container">
 					<div class = "display no-border">
 						<?php echo $content ?>
 					</div>
-				</div>
-			</div>
-			<div class="col-sm-3 hidden-xs bootnav <?php echo !isset($_REQUEST['view'])?'hidden':''?>">
-				<div class="list-group">
-					<?php echo load_view(__DIR__.'/views/routing/bootnav.php');?>
 				</div>
 			</div>
 		</div>

@@ -98,7 +98,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					return $html;
 				}
 			break;
-			//case 'routing':
+			case 'routing':
+				if(isset($request['view'])){
+					$html = load_view(__DIR__.'/views/routing/bootnav.php');
+					return $html;
+				}
+			break;
 		}
 	}
 
@@ -287,6 +292,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					break;
 					case 'allTrunks':
 						return array_values($this->listTrunks());
+					break;
+					case 'routingrnav':
+						return array_values($this->getAllRoutes());
 					break;
 				}
 			break;
@@ -1695,7 +1703,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		return $results;
 	}
-
+	/**
+	* Get All Routes
+	*/
+	public function getAllRoutes(){
+		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute();
+		$routes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		return $routes;
+	}
 	/**
 	 * Get all Users
 	 */
