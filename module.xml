@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.7</version>
+	<version>13.0.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.8* Clean up some deprecated function calls to reduce noise on large systems
 		*13.0.7* Slide out menus and cosmetic updates
 		*13.0.6* Combine buttons into a single dropdown button
 		*13.0.5* Add the possibility of terminating the call with the no service message
