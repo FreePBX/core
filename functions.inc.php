@@ -106,841 +106,839 @@ class core_conf {
 			return $this->generate_sip_registrations($version);
 			break;
 			case 'sip_notify_additional.conf':
-				return $this->generate_sip_notify_additional($version);
-				break;
-				case 'iax_general_additional.conf':
-				return $this->generate_iax_general_additional($version);
-				break;
-				case 'iax_additional.conf':
-				return $this->generate_iax_additional($version);
-				break;
-				case 'iax_registrations.conf':
-				return $this->generate_iax_registrations($version);
-				break;
-				case 'chan_dahdi_additional.conf':
-				return $this->generate_zapata_additional($version, 'dahdi').$this->generate_zapata_additional($version);
-				break;
-				case 'zapata_additional.conf':
-				return $this->generate_zapata_additional($version);
-				break;
-				case 'features_general_additional.conf':
-				return $this->generate_featuregeneral_additional($version);
-				break;
-				case 'features_applicationmap_additional.conf':
-				return $this->generate_applicationmap_additional($version);
-				break;
-				case 'features_featuremap_additional.conf':
-				return $this->generate_featuremap_additional($version);
-				break;
-				case 'res_odbc_additional.conf':
-				return $this->generate_res_odbc_additional($version);
-				break;
-				case 'http_additional.conf':
-				return $this->generate_http_additional($version);
-				break;
-			}
+			return $this->generate_sip_notify_additional($version);
+			break;
+			case 'iax_general_additional.conf':
+			return $this->generate_iax_general_additional($version);
+			break;
+			case 'iax_additional.conf':
+			return $this->generate_iax_additional($version);
+			break;
+			case 'iax_registrations.conf':
+			return $this->generate_iax_registrations($version);
+			break;
+			case 'chan_dahdi_additional.conf':
+			return $this->generate_zapata_additional($version, 'dahdi').$this->generate_zapata_additional($version);
+			break;
+			case 'zapata_additional.conf':
+			return $this->generate_zapata_additional($version);
+			break;
+			case 'features_general_additional.conf':
+			return $this->generate_featuregeneral_additional($version);
+			break;
+			case 'features_applicationmap_additional.conf':
+			return $this->generate_applicationmap_additional($version);
+			break;
+			case 'features_featuremap_additional.conf':
+			return $this->generate_featuremap_additional($version);
+			break;
+			case 'res_odbc_additional.conf':
+			return $this->generate_res_odbc_additional($version);
+			break;
+			case 'http_additional.conf':
+			return $this->generate_http_additional($version);
+			break;
 		}
+	}
 
-		function addSipNotify($section,$entries) {
-			$this->_sip_notify[] = array('section' => $section, 'entries' => $entries);
-		}
+	function addSipNotify($section,$entries) {
+		$this->_sip_notify[] = array('section' => $section, 'entries' => $entries);
+	}
 
-		function generate_sip_notify_additional($ast_version) {
-			$output = '';
-			if (isset($this->_sip_notify) && is_array($this->_sip_notify)) {
-				foreach ($this->_sip_notify as $section) {
-					$output .= "[".$section['section']."]\n";
-					foreach ($section['entries'] as $key => $value) {
-						if (strtolower($key) == 'content-length') {
-							continue;
-						}
-						$output .= "$key=>$value\n";
-					}
-					$output .= "\n";
-				}
-			}
-			return $output;
-		}
-
-		function addResOdbc($section,$entries) {
-			$this->_res_odbc[$section][] = $entries;
-		}
-
-		function generate_res_odbc_additional($ast_version) {
-			$output = '';
-			if (!empty($this->_res_odbc)) {
-				foreach ($this->_res_odbc as $section => $entries) {
-					$output .= "[".$section."]\n";
-					foreach ($entries as $key => $entry) {
-						foreach ($entry as $key => $value) {
-							$output .= "$key=>$value\n";
-						}
-					}
-					$output .= "\n";
-				}
-			}
-			return $output;
-		}
-
-		function generate_http_additional($ast_version) {
-			$freepbx_conf =& freepbx_conf::create();
-
-			$output = "[general]\n";
-			$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
-			$output .= "enablestatic=".($freepbx_conf->get_conf_setting('HTTPENABLESTATIC') ? 'yes' : 'no')."\n";
-			$output .= "bindaddr=".$freepbx_conf->get_conf_setting('HTTPBINDADDRESS')."\n";
-			$output .= "bindport=".$freepbx_conf->get_conf_setting('HTTPBINDPORT')."\n";
-			$output .= "prefix=".$freepbx_conf->get_conf_setting('HTTPPREFIX')."\n";
-			return $output;
-		}
-
-		function addSipAdditional($section, $key, $value) {
-			$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
-		}
-
-		function addSipGeneral($key, $value) {
-			$this->_sip_general[] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_sip_general_additional($ast_version) {
-			$output = '';
-
-			if (isset($this->_sip_general) && is_array($this->_sip_general)) {
-				foreach ($this->_sip_general as $values) {
-					$output .= $values['key']."=".$values['value']."\n";
-				}
-			}
-			return $output;
-		}
-
-		function addIaxGeneral($key, $value) {
-			$this->_iax_general[] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_iax_general_additional($ast_version) {
-			$output = '';
-
-			if (isset($this->_iax_general) && is_array($this->_iax_general)) {
-				foreach ($this->_iax_general as $values) {
-					$output .= $values['key']."=".$values['value']."\n";
-				}
-			}
-			return $output;
-		}
-
-		function addFeatureGeneral($key, $value) {
-			$this->_featuregeneral[] = array('key' => $key, 'value' => $value);
-		}
-
-		function addFeatureGeneralSection($section, $key, $value) {
-			$this->_featuregeneralsection[$section][] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_featuregeneral_additional($ast_version) {
-			$output = '';
-
-			if (isset($this->_featuregeneral) && is_array($this->_featuregeneral)) {
-				foreach ($this->_featuregeneral as $values) {
-					$output .= $values['key']."=".$values['value']."\n";
-				}
-			}
-			foreach ($this->_featuregeneralsection as $section => $values) {
-				$output .= "\n[$section]\n";
-				foreach ($values as $value) {
-					$output .= $value['key'] . "=" . $value['value'] . "\n";
-				}
-			}
-			return $output;
-		}
-
-		function addFeatureMap($key, $value) {
-			$this->_featuremap[] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_featuremap_additional($ast_version) {
-			$output = '';
-
-			if (isset($this->_featuremap) && is_array($this->_featuremap)) {
-				foreach ($this->_featuremap as $values) {
-					$output .= $values['key']."=".$values['value']."\n";
-				}
-			}
-			return $output;
-		}
-
-		function addApplicationMap($key, $value, $add_to_dynamic_features=false) {
-			global $ext;
-			$this->_applicationmap[] = array('key' => $key, 'value' => $value);
-			//
-			// Now add it to the DYNAMIC_FEATURES
-			// TODO: one caveat, if we ever want to make such an application conditional, we will have to change
-			// this as for now it makes it for everyone.
-			//
-			if ($add_to_dynamic_features) {
-				$ext->_globals['DYNAMIC_FEATURES'] = empty($ext->_globals['DYNAMIC_FEATURES']) ? $key : $ext->_globals['DYNAMIC_FEATURES'] . ',' . $key;
-			}
-		}
-
-		function generate_applicationmap_additional($ast_version) {
-			$output = '';
-
-			if (isset($this->_applicationmap) && is_array($this->_applicationmap)) {
-				foreach ($this->_applicationmap as $values) {
-					$output .= $values['key']."=>".$values['value']."\n";
-				}
-			}
-			return $output;
-		}
-
-		function generate_sip_additional($ast_version) {
-			global $db;
-
-			$table_name = "sip";
-			$additional = "";
-			$finaloutput = "";
-
-			// Asterisk 1.4 requires call-limit be set for hints to work properly
-			//
-			if (version_compare($ast_version, "1.6.1", "ge")) {
-				$call_limit = "callcounter=yes\n";
-				$ver12 = false;
-			} else if (version_compare($ast_version, "1.4", "ge")) {
-				$call_limit = "call-limit=50\n";
-				$ver12 = false;
-			} else {
-				$call_limit = "";
-				$ver12 = true;
-			}
-			if (version_compare($ast_version, "1.6", "ge")) {
-				$faxdetect = "faxdetect=no\n";
-				$ver16 = true;
-			} else {
-				$faxdetect = "";
-				$ver16 = false;
-			}
-			if (version_compare($ast_version, "1.8", "ge")) {
-				$ver18 = true;
-			} else {
-				$ver18 = false;
-			}
-			if (version_compare($ast_version, "10", "ge")) {
-				$ver100 = true;
-			} else {
-				$ver100 = false;
-			}
-			if (version_compare($ast_version, "11.5", "ge")) {
-				$ver115 = true;
-			} else {
-				$ver115 = false;
-			}
-			// TODO: Temporary Kludge until CCSS is fixed
-			//
-			if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
-				$cc_monitor_policy = "cc_monitor_policy=generic\n";
-			} else {
-				$cc_monitor_policy = "";
-			}
-
-			$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-			foreach ($results as $result) {
-				if ($ver12) {
-					$additional .= $result['keyword']."=".$result['data']."\n";
-				} else {
-					$option = $result['data'];
-					switch (strtolower($result['keyword'])) {
-						case 'insecure':
-						if ($option == 'very')
-						$additional .= "insecure=port,invite\n";
-						else if ($option == 'yes')
-						$additional .= "insecure=port\n";
-						else
-						$additional .= $result['keyword']."=$option\n";
-						break;
-						case 'allow':
-						case 'disallow':
-						case 'accountcode':
-						if ($option != '')
-						$additional .= $result['keyword']."=$option\n";
-						break;
-						default:
-						$additional .= $result['keyword']."=$option\n";
-					}
-				}
-			}
-
-			$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-
-			foreach ($results as $result) {
-				$output = "";
-				$account = $result['data'];
-				$id = $result['id'];
-
-				$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
-				$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-				if(DB::IsError($results2_pre)) {
-					die($results2->getMessage());
-				}
-
-				// Move all 'disallow=all' and 'deny' to the top to avoid errors
-				//
-				$results2 = array();
-				foreach ($results2_pre as $element) {
-					if($element['keyword'] == 'sipdriver' && $element['data'] == 'chan_pjsip'){
-						continue(2);
-					}
-					if($element['keyword'] == 'sipdriver'){
+	function generate_sip_notify_additional($ast_version) {
+		$output = '';
+		if (isset($this->_sip_notify) && is_array($this->_sip_notify)) {
+			foreach ($this->_sip_notify as $section) {
+				$output .= "[".$section['section']."]\n";
+				foreach ($section['entries'] as $key => $value) {
+					if (strtolower($key) == 'content-length') {
 						continue;
 					}
-					if (strtolower(trim($element['keyword'])) != 'secret') {
-						$options = explode("&", $element['data']);
-						foreach ($options as $option) {
-							if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
-								array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
-							} else {
-								$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
-							}
-						}
-					} else {
-						$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
-					}
+					$output .= "$key=>$value\n";
 				}
-				unset($results2_pre);
+				$output .= "\n";
+			}
+		}
+		return $output;
+	}
 
-				$output .= "[$account]\n";
-				$context='';
-				foreach ($results2 as $result2) {
-					$option = strtolower($result2['data']);
-					if ($ver12) {
-						switch (strtolower($result2['keyword'])) {
-							case 'context':
-							$context = $option;
-							//fall-through
-							default:
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
-					} else {
-						switch (strtolower($result2['keyword'])) {
-							case 'insecure':
-							if ($option == 'very')
-							$output .= "insecure=port,invite\n";
-							else if ($option == 'yes')
-							$output .= "insecure=port\n";
-							else
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-							break;
-							case 'allow':
-							case 'disallow':
-							case 'accountcode':
-							if ($option != '')
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-							break;
-							case 'callerid':
-							case 'mailbox':
-							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-							break;
-							case 'secret_origional':
-							//stupidness coming through
-							break;
-							case 'username':
-							//http://issues.freepbx.org/browse/FREEPBX-7715
-							if($ver18) {
-								$output .= "defaultuser=".$result2['data']."\n";
-							} else {
-								$output .= "username=".$result2['data']."\n";
-							}
-							break;
-							case 'nat':
-							//http://issues.freepbx.org/browse/FREEPBX-6518
-							if($ver115) {
-								$newval = "";
-								switch($result2['data']) {
-									case 'yes':
-									$newval = "force_rport,comedia";
-									break;
-									case 'route':
-									$newval = "force_rport";
-									break;
-									case 'never':
-									$newval = "no";
-									break;
-									default:
-									$newval = $result2['data'];
-									break;
-								}
-								$output .= $result2['keyword']."=".$newval."\n";
-							} elseif($ver100) {
-								$newval = "";
-								switch($result2['data']) {
-									case 'route':
-									$newval = "force_rport";
-									break;
-									case 'never':
-									$newval = "no";
-									break;
-									default:
-									$newval = $result2['data'];
-									break;
-								}
-								$output .= $result2['keyword']."=".$newval."\n";
-							} elseif($ver18) {
-								$newval = "";
-								switch($result2['data']) {
-									case 'route':
-									$newval = "force_rport";
-									break;
-									case 'never':
-									$newval = "no";
-									break;
-									default:
-									$newval = $result2['data'];
-									break;
-								}
-								$output .= $result2['keyword']."=".$newval."\n";
-							} else {
-								$output .= $result2['keyword']."=".$result2['data']."\n";
-							}
-							break;
-							case 'context':
-							$context = $result2['data'];
-							//fall-through
-							default:
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
+	function addResOdbc($section,$entries) {
+		$this->_res_odbc[$section][] = $entries;
+	}
+
+	function generate_res_odbc_additional($ast_version) {
+		$output = '';
+		if (!empty($this->_res_odbc)) {
+			foreach ($this->_res_odbc as $section => $entries) {
+				$output .= "[".$section."]\n";
+				foreach ($entries as $key => $entry) {
+					foreach ($entry as $key => $value) {
+						$output .= "$key=>$value\n";
 					}
 				}
-				switch (substr($id,0,8)) {
-					case 'tr-peer-':
-					if ($context == '') {
-						$output .= "context=from-trunk-sip-$account\n";
-					}
+				$output .= "\n";
+			}
+		}
+		return $output;
+	}
+
+	function generate_http_additional($ast_version) {
+		$freepbx_conf =& freepbx_conf::create();
+
+		$output = "[general]\n";
+		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
+		$output .= "enablestatic=".($freepbx_conf->get_conf_setting('HTTPENABLESTATIC') ? 'yes' : 'no')."\n";
+		$output .= "bindaddr=".$freepbx_conf->get_conf_setting('HTTPBINDADDRESS')."\n";
+		$output .= "bindport=".$freepbx_conf->get_conf_setting('HTTPBINDPORT')."\n";
+		$output .= "prefix=".$freepbx_conf->get_conf_setting('HTTPPREFIX')."\n";
+		return $output;
+	}
+
+	function addSipAdditional($section, $key, $value) {
+		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	function addSipGeneral($key, $value) {
+		$this->_sip_general[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_sip_general_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_sip_general) && is_array($this->_sip_general)) {
+			foreach ($this->_sip_general as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addIaxGeneral($key, $value) {
+		$this->_iax_general[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_iax_general_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_iax_general) && is_array($this->_iax_general)) {
+			foreach ($this->_iax_general as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addFeatureGeneral($key, $value) {
+		$this->_featuregeneral[] = array('key' => $key, 'value' => $value);
+	}
+
+	function addFeatureGeneralSection($section, $key, $value) {
+		$this->_featuregeneralsection[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_featuregeneral_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_featuregeneral) && is_array($this->_featuregeneral)) {
+			foreach ($this->_featuregeneral as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		foreach ($this->_featuregeneralsection as $section => $values) {
+			$output .= "\n[$section]\n";
+			foreach ($values as $value) {
+				$output .= $value['key'] . "=" . $value['value'] . "\n";
+			}
+		}
+		return $output;
+	}
+
+	function addFeatureMap($key, $value) {
+		$this->_featuremap[] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_featuremap_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_featuremap) && is_array($this->_featuremap)) {
+			foreach ($this->_featuremap as $values) {
+				$output .= $values['key']."=".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function addApplicationMap($key, $value, $add_to_dynamic_features=false) {
+		global $ext;
+		$this->_applicationmap[] = array('key' => $key, 'value' => $value);
+		//
+		// Now add it to the DYNAMIC_FEATURES
+		// TODO: one caveat, if we ever want to make such an application conditional, we will have to change
+		// this as for now it makes it for everyone.
+		//
+		if ($add_to_dynamic_features) {
+			$ext->_globals['DYNAMIC_FEATURES'] = empty($ext->_globals['DYNAMIC_FEATURES']) ? $key : $ext->_globals['DYNAMIC_FEATURES'] . ',' . $key;
+		}
+	}
+
+	function generate_applicationmap_additional($ast_version) {
+		$output = '';
+
+		if (isset($this->_applicationmap) && is_array($this->_applicationmap)) {
+			foreach ($this->_applicationmap as $values) {
+				$output .= $values['key']."=>".$values['value']."\n";
+			}
+		}
+		return $output;
+	}
+
+	function generate_sip_additional($ast_version) {
+		global $db;
+
+		$table_name = "sip";
+		$additional = "";
+		$finaloutput = "";
+
+		// Asterisk 1.4 requires call-limit be set for hints to work properly
+		//
+		if (version_compare($ast_version, "1.6.1", "ge")) {
+			$call_limit = "callcounter=yes\n";
+			$ver12 = false;
+		} else if (version_compare($ast_version, "1.4", "ge")) {
+			$call_limit = "call-limit=50\n";
+			$ver12 = false;
+		} else {
+			$call_limit = "";
+			$ver12 = true;
+		}
+		if (version_compare($ast_version, "1.6", "ge")) {
+			$faxdetect = "faxdetect=no\n";
+			$ver16 = true;
+		} else {
+			$faxdetect = "";
+			$ver16 = false;
+		}
+		if (version_compare($ast_version, "1.8", "ge")) {
+			$ver18 = true;
+		} else {
+			$ver18 = false;
+		}
+		if (version_compare($ast_version, "10", "ge")) {
+			$ver100 = true;
+		} else {
+			$ver100 = false;
+		}
+		if (version_compare($ast_version, "11.5", "ge")) {
+			$ver115 = true;
+		} else {
+			$ver115 = false;
+		}
+		// TODO: Temporary Kludge until CCSS is fixed
+		//
+		if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
+			$cc_monitor_policy = "cc_monitor_policy=generic\n";
+		} else {
+			$cc_monitor_policy = "";
+		}
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+		foreach ($results as $result) {
+			if ($ver12) {
+				$additional .= $result['keyword']."=".$result['data']."\n";
+			} else {
+				$option = $result['data'];
+				switch (strtolower($result['keyword'])) {
+					case 'insecure':
+					if ($option == 'very')
+					$additional .= "insecure=port,invite\n";
+					else if ($option == 'yes')
+					$additional .= "insecure=port\n";
+					else
+					$additional .= $result['keyword']."=$option\n";
 					break;
-					case 'tr-user-':
-					if ($context == '') {
-						$tn = substr($id, 8);
-						// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
-						// trunk so we can set the context appropriately for the group count
-						//
-						$td = core_trunks_getDetails($tn);
-						if (isset($td['channelid'])) {
-							$output .= "context=from-trunk-sip-".$td['channelid']."\n";
-						}
-					}
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+					if ($option != '')
+					$additional .= $result['keyword']."=$option\n";
 					break;
 					default:
-					if ($call_limit) {
-						$output .= $call_limit;
-					}
-					if ($faxdetect) {
-						$output .= $faxdetect;
-					}
-					if ($cc_monitor_policy) {
-						$output .= $cc_monitor_policy;
-					}
+					$additional .= $result['keyword']."=$option\n";
 				}
-				if (isset($this->_sip_additional[$account])) {
-					foreach ($this->_sip_additional[$account] as $asetting) {
-						$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
-					}
+			}
+		}
+
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$output = "";
+			$account = $result['data'];
+			$id = $result['id'];
+
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
+			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2_pre)) {
+				die($results2->getMessage());
+			}
+
+			// Move all 'disallow=all' and 'deny' to the top to avoid errors
+			//
+			$results2 = array();
+			foreach ($results2_pre as $element) {
+				if($element['keyword'] == 'sipdriver' && $element['data'] == 'chan_pjsip'){
+					continue(2);
 				}
-				$output .= $additional."\n";
-				$finaloutput .= $output;
-			}
-			return $finaloutput;
-		}
-
-		function generate_sip_registrations($ast_version) {
-			global $db;
-
-			$table_name = "sip";
-			$output = "";
-
-			$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-
-			foreach ($results as $result) {
-				$output .= $result['keyword']."=".$result['data']."\n";
-			}
-
-			return $output;
-		}
-
-		function addIaxAdditional($section, $key, $value) {
-			$this->_iax_additional[$section][] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_iax_additional($ast_version) {
-			global $db;
-
-			$table_name = "iax";
-			$additional = "";
-			$output = "";
-
-			$ver12 = version_compare($ast_version, '1.4', 'lt');
-
-			$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-			foreach ($results as $result) {
-				if ($ver12) {
-					$additional .= $result['keyword']."=".$result['data']."\n";
-				} else {
-					$option = $result['data'];
-					switch ($result['keyword']) {
-						case 'notransfer':
-						if (strtolower($option) == 'yes') {
-							$additional .= "transfer=no\n";
-						} else if (strtolower($option) == 'no') {
-							$additional .= "transfer=yes\n";
-						} else if (strtolower($option) == 'mediaonly') {
-							$additional .= "transfer=mediaonly\n";
+				if($element['keyword'] == 'sipdriver'){
+					continue;
+				}
+				if (strtolower(trim($element['keyword'])) != 'secret') {
+					$options = explode("&", $element['data']);
+					foreach ($options as $option) {
+						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
+							array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
 						} else {
-							$additional .= $result['keyword']."=$option\n";
+							$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
 						}
+					}
+				} else {
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
+				}
+			}
+			unset($results2_pre);
+
+			$output .= "[$account]\n";
+			$context='';
+			foreach ($results2 as $result2) {
+				$option = strtolower($result2['data']);
+				if ($ver12) {
+					switch (strtolower($result2['keyword'])) {
+						case 'context':
+						$context = $option;
+						//fall-through
+						default:
+						$output .= $result2['keyword']."=".$result2['data']."\n";
+					}
+				} else {
+					switch (strtolower($result2['keyword'])) {
+						case 'insecure':
+						if ($option == 'very')
+						$output .= "insecure=port,invite\n";
+						else if ($option == 'yes')
+						$output .= "insecure=port\n";
+						else
+						$output .= $result2['keyword']."=".$result2['data']."\n";
 						break;
 						case 'allow':
 						case 'disallow':
 						case 'accountcode':
 						if ($option != '')
-						$additional .= $result['keyword']."=$option\n";
-						break;
-						case 'requirecalltoken':
-						if ($option != '')
-						$additional .= $result['keyword']."=$option\n";
-						break;
-						default:
-						$additional .= $result['keyword']."=$option\n";
-					}
-				}
-			}
-
-			$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-
-			foreach ($results as $result) {
-				$account = $result['data'];
-				$id = $result['id'];
-				$output .= "[$account]\n";
-
-				$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
-				$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-				if(DB::IsError($results2_pre)) {
-					die($results2_pre->getMessage());
-				}
-
-				// Move all 'disallow=all' and 'deny=' to the top to avoid errors
-				//
-				$results2 = array();
-				foreach ($results2_pre as $element) {
-					if (strtolower(trim($element['keyword'])) != 'secret') {
-						$options = explode("&", $element['data']);
-						foreach ($options as $option) {
-							if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
-								array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
-							} else {
-								$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
-							}
-						}
-					} else {
-						$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
-					}
-				}
-				unset($results2_pre);
-
-				$context='';
-				foreach ($results2 as $result2) {
-					$option = strtolower($result2['data']);
-					if ($ver12) {
-						switch (strtolower($result2['keyword'])) {
-							case 'context':
-							$context = $result2['data'];
-							//fall-through
-							default:
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
-					} else {
-						switch ($result2['keyword']) {
-							case 'notransfer':
-							if (strtolower($option) == 'yes') {
-								$output .= "transfer=no\n";
-							} else if (strtolower($option) == 'no') {
-								$output .= "transfer=yes\n";
-							} else if (strtolower($option) == 'mediaonly') {
-								$output .= "transfer=mediaonly\n";
-							} else {
-								$output .= $result2['keyword']."=".$result2['data']."\n";
-							}
-							break;
-							case 'allow':
-							case 'disallow':
-							case 'accountcode':
-							if ($option != '')
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-							break;
-							case 'requirecalltoken':
-							if ($option != '')
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-							break;
-							case 'callerid':
-							case 'mailbox':
-							$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-							break;
-							case 'context':
-							$context = $option;
-							//fall-through
-							default:
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
-					}
-				}
-				switch (substr($id,0,8)) {
-					case 'tr-peer-':
-					if ($context == '') {
-						$output .= "context=from-trunk-iax2-$account\n";
-					}
-					break;
-					case 'tr-user-':
-					if ($context == '') {
-						$tn = substr($id, 8);
-						// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
-						// trunk so we can set the context appropriately for the group count
-						//
-						$td = core_trunks_getDetails($tn);
-						if (isset($td['channelid'])) {
-							$output .= "context=from-trunk-iax2-".$td['channelid']."\n";
-						}
-					}
-					break;
-					default:
-				}
-				if (isset($this->_iax_additional[$account])) {
-					foreach ($this->_iax_additional[$account] as $asetting) {
-						$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
-					}
-				}
-				$output .= $additional."\n";
-			}
-			return $output;
-		}
-
-		function generate_iax_registrations($ast_version) {
-			global $db;
-
-			$table_name = "iax";
-			$output = "";
-
-			$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-
-			foreach ($results as $result) {
-				$output .= $result['keyword']."=".$result['data']."\n";
-			}
-
-			return $output;
-		}
-
-		function addDahdiAdditional($section, $key, $value) {
-			$this->_dahdi_additional[$section][] = array('key' => $key, 'value' => $value);
-		}
-
-		function generate_zapata_additional($ast_version, $table_name = 'zap') {
-			global $db;
-
-			$additional = "";
-			$output = '';
-
-			$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				if($table_name == 'zap') {
-					return '';
-				} else {
-					die($results->getMessage());
-				}
-			}
-			foreach ($results as $result) {
-				$additional .= $result['keyword']."=".$result['data']."\n";
-			}
-
-			$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
-			$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-			if(DB::IsError($results)) {
-				die($results->getMessage());
-			}
-
-			foreach ($results as $result) {
-				$account = $result['data'];
-				$id = $result['id'];
-				$output .= ";;;;;;[$account]\n";
-
-				$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
-				$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-				if(DB::IsError($results2)) {
-					die($results2->getMessage());
-				}
-				$zapchannel="";
-				foreach ($results2 as $result2) {
-					switch ($result2['keyword']) {
-						case 'channel':
-						$zapchannel = $result2['data'];
-						break;
-
-						// These are not zapata.conf variables so keep out of file
-						case 'dial':
+						$output .= $result2['keyword']."=".$result2['data']."\n";
 						break;
 						case 'callerid':
 						case 'mailbox':
 						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
 						break;
+						case 'secret_origional':
+						//stupidness coming through
+						break;
+						case 'username':
+						//http://issues.freepbx.org/browse/FREEPBX-7715
+						if($ver18) {
+							$output .= "defaultuser=".$result2['data']."\n";
+						} else {
+							$output .= "username=".$result2['data']."\n";
+						}
+						break;
+						case 'nat':
+						//http://issues.freepbx.org/browse/FREEPBX-6518
+						if($ver115) {
+							$newval = "";
+							switch($result2['data']) {
+								case 'yes':
+								$newval = "force_rport,comedia";
+								break;
+								case 'route':
+								$newval = "force_rport";
+								break;
+								case 'never':
+								$newval = "no";
+								break;
+								default:
+								$newval = $result2['data'];
+								break;
+							}
+							$output .= $result2['keyword']."=".$newval."\n";
+						} elseif($ver100) {
+							$newval = "";
+							switch($result2['data']) {
+								case 'route':
+								$newval = "force_rport";
+								break;
+								case 'never':
+								$newval = "no";
+								break;
+								default:
+								$newval = $result2['data'];
+								break;
+							}
+							$output .= $result2['keyword']."=".$newval."\n";
+						} elseif($ver18) {
+							$newval = "";
+							switch($result2['data']) {
+								case 'route':
+								$newval = "force_rport";
+								break;
+								case 'never':
+								$newval = "no";
+								break;
+								default:
+								$newval = $result2['data'];
+								break;
+							}
+							$output .= $result2['keyword']."=".$newval."\n";
+						} else {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+						break;
+						case 'context':
+						$context = $result2['data'];
+						//fall-through
 						default:
 						$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
 				}
-				if (isset($this->_dahdi_additional[$account])) {
-					foreach ($this->_dahdi_additional[$account] as $asetting) {
-						$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+			}
+			switch (substr($id,0,8)) {
+				case 'tr-peer-':
+				if ($context == '') {
+					$output .= "context=from-trunk-sip-$account\n";
+				}
+				break;
+				case 'tr-user-':
+				if ($context == '') {
+					$tn = substr($id, 8);
+					// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
+					// trunk so we can set the context appropriately for the group count
+					//
+					$td = core_trunks_getDetails($tn);
+					if (isset($td['channelid'])) {
+						$output .= "context=from-trunk-sip-".$td['channelid']."\n";
 					}
 				}
-				$output .= $additional ? $additional."\n" : '';
-				$output .= "channel=>$zapchannel\n";
-			}
-			return $output;
-		}
-	}
-
-	function core_destination_popovers() {
-		global $amp_conf;
-		if ($amp_conf['AMPEXTENSIONS'] == "deviceanduser") {
-			$ret['users'] = 'Users';
-		} else {
-			$ret['extensions'] = 'Extensions';
-		}
-		return $ret;
-	}
-
-	// The destinations this module provides
-	// returns a associative arrays with keys 'destination' and 'description'
-	function core_destinations() {
-		global $amp_conf;
-		//static destinations
-		$extens = array();
-		$category = _("Terminate Call");
-		$ds_id = 'blackhole';
-		$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
-		$extens[] = array('destination' => 'app-blackhole,no-service,1', 'description' => _("Play no service message"), 'category' => $category, 'id' => $ds_id);
-
-		//get the list of meetmes
-		$results = core_users_list();
-
-		if (isset($results) && function_exists('voicemail_getVoicemail')) {
-			//get voicemail
-			$uservm = voicemail_getVoicemail();
-			$vmcontexts = array_keys($uservm);
-			foreach ($results as $thisext) {
-				$extnum = $thisext[0];
-				// search vm contexts for this extensions mailbox
-				foreach ($vmcontexts as $vmcontext) {
-					if(isset($uservm[$vmcontext][$extnum])){
-						//$vmname = $uservm[$vmcontext][$extnum]['name'];
-						//$vmboxes[$extnum] = array($extnum, '"' . $vmname . '" <' . $extnum . '>');
-						$vmboxes[$extnum] = true;
-					}
-				}
-			}
-		}
-
-		// return an associative array with destination and description
-		// core provides both users and voicemail boxes as destinations
-		if (isset($results)) {
-			$cat_id = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-			$cat    = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'Users':'Extensions';
-			foreach($results as $result) {
-				$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' <'.$result['0'].'> '.$result['1'], 'category' => $cat, 'id' => $cat_id);
-				if(isset($vmboxes[$result['0']])) {
-					$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail', 'id' => 'voicemail');
-					$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail', 'id' => 'voicemail');
-					$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail', 'id' => 'voicemail');
-					$extens[] = array('destination' => 'ext-local,vmi'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (instructions-only)', 'category' => 'Voicemail', 'id' => 'voicemail');
-				}
-			}
-		}
-
-		$trunklist = core_trunks_listbyid();
-		if (is_array($trunklist)) foreach ($trunklist as $trunk) {
-			switch($trunk['tech']) {
-				case 'enum':
 				break;
 				default:
-				$extens[] = array('destination' => 'ext-trunk,'.$trunk['trunkid'].',1', 'description' => $trunk['name'].' ('.$trunk['tech'].')', 'category' => 'Trunks', 'id' => 'trunks');
-				break;
+				if ($call_limit) {
+					$output .= $call_limit;
+				}
+				if ($faxdetect) {
+					$output .= $faxdetect;
+				}
+				if ($cc_monitor_policy) {
+					$output .= $cc_monitor_policy;
+				}
+			}
+			if (isset($this->_sip_additional[$account])) {
+				foreach ($this->_sip_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
+			$output .= $additional."\n";
+			$finaloutput .= $output;
+		}
+		return $finaloutput;
+	}
+
+	function generate_sip_registrations($ast_version) {
+		global $db;
+
+		$table_name = "sip";
+		$output = "";
+
+		$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$output .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		return $output;
+	}
+
+	function addIaxAdditional($section, $key, $value) {
+		$this->_iax_additional[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_iax_additional($ast_version) {
+		global $db;
+
+		$table_name = "iax";
+		$additional = "";
+		$output = "";
+
+		$ver12 = version_compare($ast_version, '1.4', 'lt');
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+		foreach ($results as $result) {
+			if ($ver12) {
+				$additional .= $result['keyword']."=".$result['data']."\n";
+			} else {
+				$option = $result['data'];
+				switch ($result['keyword']) {
+					case 'notransfer':
+					if (strtolower($option) == 'yes') {
+						$additional .= "transfer=no\n";
+					} else if (strtolower($option) == 'no') {
+						$additional .= "transfer=yes\n";
+					} else if (strtolower($option) == 'mediaonly') {
+						$additional .= "transfer=mediaonly\n";
+					} else {
+						$additional .= $result['keyword']."=$option\n";
+					}
+					break;
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+					if ($option != '')
+					$additional .= $result['keyword']."=$option\n";
+					break;
+					case 'requirecalltoken':
+					if ($option != '')
+					$additional .= $result['keyword']."=$option\n";
+					break;
+					default:
+					$additional .= $result['keyword']."=$option\n";
+				}
 			}
 		}
 
-		return $extens;
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$account = $result['data'];
+			$id = $result['id'];
+			$output .= "[$account]\n";
+
+			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
+			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2_pre)) {
+				die($results2_pre->getMessage());
+			}
+
+			// Move all 'disallow=all' and 'deny=' to the top to avoid errors
+			//
+			$results2 = array();
+			foreach ($results2_pre as $element) {
+				if (strtolower(trim($element['keyword'])) != 'secret') {
+					$options = explode("&", $element['data']);
+					foreach ($options as $option) {
+						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
+							array_unshift($results2,array('keyword'=>$element['keyword'],'data'=>$option));
+						} else {
+							$results2[] = array('keyword'=>$element['keyword'],'data'=>$option);
+						}
+					}
+				} else {
+					$results2[] = array('keyword'=>$element['keyword'],'data'=>str_replace(';','\;',$element['data']));
+				}
+			}
+			unset($results2_pre);
+
+			$context='';
+			foreach ($results2 as $result2) {
+				$option = strtolower($result2['data']);
+				if ($ver12) {
+					switch (strtolower($result2['keyword'])) {
+						case 'context':
+						$context = $result2['data'];
+						//fall-through
+						default:
+						$output .= $result2['keyword']."=".$result2['data']."\n";
+					}
+				} else {
+					switch ($result2['keyword']) {
+						case 'notransfer':
+						if (strtolower($option) == 'yes') {
+							$output .= "transfer=no\n";
+						} else if (strtolower($option) == 'no') {
+							$output .= "transfer=yes\n";
+						} else if (strtolower($option) == 'mediaonly') {
+							$output .= "transfer=mediaonly\n";
+						} else {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+						break;
+						case 'allow':
+						case 'disallow':
+						case 'accountcode':
+						if ($option != '')
+						$output .= $result2['keyword']."=".$result2['data']."\n";
+						break;
+						case 'requirecalltoken':
+						if ($option != '')
+						$output .= $result2['keyword']."=".$result2['data']."\n";
+						break;
+						case 'callerid':
+						case 'mailbox':
+						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+						break;
+						case 'context':
+						$context = $option;
+						//fall-through
+						default:
+						$output .= $result2['keyword']."=".$result2['data']."\n";
+					}
+				}
+			}
+			switch (substr($id,0,8)) {
+				case 'tr-peer-':
+				if ($context == '') {
+					$output .= "context=from-trunk-iax2-$account\n";
+				}
+				break;
+				case 'tr-user-':
+				if ($context == '') {
+					$tn = substr($id, 8);
+					// this is a 'user' trunk, we need to get the name of the corresponding 'peer'
+					// trunk so we can set the context appropriately for the group count
+					//
+					$td = core_trunks_getDetails($tn);
+					if (isset($td['channelid'])) {
+						$output .= "context=from-trunk-iax2-".$td['channelid']."\n";
+					}
+				}
+				break;
+				default:
+			}
+			if (isset($this->_iax_additional[$account])) {
+				foreach ($this->_iax_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
+			$output .= $additional."\n";
+		}
+		return $output;
 	}
 
-	function core_getdest($exten) {
-		$dests[] = 'from-did-direct,'.$exten.',1';
-		$dests[] = 'ext-trunk,'.$exten.',1';
-		if (!function_exists('voicemail_mailbox_get')) {
-			return $dests;
-		}
-		$box = voicemail_mailbox_get($exten);
-		if ($box == null) {
-			return $dests;
-		}
-		$dests[] = 'ext-local,vmb'.$exten.',1';
-		$dests[] = 'ext-local,vmu'.$exten.',1';
-		$dests[] = 'ext-local,vms'.$exten.',1';
-		$dests[] = 'ext-local,vmi'.$exten.',1';
+	function generate_iax_registrations($ast_version) {
+		global $db;
 
+		$table_name = "iax";
+		$output = "";
+
+		$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$output .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		return $output;
+	}
+
+	function addDahdiAdditional($section, $key, $value) {
+		$this->_dahdi_additional[$section][] = array('key' => $key, 'value' => $value);
+	}
+
+	function generate_zapata_additional($ast_version, $table_name = 'zap') {
+		global $db;
+
+		$additional = "";
+		$output = '';
+
+		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			if($table_name == 'zap') {
+				return '';
+			} else {
+				die($results->getMessage());
+			}
+		}
+		foreach ($results as $result) {
+			$additional .= $result['keyword']."=".$result['data']."\n";
+		}
+
+		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+		if(DB::IsError($results)) {
+			die($results->getMessage());
+		}
+
+		foreach ($results as $result) {
+			$account = $result['data'];
+			$id = $result['id'];
+			$output .= ";;;;;;[$account]\n";
+
+			$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
+			if(DB::IsError($results2)) {
+				die($results2->getMessage());
+			}
+			$zapchannel="";
+			foreach ($results2 as $result2) {
+				switch ($result2['keyword']) {
+					case 'channel':
+					$zapchannel = $result2['data'];
+					break;
+
+					// These are not zapata.conf variables so keep out of file
+					case 'dial':
+					break;
+					case 'callerid':
+					case 'mailbox':
+					$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+					break;
+					default:
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+				}
+			}
+			if (isset($this->_dahdi_additional[$account])) {
+				foreach ($this->_dahdi_additional[$account] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+			}
+			$output .= $additional ? $additional."\n" : '';
+			$output .= "channel=>$zapchannel\n";
+		}
+		return $output;
+	}
+}
+
+function core_destination_popovers() {
+	global $amp_conf;
+	if ($amp_conf['AMPEXTENSIONS'] == "deviceanduser") {
+		$ret['users'] = 'Users';
+	} else {
+		$ret['extensions'] = 'Extensions';
+	}
+	return $ret;
+}
+
+// The destinations this module provides
+// returns a associative arrays with keys 'destination' and 'description'
+function core_destinations() {
+	global $amp_conf;
+	//static destinations
+	$extens = array();
+	$category = _("Terminate Call");
+	$ds_id = 'blackhole';
+	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'category' => $category, 'id' => $ds_id);
+	$extens[] = array('destination' => 'app-blackhole,no-service,1', 'description' => _("Play no service message"), 'category' => $category, 'id' => $ds_id);
+
+	//get the list of meetmes
+	$results = core_users_list();
+
+	if (isset($results) && function_exists('voicemail_getVoicemail')) {
+		//get voicemail
+		$uservm = voicemail_getVoicemail();
+		$vmcontexts = array_keys($uservm);
+		foreach ($results as $thisext) {
+			$extnum = $thisext[0];
+			// search vm contexts for this extensions mailbox
+			foreach ($vmcontexts as $vmcontext) {
+				if(isset($uservm[$vmcontext][$extnum])){
+					//$vmname = $uservm[$vmcontext][$extnum]['name'];
+					//$vmboxes[$extnum] = array($extnum, '"' . $vmname . '" <' . $extnum . '>');
+					$vmboxes[$extnum] = true;
+				}
+			}
+		}
+	}
+
+	// return an associative array with destination and description
+	// core provides both users and voicemail boxes as destinations
+	if (isset($results)) {
+		$cat_id = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+		$cat    = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'Users':'Extensions';
+		foreach($results as $result) {
+			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' <'.$result['0'].'> '.$result['1'], 'category' => $cat, 'id' => $cat_id);
+			if(isset($vmboxes[$result['0']])) {
+				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (busy)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (unavail)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (no-msg)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmi'.$result['0'].',1', 'description' => '<'.$result[0].'> '.$result[1].' (instructions-only)', 'category' => 'Voicemail', 'id' => 'voicemail');
+			}
+		}
+	}
+
+	$trunklist = core_trunks_listbyid();
+	if (is_array($trunklist)) foreach ($trunklist as $trunk) {
+		switch($trunk['tech']) {
+			case 'enum':
+			break;
+			default:
+			$extens[] = array('destination' => 'ext-trunk,'.$trunk['trunkid'].',1', 'description' => $trunk['name'].' ('.$trunk['tech'].')', 'category' => 'Trunks', 'id' => 'trunks');
+			break;
+		}
+	}
+
+	return $extens;
+}
+
+function core_getdest($exten) {
+	$dests[] = 'from-did-direct,'.$exten.',1';
+	$dests[] = 'ext-trunk,'.$exten.',1';
+	if (!function_exists('voicemail_mailbox_get')) {
 		return $dests;
 	}
+	$box = voicemail_mailbox_get($exten);
+	if ($box == null) {
+		return $dests;
+	}
+	$dests[] = 'ext-local,vmb'.$exten.',1';
+	$dests[] = 'ext-local,vmu'.$exten.',1';
+	$dests[] = 'ext-local,vms'.$exten.',1';
+	$dests[] = 'ext-local,vmi'.$exten.',1';
 
-	function core_getdestinfo($dest) {
-		global $amp_conf;
-		global $active_modules;
+	return $dests;
+}
 
-		// Check for Extension Number Destinations
-		//
-		if (substr(trim($dest),0,16) == 'from-did-direct,') {
-			$exten = explode(',',$dest);
-			$exten = $exten[1];
-			$thisexten = \FreePBX::Core()->getUser($exten);
-			if (empty($thisexten)) {
-				return array();
-			} else {
-				//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
-				$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-				return array('description' => sprintf(_("User Extension %s: %s"),$exten,$thisexten['name']),
-				'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
-			);
+function core_getdestinfo($dest) {
+	global $amp_conf;
+	global $active_modules;
+
+	// Check for Extension Number Destinations
+	//
+	$users = \FreePBX::Core()->getAllUsers();
+	if (substr(trim($dest),0,16) == 'from-did-direct,') {
+		$exten = explode(',',$dest);
+		$exten = $exten[1];
+		$key = array_search($exten, array_column($users, 'extension'));
+		if ($key === false || empty($users[$key])) {
+			return array();
+		} else {
+			//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
+			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$thisexten['name']),
+			'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 		}
-
-
 	} else if (substr(trim($dest),0,10) == 'ext-trunk,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
@@ -951,76 +949,70 @@ class core_conf {
 			$display = 'trunks';
 			$name = isset($thisexten['name']) && $thisexten['name'] ? $thisexten['name'] : '';
 			return array('description' => sprintf(_('Trunk: %s (%s)'),$name,$thisexten['tech']),
-			'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten),
-		);
-
-	}
+			'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten));
+		}
 
 	// Check for voicemail box destinations
 	//
-} else if (substr(trim($dest),0,12) == 'ext-local,vm') {
-	$exten = explode(',',$dest);
-	$exten = substr($exten[1],3);
-	if (!function_exists('voicemail_mailbox_get')) {
-		return array();
-	}
-	$thisexten = \FreePBX::Core()->getUser($exten);
-	if (empty($thisexten)) {
-		return array();
-	}
-	$box = voicemail_mailbox_get($exten);
-	if ($box == null) {
-		return array();
-	}
-	$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-	return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
-	'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
-);
+	} else if (substr(trim($dest),0,12) == 'ext-local,vm') {
+		$exten = explode(',',$dest);
+		$exten = substr($exten[1],3);
+		if (!function_exists('voicemail_mailbox_get')) {
+			return array();
+		}
+		$key = array_search($exten, array_column($users, 'extension'));
+		if ($key === false || empty($users[$key])) {
+			return array();
+		}
+		$box = voicemail_mailbox_get($exten);
+		if ($box == null) {
+			return array();
+		}
+		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
+		return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
+		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 
-// Check for blackhole Termination Destinations
-//
-} else if (substr(trim($dest),0,14) == 'app-blackhole,') {
-	$exten = explode(',',$dest);
-	$exten = $exten[1];
+	// Check for blackhole Termination Destinations
+	//
+	} else if (substr(trim($dest),0,14) == 'app-blackhole,') {
+		$exten = explode(',',$dest);
+		$exten = $exten[1];
 
-	switch ($exten) {
-		case 'hangup':
-		$description = 'Hangup';
-		break;
-		case 'congestion':
-		$description = 'Congestion';
-		break;
-		case 'busy':
-		$description = 'Busy';
-		break;
-		case 'zapateller':
-		$description = 'Play SIT Tone (Zapateller)';
-		break;
-		case 'musiconhold':
-		$description = 'Put caller on hold forever';
-		break;
-		case 'ring':
-		$description = 'Play ringtones to caller';
-		break;
-		case 'no-service':
-		$description = 'Play no service message';
-		break;
-		default:
-		$description = false;
+		switch ($exten) {
+			case 'hangup':
+			$description = 'Hangup';
+			break;
+			case 'congestion':
+			$description = 'Congestion';
+			break;
+			case 'busy':
+			$description = 'Busy';
+			break;
+			case 'zapateller':
+			$description = 'Play SIT Tone (Zapateller)';
+			break;
+			case 'musiconhold':
+			$description = 'Put caller on hold forever';
+			break;
+			case 'ring':
+			$description = 'Play ringtones to caller';
+			break;
+			case 'no-service':
+			$description = 'Play no service message';
+			break;
+			default:
+			$description = false;
+		}
+		if ($description) {
+			return array('description' => 'Core: '.$description,
+			'edit_url' => false);
+		} else {
+			return array();
+		}
+	// None of the above, so not one of ours
+	} else {
+		return false;
 	}
-	if ($description) {
-		return array('description' => 'Core: '.$description,
-		'edit_url' => false,
-	);
-} else {
-	return array();
-}
-
-// None of the above, so not one of ours
-//
-} else {
-	return false;
-}
 }
 /* 	Generates dialplan for "core" components (extensions & inbound routing)
 We call this with retrieve_conf
