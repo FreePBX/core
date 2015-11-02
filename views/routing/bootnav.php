@@ -6,12 +6,12 @@
 <table data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=routingrnav" data-cache="false" data-toggle="table" data-search="true" data-toolbar="#routing-rnav" class="table" id="table-all-side">
     <thead>
         <tr>
-            <th data-sortable="true" data-formatter="routingFormatter" data-field="name"><?php echo _('Route')?></th>
+            <th data-sortable="true" data-field="name"><?php echo _('Route')?></th>
         </tr>
     </thead>
 </table>
 <script type="text/javascript">
-  function routingFormatter(v,r){
-    return '<a href="?display=routing&view=form&id='+r['route_id']+'">'+v+'</a>';
-  }
+  $("#table-all-side").on('click-row.bs.table',function(e,row,elem){
+    window.location = '?display=routing&view=form&id='+row['route_id'];
+  })
 </script>

@@ -22,5 +22,10 @@
 	</thead>
 </table>
 <script>
-	function rtrunk(v,r){return '<a href="?display=trunks&tech='+r['tech']+'&extdisplay=OUT_'+r['trunkid']+'">'+r['name']+'&nbsp;('+r['tech']+')</a>';}
+	function rtrunk(v,r){
+    return r['name']+'&nbsp;('+r['tech']+')';
+  }
+  $("#table-all-side").on('click-row.bs.table',function(e,row,elem){
+    window.location = '?display=trunks&tech='+row['tech']+'&extdisplay=OUT_'+row['trunkid'];
+  })
 </script>
