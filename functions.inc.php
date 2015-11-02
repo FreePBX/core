@@ -929,7 +929,7 @@ class core_conf {
 		if (substr(trim($dest),0,16) == 'from-did-direct,') {
 			$exten = explode(',',$dest);
 			$exten = $exten[1];
-			$thisexten = core_users_get($exten);
+			$thisexten = \FreePBX::Core()->getUser($exten);
 			if (empty($thisexten)) {
 				return array();
 			} else {
@@ -964,7 +964,7 @@ class core_conf {
 	if (!function_exists('voicemail_mailbox_get')) {
 		return array();
 	}
-	$thisexten = core_users_get($exten);
+	$thisexten = \FreePBX::Core()->getUser($exten);
 	if (empty($thisexten)) {
 		return array();
 	}
@@ -1460,7 +1460,7 @@ function core_do_get_config($engine) {
 		$ext->add('ext-did', 'foo','', new ext_noop('bar'));
 
 		/* inbound routing extensions */
-		$didlist = core_did_list();
+		$didlist = \FreePBX::Core()->getAllDIDs();
 		if(is_array($didlist)){
 			$catchall = false;
 			$catchall_context='ext-did-catchall';
@@ -1651,7 +1651,7 @@ function core_do_get_config($engine) {
 		$userlist = core_users_list();
 		if (is_array($userlist)) {
 			foreach($userlist as $item) {
-				$exten = core_users_get($item[0]);
+				$exten = \FreePBX::Core()->getUser($item[0]);
 				$vm = ((($exten['voicemail'] == "novm") || ($exten['voicemail'] == "disabled") || ($exten['voicemail'] == "")) ? "novm" : $exten['extension']);
 
 				$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($["${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}" > "0"]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
@@ -2084,7 +2084,7 @@ function core_do_get_config($engine) {
 	$ext->addInclude('from-internal-additional','outbound-allroutes');
 	//$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
 	$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
-	$routes = core_routing_list();
+	$routes = \FreePBX::Core()->getAllRoutes();
 	$trunk_table = core_trunks_listbyid();
 	$trunk_type_needed = array(); // track which macros need to be generated
 	$delim = $ast_lt_16 ? '|' : ',';
@@ -4101,7 +4101,7 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 	// if did or cid changed, then check to make sure that this pair is not already being used.
 	//
 	if (($extension != $old_extension) || ($cidnum != $old_cidnum)) {
-		$existing=core_did_get($extension,$cidnum);
+		$existing=\FreePBX::Core()->getDID($extension,$cidnum);
 	}
 
 	if (empty($existing)) {
@@ -4119,7 +4119,7 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 function core_did_create_update($did_vars) {
 	$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
 	$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
-	$coredid = core_did_get($did_create['extension'], $did_create['cidnum']);
+	$coredid = \FreePBX::Core()->getDID($did_create['extension'], $did_create['cidnum']);
 	if (!empty($coredid) && count($coredid)) {
 		return core_did_edit_properties($did_vars); //already exists so just edit properties
 	} else {
@@ -4193,7 +4193,7 @@ function core_did_add($incoming,$target=false){
 
 	// Check to make sure the did is not being used elsewhere
 	//
-	$existing=core_did_get($extension,$cidnum);
+	$existing=\FreePBX::Core()->getDID($extension,$cidnum);
 	if (empty($existing)) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
 		$invalidDIDChars = array('<','>');
@@ -4467,7 +4467,7 @@ function core_devices2astdb(){
 
 
 			// create a voicemail symlink if needed
-			$thisUser = core_users_get($user);
+			$thisUser = \FreePBX::Core()->getUser($user);
 			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 				if(empty($thisUser['voicemail']))
 				$vmcontext = "default";
@@ -4759,7 +4759,7 @@ function core_users_edit($extension, $vars){
 
 	// Well more ugliness since the javascripts are already in here
 	if ($newdid != '' || $newdidcid != '') {
-		$existing = core_did_get($newdid, $newdidcid);
+		$existing = \FreePBX::Core()->getDID($newdid, $newdidcid);
 		if (! empty($existing)) {
 			echo "<script>javascript:alert('".sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum'])."')</script>";
 			return false;
@@ -4768,7 +4768,7 @@ function core_users_edit($extension, $vars){
 
 	//delete and re-add
 	if (core_sipname_check($vars['sipname'],$extension)) {
-		core_users_del($extension, true);
+		\FreePBX::Core()->delUser($extension, true);
 		core_users_add($vars, true);
 
 		// If the vmcontext has changed, we need to change all the links. In extension mode, the link
@@ -6056,7 +6056,7 @@ function core_users_configpageload() {
 		if ( is_string($extdisplay) ) {
 
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-				$extenInfo=core_users_get($extdisplay);
+				$extenInfo=\FreePBX::Core()->getUser($extdisplay);
 				extract($extenInfo);
 			}
 			if (isset($deviceInfo) && is_array($deviceInfo)) {
@@ -6235,7 +6235,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4, null, $category);
 		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous, Withheld and Unavailable in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4, null, $category);
 
-		$dids = core_did_list('extension');
+		$dids = \FreePBX::Core()->getAllDIDs('extension');
 		$did_count = 0;
 		foreach ($dids as $did) {
 			$did_dest = preg_split('/,/',$did['destination']);
@@ -6346,7 +6346,7 @@ function core_users_configprocess() {
 			}
 			break;
 			case "del":
-			core_users_del($extdisplay);
+			\FreePBX::Core()->delUser($extdisplay);
 			core_users_cleanastdb($extdisplay);
 			if (function_exists('findmefollow_del')) {
 				findmefollow_del($extdisplay);
