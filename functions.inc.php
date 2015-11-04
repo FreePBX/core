@@ -3839,6 +3839,13 @@ function core_do_get_config($engine) {
 	$exten = '_s-.';
 	$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting ${EXTEN}'));
 
+	/*
+		Originate a call but skip voicemail if the device does not answer
+	 */
+	$mcontext = 'originate-skipvm';
+	$ext->add($mcontext,'_.X','', new ext_macro('blkvm-set'));
+	$ext->add($mcontext,'_.X','', new ext_goto('1', '${EXTEN}', 'from-internal'));
+
 	/* macro-simple-dial */
 
 
