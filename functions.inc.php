@@ -934,9 +934,8 @@ function core_getdestinfo($dest) {
 		if ($key === false || empty($users[$key])) {
 			return array();
 		} else {
-			//$type = isset($active_modules['announcement']['type'])?$active_modules['announcement']['type']:'setup';
 			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$thisexten['name']),
+			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$key['name']),
 			'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 		}
 	} else if (substr(trim($dest),0,10) == 'ext-trunk,') {
@@ -969,7 +968,7 @@ function core_getdestinfo($dest) {
 			return array();
 		}
 		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-		return array('description' => 'User Extension '.$exten.': '.$thisexten['name'],
+		return array('description' => 'User Extension '.$exten.': '.$key['name'],
 		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 
 	// Check for blackhole Termination Destinations
