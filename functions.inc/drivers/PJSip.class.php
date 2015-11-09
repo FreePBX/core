@@ -91,15 +91,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"trustrpid" => array(
-				"value" => "yes",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
 			"sendpid" => array(
-				"value" => "no",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
 			"qualifyfreq" => array(
-				"value" => "60",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_QUALIFYFREQ'),
 				"flag" => $flag++
 			),
 			"transport" => array(
@@ -115,19 +115,19 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"callgroup" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
 			"pickupgroup" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_DISALLOW'),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_ALLOW'),
 				"flag" => $flag++
 			),
 			"accountcode" => array(
