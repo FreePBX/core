@@ -576,6 +576,116 @@ $codechtml .= '</ul>';
 				</div>
 			</div>
 		</div><!--MATCH-->
+		<!--Support T.38 UDPTL-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="t38_udptl"><?php echo _("Support T.38 UDPTL") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl"></i>
+							</div>
+							<div class="col-md-9 radioset">
+		            <input type="radio" name="t38_udptl" id="t38_udptlyes" value="yes" <?php echo ($t38_udptl == "yes"?"CHECKED":"") ?>>
+		            <label for="t38_udptlyes"><?php echo _("Yes");?></label>
+		            <input type="radio" name="t38_udptl" id="t38_udptlno" value="no" <?php echo ($t38_udptl == "yes"?"":"CHECKED") ?>>
+		            <label for="t38_udptlno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="t38_udptl-help" class="help-block fpbx-help-block"><?php echo _("Whether T.38 UDPTL support is enabled or not")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Support T.38 UDPTL-->
+		<!--T.38 UDPTL Error Correction-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="t38_udptl_ec"><?php echo _("T.38 UDPTL Error Correction") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_ec"></i>
+							</div>
+							<div class="col-md-9 radioset">
+		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo ($t38_udptl_ec == "none"?"CHECKED":"") ?>>
+		            <label for="t38_udptl_ecnone"><?php echo _("None");?></label>
+		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ($t38_udptl_ec == "fec"?"CHECKED":"") ?>>
+		            <label for="t38_udptl_ecfec"><?php echo _("Forward");?></label>
+		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecred" value="redundancy" <?php echo ($t38_udptl_ec == "redundancy"?"CHECKED":"") ?>>
+		            <label for="t38_udptl_ecred"><?php echo _("Redundancy");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="t38_udptl_ec-help" class="help-block fpbx-help-block"><?php echo _("T.38 UDPTL error correction method")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END T.38 UDPTL Error Correction-->
+		<!--T.38 UDPTL NAT-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="t38_udptl_nat"><?php echo _("T.38 UDPTL NAT") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_nat"></i>
+							</div>
+							<div class="col-md-9 radioset">
+		            <input type="radio" name="t38_udptl_nat" id="t38_udptl_natyes" value="yes" <?php echo ($t38_udptl_nat == "yes"?"CHECKED":"") ?>>
+		            <label for="t38_udptl_natyes"><?php echo _("Yes");?></label>
+		            <input type="radio" name="t38_udptl_nat" id="t38_udptl_natno" value = "no" <?php echo ($t38_udptl_nat == "yes"?"":"CHECKED") ?>>
+		            <label for="t38_udptl_natno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="t38_udptl_nat-help" class="help-block fpbx-help-block"><?php echo _("Whether NAT support is enabled on UDPTL sessions")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END T.38 UDPTL NAT-->
+		<!--Fax Detect-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="fax_detect"><?php echo _("Fax Detect") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="fax_detect"></i>
+							</div>
+							<div class="col-md-9 radioset">
+		            <input type="radio" name="fax_detect" id="fax_detectyes" value="yes" <?php echo ($fax_detect == "yes"?"CHECKED":"") ?>>
+		            <label for="fax_detectyes"><?php echo _("Yes");?></label>
+		            <input type="radio" name="fax_detect" id="fax_detectno" value="no" <?php echo ($fax_detect == "yes"?"":"CHECKED") ?>>
+		            <label for="fax_detectno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="fax_detect-help" class="help-block fpbx-help-block"><?php echo _("This option can be set to send the session to the fax extension when a CNG tone is detected.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Fax Detect-->
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
 		<br/>

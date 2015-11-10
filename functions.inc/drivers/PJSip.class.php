@@ -421,6 +421,24 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					&& $trunk['dtmfmode'] != 'none' ) {
 					$trunk['dtmfmode'] = "rtc4733";
 				}
+				//FREEPBX-10666
+				//yes,no
+				if(!empty($trunk['t38_udptl'])){
+					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl'] = $trunk['t38_udptl'];
+				}
+				//none, fec, redundancy
+				if(!empty($trunk['t38_udptl_ec'])){
+					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_ec'] = $trunk['t38_udptl_ec'];
+				}
+				//yes,no
+				if(!empty($trunk['fax_detect'])){
+					$conf['pjsip.endpoint.conf'][$tn]['fax_detect'] = $trunk['fax_detect'];
+				}
+				//yes,no
+				if(!empty($trunk['t38_udptl_nat'])){
+					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
+				}
+				
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
 
