@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.10</version>
+	<version>13.0.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.11* FREEPBX-10569 
 		*13.0.10* FREEPBX-10666, FREEPBX-10691, FREEPBX-10628, FREEPBX-10627
 		*13.0.9* Speed up inbound routes ten fold.
 		*13.0.8* Clean up some deprecated function calls to reduce noise on large systems
