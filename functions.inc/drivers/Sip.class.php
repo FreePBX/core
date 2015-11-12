@@ -33,7 +33,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"canreinvite" => array(
-				"value" => "no",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_CANREINVITE'),
 				"flag" => $flag++
 			),
 			"host" => array(
@@ -41,11 +41,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"trustpid" => array(
-				"value" => "yes",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
 			"sendpid" => array(
-				"value" => "no",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
 			"type" => array(
@@ -53,7 +53,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"nat" => array(
-				"value" => "no",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_NAT'),
 				"flag" => $flag++
 			),
 			"port" => array(
@@ -61,11 +61,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"qualify" => array(
-				"value" => "yes",
+				"value" => \FreePBX::Config()->get('DEVICE_QUALIFY'),
 				"flag" => $flag++
 			),
 			"qualifyfreq" => array(
-				"value" => "60",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_QUALIFYFREQ'),
 				"flag" => $flag++
 			),
 			"transport" => array(
@@ -85,23 +85,23 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"encryption" => array(
-				"value" => "no",
+				"value" => \FreePBX::Config()->get('DEVICE_SIP_ENCRYPTION'),
 				"flag" => $flag++
 			),
 			"callgroup" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
 			"pickupgroup" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_DISALLOW'),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => "",
+				"value" => \FreePBX::Config()->get('DEVICE_ALLOW'),
 				"flag" => $flag++
 			),
 			"accountcode" => array(

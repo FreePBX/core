@@ -15,7 +15,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->config = $freepbx->Config;
 		$this->freepbx = $freepbx;
 		$this->astman = $freepbx->astman;
-
 		//load drivers
 		$this->loadDrivers();
 	}
@@ -121,6 +120,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$setting['authenticate'] = false;
 		$setting['allowremote'] = false;
 		switch($req) {
+			case "delastmodule":
+			case "addastmodule":
 			case "quickcreate":
 			case "delete":
 			case "getJSON":
@@ -139,6 +140,36 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function ajaxHandler() {
 		switch($_REQUEST['command']) {
+			case "addastmodule":
+				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
+				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				switch($section){
+					case 'amodload':
+						return $this->ModulesConf->load($module);
+					break;
+					case 'amodnoload':
+						return $this->ModulesConf->noload($module);
+					break;
+					case 'amodpreload':
+						return $this->ModulesConf->preload($module);
+					break;
+				}
+			break;
+			case "delastmodule":
+				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
+				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				switch($section){
+					case 'amodload':
+						return $this->ModulesConf->removeload($module);
+					break;
+					case 'amodnoload':
+						return $this->ModulesConf->removenoload($module);
+					break;
+					case 'amodpreload':
+						return $this->ModulesConf->removepreload($module);
+					break;
+				}
+			break;
 			case "delroute":
 				if (!function_exists('core_routing_delbyid')) {
 					if (file_exists(__DIR__."/functions.inc.php")) {

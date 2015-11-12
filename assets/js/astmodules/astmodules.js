@@ -15,38 +15,29 @@ $("#addmodule").click(function(){
 			section: currentTab,
 			module: modName
 		},
-		function(data,status){			
+		function(data,status){
 			location.reload();
 		});
-	
+
 });
-$('[id^="del"]').on('click', function(){
+$(document).ready(function(){
+$('[id^="del"]').on('click', function(e){
+  e.preventDefault();
 	var currentTab = $("ul li.active").data('name');
 	var modName = $(this).data('mod');
-		$.get("config.php?display=astmodules",
+  var row = $(this).closest('tr');
+  console.log(currentTab);
+		$.get("ajax.php?module=core",
 		{
-			action: 'del',
+			command: 'delastmodule',
 			section: currentTab,
-			module: modName
+			astmod: modName
 		},
-		function(data,status){			
-			location.reload();
+		function(data,status){
+      if(data){
+        row.remove();
+        fpbxToast(_('Modules updated'));
+      }
 		});
-	
 });
-$(document).on('show.bs.tab', 'a[data-toggle="tab"]', function (e) {
-    var clicked = $(this).attr('href');
-    switch(clicked){
-		case '#amodload':
-			$("#addform").addClass('hidden');
-		break;
-		case '#amodnoload':
-			$("#addform").removeClass('hidden');
-		break;
-		case '#amodpreload':
-			$("#addform").removeClass('hidden');
-		break;
-		default:
-		break;
-	}
-})
+});
