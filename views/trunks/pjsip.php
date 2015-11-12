@@ -614,7 +614,7 @@ $codechtml .= '</ul>';
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_ec"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo ($t38_udptl_ec == "none"?"CHECKED":"") ?>>
+		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo (!isset($t38_udptl_ec) || $t38_udptl_ec == "none" || $t38_udptl_ec == "" ?"CHECKED":"") ?>>
 		            <label for="t38_udptl_ecnone"><?php echo _("None");?></label>
 		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ($t38_udptl_ec == "fec"?"CHECKED":"") ?>>
 		            <label for="t38_udptl_ecfec"><?php echo _("Forward");?></label>
