@@ -74,7 +74,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 										<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
 										<th data-formatter="CWIconFormatter"><?php echo _('CW')?></th>
 										<th data-formatter="DNDIconFormatter"><?php echo _('DND')?></th>
-										<th data-formatter="FMFMIconFormatter"><?php echo _('FMFM')?></th>
+										<th data-formatter="FMFMIconFormatter"><?php echo _('FM/FM')?></th>
 										<th data-formatter="CFIconFormatter"><?php echo _('CF')?></th>
 										<th data-formatter="CFBIconFormatter"><?php echo _('CFB')?></th>
 										<th data-formatter="CFUIconFormatter"><?php echo _('CFU')?></th>
