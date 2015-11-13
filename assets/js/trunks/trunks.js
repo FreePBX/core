@@ -55,10 +55,6 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 		data: 'module=core&command=getnpanxxjson&npa='+npa+'&nxx='+nxx,
 		dataType: 'json',
 		async:false,
-		beforeSend: function(){
-			$('#dpwizard').modal('hide');
-			$('#dploading').modal('show');
-		},
 		success: function(data) {
 			$.each(data,function(){
 				var npa = this.npa;
@@ -75,7 +71,7 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 			});
 		},
 		error: function(){
-			$('#dploading').html('<h1>Something went wrong with the download</h1>');
+			fpbxToast(_('Something went wrong with the download'));
 		}
 	});
 	}else{
@@ -178,7 +174,7 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 	if($('#bulk_patterns').length){
 		$('#bulk_patterns').val(patterns.join("\r\n"));
 	}
-	$('#dploading').modal('hide');
+	$('#dpwizard').modal('hide');
 });
 
 //Duplicate button

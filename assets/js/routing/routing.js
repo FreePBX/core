@@ -138,7 +138,6 @@ $("[id='routinggetlocalprefixes']").click(function(){
 		async:false,
 		beforeSend: function(){
 			$('#dpwizard').modal('hide');
-			$('#dploading').modal('show');
 		},
 		success: function(data) {
 			$.each(data,function(){
@@ -156,7 +155,7 @@ $("[id='routinggetlocalprefixes']").click(function(){
 			});
 		},
 		error: function(){
-			$('#dploading').html('<h1>Something went wrong with the download</h1>');
+			fpbxToast(_('Something went wrong with the download'));
 		}
 	});
 	}else{
@@ -259,7 +258,7 @@ $("[id='routinggetlocalprefixes']").click(function(){
 	if($('#bulk_patterns').length){
 		$('#bulk_patterns').val(patterns.join("\r\n"));
 	}
-	$('#dploading').modal('hide');
+	$('#dpwizard').modal('hide');
 });
 //tab specifics
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
