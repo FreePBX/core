@@ -1557,6 +1557,7 @@ function core_do_get_config($engine) {
 				if (!empty($item['alertinfo'])) {
 					$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
 				}
+				$ext->add($context,$exten,'did-cid-hook', new ext_noop('CallerID Entry Point'));
 				if (!empty($item['grppre'])) {
 					$ext->add($context, $exten, '', new ext_macro('prepend-cid', $item['grppre']));
 				}
