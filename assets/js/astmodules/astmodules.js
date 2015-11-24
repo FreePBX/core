@@ -20,7 +20,7 @@ $("#addmodule").click(function(){
 		});
 
 });
-$(document).ready(function(){
+$("#modnoload,#modpreload,#modload").on('post-body.bs.table',function(){
 $('[id^="del"]').on('click', function(e){
   e.preventDefault();
 	var currentTab = $("ul li.active").data('name');
