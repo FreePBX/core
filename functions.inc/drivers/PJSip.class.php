@@ -438,7 +438,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
-				
+
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
 
@@ -581,7 +581,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (isset($this->TransportConfigCache)) {
 			return $this->TransportConfigCache;
 		}
-
+		$transport = array();
 		//TODO: move this to \FreePBX::Sipsettings()->getBinds();
 		//Calling the config directly will return an array or false.
 		$binds = $this->freepbx->Sipsettings->getConfig("binds");
