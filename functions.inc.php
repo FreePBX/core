@@ -6141,9 +6141,8 @@ function core_trunks_getDetails($trunkid='') {
 	global $astman;
 
 	if ($trunkid != '') {
-		$sql = "SELECT * FROM `trunks` WHERE `trunkid` = '$trunkid'";
-		$trunk = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
-
+		$sql = "SELECT * FROM `trunks` WHERE `trunkid` = ?";
+		$trunk = $db->getRow($sql,array($trunkid),DB_FETCHMODE_ASSOC);
 		$tech = strtolower($trunk['tech']);
 		switch ($tech) {
 			case 'iax2':
