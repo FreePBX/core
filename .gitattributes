@@ -1,3 +1,5 @@
 amp_conf/htdocs/admin/assets/js/pbxlib.js	merge=ours
 module.xml	merge=ours
 *.po	merge=merge-gettext-po
+*.pot merge=merge-gettext-po
+*.mo merge=ours
