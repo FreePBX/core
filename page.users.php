@@ -45,6 +45,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 								<button id="remove-user" class="btn btn-danger btn-remove" data-type="users" disabled>
 									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
+								<a href="?display=users&view=add" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp;<?php echo _("Add User")?></a>
 							</div>
 							<table data-url="ajax.php?module=core&amp;command=getUserGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-users" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-users">
 								<thead>
