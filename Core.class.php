@@ -1107,6 +1107,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 					needreload();
 				break;
+				case "delroute":
+					if (!function_exists('core_routing_delbyid')) {
+						if (file_exists(__DIR__."/functions.inc.php")) {
+							include __DIR__."/functions.inc.php";
+						}
+					}
+					$ret = core_routing_delbyid($_REQUEST['id']);
+					// re-order the routes to make sure that there are no skipped numbers.
+					// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
+					// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
+					// so we are left with 001-test1, 002-test3
+					needreload();
+					return $ret;
+				break;
 				case "updatetrunks":
 					$ret = core_routing_updatetrunks($extdisplay, $trunkpriority, true);
 					header("Content-type: application/json");
