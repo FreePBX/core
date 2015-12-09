@@ -484,7 +484,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<br/>
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
-				<a href="#" class="list-group-item" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp; <?php echo _("Dial patterns wizards")?></i></a>
+				<br/>
+				<a href="#" class="btn btn-default btn-block" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp; <?php echo _("Dial patterns wizards")?></i></a>
+				<br/><br/>
 				<table class="table table-striped" id="dptable">
 				<?php echo $dprows ?>
 				</table>
