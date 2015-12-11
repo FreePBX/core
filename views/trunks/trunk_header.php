@@ -94,7 +94,7 @@ if($amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpmrhtml .= '<strong>+</strong>&nbsp;&nbsp;&nbsp;' . _("adds a dialing prefix from the number (for example, 1613+NXXXXXX would match when some dialed \"5551234\" and would pass \"16135551234\" to the trunk)").'<br /><br />';
 	$dpmrhtml .= _("You can also use both + and |, for example: 01+0|1ZXXXXXXXXX would match \"016065551234\" and dial it as \"0116065551234\" Note that the order does not matter, eg. 0|01+1ZXXXXXXXXX does the same thing.");
 }
-$dpmrhtml .= '<a href="#" class="list-group-item" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp;'. _("Dial patterns wizards").'</i></a>';
+$dpmrhtml .= '<br/><a href="#" class="btn btn-default btn-block" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp;'. _("Dial patterns wizards").'</i></a><br/><br/>';
 
 $pp_tit = _("prepend");
 $pf_tit = _("prefix");
