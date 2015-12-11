@@ -76,6 +76,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	}
 
 	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		$dtmf = $this->freepbx->Config->get('DEVICE_SIP_DTMF');
+		if($dtmf == "rfc2833") {
+			$dtmf = "rfc4733";
+		}
 		$dial = 'PJSIP';
 		$settings  = array(
 			"sipdriver" => array(
@@ -83,23 +87,23 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"secret" => array(
-				"value" => \FreePBX::Core()->generateSecret(),
+				"value" => $this->freepbx->Core()->generateSecret(),
 				"flag" => $flag++
 			),
 			"dtmfmode" => array(
-				"value" => "rfc4733",
+				"value" => $dtmf,
 				"flag" => $flag++
 			),
 			"trustrpid" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_TRUSTRPID'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
 			"sendpid" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_SENDRPID'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
 			"qualifyfreq" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_QUALIFYFREQ'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_QUALIFYFREQ'),
 				"flag" => $flag++
 			),
 			"transport" => array(
@@ -115,19 +119,19 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"callgroup" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_CALLGROUP'),
+				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
 			"pickupgroup" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_PICKUPGROUP'),
+				"value" => $this->freepbx->Config->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_DISALLOW'),
+				"value" => $this->freepbx->Config->get('DEVICE_DISALLOW'),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_ALLOW'),
+				"value" => $this->freepbx->Config->get('DEVICE_ALLOW'),
 				"flag" => $flag++
 			),
 			"accountcode" => array(
@@ -417,8 +421,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 			if(!empty($trunk['dtmfmode'])) {
 				// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
-				if ($trunk['dtmfmode'] != "rfc4733" && $trunk['dtmfmode'] != 'inband' && $trunk['dtmfmode'] != 'info'
-					&& $trunk['dtmfmode'] != 'none' ) {
+				$validdtmf = array("rfc4733","inband","info");
+				if(version_compare($this->version,'13','ge')) {
+					$validdtmf[] = "auto";
+				}
+				if (!in_array($trunk['dtmfmode'],$validdtmf)) {
 					$trunk['dtmfmode'] = "rtc4733";
 				}
 				//FREEPBX-10666
@@ -722,8 +729,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
 		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
-		if ($config['dtmfmode'] != "rfc4733" && $config['dtmfmode'] != 'inband' && $config['dtmfmode'] != 'info'
-			&& $config['dtmfmode'] != 'none' ) {
+		$validdtmf = array("rfc4733","inband","info");
+		if(version_compare($this->version,'13','ge')) {
+			$validdtmf[] = "auto";
+		}
+		if (!in_array($trunk['dtmfmode'],$validdtmf)) {
 			$config['dtmfmode'] = "rtc4733";
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
@@ -889,12 +899,20 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		//   accountcode, callgroup,
 
 		// DTMF Mode has changed.
-		if ($config['dtmfmode'] == "rfc2833")
+		if ($config['dtmfmode'] == "rfc2833") {
 			$config['dtmfmode'] = "rfc4733";
+		}
+
+		if(version_compare($this->version,'13','lt')) {
+			if ($config['dtmfmode'] == "auto") {
+				$config['dtmfmode'] = "rfc4733";
+			}
+		}
 
 		// 'username' is for when username != exten.
-		if (!isset($config['username']))
+		if (!isset($config['username'])) {
 			$config['username'] = $config['account'];
+		}
 
 		// Codec allow is now mandatory
 		if (empty($config['allow'])) {

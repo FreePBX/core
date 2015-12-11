@@ -2,6 +2,8 @@
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
 class Sip extends \FreePBX\modules\Core\Driver {
+	public $version;
+
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->version = $freepbx->Config->get('ASTVERSION');
@@ -29,11 +31,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"dtmfmode" => array(
-				"value" => "rfc2833",
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_DTMF'),
 				"flag" => $flag++
 			),
 			"canreinvite" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_CANREINVITE'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_CANREINVITE'),
 				"flag" => $flag++
 			),
 			"host" => array(
@@ -41,11 +43,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"trustpid" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_TRUSTRPID'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
 			"sendpid" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_SENDRPID'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
 			"type" => array(
@@ -53,7 +55,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"nat" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_NAT'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_NAT'),
 				"flag" => $flag++
 			),
 			"port" => array(
@@ -61,11 +63,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"qualify" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_QUALIFY'),
+				"value" => $this->freepbx->Config->get('DEVICE_QUALIFY'),
 				"flag" => $flag++
 			),
 			"qualifyfreq" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_QUALIFYFREQ'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_QUALIFYFREQ'),
 				"flag" => $flag++
 			),
 			"transport" => array(
@@ -85,23 +87,23 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"flag" => $flag++
 			),
 			"encryption" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_SIP_ENCRYPTION'),
+				"value" => $this->freepbx->Config->get('DEVICE_SIP_ENCRYPTION'),
 				"flag" => $flag++
 			),
 			"callgroup" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_CALLGROUP'),
+				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
 			"pickupgroup" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_PICKUPGROUP'),
+				"value" => $this->freepbx->Config->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_DISALLOW'),
+				"value" => $this->freepbx->Config->get('DEVICE_DISALLOW'),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => \FreePBX::Config()->get('DEVICE_ALLOW'),
+				"value" => $this->freepbx->Config->get('DEVICE_ALLOW'),
 				"flag" => $flag++
 			),
 			"accountcode" => array(
@@ -238,6 +240,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 
 		if ($mydriver == "CHAN_PJSIP") {
 			$select[] = array('value' => 'rfc4733', 'text' => _('RFC 4733'));
+			if(version_compare($this->version,'13','ge')) {
+				$select[] = array('value' => 'auto', 'text' => _('Auto'));
+			}
 		} else {
 			$select[] = array('value' => 'rfc2833', 'text' => _('RFC 2833'));
 			$select[] = array('value' => 'auto', 'text' => _('Auto'));
