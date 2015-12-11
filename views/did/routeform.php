@@ -112,7 +112,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="extension" name="extension" value="<?php echo isset($extension)?$extension:''; ?>" placeholder="<?php echo _("ANY")?>">
+									<input type="text" class="form-control" id="extension" name="extension" data-no-duplicate-check="true" value="<?php echo isset($extension)?$extension:''; ?>" placeholder="<?php echo _("ANY")?>">
 								</div>
 							</div>
 						</div>
