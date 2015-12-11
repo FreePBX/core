@@ -6610,8 +6610,10 @@ function core_devices_configprocess() {
 		break;
 		case "del":
 		core_devices_del($extdisplay);
+    isset($_REQUEST['exdisplay'])?$_REQUEST['exdisplay'] = NULL:'';
+    isset($_REQUEST['action'])?$_REQUEST['action'] = NULL:'';
 		needreload();
-		//redirect_standard_continue();
+	  redirect_standard_continue();
 		break;
 		case "edit":  //just delete and re-add
 		// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
