@@ -6610,8 +6610,8 @@ function core_devices_configprocess() {
 		break;
 		case "del":
 		core_devices_del($extdisplay);
-    isset($_REQUEST['exdisplay'])?$_REQUEST['exdisplay'] = NULL:'';
-    isset($_REQUEST['action'])?$_REQUEST['action'] = NULL:'';
+		//$_REQUEST['exdisplay'] = isset($_REQUEST['exdisplay'])?NULL:'';
+		//$_REQUEST['action'] = isset($_REQUEST['action'])?NULL:'';
 		needreload();
 	  redirect_standard_continue();
 		break;
