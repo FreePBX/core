@@ -426,7 +426,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$validdtmf[] = "auto";
 				}
 				if (!in_array($trunk['dtmfmode'],$validdtmf)) {
-					$trunk['dtmfmode'] = "rtc4733";
+					$trunk['dtmfmode'] = "rfc4733";
 				}
 				//FREEPBX-10666
 				//yes,no
@@ -734,7 +734,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$validdtmf[] = "auto";
 		}
 		if (!in_array($trunk['dtmfmode'],$validdtmf)) {
-			$config['dtmfmode'] = "rtc4733";
+			$config['dtmfmode'] = "rfc4733";
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 

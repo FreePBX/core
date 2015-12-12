@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.16</version>
+	<version>13.0.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.17* FREEPBX-11047			
 		*13.0.16* FREEPBX-10965 FREEPBX-10890 FREEPBX-8863 FREEPBX-10909 FREEPBX-10948 FREEPBX-10575 FREEPBX-10797 FREEPBX-10880
 		*13.0.15* FREEPBX-9951 Japanese language prompts
 		*13.0.14* FREEPBX-10876 SQL escape fix - Eswee Odendaal
