@@ -13,12 +13,12 @@
  data-toggle="table"
  class="table table-striped">
 	<thead>
-					<tr>
+			<tr>
 					<th data-field="extension" data-sortable="true" data-searchable="true" data-formatter="DIDnumberFormatter"><?php echo _("DID")?></th>
 					<th data-field="cidnum" data-searchable="true" data-sortable="true" data-formatter="DIDnumberFormatter"><?php echo _("CID")?></th>
 					<th data-field="description" data-sortable="true"><?php echo _("Description")?></th>
 					<th data-field="destination" data-formatter="DIDdestFormatter"><?php echo _("Destination")?></th>
-					<th data-field="extension" data-formatter="DIDlinkFormatter"><?php echo _("Actions")?></th>
+					<th data-formatter="DIDlinkFormatter"><?php echo _("Actions")?></th>
 			</tr>
 	</thead>
 </table>
