@@ -32,8 +32,8 @@ function bootnavlinkFormatter(value, row){
 	return html;
 }
 $("#didtablernav").on('click-row.bs.table',function(e,row,elem){
-	var extension = bootnavnumberFormatter(row['extension']);
-  var cidnum = bootnavnumberFormatter(row['cidnum']);
+	var extension = row['extension'];
+  var cidnum = row['cidnum'];
 	window.location = '?display=did&view=form&extdisplay='+extension+'%2F'+cidnum;
 });
 </script>
