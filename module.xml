@@ -3,16 +3,17 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.19</version>
+	<version>13.0.20</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.20* FREEPBX-11002
 		*13.0.19* FREEPBX-11082
 		*13.0.18* FREEPBX-10855
-		*13.0.17* FREEPBX-11047			
+		*13.0.17* FREEPBX-11047
 		*13.0.16* FREEPBX-10965 FREEPBX-10890 FREEPBX-8863 FREEPBX-10909 FREEPBX-10948 FREEPBX-10575 FREEPBX-10797 FREEPBX-10880
 		*13.0.15* FREEPBX-9951 Japanese language prompts
 		*13.0.14* FREEPBX-10876 SQL escape fix - Eswee Odendaal
@@ -117,10 +118,10 @@
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
 		<devices needsenginedb="yes">Devices</devices>
-		<did category="Connectivity">Inbound Routes</did>
+		<did needsenginedb="yes" category="Connectivity">Inbound Routes</did>
 		<dahdichandids category="Connectivity">DAHDI Channel DIDs</dahdichandids>
 		<routing category="Connectivity">Outbound Routes</routing>
-		<trunks category="Connectivity">Trunks</trunks>
+		<trunks needsenginedb="yes" category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>
 		<ampusers category="Admin">Administrators</ampusers>
 		<astmodules category="Admin">Asterisk Modules</astmodules>
