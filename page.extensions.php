@@ -170,6 +170,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 <script>
 	$(document).ready(function() {
 		$('#wizard').smartWizard({
+			keyNavigation: false,
 			onLeaveStep: function(obj, context) {
 				<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
 					if(context.fromStep == <?php echo $page + 1?>) {
