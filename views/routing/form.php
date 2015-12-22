@@ -251,6 +251,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		<input type="text" id="PreventChromeAutocomplete" name="PreventChromeAutocomplete" autocomplete="address-level4" aria-hidden="true" />
 		<input type="password" id="PreventChromeAutocomplete2" name="PreventChromeAutocomplete2" autocomplete="address-level4" aria-hidden="true"/>
 	</div>
+	<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="id" name="id" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 	<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
