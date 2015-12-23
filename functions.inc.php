@@ -1867,6 +1867,7 @@ function core_do_get_config($engine) {
 			"CWINUSEBUSY",
 			"AMPMGRUSER",
 			"AMPMGRPASS",
+			"ASTMANAGERHOST",
 			// Before you get upset about these being exposed to the dialplan,
 			// they are ALREADY readable from /etc/amportal.conf - adding them
 			// here means that AGI's and Dialplan can connect to the database

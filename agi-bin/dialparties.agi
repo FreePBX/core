@@ -39,8 +39,9 @@ if (!$has_extension_state) {
   require_once "phpagi-asmanager.php";
   $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
   $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
+  $astmgrhost  = get_var( $AGI, "ASTMANAGERHOST" );
   $astman = $AGI->new_AsteriskManager();
-	if (!$astman->connect("127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
+	if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
 		exit (1);
 	}
 }
