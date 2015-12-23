@@ -82,8 +82,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		switch($request['display']){
 			case 'extensions':
 			case 'devices':
+				$popover = isset($request['fw_popover']) ? "&amp;fw_popover=".$request['fw_popover'] : '';
 				$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
-				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display']));
+				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display'], "popover"=>$popover));
 			break;
 			case 'trunks':
 				if(isset($request['tech'])){
