@@ -187,7 +187,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="alertinfo"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="alertinfo" name="alertinfo" value="<?php echo $alertinfo ?>" ">
+									<?php echo FreePBX::View()->alertInfoDrawSelect("alertinfo",$alertinfo);?>
 								</div>
 							</div>
 						</div>
