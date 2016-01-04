@@ -32,6 +32,8 @@ $(document).ready(function() {
 			case 'text':
 			case 'textarea':
 			case 'select':
+			case 'fselect':
+			case 'cselect':
 				if($('#'+current).val() != defval){
 					$(this).removeClass('hidden');
 				}
@@ -126,7 +128,12 @@ $(".defset").click(function(e){
 		case 'text':
 		case 'textarea':
 		case 'select':
+		case 'fselect':
 			$('#'+current).val(defval);
+			$(this).addClass('hidden');
+		break;
+		case 'cselect':
+			$('#'+current).selectize()[0].selectize.setValue(defval);
 			$(this).addClass('hidden');
 		break;
 	}

@@ -167,6 +167,48 @@ foreach ($conf as $c){
 			}
 			$forminputs .= $inputhtmlend;
 		break;
+		case 'cselect':
+			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
+			$forminputs .= $inputhtmltop;
+			if($display_friendly_name == 1){
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
+			}else{
+				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'.$c['keyword'].'</label>';
+			}
+			$forminputs .= '<i class="fa fa-question-circle fpbx-help-icon" data-for="' . $c['keyword'] . '"></i>';
+			$forminputs .= '&nbsp;';
+			$forminputs .= '<a href="#" data-for="'.$c['keyword'].'" data-type="'.$c['type'].'" data-defval="'.$c['defaultval'].'" class="hidden defset"><i class="fa fa-refresh"></i></a>';
+			$forminputs .= '</div>';
+			$forminputs .= '<div class="col-md-5">';
+			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
+			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			$opt = explode(',',$c['options']);
+			$matched = false;
+			foreach($opt as $o) {
+				if($amp_conf[$c['keyword']] == $o) {
+					$matched = true;
+				}
+				$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
+				$forminputs .= '<option value="'.$o.'"'.$selected.'>'._($o).'</option>';
+			}
+			if(!$matched) {
+				$forminputs .= '<option value="'.$amp_conf[$c['keyword']].'" selected>'.$amp_conf[$c['keyword']].'</option>';
+			}
+			$forminputs .= '</select>';
+			$forminputs .= '</div>';
+			$szoptions = array(
+				"create" => true,
+				"allowEmptyOption" => false
+			);
+			$forminputs .= '<script>$(function() {$("#'.$c['keyword'].'").removeClass("form-control");$("#'.$c['keyword'].'").selectize('.json_encode($szoptions).');});</script>';
+			$forminputs .= $inputhtmlmiddle;
+			if($display_friendly_name == 1){
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
+			}else{
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
+			}
+			$forminputs .= $inputhtmlend;
+		break;
 		case 'select':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;

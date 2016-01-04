@@ -1393,3 +1393,42 @@ $set['module'] = '';
 $set['type'] = CONF_TYPE_TEXTAREA;
 $freepbx_conf->define_conf_setting('RSSFEEDS',$set);
 $freepbx_conf->commit_conf_settings();
+
+unset($set);
+
+$INTERNALALERTINFO = $ATTTRANSALERTINFO = $BLINDTRANSALERTINFO = 'inherit';
+if($freepbx_conf->conf_setting_exists("INTERNALALERTINFO")) {
+	$setting = $freepbx_conf->conf_setting("INTERNALALERTINFO");
+	if($setting != CONF_TYPE_CSELECT) {
+		foreach(array("INTERNALALERTINFO", "ATTTRANSALERTINFO", "BLINDTRANSALERTINFO") as $key) {
+			$$key = $freepbx_conf->get($key);
+		}
+		$freepbx_conf->remove_conf_settings(array("INTERNALALERTINFO", "ATTTRANSALERTINFO", "BLINDTRANSALERTINFO"));
+	}
+}
+$set['category'] = 'Dialplan and Operational';
+$set['value'] = $INTERNALALERTINFO;
+$set['defaultval'] = $set['value'];
+$set['name'] = 'Internal Alert Info';
+$set['description'] = "Alert Info to use on Extension to Extension Calls. 'Inherit' will use the previously set Alert Info";
+$set['hidden'] = 0;
+$set['emptyok'] = 1;
+$set['readonly'] = 0;
+$set['level'] = 0;
+$set['options'] = array("inherit","ring1","ring2","ring3","ring4","ring5");
+$set['module'] = '';
+$set['type'] = CONF_TYPE_CSELECT;
+$freepbx_conf->define_conf_setting('INTERNALALERTINFO',$set);
+$freepbx_conf->commit_conf_settings();
+
+$set['name'] = 'Attended Transfer Alert Info';
+$set['description'] = "Alert Info to use on Attended Transfer Calls. 'Inherit' will use the previously set Alert Info. Note: Attended Transfer detection only works in Asterisk 12 or higher";
+$set['value'] = $ATTTRANSALERTINFO;
+$freepbx_conf->define_conf_setting('ATTTRANSALERTINFO',$set);
+$freepbx_conf->commit_conf_settings();
+
+$set['name'] = 'Blind Transfer Alert Info';
+$set['description'] = "Alert Info to use on Blind Transfer Calls. 'Inherit' will use the previously set Alert Info";
+$set['value'] = $BLINDTRANSALERTINFO;
+$freepbx_conf->define_conf_setting('BLINDTRANSALERTINFO',$set);
+$freepbx_conf->commit_conf_settings();
