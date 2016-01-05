@@ -1432,3 +1432,41 @@ $set['description'] = "Alert Info to use on Blind Transfer Calls. 'Inherit' will
 $set['value'] = $BLINDTRANSALERTINFO;
 $freepbx_conf->define_conf_setting('BLINDTRANSALERTINFO',$set);
 $freepbx_conf->commit_conf_settings();
+
+$timezone = 'UTC';
+if (is_link('/etc/localtime')) {
+	// Mac OS X (and older Linuxes)
+	// /etc/localtime is a symlink to the
+	// timezone in /usr/share/zoneinfo.
+	$filename = readlink('/etc/localtime');
+	if (strpos($filename, '/usr/share/zoneinfo/') === 0) {
+		$timezone = substr($filename, 20);
+	}
+} elseif (file_exists('/etc/timezone')) {
+	// Ubuntu / Debian.
+	$data = file_get_contents('/etc/timezone');
+	if ($data) {
+		$timezone = $data;
+	}
+} elseif (file_exists('/etc/sysconfig/clock')) {
+	// RHEL / CentOS
+	$data = @parse_ini_file('/etc/sysconfig/clock');
+	if (!empty($data['ZONE'])) {
+		$timezone = $data['ZONE'];
+	}
+}
+
+$set['category'] = 'System Setup';
+$set['value'] = $timezone;
+$set['defaultval'] = 'UTC';
+$set['name'] = 'PHP Timezone';
+$set['description'] = "Timezone that should be used by PHP. Empty value will use PHP defaults";
+$set['hidden'] = 0;
+$set['emptyok'] = 1;
+$set['readonly'] = 0;
+$set['level'] = 0;
+$set['options'] = \DateTimeZone::listIdentifiers();
+$set['module'] = '';
+$set['type'] = CONF_TYPE_CSELECT;
+$freepbx_conf->define_conf_setting('PHPTIMEZONE',$set);
+$freepbx_conf->commit_conf_settings();
