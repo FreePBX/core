@@ -119,7 +119,7 @@
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
 	</changelog>
 	<depends>
-		<version>13.0.44</version>
+		<version>13.0.46</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
