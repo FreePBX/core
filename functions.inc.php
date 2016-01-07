@@ -2850,7 +2850,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
 	$ext->add($context, $exten, '', new ext_answer());
 	$ext->add($context, $exten, '', new ext_wait('1'));
-	$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+	$ext->add($context, $exten, '', new ext_playback('im-sorry&an-error-has-occurred&with&call-forwarding'));
 	$ext->add($context, $exten, '', new ext_macro('hangupcall'));
 	$ext->add($context, $exten, 'limit', new ext_answer());
 	$ext->add($context, $exten, '', new ext_wait('1'));
@@ -3626,7 +3626,7 @@ function core_do_get_config($engine) {
 	$ext->add('macro-vm','adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 	$ext->add('macro-vm','adef','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occured'));
+	$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occurred'));
 	$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 	$ext->add('macro-vm','exit-FAILED','',new ext_hangup(''));
 
