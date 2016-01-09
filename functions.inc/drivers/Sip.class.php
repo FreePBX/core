@@ -425,7 +425,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 
 	public function getDeviceHeaders() {
 		return array(
-			'secret' => array('description' => _('Secret')),
+			'secret' => array('identifier' => _('Secret'), 'description' => sprintf(_('Secret [Enter "%s" to regenerate]'),"REGEN")),
 		);
 	}
 }

@@ -4080,35 +4080,19 @@ function core_did_get($extension="",$cidnum=""){
 }
 
 function core_did_del($extension,$cidnum){
-	global $db;
-	$cidnum = $db->escapeSimple($cidnum);
-	$sql="DELETE FROM incoming WHERE cidnum = \"$cidnum\" AND extension = \"$extension\"";
-	sql($sql);
+	_core_backtrace();
+	return FreePBX::Core()->delDID($extension,$cidnum);
 }
 
-function core_did_edit($old_extension,$old_cidnum, $incoming){
-	global $db;
-
-	$old_extension = $db->escapeSimple(trim($old_extension));
-	$old_cidnum = $db->escapeSimple(trim($old_cidnum));
-
-	$incoming['extension'] = trim($incoming['extension']);
-	$incoming['cidnum'] = trim($incoming['cidnum']);
-
-	$extension = $db->escapeSimple($incoming['extension']);
-	$cidnum = $db->escapeSimple($incoming['cidnum']);
-
-	// if did or cid changed, then check to make sure that this pair is not already being used.
-	//
-	if (($extension != $old_extension) || ($cidnum != $old_cidnum)) {
-		$existing=\FreePBX::Core()->getDID($extension,$cidnum);
-	}
-
-	if (empty($existing)) {
-		core_did_del($old_extension,$old_cidnum);
-		core_did_add($incoming);
+function core_did_edit($oldExtension,$oldCidnum, $incoming){
+	$incoming['destination'] = isset($incoming[$incoming['goto0'].'0']) ? $incoming[$incoming['goto0'].'0'] : "";
+	$res = FreePBX::Core()->editDID($oldExtension,$oldCidnum, $incoming);
+	if ($res) {
 		return true;
 	} else {
+		$extension = $incoming['extension'];
+		$cidnum = $incoming['cidnum'];
+		$existing = FreePBX::Core()->getDID($extension,$cidnum);
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 	}
 	return false;
@@ -4117,97 +4101,27 @@ function core_did_edit($old_extension,$old_cidnum, $incoming){
 /* Create a new did with values passed into $did_vars and defaults used otherwise
 */
 function core_did_create_update($did_vars) {
-	$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
-	$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
-	$coredid = \FreePBX::Core()->getDID($did_create['extension'], $did_create['cidnum']);
-	if (!empty($coredid) && count($coredid)) {
-		return core_did_edit_properties($did_vars); //already exists so just edit properties
-	} else {
-		$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
-		$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries'])  ? $did_vars['pmmaxretries']  : '';
-		$did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
-		$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
-		$did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
-		$did_create['reversal']     = isset($did_vars['reversal'])     ? $did_vars['reversal']     : '';
-		$did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
-		$did_create['description'] = isset($did_vars['description']) ? $did_vars['description'] : '';
-		$did_create['grppre']      = isset($did_vars['grppre'])      ? $did_vars['grppre']      : '';
-		$did_create['delay_answer']= isset($did_vars['delay_answer'])? $did_vars['delay_answer']: '0';
-		$did_create['pricid']      = isset($did_vars['pricid'])      ? $did_vars['pricid']      : '';
-
-		$did_dest                  = isset($did_vars['destination']) ? $did_vars['destination'] : '';
-		return core_did_add($did_vars, $did_dest);
-	}
+	return FreePBX::Core()->createUpdateDID($did_vars);
 }
 
 
-/* Edits the poperties of a did, but not the did or cid nums since those could of course be
-in conflict
+/* Edits the poperties of a did, but not the did or cid nums since those could of course be in conflict
 */
 function core_did_edit_properties($did_vars) {
-	global $db;
-	if (!is_array($did_vars)) {
-		return false;
-	}
-
-	$extension = $db->escapeSimple(isset($did_vars['extension']) ? $did_vars['extension'] : '');
-	$cidnum    = $db->escapeSimple(isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '');
-	$sql = "";
-	foreach ($did_vars as $key => $value) {
-		switch ($key) {
-			case 'privacyman':
-			case 'pmmaxretries':
-			case 'pmminlength':
-			case 'alertinfo':
-			case 'ringing':
-			case 'reversal':
-			case 'mohclass':
-			case 'description':
-			case 'grppre':
-			case 'delay_answer':
-			case 'pricid':
-			case 'destination':
-			$sql_value = $db->escapeSimple($value);
-			$sql .= " `$key` = '$sql_value',";
-			break;
-			default:
-		}
-	}
-	if ($sql == '') {
-		return false;
-	}
-	$sql = substr($sql,0,(strlen($sql)-1)); //strip off tailing ','
-	$sql_update = "UPDATE `incoming` SET"."$sql WHERE `extension` = '$extension' AND `cidnum` = '$cidnum'";
-	return sql($sql_update);
+	return FreePBX::Core()->editDIDProperties($did_vars);
 }
 
 function core_did_add($incoming,$target=false){
-	global $db;
-	foreach ($incoming as $key => $val) {
-		if(is_string($val)) {
-			${$key} = $db->escapeSimple($val);
-		} elseif(is_array($val)) {
-			${$key} = $db->escapeSimple(implode(",",$val));
-		}
-	}
+
+	$incoming['destination'] = ($target) ? $target : (isset($incoming[$incoming['goto0'].'0']) ? $incoming[$incoming['goto0'].'0'] : "");
 
 	// Check to make sure the did is not being used elsewhere
 	//
-	$existing=\FreePBX::Core()->getDID($extension,$cidnum);
-	if (empty($existing)) {
-		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
-		$invalidDIDChars = array('<','>');
-		$extension = trim(str_replace($invalidDIDChars,"",$extension));
-		$cidnum = trim(str_replace($invalidDIDChars,"",$cidnum));
-
-		$destination= ($target) ? $target : (isset(${$goto0.'0'}) ? ${$goto0.'0'} : "");
-		$pmmaxretries = isset($pmmaxretries) ? $pmmaxretries : "";
-		$pmminlength = isset($pmminlength) ? $pmminlength : "";
-		$privacyman = isset($privacyman) ? $privacyman : "";
-		$sql="INSERT INTO incoming (cidnum,extension,destination,privacyman,pmmaxretries,pmminlength,alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) values ('$cidnum','$extension','$destination','$privacyman','$pmmaxretries','$pmminlength','$alertinfo', '$ringing', '$reversal', '$mohclass', '$description', '$grppre', '$delay_answer', '$pricid')";
-		sql($sql);
+	$res = \FreePBX::Core()->addDID($incoming);
+	if ($res) {
 		return true;
 	} else {
+		$existing = \FreePBX::Core()->getDID($incoming['extension'],$incoming['cidnum']);
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 		return false;
 	}

@@ -45,6 +45,56 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 		return $tech;
 	}
 
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		$dial = 'DAHDI';
+		$settings  = array(
+			"channel" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
+			"context" => array(
+				"value" => "from-internal",
+				"flag" => $flag++
+			),
+			"immediate" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"signalling" => array(
+				"value" => "fxo_ks",
+				"flag" => $flag++
+			),
+			"echocancel" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"echocancelwhenbridged" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"echotraining" => array(
+				"value" => "800",
+				"flag" => $flag++
+			),
+			"busydetect" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"busycount" => array(
+				"value" => "7",
+				"flag" => $flag++
+			),
+			"callprogress" => array(
+				"value" => "no",
+				"flag" => $flag++
+			)
+		);
+		return array(
+			"dial" => $dial,
+			"settings" => $settings
+		);
+	}
+
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$msgInvalidChannel = _("Please enter the channel for this device");
 		$tmparr = array();

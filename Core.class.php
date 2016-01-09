@@ -1904,10 +1904,23 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql="INSERT INTO incoming (cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array(':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			$this->freepbx->Hooks->processHooks($settings);
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Delete a DID
+	 * @param  string $extension The DID Extension
+	 * @param  string $cidnum    The DID cidnum
+	 */
+	public function delDID($extension,$cidnum) {
+		$sql = "DELETE FROM incoming WHERE cidnum = ? AND extension = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($cidnum, $extension));
+		$this->freepbx->Hooks->processHooks($extension, $cidnum);
 	}
 
 	/**
@@ -1925,6 +1938,102 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array();
 		}
 		return $results;
+	}
+
+	/**
+	 * Edit DID
+	 * @param  string $oldExtension The old extension
+	 * @param  string $oldCidnum    The old CID Num
+	 * @param  array $incoming     Array of new data to use
+	 */
+	public function editDID($oldExtension,$oldCidnum, $incoming) {
+		$extension = trim($incoming['extension']);
+		$cidnum = trim($incoming['cidnum']);
+
+		// if did or cid changed, then check to make sure that this pair is not already being used.
+		//
+		if (($extension != $oldExtension) || ($cidnum != $oldCidnum)) {
+			$existing = $this->getDID($extension,$cidnum);
+		}
+
+		if (empty($existing)) {
+			$this->delDID($oldExtension,$oldCidnum);
+			$this->addDID($incoming);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Create a new did with values passed into $did_vars and defaults used otherwise
+	 * @param  array $did_vars Array of new values
+	 */
+	public function createUpdateDID($did_vars) {
+		$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
+		$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
+		$coredid = $this->getDID($did_create['extension'], $did_create['cidnum']);
+		if (!empty($coredid) && count($coredid)) {
+			return $this->editDIDProperties($did_vars); //already exists so just edit properties
+		} else {
+			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
+			$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries'])  ? $did_vars['pmmaxretries']  : '';
+			$did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
+			$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
+			$did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
+			$did_create['reversal']     = isset($did_vars['reversal'])     ? $did_vars['reversal']     : '';
+			$did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
+			$did_create['description'] = isset($did_vars['description']) ? $did_vars['description'] : '';
+			$did_create['grppre']      = isset($did_vars['grppre'])      ? $did_vars['grppre']      : '';
+			$did_create['delay_answer']= isset($did_vars['delay_answer'])? $did_vars['delay_answer']: '0';
+			$did_create['pricid']      = isset($did_vars['pricid'])      ? $did_vars['pricid']      : '';
+
+			$did_dest                  = isset($did_vars['destination']) ? $did_vars['destination'] : '';
+			return $this->addDID($did_vars, $did_dest);
+		}
+	}
+
+	/**
+	 * Edits the poperties of a did
+	 * but not the did or cid nums since those could of course be in conflict
+	 * @param  array $did_vars Array of variables
+	 * @return [type]           [description]
+	 */
+	public function editDIDProperties($did_vars) {
+		if (!is_array($did_vars)) {
+			return false;
+		}
+
+		$extension = isset($did_vars['extension']) ? $did_vars['extension'] : '';
+		$cidnum    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
+		$sql = "";
+		foreach ($did_vars as $key => $value) {
+			switch ($key) {
+				case 'privacyman':
+				case 'pmmaxretries':
+				case 'pmminlength':
+				case 'alertinfo':
+				case 'ringing':
+				case 'reversal':
+				case 'mohclass':
+				case 'description':
+				case 'grppre':
+				case 'delay_answer':
+				case 'pricid':
+				case 'destination':
+					$sql_value = $this->database->escapeSimple($value);
+					$sql .= " `$key` = '$sql_value',";
+				break;
+				default:
+			}
+		}
+		if ($sql == '') {
+			return false;
+		}
+		$sql = substr($sql,0,(strlen($sql)-1)); //strip off tailing ','
+		$sql_update = "UPDATE `incoming` SET"."$sql WHERE `extension` = ? AND `cidnum` = ?";
+		$sth = $this->database->prepare($sql_update);
+		return $sth->execute(array($extension, $cidnum));
 	}
 
 	/**
@@ -2404,7 +2513,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $ret;
 	}
 
-	public function bulkhandlerImport($type, $rawData) {
+	public function bulkhandlerImport($type, $rawData, $replaceExisting = true) {
 		$ret = NULL;
 
 		switch ($type) {
@@ -2417,8 +2526,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				foreach ($settings as $key => $value) {
 					if (isset($data[$key])) {
 						/* Override default setting with our value. */
+						if($key == "secret" && $data[$key] == "REGEN"){
+							continue;
+						}
 						$settings[$key]['value'] = $data[$key];
 					}
+				}
+				$device = $this->getDevice($data['extension']);
+				if($replaceExisting && !empty($device)) {
+					$this->delDevice($data['extension']);
+				}
+				$user = $this->getUser($data['extension']);
+				if($replaceExisting && !empty($user)) {
+					$this->delUser($data['extension']);
 				}
 				try {
 					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
@@ -2457,6 +2577,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			break;
 		case "dids":
 			foreach ($rawData as $data) {
+				$exists = $this->getDID($data['extension'], $data['cidnum']);
+				if(!$replaceExisting && !empty($exists)) {
+					return array("status" => false, "message" => _("DID already exists"));
+				} elseif($replaceExisting && !empty($exists)) {
+					$this->delDID($data['extension'], $data['cidnum']);
+				}
 				$this->addDID($data);
 			}
 
@@ -2497,7 +2623,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 			break;
 		case 'dids':
-			$data = $this->getAllDIDs();
+			$dids = $this->getAllDIDs();
+			$data = array();
+			foreach($dids as $did) {
+				$key = $did['extension']."/".$did["cidnum"];
+				$data[$key] = $did;
+			}
 			break;
 		}
 

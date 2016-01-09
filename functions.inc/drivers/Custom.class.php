@@ -24,6 +24,13 @@ class Custom extends \FreePBX\modules\Core\Driver {
 		return array();
 	}
 
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+		return array(
+			"dial" => "",
+			"settings" => array()
+		);
+	}
+
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = array();
 		$tt = _("How to dial this device. This will be device specific. For example, a custom device which is really a remote SIP URI might be configured such as SIP/joe@somedomain.com");
