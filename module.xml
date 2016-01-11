@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.29</version>
+	<version>13.0.30</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.30* FREEPBX-11264 Fixes bug in update default values
 		*13.0.29* FREEPBX-11084 fix typo in playback FREEPBX-11113 Quick Create Extension Navigation Issue FREEPBX-11247 Dial Plans Wizard has broken buttons
 		*13.0.28* FREEPBX-10698 regen secret FREEPBX-11090 handle dahdi and custom extensions
 		*13.0.27* PHP setable timezone

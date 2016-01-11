@@ -1989,7 +1989,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$did_create['pricid']      = isset($did_vars['pricid'])      ? $did_vars['pricid']      : '';
 
 			$did_dest                  = isset($did_vars['destination']) ? $did_vars['destination'] : '';
-			return $this->addDID($did_vars, $did_dest);
+			return $this->addDID($did_create, $did_dest);
 		}
 	}
 
@@ -2608,6 +2608,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (isset($device['secret_origional'])) {
 					/* Don't expose our typo laden craziness to users.  We like our users! */
 					unset($device['secret_origional']);
+				}
+				if (isset($device['vm'])) {
+					/* This value doesnt make sense since we control vm externally through voicemail */
+					unset($device['vm']);
 				}
 				$du = $this->freepbx->Config->get("AMPEXTENSIONS");
 				if($du != "deviceanduser") {
