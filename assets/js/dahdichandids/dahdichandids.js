@@ -1,4 +1,4 @@
-$('a[id^="del"]').on("click",function(){
+$(document).on("click",'a[id^="del"]',function(){
 	var cmessage = _("Are you sure you want to delete this DID?");
 	if(!confirm(cmessage)){
 		return false;
