@@ -83,10 +83,10 @@ function get_dig($lookup, $enum) {
         }
         if ($usegdns == TRUE) {
                 $AGI->verbose("Looking up $lookup on $enum via shell command DIG and use google dns",3);
-                $lines = trim(`/usr/bin/dig @8.8.8.8 +short ${arpa}${enum} naptr`);
+                $lines = trim(`dig @8.8.8.8 +short ${arpa}${enum} naptr`);
         } else {
                 $AGI->verbose("Looking up $lookup on $enum via shell command DIG",3);
-                $lines = trim(`/usr/bin/dig +short ${arpa}${enum} naptr`);
+                $lines = trim(`dig +short ${arpa}${enum} naptr`);
         }
 	$lines = explode("\n", $lines);
 	foreach($lines as $line) {
