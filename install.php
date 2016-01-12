@@ -1083,7 +1083,7 @@ if (!DB::IsError($zaptbl_size)) {
 	}
 }
 // migrate any zap trunks to dahdi
-outn(_("upgrading any zap trunks to dahdi if found"));
+outn(_("upgrading any zap trunks to dahdi if found.."));
 $res = $db->query("UPDATE trunks set tech = 'dahdi' WHERE lower(tech) = 'zap'");
 if (!DB::IsError($res)) {
 	out(_("ok"));
