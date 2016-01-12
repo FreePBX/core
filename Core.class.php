@@ -2022,7 +2022,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				case 'pricid':
 				case 'destination':
 					$sql_value = $this->database->escapeSimple($value);
-					$sql .= " `$key` = '$sql_value',";
+					$sql .= " `$key` = $sql_value,";
 				break;
 				default:
 			}
