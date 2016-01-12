@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.31</version>
+	<version>13.0.32</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.32* FREEPBX-11298 inherit should not modify alert info
 		*13.0.31* Fix SQL statement
 		*13.0.30* FREEPBX-11264 Fixes bug in update default values
 		*13.0.29* FREEPBX-11084 fix typo in playback FREEPBX-11113 Quick Create Extension Navigation Issue FREEPBX-11247 Dial Plans Wizard has broken buttons
