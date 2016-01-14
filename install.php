@@ -1223,74 +1223,139 @@ function _initialize_zonelist() {
 //
 // CATEGORY:  Asterisk Builtin mini-HTTP server
 
+$httpupdate = false;
 if(!$freepbx_conf->conf_setting_exists('HTTPENABLED')) {
-	unset($set);
-	$set['module'] = '';
-	$set['category'] = 'Asterisk Builtin mini-HTTP server';
+	$httpupdate = true;
+}
+unset($set);
+$set['module'] = '';
+$set['category'] = 'Asterisk Builtin mini-HTTP server';
 
-	// HTTPENABLED
-	$set['value'] = false;
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'Enable the mini-HTTP Server';
-	$set['description'] = 'Whether the Asterisk HTTP interface is enabled or not. This is for Asterisk, it is not directly related for FreePBX usage and the value of this setting is irrelevant for accessing core FreePBX settings. Default is no.';
-	$set['emptyok'] = 0;
-	$set['level'] = 1;
-	$set['readonly'] = 0;
-	$set['type'] = CONF_TYPE_BOOL;
-	$freepbx_conf->define_conf_setting('HTTPENABLED',$set);
+// HTTPENABLED
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'Enable the mini-HTTP Server';
+$set['description'] = 'Whether the Asterisk HTTP interface is enabled or not. This is for Asterisk, it is not directly related for FreePBX usage and the value of this setting is irrelevant for accessing core FreePBX settings. Default is no.';
+$set['emptyok'] = 0;
+$set['level'] = 1;
+$set['readonly'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('HTTPENABLED',$set);
 
-	// HTTPENABLESTATIC
-	$set['value'] = false;
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'Enable Static Content';
-	$set['description'] = 'Whether Asterisk should serve static content from http-static (HTML pages, CSS, javascript, etc.). Default is no.';
-	$set['emptyok'] = 0;
-	$set['level'] = 2;
-	$set['readonly'] = 0;
-	$set['type'] = CONF_TYPE_BOOL;
-	$freepbx_conf->define_conf_setting('HTTPENABLESTATIC',$set);
+// HTTPENABLESTATIC
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'Enable Static Content';
+$set['description'] = 'Whether Asterisk should serve static content from http-static (HTML pages, CSS, javascript, etc.). Default is no.';
+$set['emptyok'] = 0;
+$set['level'] = 2;
+$set['readonly'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('HTTPENABLESTATIC',$set);
 
-	// HTTPBINDADDRESS
-	$set['value'] = '::';
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'HTTP Bind Address';
-	$set['description'] = 'Address to bind to. Default is 0.0.0.0';
-	$set['emptyok'] = 0;
-	$set['type'] = CONF_TYPE_TEXT;
-	$set['level'] = 2;
-	$set['readonly'] = 0;
-	$freepbx_conf->define_conf_setting('HTTPBINDADDRESS',$set);
+// HTTPBINDADDRESS
+$set['value'] = '::';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTP Bind Address';
+$set['description'] = 'Address to bind to. Default is 0.0.0.0';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_TEXT;
+$set['level'] = 2;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPBINDADDRESS',$set);
 
-	// HTTPBINDPORT
-	$set['value'] = '8088';
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'HTTP Bind Port';
-	$set['description'] = 'Port to bind to. Default is 8088';
-	$set['emptyok'] = 0;
-	$set['options'] = array(10,65536);
-	$set['type'] = CONF_TYPE_INT;
-	$set['level'] = 2;
-	$set['readonly'] = 0;
-	$freepbx_conf->define_conf_setting('HTTPBINDPORT',$set);
+// HTTPBINDPORT
+$set['value'] = '8088';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTP Bind Port';
+$set['description'] = 'Port to bind to. Default is 8088';
+$set['emptyok'] = 0;
+$set['options'] = array(10,65536);
+$set['type'] = CONF_TYPE_INT;
+$set['level'] = 2;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPBINDPORT',$set);
 
-	// HTTPPREFIX
-	$set['value'] = '';
-	$set['defaultval'] =& $set['value'];
-	$set['options'] = '';
-	$set['name'] = 'HTTP Prefix';
-	$set['description'] = 'HTTP Prefix allows you to specify a prefix for all requests to the server. For example, if the prefix is set to "asterisk" then all requests must begin with /asterisk. If this field is blank it is akin to saying all requests must being with /, essentially no prefix';
-	$set['emptyok'] = 1;
-	$set['type'] = CONF_TYPE_TEXT;
-	$set['level'] = 2;
-	$set['readonly'] = 0;
-	$freepbx_conf->define_conf_setting('HTTPPREFIX',$set);
+// HTTPPREFIX
+$set['value'] = '';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTP Prefix';
+$set['description'] = 'HTTP Prefix allows you to specify a prefix for all requests to the server. For example, if the prefix is set to "asterisk" then all requests must begin with /asterisk. If this field is blank it is akin to saying all requests must being with /, essentially no prefix';
+$set['emptyok'] = 1;
+$set['type'] = CONF_TYPE_TEXT;
+$set['level'] = 2;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPPREFIX',$set);
 
-	$freepbx_conf->commit_conf_settings();
+// HTTPENABLED
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'Enable TLS for the mini-HTTP Server';
+$set['description'] = 'Enables listening for HTTPS connections. This is for Asterisk, it is not directly related for FreePBX usage and the value of this setting is irrelevant for accessing core FreePBX settings. Default is no.';
+$set['emptyok'] = 0;
+$set['level'] = 3;
+$set['readonly'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('HTTPTLSENABLE',$set);
 
+// HTTPBINDADDRESS
+$set['value'] = '::';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS Bind Address';
+$set['description'] = 'Address to bind to. Default is 0.0.0.0';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_TEXT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPTLSBINDADDRESS',$set);
+
+// HTTPBINDPORT
+$set['value'] = '8089';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS Bind Port';
+$set['description'] = 'Port to bind to. Default is 8089';
+$set['emptyok'] = 0;
+$set['options'] = array(10,65536);
+$set['type'] = CONF_TYPE_INT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPTLSBINDPORT',$set);
+
+// HTTPBINDADDRESS
+$set['value'] = '';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS TLS Certificate Location';
+$set['description'] = 'Sets the path to the HTTPS server certificate. This is required if "Enable TLS for the mini-HTTP Server" is set to yes.';
+$set['emptyok'] = 1;
+$set['type'] = CONF_TYPE_TEXT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPTLSCERTFILE',$set);
+
+// HTTPBINDADDRESS
+$set['value'] = '';
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS TLS Private Key Location';
+$set['description'] = 'Sets the path to the HTTPS private key. If this is not specified, the "HTTPS TLS Certificate" will be checked to see if it also contains the private key.';
+$set['emptyok'] = 1;
+$set['type'] = CONF_TYPE_TEXT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPTLSPRIVATEKEY',$set);
+
+$freepbx_conf->commit_conf_settings();
+
+if($httpupdate) {
 	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf')) {
 		$settings = array();
 		$httpcontents = file_get_contents($amp_conf['ASTETCDIR'].'/http.conf');
