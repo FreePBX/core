@@ -1268,17 +1268,19 @@ $set['readonly'] = 0;
 $freepbx_conf->define_conf_setting('HTTPBINDADDRESS',$set);
 
 // HTTPBINDPORT
-$set['value'] = '8088';
-$set['defaultval'] =& $set['value'];
-$set['options'] = '';
-$set['name'] = 'HTTP Bind Port';
-$set['description'] = 'Port to bind to. Default is 8088';
-$set['emptyok'] = 0;
-$set['options'] = array(10,65536);
-$set['type'] = CONF_TYPE_INT;
-$set['level'] = 2;
-$set['readonly'] = 0;
-$freepbx_conf->define_conf_setting('HTTPBINDPORT',$set);
+if(!$freepbx_conf->conf_setting_exists('HTTPBINDPORT')) {
+	$set['value'] = '8088';
+	$set['defaultval'] =& $set['value'];
+	$set['options'] = '';
+	$set['name'] = 'HTTP Bind Port';
+	$set['description'] = 'Port to bind to. Default is 8088';
+	$set['emptyok'] = 0;
+	$set['options'] = array(10,65536);
+	$set['type'] = CONF_TYPE_INT;
+	$set['level'] = 2;
+	$set['readonly'] = 0;
+	$freepbx_conf->define_conf_setting('HTTPBINDPORT',$set);
+}
 
 // HTTPPREFIX
 $set['value'] = '';
