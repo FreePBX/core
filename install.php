@@ -1109,6 +1109,33 @@ $sql = "CREATE TABLE IF NOT EXISTS `pjsip` (
 ) ENGINE=MyISAM;";
 	$db->query($sql);
 
+//FREEPBX-11259 On previous versions of Core quick create would set emergency_cid to the description. This may be a bad thing.
+//We are looking at all devices to see in emergency_cid = description and that it is NOT all numeric. If so we are blanking
+//Out the emergency_cid and setting an alert.
+
+outn(_("checking possibly for invalid emergency caller id fields"));
+$sql = "select a.id, a.description from devices as a, devices as b where a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid";
+$devices = $db->getAll($sql,DB_FETCHMODE_ASSOC);
+if(DB::IsError($devices)) {
+  die_freepbx($devices->getMessage());
+}
+if (count($devices)) {
+	$nt = \notifications::create();
+	$rawname = 'core';
+  outn(_("Found what appear to be invalid emergency callerid entries."));
+  foreach ($devices as $dev) {
+		$uid = 'core_ecid_'.$dev['id'];
+		if(!$nt->exists($rawname, $uid)) {
+			$nt->add_critical($rawname, $uid, sprintf(_("Device %s (%s) had an invalid emergency callerid and was set to blank"),$dev['description'],$dev['id']),"", $link="?display=extensions", true, true);
+		}
+  }
+	$sql = "update devices a, devices b SET b.emergency_cid = '' WHERE a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid;";
+	$db->query($sql);
+
+} else {
+  outn(_("No invalid callerid entries found"));
+}
+
 
 function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	global $db, $freepbx_conf;

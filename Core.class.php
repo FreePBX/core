@@ -1450,7 +1450,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"value" => $displayname
 			),
 			"emergency_cid" => array(
-				"value" => $displayname,
+				"value" => '',
 			),
 			"dial" => array(
 				"value" => $settings['dial']."/".$number,
