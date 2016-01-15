@@ -20,7 +20,7 @@
   function dahdididFormatter(v,r){
     return '<a href="?display=dahdichandids&view=add&extdisplay='+r['channel']+'">'+v+'/'+r['did']+'</a>';
   }
-  $("#table-all-side").on('click-row.bs.table',function(e,row,elem){
+  $("#dahdidid-side").on('click-row.bs.table',function(e,row,elem){
     window.location = '?display=dahdichandids&view=add&extdisplay='+row['channel'];
   })
 </script>
