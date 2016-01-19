@@ -2610,7 +2610,7 @@ function core_do_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 		}
 		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-		$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
 
 		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
@@ -2743,7 +2743,8 @@ function core_do_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 		}
 		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-		$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
+
 
 		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
@@ -3010,7 +3011,7 @@ function core_do_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
 		}
 		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
-		$ext->add($context, $exten, '', new ext_set('CALLERID(number)', '${AMPUSER}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
 
 		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
 		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
