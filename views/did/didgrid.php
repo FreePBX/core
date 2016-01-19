@@ -33,7 +33,7 @@ function DIDnumberFormatter(value){
 	}
 }
 function DIDdestFormatter(value){
-	if(value.length == 0){
+	if(value === null || value.length == 0){
 		return _("No Destination");
 	}else{
 		if(typeof destinations[value] !== "undefined") {

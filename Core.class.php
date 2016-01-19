@@ -1798,7 +1798,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			try {
 				$sth->execute();
 				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
-				$this->allUsersCache = $results;
+				$final = array();
+				foreach($results as $res) {
+					$ext = $res['extension'];
+					$final[$ext] = $res;
+				}
+				$this->allUsersCache = $final;
 			} catch(\Exception $e) {
 				return array();
 			}

@@ -935,8 +935,7 @@ function core_getdestinfo($dest) {
 	if (substr(trim($dest),0,16) == 'from-did-direct,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
-		$key = array_search($exten, array_column($users, 'extension'));
-		if ($key === false || empty($users[$key])) {
+		if (!isset($users[$exten])) {
 			return array();
 		} else {
 			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
