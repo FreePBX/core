@@ -1407,7 +1407,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"sipname" => "",
 			"ringtimer" => 0,
 			"callwaiting" => "enabled",
-			"pinless" => "disabled"
+			"pinless" => "disabled",
+			"recording_in_external" => "dontcare",
+			"recording_out_external" => "dontcare",
+			"recording_in_internal" => "dontcare",
+			"recording_out_internal" => "dontcare",
+			"recording_ondemand" => "disabled",
+			"recording_priority" => "10",
 		);
 	}
 	/**
@@ -1827,6 +1833,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 		}
 
+		$astman = $this->FreePBX->astman;
+		$dbfamily = $astman->connected() ? $astman->database_show("AMPUSER") : array();
+
 		//Virtual Extensions are strange
 		$final = array();
 		foreach($results as $result) {
@@ -1835,6 +1844,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			} elseif(!empty($result['tech']) && $type == "virtual") {
 				continue;
 			}
+			$result['recording_in_external'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/external']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/external'] : "";
+			$result['recording_out_external'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/external']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/external'] : "";
+			$result['recording_in_internal'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/internal']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/internal'] : "";
+			$result['recording_out_internal'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/internal']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/internal'] : "";
+			$result['recording_ondemand'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand'] : "";
+			$result['recording_priority'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority']) ? (int) $dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority'] : "10";
+			$result['answermode'] = function_exists('paging_get_config') && isset($dbfamily['/AMPUSER/'.$result['extension'].'/answermode']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/answermode'] : "";
+
 			$final[] = $result;
 		}
 		return $final;
@@ -2080,31 +2097,31 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		// TODO this should be done with a hook
 		if (isset($settings['recording_in_external'])) {
 			$rec_tmp = explode('=',$settings['recording_in_external'],2);
-			$settings['recording_in_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+			$settings['recording_in_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : $rec_tmp[0];
 		} else {
 			$settings['recording_in_external'] = 'dontcare';
 		}
 		if (isset($settings['recording_out_external'])) {
 			$rec_tmp = explode('=',$settings['recording_out_external'],2);
-			$settings['recording_out_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+			$settings['recording_out_external'] = count($rec_tmp) == 2 ? $rec_tmp[1] : $rec_tmp[0];
 		} else {
 			$settings['recording_out_external'] = 'dontcare';
 		}
 		if (isset($settings['recording_in_internal'])) {
 			$rec_tmp = explode('=',$settings['recording_in_internal'],2);
-			$settings['recording_in_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+			$settings['recording_in_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : $rec_tmp[0];
 		} else {
 			$settings['recording_in_internal'] = 'dontcare';
 		}
 		if (isset($settings['recording_out_internal'])) {
 			$rec_tmp = explode('=',$settings['recording_out_internal'],2);
-			$settings['recording_out_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'dontcare';
+			$settings['recording_out_internal'] = count($rec_tmp) == 2 ? $rec_tmp[1] : $rec_tmp[0];
 		} else {
 			$settings['recording_out_internal'] = 'dontcare';
 		}
 		if (isset($settings['recording_ondemand'])) {
 			$rec_tmp = explode('=',$settings['recording_ondemand'],2);
-			$settings['recording_ondemand'] = count($rec_tmp) == 2 ? $rec_tmp[1] : 'disabled';
+			$settings['recording_ondemand'] = count($rec_tmp) == 2 ? $rec_tmp[1] : $rec_tmp[0];
 		} else {
 			$settings['recording_ondemand'] = 'disabled';
 		}
