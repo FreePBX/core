@@ -1801,7 +1801,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$final = array();
 				foreach($results as $res) {
 					$ext = $res['extension'];
-					$final[$ext] = $res;
+					if(checkRange($ext)){
+						$final[$ext] = $res;
+					}
 				}
 				$this->allUsersCache = $final;
 			} catch(\Exception $e) {
