@@ -3,15 +3,16 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.36</version>
+	<version>13.0.37</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.37* Ignore space on Alert Infos
 		*13.0.36* FREEPBX-11233
-		*13.0.35* FREEPBX-11259 FREEPBX-11224			
+		*13.0.35* FREEPBX-11259 FREEPBX-11224
 		*13.0.34* Allow older installs to update
 		*13.0.33* HTTP TLS Support
 		*13.0.32* FREEPBX-11298 inherit should not modify alert info
