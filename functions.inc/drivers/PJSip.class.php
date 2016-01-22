@@ -589,10 +589,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			return $this->TransportConfigCache;
 		}
 		$transport = array();
-		//TODO: move this to \FreePBX::Sipsettings()->getBinds();
-		//Calling the config directly will return an array or false.
-		$binds = $this->freepbx->Sipsettings->getConfig("binds");
-		//false breaks the foreach loop FREEPBX-9419
+
+		$ss = \FreePBX::Sipsettings();
+
+		// Calling the config directly will return an array or false.
+		$binds = $ss->getConfig("binds");
+		// Make sure it's an array
 		$binds = is_array($binds)?$binds:array();
 
 		foreach ($binds as $protocol => $arr) {
@@ -603,17 +605,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$t = "$ip-$protocol";
 				$transport[$t]['type'] = "transport";
 				$transport[$t]['protocol'] = $protocol;
-				$port = $this->freepbx->Sipsettings->getConfig($protocol."port-$ip");
+				$port = $ss->getConfig($protocol."port-$ip");
 				if (!$port) {
 					$transport[$t]['bind'] = "$ip";
 				} else {
 					$transport[$t]['bind'] = "$ip:$port";
 				}
-				$extip = $this->freepbx->Sipsettings->getConfig($protocol."extip-$ip");
+				$extip = $ss->getConfig($protocol."extip-$ip");
 
 				if (!$extip) {
 					// Is there a global extern setting?
-					$extip = $this->freepbx->Sipsettings->getConfig("externip");
+					$extip = $ss->getConfig("externip");
 				}
 
 				if ($extip) {
@@ -621,9 +623,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$transport[$t]['external_signaling_address'] = $extip;
 				}
 
+				// Is this a TLS transport?
+				if ($protocol === "tls") {
+					$tls = $ss->getTLSConfig();
+					foreach ($tls as $k => $v) {
+						$transport[$t][$k] = $v;
+					}
+				}
+
 				// Add the Generic localnet settings.
 				//TODO: This should call a method and not the config direct.
-				$localnets = $this->freepbx->Sipsettings->getConfig('localnets');
+				$localnets = $ss->getConfig('localnets');
 				$localnets = is_array($localnets)?$localnets:array();
 				if ($localnets) {
 					foreach($localnets as $arr) {
@@ -795,6 +805,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['mediaencryption'])) {
 			$endpoint[] = "media_encryption=".$config['mediaencryption'];
+		} else {
+			// Automatically enable sdes if possible
+			if (\FreePBX::Sipsettings()->getTLSConfig()) {
+				$endpoint[] = "media_encryption=sdes";
+			}
 		}
 
 		if (!empty($config['mediaencryptionoptimistic'])) {
