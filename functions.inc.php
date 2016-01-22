@@ -963,14 +963,14 @@ function core_getdestinfo($dest) {
 		if (!function_exists('voicemail_mailbox_get')) {
 			return array();
 		}
-		$key = array_search($exten, array_column($users, 'extension'));
-		if ($key === false || empty($users[$key])) {
+		if (!isset($users[$exten])) {
 			return array();
 		}
 		$box = voicemail_mailbox_get($exten);
 		if ($box == null) {
 			return array();
 		}
+
 		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
 		return array('description' => 'User Extension '.$exten.': '.$key['name'],
 		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");

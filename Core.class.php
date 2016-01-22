@@ -1808,9 +1808,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				return array();
 			}
 		} else {
-			$results = $this->allUsersCache;
+			$final = $this->allUsersCache;
 		}
-		return $results;
+		return $final;
 	}
 
 	/**
