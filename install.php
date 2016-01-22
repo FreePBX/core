@@ -1121,28 +1121,28 @@ foreach ($curnotif as $notif) {
 		$nt->delete('core', $notif['id']);
 	}
 }
-outn(_("checking possibly for invalid emergency caller id fields"));
+outn(_("Checking for possibly invalid emergency caller id fields.."));
 $sql = "select a.id, a.description from devices as a, devices as b where a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid";
 $devices = $db->getAll($sql,DB_FETCHMODE_ASSOC);
-if(DB::IsError($devices)) {
-  die_freepbx($devices->getMessage());
+if (DB::IsError($devices)) {
+	die_freepbx($devices->getMessage());
 }
 if (count($devices)) {
 	$rawname = 'core';
-  outn(_("Found what appear to be invalid emergency callerid entries."));
+	outn("\n\t");
+	out(_("Found what appear to be invalid emergency callerid entries."));
 	$badcids = array();
-  foreach ($devices as $dev) {
+	foreach ($devices as $dev) {
 		$badcids[] = sprintf(_("Device %s (%s) had an invalid emergency callerid and we set it to blank"),$dev['description'],$dev['id']);
-  }
+	}
 	$uid = 'core_bad_ecid';
 	if(!$nt->exists($rawname, $uid)) {
 		$nt->add_critical($rawname, $uid, _("Emergency CID set to blank for one or more extensions"),implode(PHP_EOL, $badcids), $link="?display=extensions", true, true);
 	}
 	$sql = "update devices a, devices b SET b.emergency_cid = '' WHERE a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid;";
 	$db->query($sql);
-
 } else {
-  outn(_("No invalid callerid entries found"));
+	out(_("none found"));
 }
 
 
