@@ -218,8 +218,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
-		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP'));
-		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP'));
+		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
+		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
 		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media_encryption]';
 		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
@@ -227,7 +227,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';
-		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Media Encryption Optimistic'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Require RTP (Media) Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		//https://wiki.asterisk.org/wiki/display/AST/Asterisk+13+Configuration_res_pjsip_endpoint_identifier_ip
 		$tt = _("The value is a comma-delimited list of IP addresses. IP addresses may have a subnet mask appended. The subnet mask may be written in either CIDR or dot-decimal notation. Separate the IP address and subnet mask with a slash ('/')");
@@ -807,8 +807,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "media_encryption=".$config['mediaencryption'];
 		} else {
 			// Automatically enable sdes if possible
-			if (\FreePBX::Sipsettings()->getTLSConfig()) {
-				$endpoint[] = "media_encryption=sdes";
+			//
+			// Requires sipsettings 13.0.16 or higher
+			if ($this->freepbx->Modules->moduleHasMethod('Sipsettings', 'getTLSConfig')) {
+				if (\FreePBX::Sipsettings()->getTLSConfig()) {
+					$endpoint[] = "media_encryption=sdes";
+				}
 			}
 		}
 
