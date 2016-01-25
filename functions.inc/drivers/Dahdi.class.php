@@ -142,10 +142,10 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 		$tmparr['dial'] = array('value' => '', 'level' => 2);
 		$tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
-		$tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1);
-		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1);
+		$tt = _("Callgroup(s) that this device is part of, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2.'");
+		$tmparr['namedcallgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1);
+		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2'. Device does not have to be in a group to be able to pickup calls from that group.");
+		$tmparr['namedpickupgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
 		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$devopts = $tmparr;
