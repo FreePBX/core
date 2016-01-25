@@ -776,11 +776,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "aggregate_mwi=".(isset($config['aggregate_mwi']) ? $config['aggregate_mwi'] : "yes");
 
 		if (!empty($config['callgroup'])) {
-			$endpoint[] = "call_group=".$config['callgroup'];
+			$endpoint[] = "named_call_group=".$config['callgroup'];
 		}
 
 		if (!empty($config['pickupgroup'])) {
-			$endpoint[] = "pickup_group=".$config['pickupgroup'];
+			$endpoint[] = "named_pickup_group=".$config['pickupgroup'];
 		}
 
 		if (!empty($config['avpf'])) {

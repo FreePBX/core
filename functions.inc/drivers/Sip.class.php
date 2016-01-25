@@ -90,11 +90,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_ENCRYPTION'),
 				"flag" => $flag++
 			),
-			"callgroup" => array(
+			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
-			"pickupgroup" => array(
+			"namedpickupgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
