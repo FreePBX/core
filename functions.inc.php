@@ -1205,8 +1205,7 @@ function core_do_get_config($engine) {
 		$ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
 		$exten = '_LC-.';
 		$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
-		$ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
-		$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})'));
+		$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})b(func-apply-sipheaders^s^1)'));
 
 		/* This needs to be before outbound-routes since they can have a wild-card in them
 		*

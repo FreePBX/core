@@ -14,8 +14,28 @@
 $c = "macro-dial";
 $s = "s";
 
+//Advanced settings alert info internal calls
+$ext->add($c,$s,'', new ext_noop('Blind Transfer: ${BLINDTRANSFER}, Attended Transfer: ${ATTENDEDTRANSFER}, User: ${AMPUSER}, Alert Info: ${ALERT_INFO}'));
+$ai = FreePBX::Config()->get('INTERNALALERTINFO');
+$ai = trim($ai);
+$ai = ($ai != "none" && $ai != "inherit") ? $ai : '';
+$ext->add($c,$s,'', new ext_execif('$["${ALERT_INFO}"="" & ${LEN(${AMPUSER})}!=0 & ${LEN(${BLINDTRANSFER})}=0 & ${LEN(${ATTENDEDTRANSFER})}=0]', 'Set', 'ALERT_INFO='.$ai));
+
+//Advanced settings alert info Blind Transfer
+$bt = FreePBX::Config()->get('BLINDTRANSALERTINFO');
+$bt = trim($bt);
+$bt = ($bt != "none" && $bt != "inherit") ? $bt : '';
+$ext->add($c,$s,'', new ext_execif('$[${LEN(${BLINDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$bt));
+
+//Advanced settings alert info Attended Transfer
+$at = FreePBX::Config()->get('ATTTRANSALERTINFO');
+$at = trim($at);
+$at = ($at != "none" && $at != "inherit") ? $at : '';
+$ext->add($c,$s,'', new ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
+
 $ext->add($c,$s,'', new ext_gotoif('$["${MOHCLASS}" = ""]', 'dial'));
 $ext->add($c,$s,'', new ext_set('CHANNEL(musicclass)', '${MOHCLASS}'));
+
 $ext->add($c,$s,'dial', new ext_agi('dialparties.agi'));
 $ext->add($c,$s,'', new ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));
 $ext->add($c,$s,'normdial', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', ''), 'n', 2); // dialparties will set the priority to 10 if $ds is not null
