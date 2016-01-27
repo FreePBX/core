@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.38.2</version>
+	<version>13.0.39</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.39* FREEPBX-11329 Add checkrange to grid FREEPBX-11324 Array validation FREEPBX-11017 Patch submission namedpickupgroup instead of pickupgroup
 		*13.0.38.2* Add func-sip-apply-headers to local confirm
 		*13.0.38.1* FREEPBX-11149 bad destinations fix
 		*13.0.37* Ignore space on Alert Infos
