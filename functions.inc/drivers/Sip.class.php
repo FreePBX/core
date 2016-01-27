@@ -90,11 +90,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_ENCRYPTION'),
 				"flag" => $flag++
 			),
-			"callgroup" => array(
+			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
-			"pickupgroup" => array(
+			"namedpickupgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
@@ -371,10 +371,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_ENCRYPTION'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		}
 
-		$tt = _("Callgroup(s) that this device is part of, can be one or more callgroups, e.g. '1,3-5' would be in groups 1,3,4,5.");
-		$tmparr['callgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
-		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more groups, e.g. '1,3-5' would be in groups 1,3,4,5. Device does not have to be in a group to be able to pickup calls from that group.");
-		$tmparr['pickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
+		$tt = _("Callgroup(s) that this device is part of, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2'.");
+		$tmparr['namedcallgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
+		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2'. Device does not have to be in a group to be able to pickup calls from that group.");
+		$tmparr['namedpickupgroup'] = array('prompttext' => _('Pickup Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");
 		$tt = _("Disallowed codecs. Set this to all to remove all codecs defined in the general settings and then specify specific codecs separated by '&' on the 'allow' setting, or just disallow specific codecs separated by '&'.");
 		$tmparr['disallow'] = array('prompttext' => _('Disallowed Codecs'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_DISALLOW'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Allow specific codecs, separated by the '&' sign and in priority order. E.g. 'ulaw&g729'. Codecs allowed in the general settings will also be allowed unless removed with the 'disallow' directive.");
