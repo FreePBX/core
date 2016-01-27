@@ -2,6 +2,7 @@
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	$popover = isset($_REQUEST['fw_popover']) ? "&amp;fw_popover=".$_REQUEST['fw_popover'] : '';
 ?>
+
 <div class="fpbx-container container-fluid">
 	<?php if((isset($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay']))) { ?>
 		<div class="row">
