@@ -218,7 +218,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					);
 					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
 				}
-				return $users;
+				return array_values($users);
 			break;
 			case "getExtensionGrid":
 				$ampuser = $this->astman->database_show("AMPUSER");
