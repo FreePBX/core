@@ -4152,15 +4152,15 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	}
 	switch (strtoupper($tech)) {
 		case "IAX":
-		$sql .= " WHERE tech = 'iax2'";
-		break;
+			$sql .= " WHERE tech = 'iax2'";
+			break;
 		case "IAX2":
 		case "SIP":
 		case "ZAP":
 		case "DAHDI":
 		case 'CUSTOM':
-		$sql .= " WHERE tech = '".strtolower($tech)."'";
-		break;
+			$sql .= " WHERE tech = '".strtolower($tech)."'";
+			break;
 		case "ALL":
 		default:
 	}
@@ -4168,8 +4168,8 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
 	$extens = null;
-	foreach($results as $result){
-		if ($get_all || checkRange($result['id'])){
+	foreach ($results as $result) {
+		if ($get_all || checkRange($result['id'])) {
 
 			$record = array();
 			$record[0] = $result['id'];  // for backwards compatibility
@@ -4180,15 +4180,15 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 			$extens[] = $record;
 			/*
 			$extens[] = array(
-			0=>$result[0],  // for backwards compatibility
-			1=>$result[1],
-			'id'=>$result[0], // FETCHMODE_ASSOC emulation
-			'description'=>$result[1],
-		);
-		*/
+				0=>$result[0],  // for backwards compatibility
+				1=>$result[1],
+				'id'=>$result[0], // FETCHMODE_ASSOC emulation
+				'description'=>$result[1],
+			);
+			*/
+		}
 	}
-}
-return $extens;
+	return $extens;
 }
 
 // get a mapping of the devices to user description and vmcontext
