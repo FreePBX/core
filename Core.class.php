@@ -87,7 +87,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display'], "popover"=>$popover));
 			break;
 			case 'trunks':
-				if(isset($request['tech'])){
+				if(isset($request['tech'])||(isset($request['extdisplay']) && !empty($request['extdisplay']))){
 					$html = load_view(__DIR__.'/views/trunks/bootnav.php', array('trunk_types' => \FreePBX::Core()->listTrunkTypes()));
 					return $html;
 				}
