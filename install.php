@@ -449,6 +449,17 @@ function __migrate_trunks_to_table() {
 	return $trunkinfo;
 }
 
+out(_("Migrating pickup groups to named pickup groups"));
+$sql = "update sip set keyword = 'namedpickupgroup' where keyword = 'pickupgroup'";
+sql($sql);
+$sql = "update dahdi set keyword = 'namedpickupgroup' where keyword = 'pickupgroup'";
+sql($sql);
+out(_("Migrating call groups to named call groups"));
+$sql = "update sip set keyword = 'namedcallgroup' where keyword = 'callgroup'";
+sql($sql);
+$sql = "update dahdi set keyword = 'namedcallgroup' where keyword = 'callgroup'";
+sql($sql);
+
 // __migrate_trunks_to_table will return false if the trunks table already exists and
 // no migration is needed
 //
