@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.42</version>
+	<version>13.0.43</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.43* FREEPBX-11460 add mediaencryption defaults so they import
 		*13.0.42* Fix pjsip trunks with no auth generating invalid config
 		*13.0.41* Migrate from pickupgroup to namedpickupgroup
 		*13.0.40* FREEPBX-11421 Users Section - No Users Listed
