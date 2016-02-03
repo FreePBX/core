@@ -385,7 +385,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['aor_contact'])) {
 					$conf['pjsip.aor.conf'][$tn]['contact'] = $trunk['aor_contact'];
 				} else {
-					$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					// If there is no username, don't add the @
+					if ($trunk['username']) {
+						$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					} else {
+						$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					}
 				}
 			} elseif ($trunk['registration'] == "receive") {
 				$conf['pjsip.aor.conf'][$tn]['max_contacts'] = 1;
