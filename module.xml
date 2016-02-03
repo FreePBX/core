@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.41</version>
+	<version>13.0.42</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.42* Fix pjsip trunks with no auth generating invalid config
 		*13.0.41* Migrate from pickupgroup to namedpickupgroup
 		*13.0.40* FREEPBX-11421 Users Section - No Users Listed
 		*13.0.39* FREEPBX-11329 Add checkrange to grid FREEPBX-11324 Array validation FREEPBX-11017 Patch submission namedpickupgroup instead of pickupgroup
