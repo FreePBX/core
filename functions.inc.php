@@ -938,8 +938,9 @@ function core_getdestinfo($dest) {
 		if (!isset($users[$exten])) {
 			return array();
 		} else {
+			$name = isset($users[$exten]['name'])?$users[$exten]['name']:'';
 			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$key['name']),
+			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$name),
 			'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 		}
 	} else if (substr(trim($dest),0,10) == 'ext-trunk,') {
