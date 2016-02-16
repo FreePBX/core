@@ -387,9 +387,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tmparr['mailbox'] = array('prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only change this on devices that may have special needs.");
 		$tmparr['vmexten'] = array('prompttext' => _('Voicemail Extension'), 'value' => '', 'tt' => $tt, 'level' => 1);
-		$tt = _("IP Address range to deny access to, in the form of network/netmask.");
+		$tt = _("IP Address range to deny access to, in the form of network/netmask.")." "._("You may add multiple subnets, separate them with an &amp;.");
 		$tmparr['deny'] = array('prompttext' => _('Deny'), 'value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
-		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
+		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.")." "._("You may add multiple subnets, separate them with an &amp;.");
 		$tmparr['permit'] = array('prompttext' => _('Permit'), 'value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$currentcomponent->addjsfunc('changeDriver()',"
 		if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit submit to resave the device when you are done to propagate the new settings)')."')) {
