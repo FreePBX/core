@@ -118,11 +118,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
-			"callgroup" => array(
+			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
 			),
-			"pickupgroup" => array(
+			"namedpickupgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_PICKUPGROUP'),
 				"flag" => $flag++
 			),
@@ -710,7 +710,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private function generateEndpoint($config, &$retarr) {
 		// Validate $config array
 		$this->validateEndpoint($config);
-
+		dbug($config);
 		if($config['sipdriver'] != 'chan_pjsip') {
 			return false;
 		}
@@ -775,12 +775,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = "aggregate_mwi=".(isset($config['aggregate_mwi']) ? $config['aggregate_mwi'] : "yes");
 
-		if (!empty($config['callgroup'])) {
-			$endpoint[] = "named_call_group=".$config['callgroup'];
+		if (!empty($config['namedcallgroup'])) {
+			$endpoint[] = "named_call_group=".$config['namedcallgroup'];
 		}
 
-		if (!empty($config['pickupgroup'])) {
-			$endpoint[] = "named_pickup_group=".$config['pickupgroup'];
+		if (!empty($config['namedpickupgroup'])) {
+			$endpoint[] = "named_pickup_group=".$config['namedpickupgroup'];
 		}
 
 		if (!empty($config['avpf'])) {
