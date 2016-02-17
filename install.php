@@ -245,7 +245,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error"));
-		die_freepbx($result->getDebugInfo());
+		return false;
 	} else {
 		out(_("added"));
 	}
@@ -262,7 +262,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error"));
-		die_freepbx($result->getDebugInfo());
+		return false;
 	} else {
 		out(_("added"));
 	}
@@ -278,7 +278,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error"));
-		die_freepbx($result->getDebugInfo());
+		return false;
 	} else {
 		out(_("added"));
 	}
@@ -329,7 +329,7 @@ function __migrate_trunks_to_table() {
 			//echo ("already exists\n");
 			return false;
 		} else {
-			die_freepbx($check->getDebugInfo());
+			return false;
 		}
 	}
 
@@ -512,7 +512,8 @@ $check = $db->query('SELECT pmmaxretries FROM incoming');
 if(DB::IsError($check)){
 	$result = $db->query('alter table incoming add pmmaxretries varchar(2), add pmminlength varchar(2);');
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo().'fatal error adding fields to incoming table');
+		out(_('fatal error adding fields to incoming table'));
+		return false;
 	} else {
 	  out(_("Added pmmaxretries and pmminlength"));
   }
@@ -533,7 +534,9 @@ foreach ($new_cols as $col) {
     // add new field
     $sql = "ALTER TABLE `users` ADD `$col` VARCHAR( 20 ) DEFAULT '';";
     $result = $db->query($sql);
-    if(DB::IsError($result)) { die_freepbx($result->getDebugInfo()); }
+    if(DB::IsError($result)) {
+			return false;
+		}
     out(_("added"));
   } else {
     out(_("already exists"));
@@ -549,7 +552,9 @@ foreach ($new_cols as $col) {
     // add new field
     $sql = "ALTER TABLE `users` ADD `$col` VARCHAR( 255 ) DEFAULT '';";
     $result = $db->query($sql);
-    if(DB::IsError($result)) { die_freepbx($result->getDebugInfo()); }
+    if(DB::IsError($result)) {
+			return false;
+		}
     out(_("added"));
   } else {
     out(_("already exists"));
@@ -862,7 +867,7 @@ $sql_where = " FROM globals WHERE `variable` IN ('".implode("','",array_keys($gl
 $sql .= $sql_where;
 $globals = $db->getAll($sql,DB_FETCHMODE_ASSOC);
 if(DB::IsError($globals)) {
-  die_freepbx($globals->getMessage());
+  return false;
 }
 outn(_("Checking for General Setting migrations.."));
 if (count($globals)) {
@@ -965,7 +970,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error trying to add field"));
-		die_freepbx($result->getDebugInfo());
+		return false;
 	} else {
 		out(_("added"));
 	}
@@ -981,7 +986,7 @@ if(DB::IsError($check)) {
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("fatal error trying to add field"));
-		die_freepbx($result->getDebugInfo());
+		return false;
 	} else {
 		out(_("added"));
 	}
@@ -1136,7 +1141,7 @@ outn(_("Checking for possibly invalid emergency caller id fields.."));
 $sql = "select a.id, a.description from devices as a, devices as b where a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid";
 $devices = $db->getAll($sql,DB_FETCHMODE_ASSOC);
 if (DB::IsError($devices)) {
-	die_freepbx($devices->getMessage());
+	return false;
 }
 if (count($devices)) {
 	$rawname = 'core';
@@ -1174,7 +1179,8 @@ function _core_create_update_tonezones($tz = 'us', $commit = true) {
 	$compiled = $db->prepare('REPLACE INTO `indications_zonelist` (`name`, `iso`, `conf`) values (?,?,?)');
 	$result = $db->executeMultiple($compiled,$zonelist);
 	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error initializing indications_zonelist');
+		out("error initializing indications_zonelist");
+		return false;
 	}
 
 	// Now get what ever we have and update it in the FreePBX Settings choices in case the DB has been modified

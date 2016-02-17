@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.44</version>
+	<version>13.0.45</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.45* If there are fatal errors in install then return false dont die_freepbx, just abort this module
 		*13.0.44* FREEPBX-11494 "fwconsole chown" doesn't work in Kickstart script
 		*13.0.43* FREEPBX-11460 add mediaencryption defaults so they import
 		*13.0.42* Fix pjsip trunks with no auth generating invalid config
