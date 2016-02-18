@@ -159,7 +159,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"force_rport" => array(
-				"value" => "no",
+				"value" => "yes",
 				"flag" => $flag++
 			),
 			"rewrite_contact" => array(
@@ -209,7 +209,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
 		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Force use of return port.");
-		$tmparr['force_rport'] = array('prompttext' => _('Force rport'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		$tmparr['force_rport'] = array('prompttext' => _('Force rport'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		unset($select);
 
@@ -846,6 +846,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = !empty($config['rtp_symmetric']) ? "rtp_symmetric=".$config['rtp_symmetric'] : "rtp_symmetric=yes";
 		//rewrite_contact needs to be yes for NAT --mjordan, Digium
 		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['rewrite_contact'] : "rewrite_contact=yes";
+
+		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
 		if ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
 			$language = $this->freepbx->Soundlang->getLanguage();

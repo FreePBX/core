@@ -1590,3 +1590,15 @@ $set['module'] = '';
 $set['type'] = CONF_TYPE_CSELECT;
 $freepbx_conf->define_conf_setting('PHPTIMEZONE',$set);
 $freepbx_conf->commit_conf_settings();
+
+$mf = \module_functions::create();
+$info = $mf->getinfo("core");
+if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['dbversion'], "13.0.45" , "<=")) {
+	outn(_("Migrating force_rport to the right default value..."));
+	$res = $db->query("UPDATE sip SET data = 'yes' WHERE keyword = 'force_rport'");
+	if (!DB::IsError($res)) {
+		out(_("done"));
+	} else {
+		out(_("error occured"));
+	}
+}
