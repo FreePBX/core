@@ -885,10 +885,10 @@ function core_destinations() {
 		foreach($results as $result) {
 			$extens[] = array('destination' => 'from-did-direct,'.$result['0'].',1', 'description' => ' '.$result['0'].' '.$result['1'], 'category' => $cat, 'id' => $cat_id);
 			if(isset($vmboxes[$result['0']])) {
-				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (busy)', 'category' => 'Voicemail', 'id' => 'voicemail');
-				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (unavail)', 'category' => 'Voicemail', 'id' => 'voicemail');
-				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (no-msg)', 'category' => 'Voicemail', 'id' => 'voicemail');
-				$extens[] = array('destination' => 'ext-local,vmi'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (instructions-only)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmb'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (Busy Message)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmu'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (Unavailable Message)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vms'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (No Message)', 'category' => 'Voicemail', 'id' => 'voicemail');
+				$extens[] = array('destination' => 'ext-local,vmi'.$result['0'].',1', 'description' => $result[0].' '.$result[1].' (Instructions Only)', 'category' => 'Voicemail', 'id' => 'voicemail');
 			}
 		}
 	}
