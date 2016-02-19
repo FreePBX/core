@@ -1258,7 +1258,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$alertinfo = htmlspecialchars(isset($request['alertinfo'])?$request['alertinfo']:'');
 			$mohclass = isset($request['mohclass'])?$request['mohclass']:'default';
 			$grppre = isset($request['grppre'])?$request['grppre']:'';
-			$delay_answer = isset($request['delay_answer'])&&$request['delay_answer']?$request['delay_answer']:'';
+			$delay_answer = isset($request['delay_answer'])&&$request['delay_answer']?$request['delay_answer']:'0';
 			$pricid = isset($request['pricid'])?$request['pricid']:'';
 			$rnavsort = isset($request['rnavsort'])?$request['rnavsort']:'description';
 			$didfilter = isset($request['didfilter'])?$request['didfilter']:'';
@@ -1921,6 +1921,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
 		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
 
+		// XXX: Kludge for empty value
+		if ($settings['delay_answer'] == '') {
+			$settings['delay_answer'] = '0';
+		}
 		// Check to make sure the did is not being used elsewhere
 		//
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
