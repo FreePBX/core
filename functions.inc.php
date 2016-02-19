@@ -4547,7 +4547,7 @@ function core_check_destinations($dest=true) {
 		$destlist[] = array(
 			'dest' => $thisdest,
 			'description' => sprintf(_("Inbound Route: %s (%s)"),$result['description'],$thisid),
-			'edit_url' => 'config.php?display=did&extdisplay='.urlencode($thisid),
+			'edit_url' => 'config.php?display=did&view=form&extdisplay='.urlencode($thisid),
 		);
 	}
 
@@ -6165,7 +6165,7 @@ function core_users_configpageload() {
 
 				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
-				$addURL = '?display=did&&extdisplay='.$did['extension'].'/'.$did['cidnum'];
+				$addURL = '?display=did&view=form&extdisplay='.$did['extension'].'/'.$did['cidnum'];
 				$did_icon = 'images/email_edit.png';
 				$did_label = trim($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
 				if (trim($did['cidnum']) != '') {
