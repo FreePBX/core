@@ -1,5 +1,5 @@
 
-$("a[id^='rowadd']").click(function(e){
+$(document).on('click',"a[id^='routerowadd']",function(e){
 	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
 	var id = $("tr[id^='dprow']").length++;
