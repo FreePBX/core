@@ -2206,10 +2206,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$astman->database_del("AMPUSER",$extension."/screen");
 				break;
 				case 'nomemory':
-					$astman->database_put("AMPUSER",$extension."/screen",'"nomemory"');
+					$astman->database_put("AMPUSER",$extension."/screen",'nomemory');
 				break;
 				case 'memory':
-					$astman->database_put("AMPUSER",$extension."/screen",'"memory"');
+					$astman->database_put("AMPUSER",$extension."/screen",'memory');
 				break;
 				default:
 				break;
