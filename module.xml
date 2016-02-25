@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.47</version>
+	<version>13.0.48</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.48* Allow splicing into macro-dial one during group exten parsing
 		*13.0.47* Better wording of destination drop downs for voicemail
 		*13.0.46* FREEPBX-11612 force_rport not being written
 		*13.0.45* If there are fatal errors in install then return false dont die_freepbx, just abort this module

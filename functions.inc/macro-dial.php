@@ -38,7 +38,14 @@ $ext->add($c,$s,'', new ext_set('CHANNEL(musicclass)', '${MOHCLASS}'));
 
 $ext->add($c,$s,'dial', new ext_agi('dialparties.agi'));
 $ext->add($c,$s,'', new ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));
-$ext->add($c,$s,'normdial', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', ''), 'n', 2); // dialparties will set the priority to 10 if $ds is not null
+$ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial'), 'n', 2); // dialparties will set the priority to 10 if $ds is not null
+$ext->add($c,$s,'', new ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
+$ext->add($c,$s,'', new ext_set('ITER','1'));
+$ext->add($c,$s,'ndloopbegin', new ext_set('EXTTOCALL','${CUT(FILTERED_DIAL,-,${ITER})}'));
+$ext->add($c,$s,'', new ext_noop('Working with ${EXTTOCALL}'));
+$ext->add($c,$s,'', new ext_set('ITER','$[${ITER}+1]'));
+$ext->add($c,$s,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'ndloopbegin')); // if this is from rg-group, don't strip prefix
+$ext->add($c,$s,'', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', '')); // dialparties will set the priority to 10 if $ds is not null
 $ext->add($c,$s,'', new ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
 $ext->add($c,$s,'', new ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
 
@@ -53,15 +60,16 @@ $ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'), 'n', 
 $ext->add($c,$s,'', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $[$["${RingGroupMethod}" = "hunt" ] | $["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]]]', 'a32', 'a35'));
 $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoop} + 1])}'));
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
-$ext->add($c,$s,'', new ext_goto('a42', 's'));
+$ext->add($c,$s,'', new ext_goto('huntstart', 's'));
 $ext->add($c,$s,'a35', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $["${RingGroupMethod}" = "memoryhunt" ]]', 'a36', 'a50'));
 $ext->add($c,$s,'a36', new ext_set('CTLoop', (string) '0')); // String zeros.
-$ext->add($c,$s,'a37', new ext_gotoif('$[${CTLoop} > ${HuntLoop}]', 'a42')); // if this is from rg-group, don't strip prefix
+$ext->add($c,$s,'a37', new ext_gotoif('$[${CTLoop} > ${HuntLoop}]', 'huntstart')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${CTLoop} + 1])}'));
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
 $ext->add($c,$s,'', new ext_set('CTLoop', '$[1 + ${CTLoop}]'));
 $ext->add($c,$s,'', new ext_goto('a37', 's'));
-$ext->add($c,$s,'a42', new ext_dial('${${HuntMember}}${ds}', ''));
+$ext->add($c,$s,'huntstart', new ext_noop("Hunt Dial Start"));
+$ext->add($c,$s,'', new ext_dial('${${HuntMember}}${ds}', ''));
 $ext->add($c,$s,'', new ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
 $ext->add($c,$s,'', new ext_gotoif('$[$[$["foo${RingGroupMethod}" != "foofirstavailable"] & $["foo${RingGroupMethod}" != "foofirstnotonphone"]] | $["foo${DialStatus}" = "fooBUSY"]]', 'a46'));
@@ -69,7 +77,7 @@ $ext->add($c,$s,'', new ext_set('HuntMembers', (string) '0')); // String zeros.
 $ext->add($c,$s,'a46', new ext_set('HuntMembers', '$[${HuntMembers} - 1]'));
 $ext->add($c,$s,'', new ext_goto('a22', 's'));
 $ext->add($c,$s,'a50', new ext_noop('Deleting: CALLTRACE/${CT_EXTEN} ${DB_DELETE(CALLTRACE/${CT_EXTEN})}'));
-$ext->add($c,$s,'', new ext_goto('a42', 's'));
+$ext->add($c,$s,'', new ext_goto('huntstart', 's'));
 
 $s = 'NOANSWER';
 $ext->add($c,$s,'', new ext_macro('vm', '${SCREEN_EXTEN},BUSY,${IVR_RETVM}'));
