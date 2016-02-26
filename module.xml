@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.49</version>
+	<version>13.0.50</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.50* Exit the macro-dial properly (RE: FREEPBX-11698)
 		*13.0.49* FREEPBX-11698 Remove all numbered priorities on ring groups
 		*13.0.48* Allow splicing into macro-dial one during group exten parsing
 		*13.0.47* Better wording of destination drop downs for voicemail

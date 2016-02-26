@@ -50,12 +50,15 @@ $ext->add($c,$s,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'ndloopbegin')); //
 $ext->add($c,$s,'', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', '')); // dialparties will set the priority to 10 if $ds is not null
 $ext->add($c,$s,'', new ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
 $ext->add($c,$s,'', new ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
+$ext->add($c,$s,'', new ext_macroexit());
 
 //Hunt Groups
 $ext->add($c,$s,'huntdial', new ext_noop('Returned from dialparties with hunt groups to dial'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', (string) '0')); // String zeros, to avoid php getting confused.
+$ext->add($c,$s,'', new ext_execif('$[${LEN(${HuntMembers})}=0]', 'Set', 'HuntMembers=0')); //make sure HuntMembers isnt set to null
 $ext->add($c,$s,'a22', new ext_gotoif('$[${HuntMembers} >= 1]', 'a30')); // if this is from rg-group, don't strip prefix
-$ext->add($c,$s,'', new ext_noop('Returning there are no members left in the hunt group to ring'));
+$ext->add($c,$s,'', new ext_noop('Returning there are no members left in the hunt group to ring ${HuntMembers}'));
+$ext->add($c,$s,'', new ext_macroexit());
 $ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'));
 $ext->add($c,$s,'', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $[$["${RingGroupMethod}" = "hunt" ] | $["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]]]', 'a32', 'a35'));
 $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoop} + 1])}'));
