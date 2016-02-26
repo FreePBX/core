@@ -38,7 +38,9 @@ $ext->add($c,$s,'', new ext_set('CHANNEL(musicclass)', '${MOHCLASS}'));
 
 $ext->add($c,$s,'dial', new ext_agi('dialparties.agi'));
 $ext->add($c,$s,'', new ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));
-$ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial'), 'n', 2); // dialparties will set the priority to 10 if $ds is not null
+
+//Ringall
+$ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial')); // dialparties will set the priority to 10 if $ds is not null
 $ext->add($c,$s,'', new ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
 $ext->add($c,$s,'', new ext_set('ITER','1'));
 $ext->add($c,$s,'ndloopbegin', new ext_set('EXTTOCALL','${CUT(FILTERED_DIAL,-,${ITER})}'));
@@ -49,14 +51,12 @@ $ext->add($c,$s,'', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', '')); // d
 $ext->add($c,$s,'', new ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
 $ext->add($c,$s,'', new ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
 
-// This is bad and terrible, and don't do this. But we can't, currently,
-// explicitly set a priority.
-$ext->_exts[$c][" s "][] = array('basetag' => 20, 'tag' => 'huntdial', 'addpri' => false, 'cmd' => new ext_noop('Returned from dialparties with hunt groups to dial '));
-
+//Hunt Groups
+$ext->add($c,$s,'huntdial', new ext_noop('Returned from dialparties with hunt groups to dial'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', (string) '0')); // String zeros, to avoid php getting confused.
 $ext->add($c,$s,'a22', new ext_gotoif('$[${HuntMembers} >= 1]', 'a30')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_noop('Returning there are no members left in the hunt group to ring'));
-$ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'), 'n', 2);
+$ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'));
 $ext->add($c,$s,'', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $[$["${RingGroupMethod}" = "hunt" ] | $["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]]]', 'a32', 'a35'));
 $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoop} + 1])}'));
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
