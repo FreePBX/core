@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.52</version>
+	<version>13.0.53</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.53* FREEPBX-11017 fix variables for PJSIP, FREEPBX-11068 Fix quoting of screen variable, FREEPBX-11388 Fix did links, 	FREEPBX-11570 catch username conflicts., FREEPBX-11601 Fix element bindings for trunk
 		*13.0.52* FREEPBX-11648 FREEPBX-11676 use datalist instead of unsupport js library
 		*13.0.51* Macro hook additions
 		*13.0.50* Exit macro-dial properly (RE: FREEPBX-11698)
