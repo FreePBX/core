@@ -811,9 +811,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
-
 		if (!empty($config['match'])) {
-			$identify[] = "match=".$config['match'];
+			$endpoint[] = "match=".$config['match'];
 		}
 
 		if (!empty($config['mediaencryption'])) {
