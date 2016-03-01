@@ -181,26 +181,13 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			$forminputs .= '<input id="'.$c['keyword'].'" type="search" name="'.$c['keyword'].'" placeholder="'._("Double-Click to see options or type freeform").'" class="form-control" list="'.$c['keyword'].'-list" value="'.$amp_conf[$c['keyword']].'">';
+			$forminputs .= '<datalist id="'.$c['keyword'].'-list">';
 			$opt = explode(',',$c['options']);
-			$matched = false;
 			foreach($opt as $o) {
-				if($amp_conf[$c['keyword']] == $o) {
-					$matched = true;
-				}
-				$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
-				$forminputs .= '<option value="'.$o.'"'.$selected.'>'._($o).'</option>';
+				$forminputs .= '<option label="'._($o).'" value="'.$o.'">'._($o).'</option>';
 			}
-			if(!$matched) {
-				$forminputs .= '<option value="'.$amp_conf[$c['keyword']].'" selected>'.$amp_conf[$c['keyword']].'</option>';
-			}
-			$forminputs .= '</select>';
-			$forminputs .= '</div>';
-			$szoptions = array(
-				"create" => true,
-				"allowEmptyOption" => false
-			);
-			$forminputs .= '<script>$(function() {$("#'.$c['keyword'].'").removeClass("form-control");$("#'.$c['keyword'].'").selectize('.json_encode($szoptions).');});</script>';
+			$forminputs .= '</datalist>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
 				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';

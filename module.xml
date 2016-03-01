@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.51</version>
+	<version>13.0.52</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.52* FREEPBX-11648 FREEPBX-11676 use datalist instead of unsupport js library
 		*13.0.51* Macro hook additions
 		*13.0.50* Exit macro-dial properly (RE: FREEPBX-11698)
 		*13.0.49* FREEPBX-11698 Remove all numbered priorities on ring groups
