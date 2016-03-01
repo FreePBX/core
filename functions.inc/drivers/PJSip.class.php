@@ -812,7 +812,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
 		if (!empty($config['match'])) {
-			$endpoint[] = "match=".$config['match'];
+			$identify[] = "match=".$config['match'];
 		}
 
 		if (!empty($config['mediaencryption'])) {
@@ -913,7 +913,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (isset($retarr["pjsip.identify.conf"][$identifyname])) {
 			throw new \Exception("Identify $aorname already exists.");
 		}
-		$retarr["pjsip.identify.conf"][$identifyname] = $aor;
+		$retarr["pjsip.identify.conf"][$identifyname] = $identify;
 		if(!empty($this->_identify[$identifyname]) && is_array($this->_identify[$identifyname])) {
 			foreach($this->_identify[$identifyname] as $el) {
 				$retarr["pjsip.identify.conf"][$identifyname][] = "{$el['key']}={$el['value']}";
