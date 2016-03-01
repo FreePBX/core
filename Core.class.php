@@ -2692,6 +2692,41 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			break;
 		}
 	}
+	public function addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections){
+		if (strlen($password) == 40 && ctype_xdigit($password)) {
+			$password_sha1 = $password;
+		}else {
+			$password_sha1 = sha1($password);
+		}
+		$sections = implode("\;",$sections);
+		$vars = array(
+			':username' => $username,
+			':password_sha1' => $password_sha1,
+			':extension_low' => $extension_low,
+			':extension_high' => $extension_high,
+			':deptname' => $deptname,
+			':sections' => $sections,
+		);
+		$sql = "INSERT INTO ampusers (username, password_sha1, extension_low, extension_high, deptname, sections) VALUES (:username,
+					:password_sha1,
+					:extension_low,
+					:extension_high,
+					:deptname,
+					:sections)";
+		$stmt = $this->database->prepare($sql);
+		try{
+			$stmt->execute($vars);
+			return true;
+		}catch(\PDOException $e){
+			//data colission
+			if($e->getCode() == '23000'){
+				return false;
+			}else{
+				echo $e->getMessage();
+        throw $e;
+			}
+		}
+	}
 	public function listTrunkTypes(){
 		$sipdriver = \FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 		$default_trunk_types = array(

@@ -9,7 +9,6 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
 $display = isset($_REQUEST['display'])?$_REQUEST['display']:'ampusers';
 
-$tabindex = 0;
 // populate some global variables from the request string
 $set_globals = array("username","password","extension_high","extension_low");
 foreach ($set_globals as $var) {
@@ -66,8 +65,12 @@ if (isset($_REQUEST["sections"])) {
 //if submitting form, update database
 switch ($action) {
 	case "addampuser":
-		core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
-		redirect_standard();
+		$ret = core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
+		if(!$ret){
+			echo '<div class="alert alert-danger">'.sprintf(_("The user name %s is already in use"),$username).'</div>';
+		}
+		echo '<script>window.location = "?display=ampusers&userdisplay='.$username.'";</script>';
+		//redirect_standard();
 	break;
 	case "editampuser":
 		// Check to make sure the hidden var is sane, and that they haven't changed the password field
@@ -83,16 +86,27 @@ switch ($action) {
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
 			unset($_SESSION['AMP_user']);
 		}
-		redirect_standard('userdisplay');
+	//	redirect_standard('userdisplay');
 	break;
 	case "delampuser":
 		core_ampusers_del($userdisplay);
-		$userdisplay = ""; // go "add" screen
-		redirect_standard();
+		echo '<script>window.location = "?display=ampusers";</script>';
+	//	redirect_standard();
 	break;
 }
+// set defaults
+$user = array(
+	'sections' => isset($_REQUEST['sections'])?$_REQUEST['sections']:array("*"),
+);
+$title = '<h2>' . _("Add Administrator") . '</h2>';
+$username = isset($_REQUEST['username'])?$_REQUEST['username']:"";
+$password = isset($_REQUEST['password'])?$_REQUEST['password']:"";
+$password_sha1 = isset($_REQUEST['password_sha1'])?$_REQUEST['password_sha1']:"";
+$extension_low = isset($_REQUEST['extension_low'])?$_REQUEST['extension_low']:"";
+$extension_high = isset($_REQUEST['extension_high'])?$_REQUEST['extension_high']:"";
+$sections = $user["sections"];
 
-if ($userdisplay) {
+if (!empty($userdisplay)) {
 	$title =  '<h2>' . _("Edit Administrator") . '</h2>';
 	$user = core_getAmpUser($userdisplay);
 	$username = $user["username"];
@@ -101,21 +115,9 @@ if ($userdisplay) {
 	$extension_high = $user["extension_high"];
 	$extension_low = $user["extension_low"];
 	$sections = $user["sections"];
-
-} else {
-	// set defaults
-	$user = array(
-		'sections' => '',
-	);
-	$title = '<h2>' . _("Add Administrator") . '</h2>';
-	$username = "";
-	$password = "";
-	$password_sha1 ="";
-	$extension_low = "";
-	$extension_high = "";
-
-	$sections = array("*");
 }
+
+
 //if(FreePBX::Config()->get('AUTHTYPE') == "usermanager") {
 	//echo _("User Manager is controlling these settings. Please look in User Manager or select 'database' for Authorization Type in Advanced Settings");
 //} else {
@@ -221,7 +223,7 @@ foreach ($module_list as $key => $val) {
 													<label for="password"><?php echo _("Password") ?></label>
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
 												</div>
-												<div class="col-md-9"><input type="password" class="form-control" id="password" name="password" value = "<?php echo $password ?>" tabindex = "<?php ++$tabindex?>">
+												<div class="col-md-9"><input type="password" class="form-control" id="password" name="password" value = "<?php echo $password ?>">
 												</div>
 											</div>
 										</div>
