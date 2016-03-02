@@ -2698,7 +2698,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}else {
 			$password_sha1 = sha1($password);
 		}
-		$sections = implode("\;",$sections);
+		$sections = implode(";",$sections);
 		$vars = array(
 			':username' => $username,
 			':password_sha1' => $password_sha1,
