@@ -188,6 +188,7 @@ foreach ($conf as $c){
 				$forminputs .= '<option label="'._($o).'" value="'.$o.'">'._($o).'</option>';
 			}
 			$forminputs .= '</datalist>';
+			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
 				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
@@ -278,3 +279,6 @@ $forminputs .= "</div> <!-- close last element -->\n";
 		</div>
 	</div>
 </div>
+</br>
+</br>
+</br>
