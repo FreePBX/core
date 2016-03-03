@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.56</version>
+	<version>13.0.57</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.57* Simple inbound routes views
 		*13.0.56* FREEPBX-11734 remove backslashed semi-colon
 		*13.0.55* FREEPBX-11730 Advanced settings display issues
 		*13.0.54* FREEPBX-11463 Improve permit/deny tooltips, FREEPBX-11649 bootstrap tables cookie fix

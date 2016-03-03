@@ -94,23 +94,22 @@ if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 	$formdata['userlink'] = $link;
 }
 $view = !empty($request['view']) ? $request['view'] : '';
+$display_mode = "advanced";
+$mode = \FreePBX::Config()->get("FPBXOPMODE");
+if(!empty($mode)) {
+	$display_mode = $mode;
+}
+
 switch($view){
 	case "form":
-		$content = load_view(__DIR__.'/views/did/routeform.php', $formdata);
-		$mwidth = '9';
-		$bootnav = '
-		<div class="col-sm-3 hidden-xs bootnav">
-			<div class="list-group">';
-			$bootnav .=	load_view(__DIR__.'/views/did/rnav.php');
-		$bootnav .= '
-			</div>
-		</div>
-		';
+		if($display_mode == "basic") {
+			$content = load_view(__DIR__.'/views/did/basic_form.php', $formdata);
+		} else {
+			$content = load_view(__DIR__.'/views/did/advanced_form.php', $formdata);
+		}
 	break;
 	default:
 		$content = load_view(__DIR__.'/views/did/didgrid.php');
-		$bootnav = '';
-		$mwidth = '12';
 	break;
 }
 
