@@ -1659,7 +1659,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		//only allow extensions that are within administrator's allowed range
 		foreach($results as $result){
-			if ($get_all || checkRange($result[0])){
+			if ($get_all || \checkRange($result[0])){
 				$extens[] = array($result[0],$result[1],$result[2]);
 			}
 		}
@@ -1801,7 +1801,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$final = array();
 				foreach($results as $res) {
 					$ext = $res['extension'];
-					if(checkRange($ext)){
+					$ret = checkRange($ext);
+					if($ret){
 						$final[$ext] = $res;
 					}
 				}
@@ -1846,6 +1847,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//Virtual Extensions are strange
 		$final = array();
 		foreach($results as $result) {
+			if(!checkRange($result['extension'])){
+				continue;
+			}
 			if(empty($result['tech'])) {
 				$result['tech'] = 'virtual';
 			} elseif(!empty($result['tech']) && $type == "virtual") {
