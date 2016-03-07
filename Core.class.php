@@ -79,11 +79,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function getRightNav($request) {
+		$display_mode = "advanced";
+		$mode = $this->freepbx->Config()->get("FPBXOPMODE");
+		if(!empty($mode)) {
+			$display_mode = $mode;
+		}
 		switch($request['display']){
 			case 'extensions':
 			case 'devices':
 				$popover = isset($request['fw_popover']) ? "&amp;fw_popover=".$request['fw_popover'] : '';
 				$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
+				if($display_mode == "basic" && (!isset($request['extdisplay']) || trim($request['extdisplay']) == "")) {
+					return array();
+				}
 				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display'], "popover"=>$popover));
 			break;
 			case 'trunks':

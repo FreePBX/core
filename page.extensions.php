@@ -1,8 +1,44 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-	$popover = isset($_REQUEST['fw_popover']) ? "&amp;fw_popover=".$_REQUEST['fw_popover'] : '';
-?>
+$popover = isset($_REQUEST['fw_popover']) ? "&amp;fw_popover=".$_REQUEST['fw_popover'] : '';
 
+$display_mode = "advanced";
+$mode = \FreePBX::Config()->get("FPBXOPMODE");
+if(!empty($mode)) {
+	$display_mode = $mode;
+}
+
+if($display_mode == "basic") { ?>
+	<div class="fpbx-container container-fluid">
+		<div class="row">
+			<div class="col-sm-12">
+				<?php if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) { ?>
+					<div class="display no-border">
+						<h1><?php echo _("Extensions")?></h1>
+						<div id="toolbar-sip">
+							<a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=sip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a>
+							<button id="remove-sip" class="btn btn-danger btn-remove" data-type="extensions" data-section="sip" disabled>
+								<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+							</button>
+						</div>
+						<table data-cookie="true" data-cookie-id-table="extensions-sip" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=sip" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-sip" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-sip">
+							<thead>
+								<tr>
+									<th data-checkbox="true"></th>
+									<th data-sortable="true" data-field="extension"><?php echo _('Extension')?></th>
+									<th data-sortable="true" data-field="name"><?php echo _('Name')?></th>
+									<th data-field="actions"><?php echo _('Actions')?></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				<?php } else {
+					echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php", array("hideCategory" => array("advanced","other","findmefollow")));
+				} ?>
+			</div>
+		</div>
+	</div>
+<?php } else { ?>
 <div class="fpbx-container container-fluid">
 	<?php if((isset($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay']))) { ?>
 		<div class="row">
@@ -229,3 +265,4 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 		return row.settings.fmfm ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Find Me/Follow Me is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Find Me/Follow Me is disabled")?>"></i>';
 	}
 </script>
+<?php } ?>
