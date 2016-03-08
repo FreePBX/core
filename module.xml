@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.59</version>
+	<version>13.0.60</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.60* FREEPBX-11768 Inbound Call Fails If All Extensions on DND
 		*13.0.59* FREEPBX-11093 Check for common errors during bulk import
 		*13.0.58* Simplify settings
 		*13.0.57* Simple inbound routes views

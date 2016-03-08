@@ -38,6 +38,7 @@ $ext->add($c,$s,'', new ext_set('CHANNEL(musicclass)', '${MOHCLASS}'));
 
 $ext->add($c,$s,'dial', new ext_agi('dialparties.agi'));
 $ext->add($c,$s,'', new ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));
+$ext->add($c,$s,'', new ext_macroexit());
 
 //Ringall
 $ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial')); // dialparties will set the priority to 10 if $ds is not null
