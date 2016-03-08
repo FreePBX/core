@@ -47,7 +47,7 @@
                         <?php if(!empty($elem['helptext'])) { ?>
                           <div class="row">
                             <div class="col-md-12">
-                              <span id="<?php echo $elem['name']?>-help" class="help-block fpbx-help-block"><?php echo $elem['helptext']?></span>
+                              <span id="<?php echo $elem['name']?>-help" class="help-block fpbx-help-block <?php echo strtolower($category)?>-find"><?php echo $elem['helptext']?></span>
                             </div>
                           </div>
                         <?php } ?>

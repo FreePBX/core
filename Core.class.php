@@ -2558,6 +2558,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if (!is_numeric($data['extension'])) {
 					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
+				if(empty($data['tech'])) {
+					return array("status" => false, "message" => _("Technology of device is undefined. Please specify a 'tech'"));
+				}
+				if(empty($data['name'])) {
+					return array("status" => false, "message" => _("Device 'name' can not be blank."));
+				}
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
 				foreach ($settings as $key => $value) {
 					if (isset($data[$key])) {
