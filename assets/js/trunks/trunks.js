@@ -164,8 +164,8 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td><td>';
-			newhtml +=	'		<a href="#" id="routerowadd'+id+'"><i class="fa fa-plus"></i></a>';
-			newhtml +=	'		<a href="#" id="routerowdel'+id+'"><i class="fa fa-trash"></i></a>';
+			newhtml +=	'		<a href="#" id="rowadd'+id+'"><i class="fa fa-plus"></i></a>';
+			newhtml +=	'		<a href="#" id="rowdel'+id+'"><i class="fa fa-trash"></i></a>';
 			newhtml +=	'</td>';
 			newhtml +=	'</tr>';
 			lastRow.parent().append(newhtml);
