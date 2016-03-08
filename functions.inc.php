@@ -6143,7 +6143,7 @@ function core_users_configpageload() {
 
 				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
-				$addURL = '?display=did&view=form&extdisplay='.$did['extension'].'/'.$did['cidnum'];
+				$addURL = '?display=did&view=form&extdisplay='.urlencode($did['extension'].'/'.$did['cidnum']);
 				$did_icon = 'images/email_edit.png';
 				$did_label = trim($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
 				if (trim($did['cidnum']) != '') {
@@ -6332,7 +6332,7 @@ function core_devices_configpageload() {
 				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
 				if ($deviceInfo['device_user'] != 'none') {
-					$editURL = '?display=users&skip=0&extdisplay='.$deviceInfo['user'];
+					$editURL = '?display=users&skip=0&extdisplay='.urlencode($deviceInfo['user']);
 					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
 					$currentcomponent->addguielem('_top', new gui_link('edit_user', $label, $editURL, true, false), 0);
