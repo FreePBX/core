@@ -1,5 +1,5 @@
 
-$(document).on('click',"a[id^='routerowadd']",function(e){
+$(document).on('click',"a[id^='rowadd']",function(e){
 	e.preventDefault();
 	var curRow = $("tr[id^='dprow']").last();
 	var id = $("tr[id^='dprow']").length++;
@@ -31,8 +31,8 @@ $(document).on('click',"a[id^='routerowadd']",function(e){
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
 	newhtml +=	'	</div>';
 	newhtml +=	'</td><td>';
-	newhtml +=	'		<a href="#" id="routerowadd'+id+'"><i class="fa fa-plus"></i></a>';
-	newhtml +=	'		<a href="#" id="routerowdel'+id+'"><i class="fa fa-trash"></i></a>';
+	newhtml +=	'		<a href="#" id="rowadd'+id+'"><i class="fa fa-plus"></i></a>';
+	newhtml +=	'		<a href="#" id="rowdel'+id+'"><i class="fa fa-trash"></i></a>';
 	newhtml +=	'</td>';
 	newhtml +=	'</tr>';
 	curRow.parent().append(newhtml);
