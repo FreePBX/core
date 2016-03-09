@@ -33,8 +33,7 @@ $at = trim($at);
 $at = ($at != "none" && $at != "inherit") ? $at : '';
 $ext->add($c,$s,'', new ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
 
-$ext->add($c,$s,'', new ext_gotoif('$["${MOHCLASS}" = ""]', 'dial'));
-$ext->add($c,$s,'', new ext_set('CHANNEL(musicclass)', '${MOHCLASS}'));
+$ext->add($c,$s,'', new ext_execif('$[("${MOHCLASS}"!="default") & ("${MOHCLASS}"!="")]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 
 $ext->add($c,$s,'dial', new ext_agi('dialparties.agi'));
 $ext->add($c,$s,'', new ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));

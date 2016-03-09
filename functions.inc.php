@@ -1512,8 +1512,12 @@ function core_do_get_config($engine) {
 					// Should never happen
 					$item['mohclass'] = "default";
 				}
-				$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
-				$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
+				if($item['mohclass'] != "default") {
+					$ext->add($context, $exten, '', new ext_setmusiconhold($item['mohclass']));
+					$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',$item['mohclass']));
+				} else {
+					$ext->add($context, $exten, '', new ext_setvar('__MOHCLASS',""));
+				}
 
 				// If we require RINGING, signal it as soon as we enter.
 				if ($item['ringing'] === "CHECKED") {

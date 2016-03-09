@@ -65,7 +65,7 @@ $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ALERT_INFO}"!="" & "${ALERT
 // This is now broken. SIPADDHEADER needs to be a hash. TODO figure out how to fix this
 // $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
 
-$ext->add($mcontext,$exten,'', new ext_execif('$["${MOHCLASS}"!=""]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
+$ext->add($mcontext,$exten,'', new ext_execif('$[("${MOHCLASS}"!="default") & ("${MOHCLASS}"!="")]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 $ext->add($mcontext,$exten,'', new ext_gosubif('$["${QUEUEWAIT}"!=""]','qwait,1'));
 $ext->add($mcontext,$exten,'', new ext_set('__CWIGNORE', '${CWIGNORE}'));
 $ext->add($mcontext,$exten,'', new ext_set('__KEEPCID', 'TRUE'));
