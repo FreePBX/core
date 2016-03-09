@@ -6379,16 +6379,16 @@ function core_devices_configpageload() {
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display != 'extensions' ) {
-			$section = _("Device Info");
+			$section = ($extdisplay ? _("Edit User") : _("Add User"));
 			if ( $extdisplay ) { // Editing
-				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay));
+				$currentcomponent->addguielem($section, new gui_hidden('deviceid', $extdisplay),"general");
 			} else { // Adding
-				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenticate to the system."), '!isInteger()', $msgInvalidDevID, false));
+				$currentcomponent->addguielem($section, new gui_textbox('deviceid', $extdisplay, _("Device ID"), _("Give your device a unique integer ID.  The device will use this ID to authenticate to the system."), '!isInteger()', $msgInvalidDevID, false),"general");
 			}
-			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The CallerID name for this device will be set to this description until it is logged into."), '!isUnicodeLetter() || isWhitespace()', $msgInvalidDevDesc, false));
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID));
-			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false));
-			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false));
+			$currentcomponent->addguielem($section, new gui_textbox('description', $devinfo_description, _("Description"), _("The CallerID name for this device will be set to this description until it is logged into."), '!isUnicodeLetter() || isWhitespace()', $msgInvalidDevDesc, false),"general");
+			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false),"general");
+			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false),"general");
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
 		} else {
 			$section = _("Extension Options");
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
