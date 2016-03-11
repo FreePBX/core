@@ -64,7 +64,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth->execute(array("%".$query."%"));
 			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
-				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
+				$results[] = array("text" => _("Outbound Route:")." ".$row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
 			}
 
 			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
@@ -72,10 +72,28 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth->execute(array("%".$query."%"));
 			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
-				$results[] = array("text" => $row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
+				$results[] = array("text" => _("Trunk:")." ".$row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
+			}
+
+			$sql = "SELECT * FROM incoming WHERE description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$display = urlencode($row['extension']."/".$row['cidnum']);
+				$results[] = array("text" => _("Inbound Route:")." ".$row['description'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
+			}
+		} else {
+			$sql = "SELECT * FROM incoming WHERE cidnum LIKE :search OR extension LIKE :search";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("search" => "%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			dbug($rows);
+			foreach($rows as $row) {
+				$display = urlencode($row['extension']."/".$row['cidnum']);
+				$results[] = array("text" => _("Inbound Route:")." ".$row['extension']."/".$row['cidnum'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
 			}
 		}
-
 	}
 
 	public function getRightNav($request) {

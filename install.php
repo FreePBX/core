@@ -1565,7 +1565,7 @@ if (is_link('/etc/localtime')) {
 } elseif (file_exists('/etc/timezone')) {
 	// Ubuntu / Debian.
 	$data = file_get_contents('/etc/timezone');
-	if ($data) {
+	if (!empty($data)) {
 		$timezone = $data;
 	}
 } elseif (file_exists('/etc/sysconfig/clock')) {
@@ -1577,10 +1577,10 @@ if (is_link('/etc/localtime')) {
 }
 
 $set['category'] = 'System Setup';
-$set['value'] = $timezone;
+$set['value'] = !empty($timezone) ? $timezone : "UTC";
 $set['defaultval'] = 'UTC';
 $set['name'] = 'PHP Timezone';
-$set['description'] = "Timezone that should be used by PHP. Empty value will use PHP defaults";
+$set['description'] = "Timezone that should be used by PHP. Empty value will use PHP defaults. List of value Timezones: <a href='http://php.net/manual/en/timezones.php'>http://php.net/manual/en/timezones.php</a>";
 $set['hidden'] = 0;
 $set['emptyok'] = 1;
 $set['readonly'] = 0;
