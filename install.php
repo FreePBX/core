@@ -1460,6 +1460,60 @@ if($httpupdate) {
 	}
 }
 
+// HTTPBINDADDRESS
+$set['value'] = '';
+$set['defaultval'] =& $set['value'];
+$set['name'] = 'Session Limit';
+$set['description'] = 'Specifies the maximum number of http sessions that will be allowed to exist at any given time.';
+$set['emptyok'] = 1;
+$set['options'] = array(10,65536);
+$set['type'] = CONF_TYPE_INT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPSESSIONLIMIT',$set);
+
+// HTTPBINDADDRESS
+$set['value'] = 30000;
+$set['defaultval'] =& $set['value'];
+$set['name'] = 'Session Inactivity ';
+$set['description'] = 'Specifies the number of milliseconds to wait for more data over the HTTP connection before closing it.';
+$set['emptyok'] = 1;
+$set['options'] = array(0,65536);
+$set['type'] = CONF_TYPE_INT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPSESSIONINACTIVITY',$set);
+
+// HTTPBINDADDRESS
+$set['value'] = 15000;
+$set['defaultval'] =& $set['value'];
+$set['name'] = 'Session Keep Alive';
+$set['description'] = 'Specifies the number of milliseconds to wait for the next HTTP request over a persistent connection. Set to 0 to disable persistent HTTP connections.';
+$set['emptyok'] = 1;
+$set['options'] = array(0,65536);
+$set['type'] = CONF_TYPE_INT;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('HTTPSESSIONKEEPALIVE',$set);
+$freepbx_conf->commit_conf_settings();
+
+$migrate = array("sessionlimit" => "HTTPSESSIONLIMIT","session_inactivity" => "HTTPSESSIONINACTIVITY","session_keep_alive" => "HTTPSESSIONKEEPALIVE");
+if(file_exists($amp_conf['ASTETCDIR'].'/http_custom.conf')) {
+	$data = FreePBX::LoadConfig()->getConfig('http_custom.conf');
+	$contents = file_get_contents($amp_conf['ASTETCDIR'].'/http_custom.conf');
+	if(!empty($data['HEADER']) && is_array($data['HEADER'])) {
+		foreach($data['HEADER'] as $key => $value) {
+			if(!isset($migrate[$key])) {
+				continue;
+			}
+			outn(sprintf(_("Migrating http setting '%s' to Advanced Settings..."),$key));
+			$contents = preg_replace('/'.$key.'\s*=\s*'.$value.'.*\n/','',$contents);
+			$freepbx_conf->update($migrate[$key],$value);
+			out(_("Done"));
+		}
+	}
+	file_put_contents($amp_conf['ASTETCDIR'].'/http_custom.conf',$contents);
+}
 //
 // CATEGORY: GUI Behavior
 //

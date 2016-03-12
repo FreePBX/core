@@ -196,6 +196,9 @@ class core_conf {
 		$output .= "tlsbindaddr=".$freepbx_conf->get_conf_setting('HTTPTLSBINDADDRESS')."\n";
 		$output .= "tlscertfile=".$freepbx_conf->get_conf_setting('HTTPTLSCERTFILE')."\n";
 		$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
+		$output .= "sessionlimit=".$freepbx_conf->get_conf_setting('HTTPSESSIONLIMIT')."\n";
+		$output .= "session_inactivity=".$freepbx_conf->get_conf_setting('HTTPSESSIONINACTIVITY')."\n";
+		$output .= "session_keep_alive=".$freepbx_conf->get_conf_setting('HTTPSESSIONKEEPALIVE')."\n";
 		return $output;
 	}
 

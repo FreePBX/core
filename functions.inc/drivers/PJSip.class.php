@@ -723,7 +723,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private function generateEndpoint($config, &$retarr) {
 		// Validate $config array
 		$this->validateEndpoint($config);
-		dbug($config);
 		if($config['sipdriver'] != 'chan_pjsip') {
 			return false;
 		}
