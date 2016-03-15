@@ -5965,7 +5965,9 @@ function core_users_configpageload() {
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
-
+	if(!checkRange($extdisplay)){
+		return;
+	}
 	if ( $action == 'del' ) { // Deleted
 
 		$currentcomponent->addguielem('_top', new gui_subheading('del', $extdisplay.' '._("deleted"), false));
@@ -6296,7 +6298,6 @@ function core_users_configprocess() {
 
 function core_devices_configpageinit($dispnum) {
 	global $currentcomponent, $amp_conf;
-
 	if ( $dispnum == 'devices' || $dispnum == 'extensions' ) {
 		// Option lists used by the gui
 		$currentcomponent->addoptlistitem('devicetypelist', 'fixed', _("Fixed"));
