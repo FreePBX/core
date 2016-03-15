@@ -228,7 +228,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 							</li>
 							<li role="presentation" data-name="tdialplan" class="change-tab">
 								<a href="#tdialplan" aria-controls="tdialplan" role="tab" data-toggle="tab">
-									<?php echo _("Dialplan Manipulation Rules")?>
+									<?php echo _("Dialed Number Manipulation Rules")?>
 								</a>
 							</li>
 							<li role="presentation" data-name="ttech" class="change-tab">
