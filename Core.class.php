@@ -2206,11 +2206,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		//write to astdb
 		$astman = $this->FreePBX->astman;
+		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
-			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : '');
-			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : 0);
-			$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($settings['concurrency_limit']) ? $settings['concurrency_limit'] : 0);
+			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
+			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : $fpc->get('CFRINGTIMERDEFAULT'));
+			$astman->database_put("AMPUSER",$extension."/concurrency_limit",isset($settings['concurrency_limit']) ? $settings['concurrency_limit'] : $fpc->get('CONCURRENCYLIMITDEFAULT'));
 			$astman->database_put("AMPUSER",$extension."/noanswer",isset($settings['noanswer']) ? $settings['noanswer'] : '');
 			$astman->database_put("AMPUSER",$extension."/recording",isset($settings['recording']) ? $settings['recording'] : '');
 			$astman->database_put("AMPUSER",$extension."/outboundcid",isset($settings['outboundcid']) ? $settings['outboundcid'] : '');
