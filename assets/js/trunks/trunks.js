@@ -140,20 +140,20 @@ $("[id='trunkgetlocalprefixes']").click(function(){
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
-			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="'+prepend+'">';
+			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control dp-prepend" value="'+prepend+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
-			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value="'+prefix+'"> ';
+			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control dp-prefix " value="'+prefix+'"> ';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
-			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="'+match+'">';
+			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dp-match dpt-value" value="'+match+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
@@ -313,9 +313,26 @@ function validatePatterns() {
       }
     });
   }
+	if (!culprit) {
+		var hash = [];
+		$(".dp-prefix").each(function() {
+			var prefix = $(this).val(),
+					match = $(this).parents("tr").find(".dp-match").val(),
+					check = prefix+match;
+			if(check.length === 0) {
+				return true;
+			}
+			if(hash.indexOf(check) === -1) {
+				hash.push(check);
+			} else {
+				culprit = this;
+				return false;
+			}
+		});
+	}
 
   if (culprit !== undefined) {
-	  msgInvalidDialPattern = "<?php echo _('Dial pattern is invalid'); ?>";
+	  msgInvalidDialPattern = _('Dial pattern is invalid');
     return warnInvalid(culprit, msgInvalidDialPattern);
   } else {
     return true;
