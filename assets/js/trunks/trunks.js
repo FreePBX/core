@@ -37,11 +37,10 @@ $(document).on('click',"a[id^='rowadd']",function(e){
 	newhtml +=	'</tr>';
 	curRow.parent().append(newhtml);
 });
-$("a[id^='rowdel']").click(function(){
+$("a[id^='rowdel']").click(function(e){
+	e.preventDefault();
 	var curRow = $(this).closest('tr');
-	curRow.fadeOut(2000, function(){
-		$(this).remove();
-	});
+	curRow.remove();
 });
 //DialPlan Wizard
 $("[id='trunkgetlocalprefixes']").click(function(){
