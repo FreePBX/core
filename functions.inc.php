@@ -8,6 +8,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 class core_conf {
 	var $_sip_general    = array();
 	var $_sip_additional = array();
+	var $_sip_additionalsection = array();
 	var $_sip_notify     = array();
 	var $_iax_general    = array();
 	var $_iax_additional = array();
@@ -206,6 +207,10 @@ class core_conf {
 		$this->_sip_additional[$section][] = array('key' => $key, 'value' => $value);
 	}
 
+	function addSipAdditionalSection($section) {
+		$this->_sip_additionalsection[] = $section;
+	}
+
 	function addSipGeneral($key, $value) {
 		$this->_sip_general[] = array('key' => $key, 'value' => $value);
 	}
@@ -386,9 +391,11 @@ class core_conf {
 			die($results->getMessage());
 		}
 
+		$usedAccounts = array();
 		foreach ($results as $result) {
 			$output = "";
 			$account = $result['data'];
+			$usedAccounts[] = $account;
 			$id = $result['id'];
 
 			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
@@ -560,6 +567,17 @@ class core_conf {
 			}
 			$output .= $additional."\n";
 			$finaloutput .= $output;
+		}
+		foreach($this->_sip_additionalsection as $section) {
+			if(!in_array($section,$usedAccounts) && !empty($this->_sip_additional[$section])) {
+				$output = "[".$section."]\n";
+				foreach ($this->_sip_additional[$section] as $asetting) {
+					$output .= $asetting['key'] . "=" . $asetting['value'] . "\n";
+				}
+				$finaloutput .= $output;
+			} elseif(in_array($section,$usedAccounts)) {
+				throw new \Exception(sprintf(_("%s is already in use sip.conf. Can not continue"),$section));
+			}
 		}
 		return $finaloutput;
 	}

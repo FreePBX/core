@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.63</version>
+	<version>13.0.64</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.64* Allow adding sections to sip_additional.conf
 		*13.0.63* FREEPBX-9691 Add asterisk http.conf settings in GUI
 		*13.0.62* FREEPBX-9914 Add incoming routes/dids to search
 		*13.0.61* FREEPBX-11037 Parking Pro module - Parked Music Class wont change
