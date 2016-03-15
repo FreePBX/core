@@ -1613,7 +1613,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		// create a voicemail symlink if needed
 		// TODO: This should be hooked from voicemail
 		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','setupMailboxSymlinks') ) {
-			$this->FreePBX->Voicemail->setupMailboxSymlinks($id);
+			$this->FreePBX->Voicemail->setupMailboxSymlinks($settings['user']['value']);
 		}
 
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
