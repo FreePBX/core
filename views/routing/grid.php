@@ -62,10 +62,11 @@ HERE;
 			data-url="<?php echo $dataurl?>"
 			data-cache="false"
 			data-cookie="true"
-			data-cookie-id-table="<must be a uniquely global name throughout all of freepbx>"
+			data-cookie-id-table="routing-grid-table"
 			data-toolbar="#toolbar-all"
 			data-maintain-selected="true"
 			data-toggle="table"
+			data-pagination="true"
 			class="table table-striped">
 		<thead>
 			<tr>

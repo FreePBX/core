@@ -12,7 +12,20 @@
     </ul>
   </div>
 </div>
-<table data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" id="table-all">
+<table data-toolbar="#toolbar-all"
+        data-toggle="table"
+        data-pagination="true"
+        data-search="true"
+        class="table table-striped"
+        data-maintain-selected="true"
+        data-show-columns="true"
+        data-show-toggle="true"
+        data-toggle="table"
+        data-pagination="true"
+        data-search="true"
+        data-cookie="true"
+        data-cookie-id-table="table-trunk-all"
+        id="table-all">
 	<thead>
 		<tr>
 			<th data-sortable="true"><?php echo _('Name')?></th>
