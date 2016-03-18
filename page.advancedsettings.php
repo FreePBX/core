@@ -261,7 +261,7 @@ $forminputs .= "</div> <!-- close last element -->\n";
 ?>
 
 <div class="container-fluid">
-	<h1><?php echo _("FreePBX Advanced Settings")?></h1>
+	<h1><?php echo sprintf(_("%s Advanced Settings"),$conf['DASHBOARD_FREEPBX_BRAND']['value'])?></h1>
 	<div class="alert alert-warning">
 		<?php echo "<b>"._('IMPORTANT:')."</b>". _('Use extreme caution when making changes!')?>
 	</div>
