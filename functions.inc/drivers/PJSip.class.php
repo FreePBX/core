@@ -739,6 +739,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$aorname = "$endpointname";
 		$aor[] = "type=aor";
 
+		//identify
+		$identify[] = "endpoint=$endpointname";
+
 		// Endpoint
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
