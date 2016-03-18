@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.67* Branding changes
+		*13.0.67* Advanced settings name changes
 		*13.0.66* FREEPBX-11710 Attach endpoint to identify
 		*13.0.65* FREEPBX-11753, FREEPBX-11601, FREEPBX-11777, FREEPBX-11564, FREEPBX-11671, FREEPBX-11710, FREEPBX-11727, FREEPBX-11728, FREEPBX-11733, FREEPBX-9268, FREEPBX-11744
 		*13.0.64* Allow adding sections to sip_additional.conf
