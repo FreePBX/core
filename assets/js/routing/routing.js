@@ -90,7 +90,7 @@ $(document).on('click',"a[id^='routerowadd']",function(e){
 	var id = $("tr[id^='dprow']").length++;
 	var newhtml = '';
 	newhtml +='<tr id="dprow'+id+'">';
-	newhtml +=	'<td class="hidden-xs prepend">';
+	newhtml +=	'<td class="prepend">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
 	newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="">';
@@ -110,7 +110,7 @@ $(document).on('click',"a[id^='routerowadd']",function(e){
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
 	newhtml +=	'	</div>';
 	newhtml +=	'</td>';
-	newhtml +=	'<td class="hidden-xs hidden-sm callerid">';
+	newhtml +=	'<td class="callerid">';
 	newhtml +=	'	<div class="input-group">';
 	newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="">';
 	newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
