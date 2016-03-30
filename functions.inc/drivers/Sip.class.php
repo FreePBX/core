@@ -175,9 +175,17 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$pport = '';
 		}
 
-		$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
-		$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
-		$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
+		$display_mode = "advanced";
+		$mode = \FreePBX::Config()->get("FPBXOPMODE");
+		if(!empty($mode)) {
+			$display_mode = $mode;
+		}
+		if ($display_mode != 'basic') {
+			$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
+			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
+			$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
+		}
+
 		// We need to scream loudly if this device is using a channel driver that's disabled.
 		if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
 			$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
