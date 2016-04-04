@@ -1735,15 +1735,23 @@ function core_do_get_config($engine) {
 				if ($exten['sipname']) {
 					$ext->add('ext-local', $exten['sipname'], '', new ext_goto('1',$item[0],'from-internal'));
 				}
-				// Now make a special context for the IVR inclusions of local extension dialing so that
-				// when people use the Queues breakout ability, and break out to someone's extensions, voicemail
-				// works.
-				//
-				$ivr_context = 'from-did-direct-ivr';
-				$ext->add($ivr_context, $exten['extension'],'', new ext_macro('blkvm-clr'));
-				$ext->add($ivr_context, $exten['extension'],'', new ext_setvar('__NODEST', ''));
-				$ext->add($ivr_context, $exten['extension'],'', new ext_goto('1',$exten['extension'],'from-did-direct'));
 			}
+
+			// Now make a special context for the IVR inclusions of local extension dialing so that
+			// when people use the Queues breakout ability, and break out to someone's extensions, voicemail
+			// works.
+			//
+			$ivr_context = 'from-did-direct-ivr';
+			$sql = "SELECT LENGTH(id) as len FROM devices GROUP BY len";
+			$sth = FreePBX::Database()->prepare($sql);
+			$sth->execute();
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_macro('blkvm-clr'));
+				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_setvar('__NODEST', ''));
+				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_goto('1','${EXTEN}','from-did-direct'));
+			}
+
 			$ext->add('ext-local', 'vmret', '', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','playret'));
 			$ext->add('ext-local', 'vmret', '', new ext_hangup(''));
 			$ext->add('ext-local', 'vmret', 'playret', new ext_playback('exited-vm-will-be-transfered&silence/1'));

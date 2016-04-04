@@ -6,6 +6,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	private $drivers = array();
 	private $deviceCache = array();
 	private $getUserCache = array();
+	private $getDeviceCache = array();
 	private $listUsersCache = array();
 
 	public function __construct($freepbx = null) {
@@ -1765,6 +1766,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$this->drivers[$tech]->delDevice($account);
 		}
 		$this->freepbx->Hooks->processHooks($account, $editmode);
+		$this->getDeviceHeadersCache = array();
+		$this->deviceCache = array();
 		return true;
 	}
 
@@ -2409,6 +2412,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {int} $account The Device ID
 	 */
 	public function getDevice($account) {
+		if (isset($this->getDeviceCache[$account])) {
+			return $this->getDeviceCache[$account];
+		}
 		$sql = "SELECT * FROM devices WHERE id = ?";
 		$sth = $this->database->prepare($sql);
 		try {
@@ -2430,7 +2436,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		$results = array_merge($device,$tech);
 
-		return $results;
+		$this->getDeviceCache[$account] = $results;
+		return $this->getDeviceCache[$account];
 	}
 
 	public function hookTabs($page){
