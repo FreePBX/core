@@ -1761,13 +1761,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$tech = $devinfo['tech'];
 
 		//TODO should only delete the record for this device buuuutttt......
-		$this->deviceCache = array();
 		if(isset($this->drivers[$tech])) {
 			$this->drivers[$tech]->delDevice($account);
 		}
 		$this->freepbx->Hooks->processHooks($account, $editmode);
 		$this->getDeviceHeadersCache = array();
 		$this->deviceCache = array();
+		$this->getDeviceCache = array();
 		return true;
 	}
 

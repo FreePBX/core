@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.68</version>
+	<version>13.0.69</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.69* FREEPBX-11988 Fix bug with editing extensions
 		*13.0.68* FREEPBX-11862 Fix field sizing
 		*13.0.67* Advanced settings name changes
 		*13.0.66* FREEPBX-11710 Attach endpoint to identify
