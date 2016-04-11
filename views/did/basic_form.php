@@ -117,7 +117,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="goto0"></i>
 							</div>
 							<div class="col-md-9">
-								<?php echo drawselects((isset($destination)?$destination:null),0,array("core" => array("extensions","voicemail"), "timeconditions"),false,'', false, false, true); ?>
+								<?php echo drawselects((isset($destination)?$destination:null),0,array("core" => array("extensions","voicemail"), "timeconditions", "sipstation"),false,'', false, false, true); ?>
 							</div>
 						</div>
 					</div>
