@@ -44,16 +44,13 @@ $routerows .= <<<HERE
 <td>$attributes</td>
 <td><a href="config.php?display=routing&view=form&id=$id">
 	<i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-	<a id="del$id" data-id="$id" class="clickable delAction">
-	<i class="fa fa-trash-o"></i></a>&nbsp;&nbsp;
+	<a id="del$id" data-id="$id">
+	<i class="fa fa-trash"></i></a>&nbsp;&nbsp;
 </tr>
 HERE;
 
 }
 ?>
-<style>
-.text-grey:
-</style>
 <div id="toolbar-all">
 <a href="config.php?display=routing&amp;view=form" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp; <?php echo _("Add Outbound Route")?></a>
 </div>

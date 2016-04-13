@@ -54,9 +54,13 @@ $(function() {
 			});
 		}
 	});
-	$("a[id^='del']").click(function(){
+	$("a[id^='del']").click(function(e){
+		e.preventDefault();
+		if(confirm("Are you sure you want to delete this route?") === false){
+			return false;
+		}
 		var id = $(this).data('id'),
-				curRow = $(this).closest('tr');
+		curRow = $(this).closest('tr');
 		$.ajax({
 			type: 'POST',
 			url: "ajax.php",
