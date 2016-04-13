@@ -17,7 +17,7 @@
 <table data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allTrunks" data-cache="false" data-toggle="table" data-search="true" data-toolbar="#bnavtrunk" class="table" id="table-all-side">
 	<thead>
 			<tr>
-					<th data-formatter="rtrunk" data-sortable="true" data-field="trunkid"><?php echo _('Trunks')?></th>
+					<th data-formatter="rtrunk" data-sortable="true" data-field="name"><?php echo _('Trunks')?></th>
 			</tr>
 	</thead>
 </table>
