@@ -705,6 +705,9 @@ if (!strlen($ds)) {
 			$ds .= $timer;
 		}
 		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
+		$dir = get_var( $AGI, "DIRECTION" );
+		//dont allow inbound callers to transfer around inside the system
+		$ds = ($dir == "INBOUND") ? str_replace("T","",$ds) : $ds;
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_variable("HuntMembers",$loops);
 		$AGI->set_priority("huntdial"); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
@@ -728,6 +731,9 @@ if (!strlen($ds)) {
 				$AGI->set_variable('__CALLCONFIRMCID',"999");
 			}
 		}
+		$dir = get_var( $AGI, "DIRECTION" );
+		//dont allow inbound callers to transfer around inside the system
+		$ds = ($dir == "INBOUND") ? str_replace("T","",$ds) : $ds;
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_priority("normdial"); // dial command was at priority 10
 	}

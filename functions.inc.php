@@ -1227,6 +1227,8 @@ function core_do_get_config($engine) {
 		$ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
 		$exten = '_LC-.';
 		$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
+		//dont allow inbound callers to transfer around inside the system
+		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}I'));
 		$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})b(func-apply-sipheaders^s^1)'));
 
 		/* This needs to be before outbound-routes since they can have a wild-card in them
@@ -1506,7 +1508,7 @@ function core_do_get_config($engine) {
 
 				$exten = (($exten == "")?"s":$exten);
 				$exten = $exten.(($cidnum == "")?"":"/".$cidnum); //if a CID num is defined, add it
-
+				$ext->add($context, $exten, '', new ext_setvar('__DIRECTION',($amp_conf['INBOUND_NOTRANS'] ? 'INBOUND' : '')));
 				if ($cidroute) {
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					$ext->add($context, $exten, '', new ext_goto('1','s'));
