@@ -1206,6 +1206,8 @@ function core_do_get_config($engine) {
 		$ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
 		$exten = '_LC-.';
 		$ext->add($context, $exten, '', new ext_noop_trace('IN '.$context.' with - RT: ${RT}, RG_IDX: ${RG_IDX}'));
+		//dont allow inbound callers to transfer around inside the system
+		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}I'));
 		$ext->add($context, $exten, '', new ext_execif('$["${ALERT_INFO}"!=""]', 'SIPAddHeader','Alert-Info: ${ALERT_INFO}'));
 		$ext->add($context, $exten, '', new ext_dial('${DB(DEVICE/${EXTEN:3}/dial)}', '${RT},${DIAL_OPTIONS}M(auto-confirm^${RG_IDX})'));
 
@@ -1486,7 +1488,7 @@ function core_do_get_config($engine) {
 
 				$exten = (($exten == "")?"s":$exten);
 				$exten = $exten.(($cidnum == "")?"":"/".$cidnum); //if a CID num is defined, add it
-
+				$ext->add($context, $exten, '', new ext_setvar('__DIRECTION',($amp_conf['INBOUND_NOTRANS'] ? 'INBOUND' : '')));
 				if ($cidroute) {
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					$ext->add($context, $exten, '', new ext_goto('1','s'));
@@ -4064,6 +4066,8 @@ function core_do_get_config($engine) {
 		//Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
 		//We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
 		$ext->add($mcontext,$exten,'godial', new ext_macro('dialout-one-predial-hook'));
+		//dont allow inbound callers to transfer around inside the system
+		$ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}I'));
 		$ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}'));
 		$ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 

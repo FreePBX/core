@@ -591,7 +591,7 @@ $globals_convert['MIXMON_POST'] = '';
 $globals_convert['MIXMON_FORMAT'] = 'wav';
 
 $globals_convert['DIAL_OPTIONS'] = 'Ttr';
-$globals_convert['TRUNK_OPTIONS'] = 'Tt';
+$globals_convert['TRUNK_OPTIONS'] = 'T';
 $globals_convert['RINGTIMER'] = '15';
 $globals_convert['TONEZONE'] = 'us';
 
@@ -802,6 +802,22 @@ $set['name'] = 'Asterisk Outbound Trunk Dial Options';
 $set['description'] = "Options to be passed to the Asterisk Dial Command when making outbound calls on your trunks when not part of an Intra-Company Route. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. It is HIGHLY DISCOURAGED to use the r option here as this will prevent early media from being delivered from the PSTN and can result in the inability to interact with some external IVRs";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('TRUNK_OPTIONS',$set);
+
+// INBOUND_NOTRANS
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Disallow transfer options for inbound callers';
+$set['description'] = "Disallow transfer features (Normally ## and *2) for callers who passthrough inbound routes (Such as external callers)";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('INBOUND_NOTRANS',$set);
 
 // RINGTIMER
 $opts = array();
