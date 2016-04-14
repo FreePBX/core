@@ -829,7 +829,7 @@ $set['level'] = 0;
 $set['module'] = '';
 $set['category'] = 'Dialplan and Operational';
 $set['emptyok'] = 0;
-$set['name'] = 'Disallow transfer options for inbound callers';
+$set['name'] = 'Disallow transfer features for inbound callers';
 $set['description'] = "Disallow transfer features (Normally ## and *2) for callers who passthrough inbound routes (Such as external callers)";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('INBOUND_NOTRANS',$set);
