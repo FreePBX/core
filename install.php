@@ -798,7 +798,7 @@ $set['module'] = '';
 $set['category'] = 'Dialplan and Operational';
 $set['emptyok'] = 1;
 $set['name'] = 'Asterisk Dial Options';
-$set['description'] = "Options to be passed to the Asterisk Dial Command when making internal calls or for calls ringing internal phones. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. The r option allows Asterisk to generate ringing back to the calling phones which is needed by some phones and sometimes needed in complex dialplan features that may otherwise result in silence to the caller.";
+$set['description'] = "Options to be passed to the Asterisk Dial Command when making internal calls or for calls ringing internal phones. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. If 'Disallow transfer features for inbound callers' is set to 'Yes' the T option is removed for inbound callers. The r option allows Asterisk to generate ringing back to the calling phones which is needed by some phones and sometimes needed in complex dialplan features that may otherwise result in silence to the caller.";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('DIAL_OPTIONS',$set);
 
@@ -814,7 +814,7 @@ $set['module'] = '';
 $set['category'] = 'Dialplan and Operational';
 $set['emptyok'] = 1;
 $set['name'] = 'Asterisk Outbound Trunk Dial Options';
-$set['description'] = "Options to be passed to the Asterisk Dial Command when making outbound calls on your trunks when not part of an Intra-Company Route. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. It is HIGHLY DISCOURAGED to use the r option here as this will prevent early media from being delivered from the PSTN and can result in the inability to interact with some external IVRs";
+$set['description'] = "Options to be passed to the Asterisk Dial Command when making outbound calls on your trunks when not part of an Intra-Company Route. The options are documented in Asterisk documentation, a subset of which are described here. The default option T allows the calling user to transfer a call with ##. It is HIGHLY DISCOURAGED to use the r option here as this will prevent early media from being delivered from the PSTN and can result in the inability to interact with some external IVRs";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('TRUNK_OPTIONS',$set);
 
