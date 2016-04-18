@@ -62,9 +62,9 @@ if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_
 	$mtfhtml .= '						<input type="text" class="form-control" name="failtrunk" id="failtrunk" '.$mtfenable.' value="'.htmlspecialchars($failtrunk).'"/>';
 	$mtfhtml .=	'
 											<span class="radioset">
-											<input type="radio" name="failtrunk_enable" id="failtrunk_enableyes" value="1" '. ($failtrunk_enable == "1"?"CHECKED":"").'>
+											<input type="radio" name="failtrunk_enable" id="failtrunk_enableyes" value="1" '. ($failtrunk_enable == "CHECKED"?"CHECKED":"").'>
 											<label for="failtrunk_enableyes">'._("Yes").'</label>
-											<input type="radio" name="failtrunk_enable" id="failtrunk_enableno" value="0" '.($failtrunk_enable == "1"?"":"CHECKED") .'>
+											<input type="radio" name="failtrunk_enable" id="failtrunk_enableno" value="0" '.($failtrunk_enable == "CHECKED"?"":"CHECKED") .'>
 											<label for="failtrunk_enableno">'. _("No").'</label>
 											</span>
 	';
