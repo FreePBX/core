@@ -45,7 +45,7 @@ $routerows .= <<<HERE
 <td><a href="config.php?display=routing&view=form&id=$id">
 	<i class="fa fa-edit"></i></a>&nbsp;&nbsp;
 	<a id="del$id" data-id="$id" class="clickable delAction">
-	<i class="fa fa-trash-o"></i></a>&nbsp;&nbsp;
+	<i class="fa fa-trash"></i></a>&nbsp;&nbsp;
 </tr>
 HERE;
 
@@ -66,7 +66,7 @@ HERE;
 			data-toolbar="#toolbar-all"
 			data-maintain-selected="true"
 			data-toggle="table"
-			data-pagination="true"
+			data-pagination="false"
 			class="table table-striped">
 		<thead>
 			<tr>
