@@ -89,7 +89,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("search" => "%".$query."%"));
 			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			dbug($rows);
 			foreach($rows as $row) {
 				$display = urlencode($row['extension']."/".$row['cidnum']);
 				$results[] = array("text" => _("Inbound Route:")." ".$row['extension']."/".$row['cidnum'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
@@ -1131,7 +1130,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					dbug("EDITING:".$extdisplay);
 					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
 					needreload();
 				break;
@@ -1635,6 +1633,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return $this->drivers[$tech]->addDevice($id, $settings);
 		}
 
+		$this->deviceCache = array();
 		return true;
 	}
 	public function listDahdiChannels(){
@@ -1767,7 +1766,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->freepbx->Hooks->processHooks($account, $editmode);
 		$this->getDeviceHeadersCache = array();
 		$this->deviceCache = array();
-		$this->getDeviceCache = array();
+		$this->getDeviceCache[$account] = array();
 		return true;
 	}
 
@@ -2295,6 +2294,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			core_did_add($did_vars, $did_dest);
 		}
 
+		$this->getUserCache[$extension] = array();
+		$this->listUsersCache = array();
 		return true;
 	}
 
@@ -2340,6 +2341,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//        )
 		//
 		//)
+		$this->getUserCache[$extension] = array();
 		$this->listUsersCache = array();
 		$this->freepbx->Hooks->processHooks($extension, $editmode);
 

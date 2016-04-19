@@ -881,6 +881,7 @@ function core_destinations() {
 	//get the list of meetmes
 	$results = core_users_list();
 
+	$vmboxes = array();
 	if (isset($results) && function_exists('voicemail_getVoicemail')) {
 		//get voicemail
 		$uservm = voicemail_getVoicemail();
