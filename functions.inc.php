@@ -443,6 +443,11 @@ class core_conf {
 					}
 				} else {
 					switch (strtolower($result2['keyword'])) {
+						case 'videosupport':
+							if($result2['data'] != 'inherit') {
+								$output .= "videosupport=".$result2['data']."\n";
+							}
+						break;
 						case 'insecure':
 						if ($option == 'very')
 						$output .= "insecure=port,invite\n";

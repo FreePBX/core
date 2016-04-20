@@ -82,6 +82,14 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"session-timers" => array(
+				"value" => "accept",
+				"flag" => $flag++
+			),
+			"videosupport" => array(
+				"value" => "inherit",
+				"flag" => $flag++
+			),
 			"icesupport" => array(
 				"value" => "no",
 				"flag" => $flag++
@@ -300,6 +308,13 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tmparr['type'] = array('prompttext' => _('Connection Type'),'value' => 'friend', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
+		$select[] = array('value' => 'accept', 'text' => _('Accept'));
+		$select[] = array('value' => 'originate', 'text' => _('originate'));
+		$select[] = array('value' => 'refuse', 'text' => _('Refuse'));
+		$tt = _("The sessions are kept alive by sending a RE-INVITE or UPDATE request at a negotiated interval. If a session refresh fails then all the entities that support Session-Timers clear their internal session state. Default is Accept.").'[session-timers]';
+		$tmparr['session-timers'] = array('prompttext' => _('Session Timers'),'value' => 'accept', 'tt' => $tt, 'select' => $select, 'level' => 1);
+
+		unset($select);
 		$select[] = array('value' => 'yes', 'text' => sprintf(_('Yes - (%s)'),'force_rport,comedia'));
 		$select[] = array('value' => 'no', 'text' => sprintf(_('No - (%s)'),'no'));
 
@@ -378,6 +393,14 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$tt = _("Whether to offer SRTP encrypted media (and only SRTP encrypted media) on outgoing calls to a peer. Calls will fail with HANGUPCAUSE=58 if the peer does not support SRTP. Defaults to no.");
 			$tmparr['encryption'] = array('prompttext' => _('Enable Encryption'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_ENCRYPTION'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		}
+
+		unset($select);
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'inherit', 'text' => _('Inherit'));
+		$tt = _("Enable or disable video support for this extension. If set to inherit it will use the global value from SIP Settings. Default is inherit");
+		$tmparr['videosupport'] = array('prompttext' => _('Video Support'),'value' => 'inherit', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		//videosupport
 
 		$tt = _("Callgroup(s) that this device is part of, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2'.");
 		$tmparr['namedcallgroup'] = array('prompttext' => _('Call Groups'),'value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1, 'jsvalidation' => "frm_".$display."_pickupGroup()");

@@ -114,6 +114,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"timers" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
 			"icesupport" => array(
 				"value" => "no",
 				"flag" => $flag++
@@ -187,7 +191,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = parent::getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection);
-		unset($tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
+		unset($tmparr['videosupport'],$tmparr['session-timers'],$tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
 		if (version_compare($this->version,'12.5.0','ge')) {
 			$tt = _("Account Code for this extension");
 			$tmparr['accountcode'] = array('prompttext' => _("Account Code"), 'value' => '', 'tt' => $tt, 'level' => 1);
@@ -230,6 +234,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
 		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media_encryption]';
 		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		unset($select);
+
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$select[] = array('value' => 'required', 'text' => _('Required'));
+		$select[] = array('value' => 'always', 'text' => _('Always'));
+		$select[] = array('value' => 'forced', 'text' => _('Forced'));
+		$tt = _("The sessions are kept alive by sending a RE-INVITE or UPDATE request at a negotiated interval. If a session refresh fails then all the entities that support Session-Timers clear their internal session state. Default is Yes.").' [timers]';
+		$tmparr['timers'] = array('prompttext' => _('Session Timers'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -828,6 +841,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$endpoint[] = "media_encryption=sdes";
 				}
 			}
+		}
+
+		if (!empty($config['timers'])) {
+			$endpoint[] = "timers=".$config['timers'];
 		}
 
 		if (!empty($config['mediaencryptionoptimistic'])) {
