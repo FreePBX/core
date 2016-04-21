@@ -657,6 +657,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					}
 				}
 
+				if(version_compare($this->version,'13.8','ge')) {
+					$transport[$t]['allow_reload'] = "yes";
+				}
+
 				// Add the Generic localnet settings.
 				//TODO: This should call a method and not the config direct.
 				$localnets = $ss->getConfig('localnets');
