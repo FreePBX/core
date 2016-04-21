@@ -1519,6 +1519,7 @@ function core_do_get_config($engine) {
 				// If we require RINGING, signal it as soon as we enter.
 				if ($item['ringing'] === "CHECKED") {
 					$ext->add($context, $exten, '', new ext_ringing(''));
+					$ext->add($context, $exten, '', new ext_setvar('__RINGINGSENT','TRUE'));
 				}
 
 				//Block collect Calls
