@@ -2908,7 +2908,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 
 	$lang = 'en'; //English
-	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&an-error-has-occured&with&call-forwarding'));
+	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&an-error-has-occurred&with&call-forwarding'));
 	$ext->add($context, $lang, '', new ext_return());
 	$ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
 	$ext->add($context, $lang, '', new ext_return());
