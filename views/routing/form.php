@@ -234,7 +234,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		if ($trunkstate[$name] == 'off') {
 			$trunkhtml .= '<option value="'.$name.'">'.str_replace('AMP:', '', $display_description).'</option>';
 		} else {
-			$trunkhtml .= '<option value="'.$name.'" class="text-danger" >*'.ltrim($display_description,"AMP:").'*</option>';
+			$trunkhtml .= '<option value="'.$name.'" class="text-danger" >*'.str_replace('AMP:','',$display_description).'*</option>';
 		}
 	}
 	$trunkhtml .= '</select>';
