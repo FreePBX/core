@@ -12,34 +12,7 @@ $(document).ready(function() {
 			}
 		});
 	//On load mark things that are not default
-	$(".defset").each(function(){
-		var current = $(this).data('for');
-		var defval = $(this).data('defval');
-		var itype = $(this).data('type');
-		switch(itype){
-			case 'bool':
-				if(defval == 1){
-					if(!$('#'+current+"true").is(':checked')){
-						$(this).removeClass('hidden');
-					}
-				}else{
-					if($('#'+current+"true").is(':checked')){
-						$(this).removeClass('hidden');
-					}
-				}
-			break;
-			case 'int':
-			case 'text':
-			case 'textarea':
-			case 'select':
-			case 'fselect':
-			case 'cselect':
-				if($('#'+current).val() != defval){
-					$(this).removeClass('hidden');
-				}
-			break;
-		}
-	});
+	toggleResetIcons();
 	//Act on read only
 	if($("#AS_DISPLAY_READONLY_SETTINGSfalse").is(':checked')){
 		$(".setro").each(function(){
@@ -184,3 +157,39 @@ $('textarea').on('change', function() {
 		$("a[data-for='"+tid+"']").removeClass('hidden');
 	}
 });
+$("#reset").on("click", function(e){
+	//We want other click actions to happen first so we wait 100ms then go...
+	setTimeout(function() {
+		toggleResetIcons();
+	},100);
+});
+function toggleResetIcons(){
+	$(".defset").each(function(){
+		var current = $(this).data('for');
+		var defval = $(this).data('defval');
+		var itype = $(this).data('type');
+		switch(itype){
+			case 'bool':
+				if(defval == 1){
+					if(!$('#'+current+"true").is(':checked')){
+						$(this).removeClass('hidden');
+					}
+				}else{
+					if($('#'+current+"true").is(':checked')){
+						$(this).removeClass('hidden');
+					}
+				}
+			break;
+			case 'int':
+			case 'text':
+			case 'textarea':
+			case 'select':
+			case 'fselect':
+			case 'cselect':
+				if($('#'+current).val() != defval){
+					$(this).removeClass('hidden');
+				}
+			break;
+		}
+	});
+}
