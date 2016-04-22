@@ -1551,6 +1551,7 @@ function core_do_get_config($engine) {
 				// If we require RINGING, signal it as soon as we enter.
 				if ($item['ringing'] === "CHECKED") {
 					$ext->add($context, $exten, '', new ext_ringing(''));
+					$ext->add($context, $exten, '', new ext_setvar('__RINGINGSENT','TRUE'));
 				}
 
 				//Block collect Calls
@@ -3668,7 +3669,7 @@ function core_do_get_config($engine) {
 	$ext->add('macro-vm','adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 	$ext->add('macro-vm','adef','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occured'));
+	$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occurred'));
 	$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
 	$ext->add('macro-vm','exit-FAILED','',new ext_hangup(''));
 
