@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.72</version>
+	<version>13.0.73</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.73* FREEPBX-11969 FREEPBX-12015 FREEPBX-12074 FREEPBX-12076 FREEPBX-12085 FREEPBX-11915 FREEPBX-12000			
 		*13.0.72* FREEPBX-12058 prevent potential unexpected use of transfer functionality
 		*13.0.71* IP-196
 		*13.0.70* FREEPBX-12019 run trim against any timezone setting
