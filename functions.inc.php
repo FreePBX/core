@@ -443,6 +443,9 @@ class core_conf {
 					}
 				} else {
 					switch (strtolower($result2['keyword'])) {
+						case 'sessiontimers':
+							$output .= "session-timers=".$result2['data']."\n";
+						break;
 						case 'videosupport':
 							if($result2['data'] != 'inherit') {
 								$output .= "videosupport=".$result2['data']."\n";

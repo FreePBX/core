@@ -82,7 +82,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "no",
 				"flag" => $flag++
 			),
-			"session-timers" => array(
+			"sessiontimers" => array(
 				"value" => "accept",
 				"flag" => $flag++
 			),
@@ -312,7 +312,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$select[] = array('value' => 'originate', 'text' => _('originate'));
 		$select[] = array('value' => 'refuse', 'text' => _('Refuse'));
 		$tt = _("The sessions are kept alive by sending a RE-INVITE or UPDATE request at a negotiated interval. If a session refresh fails then all the entities that support Session-Timers clear their internal session state. Default is Accept.").'[session-timers]';
-		$tmparr['session-timers'] = array('prompttext' => _('Session Timers'),'value' => 'accept', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tmparr['sessiontimers'] = array('prompttext' => _('Session Timers'),'value' => 'accept', 'tt' => $tt, 'select' => $select, 'level' => 1);
 
 		unset($select);
 		$select[] = array('value' => 'yes', 'text' => sprintf(_('Yes - (%s)'),'force_rport,comedia'));
