@@ -1138,7 +1138,7 @@ $sql = "CREATE TABLE IF NOT EXISTS `pjsip` (
   `data` varchar(255) NOT NULL,
   `flags` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`keyword`)
-) ENGINE=MyISAM;";
+);";
 	$db->query($sql);
 
 //FREEPBX-11259 On previous versions of Core quick create would set emergency_cid to the description. This may be a bad thing.
