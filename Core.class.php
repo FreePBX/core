@@ -1766,7 +1766,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->freepbx->Hooks->processHooks($account, $editmode);
 		$this->getDeviceHeadersCache = array();
 		$this->deviceCache = array();
-		$this->getDeviceCache[$account] = array();
+		$this->getDeviceCache = array();
 		return true;
 	}
 
@@ -2294,7 +2294,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			core_did_add($did_vars, $did_dest);
 		}
 
-		$this->getUserCache[$extension] = array();
+		$this->getUserCache = array();
 		$this->listUsersCache = array();
 		return true;
 	}
@@ -2341,7 +2341,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//        )
 		//
 		//)
-		$this->getUserCache[$extension] = array();
+
+		$this->getUserCache = array();
 		$this->listUsersCache = array();
 		$this->freepbx->Hooks->processHooks($extension, $editmode);
 
