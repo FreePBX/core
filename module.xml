@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.78</version>
+	<version>13.0.79</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.79* Add ipv6 brackets when needed
 		*13.0.78* Use proper bind port
 		*13.0.77* Yes is not true
 		*13.0.76* Bind to correct port on https
