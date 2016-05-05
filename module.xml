@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.75</version>
+	<version>13.0.76</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.76* Bind to correct port on https
 		*13.0.75* Fix missing data on edit
 		*13.0.74* Session timers needs to be labeled something else
 		*13.0.73* FREEPBX-11969 FREEPBX-12015 FREEPBX-12074 FREEPBX-12076 FREEPBX-12085 FREEPBX-11915 FREEPBX-12000
