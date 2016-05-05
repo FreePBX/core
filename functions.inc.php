@@ -192,14 +192,16 @@ class core_conf {
 		$output .= "bindaddr=".$freepbx_conf->get_conf_setting('HTTPBINDADDRESS')."\n";
 		$output .= "bindport=".$freepbx_conf->get_conf_setting('HTTPBINDPORT')."\n";
 		$output .= "prefix=".$freepbx_conf->get_conf_setting('HTTPPREFIX')."\n";
-		$output .= "tlsenable=".($freepbx_conf->get_conf_setting('HTTPTLSENABLE') ? 'yes' : 'no')."\n";
-		$output .= "tlsbindport=".$freepbx_conf->get_conf_setting('HTTPTLSBINDPORT')."\n";
-		$output .= "tlsbindaddr=".$freepbx_conf->get_conf_setting('HTTPTLSBINDADDRESS')."\n";
-		$output .= "tlscertfile=".$freepbx_conf->get_conf_setting('HTTPTLSCERTFILE')."\n";
-		$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
 		$output .= "sessionlimit=".$freepbx_conf->get_conf_setting('HTTPSESSIONLIMIT')."\n";
 		$output .= "session_inactivity=".$freepbx_conf->get_conf_setting('HTTPSESSIONINACTIVITY')."\n";
 		$output .= "session_keep_alive=".$freepbx_conf->get_conf_setting('HTTPSESSIONKEEPALIVE')."\n";
+		$tls = $freepbx_conf->get_conf_setting('HTTPTLSENABLE');
+		if ($tls == "yes") {
+			$output .= "tlsenable=$tls\n";
+			$output .= "tlsbindaddr=".$freepbx_conf->get_conf_setting('HTTPTLSBINDADDRESS').":".$freepbx_conf->get_conf_setting('HTTPTLSBINDPORT')."\n";
+			$output .= "tlscertfile=".$freepbx_conf->get_conf_setting('HTTPTLSCERTFILE')."\n";
+			$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
+		}
 		return $output;
 	}
 
