@@ -1325,11 +1325,11 @@ $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('HTTPENABLESTATIC',$set);
 
 // HTTPBINDADDRESS
-$set['value'] = '[::]';
+$set['value'] = '::';
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['name'] = 'HTTP Bind Address';
-$set['description'] = 'Address to bind to. Default is [::]';
+$set['description'] = 'Address to bind to. Default is ::';
 $set['emptyok'] = 0;
 $set['type'] = CONF_TYPE_TEXT;
 $set['level'] = 2;
@@ -1376,11 +1376,11 @@ $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('HTTPTLSENABLE',$set);
 
 // HTTPBINDADDRESS
-$set['value'] = '[::]';
+$set['value'] = '::';
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['name'] = 'HTTPS Bind Address';
-$set['description'] = 'Address to bind to. Default is [::]';
+$set['description'] = 'Address to bind to. Default is ::';
 $set['emptyok'] = 0;
 $set['type'] = CONF_TYPE_TEXT;
 $set['level'] = 4;
