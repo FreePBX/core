@@ -198,7 +198,12 @@ class core_conf {
 		$tls = $freepbx_conf->get_conf_setting('HTTPTLSENABLE');
 		if ($tls) {
 			$output .= "tlsenable=yes\n";
-			$output .= "tlsbindaddr=".$freepbx_conf->get_conf_setting('HTTPTLSBINDADDRESS').":".$freepbx_conf->get_conf_setting('HTTPTLSBINDPORT')."\n";
+			// Is this an IPv6 address? If so, it needs brackets around it.
+			$bindaddr = $freepbx_conf->get_conf_setting('HTTPTLSBINDADDRESS');
+			if (filter_var($bindaddr, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+				$bindaddr = "[$bindaddr]";
+			}
+			$output .= "tlsbindaddr=$bindaddr:".$freepbx_conf->get_conf_setting('HTTPTLSBINDPORT')."\n";
 			$output .= "tlscertfile=".$freepbx_conf->get_conf_setting('HTTPTLSCERTFILE')."\n";
 			$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
 		}
