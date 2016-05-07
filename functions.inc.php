@@ -1743,11 +1743,10 @@ function core_do_get_config($engine) {
 					$dnd_string = ($amp_conf['USEDEVSTATE'] && function_exists('donotdisturb_get_config')) ? "&Custom:DND".$exten['extension'] : '';
 					$presence_string = $amp_conf['AST_FUNC_PRESENCE_STATE'] ? ",CustomPresence:".$exten['extension'] : '';
 					$hint_string = (!empty($hint) ? $hint : '') . $dnd_string . $presence_string;
+					$astman->database_put("AMPUSER/".$exten['extension'],"hint",$hint_string);
 					if ($hint_string) {
+						//TODO: Lots of hints here. Can this be dynamic? No I dont think so
 						$ext->addHint('ext-local', $exten['extension'], $hint_string);
-						if ($intercom_code != '') {
-							$ext->addHint('ext-local', $intercom_code.$exten['extension'], $hint_string);
-						}
 					}
 				}
 
@@ -1777,6 +1776,11 @@ function core_do_get_config($engine) {
 			$ext->add('ext-local', 'vmret', '', new ext_goto('1','return','${IVR_CONTEXT}'));
 
 			$ext->add('ext-local', 'h', '', new ext_macro('hangupcall'));
+		}
+
+		//$ext->addHint('ext-local', "_X.", $hint_string);
+		if ($intercom_code != '') {
+			$ext->addHint('ext-local', "_".$intercom_code."X.", '${DB(AMPUSER/${EXTEN:'.strlen($intercom_code).'}/hint)}');
 		}
 
 		/* Create the from-trunk-tech-chanelid context that can be used for inbound group counting
