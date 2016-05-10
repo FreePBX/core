@@ -1439,6 +1439,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"recording_out_internal" => "dontcare",
 			"recording_ondemand" => "disabled",
 			"recording_priority" => "10",
+			"answermode" => "disabled"
 		);
 	}
 	/**
@@ -1889,7 +1890,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$result['recording_out_internal'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/internal']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/internal'] : "";
 			$result['recording_ondemand'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand'] : "";
 			$result['recording_priority'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority']) ? (int) $dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority'] : "10";
-			$result['answermode'] = function_exists('paging_get_config') && isset($dbfamily['/AMPUSER/'.$result['extension'].'/answermode']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/answermode'] : "";
+			$result['answermode'] = $this->FreePBX->Modules->checkStatus("paging") && isset($dbfamily['/AMPUSER/'.$result['extension'].'/answermode']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/answermode'] : "";
 
 			$final[] = $result;
 		}
@@ -2373,7 +2374,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$astman = $this->FreePBX->astman;
 		if ($astman->connected()) {
 
-			if (function_exists('paging_get_config')) {
+			if ($this->FreePBX->Modules->checkStatus("paging")) {
 				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
 				$results['answermode'] = (trim($answermode) == '') ? 'disabled' : $answermode;
 			}
@@ -2630,6 +2631,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$settings[$key] = $data[$key];
 					}
 				}
+				dbug($settings);
 
 				try {
 					if (!$this->addUser($data['extension'], $settings)) {
