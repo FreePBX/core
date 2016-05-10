@@ -1139,10 +1139,8 @@ function core_do_get_config($engine) {
 			$fcc = new featurecode($modulename, 'automon');
 			$code = $fcc->getCodeActive();
 			unset($fcc);
-			// $automon = $amp_conf['AUTOMIXMON'] && !$ast_lt_16 ? 'automixmon' : 'automon';
 			if ($code != '') {
-				// was this for automixmon
-				// $core_conf->addFeatureMap($automon,$code);
+				$core_conf->addFeatureMap('automon',$code);
 				$core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
 
 				/* At this point we are not using hints since we have not found a good way to be always

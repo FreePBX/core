@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.82</version>
+	<version>13.0.83</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.83* FREEPBX-8981 add automon back into featuremap as it doesnt seem to conflict
 		*13.0.82* FREEPBX-12013 remove invalid dtmf none option, add valid auto option
 		*13.0.81* FREEPBX-11826 import answermode
 		*13.0.80* Dynamic intercom hints for reload improvements
