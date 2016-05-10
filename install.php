@@ -574,10 +574,10 @@ if (empty($check)) {
 	}
 }
 
-$sql = "SHOW KEYS FROM users WHERE Key_name='extensions'";
+$sql = "SHOW KEYS FROM users WHERE Key_name='extension'";
 $check = $db->getOne($sql);
 if (empty($check)) {
-	$sql = "ALTER TABLE users ADD KEY `extension` (`extension`), ADD KEY `extension` (`extension`)";
+	$sql = "ALTER TABLE users ADD KEY `extension` (`extension`)";
 	$result = $db->query($sql);
 	if(DB::IsError($result)) {
 		out(_("Unable to add index to extensions field in users"));
