@@ -234,8 +234,8 @@ if($display_mode == "basic") { ?>
 						extmap[d.ext] = d.name;
 						$('#quickCreate').modal('hide');
 						toggle_reload_button("show");
-						$("#quickCreate form")[0].reset();
 						$('#wizard').smartWizard('goToStep',1);
+						$("#quickCreate form")[0].reset();
 						$('#table-all').bootstrapTable('refresh');
 						$('#table-' + data.tech).bootstrapTable('refresh');
 					} else {
