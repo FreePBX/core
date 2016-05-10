@@ -452,7 +452,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$validdtmf[] = "auto";
 				}
 				if (!in_array($trunk['dtmfmode'],$validdtmf)) {
-					$trunk['dtmfmode'] = "rfc4733";
+					if(version_compare($this->version,'13','ge')) {
+						$trunk['dtmfmode'] = "auto";
+					} else {
+						$trunk['dtmfmode'] = "rfc4733";
+					}
+
 				}
 				//FREEPBX-10666
 				//yes,no
@@ -776,7 +781,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$validdtmf[] = "auto";
 		}
 		if (!in_array($trunk['dtmfmode'],$validdtmf)) {
-			$config['dtmfmode'] = "rfc4733";
+			if(version_compare($this->version,'13','ge')) {
+				$config['dtmfmode'] = "auto";
+			} else {
+				$config['dtmfmode'] = "rfc4733";
+			}
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 
@@ -1106,6 +1115,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733"
 			);
+			if(version_compare($this->version,'13','ge')) {
+				$dispvars['dtmfmode'] = 'auto';
+			}
 		}
 		$dispvars['transports'] = array_keys($this->getTransportConfigs());
 

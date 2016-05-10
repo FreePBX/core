@@ -22,7 +22,7 @@ $codechtml = '<ul class="sortable">';
 			. ' </label></a></li>';
 	}
 $codechtml .= '</ul>';
-
+$ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge");
 ?>
 
 <h3><?php echo _("PJSIP Settings")?></h3>
@@ -201,8 +201,6 @@ $codechtml .= '</ul>';
 		</div><!--END TRANSPORT-->
 	</div><!--END GENERAL TAB-->
 	<div role="tabpanel" id="pjsadvanced" class="tab-pane">
-		<br/>
-		<br/>
 		<!--TRANSPORT-->
 		<div class="element-container">
 			<div class="row">
@@ -215,10 +213,12 @@ $codechtml .= '</ul>';
 							</div>
 							<div class="col-md-9">
 								<select name="dtmfmode" id="dtmfmode" class="form-control">
+									<?php if($ast_ge_12) {?>
+										<option value="auto" <?php echo isset($dtmfmode) && $dtmfmode == "auto" ? "selected" : ""?>><?php echo _("Auto")?></option>
+									<?php } ?>
 									<option value="rfc4733" <?php echo isset($dtmfmode) && $dtmfmode == "rfc4733" ? "selected" : ""?>>RFC 4733</option>
 									<option value="inband" <?php echo isset($dtmfmode) && $dtmfmode == "inband" ? "selected" : ""?>><?php echo _("Inband")?></option>
 									<option value="info" <?php echo isset($dtmfmode) && $dtmfmode == "info" ? "selected" : ""?>><?php echo _("Info")?></option>
-									<option value="none" <?php echo isset($dtmfmode) && $dtmfmode == "none" ? "selected" : ""?>><?php echo _("None")?></option>
 								</select>
 							</div>
 						</div>
@@ -227,7 +227,7 @@ $codechtml .= '</ul>';
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="dtmfmode-help" class="help-block fpbx-help-block"><?php echo _("The DTMF signaling mode used by this trunk, usually RFC for most trunks<ul><li>rfc4733 - DTMF is sent out of band of the main audio stream.This supercedes the older RFC-2833 used within the older chan_sip.</li><li>inband - DTMF is sent as part of audio stream.</li><li>info - DTMF is sent as SIP INFO packets.</li></ul>")?></span>
+					<span id="dtmfmode-help" class="help-block fpbx-help-block"><?php echo sprintf(_("The DTMF signaling mode used by this trunk, usually RFC for most trunks<ul><li>Auto [%s] - DTMF is sent as RFC 4733 if the other side supports it or as INBAND if not.</li><li>rfc4733 - DTMF is sent out of band of the main audio stream.This supercedes the older RFC-2833 used within the older chan_sip.</li><li>inband - DTMF is sent as part of audio stream.</li><li>info - DTMF is sent as SIP INFO packets.</li></ul>"),"Asterisk 13")?></span>
 				</div>
 			</div>
 		</div><!--END TRANSPORT-->
