@@ -1140,7 +1140,7 @@ function core_do_get_config($engine) {
 			$code = $fcc->getCodeActive();
 			unset($fcc);
 			if ($code != '') {
-				$core_conf->addFeatureMap('automon',$code);
+				$core_conf->addFeatureMap('automon',$code); //references app record
 				$core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
 
 				/* At this point we are not using hints since we have not found a good way to be always
