@@ -169,18 +169,48 @@ class Sip extends \FreePBX\modules\Core\Driver {
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$section = _("Settings");
 		$category = "general";
-		$pport = '';
+		$pports = array();
 		$techd = ($deviceInfo['tech'] == 'sip') ? 'CHAN_SIP' : strtoupper($deviceInfo['tech']);
 		$devinfo_tech = $deviceInfo['tech'];
-		if($this->freepbx->Modules->moduleHasMethod("sipsettings","getBinds")) {
-			$out = $this->freepbx->Sipsettings->getBinds();
+		$out = $this->freepbx->Sipsettings->getBinds();
+		if (isset($out[$devinfo_tech])) {
 			foreach($out[$devinfo_tech] as $ip => $data1) {
-				foreach($data1 as $protocol => $port)
-				$pport .= $ip.":".$port.', ';
+				foreach($data1 as $protocol => $port) {
+					if ($protocol == "ws" || $protocol == "wss") {
+						continue;
+					}
+					// Is this the default port for this protocol?
+					$defaultport = false;
+					if ($protocol == "udp" && $port == 5060) {
+						$defaultport = true;
+					} elseif ($protocol == "tcp" && $port == 5060) {
+						$defaultport = true;
+					} elseif ($protocol == "tls" && $port == 5061) {
+						$defaultport = true;
+					}
+
+					// If the bind address is 0.0.0.0 (or :: or [::]), we don't need to say
+					// that it's listening on a specific address.
+					if ($ip == "0.0.0.0" || $ip == "::" || $ip = "[::]") {
+						if ($defaultport) {
+							$pports[] = sprintf(_("Port %s (%s)"), $port, strtoupper($protocol));
+						} else {
+							$pports[] = sprintf(_("Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $port, strtoupper($protocol));
+						}
+					} else {
+						if ($defaultport) {
+							$pports[] = sprintf(_("Interface %s, Port %s (%s)"), $ip, $port, strtoupper($protocol));
+						} else {
+							$pports[] = sprintf(_("Interface %s, Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $ip, $port, strtoupper($protocol));
+						}
+					}
+				}
 			}
-			$pport = rtrim($pport,", ");
+		}
+		if (!$pports) {
+			$pport = "(SipSettings Error)";
 		} else {
-			$pport = '';
+			$pport = join(", ", $pports);
 		}
 
 		$display_mode = "advanced";
@@ -189,7 +219,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$display_mode = $mode;
 		}
 		if ($display_mode != 'basic') {
-			$extrac = !empty($pport) ? sprintf(_('listening on <strong>%s</strong>'),$pport) : '';
+			$extrac = !empty($pport) ? sprintf(_('listening on %s'),$pport) : '';
 			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
 			$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
 		}
