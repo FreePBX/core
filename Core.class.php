@@ -1379,7 +1379,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {int} &$flag   The Flag Number
 	 */
 	public function convertRequest2Array($account,$tech,&$flag = 2) {
-		if(empty($account)) {
+		if(!isset($account) || (trim($account) === "") || !ctype_digit($account)) {
 			throw new \Exception("Account must be set!");
 		}
 		if(empty($tech)) {

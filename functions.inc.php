@@ -6070,7 +6070,7 @@ function core_users_configpageload() {
 		$msgInvalidCIDNum = _("Please enter a valid CallerID Number or leave it blank for your Assigned DID/CID pair");
 
 		// This is the actual gui stuff
-		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && trim($extdisplay) !== '') ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display == 'extensions' ) {
@@ -6430,7 +6430,7 @@ function core_devices_configpageload() {
 		$msgInvalidExtNum = _("Please enter a valid extension number.");
 
 		// Actual gui
-		$currentcomponent->addguielem('_top', new gui_hidden('action', ($extdisplay ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && trim($extdisplay) !== '') ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display != 'extensions' ) {

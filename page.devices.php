@@ -26,7 +26,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 
 			global $currentcomponent;
-			if(empty($_REQUEST['tech_hardware']) && empty($_REQUEST['extdisplay'])) {
+			if(empty($_REQUEST['tech_hardware']) && ((!isset($_REQUEST['extdisplay']) || (trim($_REQUEST['extdisplay']) === "") || !ctype_digit($_REQUEST['extdisplay'])))) {
 				?>
 				<div class="display no-border">
 					<div class="nav-container">
