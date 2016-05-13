@@ -5931,12 +5931,6 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('callwaiting', 'disabled', _("Disable"));
 		$currentcomponent->setoptlistopts('callwaiting', 'sort', false);
 
-		if (function_exists('paging_get_config')) {
-			$currentcomponent->addoptlistitem('answermode', 'disabled', _("Disable"));
-			$currentcomponent->addoptlistitem('answermode', 'intercom', _("Intercom"));
-			$currentcomponent->setoptlistopts('answermode', 'sort', false);
-		}
-
 		$currentcomponent->addoptlistitem('pinless', 'disabled', _("Disable"));
 		$currentcomponent->addoptlistitem('pinless', 'enabled', _("Enable"));
 		$currentcomponent->setoptlistopts('pinless', 'sort', false);
@@ -6181,10 +6175,6 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_selectbox('concurrency_limit', $currentcomponent->getoptlist('concurrency_limit'), $concurrency_limit, _("Outbound Concurrency Limit"), _("Maximum number of outbound simultaneous calls that an extension can make. This is also very useful as a Security Protection against a system that has been compromised. It will limit the number of simultaneous calls that can be made on the compromised extension."), false), $category);
 
 		$currentcomponent->addguielem($section, new gui_radio('callwaiting', $currentcomponent->getoptlist('callwaiting'), $callwaiting, _("Call Waiting"), _("Set the initial/current Call Waiting state for this user's extension"), false,'','',false),$category);
-		if (function_exists('paging_get_config')) {
-			$answermode = isset($answermode) ? $answermode : $amp_conf['DEFAULT_INTERNAL_AUTO_ANSWER'];
-			$currentcomponent->addguielem($section, new gui_radio('answermode', $currentcomponent->getoptlist('answermode'), $answermode, _("Internal Auto Answer"), _("When set to Intercom, calls to this extension/user from other internal users act as if they were intercom calls meaning they will be auto-answered if the endpoint supports this feature and the system is configured to operate in this mode. All the normal white list and black list settings will be honored if they are set. External calls will still ring as normal, as will certain other circumstances such as blind transfers and when a Follow Me is configured and enabled. If Disabled, the phone rings as a normal phone."), false, '','',false), $category);
-		}
 		$currentcomponent->addguielem($section, new gui_selectbox('call_screen', $currentcomponent->getoptlist('call_screen'), $call_screen, _("Call Screening"),_("Call Screening requires external callers to say their name, which will be played back to the user and allow the user to accept or reject the call.  Screening with memory only verifies a caller for their CallerID once. Screening without memory always requires a caller to say their name. Either mode will always announce the caller based on the last introduction saved with that CallerID. If any user on the system uses the memory option, when that user is called, the caller will be required to re-introduce themselves and all users on the system will have that new introduction associated with the caller's CallerID."), false), $category);
 		$pinless = isset($pinless) ? $pinless : "disabled";
 		$currentcomponent->addguielem($section, new gui_radio('pinless', $currentcomponent->getoptlist('pinless'), $pinless, _("Pinless Dialing"), _("Enabling Pinless Dialing will allow this extension to bypass any pin codes normally required on outbound calls"), false, '','',false), $category);

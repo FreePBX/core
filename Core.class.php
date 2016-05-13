@@ -1439,7 +1439,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"recording_out_internal" => "dontcare",
 			"recording_ondemand" => "disabled",
 			"recording_priority" => "10",
-			"answermode" => "disabled"
+			"answermode" => "disabled",
+			"intercommode" => "yes"
 		);
 	}
 	/**
@@ -1891,6 +1892,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$result['recording_ondemand'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/ondemand'] : "";
 			$result['recording_priority'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority']) ? (int) $dbfamily['/AMPUSER/'.$result['extension'].'/recording/priority'] : "10";
 			$result['answermode'] = $this->FreePBX->Modules->checkStatus("paging") && isset($dbfamily['/AMPUSER/'.$result['extension'].'/answermode']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/answermode'] : "";
+			$result['intercom'] = $this->FreePBX->Modules->checkStatus("paging") && isset($dbfamily['/AMPUSER/'.$result['extension'].'/intercom']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/intercom'] : "";
 
 			$final[] = $result;
 		}
@@ -2221,7 +2223,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$astman->database_put("AMPUSER",$extension."/cidname",isset($settings['name']) ? $settings['name'] : '');
 			$astman->database_put("AMPUSER",$extension."/cidnum",(isset($settings['cid_masquerade']) && trim($settings['cid_masquerade']) != "") ? trim($settings['cid_masquerade']) : $extension);
 			$astman->database_put("AMPUSER",$extension."/voicemail",isset($settings['voicemail']) ? $settings['voicemail'] : '');
+			//TODO need to be in paging soon
 			$astman->database_put("AMPUSER",$extension."/answermode",isset($settings['answermode']) ? $settings['answermode']: 'disabled');
+			$astman->database_put("AMPUSER",$extension."/intercom",isset($settings['intercom']) ? $settings['intercom']: 'enabled');
 
 			$astman->database_put("AMPUSER",$extension."/recording/in/external",$settings['recording_in_external']);
 			$astman->database_put("AMPUSER",$extension."/recording/out/external",$settings['recording_out_external']);
@@ -2376,7 +2380,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 			if ($this->FreePBX->Modules->checkStatus("paging")) {
 				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
-				$results['answermode'] = (trim($answermode) == '') ? 'disabled' : $answermode;
+				$results['answermode'] = (trim($answermode) == '') ? $this->freepbx->Config->get("DEFAULT_INTERNAL_AUTO_ANSWER") : $answermode;
+				$astman->database_put("AMPUSER",$extension."/answermode",$results['answermode']); //incase it was updated from above
+
+				$intercom=$astman->database_get("AMPUSER",$extension."/intercom");
+				$results['intercom'] = (trim($intercom) == '') ? 'enabled' : $intercom;
 			}
 
 			$cw = $astman->database_get("CW",$extension);
