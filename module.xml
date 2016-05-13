@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.84</version>
+	<version>13.0.85</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.85* FREEPBX-12271 IVR Direct Dial no longer working with Device and User mode
 		*13.0.84* FREEPBX-11597 reset form after quick create page change
 		*13.0.83* FREEPBX-8981 add automon back into featuremap as it doesnt seem to conflict
 		*13.0.82* FREEPBX-12013 remove invalid dtmf none option, add valid auto option

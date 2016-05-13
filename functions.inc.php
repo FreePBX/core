@@ -1758,7 +1758,7 @@ function core_do_get_config($engine) {
 			// works.
 			//
 			$ivr_context = 'from-did-direct-ivr';
-			$sql = "SELECT LENGTH(id) as len FROM devices GROUP BY len";
+			$sql = "SELECT LENGTH(extension) as len FROM users GROUP BY len";
 			$sth = FreePBX::Database()->prepare($sql);
 			$sth->execute();
 			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
