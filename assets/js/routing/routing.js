@@ -54,6 +54,9 @@ $(function() {
 			});
 		}
 	});
+});
+
+$('#routes').on("post-body.bs.table", function () {
 	$("a[id^='del']").click(function(e){
 		e.preventDefault();
 		if(confirm("Are you sure you want to delete this route?") === false){
