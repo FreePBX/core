@@ -67,7 +67,7 @@ $dphstring[] = '			<tr><td><strong>X</strong></td><td>'. _("matches any digit fr
 $dphstring[] = '			<tr><td><strong>Z</strong></td><td>'. _("matches any digit from 1-9").'</td></tr>';
 $dphstring[] = '			<tr><td><strong>N</strong></td><td>'. _("matches any digit from 2-9").'</td></tr>';
 $dphstring[] = '			<tr><td><strong>[1237-9]</strong></td><td>'. _("matches any digit or letter in the brackets (in this example, 1,2,3,7,8,9)").'</td></tr>';
-$dphstring[] = '			<tr><td><strong>.</strong></td><td>;'. _("wildcard, matches one or more characters").'</td></tr>';
+$dphstring[] = '			<tr><td><strong>.</strong></td><td>'. _("wildcard, matches one or more characters").'</td></tr>';
 
 if($amp_conf['ENABLEOLDDIALPATTERNS']){
 	$dphstring[] = '		<tr><td><strong>|</strong></td><td>'. _("separates a dialing prefix from the number (for example, 9|NXXXXXX would match when some dialed \"95551234\" but would only pass \"5551234\" to the trunks)").'</td></tr>';
@@ -482,7 +482,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
 				<br/>
-				<a href="#" class="btn btn-default btn-block" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic">&nbsp; <?php echo _("Dial patterns wizards")?></i></a>
+				<a href="#" class="btn btn-default btn-block" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic"></i>&nbsp; <?php echo _("Dial patterns wizards")?></a>
 				<br/><br/>
 				<table class="table table-striped" id="dptable">
 				<?php echo $dprows ?>
