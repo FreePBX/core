@@ -306,15 +306,15 @@ function bindToLast() {
 }
 
 $("#duplicate").click(function(e){
+	e.preventDefault();
+	e.stopPropagation();
 	var name = $("#routename").val();
 	$("#routename").val(name + "-" + _("copy"));
 	$("#action").val("addroute");
 	$("#extdisplay").val("");
 	$("#id").val("");
-	//$("#action").val("copyroute");
-	e.preventDefault();
-	e.stopPropagation();
 	$("#routeEdit").submit();
+	//$("#action").val("copyroute");
 });
 $("#routeEdit").submit(function(){
 	var patlen = 0;
