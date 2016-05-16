@@ -305,8 +305,16 @@ function bindToLast() {
 	});
 }
 
-$("#duplicate").click(function(){
-	$("#action").val("copyroute");
+$("#duplicate").click(function(e){
+	var name = $("#routename").val();
+	$("#routename").val(name + "-" + _("copy"));
+	$("#action").val("addroute");
+	$("#extdisplay").val("");
+	$("#id").val("");
+	//$("#action").val("copyroute");
+	e.preventDefault();
+	e.stopPropagation();
+	$("#routeEdit").submit();
 });
 $("#routeEdit").submit(function(){
 	var patlen = 0;
