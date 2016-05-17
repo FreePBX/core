@@ -217,7 +217,7 @@
 		</bulkhandler>
 	</hooks>
 	<supported>
-		<version>13.0</version>
+		<version>14.0</version>
 	</supported>
 	<location>release/2.11/core-2.11.0.7.tgz</location>
 	<md5sum>0fd1e869a8c4a2960e0894c202ba24fa</md5sum>
