@@ -6261,12 +6261,12 @@ function core_users_configpageload() {
 }
 
 function core_users_configprocess() {
-
+	global $astman;
 	//create vars from the request
 	extract($_REQUEST);
 
 	//make sure we can connect to Asterisk Manager
-	if (!checkAstMan()) {
+	if (!$astman || !$astman->connected()) {
 		return false;
 	}
 
@@ -6513,11 +6513,12 @@ function core_devices_configpageload() {
 }
 
 function core_devices_configprocess() {
+	global $astman;
 	if ( !class_exists('agi_asteriskmanager') )
 	include 'common/php-asmanager.php';
 
 	//make sure we can connect to Asterisk Manager
-	if (!checkAstMan()) {
+	if (!$astman || !$astman->connected()) {
 		return false;
 	}
 
