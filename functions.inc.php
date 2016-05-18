@@ -2287,7 +2287,7 @@ function core_do_get_config($engine) {
 	$ext->add('app-blackhole', 'no-service', '', new ext_playback('ss-noservice'));
 	$ext->add('app-blackhole', 'no-service', '', new ext_hangup());
 
-	if ($amp_conf['AMPBADNUMBER'] !== false) {
+	if ($amp_conf['AMPBADNUMBER']) {
 		$context = 'bad-number';
 		$exten = '_X.';
 		$ext->add($context, $exten, '', new extension('ResetCDR()'));
