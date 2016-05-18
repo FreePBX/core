@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.87</version>
+	<version>13.0.88</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.88* FREEPBX-12345 Only replace dialopts not the string
 		*13.0.87* FREEPBX-12325 only use PJSIP or SIP when they are the driver
 		*13.0.86* FREEPBX-8801 Move some paging functionality into paging
 		*13.0.85* FREEPBX-12271 IVR Direct Dial no longer working with Device and User mode
