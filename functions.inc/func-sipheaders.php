@@ -19,13 +19,14 @@ $c = 'func-apply-sipheaders';
 
 $ext->add($c,$e,'', new ext_noop('Applying SIP Headers to channel'));
 $ext->add($c,$e,'', new ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
-// TODO: Possibly put some code in here to detect if pjsip or not?  This
-// may NOT be a good idea though, if multiple channels are part of the dial
-// string, some may be PJSIP, some may be SIP..
 $ext->add($c,$e,'', new ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));
 $ext->add($c,$e,'', new ext_set('sipheader', '${HASH(SIPHEADERS,${sipkey})}'));
-$ext->add($c,$e,'', new ext_sipaddheader('${sipkey}', '${sipheader}'));
-$ext->add($c,$e,'', new ext_set('PJSIP_HEADER(add,${sipkey})', '${sipheader}'));
+$driver = \FreePBX::Config()->get("ASTSIPDRIVER");
+if(in_array($driver,array("both","chan_sip"))) {
+	$ext->add($c,$e,'', new ext_sipaddheader('${sipkey}', '${sipheader}'));
+}
+if(in_array($driver,array("both","chan_pjsip"))) {
+	$ext->add($c,$e,'', new ext_set('PJSIP_HEADER(add,${sipkey})', '${sipheader}'));
+}
 $ext->add($c,$e,'', new ext_endwhile(''));
 $ext->add($c,$e,'', new ext_return());
-
