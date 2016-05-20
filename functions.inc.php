@@ -1008,9 +1008,9 @@ function core_getdestinfo($dest) {
 		if ($box == null) {
 			return array();
 		}
-
+		$description = sprintf(_("User Extension %s: %s"),$exten, $box['name']);
 		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-		return array('description' => 'User Extension '.$exten.': '.$key['name'],
+		return array('description' => $description,
 		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 
 	// Check for blackhole Termination Destinations
