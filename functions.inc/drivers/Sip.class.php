@@ -172,57 +172,62 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$pports = array();
 		$techd = ($deviceInfo['tech'] == 'sip') ? 'CHAN_SIP' : strtoupper($deviceInfo['tech']);
 		$devinfo_tech = $deviceInfo['tech'];
-		$out = $this->freepbx->Sipsettings->getBinds();
-		if (isset($out[$devinfo_tech])) {
-			foreach($out[$devinfo_tech] as $ip => $data1) {
-				foreach($data1 as $protocol => $port) {
-					if ($protocol == "ws" || $protocol == "wss") {
-						continue;
-					}
-					// Is this the default port for this protocol?
-					$defaultport = false;
-					if ($protocol == "udp" && $port == 5060) {
-						$defaultport = true;
-					} elseif ($protocol == "tcp" && $port == 5060) {
-						$defaultport = true;
-					} elseif ($protocol == "tls" && $port == 5061) {
-						$defaultport = true;
-					}
-
-					// If the bind address is 0.0.0.0 (or :: or [::]), we don't need to say
-					// that it's listening on a specific address.
-					if ($ip == "0.0.0.0" || $ip == "::" || $ip = "[::]") {
-						if ($defaultport) {
-							$pports[] = sprintf(_("Port %s (%s)"), $port, strtoupper($protocol));
-						} else {
-							$pports[] = sprintf(_("Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $port, strtoupper($protocol));
+		if($this->freepbx->Modules->moduleHasMethod("sipsettings","getBinds")) {
+			$out = $this->freepbx->Sipsettings->getBinds();
+			if (isset($out[$devinfo_tech])) {
+				foreach($out[$devinfo_tech] as $ip => $data1) {
+					foreach($data1 as $protocol => $port) {
+						if ($protocol == "ws" || $protocol == "wss") {
+							continue;
 						}
-					} else {
-						if ($defaultport) {
-							$pports[] = sprintf(_("Interface %s, Port %s (%s)"), $ip, $port, strtoupper($protocol));
+						// Is this the default port for this protocol?
+						$defaultport = false;
+						if ($protocol == "udp" && $port == 5060) {
+							$defaultport = true;
+						} elseif ($protocol == "tcp" && $port == 5060) {
+							$defaultport = true;
+						} elseif ($protocol == "tls" && $port == 5061) {
+							$defaultport = true;
+						}
+
+						// If the bind address is 0.0.0.0 (or :: or [::]), we don't need to say
+						// that it's listening on a specific address.
+						if ($ip == "0.0.0.0" || $ip == "::" || $ip = "[::]") {
+							if ($defaultport) {
+								$pports[] = sprintf(_("Port %s (%s)"), $port, strtoupper($protocol));
+							} else {
+								$pports[] = sprintf(_("Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $port, strtoupper($protocol));
+							}
 						} else {
-							$pports[] = sprintf(_("Interface %s, Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $ip, $port, strtoupper($protocol));
+							if ($defaultport) {
+								$pports[] = sprintf(_("Interface %s, Port %s (%s)"), $ip, $port, strtoupper($protocol));
+							} else {
+								$pports[] = sprintf(_("Interface %s, Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $ip, $port, strtoupper($protocol));
+							}
 						}
 					}
 				}
 			}
-		}
-		if (!$pports) {
-			$pport = "(SipSettings Error)";
+			if (!$pports) {
+				$pport = "(SipSettings Error)";
+			} else {
+				$pport = join(", ", $pports);
+			}
+
+			$display_mode = "advanced";
+			$mode = \FreePBX::Config()->get("FPBXOPMODE");
+			if(!empty($mode)) {
+				$display_mode = $mode;
+			}
+			if ($display_mode != 'basic') {
+				$extrac = !empty($pport) ? sprintf(_('listening on %s'),$pport) : '';
+				$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
+				$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
+			}
 		} else {
-			$pport = join(", ", $pports);
+			$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-danger" role="alert" style="width:100%">'._("The Asterisk SIP Setting Module is not installed or is disabled. Please install it.").'</div>'),1, null, $category);
 		}
 
-		$display_mode = "advanced";
-		$mode = \FreePBX::Config()->get("FPBXOPMODE");
-		if(!empty($mode)) {
-			$display_mode = $mode;
-		}
-		if ($display_mode != 'basic') {
-			$extrac = !empty($pport) ? sprintf(_('listening on %s'),$pport) : '';
-			$device_uses = sprintf(_("This device uses %s technology %s"),"<strong>".$techd."</strong>",$extrac);
-			$currentcomponent->addguielem($primarySection, new \gui_label('techlabel', '<div class="alert alert-info" role="alert" style="width:100%">'.$device_uses.'</div>'),1, null, $category);
-		}
 
 		// We need to scream loudly if this device is using a channel driver that's disabled.
 		if ($devinfo_tech == "pjsip" || $devinfo_tech == "sip") {
