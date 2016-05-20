@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.89</version>
+	<version>13.0.90</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.90* Display the ports that are being used in a more comprehensible fashion.
 		*13.0.89* FREEPBX-12192 Update validation, FREEPBX-12281 variable naming, FREEPBX-12286 Fix dialplan logic for AMPBADNUMBER
 		*13.0.88* FREEPBX-12345 Only replace dialopts not the string
 		*13.0.87* FREEPBX-12325 only use PJSIP or SIP when they are the driver
