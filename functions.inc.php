@@ -1008,9 +1008,9 @@ function core_getdestinfo($dest) {
 		if ($box == null) {
 			return array();
 		}
-
+		$description = sprintf(_("User Extension %s: %s"),$exten, $box['name']);
 		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-		return array('description' => 'User Extension '.$exten.': '.$key['name'],
+		return array('description' => $description,
 		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
 
 	// Check for blackhole Termination Destinations
@@ -2287,7 +2287,7 @@ function core_do_get_config($engine) {
 	$ext->add('app-blackhole', 'no-service', '', new ext_playback('ss-noservice'));
 	$ext->add('app-blackhole', 'no-service', '', new ext_hangup());
 
-	if ($amp_conf['AMPBADNUMBER'] !== false) {
+	if ($amp_conf['AMPBADNUMBER']) {
 		$context = 'bad-number';
 		$exten = '_X.';
 		$ext->add($context, $exten, '', new extension('ResetCDR()'));
