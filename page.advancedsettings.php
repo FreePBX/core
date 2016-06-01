@@ -48,8 +48,10 @@ foreach ($conf as $c){
 	}
 	$type = $c['type'];
 	$iclasses = array('element-container');
+	$inputclass = '';
 	if($c['readonly']){
 		$iclasses[] = 'setro';
+		$inputclass = 'setro';
 		if(!$display_readonly) {
 			continue;
 		}
@@ -76,9 +78,9 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 radioset text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input type="radio" id="' . $c['keyword'] . 'true" name="' . $c['keyword'] . '" value="true" '.$true.'>';
+			$forminputs .= '<input type="radio" class="'.$inputclass.'" id="' . $c['keyword'] . 'true" name="' . $c['keyword'] . '" value="true" '.$true.'>';
 			$forminputs .= '<label for="'.$c['keyword'].'true">'._("Yes").'</label>';
-			$forminputs .= '<input type="radio" id="' . $c['keyword'] . 'false" name="' . $c['keyword'] . '" value="false" '.$false.'>';
+			$forminputs .= '<input type="radio" class="'.$inputclass.'" id="' . $c['keyword'] . 'false" name="' . $c['keyword'] . '" value="false" '.$false.'>';
 			$forminputs .= '<label for="'.$c['keyword'].'false">'._("No").'</label>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
@@ -103,7 +105,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input type="number" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			$forminputs .= '<input type="number" class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
@@ -128,7 +130,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input type="text" class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			$forminputs .= '<input type="text" class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
@@ -152,7 +154,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			$forminputs .= '<select class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
 			foreach($c['options'] as $k => $o) {
 				$selected = ($amp_conf[$c['keyword']] == $k) ? ' selected ' : '';
 				$forminputs .= '<option value="'.$k.'"'.$selected.'>'._($o).'</option>';
@@ -181,7 +183,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input id="'.$c['keyword'].'" type="search" name="'.$c['keyword'].'" placeholder="'._("Double-Click to see options or type freeform").'" class="form-control" list="'.$c['keyword'].'-list" value="'.$amp_conf[$c['keyword']].'">';
+			$forminputs .= '<input id="'.$c['keyword'].'" type="search" name="'.$c['keyword'].'" placeholder="'._("Double-Click to see options or type freeform").'" class="form-control '.$inputclass.'" list="'.$c['keyword'].'-list" value="'.$amp_conf[$c['keyword']].'">';
 			$forminputs .= '<datalist id="'.$c['keyword'].'-list">';
 			$opt = explode(',',$c['options']);
 			foreach($opt as $o) {
@@ -211,7 +213,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<select class="form-control" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
+			$forminputs .= '<select class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'">';
 			$opt = explode(',',$c['options']);
 			foreach($opt as $o) {
 				$selected = ($amp_conf[$c['keyword']] == $o) ? ' selected ' : '';
@@ -241,7 +243,7 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<textarea class="form-control" rows = "4" id="'.$c['keyword'].'" name="'.$c['keyword'].'">'.$c['value'].'</textarea>';
+			$forminputs .= '<textarea class="form-control '.$inputclass.'" rows = "4" id="'.$c['keyword'].'" name="'.$c['keyword'].'">'.$c['value'].'</textarea>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
