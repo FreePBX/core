@@ -780,7 +780,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if(version_compare($this->version,'13','ge')) {
 			$validdtmf[] = "auto";
 		}
-		if (!in_array($trunk['dtmfmode'],$validdtmf)) {
+		if (!in_array($config['dtmfmode'],$validdtmf)) {
 			if(version_compare($this->version,'13','ge')) {
 				$config['dtmfmode'] = "auto";
 			} else {
