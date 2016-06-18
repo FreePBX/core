@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>12.0.43</version>
+	<version>12.0.44</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*12.0.44* FREEPBX-12163 support Asterisk 1.8
 		*12.0.43* FREEPBX-12058 prevent potential unexpected use of transfer functionality
 		*12.0.42* FREEPBX-11915 detect ringing
 		*12.0.41* FREEPBX-11084 fix typo in playback
