@@ -6327,7 +6327,6 @@ function core_devices_configpageinit($dispnum) {
 		$currentcomponent->setoptlistopts('devicetypelist', 'sort', false);
 
 		$currentcomponent->addoptlistitem('deviceuserlist', 'none', _("none"));
-		$currentcomponent->addoptlistitem('deviceuserlist', 'new', _("New User"));
 		$users = core_users_list();
 		if (isset($users)) {
 			foreach ($users as $auser) {
@@ -6547,7 +6546,7 @@ function core_devices_configprocess() {
 		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true || !$_SESSION["AMP_user"]->checkSection('999')) {
 			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
 				needreload();
-				if ($deviceuser != 'new') {
+				if ($deviceuser == 'new') {
 					//redirect_standard_continue();
 				}
 			}
