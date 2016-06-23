@@ -94,6 +94,7 @@ foreach ($conf as $c){
 		case 'int':
 			$forminputs .= '<div class="'.implode(' ',$iclasses).'">';
 			$forminputs .= $inputhtmltop;
+			$opts = $c['options'];
 			if($display_friendly_name == 1){
 				$forminputs .= '<label class="control-label" for="' . $c['keyword'] . '">'._($c['name']).'</label>';
 			}else{
@@ -105,7 +106,14 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5 text-right">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input type="number" class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" >';
+			if(!empty($c['options']) && preg_match('/,/',$c['options'])) {
+				$parts = explode(",",$c['options']);
+				$min = $parts[0];
+				$max = $parts[1];
+				$forminputs .= '<input type="number" class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'" min="'.$min.'" max="'.$max.'">';
+			} else {
+				$forminputs .= '<input type="number" class="form-control '.$inputclass.'" id="'.$c['keyword'].'" name="'.$c['keyword'].'" value="'.$c['value'].'">';
+			}
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
