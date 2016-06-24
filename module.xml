@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.94</version>
+	<version>13.0.95</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.95* FREEPBX-12608 Add a field for PJSIP extensions to set device_state_busy_at
 		*13.0.94* FREEPBX-9281 remove new user option when creating a device in UD mode
 		*13.0.93* FREEPBX-10264 Don't auto-answer when in a queue
 		*13.0.92* FREEPBX-12408 Regression: DID using keywords in cid field
