@@ -386,6 +386,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					foreach($this->_registration[$tn] as $el) {
 						$conf["pjsip.registration.conf"][$tn][] = "{$el['key']}={$el['value']}";
 					}
+					unset($this->_registration[$tn]);
+				}
+			}
+			if(!empty($this->_registration) && is_array($this->_registration)) {
+				foreach($this->_registration as $section => $els) {
+					foreach($els as $key => $value) {
+						$conf["pjsip.registration.conf"][$section][] = $key."=".$value;
+					}
 				}
 			}
 
@@ -401,6 +409,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $tn;
 				} else {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
+				}
+			}
+			if(!empty($this->_auth) && is_array($this->_auth)) {
+				foreach($this->_auth as $section => $els) {
+					foreach($els as $key => $value) {
+						$conf["pjsip.auth.conf"][$section][] = $key."=".$value;
+					}
 				}
 			}
 
@@ -428,6 +443,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($this->_aor[$tn]) && is_array($this->_aor[$tn])) {
 				foreach($this->_aor[$tn] as $el) {
 					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				}
+				unset($this->_aor[$tn]);
+			}
+			if(!empty($this->_aor) && is_array($this->_aor)) {
+				foreach($this->_aor as $section => $els) {
+					foreach($els as $key => $value) {
+						$conf["pjsip.aor.conf"][$section][] = $key."=".$value;
+					}
 				}
 			}
 
@@ -492,6 +515,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				foreach($this->_endpoint[$tn] as $el) {
 					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
+				unset($this->_endpoint[$tn]);
+			}
+			if(!empty($this->_endpoint) && is_array($this->_endpoint)) {
+				foreach($this->_endpoint as $section => $els) {
+					foreach($els as $key => $value) {
+						$conf["pjsip.endpoint.conf"][$section][] = $key."=".$value;
+					}
+				}
 			}
 
 			// Identify types aren't used when we're receiving registrations
@@ -506,6 +537,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($this->_identify[$tn]) && is_array($this->_identify[$tn])) {
 				foreach($this->_identify[$tn] as $el) {
 					$conf["pjsip.identify.conf"][$tn][] = "{$el['key']}={$el['value']}";
+				}
+				unset($this->_identify[$tn]);
+			}
+			if(!empty($this->_identify) && is_array($this->_indentify)) {
+				foreach($this->_identify as $section => $els) {
+					foreach($els as $key => $value) {
+						$conf["pjsip.identify.conf"][$section][] = $key."=".$value;
+					}
 				}
 			}
 		}
@@ -933,6 +972,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			foreach($this->_endpoint[$endpointname] as $el) {
 				$retarr["pjsip.endpoint.conf"][$endpointname][] = "{$el['key']}={$el['value']}";
 			}
+			unset($this->_endpoint[$endpointname]);
 		}
 
 		if (isset($retarr["pjsip.auth.conf"][$authname])) {
@@ -943,6 +983,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			foreach($this->_auth[$authname] as $el) {
 				$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
 			}
+			unset($this->_auth[$authname]);
 		}
 
 		if (isset($retarr["pjsip.aor.conf"][$aorname])) {
@@ -953,6 +994,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			foreach($this->_aor[$aorname] as $el) {
 				$retarr["pjsip.aor.conf"][$aorname][] = "{$el['key']}={$el['value']}";
 			}
+			unset($this->_aor[$aorname]);
 		}
 
 
@@ -964,6 +1006,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			foreach($this->_identify[$identifyname] as $el) {
 				$retarr["pjsip.identify.conf"][$identifyname][] = "{$el['key']}={$el['value']}";
 			}
+			unset($this->_identify[$identifyname]);
 		}
 	}
 
