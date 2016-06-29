@@ -391,8 +391,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($this->_registration) && is_array($this->_registration)) {
 				foreach($this->_registration as $section => $els) {
-					foreach($els as $key => $value) {
-						$conf["pjsip.registration.conf"][$section][] = $key."=".$value;
+					foreach($els as $el) {
+						$conf["pjsip.registration.conf"][$section][] = "{$el['key']}={$el['value']}";
 					}
 				}
 			}
@@ -413,8 +413,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($this->_auth) && is_array($this->_auth)) {
 				foreach($this->_auth as $section => $els) {
-					foreach($els as $key => $value) {
-						$conf["pjsip.auth.conf"][$section][] = $key."=".$value;
+					foreach($els as $el) {
+						$conf["pjsip.auth.conf"][$section][] = "{$el['key']}={$el['value']}";
 					}
 				}
 			}
@@ -448,8 +448,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($this->_aor) && is_array($this->_aor)) {
 				foreach($this->_aor as $section => $els) {
-					foreach($els as $key => $value) {
-						$conf["pjsip.aor.conf"][$section][] = $key."=".$value;
+					foreach($els as $el) {
+						$conf["pjsip.aor.conf"][$section][] = "{$el['key']}={$el['value']}";
 					}
 				}
 			}
@@ -519,8 +519,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($this->_endpoint) && is_array($this->_endpoint)) {
 				foreach($this->_endpoint as $section => $els) {
-					foreach($els as $key => $value) {
-						$conf["pjsip.endpoint.conf"][$section][] = $key."=".$value;
+					foreach($els as $el) {
+						$conf["pjsip.endpoint.conf"][$section][] = "{$el['key']}={$el['value']}";
 					}
 				}
 			}
@@ -542,8 +542,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($this->_identify) && is_array($this->_indentify)) {
 				foreach($this->_identify as $section => $els) {
-					foreach($els as $key => $value) {
-						$conf["pjsip.identify.conf"][$section][] = $key."=".$value;
+					foreach($els as $el) {
+						$conf["pjsip.identify.conf"][$section][] = "{$el['key']}={$el['value']}";
 					}
 				}
 			}

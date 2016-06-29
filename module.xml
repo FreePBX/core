@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.96</version>
+	<version>13.0.97</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.97* Address concerns re digium. Thanks Scott!
 		*13.0.96* ASTNOW-436 allow addEndpoint to create non-device sections
 		*13.0.95* FREEPBX-12608 Add a field for PJSIP extensions to set device_state_busy_at
 		*13.0.94* FREEPBX-9281 remove new user option when creating a device in UD mode
