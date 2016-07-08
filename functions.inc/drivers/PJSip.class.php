@@ -389,13 +389,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					unset($this->_registration[$tn]);
 				}
 			}
-			if(!empty($this->_registration) && is_array($this->_registration)) {
-				foreach($this->_registration as $section => $els) {
-					foreach($els as $el) {
-						$conf["pjsip.registration.conf"][$section][] = "{$el['key']}={$el['value']}";
-					}
-				}
-			}
 
 			// Are we doing authentication?
 			if ($trunk['authentication'] !== "none") {
@@ -409,13 +402,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $tn;
 				} else {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
-				}
-			}
-			if(!empty($this->_auth) && is_array($this->_auth)) {
-				foreach($this->_auth as $section => $els) {
-					foreach($els as $el) {
-						$conf["pjsip.auth.conf"][$section][] = "{$el['key']}={$el['value']}";
-					}
 				}
 			}
 
@@ -445,13 +431,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf["pjsip.aor.conf"][$tn][] = "{$el['key']}={$el['value']}";
 				}
 				unset($this->_aor[$tn]);
-			}
-			if(!empty($this->_aor) && is_array($this->_aor)) {
-				foreach($this->_aor as $section => $els) {
-					foreach($els as $el) {
-						$conf["pjsip.aor.conf"][$section][] = "{$el['key']}={$el['value']}";
-					}
-				}
 			}
 
 			$conf['pjsip.endpoint.conf'][$tn] = array(
@@ -517,13 +496,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				unset($this->_endpoint[$tn]);
 			}
-			if(!empty($this->_endpoint) && is_array($this->_endpoint)) {
-				foreach($this->_endpoint as $section => $els) {
-					foreach($els as $el) {
-						$conf["pjsip.endpoint.conf"][$section][] = "{$el['key']}={$el['value']}";
-					}
-				}
-			}
 
 			// Identify types aren't used when we're receiving registrations
 			if ($trunk['registration'] != "receive") {
@@ -540,11 +512,49 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				unset($this->_identify[$tn]);
 			}
-			if(!empty($this->_identify) && is_array($this->_indentify)) {
-				foreach($this->_identify as $section => $els) {
-					foreach($els as $el) {
-						$conf["pjsip.identify.conf"][$section][] = "{$el['key']}={$el['value']}";
-					}
+		}
+
+		if(!empty($this->_registration) && is_array($this->_registration)) {
+			foreach($this->_registration as $section => $els) {
+				$conf["pjsip.registration.conf"][$section][] = "type=registration";
+				foreach($els as $el) {
+					$conf["pjsip.registration.conf"][$section][] = "{$el['key']}={$el['value']}";
+				}
+			}
+		}
+
+		if(!empty($this->_auth) && is_array($this->_auth)) {
+			foreach($this->_auth as $section => $els) {
+				$conf["pjsip.auth.conf"][$section][] = "type=auth";
+				foreach($els as $el) {
+					$conf["pjsip.auth.conf"][$section][] = "{$el['key']}={$el['value']}";
+				}
+			}
+		}
+
+		if(!empty($this->_aor) && is_array($this->_aor)) {
+			foreach($this->_aor as $section => $els) {
+				$conf["pjsip.aor.conf"][$section][] = "type=aor";
+				foreach($els as $el) {
+					$conf["pjsip.aor.conf"][$section][] = "{$el['key']}={$el['value']}";
+				}
+			}
+		}
+
+		if(!empty($this->_endpoint) && is_array($this->_endpoint)) {
+			foreach($this->_endpoint as $section => $els) {
+				$conf["pjsip.endpoint.conf"][$section][] = "type=endpoint";
+				foreach($els as $el) {
+					$conf["pjsip.endpoint.conf"][$section][] = "{$el['key']}={$el['value']}";
+				}
+			}
+		}
+
+		if(!empty($this->_identify) && is_array($this->_indentify)) {
+			foreach($this->_identify as $section => $els) {
+				$conf["pjsip.identify.conf"][$section][] = "type=identify";
+				foreach($els as $el) {
+					$conf["pjsip.identify.conf"][$section][] = "{$el['key']}={$el['value']}";
 				}
 			}
 		}
