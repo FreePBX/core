@@ -314,7 +314,7 @@ function __migrate_trunks_to_table() {
 		`maxchans` VARCHAR( 6 ) DEFAULT '',
 		`failscript` VARCHAR( 255 ) NOT NULL DEFAULT '',
 		`dialoutprefix` VARCHAR( 255 ) NOT NULL DEFAULT '',
-		`channelid` VARCHAR( 255 ) NOT NULL DEFAULT '',
+		`channelid` VARCHAR( 190 ) NOT NULL DEFAULT '',
 		`usercontext` VARCHAR( 255 ) NULL,
 		`provider` VARCHAR( 40 ) NULL,
 		`disabled` VARCHAR( 4 ) DEFAULT 'off',
