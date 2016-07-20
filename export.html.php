@@ -5,7 +5,7 @@
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
 $extdisplay = isset($_REQUEST['extdisplay']) && !empty($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '';
-$display = isset($_REQUEST['display']) && !empty($_REQUEST['display']) ? $_REQUEST['display'] : ''; 
+$display = isset($_REQUEST['display']) && !empty($_REQUEST['display']) ? $_REQUEST['display'] : '';
 
 $csvdata = array();
 $header = array();
@@ -14,33 +14,41 @@ switch($display) {
     case "routing":
         //Setup Column headers.
         $header[0] = array("prepend", "prefix", "match pattern" , "callerid");
-        
+
         //Get route name
-        $sql = "SELECT name FROM outbound_routes WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
-        $name = sql($sql,'getOne');
-        if(isset($name) && !empty($name)) {
-            //Get all dial patterns for this route
-            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass, match_cid  FROM outbound_route_patterns WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
-            $csvdata = sql($sql,'getAll');
-        }
+        if(!empty($extdisplay)) {
+					$sql = "SELECT name FROM outbound_routes WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
+					$name = sql($sql,'getOne');
+					if(isset($name) && !empty($name)) {
+							//Get all dial patterns for this route
+							$sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass, match_cid  FROM outbound_route_patterns WHERE `route_id` = '".$db->escapeSimple($extdisplay)."'";
+							$csvdata = sql($sql,'getAll');
+					}
+				} else {
+					$csvdata = array();
+				}
         break;
     case "trunks":
         $extdisplay = str_replace('OUT_','',$extdisplay);
         //Setup Column headers.
         $header[0] = array("prepend", "prefix", "match pattern");
-        
-        //Get trunk name
-        $sql = "SELECT name FROM trunks WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
-        $name = sql($sql,'getOne');
-        if(isset($name) && !empty($name)) {
-            //Get all dial patterns for this trunk
-            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass  FROM trunk_dialpatterns WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
-            $csvdata = sql($sql,'getAll');
-        }
+
+				if(!empty($extdisplay)) {
+	        //Get trunk name
+	        $sql = "SELECT name FROM trunks WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
+	        $name = sql($sql,'getOne');
+	        if(isset($name) && !empty($name)) {
+	            //Get all dial patterns for this trunk
+	            $sql = "SELECT prepend_digits, match_pattern_prefix, match_pattern_pass  FROM trunk_dialpatterns WHERE `trunkid` = '".$db->escapeSimple($extdisplay)."'";
+	            $csvdata = sql($sql,'getAll');
+	        }
+				} else {
+					$csvdata = array();
+				}
         break;
 }
 
-if(!empty($header) && !empty($csvdata)) {
+if(!empty($header)) {
     $final_data = array_merge($header,$csvdata); //Merge headers and data
 
     header("Content-type: text/csv"); //Declare to browser this is a CSV file
