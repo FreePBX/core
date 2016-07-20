@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.99</version>
+	<version>13.0.100</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.100* FREEPBX-12708 fix export with no data
 		*13.0.99* Add sound languages: it,fr,en_GB			
 		*13.0.98* Allow arbitrary sections in pjsip configuration
 		*13.0.97* Address concerns re digium. Thanks Scott!
