@@ -236,7 +236,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => _('None'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
-		$tt = _("Media (RTP) Encryption. Normally you would use None, unless you have explicitly set up SDP or DTLS.").' [media_encryption]';
+		$tt = _("Allow Non-Encrypted Media (Opportunistic SRTP) ").' [media_encryption]';
 		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
