@@ -37,7 +37,7 @@ $(document).on('click',"a[id^='rowadd']",function(e){
 	newhtml +=	'</tr>';
 	curRow.parent().append(newhtml);
 });
-$("a[id^='rowdel']").click(function(e){
+$(document).on('click',"a[id^='rowdel']",function(e){
 	e.preventDefault();
 	var curRow = $(this).closest('tr');
 	curRow.remove();
