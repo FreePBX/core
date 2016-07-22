@@ -21,10 +21,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private $_global = array();
 	private $_registration = array();
 	private $_identify = array();
+	private $language = null;
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->db = $this->database;
+
+		if ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
+			$this->language = $this->freepbx->Soundlang->getLanguage(); //global language
+		}
 	}
 
 	public function getInfo() {
@@ -441,6 +446,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
 				'aors' => $tn
 			);
+			$lang = !empty($trunk['language']) ? $trunk['language'] : $this->language;
+			if (!empty($lang)) {
+				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
+			}
 
 			if ($trunk['authentication'] == "outbound" || $trunk['authentication'] == "both") {
 				$conf['pjsip.endpoint.conf'][$tn]['outbound_auth'] = $tn;
@@ -638,7 +647,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	/**
 	* External Hook to Add settings to the Global Section
 	* Works like Core Conf
-	* @param {string} $section The section to be adding information to
 	* @param {string} $key     The Key
 	* @param {string} $value   The Value
 	*/
@@ -941,11 +949,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
-		if ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
-			$language = $this->freepbx->Soundlang->getLanguage();
-			if ($language != "") {
-				$endpoint[] = "language=" . $language;
-			}
+		if (!empty($this->language)) {
+			$endpoint[] = "language=" . $this->language;
 		}
 
 		// Auth
@@ -1141,7 +1146,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	/**
 	 * Get Display Variables
 	 * @param {int} $trunkid   Trunk ID
-	 * @param {array} &$dispvars Display Variables
+	 * @param {array} $dispvars Display Variables
 	 */
 	public function getDisplayVars($trunkid, $dispvars) {
 		$sipSettingsCodecs = $this->freepbx->Sipsettings->getCodecs('audio',true);
@@ -1178,7 +1183,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"transport" => null,
 				"codecs" => $sipSettingsCodecs,
 				"qualify_frequency" => 60,
-				"dtmfmode" => "rfc4733"
+				"dtmfmode" => "rfc4733",
+				"language" => ""
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';

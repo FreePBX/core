@@ -92,7 +92,7 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 				</div>
 				<div class="col-md-12">
 					<span id="authentication-help" class="help-block fpbx-help-block"><?php echo _("Usually, this will be set to 'Outbound', which authenticates calls going out, and allows unauthenticated calls in from the other server. If you select 'None', all calls from or to the specified SIP Server are unauthenticated. <strong>Setting this to 'None' may be insecure!</strong>")?></span>
-                                </div>
+				</div>
 			</div>
 		</div>
 		<div class="element-container">
@@ -111,7 +111,31 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 				</div>
 				<div class="col-md-12">
 					<span id="registration-help" class="help-block fpbx-help-block"><?php echo _("You normally <strong>Send</strong> registration, which tells the remote server where to send your calls. If the other server is not on a fixed address, it will need to register to this server (<strong>Receive</strong>), so this server can send calls to it. You would select <strong>None</strong> if both machines have a fixed address and do not require registration.")."<br>"._("<strong>Warning:</strong> If you select 'None', registration attempts for the Username and Secret specified above will be rejected. Setting this incorrectly may result in firewall services detecting this as an attack and blocking the machine trying to register. Do not change this unless you control both servers, and are sure it is required!")?></span>
-                                </div>
+					</div>
+			</div>
+		</div>
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-3">
+					<label class="control-label" for="language"><?php echo _("Language Code") ?></label>
+					<i class="fa fa-question-circle fpbx-help-icon" data-for="language"></i>
+				</div>
+				<div class="col-md-9">
+					<?php if(\FreePBX::Modules()->checkStatus("soundlang")) {?>
+						<?php $langs = \FreePBX::Soundlang()->getLanguages(); $langs = is_array($langs) ? $langs : array();?>
+						<select name="language" class="form-control">
+							<option value=""><?php echo _("Default")?></option>
+							<?php foreach($langs as $key => $lang) { ?>
+								<option value="<?php echo $key?>" <?php echo ($language == $key) ? "selected" : ""?>><?php echo $lang?></option>
+							<?php } ?>
+						</select>
+					<?php } else { ?>
+						<input name="language" class="form-control" value="<?php echo $language?>">
+					<?php } ?>
+				</div>
+				<div class="col-md-12">
+					<span id="language-help" class="help-block fpbx-help-block"><?php echo _("This will cause all messages and voice prompts to use the selected language if installed. Languages can be added or removed in the Sound Languages module")?></span>
+				</div>
 			</div>
 		</div>
 		<!--SIP SERVER-->
