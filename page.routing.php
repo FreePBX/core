@@ -43,6 +43,7 @@ switch($request['view']){
 			$routename = $route_info['name'];
 			$dest = $route_info['dest'];
 			$routelist = core_routing_list();
+			$subhead = sprintf('%s: %s',$subhead,$routename);
 			$viewinfo = array(
 							'formAction' => 'editroute',
 							'extdisplay' => $extdisplay,
