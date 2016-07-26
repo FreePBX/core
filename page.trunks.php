@@ -29,7 +29,8 @@ $disabletrunk = isset($request['disabletrunk'])?$request['disabletrunk']:'off';
 $continue     = isset($request['continue'])?$request['continue']:'off';
 $provider     = isset($request['provider'])?$request['provider']:'';
 $trunk_name   = isset($request['trunk_name'])?$request['trunk_name']:'';
-
+//Strip Spaces
+$trunk_name = str_replace(" ", "_", $trunk_name);
 $failtrunk    = isset($request['failtrunk'])?$request['failtrunk']:'';
 $failtrunk_enable = ($failtrunk == "")?'':'CHECKED';
 
