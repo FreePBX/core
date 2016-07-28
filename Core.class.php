@@ -1009,9 +1009,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 						$dialpattern_insert[] = array(
 							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
-							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix')),
+							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
 							'match_pattern_pass' => htmlspecialchars(trim($pattern['pattern_pass'])),
-							'match_cid' => htmlspecialchars(trim($pattern['match_cid')),
+							'match_cid' => htmlspecialchars(trim($pattern['match_cid'])),
 						);
 					}
 				}
