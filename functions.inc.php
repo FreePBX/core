@@ -1097,26 +1097,7 @@ function core_do_get_config($engine) {
 		//
 
 		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-			$core_conf->addSipGeneral('disallow','all');
-			$core_conf->addSipGeneral('allow','ulaw');
-			$core_conf->addSipGeneral('allow','alaw');
-			$core_conf->addSipGeneral('context','from-sip-external');
-			$core_conf->addSipGeneral('callerid','Unknown');
-			$core_conf->addSipGeneral('notifyringing','yes');
-			if ($ast_ge_14) {
-				$core_conf->addSipGeneral('notifyhold','yes');
-				$core_conf->addSipGeneral('tos_sip','cs3');    // Recommended setting from doc/ip-tos.txt
-				$core_conf->addSipGeneral('tos_audio','ef');   // Recommended setting from doc/ip-tos.txt
-				$core_conf->addSipGeneral('tos_video','af41'); // Recommended setting from doc/ip-tos.txt
-				$core_conf->addSipGeneral('alwaysauthreject','yes');
-				if ($ast_lt_161) {
-					$core_conf->addSipGeneral('limitonpeers','yes');
-				}
-			} else {
-				$core_conf->addSipGeneral('tos','0x68'); // This really doesn't do anything with astersk not running as root
-			}
 			$useragent = $amp_conf['SIPUSERAGENT'] . '-' . getversion() . "($version)";
-			$core_conf->addSipGeneral('useragent',$useragent);
 			$core_conf->addIaxGeneral('disallow','all');
 			$core_conf->addIaxGeneral('allow','ulaw');
 			$core_conf->addIaxGeneral('allow','alaw');
