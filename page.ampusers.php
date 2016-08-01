@@ -3,8 +3,9 @@
 //	Copyright 2006-2014 Schmooze Com Inc.
 //
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-
+global $amp_conf;
 $userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
+$display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
 $display = isset($_REQUEST['display'])?$_REQUEST['display']:'ampusers';
