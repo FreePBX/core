@@ -205,6 +205,7 @@ $(document).ready(function(){
   $("#dial-pattern-clear").click(function(){
     clearAllPatterns();
   });
+	$('#trunk_name').val($('#trunk_name').val().replace(" ","_"));
 });
 
 function patternsRemove(idx) {
@@ -460,3 +461,13 @@ function isDialIdentifierSpecial(s) { // special chars allowed in dial prefix (e
 
 	return true;
 }
+//No spaces in trunk names
+$("#trunk_name").keydown(function (e) {
+     if (e.keyCode == 32) {
+       $(this).val($(this).val() + "_");
+       return false;
+     }
+});
+$('#trunk_name').bind('input propertychange', function() {
+	$(this).val($(this).val().replace(" ","_"));
+});
