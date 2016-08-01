@@ -1001,20 +1001,17 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						);
 					}
 				}
-			} else if (isset($request["prepend_digit"])) {
-				$prepend_digit = $request["prepend_digit"];
-				$pattern_prefix = $request["pattern_prefix"];
-				$pattern_pass = $request["pattern_pass"];
-				$match_cid = $request["match_cid"];
+			} else if (isset($request["dialpatterns"])) {
 
-				foreach (array_keys($prepend_digit) as $key) {
-					if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='' || $match_cid[$key]!='') {
+				$dp = json_decode($request['dialpatterns']);
+				foreach ($dp as $pattern) {
+					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $$pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
 
 						$dialpattern_insert[] = array(
-							'prepend_digits' => htmlspecialchars(trim($prepend_digit[$key])),
-							'match_pattern_prefix' => htmlspecialchars(trim($pattern_prefix[$key])),
-							'match_pattern_pass' => htmlspecialchars(trim($pattern_pass[$key])),
-							'match_cid' => htmlspecialchars(trim($match_cid[$key])),
+							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
+							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
+							'match_pattern_pass' => htmlspecialchars(trim($pattern['pattern_pass'])),
+							'match_cid' => htmlspecialchars(trim($pattern['match_cid'])),
 						);
 					}
 				}
