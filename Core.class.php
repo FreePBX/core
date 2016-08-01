@@ -2033,7 +2033,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param  array $did_vars Array of new values
 	 */
 	public function createUpdateDID($did_vars) {
-		dbug($did_vars);
 		$did_create['extension'] = isset($did_vars['extension']) ? $did_vars['extension'] : '';
 		$did_create['cidnum']    = isset($did_vars['cidnum']) ? $did_vars['cidnum'] : '';
 		$coredid = $this->getDID($did_create['extension'], $did_create['cidnum']);
