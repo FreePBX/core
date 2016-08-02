@@ -4,7 +4,7 @@
 //
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
-global $amp_users;
+global $amp_conf;
 $userdisplay = isset($_REQUEST['userdisplay'])?$_REQUEST['userdisplay']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
