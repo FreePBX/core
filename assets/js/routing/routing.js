@@ -232,26 +232,26 @@ $("[id='routinggetlocalprefixes']").click(function(){
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+10)+'">(</span>';
-			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" name="prepend_digit[]" class="form-control " value="'+prepend+'">';
+			newhtml +=	'		<input placeholder="prepend" type="text" id="prepend_digit_'+id+'" class="form-control " value="'+prepend+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+11)+'">)</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
-			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'" name="pattern_prefix[]" class="form-control " value="'+prefix+'"> ';
+			newhtml +=	'		<input placeholder="prefix" type="text" id="pattern_prefix_'+id+'"  class="form-control " value="'+prefix+'"> ';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+12)+'">|</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+13)+'">[</span>';
-			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" name="pattern_pass[]" class="form-control dpt-value" value="'+match+'">';
+			newhtml +=	'		<input placeholder="match pattern" type="text" id="pattern_pass_'+id+'" class="form-control dpt-value" value="'+match+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+14)+'">/</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td>';
 			newhtml +=	'<td>';
 			newhtml +=	'	<div class="input-group">';
-			newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'" name="match_cid[]" class="form-control " value="'+cid+'">';
+			newhtml +=	'		<input placeholder="CallerID" type="text" id="match_cid_'+id+'"  class="form-control " value="'+cid+'">';
 			newhtml +=	'		<span class="input-group-addon" id="basic-addon'+(id+15)+'">]</span>';
 			newhtml +=	'	</div>';
 			newhtml +=	'</td><td>';
@@ -337,13 +337,15 @@ $("#routeEdit").submit(function(){
 		$('.nav-tabs a[href="#dialpatterns"]').tab('show');
 		return false;
 	}
+	var curpatterns = [];
 	$("[id^='prepend_digit_']").each(function(){
 	    var prepend_digit = $(this).val() || "";
 	    var pattern_prefix = $(this).parent().parent().parent().find("[id^='pattern_prefix_']").val() || "";
 	    var pattern_pass = $(this).parent().parent().parent().find("[id^='pattern_pass_']" ).val() || "";
 	    var match_cid = $(this).parent().parent().parent().find("[id^='match_cid_']" ).val() || "";
-	    patterns.push({'prepend_digit': prepend_digit, 'pattern_prefix':pattern_prefix, 'pattern_pass': pattern_pass, 'match_cid':match_cid});
+	    curpatterns.push({'prepend_digit': prepend_digit, 'pattern_prefix':pattern_prefix, 'pattern_pass': pattern_pass, 'match_cid':match_cid});
 	});
-	$("#dialpatterns").val(JSON.stringify(patterns));
+	var data = JSON.stringify(curpatterns);
+	$("#dialpatterndata").val(data);
 	return true;
 });

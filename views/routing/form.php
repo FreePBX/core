@@ -482,7 +482,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
 				<br/>
-				<input type = 'hidden' name="dialpatterns" id='dialpatterns'>
+				<input type = 'hidden' name="dialpatterndata" id='dialpatterndata'>
 				<a href="#" class="btn btn-default btn-block" data-toggle="modal"	data-target="#dpwizard" id="wizmenu"><i class="fa fa-magic"></i>&nbsp; <?php echo _("Dial patterns wizards")?></a>
 				<br/><br/>
 				<table class="table table-striped" id="dptable">

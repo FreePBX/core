@@ -1001,12 +1001,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						);
 					}
 				}
-			} else if (isset($request["dialpatterns"])) {
-
-				$dp = json_decode($request['dialpatterns']);
+			} else if (isset($request["dialpatterndata"])) {
+				$dp = json_decode($request['dialpatterndata'],true);
 				foreach ($dp as $pattern) {
-					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $$pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
-
+					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
 						$dialpattern_insert[] = array(
 							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
 							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
