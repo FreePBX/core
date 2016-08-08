@@ -10,7 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.105* FREEPBX-12837
+		*13.0.105* FREEPBX-12837 pjsip extension with mutliple contacts only rings one contact when extension is included in a ring group
 		*13.0.104* FREEPBX-12887
 		*13.0.103* FREEPBX-11764, FREEPBX-12605, FREEPBX-12798, FREEPBX-12484, FREEPBX-12639, FREEPBX-12721, FREEPBX-12805, FREEPBX-12840
 		*13.0.102* Noload a few more pjsip modules
