@@ -20,82 +20,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->loadDrivers();
 	}
 
-	public function search($query, &$results) {
-		if($this->freepbx->Config->get('AMPEXTENSIONS') == "extensions") {
-			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				if(ctype_digit($query)) {
-					$results[] = array("text" => _("Extension")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
-				} else {
-					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
-				}
-			}
-		} else {
-			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				if(ctype_digit($query)) {
-					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
-				} else {
-					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
-				}
-			}
-
-			$sql = "SELECT * FROM users WHERE extension LIKE ? or name LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				if(ctype_digit($query)) {
-					$results[] = array("text" => _("User")." ".$row['extension'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
-				} else {
-					$results[] = array("text" => $row['name']." (".$row['extension'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
-				}
-			}
-		}
-
-		if(!ctype_digit($query)) {
-			$sql = "SELECT * FROM outbound_routes WHERE name LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				$results[] = array("text" => _("Outbound Route:")." ".$row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
-			}
-
-			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				$results[] = array("text" => _("Trunk:")." ".$row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
-			}
-
-			$sql = "SELECT * FROM incoming WHERE description LIKE ?";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				$display = urlencode($row['extension']."/".$row['cidnum']);
-				$results[] = array("text" => _("Inbound Route:")." ".$row['description'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
-			}
-		} else {
-			$sql = "SELECT * FROM incoming WHERE cidnum LIKE :search OR extension LIKE :search";
-			$sth = $this->database->prepare($sql);
-			$sth->execute(array("search" => "%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				$display = urlencode($row['extension']."/".$row['cidnum']);
-				$results[] = array("text" => _("Inbound Route:")." ".$row['extension']."/".$row['cidnum'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
-			}
-		}
-	}
-
+	/**
+	 * Get Right Nav
+	 * @param  array $request The request
+	 * @return string          The Right nav html
+	 */
 	public function getRightNav($request) {
 		$display_mode = "advanced";
 		$mode = $this->freepbx->Config()->get("FPBXOPMODE");
@@ -143,339 +72,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 	}
 
-	public function ajaxRequest($req, &$setting) {
-		$setting['authenticate'] = false;
-		$setting['allowremote'] = false;
-		switch($req) {
-			case "delastmodule":
-			case "addastmodule":
-			case "quickcreate":
-			case "delete":
-			case "getJSON":
-			case "getExtensionGrid":
-			case "getDeviceGrid":
-			case "getUserGrid":
-			case "updateRoutes":
-			case "delroute":
-			case "getnpanxxjson":
-			case "populatenpanxx":
-				return true;
-			break;
-		}
-		return false;
-	}
-
-	public function ajaxHandler() {
-		switch($_REQUEST['command']) {
-			case "addastmodule":
-				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
-				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
-				switch($section){
-					case 'amodload':
-						return $this->ModulesConf->load($module);
-					break;
-					case 'amodnoload':
-						return $this->ModulesConf->noload($module);
-					break;
-					case 'amodpreload':
-						return $this->ModulesConf->preload($module);
-					break;
-				}
-			break;
-			case "delastmodule":
-				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
-				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
-				switch($section){
-					case 'amodload':
-						return $this->ModulesConf->removeload($module);
-					break;
-					case 'amodnoload':
-						return $this->ModulesConf->removenoload($module);
-					break;
-					case 'amodpreload':
-						return $this->ModulesConf->removepreload($module);
-					break;
-				}
-			break;
-			case "delroute":
-				if (!function_exists('core_routing_delbyid')) {
-					if (file_exists(__DIR__."/functions.inc.php")) {
-						include __DIR__."/functions.inc.php";
-					}
-				}
-				$ret = core_routing_delbyid($_POST['id']);
-				// re-order the routes to make sure that there are no skipped numbers.
-				// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
-				// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
-				// so we are left with 001-test1, 002-test3
-				needreload();
-				return $ret;
-			break;
-			case "updateRoutes":
-				$order = $_REQUEST['data'];
-				array_shift($order);
-				return $this->setRouteOrder($order);
-			break;
-			case "getUserGrid":
-				$users = $this->getAllUsers();
-				if(empty($users)) {
-					return array();
-				}
-				$ampuser = $this->astman->database_show("AMPUSER");
-				// Get all CW settings
-				$cwsetting = $this->astman->database_show("CW");
-				// get all CF settings
-				$cfsetting = $this->astman->database_show("CF");
-				// get all CFB settings
-				$cfbsetting = $this->astman->database_show("CFB");
-				// get all CFU settings
-				$cfusetting = $this->astman->database_show("CFU");
-				// get all DND settings
-				$dndsetting = $this->astman->database_show("DND");
-				foreach($users as &$user) {
-					$exten = $user['extension'];
-					$user['settings'] = array(
-						'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
-						'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
-						'cf' => (isset($cfsetting['/CF/'.$exten])),
-						'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
-						'cfu' => (isset($cfusetting['/CFU/'.$exten])),
-						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
-					);
-					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
-				}
-				return array_values($users);
-			break;
-			case "getExtensionGrid":
-				$ampuser = $this->astman->database_show("AMPUSER");
-				// Get all CW settings
-				$cwsetting = $this->astman->database_show("CW");
-				// get all CF settings
-				$cfsetting = $this->astman->database_show("CF");
-				// get all CFB settings
-				$cfbsetting = $this->astman->database_show("CFB");
-				// get all CFU settings
-				$cfusetting = $this->astman->database_show("CFU");
-				// get all DND settings
-				$dndsetting = $this->astman->database_show("DND");
-				if($_REQUEST['type'] == "all") {
-					$devices = $this->getAllUsersByDeviceType();
-					if(empty($devices)) {
-						return array();
-					}
-					foreach($devices as &$device) {
-						$exten = $device['extension'];
-						$device['settings'] = array(
-							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
-							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
-							'cf' => (isset($cfsetting['/CF/'.$exten])),
-							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
-							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
-							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
-						);
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
-					}
-					return $devices;
-				} else {
-					$devices = $this->getAllUsersByDeviceType($_REQUEST['type']);
-					if(empty($devices)) {
-						return array();
-					}
-					foreach($devices as &$device) {
-						$exten = $device['extension'];
-						$device['settings'] = array(
-							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
-							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
-							'cf' => (isset($cfsetting['/CF/'.$exten])),
-							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
-							'cfu' => (isset($cfusetting['/CFU/'.$exten]))
-						);
-						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
-					}
-					return $devices;
-				}
-				break;
-			case "getDeviceGrid":
-				if($_REQUEST['type'] == "all") {
-					$devices = $this->getAllDevicesByType();
-					if(empty($devices)) {
-						return array();
-					}
-					foreach($devices as &$device) {
-						$exten = $device['id'];
-						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
-					}
-					return $devices;
-				} else {
-					$devices = $this->getAllDevicesByType($_REQUEST['type']);
-					if(empty($devices)) {
-						return array();
-					}
-					foreach($devices as &$device) {
-						$exten = $device['id'];
-						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
-					}
-					return $devices;
-				}
-			break;
-			case "delete":
-				if(!empty($_POST['extensions'])) {
-					switch($_POST['type']) {
-						case "extensions":
-							foreach($_POST['extensions'] as $ext) {
-								$this->delUser($ext);
-								$this->delDevice($ext);
-							}
-							return array("status" => true);
-						break;
-						case "users":
-							foreach($_POST['extensions'] as $ext) {
-								$this->delUser($ext);
-							}
-							return array("status" => true);
-						break;
-						case "devices":
-							foreach($_POST['extensions'] as $ext) {
-								$this->delDevice($ext);
-							}
-							return array("status" => true);
-						break;
-					}
-				}
-			break;
-			case "quickcreate":
-				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
-				return $status;
-			break;
-			case "getJSON":
-				switch ($_REQUEST['jdata']) {
-					case 'allDID':
-						$dids = $this->getAllDIDs();
-						$dids = is_array($dids)?$dids:array();
-						foreach ($dids as $key => $value) {
-							$dids[$key]['cidnum'] = urlencode($value['cidnum']);
-							$dids[$key]['extension'] = urlencode($value['extension']);
-						}
-						return array_values($dids);
-					break;
-					case 'allTrunks':
-						return array_values($this->listTrunks());
-					break;
-					case 'routingrnav':
-						return array_values($this->getAllRoutes());
-					break;
-					case 'dahdichannels':
-						return array_values($this->listDahdiChannels());
-					break;
-					case 'ampusers':
-						return array_values($this->listAMPUsers('assoc'));
-					break;
-				}
-			break;
-			case 'getnpanxxjson':
-				try {
-					$npa = $_REQUEST['npa'];
-					$nxx = $_REQUEST['nxx'];
-					$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
-					$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
-					$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
-					$xml = new \SimpleXMLElement($data);
-					$pfdata = $xml->xpath('//lca-data/prefix');
-					$retdata = array();
-					foreach($pfdata as $item){
-						$inpa = (string)$item->npa;
-						$inxx = (string)$item->nxx;
-						$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
-					}
-					return $retdata;
-
-				}catch(Pest_NotFound $e){
-					return array('error' => $e);
-				}
-			break;
-			case 'populatenpanxx':
-				$dialpattern_array = $dialpattern_insert;
-				if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
-					// first thing we do is grab the exch:
-					$ch = curl_init();
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
-					curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
-					$str = curl_exec($ch);
-					curl_close($ch);
-
-					// quick 'n dirty - nabbed from PEAR
-					global $amp_conf;
-					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
-					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
-
-					$xml = new xml_unserializer;
-					$xml->unserialize($str);
-					$xmldata = $xml->getUnserializedData();
-
-					$hash_filter = array(); //avoid duplicates
-					if (isset($xmldata['lca-data']['prefix'])) {
-						// we do the loops separately so patterns are grouped together
-
-						// match 1+NPA+NXX (dropping 1)
-						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-							if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
-								continue;
-							} else {
-								$hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
-							}
-							$dialpattern_array[] = array(
-								'prepend_digits' => '',
-								'match_pattern_prefix' => '1',
-								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
-								'match_cid' => '',
-								);
-						}
-						// match NPA+NXX
-						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-							if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
-								continue;
-							} else {
-								$hash_filter[$prefix['npa'].$prefix['nxx']] = true;
-							}
-							$dialpattern_array[] = array(
-								'prepend_digits' => '',
-								'match_pattern_prefix' => '',
-								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
-								'match_cid' => '',
-								);
-						}
-						// match 7-digits
-						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-							if (isset($hash_filter[$prefix['nxx']])) {
-								continue;
-							} else {
-								$hash_filter[$prefix['nxx']] = true;
-							}
-								$dialpattern_array[] = array(
-									'prepend_digits' => '',
-									'match_pattern_prefix' => '',
-									'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
-									'match_cid' => '',
-									);
-						}
-						unset($hash_filter);
-					} else {
-						$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
-					}
-				} else {
-					// what a horrible error message... :p
-					$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
-				}
-
-				if (isset($errormsg)) {
-					return array('error' => "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>");
-					unset($errormsg);
-				}
-			break;
-		}
-	}
-
 	/**
 	 * Get all drivers from the private handler
 	 * this is so they cant be modified by some outside source
@@ -484,6 +80,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $this->drivers;
 	}
 
+	/**
+	 * Get a single driver object
+	 * @param  string $driver The driver name
+	 * @return object         The driver Object
+	 */
 	public function getDriver($driver) {
 		return isset($this->drivers[$driver]) ? $this->drivers[$driver] : false;
 	}
@@ -858,6 +459,337 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function doTests($db) {
 		return true;
+	}
+
+	public function ajaxRequest($req, &$setting) {
+		switch($req) {
+			case "delastmodule":
+			case "addastmodule":
+			case "quickcreate":
+			case "delete":
+			case "getJSON":
+			case "getExtensionGrid":
+			case "getDeviceGrid":
+			case "getUserGrid":
+			case "updateRoutes":
+			case "delroute":
+			case "getnpanxxjson":
+			case "populatenpanxx":
+				return true;
+			break;
+		}
+		return false;
+	}
+
+	public function ajaxHandler() {
+		switch($_REQUEST['command']) {
+			case "addastmodule":
+				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
+				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				switch($section){
+					case 'amodload':
+						return $this->ModulesConf->load($module);
+					break;
+					case 'amodnoload':
+						return $this->ModulesConf->noload($module);
+					break;
+					case 'amodpreload':
+						return $this->ModulesConf->preload($module);
+					break;
+				}
+			break;
+			case "delastmodule":
+				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
+				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				switch($section){
+					case 'amodload':
+						return $this->ModulesConf->removeload($module);
+					break;
+					case 'amodnoload':
+						return $this->ModulesConf->removenoload($module);
+					break;
+					case 'amodpreload':
+						return $this->ModulesConf->removepreload($module);
+					break;
+				}
+			break;
+			case "delroute":
+				if (!function_exists('core_routing_delbyid')) {
+					if (file_exists(__DIR__."/functions.inc.php")) {
+						include __DIR__."/functions.inc.php";
+					}
+				}
+				$ret = core_routing_delbyid($_POST['id']);
+				// re-order the routes to make sure that there are no skipped numbers.
+				// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
+				// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
+				// so we are left with 001-test1, 002-test3
+				needreload();
+				return $ret;
+			break;
+			case "updateRoutes":
+				$order = $_REQUEST['data'];
+				array_shift($order);
+				return $this->setRouteOrder($order);
+			break;
+			case "getUserGrid":
+				$users = $this->getAllUsers();
+				if(empty($users)) {
+					return array();
+				}
+				$ampuser = $this->astman->database_show("AMPUSER");
+				// Get all CW settings
+				$cwsetting = $this->astman->database_show("CW");
+				// get all CF settings
+				$cfsetting = $this->astman->database_show("CF");
+				// get all CFB settings
+				$cfbsetting = $this->astman->database_show("CFB");
+				// get all CFU settings
+				$cfusetting = $this->astman->database_show("CFU");
+				// get all DND settings
+				$dndsetting = $this->astman->database_show("DND");
+				foreach($users as &$user) {
+					$exten = $user['extension'];
+					$user['settings'] = array(
+						'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+						'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+						'cf' => (isset($cfsetting['/CF/'.$exten])),
+						'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+						'cfu' => (isset($cfusetting['/CFU/'.$exten])),
+						'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
+					);
+					$user['actions'] = '<a href="?display=users&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
+				}
+				return array_values($users);
+			break;
+			case "getExtensionGrid":
+				$ampuser = $this->astman->database_show("AMPUSER");
+				// Get all CW settings
+				$cwsetting = $this->astman->database_show("CW");
+				// get all CF settings
+				$cfsetting = $this->astman->database_show("CF");
+				// get all CFB settings
+				$cfbsetting = $this->astman->database_show("CFB");
+				// get all CFU settings
+				$cfusetting = $this->astman->database_show("CFU");
+				// get all DND settings
+				$dndsetting = $this->astman->database_show("DND");
+				if($_REQUEST['type'] == "all") {
+					$devices = $this->getAllUsersByDeviceType();
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['extension'];
+						$device['settings'] = array(
+							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+							'cf' => (isset($cfsetting['/CF/'.$exten])),
+							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+							'cfu' => (isset($cfusetting['/CFU/'.$exten])),
+							'fmfm' => (isset($ampuser['/AMPUSER/'.$exten.'/followme/ddial']) && $ampuser['/AMPUSER/'.$exten.'/followme/ddial'] == "DIRECT")
+						);
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
+					}
+					return $devices;
+				} else {
+					$devices = $this->getAllUsersByDeviceType($_REQUEST['type']);
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['extension'];
+						$device['settings'] = array(
+							'cw' => (isset($cwsetting['/CW/'.$exten]) && $cwsetting['/CW/'.$exten] == "ENABLED"),
+							'dnd' => (isset($dndsetting['/DND/'.$exten]) && $dndsetting['/DND/'.$exten] == "YES"),
+							'cf' => (isset($cfsetting['/CF/'.$exten])),
+							'cfb' => (isset($cfbsetting['/CFB/'.$exten])),
+							'cfu' => (isset($cfusetting['/CFU/'.$exten]))
+						);
+						$device['actions'] = '<a href="?display=extensions&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
+					}
+					return $devices;
+				}
+				break;
+			case "getDeviceGrid":
+				if($_REQUEST['type'] == "all") {
+					$devices = $this->getAllDevicesByType();
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['id'];
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
+					}
+					return $devices;
+				} else {
+					$devices = $this->getAllDevicesByType($_REQUEST['type']);
+					if(empty($devices)) {
+						return array();
+					}
+					foreach($devices as &$device) {
+						$exten = $device['id'];
+						$device['actions'] = '<a href="?display=devices&amp;extdisplay='.$exten.'"><i class="fa fa-edit"></i></a><a class="clickable delete" data-id="'.$exten.'"><i class="fa fa-trash"></i></a>';
+					}
+					return $devices;
+				}
+			break;
+			case "delete":
+				if(!empty($_POST['extensions'])) {
+					switch($_POST['type']) {
+						case "extensions":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delUser($ext);
+								$this->delDevice($ext);
+							}
+							return array("status" => true);
+						break;
+						case "users":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delUser($ext);
+							}
+							return array("status" => true);
+						break;
+						case "devices":
+							foreach($_POST['extensions'] as $ext) {
+								$this->delDevice($ext);
+							}
+							return array("status" => true);
+						break;
+					}
+				}
+			break;
+			case "quickcreate":
+				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
+				return $status;
+			break;
+			case "getJSON":
+				switch ($_REQUEST['jdata']) {
+					case 'allDID':
+						$dids = $this->getAllDIDs();
+						$dids = is_array($dids)?$dids:array();
+						foreach ($dids as $key => $value) {
+							$dids[$key]['cidnum'] = urlencode($value['cidnum']);
+							$dids[$key]['extension'] = urlencode($value['extension']);
+						}
+						return array_values($dids);
+					break;
+					case 'allTrunks':
+						return array_values($this->listTrunks());
+					break;
+					case 'routingrnav':
+						return array_values($this->getAllRoutes());
+					break;
+					case 'dahdichannels':
+						return array_values($this->listDahdiChannels());
+					break;
+					case 'ampusers':
+						return array_values($this->listAMPUsers('assoc'));
+					break;
+				}
+			break;
+			case 'getnpanxxjson':
+				try {
+					$npa = $_REQUEST['npa'];
+					$nxx = $_REQUEST['nxx'];
+					$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
+					$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
+					$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
+					$xml = new \SimpleXMLElement($data);
+					$pfdata = $xml->xpath('//lca-data/prefix');
+					$retdata = array();
+					foreach($pfdata as $item){
+						$inpa = (string)$item->npa;
+						$inxx = (string)$item->nxx;
+						$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
+					}
+					return $retdata;
+
+				}catch(Pest_NotFound $e){
+					return array('error' => $e);
+				}
+			break;
+			case 'populatenpanxx':
+				$dialpattern_array = $dialpattern_insert;
+				if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
+					// first thing we do is grab the exch:
+					$ch = curl_init();
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
+					curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
+					$str = curl_exec($ch);
+					curl_close($ch);
+
+					// quick 'n dirty - nabbed from PEAR
+					global $amp_conf;
+					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
+					require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
+
+					$xml = new xml_unserializer;
+					$xml->unserialize($str);
+					$xmldata = $xml->getUnserializedData();
+
+					$hash_filter = array(); //avoid duplicates
+					if (isset($xmldata['lca-data']['prefix'])) {
+						// we do the loops separately so patterns are grouped together
+
+						// match 1+NPA+NXX (dropping 1)
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
+							}
+							$dialpattern_array[] = array(
+								'prepend_digits' => '',
+								'match_pattern_prefix' => '1',
+								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_cid' => '',
+								);
+						}
+						// match NPA+NXX
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter[$prefix['npa'].$prefix['nxx']] = true;
+							}
+							$dialpattern_array[] = array(
+								'prepend_digits' => '',
+								'match_pattern_prefix' => '',
+								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_cid' => '',
+								);
+						}
+						// match 7-digits
+						foreach ($xmldata['lca-data']['prefix'] as $prefix) {
+							if (isset($hash_filter[$prefix['nxx']])) {
+								continue;
+							} else {
+								$hash_filter[$prefix['nxx']] = true;
+							}
+								$dialpattern_array[] = array(
+									'prepend_digits' => '',
+									'match_pattern_prefix' => '',
+									'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
+									'match_cid' => '',
+									);
+						}
+						unset($hash_filter);
+					} else {
+						$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
+					}
+				} else {
+					// what a horrible error message... :p
+					$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
+				}
+
+				if (isset($errormsg)) {
+					return array('error' => "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>");
+					unset($errormsg);
+				}
+			break;
+		}
 	}
 
 	public function doConfigPageInit($page) {
@@ -1438,9 +1370,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"intercommode" => "yes"
 		);
 	}
+
 	/**
 	 * Generate a secret to be used as a password Up to the SIPSECRETSIZE
-	 *
 	 */
 	public function generateSecret(){
 		global $amp_conf;
@@ -1633,6 +1565,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->deviceCache = array();
 		return true;
 	}
+
+	/**
+	 * List All DAHDi Channels
+	 * @return array Array of DAHDi Channels
+	 */
 	public function listDahdiChannels(){
 		$sql = "SELECT * FROM dahdichandids ORDER BY channel";
 		$stmt = $this->database->prepare($sql);
@@ -1640,7 +1577,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		return $results;
 	}
-	function listTrunks(){
+
+	/**
+	 * List All Trunks
+	 * @return array Array of Trunks
+	 */
+	public function listTrunks(){
 		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute();
@@ -1665,6 +1607,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		return $trunk_list;
 	}
+
 	/**
 	* Get all the users
 	* @param {bool} $get_all=false Whether to get all of check in the range
@@ -1803,6 +1746,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		return $results;
 	}
+
 	/**
 	* Get All Routes
 	*/
@@ -1813,6 +1757,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$routes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		return $routes;
 	}
+
 	/**
 	 * Get all Users
 	 */
@@ -1944,7 +1889,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $results;
 	}
 
-
+	/**
+	 * Add Inbound Route
+	 * @param array $settings Array of Inbound Route Settings
+	 */
 	public function addDID($settings) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
 		$invalidDIDChars = array('<', '>');
@@ -2447,6 +2395,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $this->getDeviceCache[$account];
 	}
 
+	/**
+	 * Hook Tabs for hooking
+	 * @param  [type] $page [description]
+	 * @return [type]       [description]
+	 */
 	public function hookTabs($page){
 		$module_hook = \moduleHook::create();
 		$mods = $this->freepbx->Hooks->processHooks($page);
@@ -2503,6 +2456,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		);
 	}
 
+	/**
+	 * Bulk Handler Get headers
+	 * @param  string $type The type of bulk handler
+	 * @return array       Array of headers
+	 */
 	public function bulkhandlerGetHeaders($type) {
 		switch ($type) {
 		case 'extensions':
@@ -2565,6 +2523,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			break;
 		}
 	}
+
+	/**
+	 * Used to Validate bulk handler items
+	 * @param  string $type    The bulk handler item
+	 * @param  array $rawData         Array of data to import
+	 * @return array                  Message containing status
+	 */
 	public function bulkhandlerValidate($type, $rawData) {
 		$ret = NULL;
 
@@ -2586,6 +2551,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $ret;
 	}
 
+	/**
+	 * Bulk Handler import
+	 * @param  string $type            The type of import
+	 * @param  array $rawData         Array of data to import
+	 * @param  boolean $replaceExisting Should we replace existing data?
+	 * @return array                  Message containing status
+	 */
 	public function bulkhandlerImport($type, $rawData, $replaceExisting = true) {
 		$ret = NULL;
 
@@ -2634,7 +2606,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						$settings[$key] = $data[$key];
 					}
 				}
-				dbug($settings);
 
 				try {
 					if (!$this->addUser($data['extension'], $settings)) {
@@ -2677,6 +2648,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $ret;
 	}
 
+	/**
+	 * Bulk Handler Export hook
+	 * @param  string $type The type of bulk handling
+	 * @return array       Array of data
+	 */
 	public function bulkhandlerExport($type) {
 		$data = NULL;
 
@@ -2718,6 +2694,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		return $data;
 	}
+
+	/**
+	 * Set Outbound Routes Order
+	 */
 	public function setRouteOrder($routes){
 		$dbh = $this->database();
 		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
@@ -2731,6 +2711,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		needreload();
 		return $ret;
 	}
+
+	/**
+	 * List Admin Users
+	 * @param  string $datatype The type of data to return
+	 * @return array           Return Array
+	 */
 	public function listAMPUsers($datatype = ''){
 		$sql = "SELECT username FROM ampusers ORDER BY username";
 		$stmt = $this->database->prepare($sql);
@@ -2744,6 +2730,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			break;
 		}
 	}
+
+	/**
+	 * Add Admin User
+	 * @param string $username       The username
+	 * @param string $password       The password
+	 * @param integer $extension_low  The lowest extension
+	 * @param integer $extension_high The highest extension
+	 * @param string $deptname       The department name
+	 * @param array $sections       Sections to allow
+	 */
 	public function addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections){
 		if (strlen($password) == 40 && ctype_xdigit($password)) {
 			$password_sha1 = $password;
@@ -2779,6 +2775,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 		}
 	}
+
+	/**
+	 * List Trunk Types
+	 * @return array Array of Trunk Types
+	 */
 	public function listTrunkTypes(){
 		$sipdriver = \FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
 		$default_trunk_types = array(
@@ -2797,5 +2798,86 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$trunk_types['MISDN'] = 'mISDN';
 		}
 		return $trunk_types;
+	}
+
+	/**
+	 * Search query for global search
+	 * @param  string $query   The query
+	 * @param  array $results Results
+	 */
+	public function search($query, &$results) {
+		if($this->freepbx->Config->get('AMPEXTENSIONS') == "extensions") {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Extension")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+		} else {
+			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				} else {
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+				}
+			}
+
+			$sql = "SELECT * FROM users WHERE extension LIKE ? or name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%","%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				if(ctype_digit($query)) {
+					$results[] = array("text" => _("User")." ".$row['extension'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				} else {
+					$results[] = array("text" => $row['name']." (".$row['extension'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
+				}
+			}
+		}
+
+		if(!ctype_digit($query)) {
+			$sql = "SELECT * FROM outbound_routes WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => _("Outbound Route:")." ".$row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
+			}
+
+			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$results[] = array("text" => _("Trunk:")." ".$row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
+			}
+
+			$sql = "SELECT * FROM incoming WHERE description LIKE ?";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$display = urlencode($row['extension']."/".$row['cidnum']);
+				$results[] = array("text" => _("Inbound Route:")." ".$row['description'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
+			}
+		} else {
+			$sql = "SELECT * FROM incoming WHERE cidnum LIKE :search OR extension LIKE :search";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array("search" => "%".$query."%"));
+			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($rows as $row) {
+				$display = urlencode($row['extension']."/".$row['cidnum']);
+				$results[] = array("text" => _("Inbound Route:")." ".$row['extension']."/".$row['cidnum'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
+			}
+		}
 	}
 }
