@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.106</version>
+	<version>13.0.107</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.107* Fix json_decode if it spits back a null string
 		*13.0.106* Comment functions and reorganize
 		*13.0.105* FREEPBX-12837 pjsip extension with mutliple contacts only rings one contact when extension is included in a ring group
 		*13.0.104* FREEPBX-12887
