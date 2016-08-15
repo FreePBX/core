@@ -4720,9 +4720,9 @@ function core_users_edit($extension, $vars){
 		if ($current_vmcontext != $new_vmcontext) {
 			$user_devices = explode('&',$ud);
 			foreach ($user_devices as $user_device) {
-				exec("rm -f /var/spool/asterisk/voicemail/device/".$user_device);
+				exec("rm -f ".escapeshellarg("/var/spool/asterisk/voicemail/device/".$user_device));
 				if ($new_vmcontext != 'novm') {
-					exec("/bin/ln -s /var/spool/asterisk/voicemail/".$new_vmcontext."/".$extension."/ /var/spool/asterisk/voicemail/device/".$user_device);
+					exec("/bin/ln -s ".escapeshellarg("/var/spool/asterisk/voicemail/".$new_vmcontext."/".$extension."/")." ".escapeshellarg("/var/spool/asterisk/voicemail/device/".$user_device));
 				}
 			}
 		}

@@ -1692,7 +1692,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			//voicemail symlink
 			$spooldir = $this->config->get('ASTSPOOLDIR');
 			if(file_exists($spooldir."/voicemail/device/".$account)) {
-				exec("rm -f ".$spooldir."/voicemail/device/".$account);
+				exec("rm -f ".escapeshellarg($spooldir."/voicemail/device/".$account));
 			}
 		} else {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
