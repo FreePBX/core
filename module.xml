@@ -3,7 +3,7 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1alpha9</version>
+	<version>14.0.1alpha10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
@@ -13,7 +13,7 @@
 		*14.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>13.0.75</version>
+		<version>14.0</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
