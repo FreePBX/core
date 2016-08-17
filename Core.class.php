@@ -935,6 +935,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			} else if (isset($request["dialpatterndata"])) {
 				$dp = json_decode($request['dialpatterndata'],true);
+				$dp = is_array($dp) ? $dp : array();
 				foreach ($dp as $pattern) {
 					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
 						$dialpattern_insert[] = array(
@@ -1691,7 +1692,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			//voicemail symlink
 			$spooldir = $this->config->get('ASTSPOOLDIR');
 			if(file_exists($spooldir."/voicemail/device/".$account)) {
-				exec("rm -f ".$spooldir."/voicemail/device/".$account);
+				exec("rm -f ".escapeshellarg($spooldir."/voicemail/device/".$account));
 			}
 		} else {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
