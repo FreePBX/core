@@ -319,35 +319,7 @@ class core_conf {
 		$additional = "";
 		$finaloutput = "";
 
-		// Asterisk 1.4 requires call-limit be set for hints to work properly
-		//
-		if (version_compare($ast_version, "1.6.1", "ge")) {
-			$call_limit = "callcounter=yes\n";
-			$ver12 = false;
-		} else if (version_compare($ast_version, "1.4", "ge")) {
-			$call_limit = "call-limit=50\n";
-			$ver12 = false;
-		} else {
-			$call_limit = "";
-			$ver12 = true;
-		}
-		if (version_compare($ast_version, "1.6", "ge")) {
-			$faxdetect = "faxdetect=no\n";
-			$ver16 = true;
-		} else {
-			$faxdetect = "";
-			$ver16 = false;
-		}
-		if (version_compare($ast_version, "1.8", "ge")) {
-			$ver18 = true;
-		} else {
-			$ver18 = false;
-		}
-		if (version_compare($ast_version, "10", "ge")) {
-			$ver100 = true;
-		} else {
-			$ver100 = false;
-		}
+
 		if (version_compare($ast_version, "11.5", "ge")) {
 			$ver115 = true;
 		} else {
@@ -366,29 +338,28 @@ class core_conf {
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
+
 		foreach ($results as $result) {
-			if ($ver12) {
-				$additional .= $result['keyword']."=".$result['data']."\n";
-			} else {
-				$option = $result['data'];
-				switch (strtolower($result['keyword'])) {
-					case 'insecure':
-					if ($option == 'very')
-					$additional .= "insecure=port,invite\n";
-					else if ($option == 'yes')
-					$additional .= "insecure=port\n";
-					else
+			$option = $result['data'];
+			switch (strtolower($result['keyword'])) {
+				case 'insecure':
+					if ($option == 'very') {
+						$additional .= "insecure=port,invite\n";
+					} else if ($option == 'yes') {
+						$additional .= "insecure=port\n";
+					} else {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				case 'allow':
+				case 'disallow':
+				case 'accountcode':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				default:
 					$additional .= $result['keyword']."=$option\n";
-					break;
-					case 'allow':
-					case 'disallow':
-					case 'accountcode':
-					if ($option != '')
-					$additional .= $result['keyword']."=$option\n";
-					break;
-					default:
-					$additional .= $result['keyword']."=$option\n";
-				}
 			}
 		}
 
@@ -397,6 +368,13 @@ class core_conf {
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
+
+		if(FreePBX::Modules()->moduleHasMethod("sipsettings","getChanSipSettings")) {
+			$sipsettings = FreePBX::Sipsettings()->getChanSipSettings();
+		} else {
+			$sipsettings = array();
+		}
+
 
 		$usedAccounts = array();
 		foreach ($results as $result) {
@@ -421,6 +399,20 @@ class core_conf {
 				if($element['keyword'] == 'sipdriver'){
 					continue;
 				}
+				if(!empty($sipsettings) && $element['keyword'] == 'transport' && !empty($element['data'])) {
+					$prts = explode(",",$element['data']);
+					$itms = array("tlsenable" => 'tls',"enabletcp" => 'tcp');
+					foreach($itms as $x => $z) {
+						if((!isset($sipsettings[$x]) || $sipsettings[$x] == 'no') && in_array($z,$prts)) {
+							$ky = array_search($z,$prts);
+							if($ky !== false) {
+								unset($prts[$ky]);
+							}
+						}
+					}
+
+					$element['data'] = implode(",",$prts);
+				}
 				if (strtolower(trim($element['keyword'])) != 'secret') {
 					$options = explode("&", $element['data']);
 					foreach ($options as $option) {
@@ -440,110 +432,68 @@ class core_conf {
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
-				if ($ver12) {
-					switch (strtolower($result2['keyword'])) {
-						case 'context':
-						$context = $option;
-						//fall-through
-						default:
+				switch (strtolower($result2['keyword'])) {
+					case 'sessiontimers':
+						$output .= "session-timers=".$result2['data']."\n";
+					break;
+					case 'videosupport':
+						if($result2['data'] != 'inherit') {
+							$output .= "videosupport=".$result2['data']."\n";
+						}
+					break;
+					case 'insecure':
+					if ($option == 'very')
+					$output .= "insecure=port,invite\n";
+					else if ($option == 'yes')
+					$output .= "insecure=port\n";
+					else
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+					break;
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+					if ($option != '')
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+					break;
+					case 'callerid':
+					case 'mailbox':
+					$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+					break;
+					case 'secret_origional':
+					//stupidness coming through
+					break;
+					case 'username':
+					//http://issues.freepbx.org/browse/FREEPBX-7715
+					$output .= "username=".$result2['data']."\n";
+					break;
+					case 'nat':
+					//http://issues.freepbx.org/browse/FREEPBX-6518
+					if($ver115) {
+						$newval = "";
+						switch($result2['data']) {
+							case 'yes':
+							$newval = "force_rport,comedia";
+							break;
+							case 'route':
+							$newval = "force_rport";
+							break;
+							case 'never':
+							$newval = "no";
+							break;
+							default:
+							$newval = $result2['data'];
+							break;
+						}
+						$output .= $result2['keyword']."=".$newval."\n";
+					} else {
 						$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
-				} else {
-					switch (strtolower($result2['keyword'])) {
-						case 'sessiontimers':
-							$output .= "session-timers=".$result2['data']."\n";
-						break;
-						case 'videosupport':
-							if($result2['data'] != 'inherit') {
-								$output .= "videosupport=".$result2['data']."\n";
-							}
-						break;
-						case 'insecure':
-						if ($option == 'very')
-						$output .= "insecure=port,invite\n";
-						else if ($option == 'yes')
-						$output .= "insecure=port\n";
-						else
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'allow':
-						case 'disallow':
-						case 'accountcode':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'callerid':
-						case 'mailbox':
-						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-						break;
-						case 'secret_origional':
-						//stupidness coming through
-						break;
-						case 'username':
-						//http://issues.freepbx.org/browse/FREEPBX-7715
-						if($ver18) {
-							$output .= "defaultuser=".$result2['data']."\n";
-						} else {
-							$output .= "username=".$result2['data']."\n";
-						}
-						break;
-						case 'nat':
-						//http://issues.freepbx.org/browse/FREEPBX-6518
-						if($ver115) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'yes':
-								$newval = "force_rport,comedia";
-								break;
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} elseif($ver100) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} elseif($ver18) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} else {
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
-						break;
-						case 'context':
-						$context = $result2['data'];
-						//fall-through
-						default:
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
+					break;
+					case 'context':
+					$context = $result2['data'];
+					//fall-through
+					default:
+					$output .= $result2['keyword']."=".$result2['data']."\n";
 				}
 			}
 			switch (substr($id,0,8)) {
@@ -627,20 +577,15 @@ class core_conf {
 		$additional = "";
 		$output = "";
 
-		$ver12 = version_compare($ast_version, '1.4', 'lt');
-
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
 		foreach ($results as $result) {
-			if ($ver12) {
-				$additional .= $result['keyword']."=".$result['data']."\n";
-			} else {
-				$option = $result['data'];
-				switch ($result['keyword']) {
-					case 'notransfer':
+			$option = $result['data'];
+			switch ($result['keyword']) {
+				case 'notransfer':
 					if (strtolower($option) == 'yes') {
 						$additional .= "transfer=no\n";
 					} else if (strtolower($option) == 'no') {
@@ -650,20 +595,21 @@ class core_conf {
 					} else {
 						$additional .= $result['keyword']."=$option\n";
 					}
-					break;
-					case 'allow':
-					case 'disallow':
-					case 'accountcode':
-					if ($option != '')
+				break;
+				case 'allow':
+				case 'disallow':
+				case 'accountcode':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				case 'requirecalltoken':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				default:
 					$additional .= $result['keyword']."=$option\n";
-					break;
-					case 'requirecalltoken':
-					if ($option != '')
-					$additional .= $result['keyword']."=$option\n";
-					break;
-					default:
-					$additional .= $result['keyword']."=$option\n";
-				}
 			}
 		}
 
@@ -706,17 +652,8 @@ class core_conf {
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
-				if ($ver12) {
-					switch (strtolower($result2['keyword'])) {
-						case 'context':
-						$context = $result2['data'];
-						//fall-through
-						default:
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
-				} else {
-					switch ($result2['keyword']) {
-						case 'notransfer':
+				switch ($result2['keyword']) {
+					case 'notransfer':
 						if (strtolower($option) == 'yes') {
 							$output .= "transfer=no\n";
 						} else if (strtolower($option) == 'no') {
@@ -726,27 +663,28 @@ class core_conf {
 						} else {
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 						}
-						break;
-						case 'allow':
-						case 'disallow':
-						case 'accountcode':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'requirecalltoken':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'callerid':
-						case 'mailbox':
+					break;
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+						if ($option != '') {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+					break;
+					case 'requirecalltoken':
+						if ($option != '') {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+					break;
+					case 'callerid':
+					case 'mailbox':
 						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-						break;
-						case 'context':
+					break;
+					case 'context':
 						$context = $option;
-						//fall-through
-						default:
+					//fall-through
+					default:
 						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
 				}
 			}
 			switch (substr($id,0,8)) {
