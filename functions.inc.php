@@ -319,35 +319,6 @@ class core_conf {
 		$additional = "";
 		$finaloutput = "";
 
-		// Asterisk 1.4 requires call-limit be set for hints to work properly
-		//
-		if (version_compare($ast_version, "1.6.1", "ge")) {
-			$call_limit = "callcounter=yes\n";
-			$ver12 = false;
-		} else if (version_compare($ast_version, "1.4", "ge")) {
-			$call_limit = "call-limit=50\n";
-			$ver12 = false;
-		} else {
-			$call_limit = "";
-			$ver12 = true;
-		}
-		if (version_compare($ast_version, "1.6", "ge")) {
-			$faxdetect = "faxdetect=no\n";
-			$ver16 = true;
-		} else {
-			$faxdetect = "";
-			$ver16 = false;
-		}
-		if (version_compare($ast_version, "1.8", "ge")) {
-			$ver18 = true;
-		} else {
-			$ver18 = false;
-		}
-		if (version_compare($ast_version, "10", "ge")) {
-			$ver100 = true;
-		} else {
-			$ver100 = false;
-		}
 		if (version_compare($ast_version, "11.5", "ge")) {
 			$ver115 = true;
 		} else {
@@ -366,29 +337,28 @@ class core_conf {
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
+
 		foreach ($results as $result) {
-			if ($ver12) {
-				$additional .= $result['keyword']."=".$result['data']."\n";
-			} else {
-				$option = $result['data'];
-				switch (strtolower($result['keyword'])) {
-					case 'insecure':
-					if ($option == 'very')
-					$additional .= "insecure=port,invite\n";
-					else if ($option == 'yes')
-					$additional .= "insecure=port\n";
-					else
+			$option = $result['data'];
+			switch (strtolower($result['keyword'])) {
+				case 'insecure':
+					if ($option == 'very') {
+						$additional .= "insecure=port,invite\n";
+					} else if ($option == 'yes') {
+						$additional .= "insecure=port\n";
+					} else {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				case 'allow':
+				case 'disallow':
+				case 'accountcode':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				default:
 					$additional .= $result['keyword']."=$option\n";
-					break;
-					case 'allow':
-					case 'disallow':
-					case 'accountcode':
-					if ($option != '')
-					$additional .= $result['keyword']."=$option\n";
-					break;
-					default:
-					$additional .= $result['keyword']."=$option\n";
-				}
 			}
 		}
 
@@ -397,6 +367,13 @@ class core_conf {
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
+
+		if(FreePBX::Modules()->moduleHasMethod("sipsettings","getChanSipSettings")) {
+			$sipsettings = FreePBX::Sipsettings()->getChanSipSettings();
+		} else {
+			$sipsettings = array();
+		}
+
 
 		$usedAccounts = array();
 		foreach ($results as $result) {
@@ -421,6 +398,20 @@ class core_conf {
 				if($element['keyword'] == 'sipdriver'){
 					continue;
 				}
+				if(!empty($sipsettings) && $element['keyword'] == 'transport' && !empty($element['data'])) {
+					$prts = explode(",",$element['data']);
+					$itms = array("tlsenable" => 'tls',"enabletcp" => 'tcp');
+					foreach($itms as $x => $z) {
+						if((!isset($sipsettings[$x]) || $sipsettings[$x] == 'no') && in_array($z,$prts)) {
+							$ky = array_search($z,$prts);
+							if($ky !== false) {
+								unset($prts[$ky]);
+							}
+						}
+					}
+
+					$element['data'] = implode(",",$prts);
+				}
 				if (strtolower(trim($element['keyword'])) != 'secret') {
 					$options = explode("&", $element['data']);
 					foreach ($options as $option) {
@@ -440,110 +431,68 @@ class core_conf {
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
-				if ($ver12) {
-					switch (strtolower($result2['keyword'])) {
-						case 'context':
-						$context = $option;
-						//fall-through
-						default:
+				switch (strtolower($result2['keyword'])) {
+					case 'sessiontimers':
+						$output .= "session-timers=".$result2['data']."\n";
+					break;
+					case 'videosupport':
+						if($result2['data'] != 'inherit') {
+							$output .= "videosupport=".$result2['data']."\n";
+						}
+					break;
+					case 'insecure':
+					if ($option == 'very')
+					$output .= "insecure=port,invite\n";
+					else if ($option == 'yes')
+					$output .= "insecure=port\n";
+					else
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+					break;
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+					if ($option != '')
+					$output .= $result2['keyword']."=".$result2['data']."\n";
+					break;
+					case 'callerid':
+					case 'mailbox':
+					$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+					break;
+					case 'secret_origional':
+					//stupidness coming through
+					break;
+					case 'username':
+					//http://issues.freepbx.org/browse/FREEPBX-7715
+					$output .= "username=".$result2['data']."\n";
+					break;
+					case 'nat':
+					//http://issues.freepbx.org/browse/FREEPBX-6518
+					if($ver115) {
+						$newval = "";
+						switch($result2['data']) {
+							case 'yes':
+							$newval = "force_rport,comedia";
+							break;
+							case 'route':
+							$newval = "force_rport";
+							break;
+							case 'never':
+							$newval = "no";
+							break;
+							default:
+							$newval = $result2['data'];
+							break;
+						}
+						$output .= $result2['keyword']."=".$newval."\n";
+					} else {
 						$output .= $result2['keyword']."=".$result2['data']."\n";
 					}
-				} else {
-					switch (strtolower($result2['keyword'])) {
-						case 'sessiontimers':
-							$output .= "session-timers=".$result2['data']."\n";
-						break;
-						case 'videosupport':
-							if($result2['data'] != 'inherit') {
-								$output .= "videosupport=".$result2['data']."\n";
-							}
-						break;
-						case 'insecure':
-						if ($option == 'very')
-						$output .= "insecure=port,invite\n";
-						else if ($option == 'yes')
-						$output .= "insecure=port\n";
-						else
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'allow':
-						case 'disallow':
-						case 'accountcode':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'callerid':
-						case 'mailbox':
-						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-						break;
-						case 'secret_origional':
-						//stupidness coming through
-						break;
-						case 'username':
-						//http://issues.freepbx.org/browse/FREEPBX-7715
-						if($ver18) {
-							$output .= "defaultuser=".$result2['data']."\n";
-						} else {
-							$output .= "username=".$result2['data']."\n";
-						}
-						break;
-						case 'nat':
-						//http://issues.freepbx.org/browse/FREEPBX-6518
-						if($ver115) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'yes':
-								$newval = "force_rport,comedia";
-								break;
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} elseif($ver100) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} elseif($ver18) {
-							$newval = "";
-							switch($result2['data']) {
-								case 'route':
-								$newval = "force_rport";
-								break;
-								case 'never':
-								$newval = "no";
-								break;
-								default:
-								$newval = $result2['data'];
-								break;
-							}
-							$output .= $result2['keyword']."=".$newval."\n";
-						} else {
-							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
-						break;
-						case 'context':
-						$context = $result2['data'];
-						//fall-through
-						default:
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
+					break;
+					case 'context':
+					$context = $result2['data'];
+					//fall-through
+					default:
+					$output .= $result2['keyword']."=".$result2['data']."\n";
 				}
 			}
 			switch (substr($id,0,8)) {
@@ -565,15 +514,11 @@ class core_conf {
 				}
 				break;
 				default:
-				if ($call_limit) {
-					$output .= $call_limit;
-				}
-				if ($faxdetect) {
-					$output .= $faxdetect;
-				}
-				if ($cc_monitor_policy) {
-					$output .= $cc_monitor_policy;
-				}
+					$output .= "callcounter=yes\n";
+					$output .= "faxdetect=no\n";
+					if ($cc_monitor_policy) {
+						$output .= $cc_monitor_policy;
+					}
 			}
 			if (isset($this->_sip_additional[$account])) {
 				foreach ($this->_sip_additional[$account] as $asetting) {
@@ -627,20 +572,15 @@ class core_conf {
 		$additional = "";
 		$output = "";
 
-		$ver12 = version_compare($ast_version, '1.4', 'lt');
-
 		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
 		}
 		foreach ($results as $result) {
-			if ($ver12) {
-				$additional .= $result['keyword']."=".$result['data']."\n";
-			} else {
-				$option = $result['data'];
-				switch ($result['keyword']) {
-					case 'notransfer':
+			$option = $result['data'];
+			switch ($result['keyword']) {
+				case 'notransfer':
 					if (strtolower($option) == 'yes') {
 						$additional .= "transfer=no\n";
 					} else if (strtolower($option) == 'no') {
@@ -650,20 +590,21 @@ class core_conf {
 					} else {
 						$additional .= $result['keyword']."=$option\n";
 					}
-					break;
-					case 'allow':
-					case 'disallow':
-					case 'accountcode':
-					if ($option != '')
+				break;
+				case 'allow':
+				case 'disallow':
+				case 'accountcode':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				case 'requirecalltoken':
+					if ($option != '') {
+						$additional .= $result['keyword']."=$option\n";
+					}
+				break;
+				default:
 					$additional .= $result['keyword']."=$option\n";
-					break;
-					case 'requirecalltoken':
-					if ($option != '')
-					$additional .= $result['keyword']."=$option\n";
-					break;
-					default:
-					$additional .= $result['keyword']."=$option\n";
-				}
 			}
 		}
 
@@ -706,17 +647,8 @@ class core_conf {
 			$context='';
 			foreach ($results2 as $result2) {
 				$option = strtolower($result2['data']);
-				if ($ver12) {
-					switch (strtolower($result2['keyword'])) {
-						case 'context':
-						$context = $result2['data'];
-						//fall-through
-						default:
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
-				} else {
-					switch ($result2['keyword']) {
-						case 'notransfer':
+				switch ($result2['keyword']) {
+					case 'notransfer':
 						if (strtolower($option) == 'yes') {
 							$output .= "transfer=no\n";
 						} else if (strtolower($option) == 'no') {
@@ -726,27 +658,28 @@ class core_conf {
 						} else {
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 						}
-						break;
-						case 'allow':
-						case 'disallow':
-						case 'accountcode':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'requirecalltoken':
-						if ($option != '')
-						$output .= $result2['keyword']."=".$result2['data']."\n";
-						break;
-						case 'callerid':
-						case 'mailbox':
+					break;
+					case 'allow':
+					case 'disallow':
+					case 'accountcode':
+						if ($option != '') {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+					break;
+					case 'requirecalltoken':
+						if ($option != '') {
+							$output .= $result2['keyword']."=".$result2['data']."\n";
+						}
+					break;
+					case 'callerid':
+					case 'mailbox':
 						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
-						break;
-						case 'context':
+					break;
+					case 'context':
 						$context = $option;
-						//fall-through
-						default:
+					//fall-through
+					default:
 						$output .= $result2['keyword']."=".$result2['data']."\n";
-					}
 				}
 			}
 			switch (substr($id,0,8)) {
@@ -2825,94 +2758,8 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_congestion(20));
 	$ext->add($context, 'h', '', new ext_hangup());
 
-	/*
-	* sets the CallerID of the device to that of the logged in user
-	*
-	* ${AMPUSER} is set upon return to the real user despite any aliasing that may
-	* have been set as a result of the AMPUSER/<nnn>/cidnum field. This is used by
-	* features like DND, CF, etc. to set the proper structure on aliased instructions
-	*/
-	$context = 'macro-user-callerid';
-	$exten = 's';
-
-	//$ext->add($context, $exten, '', new ext_noop('user-callerid: ${CALLERID(name)} ${CALLERID(number)}'));
-
-	// for i18n playback in multiple languages
-	$ext->add($context, 'lang-playback', '', new ext_gosubif('$[${DIALPLAN_EXISTS('.$context.',${CHANNEL(language)})}]', $context.',${CHANNEL(language)},${ARG1}', $context.',en,${ARG1}'));
-	$ext->add($context, 'lang-playback', '', new ext_return());
-
-	$ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
-	// make sure AMPUSER is set if it doesn't get set below
-	$ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
-	$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
-	$ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
-
-	// Device & User: If they're not signed in, then they can't do anything.
-	$ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSER}" = "none"]', 'limit'));
-
-	$ext->add($context, $exten, '', new ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSERCIDNAME:1:2}" = ""]', 'report'));
-
-	// user may masquerade as a different user internally, so set the internal cid as indicated
-	// but keep the REALCALLERID which is used to determine their true identify and lookup info
-	// during outbound calls.
-	$ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${ARG2}" != "EXTERNAL" & "${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)}" = "1"]?${DB_RESULT}:${AMPUSER})}'));
-
-	// If there is a defined dialopts then use it, otherwise use the global default
-	//
-	$ext->add($context, $exten, '', new ext_set('__DIAL_OPTIONS', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/dialopts)}" = "1"]?${DB_RESULT}:${DIAL_OPTIONS})}'));
-
-	$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
-
-	$ext->add($context, $exten, '', new ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})} & ${DB_EXISTS(AMPUSER/${AMPUSER}/concurrency_limit)} & ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}>0 & ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}>=${DB(AMPUSER/${AMPUSER}/concurrency_limit)}]', 'limit'));
-	$ext->add($context, $exten, '', new ext_execif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})}]', 'Set', 'GROUP(concurrency_limit)=${AMPUSER}'));
-	/*
-	* This is where to splice in things like setting the language based on a user's astdb setting,
-	* or where you might set the CID account code based on a user instead of the device settings.
-	*/
-
-	$ext->add($context, $exten, 'report', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
-	$ext->add($context, $exten, 'report2', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
-	$ext->add($context, $exten, '', new ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
-	$ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
-	$ext->add($context, $exten, '', new ext_answer());
-	$ext->add($context, $exten, '', new ext_wait('1'));
-	$ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_0'));
-	$ext->add($context, $exten, '', new ext_macro('hangupcall'));
-	$ext->add($context, $exten, 'limit', new ext_answer());
-	$ext->add($context, $exten, '', new ext_wait('1'));
-	$ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_1'));
-	$ext->add($context, $exten, '', new ext_macro('hangupcall'));
-	$ext->add($context, $exten, '', new ext_congestion(20));
-
-	// Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
-	// malicious CID that can cause overflows in the Asterisk code.
-	//
-	$ext->add($context, $exten, 'continue', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
-	$ext->add($context, $exten, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
-	$ext->add($context, $exten, '', new ext_set('CDR(cnum)','${CALLERID(num)}'));
-	$ext->add($context, $exten, '', new ext_set('CDR(cnam)','${CALLERID(name)}'));
-	// CHANNEL(language) does not get inherited (which seems like an Asterisk bug as musicclass does)
-	// so if whe have MASTER_CHANNEL() available to us let's rectify that
-	//
-	if ($amp_conf['AST_FUNC_MASTER_CHANNEL']) {
-		$ext->add($context, $exten, '', new ext_set('CHANNEL(language)', '${MASTER_CHANNEL(CHANNEL(language))}'));
-	}
-	$ext->add($context, $exten, '', new ext_noop_trace('Using CallerID ${CALLERID(all)}'));
-	$ext->add($context, 'h', '', new ext_macro('hangupcall'));
-
-	$lang = 'en'; //English
-	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&an-error-has-occurred&with&call-forwarding'));
-	$ext->add($context, $lang, '', new ext_return());
-	$ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
-	$ext->add($context, $lang, '', new ext_return());
-	$lang = 'ja'; //Japanese
-	$ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&call-forwarding&jp-no&an-error-has-occured'));
-	$ext->add($context, $lang, '', new ext_return());
-	$ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&simul-call-limit-reached'));
-	$ext->add($context, $lang, '', new ext_return());
+	//[macro-user-callerid] Moved to external file
+	include 'functions.inc/macro-user-callerid.php';
 
 	/*
 	* arg1 = trunk number, arg2 = number
