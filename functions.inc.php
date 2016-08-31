@@ -319,7 +319,6 @@ class core_conf {
 		$additional = "";
 		$finaloutput = "";
 
-
 		if (version_compare($ast_version, "11.5", "ge")) {
 			$ver115 = true;
 		} else {
@@ -515,15 +514,11 @@ class core_conf {
 				}
 				break;
 				default:
-				if ($call_limit) {
-					$output .= $call_limit;
-				}
-				if ($faxdetect) {
-					$output .= $faxdetect;
-				}
-				if ($cc_monitor_policy) {
-					$output .= $cc_monitor_policy;
-				}
+					$output .= "callcounter=yes\n";
+					$output .= "faxdetect=no\n";
+					if ($cc_monitor_policy) {
+						$output .= $cc_monitor_policy;
+					}
 			}
 			if (isset($this->_sip_additional[$account])) {
 				foreach ($this->_sip_additional[$account] as $asetting) {
