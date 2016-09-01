@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.110</version>
+	<version>13.0.111</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.111* tcpenable not enabletcp for TCP transport checks
 		*13.0.110* FREEPBX-13039 BLF issues for calls
 		*13.0.109* Don't generate out transports that are invalid
 		*13.0.108* FREEPBX-12752

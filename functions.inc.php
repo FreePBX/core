@@ -400,7 +400,7 @@ class core_conf {
 				}
 				if(!empty($sipsettings) && $element['keyword'] == 'transport' && !empty($element['data'])) {
 					$prts = explode(",",$element['data']);
-					$itms = array("tlsenable" => 'tls',"enabletcp" => 'tcp');
+					$itms = array("tlsenable" => 'tls',"tcpenable" => 'tcp');
 					foreach($itms as $x => $z) {
 						if((!isset($sipsettings[$x]) || $sipsettings[$x] == 'no') && in_array($z,$prts)) {
 							$ky = array_search($z,$prts);
