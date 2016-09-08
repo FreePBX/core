@@ -68,7 +68,7 @@ $ext->add($context, $exten, '', new ext_congestion(20));
 $ext->add($context, $exten, 'continue', new ext_set('CALLERID(number)','${CALLERID(number):0:40}'));
 $ext->add($context, $exten, '', new ext_set('CALLERID(name)','${CALLERID(name):0:40}'));
 //FREEPBX-12752 if CNAM is empty skip setting it...
-$ext->add($context, $exten, '', new ext_gotoif('ISNULL(${CALLERID(name)})', 'cnum'));
+$ext->add($context, $exten, '', new ext_gotoif('$["${CALLERID(name)}" = ""]', 'cnum'));
 $ext->add($context, $exten, '', new ext_set('CDR(cnam)','${CALLERID(name)}'));
 $ext->add($context, $exten, 'cnum', new ext_set('CDR(cnum)','${CALLERID(num)}'));
 
