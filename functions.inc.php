@@ -1031,6 +1031,7 @@ function core_do_get_config($engine) {
 
 		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 			$useragent = $amp_conf['SIPUSERAGENT'] . '-' . getversion() . "($version)";
+			$core_conf->addSipGeneral('useragent', $useragent);
 			$core_conf->addIaxGeneral('disallow','all');
 			$core_conf->addIaxGeneral('allow','ulaw');
 			$core_conf->addIaxGeneral('allow','alaw');
