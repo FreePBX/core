@@ -2246,6 +2246,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		$this->getUserCache = array();
 		$this->listUsersCache = array();
+		$this->freepbx->Hooks->processHooks($extension, $settings, $editmode);
 		return true;
 	}
 
