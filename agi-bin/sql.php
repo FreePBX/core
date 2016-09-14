@@ -1,4 +1,4 @@
-<?php	
+<?php
 
 /* $Id$ */
 
@@ -23,15 +23,15 @@
 //  $result = $db->escape($sql)
 //	Escapes any characters that could confuse the database and lead to SQL injection problems.
 //	You should use this on ANY browser-supplied or user-supplied input.
-//	
+//
 //  $result = $db->sql($sql, $type)
-//	Returns the result of the SQL command $sql.  This will die noisily if you 
-//	try to do something that isn't portable between databases (eg ALTER TABLE 
-//	or use CREATE with 'auto_increment') - use the alternate commands below, 
+//	Returns the result of the SQL command $sql.  This will die noisily if you
+//	try to do something that isn't portable between databases (eg ALTER TABLE
+//	or use CREATE with 'auto_increment') - use the alternate commands below,
 //	or design your database to be portable.
-//	$type specifies the return type - 
-//		ASSOC for an Associative array 
-//		NUM for a numeric array. 
+//	$type specifies the return type -
+//		ASSOC for an Associative array
+//		NUM for a numeric array.
 //		BOTH for both in the same result
 //
 //	Note this returns the ENTIRE result. So for example taken from routepermissions:
@@ -40,14 +40,14 @@
 //
 //	if allowed and faildest return 'NO' and 'ext-vm,300', the result would look like this:
 //	$result = {
-//			[0] =>  {  
+//			[0] =>  {
 //					[0] = 'NO',		// Only these with 'NUM' type
 //					[1] = 'ext-vm,300',
 //					'allowed' => 'NO',	// Only these with 'ASSOC' type
 //					'faildest => 'ext-vm,300',
 //				}
 //		  }
-//	
+//
 //	if ($res[0]['allowed'] == 'NO') {
 //		$agi->goto($res[0]['faildest']);
 //	}
@@ -77,7 +77,7 @@ if (!class_exists('AGI')) {
 	$db = new AGIDB(null);
 	// Using sqlite_master crashes php-sqlite3
 	$db->alter_col('trunks', 'failscript', 'VARCHAR (20)');
-} 
+}
 
 class AGIDB {
   // Database Variables from [globals]. Self explanatory.
@@ -96,7 +96,7 @@ class AGIDB {
 
   private $agi; // A copy of the AGI class already running
   private $db;  // 'mysql', 'sqlite' or 'sqlite3'. Set in sql_database_connect, so we
-		// know which commands to use. 
+		// know which commands to use.
 
   // Public things that you might need to access
 
@@ -106,9 +106,9 @@ class AGIDB {
   // Just in case someone REALLY wants to work around all the sanity checks here, these
   // two variables are public, so you can use them if you REALLY must.
   public $dbtype;
-  public $dbhandle; 
+  public $dbhandle;
 
-  function AGIDB($AGI=null) { 
+  function AGIDB($AGI=null) {
 	// This gets called when 'new AGIDB(..)' is run.
 
 	if (!class_exists('AGI')) {
@@ -175,16 +175,15 @@ class AGIDB {
 			$this->db = "sqlite";
 			return $dbhandle;
 		// Bugger. OK, We'll have to use php-sqlite3 then. If the module is already loaded, or is
-		// compiled in, we'll already have sqlite3_ commands. 
+		// compiled in, we'll already have sqlite3_ commands.
 		} elseif (!function_exists('sqlite3_open')) {
 			$this->debug('Loading sqlite3.so', 4);
 			// It's not loaded. Load it.
-      // dl() is gone in php5, but since this will crash it anyhow, will just leave it as is
-			dl('sqlite3.so');
+			return;
 			// That would have crashed PHP if it couldn't load it, so we know it's loaded if
 			// it got to here.
 			$this->debug('Loaded', 4);
-		} 
+		}
 		// We now have sqlite3_ functions. Use them!
 		$dbhandle = sqlite3_open($this->dbfile);
 		if (!$dbhandle) {
@@ -215,7 +214,7 @@ class AGIDB {
 		}
 	}
 
-	// Check for non-portable stuff. 
+	// Check for non-portable stuff.
 	if ($override != true) {
 		$result = $this->sql_check($command);
 		// sql_check returns a sanitized SQL command, or false if error.
@@ -297,7 +296,7 @@ class AGIDB {
 			$this->numrows = $i;
 			return $sqlresult;
 		case "sqlite3":
-			// Init the sqlite3 hack variables. 
+			// Init the sqlite3 hack variables.
 			global $sql3holderAssoc;
 			global $sql3holderNum;
 			global $sql3holderRowNbr;
@@ -389,11 +388,11 @@ class AGIDB {
 		// copy everything from the old table, then delete the old table.
 		// We use the magic 'sqlite_master' table to get the information about the table.
 		// Note we CAN'T use $this->sql (aka, sqlite3_exec) because it segvs when using the
-		// sqlite_master table. I don't know enough about sqlite to be able to fix it. This 
+		// sqlite_master table. I don't know enough about sqlite to be able to fix it. This
 		// works though.
 
 			if ($this->db == "sqlite3") {
-				$res = sqlite3_query($this->dbhandle, 
+				$res = sqlite3_query($this->dbhandle,
 					"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
 				$sqlarr = sqlite3_fetch_array($res);
 				sqlite3_query_close($res);
@@ -465,10 +464,10 @@ class AGIDB {
 			return $this->sql("ALTER TABLE `$tablename` CHANGE `$colname` `$colname` $type");
 		case "sqlite":
 		case "sqlite3":
-		// As per remove_col - SQLite doesn't support ALTER TABLE properly. We have to work 
+		// As per remove_col - SQLite doesn't support ALTER TABLE properly. We have to work
 		// around it's limitations.
 			if ($this->db == "sqlite3") {
-				$res = sqlite3_query($this->dbhandle, 
+				$res = sqlite3_query($this->dbhandle,
 					"select `tbl_name`,`sql` from `sqlite_master` where `tbl_name`='$tablename'");
 				$sqlarr = sqlite3_fetch_array($res);
 				sqlite3_query_close($res);
@@ -485,7 +484,7 @@ class AGIDB {
 			preg_match_all('/\n\s+`(.+)`\s(.+)[,?$]/', $sqlCreate, $arrNewTableInfo);
 
 			// Which loads the col NAMES into $arr[1] and col TYPES into $arr[2]
-			// For ease of use, we'll just make it assocative. 
+			// For ease of use, we'll just make it assocative.
 			$i = 0;
 			foreach ($arrNewTableInfo[1] as $name) {
 				$arrAssocTypes[$name] = $arrNewTableInfo[2][$i++];
@@ -506,7 +505,7 @@ class AGIDB {
 			$sqlNewCreate = str_replace($strOld, $strNew, $sqlCreate);
 
 			// Right. So we've got the new table definition in $sqlNewCreate, now all we need
-			// to do is move the old table out of the way, create the new table, and copy 
+			// to do is move the old table out of the way, create the new table, and copy
 			// everything across.
 			$this->rename_table($tablename, "${tablename}_temp");
 			$this->sql($sqlNewCreate, "NONE", true);
@@ -526,8 +525,8 @@ class AGIDB {
 	}
   }
 
-			
-	
+
+
   function get_var($value) {
         $r = $this->agi->get_variable( $value );
 
@@ -539,7 +538,7 @@ class AGIDB {
   }
 
   function sql_check($sql) {
-	// Anything starting with ALTER is right out. 
+	// Anything starting with ALTER is right out.
 	if (preg_match('/^ALTER/', $sql)) {
 		$this->debug("SEVERE PROGRAMMING ERROR: Do not use ALTER in SQL Queries. ".
 			"Use SQL Class functions. ABORTING.", 0);
@@ -581,7 +580,7 @@ class AGIDB {
 			return false;
 	}
   }
-	
+
   function debug($string, $level=3) {
 	if (class_exists('AGI')) {
         	$this->agi->verbose($string, $level);
@@ -590,7 +589,7 @@ class AGIDB {
 	}
   }
 
-		
+
 
 }
 
@@ -598,7 +597,7 @@ class AGIDB {
 // function gets called by sqlite3_exec, above, and is run once for each row
 // returned. There's no 'rewind' of a pointer in the sqlite3_ routines, so
 // I had to figure out another way of doing it. This is nasty, but there
-// doesn't seem to be another way. 
+// doesn't seem to be another way.
 
 function sqlite3_hack($data, $column) {
 	global $sql3holderRowNbr;

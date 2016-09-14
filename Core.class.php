@@ -1691,7 +1691,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 			//voicemail symlink
 			$spooldir = $this->config->get('ASTSPOOLDIR');
-			if(file_exists($spooldir."/voicemail/device/".$account)) {
+			$account = preg_replace("/\D/","",$account);
+			if(trim($account) !== "" && file_exists($spooldir."/voicemail/device/".$account)) {
 				exec("rm -f ".escapeshellarg($spooldir."/voicemail/device/".$account));
 			}
 		} else {
