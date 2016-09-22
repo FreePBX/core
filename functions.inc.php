@@ -326,7 +326,7 @@ class core_conf {
 		}
 		// TODO: Temporary Kludge until CCSS is fixed
 		//
-		if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
+		if (function_exists('campon_get_config')) {
 			$cc_monitor_policy = "cc_monitor_policy=generic\n";
 		} else {
 			$cc_monitor_policy = "";
@@ -1019,11 +1019,6 @@ function core_do_get_config($engine) {
 
 	switch($engine) {
 		case "asterisk":
-
-		$ast_ge_14 = version_compare($version, '1.4', 'ge');
-		$ast_lt_16 = version_compare($version, '1.6', 'lt');
-		$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
-		$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
 		$ast_ge_10 = version_compare($version, '10', 'ge');
 
 		// Now add to sip_general_addtional.conf
@@ -1036,9 +1031,7 @@ function core_do_get_config($engine) {
 			$core_conf->addIaxGeneral('allow','alaw');
 			$core_conf->addIaxGeneral('allow','gsm');
 			$core_conf->addIaxGeneral('mailboxdetail','yes');
-			if ($ast_ge_14) {
-				$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
-			}
+			$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
 
 			$fcc = new featurecode($modulename, 'blindxfer');
 			$code = $fcc->getCodeActive();
@@ -1228,7 +1221,7 @@ function core_do_get_config($engine) {
 		//         if it is. So we simply assign the variable $ext_pickup which one it is, and use that variable when
 		//         creating all the extensions below. So those are "$ext_pickup" on purpose!
 		//
-		if ($fc_pickup != '' && $ast_ge_14) {
+		if ($fc_pickup != '') {
 			$ext->addInclude('from-internal-additional', 'app-pickup');
 			$fclen = strlen($fc_pickup);
 			$ext_pickup = (strstr($engineinfo['raw'], 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
@@ -2056,7 +2049,7 @@ function core_do_get_config($engine) {
 	$routes = \FreePBX::Core()->getAllRoutes();
 	$trunk_table = core_trunks_listbyid();
 	$trunk_type_needed = array(); // track which macros need to be generated
-	$delim = $ast_lt_16 ? '|' : ',';
+	$delim = ',';
 	foreach ($routes as $route) {
 		$add_extra_pri1 = array();
 		$context = 'outrt-'.$route['route_id'];
@@ -2269,11 +2262,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','0'));
 	$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
 	$ext->add($context, $exten, '', new ext_setvar('MSG1','${IF($["${ARG1}${ALT_CONFIRM_MSG}"=""]?incoming-call-1-accept-2-decline:${IF($[${LEN(${ALT_CONFIRM_MSG})}>0]?${ALT_CONFIRM_MSG}:${ARG1})})}'));
-	if ($ast_ge_14) {
-		$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
-	} else {
-		$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${LANGUAGE},macro-confirm'));
-	}
+	$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
 	$ext->add($context, $exten, '', new ext_read('INPUT', '', 1, '', '', 4));
 	$ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${INPUT})} > 0]', '${INPUT},1', 't,1'));
 
@@ -2314,11 +2303,9 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_gotoif('$[ ${LOOPCOUNT} < 5 ]', 's,start','noanswer,1'));
 
 	$exten = '_X';
-	if ($ast_ge_14) {
-		$ext->add($context, $exten, '', new ext_background('invalid,m,${CHANNEL(language)},macro-confirm'));
-	} else {
-		$ext->add($context, $exten, '', new ext_background('invalid,m,${LANGUAGE},macro-confirm'));
-	}
+
+	$ext->add($context, $exten, '', new ext_background('invalid,m,${CHANNEL(language)},macro-confirm'));
+
 	if ($amp_conf['AST_FUNC_SHARED']) {
 		$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" | "${SHARED(ANSWER_STATUS,${FORCE_CONFIRM})}"=""]', 'toolate,1'));
 	} else {
@@ -3269,15 +3256,9 @@ function core_do_get_config($engine) {
 	//
 
 	//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.[wW][aA][vV]'));
-	if ($ast_ge_14) {
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
-	} else {
-		$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
-		$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
-	}
+	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
+
 
 	$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
 	$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
@@ -3633,18 +3614,9 @@ function core_do_get_config($engine) {
 	if ($intercom_code != '') {
 		$exten = 'clrheader';
 		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPURI})}&"${SIPURI}"="${SIP_URI_OPTIONS}"]', 'Set','SIP_URI_OPTIONS='));
-		if ($ast_ge_162) {
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
-		} else {
-			$ext->add($mcontext, $exten, '', new ext_set('SP', '0'));
-			$ext->add($mcontext, $exten, '', new ext_set('ITER', '1'));
-			$ext->add($mcontext, $exten, 'begin', new ext_execif('$[${ITER} > 9]', 'Set','SP=' ));
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPADDHEADER${SP}${ITER}})}=0]', 'Return'));
-			$ext->add($mcontext, $exten, '', new ext_execif('$["${SIPADDHEADER${SP}${ITER}}"="${ALERTINFO}"|"${SIPADDHEADER${SP}${ITER}}"="${CALLINFO}"]', 'Set','SIPADDHEADER${SP}${ITER}='));
-			$ext->add($mcontext, $exten, '', new ext_setvar('ITER', '$[${ITER} + 1]'));
-			$ext->add($mcontext, $exten, '', new ext_gotoif('$[${ITER} < 100]', 'begin'));
-		}
+
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
 		$ext->add($mcontext,$exten,'', new ext_return(''));
 	}
 

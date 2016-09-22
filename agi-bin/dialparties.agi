@@ -31,20 +31,16 @@ $cwignore    = strtoupper(trim($cwignore));
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
-$ast_ge_16   = version_compare($ast_version, "1.6", "ge");
-$has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
-// If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
-//
-if (!$has_extension_state) {
-  require_once "phpagi-asmanager.php";
-  $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
-  $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
-  $astmgrhost  = get_var( $AGI, "ASTMANAGERHOST" );
-  $astman = $AGI->new_AsteriskManager();
-	if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
-		exit (1);
-	}
+
+require_once "phpagi-asmanager.php";
+$ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
+$ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
+$astmgrhost  = get_var( $AGI, "ASTMANAGERHOST" );
+$astman = $AGI->new_AsteriskManager();
+if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
+	exit (1);
 }
+
 
 // Caller ID info is stored in $request in AGI class, passed from Asterisk
 $cidnum = $AGI->request['agi_callerid'];
@@ -697,11 +693,9 @@ if (!strlen($ds)) {
 } else {
 	// Asterisk 1.6 uses , instead of | and 1.4 can't recieve a , in the ds.
 	//
-	if ($ast_ge_16) {
-		$ds_seperator = ',';
-	} else {
-		$ds_seperator = '|';
-	}
+
+	$ds_seperator = ',';
+
 
 	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
 		$ds = $ds_seperator;
@@ -747,9 +741,6 @@ if (! $ds) {
 	}
 }
 
-if (!$has_extension_state) {
-	$astman->disconnect();
-}
 
 // EOF dialparties.agi
 exit( 0 );
@@ -820,45 +811,39 @@ function debug($string, $level=3) {
 function is_ext_avail( $extnum ) {
 	global $astman;
 	global $AGI;
-	global $has_extension_state;
 
-	if ($has_extension_state) {
-		$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
-		switch ($extstate_result) {
-			case "NOT_INUSE":
-				$status = 0;
-				break;
-			case "INUSE":
-				$status = 1;
-				break;
-			case "BUSY":
-				$status = 2;
-				break;
-			case "UNAVAILABLE":
-				$status = 4;
-				break;
-			case "RINGING":
-				$status = 8;
-				break;
-			case "RINGINUSE":
-				$status = 9;
-				break;
-			case "HOLDINUSE":
-				$status = 17;
-				break;
-			case "ONHOLD":
-				$status = 16;
-				break;
-			case "UNKNOWN":
-			default:
-				$status = 4;
-		}
-		debug("EXTENSION_STATE: $status ($extstate_result)", 1);
-	} else {
-		$status = $astman->ExtensionState( $extnum, 'from-internal' );
-		$status = $status['Status'];
-		debug("ExtensionState: $status", 1);
+	$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
+	switch ($extstate_result) {
+		case "NOT_INUSE":
+			$status = 0;
+			break;
+		case "INUSE":
+			$status = 1;
+			break;
+		case "BUSY":
+			$status = 2;
+			break;
+		case "UNAVAILABLE":
+			$status = 4;
+			break;
+		case "RINGING":
+			$status = 8;
+			break;
+		case "RINGINUSE":
+			$status = 9;
+			break;
+		case "HOLDINUSE":
+			$status = 17;
+			break;
+		case "ONHOLD":
+			$status = 16;
+			break;
+		case "UNKNOWN":
+		default:
+			$status = 4;
 	}
+	debug("EXTENSION_STATE: $status ($extstate_result)", 1);
+
 	return $status;
 }
 ?>
