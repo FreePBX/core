@@ -933,19 +933,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 						);
 					}
 				}
-			} else if (isset($request["dialpatterndata"])) {
-				$dp = json_decode($request['dialpatterndata'],true);
-				$dp = is_array($dp) ? $dp : array();
-				foreach ($dp as $pattern) {
-					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
-						$dialpattern_insert[] = array(
-							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
-							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
-							'match_pattern_pass' => htmlspecialchars(trim($pattern['pattern_pass'])),
-							'match_cid' => htmlspecialchars(trim($pattern['match_cid'])),
-						);
-					}
-				}
 			} else if (isset($request["bulk_patterns"])) {
 				$prepend = '/^([^+]*)\+/';
 				$prefix = '/^([^|]*)\|/';
@@ -983,6 +970,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					);
 
 					$i++;
+				}
+			} else if (isset($request["dialpatterndata"])) {
+				$dp = json_decode($request['dialpatterndata'],true);
+				$dp = is_array($dp) ? $dp : array();
+				foreach ($dp as $pattern) {
+					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
+						$dialpattern_insert[] = array(
+							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
+							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
+							'match_pattern_pass' => htmlspecialchars(trim($pattern['pattern_pass'])),
+							'match_cid' => htmlspecialchars(trim($pattern['match_cid'])),
+						);
+					}
 				}
 			}
 
