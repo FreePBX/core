@@ -1026,6 +1026,7 @@ function core_do_get_config($engine) {
 
 		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 			$useragent = $amp_conf['SIPUSERAGENT'] . '-' . getversion() . "($version)";
+			$core_conf->addSipGeneral('useragent', $useragent);
 			$core_conf->addIaxGeneral('disallow','all');
 			$core_conf->addIaxGeneral('allow','ulaw');
 			$core_conf->addIaxGeneral('allow','alaw');
@@ -4389,6 +4390,15 @@ function core_check_destinations($dest=true) {
 			'edit_url' => 'config.php?display=did&view=form&extdisplay='.urlencode($thisid),
 		);
 	}
+	//Terminate calls
+	$extens = array();
+	$destlist[] = array('dest' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,busy,1', 'description' => _("Busy"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,zapateller,1', 'description' => _("Play SIT Tone (Zapateller)"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,musiconhold,1', 'description' => _("Put caller on hold forever"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,ring,1', 'description' => _("Play ringtones to caller until they hangup"), 'edit_url' => false);
+	$destlist[] = array('dest' => 'app-blackhole,no-service,1', 'description' => _("Play no service message"), 'edit_url' => false);
 
 	// Check Extension/User Destinations
 	//

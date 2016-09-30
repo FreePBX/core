@@ -37,10 +37,14 @@ function DIDdestFormatter(value){
 		return _("No Destination");
 	}else{
 		if(typeof destinations[value] !== "undefined") {
+			var prefix = destinations[value].name;
+			if(typeof destinations[value].category !== "undefined"){
+				prefix = destinations[value].category;
+			}
 			if(typeof destinations[value].edit_url !== "undefined" && destinations[value].edit_url !== false) {
-				return '<a href="' + destinations[value].edit_url + '">' + destinations[value].name + ": " + destinations[value].description + '</a>';
+				return '<a href="' + destinations[value].edit_url + '">' + prefix + ": " + destinations[value].description + '</a>';
 			} else {
-				return destinations[value].name + ": " + destinations[value].description;
+				return prefix + ": " + destinations[value].description;
 			}
 		} else {
 			return value;
