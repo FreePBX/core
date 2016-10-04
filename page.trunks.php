@@ -563,3 +563,18 @@ if (!$tech && !$extdisplay) {
 	echo $module_hook->hookHtml;
 	show_view(dirname(__FILE__).'/views/trunks/trunk_footer.php',$displayvars);
 }
+
+//FREEPBX-12882 Generate a list of trunk names to validate against.
+$trunks = FreePBX::Core()->listTrunks();
+$trunknames = array();
+foreach ($trunks as $trunk) {
+	//We are checking against existing names. Skip the current displayed name to avoid errors.
+	if($trunk_name === $trunk['name']){
+		continue;
+	}
+	$trunknames[$trunk['name']] = $trunk['name'];
+}
+?>
+<script>
+	var trunknames = <?php echo json_encode($trunknames)?>;
+</script>
