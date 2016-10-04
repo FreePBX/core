@@ -24,10 +24,12 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
 			$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 			$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-
 			global $currentcomponent;
 			if(empty($_REQUEST['tech_hardware']) && ((!isset($_REQUEST['extdisplay']) || (trim($_REQUEST['extdisplay']) === "") || !ctype_digit($_REQUEST['extdisplay'])))) {
 				?>
+				<div class="alert alert-danger">
+					<?php echo _("Editing devices and users seperately is not tested and is considered unsupported. Modifying devices and users seperately may cause things to not work as expected.")?>
+				</div>
 				<div class="display no-border">
 					<div class="nav-container">
 						<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>

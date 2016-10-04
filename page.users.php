@@ -4,6 +4,9 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 <div class="fpbx-container container-fluid">
 	<div class="row">
 		<div class="col-sm-12">
+			<div class="alert alert-danger">
+				<?php echo _("Editing devices and users seperately is not tested and is considered unsupported. Modifying devices and users seperately may cause things to not work as expected.")?>
+			</div>
 			<?php
 			// If this is a popOver, we need to set it so the selection of user type does not result
 			// in the popover closing because config.php thinks it was the process function. Maybe
