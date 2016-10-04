@@ -4,6 +4,12 @@ $(document).ready(function() {
 		if($('#UIDEFAULTLANG').val() != lang) {
 			$.cookie('lang', $('#UIDEFAULTLANG').val());
 		}
+		var msgInvalidAsteriskManagerPassword = _("Please enter a valid Asterisk Manager Password");
+		var passwordPattern = /^[a-z0-9!"#$%&'()*+,.\/:;<=>?@\[\] ^_`{|}~-]*$/i;
+		if (!passwordPattern.test($("[name='AMPMGRPASS']").val())){
+			return warnInvalid($("[name='AMPMGRPASS']"), msgInvalidAsteriskManagerPassword);
+		}
+		return true;
 	});
 		$(".section").each(function(){
 			if($(this).find('input').length){
