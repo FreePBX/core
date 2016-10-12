@@ -2567,6 +2567,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		switch ($type) {
 		case 'extensions':
 			foreach ($rawData as $data) {
+				array_change_key_case($data, CASE_LOWER);
 				if (!is_numeric($data['extension'])) {
 					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
