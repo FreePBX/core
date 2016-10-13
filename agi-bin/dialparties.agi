@@ -94,7 +94,7 @@ if ($sippheader) {
 
 foreach ($headers as $h => $v) {
 	debug("Setting sipheader $h: $v", 4);
-	$AGI->set_variable("HASH(_SIPHEADERS,$h)", $v);
+	$AGI->set_variable("HASH(__SIPHEADERS,$h)", $v);
 }
 
 // Follow-Me is only one setting PR_DIALSTATUS so don't bother fetching if not a followme
