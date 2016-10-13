@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.113.7</version>
+	<version>13.0.113.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.113.8* FREEPBX-13318 add AMPBIN to the list of globals that will be extracted at the top of the extensions_additional.conf file
 		*13.0.113.7* FREEPBX-12760 Set all keys to lowercase on bulkimport
 		*13.0.113.6* FREEPBX-12215 Add diversion headers for PJSIP
 		*13.0.113.5* FREEPBX-10054 Add send PAI/RPID to PJSIP advanced trunk settings
