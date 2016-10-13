@@ -193,12 +193,12 @@ foreach ($conf as $c){
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
 			$forminputs .= '<select id="'.$c['keyword'].'" name="'.$c['keyword'].'" class="form-control '.$inputclass.' custom-select">';
 			$opt = explode(',',$c['options']);
-			$forminputs .= '<option value="'.$amp_conf[$c['keyword']].'" selected>'.$amp_conf[$c['keyword']].'</option>';
+			$forminputs .= '<option value="'.$amp_conf[$c['keyword']].'" selected>'.htmlentities($amp_conf[$c['keyword']]).'</option>';
 			foreach($opt as $o) {
 				if($o == $amp_conf[$c['keyword']]) {
 					continue;
 				}
-				$forminputs .= '<option value="'.$o.'">'._($o).'</option>';
+				$forminputs .= '<option value="'.$o.'">'.htmlentities(_($o)).'</option>';
 			}
 			$forminputs .= '<option value="custom">['._("Custom").']</option>';
 			$forminputs .= '</select>';

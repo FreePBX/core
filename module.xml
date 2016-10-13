@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.113.9</version>
+	<version>13.0.113.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.113.10* Fix dialparties inheritance
 		*13.0.113.9* FREEPBX-11842 Stop using datalists for custom selects
 		*13.0.113.8* FREEPBX-13318 add AMPBIN to the list of globals that will be extracted at the top of the extensions_additional.conf file
 		*13.0.113.7* FREEPBX-12760 Set all keys to lowercase on bulkimport
@@ -17,7 +18,7 @@
 		*13.0.113.5* FREEPBX-10054 Add send PAI/RPID to PJSIP advanced trunk settings
 		*13.0.113.4* FREEPBX-13135 E_WARNING error on Outbound Route submit with dial patterns
 		*13.0.113.3* FREEPBX-12255 add process hook
-		*13.0.113.2* FREEPBX-13055 inbound routes destination labels for core, FREEPBX-13001 timeconditions hangup destinations, FREEPBX-10405 PJSIP to-header in from-pstn 
+		*13.0.113.2* FREEPBX-13055 inbound routes destination labels for core, FREEPBX-13001 timeconditions hangup destinations, FREEPBX-10405 PJSIP to-header in from-pstn
 		*13.0.113.1* FREEPBX-13055 Inbound Routes Label clarification
 		*13.0.113* FREEPBX-13153 Write out SIPUSERAGENT in core
 		*13.0.112* Fix cnam issue in CDR reports
