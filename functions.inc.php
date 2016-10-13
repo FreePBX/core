@@ -1855,7 +1855,8 @@ function core_do_get_config($engine) {
 			"AMPDBUSER",
 			"AMPDBPASS",
 			"AMPDBFILE",
-
+			// for locating some helper scripts
+			"AMPBIN",
 			// Used to be globals migrated to freepbx_conf
 			"VMX_CONTEXT",
 			"VMX_PRI",
