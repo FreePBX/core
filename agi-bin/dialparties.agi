@@ -91,7 +91,6 @@ if ($sippheader) {
 	$headers[$fields[0]] = $fields[1];
 }
 
-
 foreach ($headers as $h => $v) {
 	debug("Setting sipheader $h: $v", 4);
 	$AGI->set_variable("HASH(__SIPHEADERS,$h)", $v);
