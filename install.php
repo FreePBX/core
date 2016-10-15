@@ -543,6 +543,21 @@ foreach ($new_cols as $col) {
   }
 }
 
+outn(sprintf(_("Checking for %s field.."),"rvolume"));
+$sql = "SELECT rvolume FROM `incoming`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	// add new field
+	$sql = "ALTER TABLE `incoming` ADD `rvolume` varchar(2) DEFAULT '';";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		return false;
+	}
+	out(_("added"));
+} else {
+	out(_("already exists"));
+}
+
 $new_cols = array('noanswer_dest','busy_dest','chanunavail_dest');
 foreach ($new_cols as $col) {
   outn(sprintf(_("Checking for %s field.."),$col));

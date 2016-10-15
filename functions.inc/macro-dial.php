@@ -45,6 +45,8 @@ $ext->add($c,$s,'', new ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
 $ext->add($c,$s,'', new ext_set('ITER','1'));
 $ext->add($c,$s,'ndloopbegin', new ext_set('EXTTOCALL','${CUT(FILTERED_DIAL,-,${ITER})}'));
 $ext->add($c,$s,'', new ext_noop('Working with ${EXTTOCALL}'));
+$ext->add($c,$s,'', new ext_execif('$["${RVOL}"!=""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${RVOL}'));
+$ext->add($c,$s,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
 $ext->add($c,$s,'', new ext_set('ITER','$[${ITER}+1]'));
 $ext->add($c,$s,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'ndloopbegin')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_macro('dial-ringall-predial-hook'));
@@ -74,6 +76,8 @@ $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'
 $ext->add($c,$s,'', new ext_set('CTLoop', '$[1 + ${CTLoop}]'));
 $ext->add($c,$s,'', new ext_goto('a37', 's'));
 $ext->add($c,$s,'huntstart', new ext_noop("Hunt Dial Start"));
+$ext->add($c,$s,'', new ext_execif('$["${RVOL}"!=""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${RVOL}'));
+$ext->add($c,$s,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
 $ext->add($c,$s,'', new ext_macro('dial-hunt-predial-hook'));
 $ext->add($c,$s,'', new ext_dial('${${HuntMember}}${ds}b(func-apply-sipheaders^s^1)', ''));
 $ext->add($c,$s,'', new ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));

@@ -1900,6 +1900,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$invalidDIDChars = array('<', '>');
 		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
 		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
+		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
 
 		// XXX: Kludge for empty value
 		if ($settings['delay_answer'] == '') {
@@ -1909,9 +1910,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
 		if (empty($existing)) {
-			$sql="INSERT INTO incoming (cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
+			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
 			$sth = $this->database->prepare($sql);
-			$sth->execute(array(':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
 			$this->freepbx->Hooks->processHooks($settings);
 			return true;
 		} else {
@@ -2158,6 +2159,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$astman = $this->FreePBX->astman;
 		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
+			$astman->database_put("AMPUSER",$extension."/rvolume",isset($settings['rvolume']) ? $settings['rvolume'] : '');
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
 			$astman->database_put("AMPUSER",$extension."/cfringtimer",isset($settings['cfringtimer']) ? $settings['cfringtimer'] : $fpc->get('CFRINGTIMERDEFAULT'));
@@ -2357,6 +2359,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$results['recording_out_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/internal"));
 			$results['recording_ondemand'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/ondemand"));
 			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
+			$results['rvolume'] = strtolower($astman->database_get("AMPUSER",$extension."/rvolume"));
 
 		} else {
 			throw new \Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
