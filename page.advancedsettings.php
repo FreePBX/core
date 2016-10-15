@@ -198,7 +198,7 @@ foreach ($conf as $c){
 				if($o == $amp_conf[$c['keyword']]) {
 					continue;
 				}
-				$forminputs .= '<option value="'.$o.'">'.htmlentities(_($o)).'</option>';
+				$forminputs .= '<option value="'.$o.'">'.htmlentities($o).'</option>';
 			}
 			$forminputs .= '<option value="custom">['._("Custom").']</option>';
 			$forminputs .= '</select>';
