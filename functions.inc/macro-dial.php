@@ -66,12 +66,14 @@ $ext->add($c,$s,'', new ext_macroexit());
 $ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'));
 $ext->add($c,$s,'', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $[$["${RingGroupMethod}" = "hunt" ] | $["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]]]', 'a32', 'a35'));
 $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoop} + 1])}'));
+$ext->add($c,$s,'', new ext_set('EXTTOCALL','${CT_EXTEN}')); //keep all variables consistent
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
 $ext->add($c,$s,'', new ext_goto('huntstart', 's'));
 $ext->add($c,$s,'a35', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $["${RingGroupMethod}" = "memoryhunt" ]]', 'a36', 'a50'));
 $ext->add($c,$s,'a36', new ext_set('CTLoop', (string) '0')); // String zeros.
 $ext->add($c,$s,'a37', new ext_gotoif('$[${CTLoop} > ${HuntLoop}]', 'huntstart')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${CTLoop} + 1])}'));
+$ext->add($c,$s,'', new ext_set('EXTTOCALL','${CT_EXTEN}')); //keep all variables consistent
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
 $ext->add($c,$s,'', new ext_set('CTLoop', '$[1 + ${CTLoop}]'));
 $ext->add($c,$s,'', new ext_goto('a37', 's'));
