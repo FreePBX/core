@@ -160,7 +160,14 @@ if ($chan_dahdi) {
 // PJSIP_DIAL_CONTACTS with the endpoint id. This may return 'PJSIP/xxx', or it may
 // return any number of strings that will be valid to pass to Dial().
 $ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL:0:5}"!="PJSIP"]', 'docheck'));
-$ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}, updating with PJSIP_DIAL_CONTACTS'));
+$ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}'));
+
+// If this dialstring contains an @, or two /'s, then it's ALREADY something we can
+// dial, and does not need to be extracted.
+//
+// Note that REGEX does not have a comma delimiter. This is correct as it is.
+$ext->add($mcontext,$exten,'', new ext_gotoif('$[ ${REGEX("(/.+/|@)" ${THISDIAL})} = 1 ]', 'doset'));
+$ext->add($mcontext,$exten,'', new ext_noop('Debug: Updating PJSIP Destination with PJSIP_DIAL_CONTACTS'));
 $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${PJSIP_DIAL_CONTACTS(${THISDIAL:6})}'));
 
 // If PJSIP_DIAL_CONTACTS returns nothing, then don't try to add it to the dial string.
