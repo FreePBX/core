@@ -61,6 +61,8 @@ $at = ($at != "none" && $at != "inherit") ? $at : '';
 $ext->add($mcontext,$exten,'', new ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
 
 //Now set Alert Info
+$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"!=""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${RVOL}'));
+$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
 $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ALERT_INFO}"!="" & "${ALERT_INFO}"!=" "]', 'func-set-sipheader,s,1', false, 'Alert-Info,${ALERT_INFO}'));
 // This is now broken. SIPADDHEADER needs to be a hash. TODO figure out how to fix this
 // $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
@@ -158,7 +160,14 @@ if ($chan_dahdi) {
 // PJSIP_DIAL_CONTACTS with the endpoint id. This may return 'PJSIP/xxx', or it may
 // return any number of strings that will be valid to pass to Dial().
 $ext->add($mcontext,$exten,'', new ext_gotoif('$["${THISDIAL:0:5}"!="PJSIP"]', 'docheck'));
-$ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}, updating with PJSIP_DIAL_CONTACTS'));
+$ext->add($mcontext,$exten,'', new ext_noop('Debug: Found PJSIP Destination ${THISDIAL}'));
+
+// If this dialstring contains an @, or two /'s, then it's ALREADY something we can
+// dial, and does not need to be extracted.
+//
+// Note that REGEX does not have a comma delimiter. This is correct as it is.
+$ext->add($mcontext,$exten,'', new ext_gotoif('$[ ${REGEX("(/.+/|@)" ${THISDIAL})} = 1 ]', 'doset'));
+$ext->add($mcontext,$exten,'', new ext_noop('Debug: Updating PJSIP Destination with PJSIP_DIAL_CONTACTS'));
 $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${PJSIP_DIAL_CONTACTS(${THISDIAL:6})}'));
 
 // If PJSIP_DIAL_CONTACTS returns nothing, then don't try to add it to the dial string.

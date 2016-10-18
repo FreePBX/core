@@ -1515,6 +1515,9 @@ function core_do_get_config($engine) {
 				if (!empty($item['alertinfo'])) {
 					$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
 				}
+				if (!empty($item['rvolume'])) {
+					$ext->add($context, $exten, '', new ext_setvar("__RVOL", $item['rvolume']));
+				}
 				$ext->add($context,$exten,'did-cid-hook', new ext_noop('CallerID Entry Point'));
 				if (!empty($item['grppre'])) {
 					$ext->add($context, $exten, '', new ext_macro('prepend-cid', $item['grppre']));
@@ -1848,7 +1851,8 @@ function core_do_get_config($engine) {
 			"AMPDBUSER",
 			"AMPDBPASS",
 			"AMPDBFILE",
-
+			// for locating some helper scripts
+			"AMPBIN",
 			// Used to be globals migrated to freepbx_conf
 			"VMX_CONTEXT",
 			"VMX_PRI",
@@ -5756,6 +5760,12 @@ function core_users_configpageinit($dispnum) {
 		$currentcomponent->addoptlistitem('call_screen', 'memory', _("Screen Caller: Memory"));
 		$currentcomponent->setoptlistopts('call_screen', 'sort', false);
 
+
+		$currentcomponent->addoptlistitem('rvolume', '', _("None"));
+		for ($i=1; $i <= 14; $i++) {
+			$currentcomponent->addoptlistitem('rvolume', $i, $i);
+		}
+
 		$currentcomponent->addoptlistitem('ringtime', '0', _("Default"));
 		$currentcomponent->addoptlistitem('cfringtime', '0', _("Default"));
 		$currentcomponent->addoptlistitem('cfringtime', '-1', _("Always"));
@@ -5970,6 +5980,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox_check('dialopts', $dialopts, _("Asterisk Dial Options"), _("Cryptic Asterisk Dial Options, check to customize for this extension or un-check to use system defaults set in Advanced Options. These will not apply to trunk options which are configured with the trunk."), '', '', true, 0, $disable_dialopts, '<small>' . _("Override") . '</small>', $amp_conf['DIAL_OPTIONS'], true), $category);
 
 		$currentcomponent->addguielem($section, new gui_selectbox('ringtimer', $currentcomponent->getoptlist('ringtime'), $ringtimer, _("Ring Time"), _("Number of seconds to ring prior to going to voicemail. Default will use the value set in Advanced Settings. If no voicemail is configured this will be ignored."), false), $category);
+		$currentcomponent->addguielem($section, new gui_selectbox('rvolume', $currentcomponent->getoptlist('rvolume'), $rvolume, _("Ringer Volume Override"), _("Override the ringer volume. Note: This is only valid for Sangoma phones at this time"), false), $category);
 
 		if (!isset($cfringtimer)) {
 			if ($amp_conf['CFRINGTIMERDEFAULT'] < 0 || ctype_digit($amp_conf['CFRINGTIMERDEFAULT'])) {

@@ -191,13 +191,17 @@ foreach ($conf as $c){
 			$forminputs .= '</div>';
 			$forminputs .= '<div class="col-md-5">';
 			$forminputs .= '<input type="hidden" id="'.$c['keyword'].'default" value="'.$c['defaultval'].'">';
-			$forminputs .= '<input id="'.$c['keyword'].'" type="search" name="'.$c['keyword'].'" placeholder="'._("Double-Click to see options or type freeform").'" class="form-control '.$inputclass.'" list="'.$c['keyword'].'-list" value="'.$amp_conf[$c['keyword']].'">';
-			$forminputs .= '<datalist id="'.$c['keyword'].'-list">';
+			$forminputs .= '<select id="'.$c['keyword'].'" name="'.$c['keyword'].'" class="form-control '.$inputclass.' custom-select">';
 			$opt = explode(',',$c['options']);
+			$forminputs .= '<option value="'.$amp_conf[$c['keyword']].'" selected>'.htmlentities($amp_conf[$c['keyword']]).'</option>';
 			foreach($opt as $o) {
-				$forminputs .= '<option label="'._($o).'" value="'.$o.'">'._($o).'</option>';
+				if($o == $amp_conf[$c['keyword']]) {
+					continue;
+				}
+				$forminputs .= '<option value="'.$o.'">'.htmlentities($o).'</option>';
 			}
-			$forminputs .= '</datalist>';
+			$forminputs .= '<option value="custom">['._("Custom").']</option>';
+			$forminputs .= '</select>';
 			$forminputs .= '</div>';
 			$forminputs .= $inputhtmlmiddle;
 			if($display_friendly_name == 1){
