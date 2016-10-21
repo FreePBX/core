@@ -22,15 +22,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private $_global = array();
 	private $_registration = array();
 	private $_identify = array();
-	private $language = null;
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
 		$this->db = $this->database;
-
-		if ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
-			$this->language = $this->freepbx->Soundlang->getLanguage(); //global language
-		}
 	}
 
 	public function getInfo() {
@@ -447,7 +442,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
 				'aors' => $tn
 			);
-			$lang = !empty($trunk['language']) ? $trunk['language'] : $this->language;
+			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
 				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
 			}
@@ -955,8 +950,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
-		if (!empty($this->language)) {
-			$endpoint[] = "language=" . $this->language;
+		if($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
+			$l = $this->freepbx->Soundlang->getLanguage();
+			if(!empty($l)) {
+				$endpoint[] = "language=" . $l;
+			}
 		}
 
 		// Auth

@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.114.1</version>
+	<version>13.0.114.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.114.2* FREEPBX-13409 Dont load soundlangs until its really needed
 		*13.0.114.1* FREEPBX-13209 Only get endpoint if needed
 		*13.0.114* FREEPBX-13364 Ability to set Ringer Volumes
 		*13.0.113.10* Fix dialparties inheritance
