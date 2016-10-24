@@ -1680,15 +1680,7 @@ function core_do_get_config($engine) {
 			// works.
 			//
 			$ivr_context = 'from-did-direct-ivr';
-			$sql = "SELECT LENGTH(extension) as len FROM users GROUP BY len";
-			$sth = FreePBX::Database()->prepare($sql);
-			$sth->execute();
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-			foreach($rows as $row) {
-				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_macro('blkvm-clr'));
-				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_setvar('__NODEST', ''));
-				$ext->add($ivr_context, '_'.str_repeat('X',$row['len']),'', new ext_goto('1','${EXTEN}','from-did-direct'));
-			}
+			$ext->add($ivr_context, '_X.','', new ext_gotoif('$[${DIALPLAN_EXISTS(from-did-direct,${EXTEN},1)} = 1]','from-did-direct,${EXTEN},1','i,1'));
 
 			$ext->add('ext-local', 'vmret', '', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','playret'));
 			$ext->add('ext-local', 'vmret', '', new ext_hangup(''));
