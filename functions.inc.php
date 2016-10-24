@@ -1680,7 +1680,10 @@ function core_do_get_config($engine) {
 			// works.
 			//
 			$ivr_context = 'from-did-direct-ivr';
-			$ext->add($ivr_context, '_X.','', new ext_gotoif('$[${DIALPLAN_EXISTS(from-did-direct,${EXTEN},1)} = 1]','from-did-direct,${EXTEN},1','i,1'));
+			$ext->add($ivr_context, '_X.','', new ext_gotoif('$[${DIALPLAN_EXISTS(from-did-direct,${EXTEN},1)} = 0]','i,1'));
+			$ext->add($ivr_context, '_X.','', new ext_macro('blkvm-clr'));
+			$ext->add($ivr_context, '_X.','', new ext_setvar('__NODEST', ''));
+			$ext->add($ivr_context, '_X.','', new ext_goto('1','${EXTEN}','from-did-direct'));
 
 			$ext->add('ext-local', 'vmret', '', new ext_gotoif('$["${IVR_RETVM}" = "RETURN" & "${IVR_CONTEXT}" != ""]','playret'));
 			$ext->add('ext-local', 'vmret', '', new ext_hangup(''));
