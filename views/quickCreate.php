@@ -5,10 +5,30 @@
 				<label class="control-label" for="tech"><?php echo _('Type')?></label>
 				<i class="fa fa-question-circle fpbx-help-icon" data-for="tech"></i>
 			</div>
-			<div class="col-md-9">	<select class="form-control" name="tech" id="tech">
-					<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
-						<option value="<?php echo $driver['rawName']?>" <?php echo ($driver['rawName'] == "sip" || $driver['rawName'] == "pjsip") ? 'selected' : ''?>><?php echo $driver['shortName']?></option>
-					<?php } ?>
+			<div class="col-md-9">
+				<select class="form-control" name="tech" id="tech">
+<?php 
+// Ask SipSettings who is the default driver for 5060
+try {
+	$default = \FreePBX::Sipsettings()->getSipPortOwner();
+} catch (\Exception $e) {
+	// Sipsettings not working?
+	$default = "pjsip";
+}
+
+// Get all our enabled drivers
+$drivers = \FreePBX::Core()->getAllDriversInfo();
+
+// And loop through them to present the dropdown.
+foreach($drivers as $driver) {
+	$rawname = $driver['rawName'];
+	if ($default === $rawname) { 
+		echo "<option value='$rawname' selected>${driver['shortName']}</option>\n";
+	} else {
+		echo "<option value='$rawname'>${driver['shortName']}</option>\n";
+	}
+}
+?>
 				</select>
 			</div>
 		</div>
