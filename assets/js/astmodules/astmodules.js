@@ -6,6 +6,13 @@ $(function(){
       });
    }).scroll();
 });
+$(document).ready(function(){
+  var tabid = localStorage.getItem('astmodules.chosentab');
+  if(tabid !== null){
+    var thistab = $('a[href="'+tabid+'"]');
+    thistab.trigger("click");
+  }
+});
 $("#addmodule").click(function(){
 	var currentTab = $("ul li.active").data('name');
 	var modName = $("#module").val();
@@ -20,10 +27,18 @@ $("#addmodule").click(function(){
 		});
 
 });
-$("#modnoload,#modpreload,#modload").on('post-body.bs.table',function(){
+
+$('a[href="#amodnoload"],a[href="#amodpreload"],a[href="#amodload"]').on('click',function(e){
+  localStorage.setItem('astmodules.chosentab', e.target.hash);
+});
+
+
+
+$("#amodnoload,#amodpreload,#amodload").on('post-body.bs.table',function(){
 $('[id^="del"]').on('click', function(e){
   e.preventDefault();
 	var currentTab = $("ul li.active").data('name');
+  localStorage.setItem('astmodules.tab', currentTab);
 	var modName = $(this).data('mod');
   var row = $(this).closest('tr');
   console.log(currentTab);
