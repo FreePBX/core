@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.115.3</version>
+	<version>13.0.115.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.115.4* FREEPBX-9645 Return to same tab on submit in Asterisk Modules
 		*13.0.115.3* FREEPBX-12364 Quick Create choose correct driver
 		*13.0.115.2* FREEPBX-12577 dont go to voicemail from an ivr
 		*13.0.115.1* FREEPBX-12577 fix broken invalid entries in direct dial ivr
