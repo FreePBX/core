@@ -50,7 +50,7 @@ $ext->add($c,$s,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/
 $ext->add($c,$s,'', new ext_set('ITER','$[${ITER}+1]'));
 $ext->add($c,$s,'', new ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'ndloopbegin')); // if this is from rg-group, don't strip prefix
 $ext->add($c,$s,'', new ext_macro('dial-ringall-predial-hook'));
-$ext->add($c,$s,'', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', '')); // dialparties will set the priority to 10 if $ds is not null
+$ext->add($c,$s,'nddialapp', new ext_dial('${ds}b(func-apply-sipheaders^s^1)', '')); // dialparties will set the priority to 10 if $ds is not null
 $ext->add($c,$s,'', new ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
 $ext->add($c,$s,'', new ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
 $ext->add($c,$s,'groupnoanswer', new ext_noop('Returning since nobody answered'));
@@ -81,7 +81,7 @@ $ext->add($c,$s,'huntstart', new ext_noop("Hunt Dial Start"));
 $ext->add($c,$s,'', new ext_execif('$["${RVOL}"!=""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${RVOL}'));
 $ext->add($c,$s,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
 $ext->add($c,$s,'', new ext_macro('dial-hunt-predial-hook'));
-$ext->add($c,$s,'', new ext_dial('${${HuntMember}}${ds}b(func-apply-sipheaders^s^1)', ''));
+$ext->add($c,$s,'hsdialapp', new ext_dial('${${HuntMember}}${ds}b(func-apply-sipheaders^s^1)', ''));
 $ext->add($c,$s,'', new ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
 $ext->add($c,$s,'', new ext_gotoif('$[$[$["foo${RingGroupMethod}" != "foofirstavailable"] & $["foo${RingGroupMethod}" != "foofirstnotonphone"]] | $["foo${DialStatus}" = "fooBUSY"]]', 'a46'));
