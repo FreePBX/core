@@ -1674,6 +1674,21 @@ $set['options'] = \DateTimeZone::listIdentifiers();
 $set['module'] = '';
 $set['type'] = CONF_TYPE_CSELECT;
 $freepbx_conf->define_conf_setting('PHPTIMEZONE',$set);
+
+$set['value'] = false;
+$set['defaultval'] = $set['value'];
+$set['category'] = 'System Setup';
+$set['name'] = 'Expose All Feature Codes';
+$set['description'] = "By default *11/*12 feature codes should be hidden in Extension mode. With this Setting to expose them. In deviceanduser mode they should be exposed.";
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['emptyok'] = 0;
+$set['sortorder'] = -133;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('EXPOSE_ALL_FEATUSRE_CODES',$set);
 $freepbx_conf->commit_conf_settings();
 
 $mf = \module_functions::create();

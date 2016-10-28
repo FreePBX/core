@@ -7,6 +7,16 @@ $display_friendly_name	= $conf['AS_DISPLAY_FRIENDLY_NAME']['value'];
 
 $current_category		= '';
 $row					= 0;
+
+if(isset($conf['AMPEXTENSIONS'])){
+	$user_mode = $conf['AMPEXTENSIONS']['value'];
+	if($user_mode == 'deviceanduser' && isset($conf['EXPOSE_ALL_FEATUSRE_CODES'])){
+		//only show this setting in extensions mode
+		unset($conf['EXPOSE_ALL_FEATUSRE_CODES']);
+	}
+}
+
+
 $inputhtmltop = <<<HERE
 	<div class="row">
 		<div class="form-group">
