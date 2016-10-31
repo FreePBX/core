@@ -16,6 +16,10 @@ $(document).ready(function(){
 $("#addmodule").click(function(){
 	var currentTab = $("ul li.active").data('name');
 	var modName = $("#module").val();
+  if(modName.match(/[a-zA-Z0-9_]+\.so/) === null){
+    fpbxToast(_("The field must match module_name.so"));
+    return false;
+  }
 	$.get("config.php?display=astmodules",
 		{
 			action: 'add',
