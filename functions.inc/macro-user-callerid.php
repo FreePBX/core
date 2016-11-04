@@ -20,7 +20,8 @@ $ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 // make sure AMPUSER is set if it doesn't get set below
 $ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
-$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
+//REALCALLERIDNUM Inheriting because of: http://issues.freepbx.org/browse/FREEPBX-13173
+$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', '__REALCALLERIDNUM=${CALLERID(number)}'));
 $ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
 
 // Device & User: If they're not signed in, then they can't do anything.
