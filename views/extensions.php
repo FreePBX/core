@@ -24,8 +24,8 @@
           <div id="<?php echo strtolower($category)?>" role="tabpanel" class="tab-pane <?php echo ($active == strtolower($category)) ? 'active' : ''?>">
             <div class="container-fluid">
               <?php foreach($sections as $section => $elements) { ?>
-                <div class="section-title" data-for="<?php echo strtolower($section)?>"><h3><i class="fa fa-minus"></i> <?php echo $section?></h3></div>
-                <div class="section" data-id="<?php echo strtolower($section)?>">
+                <div class="section-title" data-for="<?php echo strtolower($category)."_".strtolower($section)?>"><h3><i class="fa fa-minus"></i> <?php echo $section?></h3></div>
+                <div class="section" data-id="<?php echo strtolower($category)."_".strtolower($section)?>">
                   <?php foreach($elements as $elem) { ?>
                     <div class="element-container">
                       <?php if(!empty($elem['prompttext'])) {?>
