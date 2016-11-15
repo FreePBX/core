@@ -272,6 +272,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['minimum_expiration'] = array('prompttext' => _('Minimum Expiration'), 'value' => '60', 'tt' => $tt, 'level' => 1);
 		unset($select);
 
+		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
 		$transports = is_array($transports)?$transports:array();
@@ -941,6 +943,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['timers'])) {
 			$endpoint[] = "timers=".$config['timers'];
+		}
+
+		if (!empty($config['outbound_proxy'])) {
+			$endpoint[] = "outbound_proxy=".$config['outbound_proxy'];
 		}
 
 		if (!empty($config['mediaencryptionoptimistic'])) {
