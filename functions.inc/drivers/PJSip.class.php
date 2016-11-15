@@ -454,6 +454,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
 			}
 
+			// Outbound proxy enabled?
+			if (!empty($trunk['outbound_proxy'])) {
+				$conf['pjsip.aor.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				$conf['pjsip.endpoint.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				// Also in registration, if we're registering.
+				if (!empty($conf['pjsip.registration.conf'][$tn])) {
+					$conf['pjsip.registration.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				}
+			}
+
 			if ($trunk['authentication'] == "outbound" || $trunk['authentication'] == "both") {
 				$conf['pjsip.endpoint.conf'][$tn]['outbound_auth'] = $tn;
 			}
@@ -1113,7 +1123,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
 		foreach ($_REQUEST as $k => $v) {
 			// Skip this value if we don't care about it.
-			if (in_array($k, $ignore))
+			if (in_array($k, $ignore) || is_array($v))
 				continue;
 
 			// Otherwise, we can insert it.
