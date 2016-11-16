@@ -272,6 +272,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['minimum_expiration'] = array('prompttext' => _('Minimum Expiration'), 'value' => '60', 'tt' => $tt, 'level' => 1);
 		unset($select);
 
+		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
 		$transports = is_array($transports)?$transports:array();
@@ -352,6 +354,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if (empty($trunk['authentication'])) {
 				$trunk['authentication'] = "outbound";
+				unset($this->_registration[$tn]);
+			}
+
+			// Make sure we're not disabled. If we are, we don't send
+			// registrations, but we still accept incoming calls.
+			if (isset($trunk['disabletrunk']) && $trunk['disabletrunk'] == "on") {
+				$trunk['registration'] = "off";
 			}
 
 			// Have we been asked to send registrations?
@@ -445,6 +454,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
 				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
+			}
+
+			// Outbound proxy enabled?
+			if (!empty($trunk['outbound_proxy'])) {
+				$conf['pjsip.aor.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				$conf['pjsip.endpoint.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				// Also in registration, if we're registering.
+				if (!empty($conf['pjsip.registration.conf'][$tn])) {
+					$conf['pjsip.registration.conf'][$tn]['outbound_proxy'] = $trunk['outbound_proxy'];
+				}
 			}
 
 			if ($trunk['authentication'] == "outbound" || $trunk['authentication'] == "both") {
@@ -926,6 +945,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "timers=".$config['timers'];
 		}
 
+		if (!empty($config['outbound_proxy'])) {
+			$endpoint[] = "outbound_proxy=".$config['outbound_proxy'];
+		}
+
 		if (!empty($config['mediaencryptionoptimistic'])) {
 			$endpoint[] = "media_encryption_optimistic=".$config['mediaencryptionoptimistic'];
 		}
@@ -1106,7 +1129,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
 		foreach ($_REQUEST as $k => $v) {
 			// Skip this value if we don't care about it.
-			if (in_array($k, $ignore))
+			if (in_array($k, $ignore) || is_array($v))
 				continue;
 
 			// Otherwise, we can insert it.
