@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.116</version>
+	<version>13.0.116.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.116.1* FREEPBX-13504 Asterisk Modules: error on invalid input of module to add
 		*13.0.116* FREEPBX-12331, FREEPBX-13481 Enable 'outbound proxy' in PJSIP
 		*13.0.115.5* FREEPBX-13516 Do not send pjsip registrations when disabled
 		*13.0.115.4* FREEPBX-9645 Return to same tab on submit in Asterisk Modules
