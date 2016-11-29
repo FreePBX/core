@@ -1256,7 +1256,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		if ($page == "astmodules") {
 			$action = !empty($request['action']) ? $request['action'] : "";
 			$section = !empty($request['section']) ? $request['section'] : "";
-			$module = !empty($request['module']) ? $request['module'] : "";
+			if(empty($request['module'])){
+				return false;
+			}
+			$modinfo = new \SplFileInfo($module);
+			if($modinfo->getExtension() !== 'so'){
+				return false;
+			}
+			$module = $modinfo->getBasename();
+			unset($modinfo);
 			switch($action){
 				case 'add':
 					switch($section){
