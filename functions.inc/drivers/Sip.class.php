@@ -126,6 +126,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "0.0.0.0/0.0.0.0",
 				"flag" => $flag++
 			),
+			"defaultuser" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -318,6 +322,9 @@ class Sip extends \FreePBX\modules\Core\Driver {
 
 		$tt = _("Host settings for this device, almost always dynamic for endpoints.").' [host]';
 		$tmparr['host'] = array('prompttext' => _('Host'), 'value' => 'dynamic', 'tt' => $tt, 'level' => 1);
+
+		$tt = _("Default user setting for this device, almost always empty for dynamic endpoints or equals to extension number for multiple endpoints residing on the same IP (VoIP Gateways).").' [defaultuser]';
+		$tmparr['defaultuser'] = array('prompttext' => _('Default User'), 'value' => '', 'tt' => $tt, 'level' => 1);
 
 		unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
