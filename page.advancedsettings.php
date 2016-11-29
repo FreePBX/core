@@ -10,9 +10,9 @@ $row					= 0;
 
 if(isset($conf['AMPEXTENSIONS'])){
 	$user_mode = $conf['AMPEXTENSIONS']['value'];
-	if($user_mode == 'deviceanduser' && isset($conf['EXPOSE_ALL_FEATUSRE_CODES'])){
+	if($user_mode == 'deviceanduser' && isset($conf['EXPOSE_ALL_FEATURE_CODES'])){
 		//only show this setting in extensions mode
-		unset($conf['EXPOSE_ALL_FEATUSRE_CODES']);
+		unset($conf['EXPOSE_ALL_FEATURE_CODES']);
 	}
 }
 

@@ -1688,7 +1688,7 @@ $set['module'] = '';
 $set['emptyok'] = 0;
 $set['sortorder'] = -133;
 $set['type'] = CONF_TYPE_BOOL;
-$freepbx_conf->define_conf_setting('EXPOSE_ALL_FEATUSRE_CODES',$set);
+$freepbx_conf->define_conf_setting('EXPOSE_ALL_FEATURE_CODES',$set);
 $freepbx_conf->commit_conf_settings();
 
 $mf = \module_functions::create();
