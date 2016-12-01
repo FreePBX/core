@@ -1769,6 +1769,17 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+     * Get a route
+     */
+	public function getRoute($id) {
+		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$route = $stmt->fetchObject();
+		return $route;
+	}
+
+	/**
 	 * Get all Users
 	 */
 	public function getAllUsers() {
