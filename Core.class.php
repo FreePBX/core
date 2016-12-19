@@ -2815,6 +2815,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $trunk_types;
 	}
 
+	public function chownFreepbx() {
+		$files = array();
+		$files[] = array('type' => 'execdir',
+						'path' => __DIR__."/hooks",
+						'perms' => 0755);
+		return $files;
+	}
+
 	/**
 	 * Search query for global search
 	 * @param  string $query   The query

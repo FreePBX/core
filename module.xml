@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.117.1</version>
+	<version>13.0.117.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.117.2* FREEPBX-13793 Move log files into respective modules
 		*13.0.117.1* FREEPBX-7373 Hide *11/*12 feature codes by default exposed with Advanced Settings or if in deviceanduser mode
 		*13.0.117* FREEPBX-12814 Add defaultuser setting to extension
 		*13.0.116.1* FREEPBX-13504 Asterisk Modules: error on invalid input of module to add
@@ -265,6 +266,9 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
+		<framework class="Chown" namespace="FreePBX\Console\Command">
+			<method callingMethod="fwcChownFiles" class="Core" namespace="FreePBX\modules">chownFreepbx</method>
+		</framework>
 	</hooks>
 	<supported>
 		<version>13.0</version>
