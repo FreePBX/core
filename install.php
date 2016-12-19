@@ -1703,6 +1703,6 @@ if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['
 	}
 }
 
-if(file_exists("/var/spool/asterisk/incron")) {
+if(FreePBX::Modules()->checkStatus("sysadmin")) {
 	touch("/var/spool/asterisk/incron/core.logrotate");
 }
