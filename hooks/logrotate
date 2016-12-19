@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if true ; then
-	cat <<- EOF > /etc/logrotate.d/freepbx
+	cat <<- EOF > /etc/logrotate.d/freepbx-core-dbug
 	/var/log/asterisk/freepbx_dbug{
 		size 500M
 		missingok
