@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if true ; then
+	cat <<- EOF > /etc/logrotate.d/freepbx-core
+	/var/log/asterisk/freepbx_dbug{
+		size 500M
+		missingok
+		rotate 7
+		notifempty
+		sharedscripts
+		create 0640 asterisk asterisk
+	}
+	/var/log/asterisk/freepbx_debug
+	/var/log/asterisk/freepbx.log
+	/var/log/asterisk/freepbx_security.log{
+		size 100M
+		missingok
+		rotate 7
+		notifempty
+		sharedscripts
+		create 0640 asterisk asterisk
+	}
+	EOF
+fi

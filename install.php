@@ -1702,3 +1702,7 @@ if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['
 		out(_("error occured"));
 	}
 }
+
+if(FreePBX::Modules()->checkStatus("sysadmin")) {
+	touch("/var/spool/asterisk/incron/core.logrotate");
+}
