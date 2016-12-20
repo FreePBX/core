@@ -362,7 +362,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$sql = "SELECT data,MAX(id) as id from $table_name where keyword='account' and flags <> 1 group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -608,7 +608,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$sql = "SELECT data,MAX(id) as id from $table_name where keyword='account' and flags <> 1 group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -754,7 +754,7 @@ class core_conf {
 			$additional .= $result['keyword']."=".$result['data']."\n";
 		}
 
-		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$sql = "SELECT data,MAX(id) as id from $table_name where keyword='account' and flags <> 1 group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
