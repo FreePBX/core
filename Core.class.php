@@ -1769,6 +1769,35 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+     * Get a route
+     */
+	public function getRoute($id) {
+		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$route = $stmt->fetchObject();
+		return $route;
+	}
+
+	/**
+     * Delete a route
+     */
+	public function delRoute($id) {
+		$sql = "DELETE FROM outbound_routes WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_patterns WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_trunks WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_sequence WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+	}
+
+	/**
 	 * Get all Users
 	 */
 	public function getAllUsers() {
