@@ -118,6 +118,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"vmexten" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 			"deny" => array(
 				"value" => "0.0.0.0/0.0.0.0",
 				"flag" => $flag++
