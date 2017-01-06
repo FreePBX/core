@@ -1588,6 +1588,63 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+	 * Delete trunk from inbound route by id.
+	 * @param  int $trunk_id id of the trunk
+	 * @return bool           Return from db call
+	 */
+	public function delRouteTrunkByID($trunk_id){
+		$sql ='DELETE FROM outbound_route_trunks WHERE trunk_id = :trunk_id';
+		$stmt = $this->database->prepare($sql);
+		return $stmt->execute(array(':trunk_id' => $trunk_id));
+	}
+
+	/**
+	 * Delete Trunk
+	 * @param  string $trunknum Trunk ID
+	 * @param  srting $tech     Trunk tech
+	 * @return mixed           Return (bool) true on success or array on failure.
+	 */
+	public function deleteTrunk($trunknum, $tech = null){
+		if ($tech === null) { // in EditTrunk, we get this info anyways
+			$tech = \core_trunks_getTrunkTech($trunknum);
+		}
+
+		// conditionally, delete from iax or sip
+		switch (strtolower($tech)) {
+			case "iax2":
+			$tech = "iax";
+			// fall through
+			case "iax":
+			case "sip":
+				$sql = "DELETE FROM $tech WHERE id IN (:trunknum1, :trunknum2, :trunknum3)";
+				$stmt = $this->database->prepare($sql);
+				$ret1 = $stmt->execute(array(':trunknum1'=>'tr-peer-:trunknum'.$trunknum,':trunknum2' => 'tr-user-'.$trunknum, ':trunknum3' => 'tr-reg-'.$trunknum));
+			break;
+			case "pjsip":
+				$sql = "DELETE FROM pjsip WHERE id = :trunknum";
+				$stmt = $this->database->prepare($sql);
+				$ret1 = $stmt->execute(array(':trunknum'=>$trunknum));
+			break;
+		}
+		$sql = "DELETE FROM trunks WHERE trunkid = :trunknum";
+		$stmt = $this->database->prepare($sql);
+		$ret = $stmt->execute(array(':trunknum'=>$trunknum));
+		if ($this->astman) {
+			$this->astman->database_del("TRUNK", $trunknum . '/dialopts');
+		}
+		//Handle hooks
+		$this->freepbx->Hooks->processHooks($trunknum, $tech);
+		//Remove trunk from inbound routes
+		$this->delRouteTrunkByID($trunknum);
+
+		if($ret & $ret1){
+			return true;
+		}else{
+			return array('status' => false, 'techdelete' => $ret1, 'trunksdel' => $ret);
+		}
+	}
+
+	/**
 	 * List All Trunks
 	 * @return array Array of Trunks
 	 */
