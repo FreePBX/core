@@ -20,11 +20,12 @@ $("#addmodule").click(function(){
     fpbxToast(_("The field must match module_name.so"));
     return false;
   }
-	$.get("config.php?display=astmodules",
+	$.get("ajax.php",
 		{
-			action: 'add',
+      module: 'core',
+      command: 'addastmodule',
 			section: currentTab,
-			module: modName
+			astmod: modName
 		},
 		function(data,status){
 			location.reload();
