@@ -50,9 +50,6 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
-		<framework class="Chown" namespace="FreePBX\Console\Command">
-			<method callingMethod="fwcChownFiles" class="Core" namespace="FreePBX\modules">chownFreepbx</method>
-		</framework>
 	</hooks>
 	<supported>
 		<version>14.0</version>
