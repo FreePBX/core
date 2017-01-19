@@ -4763,29 +4763,8 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 }
 
 function core_trunks_del($trunknum, $tech = null) {
-	global $db, $astman;
-
-	if ($tech === null) { // in EditTrunk, we get this info anyways
-		$tech = core_trunks_getTrunkTech($trunknum);
-	}
-
-	// conditionally, delete from iax or sip
-	switch (strtolower($tech)) {
-		case "iax2":
-		$tech = "iax";
-		// fall through
-		case "iax":
-		case "sip":
-		sql("DELETE FROM `$tech` WHERE `id` IN ('tr-peer-$trunknum', 'tr-user-$trunknum', 'tr-reg-$trunknum')");
-		break;
-		case "pjsip":
-		sql("DELETE FROM `pjsip` WHERE `id`='$trunknum'");
-		break;
-	}
-	sql("DELETE FROM `trunks` WHERE `trunkid` = '$trunknum'");
-	if ($astman) {
-		$astman->database_del("TRUNK", $trunknum . '/dialopts');
-	}
+	_core_backtrace();
+	return \FreePBX::Core()->deleteTrunk($trunknum, $tech);
 }
 
 function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off', $dialopts = false) {
@@ -5389,9 +5368,8 @@ function core_routing_delbyid($route_id) {
 
 // function core_routing_trunk_del($trunknum)
 function core_routing_trunk_delbyid($trunk_id) {
-	global $db;
-	$trunk_id = q($db->escapeSimple($trunk_id));
-	sql('DELETE FROM `outbound_route_trunks` WHERE `trunk_id` ='.$trunk_id);
+	_core_backtrace();
+	return \FreePBX::Core()->delRouteTrunkByID($trunk_id);
 }
 
 // function core_routing_rename($oldname, $newname)
