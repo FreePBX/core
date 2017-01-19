@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.117.4</version>
+	<version>13.0.118</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118* FREEPBX-13906 Moved trunk delete in to the class
 		*13.0.117.4* Remove the chown command because the hooks folder permissions are set correctly
 		*13.0.117.3* FREEPBX-13442 Bulk handler exports vmexten but doesnt import it
 		*13.0.117.2* FREEPBX-13793 Move log files into respective modules
