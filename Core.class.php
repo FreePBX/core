@@ -1618,7 +1618,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "sip":
 				$sql = "DELETE FROM $tech WHERE id IN (:trunknum1, :trunknum2, :trunknum3)";
 				$stmt = $this->database->prepare($sql);
-				$ret1 = $stmt->execute(array(':trunknum1'=>'tr-peer-:trunknum'.$trunknum,':trunknum2' => 'tr-user-'.$trunknum, ':trunknum3' => 'tr-reg-'.$trunknum));
+				$ret1 = $stmt->execute(array(':trunknum1'=>'tr-peer-'.$trunknum, ':trunknum2' => 'tr-user-'.$trunknum, ':trunknum3' => 'tr-reg-'.$trunknum));
 			break;
 			case "pjsip":
 				$sql = "DELETE FROM pjsip WHERE id = :trunknum";
