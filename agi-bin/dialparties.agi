@@ -53,6 +53,9 @@ if (!$has_extension_state) {
 $cidnum = $AGI->request['agi_callerid'];
 $cidname = $AGI->request['agi_calleridname'];
 debug("Caller ID name is '$cidname' number is '$cidnum'", 1);
+debug("CW Ignore is: $cwignore", 1);
+debug("CF Ignore is: $cfignore", 1);
+debug("CW IN_USE/BUSY is: $cwinusebusy",1);
 
 $queue_wait = get_var( $AGI, "QUEUEWAIT" );
 if ($queue_wait != '') {
@@ -168,7 +171,7 @@ if ($cwignore && $rgmethod != "ringallv2") {
 // if they set a -prim mode in one of the others
 //
 if ( ($use_confirmation != "FALSE") && ($rgmethod != "ringall") && ($rgmethod != "ringallv2") && ($rgmethod != "hunt") && ($rgmethod != "random") ) {	// added condition for random strategy
-	debug("Unsupported RingMethod: '$rgmethod' resetting to ringall", 1);
+	debug("Unsupported RingMethod with Confirm Calls is set to True: '$rgmethod' resetting to ringall", 1);
 	$rgmethod	= "ringall";
 }
 
@@ -495,6 +498,9 @@ foreach ( $ext as $k ) {
 					} else {
 						debug("Extension $extnum has call waiting enabled",1);
 					}
+				} elseif($extstate == 4) {
+					debug("Extension $extnum is not available to be called", 1);
+					$extnum = '';
 				}
 			// -1 means couldn't read status usually due to missing HINT
 			} elseif ($extstate < 0) {
