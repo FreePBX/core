@@ -31,6 +31,9 @@ $cwignore    = strtoupper(trim($cwignore));
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
+$ampuser = get_var( $AGI, "AMPUSER" );
+$ampuser = trim($ampuser);
+
 $ast_ge_16   = version_compare($ast_version, "1.6", "ge");
 $has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
 // If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
@@ -817,9 +820,17 @@ function debug($string, $level=3) {
 }
 
 function is_ext_avail( $extnum ) {
+	global $ampuser;
 	global $astman;
 	global $AGI;
 	global $has_extension_state;
+
+	if($extnum == $ampuser) {
+		$status = 1;
+		$extstate_result = "INUSE_ORIGINATOR";
+		debug("EXTENSION_STATE: $status ($extstate_result)", 1);
+		return $status;
+	}
 
 	if ($has_extension_state) {
 		$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
@@ -833,9 +844,6 @@ function is_ext_avail( $extnum ) {
 			case "BUSY":
 				$status = 2;
 				break;
-			case "UNAVAILABLE":
-				$status = 4;
-				break;
 			case "RINGING":
 				$status = 8;
 				break;
@@ -848,6 +856,7 @@ function is_ext_avail( $extnum ) {
 			case "ONHOLD":
 				$status = 16;
 				break;
+			case "UNAVAILABLE":
 			case "UNKNOWN":
 			default:
 				$status = 4;
