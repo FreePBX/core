@@ -2641,7 +2641,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
 				if(empty($data['tech'])) {
-					return array("status" => false, "message" => _("Technology of device is undefined. Please specify a 'tech'"));
+					$tech = \FreePBX::Sipsettings()->getSipPortOwner();
+					if ($tech == "none") {
+						$tech = 'sip';
+					}
+					$data['tech'] = $tech;
 				}
 				if(empty($data['name'])) {
 					return array("status" => false, "message" => _("Device 'name' can not be blank."));
