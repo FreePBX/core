@@ -1604,7 +1604,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param  srting $tech     Trunk tech
 	 * @return mixed           Return (bool) true on success or array on failure.
 	 */
-	public function deleteTrunk($trunknum, $tech = null){
+	public function deleteTrunk($trunknum, $tech = null, $edit = false){
 		if ($tech === null) { // in EditTrunk, we get this info anyways
 			$tech = \core_trunks_getTrunkTech($trunknum);
 		}
@@ -1635,8 +1635,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//Handle hooks
 		$this->freepbx->Hooks->processHooks($trunknum, $tech);
 		//Remove trunk from inbound routes
-		$this->delRouteTrunkByID($trunknum);
-
+		if(!$edit){
+			$this->delRouteTrunkByID($trunknum);
+		}
 		if($ret & $ret1){
 			return true;
 		}else{
