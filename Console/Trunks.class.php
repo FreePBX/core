@@ -67,11 +67,19 @@ class Trunks extends Command {
 			$id = $helper->ask($input, $output, $question);
 			if($trunks[($id -1 )]['disabled'] == 'off'){
 				$output->writeln(_('Disabling Trunk ') . $id);
-				$this->disableTrunk($id);
+				if($this->disableTrunk($id)){
+					$output->writeln(_('Disabed Trunk ') . $id . _(' Run fwconsole reload'));
+				}else{
+					$output->writeln(_('Unable to disable Trunk ') . $id . _('This trunk type may not support this'));
+				}
 			}
 			if($trunks[($id -1)]['disabled'] == 'on'){
 				$output->writeln(_('Enabling Trunk ') . $id);
-				$this->enableTrunk($id);
+				if($this->enableTrunk($id)){
+					$output->writeln(_('Enableed Trunk ') . $id . _(' Run fwconsole reload')); 
+				}else{
+					$output->writeln(_('Unable to enable Trunk ') . $id . _('This trunk type may not support this'));
+				}
 			}
 		}
 	}
@@ -85,15 +93,9 @@ class Trunks extends Command {
 		return $gotRows;
 	}
 	private function disableTrunk($id){
-		$db = \FreePBX::Database();
-		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
-		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));
+		return \FreePBX::Core()->disableTrunk($id);
 	}
 	private function enableTrunk($id){
-		$db = \FreePBX::Database();
-		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
-		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));
+		return \FreePBX::Core()->enableTrunk($id);
 	}
 }

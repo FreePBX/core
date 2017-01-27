@@ -2953,4 +2953,79 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 		}
 	}
+
+	public function disableTrunk($id){
+		if(!$tech){
+			return false;
+		}
+		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ob->execute(array($id));
+		switch ($tech) {
+			case 'sip':
+			case 'iax':
+				$sql = 'UPDATE '.$tech.' SET flags = 1 where id = :id';
+				$stmt = $this->database->prepare($sql);
+				$stmt->execute(array(':id' => 'tr-peer-'.$id));
+				$stmt->execute(array(':id' => 'tr-reg-'.$id));
+				return true;
+			break;
+			case 'pjsip':
+			 //Not implemented
+			 return false;
+			break;
+			case 'dahdi':
+				//Not implememted
+				return false;
+			break;
+			default:
+				return false;
+			break;
+		}
+	}
+	public function enableTrunk($id){
+		$tech = $this->getTrunkTech($id);
+		if(!$tech){
+			return false;
+		}
+		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ob->execute(array($id));
+		switch ($tech) {
+			case 'sip':
+			case 'iax':
+				$sql = 'UPDATE '.$tech.' SET flags = 0 where id = :id';
+				$stmt = $this->database->prepare($sql);
+				$stmt->execute(array(':id' => 'tr-peer-'.$id));
+				$stmt->execute(array(':id' =>'tr-reg-'.$id));
+				return true;
+			break;
+			case 'pjsip':
+			 //Not implemented
+			 return false;
+			break;
+			case 'dahdi':
+				//Not implememted
+				return false;
+			break;
+			default:
+				return false;
+			break;
+		}
+	}
+
+	public function getTrunkTech($trunknum) {
+		$sql = "SELECT tech FROM trunks WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ob->execute(array($trunknum));
+		$tech = $ob->fetchColumn();
+		if (!$tech) {
+			return false;
+		}
+		$tech = strtolower($tech);
+		if ($tech == "iax2") {
+			$tech = "iax"; // same thing, here
+		}
+		return $tech;
+	}
 }

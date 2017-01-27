@@ -4856,16 +4856,9 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 //TODO: replace with NEW table
 //
 function core_trunks_getTrunkTech($trunknum) {
-	$tech = sql("SELECT `tech` FROM `trunks` WHERE `trunkid` = $trunknum", "getOne");
-	if (!$tech) {
-		return false;
-	}
-	$tech = strtolower($tech);
-	if ($tech == "iax2") {
-		$tech = "iax"; // same thing, here
-	}
-	return $tech;
+	return FreePBX::Core()->getTrunkTech($trunknum);
 }
+
 
 //add trunk info to sip or iax table
 function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
