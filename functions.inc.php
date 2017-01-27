@@ -4762,9 +4762,9 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 	return $trunknum;
 }
 
-function core_trunks_del($trunknum, $tech = null) {
+function core_trunks_del($trunknum, $tech = null , $edit = false) {
 	_core_backtrace();
-	return \FreePBX::Core()->deleteTrunk($trunknum, $tech);
+	return \FreePBX::Core()->deleteTrunk($trunknum, $tech, $edit);
 }
 
 function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off', $dialopts = false) {
@@ -4775,7 +4775,7 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 	if ($tech == "") {
 		return false;
 	}
-	core_trunks_del($trunknum, $tech);
+	core_trunks_del($trunknum, $tech, true);
 	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
 }
 
