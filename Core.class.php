@@ -2955,6 +2955,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function disableTrunk($id){
+		$tech = $this->getTrunkTech($id);
 		if(!$tech){
 			return false;
 		}
