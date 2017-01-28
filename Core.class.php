@@ -1798,6 +1798,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	/**
+	 * Delete trunk association from
+	 */
+	public function delRouteTrunk($routeId, $trunkId) {
+		$sql = "DELETE FROM outbound_route_trunks WHERE route_id = ? AND trunk_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($routeId, $trunkId));
+	}
+
+	/**
 	 * Get all Users
 	 */
 	public function getAllUsers() {
