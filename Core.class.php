@@ -2635,17 +2635,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		switch ($type) {
 		case 'extensions':
+			$defaulttech = \FreePBX::Sipsettings()->getSipPortOwner();
 			foreach ($rawData as $data) {
 				array_change_key_case($data, CASE_LOWER);
 				if (!is_numeric($data['extension'])) {
 					return array("status" => false, "message" => _("Extension is not numeric."));
 				}
 				if(empty($data['tech'])) {
-					$tech = \FreePBX::Sipsettings()->getSipPortOwner();
-					if ($tech == "none") {
-						$tech = 'sip';
+					if ($defaulttech == "none") {
+						$data['tech'] = 'sip';
+					} else {
+						$data['tech'] = $defaulttech;
 					}
-					$data['tech'] = $tech;
 				}
 				if(empty($data['name'])) {
 					return array("status" => false, "message" => _("Device 'name' can not be blank."));
