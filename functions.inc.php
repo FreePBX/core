@@ -332,7 +332,8 @@ class core_conf {
 			$cc_monitor_policy = "";
 		}
 
-		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -362,7 +363,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$sql = "SELECT tech.data,tech.id from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where keyword='account' and trunks.disabled = 'off' group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -382,7 +383,7 @@ class core_conf {
 			$usedAccounts[] = $account;
 			$id = $result['id'];
 
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where id='$id' and keyword <> 'account' and trunks.disabled = 'off' order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
 				die($results2->getMessage());
@@ -548,7 +549,7 @@ class core_conf {
 		$table_name = "sip";
 		$output = "";
 
-		$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
+		$sql = "SELECT tech.keyword,tech.data FROM $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) WHERE `id` LIKE 'tr-reg-%' AND tech.keyword <> 'account' AND trunks.disabled = 'off'";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -571,8 +572,8 @@ class core_conf {
 		$table_name = "iax";
 		$additional = "";
 		$output = "";
-
-		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
+		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -607,8 +608,7 @@ class core_conf {
 					$additional .= $result['keyword']."=$option\n";
 			}
 		}
-
-		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+		$sql = "SELECT tech.data,tech.id from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where keyword='account' and trunks.disabled = 'off' group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -618,8 +618,7 @@ class core_conf {
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= "[$account]\n";
-
-			$sql = "SELECT keyword,data from $table_name where id='$id' and keyword <> 'account' and flags <> 1 order by flags, keyword DESC";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where id='$id' and keyword <> 'account' and trunks.disabled = 'off' order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
 				die($results2_pre->getMessage());
@@ -717,8 +716,8 @@ class core_conf {
 
 		$table_name = "iax";
 		$output = "";
-
-		$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
+		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
+		//$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -741,7 +740,9 @@ class core_conf {
 		$additional = "";
 		$output = '';
 
-		$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
+		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
+
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			if($table_name == 'zap') {
@@ -755,6 +756,7 @@ class core_conf {
 		}
 
 		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data";
+
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -766,6 +768,8 @@ class core_conf {
 			$output .= ";;;;;;[$account]\n";
 
 			$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = $id and trunks.disabled = 'off'";
+
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
 				die($results2->getMessage());
