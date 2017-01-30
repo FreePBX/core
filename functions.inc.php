@@ -332,7 +332,6 @@ class core_conf {
 			$cc_monitor_policy = "";
 		}
 
-		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
@@ -573,7 +572,6 @@ class core_conf {
 		$additional = "";
 		$output = "";
 		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
-		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -717,7 +715,6 @@ class core_conf {
 		$table_name = "iax";
 		$output = "";
 		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
-		//$sql = "SELECT keyword,data FROM $table_name WHERE `id` LIKE 'tr-reg-%' AND keyword <> 'account' AND flags <> 1";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -740,7 +737,6 @@ class core_conf {
 		$additional = "";
 		$output = '';
 
-		//$sql = "SELECT keyword,data from $table_name where id=-1 and keyword <> 'account' and flags <> 1";
 		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
 
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
