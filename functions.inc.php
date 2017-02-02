@@ -2216,6 +2216,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_wait('1'));
 		$ext->add($context, $exten, '', new ext_congestion('20'));
 		$ext->add($context, $exten, '', new ext_hangup());
+		$ext->add($context, 's', '', new ext_goto('11,1')); //this is dumb. Ask Andrew someday
 	}
 
 	if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
