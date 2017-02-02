@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.4</version>
+	<version>13.0.118.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118.5* FREEPBX-12962 Fix ajax call to add astmodules
 		*13.0.118.4* FREEPBX-13980 Populating CallerID field in Trunk dial patterns doesnt work
 		*13.0.118.3* FREEPBX-14035 Fix editing of a trunk to differentate from delete
 		*13.0.118.2* FREEPBX-14035 Fix typo when deleting trunks causing whoops error
