@@ -31,21 +31,20 @@ $cwignore    = strtoupper(trim($cwignore));
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
 
+$ampuser = get_var( $AGI, "AMPUSER" );
+$ampuser = trim($ampuser);
 
-require_once "phpagi-asmanager.php";
-$ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
-$ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
-$astmgrhost  = get_var( $AGI, "ASTMANAGERHOST" );
-$astman = $AGI->new_AsteriskManager();
 if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
 	exit (1);
 }
-
 
 // Caller ID info is stored in $request in AGI class, passed from Asterisk
 $cidnum = $AGI->request['agi_callerid'];
 $cidname = $AGI->request['agi_calleridname'];
 debug("Caller ID name is '$cidname' number is '$cidnum'", 1);
+debug("CW Ignore is: $cwignore", 1);
+debug("CF Ignore is: $cfignore", 1);
+debug("CW IN_USE/BUSY is: $cwinusebusy",1);
 
 $queue_wait = get_var( $AGI, "QUEUEWAIT" );
 if ($queue_wait != '') {
@@ -161,7 +160,7 @@ if ($cwignore && $rgmethod != "ringallv2") {
 // if they set a -prim mode in one of the others
 //
 if ( ($use_confirmation != "FALSE") && ($rgmethod != "ringall") && ($rgmethod != "ringallv2") && ($rgmethod != "hunt") && ($rgmethod != "random") ) {	// added condition for random strategy
-	debug("Unsupported RingMethod: '$rgmethod' resetting to ringall", 1);
+	debug("Unsupported RingMethod with Confirm Calls is set to True: '$rgmethod' resetting to ringall", 1);
 	$rgmethod	= "ringall";
 }
 
@@ -488,6 +487,9 @@ foreach ( $ext as $k ) {
 					} else {
 						debug("Extension $extnum has call waiting enabled",1);
 					}
+				} elseif($extstate == 4) {
+					debug("Extension $extnum is not available to be called", 1);
+					$extnum = '';
 				}
 			// -1 means couldn't read status usually due to missing HINT
 			} elseif ($extstate < 0) {
@@ -690,11 +692,7 @@ $dialopts = ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
 if (!strlen($ds)) {
 	$AGI->noop('');
 } else {
-	// Asterisk 1.6 uses , instead of | and 1.4 can't recieve a , in the ds.
-	//
-
 	$ds_seperator = ',';
-
 
 	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
 		$ds = $ds_seperator;
@@ -739,7 +737,6 @@ if (! $ds) {
 		$AGI->set_variable('DIALSTATUS','NOANSWER');
 	}
 }
-
 
 // EOF dialparties.agi
 exit( 0 );
@@ -808,8 +805,16 @@ function debug($string, $level=3) {
 }
 
 function is_ext_avail( $extnum ) {
+	global $ampuser;
 	global $astman;
 	global $AGI;
+
+	if($extnum == $ampuser) {
+		$status = 1;
+		$extstate_result = "INUSE_ORIGINATOR";
+		debug("EXTENSION_STATE: $status ($extstate_result)", 1);
+		return $status;
+	}
 
 	$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
 	switch ($extstate_result) {
@@ -821,9 +826,6 @@ function is_ext_avail( $extnum ) {
 			break;
 		case "BUSY":
 			$status = 2;
-			break;
-		case "UNAVAILABLE":
-			$status = 4;
 			break;
 		case "RINGING":
 			$status = 8;
@@ -837,6 +839,7 @@ function is_ext_avail( $extnum ) {
 		case "ONHOLD":
 			$status = 16;
 			break;
+		case "UNAVAILABLE":
 		case "UNKNOWN":
 		default:
 			$status = 4;
@@ -845,4 +848,3 @@ function is_ext_avail( $extnum ) {
 
 	return $status;
 }
-?>
