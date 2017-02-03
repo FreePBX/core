@@ -34,10 +34,6 @@ $cfignore    = strtoupper(trim($cfignore));
 $ampuser = get_var( $AGI, "AMPUSER" );
 $ampuser = trim($ampuser);
 
-if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
-	exit (1);
-}
-
 // Caller ID info is stored in $request in AGI class, passed from Asterisk
 $cidnum = $AGI->request['agi_callerid'];
 $cidname = $AGI->request['agi_calleridname'];
@@ -806,7 +802,6 @@ function debug($string, $level=3) {
 
 function is_ext_avail( $extnum ) {
 	global $ampuser;
-	global $astman;
 	global $AGI;
 
 	if($extnum == $ampuser) {
