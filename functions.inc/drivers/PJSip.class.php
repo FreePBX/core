@@ -151,10 +151,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "1",
 				"flag" => $flag++
 			),
-			"max_contact" => array(
-				"value" => "1",
-				"flag" => $flag++
-			),
 			"media_use_received_transport" => array(
 				"value" => "no",
 				"flag" => $flag++
