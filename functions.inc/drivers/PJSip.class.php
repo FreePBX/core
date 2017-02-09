@@ -147,7 +147,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => $id."@device",
 				"flag" => $flag++
 			),
-			"max_contact" => array(
+			"max_contacts" => array(
 				"value" => "1",
 				"flag" => $flag++
 			),
@@ -165,10 +165,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			),
 			"force_rport" => array(
 				"value" => "yes",
-				"flag" => $flag++
-			),
-			"max_contacts" => array(
-				"value" => "1",
 				"flag" => $flag++
 			),
 			"rewrite_contact" => array(
