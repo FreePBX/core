@@ -167,6 +167,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "yes",
 				"flag" => $flag++
 			),
+			"max_contacts" => array(
+				"value" => "1",
+				"flag" => $flag++
+			),
 			"rewrite_contact" => array(
 				"value" => "yes",
 				"flag" => $flag++
