@@ -2683,12 +2683,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				try {
 					if (!$this->addUser($data['extension'], $settings)) {
 						//cleanup
-						$this->delDevice($data['extension']);
+						$this->delDevice($data['extension'], $replaceExisting);
 						return array("status" => false, "message" => _("User could not be added."));
 					}
 				} catch(\Exception $e) {
 					//cleanup
-					$this->delDevice($data['extension']);
+					$this->delDevice($data['extension'], $replaceExisting);
 					return array("status" => false, "message" => $e->getMessage());
 				}
 			}
