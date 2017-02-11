@@ -3,15 +3,16 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.7</version>
+	<version>13.0.118.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118.8* FREEPBX-13791 importing updated extensions deletes voicemail and greetings
 		*13.0.118.7* FREEPBX-13999 Max_contacts field for pjsip extensions is not imported
-		*13.0.118.6* FREEPBX-13726 Dont set huntmembers to 0			
+		*13.0.118.6* FREEPBX-13726 Dont set huntmembers to 0
 		*13.0.118.5* FREEPBX-12962 Fix ajax call to add astmodules
 		*13.0.118.4* FREEPBX-13980 Populating CallerID field in Trunk dial patterns doesnt work
 		*13.0.118.3* FREEPBX-14035 Fix editing of a trunk to differentate from delete

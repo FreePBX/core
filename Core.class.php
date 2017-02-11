@@ -2658,11 +2658,11 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 				$device = $this->getDevice($data['extension']);
 				if($replaceExisting && !empty($device)) {
-					$this->delDevice($data['extension']);
+					$this->delDevice($data['extension'],true);
 				}
 				$user = $this->getUser($data['extension']);
 				if($replaceExisting && !empty($user)) {
-					$this->delUser($data['extension']);
+					$this->delUser($data['extension'],true);
 				}
 				try {
 					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
