@@ -165,12 +165,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array("status" => false, "message" => _("Extension was not numeric!"));
 		}
 		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name']);
-		try {
-			if(!$this->addDevice($extension,$tech,$settings)) {
-				return array("status" => false, "message" => _("Device was not added!"));
-			}
-		} catch(\Exception $e) {
-			return array("status" => false, "message" => $e->getMessage());
+		if(!$this->addDevice($extension,$tech,$settings)) {
+			return array("status" => false, "message" => _("Device was not added!"));
 		}
 		$settings = $this->generateDefaultUserSettings($extension,$data['name']);
 		$settings['outboundcid'] = $data['outboundcid'];
@@ -178,12 +174,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			if(!$this->addUser($extension, $settings)) {
 				//cleanup
 				$this->delDevice($extension);
-				return array("status" => false, "message" => _("User was not added!"));
+				return array("status" => false, "message" => _("There was an unknown error creating this extension"));
 			}
 		} catch(\Exception $e) {
 			//cleanup
 			$this->delDevice($extension);
-			return array("status" => false, "message" => $e->getMessage());
+			throw $e;
 		}
 
 		try {
@@ -192,7 +188,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			//cleanup
 			$this->delDevice($extension);
 			$this->delUser($extension);
-			return array("status" => false, "message" => $e->getMessage());
+			throw $e;
 		}
 		needreload();
 		return array("status" => true, "ext" => $extension, "name" => $data['name']);
@@ -2373,7 +2369,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param int $extension The user number (extension)
 	 */
 	public function getUser($extension) {
-		if (isset($this->getUserCache[$extension])) {
+		if (!empty($this->getUserCache[$extension])) {
 			return $this->getUserCache[$extension];
 		}
 		$sql = "SELECT * FROM users WHERE extension = ?";
@@ -2439,7 +2435,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {int} $account The Device ID
 	 */
 	public function getDevice($account) {
-		if (isset($this->getDeviceCache[$account])) {
+		if (!empty($this->getDeviceCache[$account])) {
 			return $this->getDeviceCache[$account];
 		}
 		$sql = "SELECT * FROM devices WHERE id = ?";
