@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.9</version>
+	<version>13.0.118.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118.10* FREEPBX-13726 firstavailable, firstnotonphone :: ring *only* the first
 		*13.0.118.9* Issues releated to FREEPBX-14212 and quick create
 		*13.0.118.8* FREEPBX-13791 importing updated extensions deletes voicemail and greetings
 		*13.0.118.7* FREEPBX-13999 Max_contacts field for pjsip extensions is not imported

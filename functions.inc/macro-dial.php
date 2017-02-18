@@ -84,8 +84,8 @@ $ext->add($c,$s,'', new ext_macro('dial-hunt-predial-hook'));
 $ext->add($c,$s,'hsdialapp', new ext_dial('${${HuntMember}}${ds}b(func-apply-sipheaders^s^1)', ''));
 $ext->add($c,$s,'', new ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
 $ext->add($c,$s,'', new ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
-//$ext->add($c,$s,'', new ext_gotoif('$[$[$["foo${RingGroupMethod}" != "foofirstavailable"] & $["foo${RingGroupMethod}" != "foofirstnotonphone"]] | $["foo${DialStatus}" = "fooBUSY"]]', 'a46'));
-//$ext->add($c,$s,'', new ext_set('HuntMembers', (string) '0')); // String zeros.
+$ext->add($c,$s,'', new ext_gotoif('$[$["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]] & $[$["${DIALSTATUS}" != "CHANUNAVAIL"] & $["${DIALSTATUS}" != "CONGESTION"]]', 'huntreset', 'a46'));
+$ext->add($c,$s,'huntreset', new ext_set('HuntMembers', (string) '1')); // String zeros.
 $ext->add($c,$s,'a46', new ext_set('HuntMembers', '$[${HuntMembers} - 1]'));
 $ext->add($c,$s,'', new ext_goto('a22', 's'));
 $ext->add($c,$s,'a50', new ext_noop('Deleting: CALLTRACE/${CT_EXTEN} ${DB_DELETE(CALLTRACE/${CT_EXTEN})}'));
