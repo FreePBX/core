@@ -295,7 +295,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 									<div class="row">
 										<div class="col-md-12">
-											<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("CallerID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span>
+											<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("Depending on the CID Option chosen, this CallerID will be used for calls placed through this trunk.<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span>
 										</div>
 									</div>
 								</div>
@@ -329,7 +329,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 									<div class="row">
 										<div class="col-md-12">
-											<span id="keepcid-help" class="help-block fpbx-help-block"><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: blocks any CID that is the result of a forwarded call from off the system. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.") . _("Intra-Company Routes will always trasmit an extension's internal number and name.")?></span>
+											<span id="keepcid-help" class="help-block fpbx-help-block"><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: Sets any CID that is the result of a forwarded call from off the system to the Outbound CallerID defined for the trunk. If no Outbound CallerID is defined for the trunk, the Foreign CID will be sent unchanged. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.") . _("Intra-Company Routes will always trasmit an extension's internal number and name.")?></span>
 										</div>
 									</div>
 								</div>
