@@ -104,6 +104,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 </div>
 <script>
 	function userLinkFormatter(value, row) {
-		return value.trim() !== "" ? "<a href='?display=users&extdisplay="+value+"'>"+value+"</a>" : null;
+		return (value !== null && value.trim() !== "") ? "<a href='?display=users&extdisplay="+value+"'>"+value+"</a>" : null;
 	}
 </script>

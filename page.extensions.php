@@ -232,6 +232,7 @@ if($display_mode == "basic") { ?>
 				});
 				$('#quickCreate .buttonFinish').addClass("buttonDisabled");
 				$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
+					console.log(d);
 					if(d.status) {
 						extmap[d.ext] = d.name;
 						$('#quickCreate').modal('hide');
