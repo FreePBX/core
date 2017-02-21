@@ -1492,11 +1492,11 @@ if($httpupdate) {
 }
 
 // HTTPBINDADDRESS
-$set['value'] = '';
+$set['value'] = 100;
 $set['defaultval'] =& $set['value'];
 $set['name'] = 'Session Limit';
 $set['description'] = 'Specifies the maximum number of http sessions that will be allowed to exist at any given time.';
-$set['emptyok'] = 1;
+$set['emptyok'] = 0;
 $set['options'] = array(10,65536);
 $set['type'] = CONF_TYPE_INT;
 $set['level'] = 4;
@@ -1507,8 +1507,8 @@ $freepbx_conf->define_conf_setting('HTTPSESSIONLIMIT',$set);
 $set['value'] = 30000;
 $set['defaultval'] =& $set['value'];
 $set['name'] = 'Session Inactivity ';
-$set['description'] = 'Specifies the number of milliseconds to wait for more data over the HTTP connection before closing it.';
-$set['emptyok'] = 1;
+$set['description'] = 'Specifies the number of milliseconds to wait for more data over the HTTP connection before closing it. Set to 0 to disable session inactivity.';
+$set['emptyok'] = 0;
 $set['options'] = array(0,65536);
 $set['type'] = CONF_TYPE_INT;
 $set['level'] = 4;
