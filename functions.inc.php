@@ -192,7 +192,8 @@ class core_conf {
 		$output .= "bindaddr=".$freepbx_conf->get_conf_setting('HTTPBINDADDRESS')."\n";
 		$output .= "bindport=".$freepbx_conf->get_conf_setting('HTTPBINDPORT')."\n";
 		$output .= "prefix=".$freepbx_conf->get_conf_setting('HTTPPREFIX')."\n";
-		$output .= "sessionlimit=".$freepbx_conf->get_conf_setting('HTTPSESSIONLIMIT')."\n";
+		$sessionlimit = $freepbx_conf->get_conf_setting('HTTPSESSIONLIMIT');
+		$output .= "sessionlimit=".((!empty($sessionlimit) && (int)$sessionlimit > 10) ? $sessionlimit : 100)."\n";
 		$output .= "session_inactivity=".$freepbx_conf->get_conf_setting('HTTPSESSIONINACTIVITY')."\n";
 		$output .= "session_keep_alive=".$freepbx_conf->get_conf_setting('HTTPSESSIONKEEPALIVE')."\n";
 		$tls = $freepbx_conf->get_conf_setting('HTTPTLSENABLE');
