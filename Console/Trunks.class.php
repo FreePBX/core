@@ -33,13 +33,13 @@ class Trunks extends Command {
 		if($input->getOption('disable')){
 			$ARGUSED = True;
 			$id = $input->getOption('disable');
-			$output->writeln(_('Disabling Trunk ') . $id);
+			$output->writeln(sprintf(_('Disabling Trunk %s'),$id));
 			$this->disableTrunk($id);
 		}
 		if($input->getOption('enable')){
 			$ARGUSED = True;
 			$id = $input->getOption('enable');
-			$output->writeln(_('Enabling Trunk ') . $id);
+			$output->writeln(sprintf(_('Enabling Trunk %s'),$id));
 			$this->enableTrunk($id);
 		}
 		if($input->getOption('list')){
@@ -66,12 +66,20 @@ class Trunks extends Command {
 			$question = new ChoiceQuestion($table->render(),$trunkids,0);
 			$id = $helper->ask($input, $output, $question);
 			if($trunks[($id -1 )]['disabled'] == 'off'){
-				$output->writeln(_('Disabling Trunk ') . $id);
-				$this->disableTrunk($id);
+				$output->writeln(sprintf(_('Disabling Trunk %s'),$id));
+				if($this->disableTrunk($id)){
+					$output->writeln(sprintf(_('Enabled Trunk %s Run fwconsole reload'),$id));
+				}else{
+					$output->writeln(sprintf(_('Unable to enable Trunk %s. This trunk type may not support this')));
+				}
 			}
 			if($trunks[($id -1)]['disabled'] == 'on'){
 				$output->writeln(_('Enabling Trunk ') . $id);
-				$this->enableTrunk($id);
+				if($this->enableTrunk($id)){
+					$output->writeln(sprintf(_('Enabled Trunk %s Run fwconsole reload'),$id));
+				}else{
+					$output->writeln(sprintf(_('Unable to enable Trunk %s. This trunk type may not support this')));
+				}
 			}
 		}
 	}
@@ -85,15 +93,9 @@ class Trunks extends Command {
 		return $gotRows;
 	}
 	private function disableTrunk($id){
-		$db = \FreePBX::Database();
-		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
-		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));
+		return \FreePBX::Core()->disableTrunk($id);
 	}
 	private function enableTrunk($id){
-		$db = \FreePBX::Database();
-		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
-		$ob = $db->prepare($sql);
-		return $ob->execute(array($id));
+		return \FreePBX::Core()->enableTrunk($id);
 	}
 }
