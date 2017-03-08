@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1rc1</version>
+	<version>14.0.1rc1.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1rc1.1* Invalid key-ing
 		*14.0.1rc1* RC1
 		*14.0.1beta9 FREEPBX-14197 When adding an extension display the extension
 		*14.0.1beta8* FREEPBX-14050 Add detail to tool tip for 'block foreign CIDs' on trunk page
@@ -31,7 +32,7 @@
 			<field name="maxchans" type="string" length="6" default="" notnull="false"/>
 			<field name="failscript" type="string" length="255" default=""/>
 			<field name="dialoutprefix" type="string" length="255" default=""/>
-			<field name="channelid" type="string" length="255" default="" primaryKey="true"/>
+			<field name="channelid" type="string" length="190" default="" primaryKey="true"/>
 			<field name="usercontext" type="string" length="255" notnull="false"/>
 			<field name="provider" type="string" length="40" notnull="false"/>
 			<field name="disabled" type="string" length="4" default="off" notnull="false"/>
