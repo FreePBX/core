@@ -2991,4 +2991,53 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 		}
 	}
+
+	/**
+	 * Disable Trunk
+	 * @method disableTrunk
+	 * @param  string       $id The trunk ID
+	 * @return boolean           Result of execute
+	 */
+	public function disableTrunk($id){
+		$tech = $this->getTrunkTech($id);
+		if(!$tech){
+			return false;
+		}
+		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		return $ob->execute(array($id));
+	}
+
+	/**
+	 * Enable Trunk
+	 * @method enableTrunk
+	 * @param  string       $id The trunk ID
+	 * @return boolean           Result of execute
+	 */
+	public function enableTrunk($id){
+		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		return $ob->execute(array($id));
+	}
+
+	/**
+	 * Get Trunk Tech
+	 * @method getTrunkTech
+	 * @param  string       $trunknum The trunk id
+	 * @return string                 The trunk tech
+	 */
+	public function getTrunkTech($trunknum) {
+		$sql = "SELECT tech FROM trunks WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ob->execute(array($trunknum));
+		$tech = $ob->fetchColumn();
+		if (!$tech) {
+			return false;
+		}
+		$tech = strtolower($tech);
+		if ($tech == "iax2") {
+			$tech = "iax"; // same thing, here
+		}
+		return $tech;
+	}
 }
