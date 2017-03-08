@@ -1029,6 +1029,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
 			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
 			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
+			$time_mode = isset($request['time_mode']) ? $request['time_mode'] : '';
+			$timezone = isset($request['timezone']) ? $request['timezone'] : '';
+			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
+			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
@@ -1049,12 +1053,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 					needreload();
 				break;
 				case "delroute":

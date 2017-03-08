@@ -39,6 +39,10 @@ switch($request['view']){
 			$outcid = $route_info['outcid'];
 			$outcid_mode = $route_info['outcid_mode'];
 			$time_group_id = $route_info['time_group_id'];
+			$time_mode = $route_info['time_mode'];
+			$timezone = $route_info['timezone'];
+			$calendar_id = $route_info['calendar_id'];
+			$calendar_group_id = $route_info['calendar_group_id'];
 			$route_seq = $route_info['seq'];
 			$routename = $route_info['name'];
 			$dest = $route_info['dest'];
@@ -58,6 +62,10 @@ switch($request['view']){
 							'outcid' => $outcid,
 							'outcid_mode' => $outcid_mode,
 							'time_group_id' => $time_group_id,
+							'time_mode' => $time_mode,
+							'timezone' => $timezone,
+							'calendar_id' => $calendar_id,
+							'calendar_group_id' => $calendar_group_id,
 							'route_seq' => $route_seq,
 							'routename' => $routename,
 							'dest' => $dest,

@@ -20,6 +20,126 @@
 	<depends>
 		<version>14.0</version>
 	</depends>
+	<database>
+		<table name="trunks">
+			<field name="trunkid" type="integer" default="0" primaryKey="true"/>
+			<field name="name" type="string" length="50" default=""/>
+			<field name="tech" type="string" length="20" primaryKey="true"/>
+			<field name="outcid" type="string" length="40" default=""/>
+			<field name="keepcid" type="string" length="4" default="off" notnull="false"/>
+			<field name="maxchans" type="string" length="6" default="" notnull="false"/>
+			<field name="failscript" type="string" length="255" default=""/>
+			<field name="dialoutprefix" type="string" length="255" default=""/>
+			<field name="channelid" type="string" length="255" default="" primaryKey="true"/>
+			<field name="usercontext" type="string" length="255" notnull="false"/>
+			<field name="provider" type="string" length="40" notnull="false"/>
+			<field name="disabled" type="string" length="4" default="off" notnull="false"/>
+			<field name="continue" type="string" length="4" default="off" notnull="false"/>
+		</table>
+		<table name="pjsip">
+			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
+			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
+			<field name="data" type="string" length="255"/>
+			<field name="flags" type="integer" default="0"/>
+		</table>
+		<table name="sip">
+			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
+			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
+			<field name="data" type="string" length="255"/>
+			<field name="flags" type="integer" default="0"/>
+		</table>
+		<table name="dahdi">
+			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
+			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
+			<field name="data" type="string" length="255" default=""/>
+			<field name="flags" type="integer" default="0"/>
+		</table>
+		<table name="iax">
+			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
+			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
+			<field name="data" type="string" length="255"/>
+			<field name="flags" type="integer" default="0"/>
+		</table>
+		<table name="indications_zonelist">
+			<field name="name" type="string" length="80"/>
+			<field name="iso" type="string" length="20" primaryKey="true"/>
+			<field name="conf" type="blob" notnull="false"/>
+		</table>
+		<table name="devices">
+			<field name="id" type="string" length="20" default=""/>
+			<field name="tech" type="string" length="10" default=""/>
+			<field name="dial" type="string" length="255" default=""/>
+			<field name="devicetype" type="string" length="5" default=""/>
+			<field name="user" type="string" length="50" notnull="false"/>
+			<field name="description" type="string" length="50" notnull="false"/>
+			<field name="emergency_cid" type="string" length="100" notnull="false"/>
+			<key name="id" type="index">
+				<column name="id"/>
+			</key>
+			<key name="tech" type="index">
+				<column name="tech"/>
+			</key>
+		</table>
+		<table name="users">
+			<field name="extension" type="string" length="20" default=""/>
+			<field name="password" type="string" length="20" notnull="false"/>
+			<field name="name" type="string" length="50" notnull="false"/>
+			<field name="voicemail" type="string" length="50" notnull="false"/>
+			<field name="ringtimer" type="integer" notnull="false"/>
+			<field name="noanswer" type="string" length="100" notnull="false"/>
+			<field name="recording" type="string" length="50" notnull="false"/>
+			<field name="outboundcid" type="string" length="50" notnull="false"/>
+			<field name="sipname" type="string" length="50" notnull="false"/>
+			<field name="noanswer_cid" type="string" length="20" default=""/>
+			<field name="busy_cid" type="string" length="20" default=""/>
+			<field name="chanunavail_cid" type="string" length="20" default=""/>
+			<field name="noanswer_dest" type="string" length="255" default=""/>
+			<field name="busy_dest" type="string" length="255" default=""/>
+			<field name="chanunavail_dest" type="string" length="255" default=""/>
+			<field name="mohclass" type="string" length="80" default="default" notnull="false"/>
+			<key name="extension" type="index">
+				<column name="extension"/>
+			</key>
+		</table>
+		<table name="incoming">
+			<field name="cidnum" type="string" length="20" notnull="false"/>
+			<field name="extension" type="string" length="50"/>
+			<field name="destination" type="string" length="50" notnull="false"/>
+			<field name="privacyman" type="boolean" notnull="false"/>
+			<field name="alertinfo" type="string" length="255" notnull="false"/>
+			<field name="ringing" type="string" length="20" notnull="false"/>
+			<field name="mohclass" type="string" length="80" default="default"/>
+			<field name="description" type="string" length="80" notnull="false"/>
+			<field name="grppre" type="string" length="80" notnull="false"/>
+			<field name="delay_answer" type="integer" notnull="false"/>
+			<field name="pricid" type="string" length="20" notnull="false"/>
+			<field name="pmmaxretries" type="string" length="2" notnull="false"/>
+			<field name="pmminlength" type="string" length="2" notnull="false"/>
+			<field name="reversal" type="string" length="10" notnull="false"/>
+			<field name="rvolume" type="string" length="2" default="" notnull="false"/>
+		</table>
+		<table name="outbound_routes">
+			<field name="route_id" type="integer" primaryKey="true" autoincrement="true"/>
+			<field name="name" type="string" length="40" notnull="false"/>
+			<field name="outcid" type="string" length="40" notnull="false"/>
+			<field name="outcid_mode" type="string" length="20" notnull="false"/>
+			<field name="password" type="string" length="30" notnull="false"/>
+			<field name="emergency_route" type="string" length="4" notnull="false"/>
+			<field name="intracompany_route" type="string" length="4" notnull="false"/>
+			<field name="mohclass" type="string" length="80" notnull="false"/>
+			<field name="time_mode" type="string" length="20" default="" notnull="false"/>
+			<field name="timezone" type="string" length="255" notnull="false"/>
+			<field name="time_group_id" type="integer" notnull="false"/>
+			<field name="calendar_id" type="string" length="255" notnull="false"/>
+			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
+			<field name="dest" type="string" length="255" notnull="false"/>
+		</table>
+		<table name="dahdichandids">
+			<field name="channel" type="integer" default="0" primaryKey="true"/>
+			<field name="description" type="string" length="40" default=""/>
+			<field name="did" type="string" length="60" default=""/>
+		</table>
+	</database>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>

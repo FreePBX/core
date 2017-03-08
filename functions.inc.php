@@ -2059,9 +2059,14 @@ function core_do_get_config($engine) {
 
 		if (function_exists('timeconditions_timegroups_get_times') && $route['time_group_id'] !== null) {
 			$times = timeconditions_timegroups_get_times($route['time_group_id'],true);
+			$timezone = $route['timezone'];
 			if (is_array($times) && count($times)) {
 				foreach ($times as $time) {
-					$ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
+					if(!empty($timezone)) {
+						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1].$delim.$timezone,$comment);
+					} else {
+						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
+					}
 				}
 			} else {
 				$ext->addInclude('outbound-allroutes',$context,$comment);
@@ -5400,25 +5405,30 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '') {
-	global $db;
-
-	$route_id = $db->escapeSimple($route_id);
-	$name = $db->escapeSimple($name);
-	$outcid = $db->escapeSimple($outcid);
-	$outcid_mode = trim($outcid) == '' ? '' : $db->escapeSimple($outcid_mode);
-	$password = $db->escapeSimple($password);
-	$emergency_route = strtoupper($db->escapeSimple($emergency_route));
-	$intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
-	$mohclass = $db->escapeSimple($mohclass);
-	$seq = $db->escapeSimple($seq);
-	$time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-	$dest = $db->escapeSimple($dest);
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	$sql = "UPDATE `outbound_routes` SET
-	`name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password',
-	`emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass',
-	`time_group_id`=$time_group_id, `dest`='$dest' WHERE `route_id` = ".q($route_id);
-	sql($sql);
+	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
+	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
+	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
+	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
+
+	$sth = FreePBX::Database()->prepare($sql);
+	$sth->execute(array(
+		":name" => $name,
+		":outcid" => $outcid,
+		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+		":password" => $password,
+		":emergency_route" => strtoupper($emergency_route),
+		":intracompany_route" => strtoupper($intracompany_route),
+		":mohclass" => $mohclass,
+		":time_group_id" => $time_group_id,
+		":dest" => $dest,
+		":route_id" => $route_id,
+		":time_mode" => $time_mode,
+		":timezone" => $timezone,
+		":calendar_id" => $calendar_id,
+		":calendar_group_id" => $calendar_group_id
+	));
 
 	core_routing_updatepatterns($route_id, $patterns, true);
 	core_routing_updatetrunks($route_id, $trunks, true);
@@ -5428,30 +5438,32 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	global $amp_conf;
 	global $db;
 
-	$name = $db->escapeSimple($name);
-	$outcid = $db->escapeSimple($outcid);
-	$outcid_mode = $db->escapeSimple($outcid_mode);
-	$password = $db->escapeSimple($password);
-	$emergency_route = strtoupper($db->escapeSimple($emergency_route));
-	$intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
-	$mohclass = $db->escapeSimple($mohclass);
-	$time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-	$dest = $db->escapeSimple($dest);
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`)
-	VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id, '$dest')";
-	sql($sql);
+	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `calendar_id`, `calendar_group_id`) SET
+	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone, :calendar_id, :calendar_group_id";
 
-	// TODO: sqlite_last_insert_rowid() un-tested and php5 ???
-	//
-	if(method_exists($db,'insert_id')) {
-		$route_id = $db->insert_id();
-	} else {
-		$route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
-	}
+	$sth = FreePBX::Database()->prepare($sql);
+	$sth->execute(array(
+		":name" => $name,
+		":outcid" => $outcid,
+		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+		":password" => $password,
+		":emergency_route" => strtoupper($emergency_route),
+		":intracompany_route" => strtoupper($intracompany_route),
+		":mohclass" => $mohclass,
+		":time_group_id" => $time_group_id,
+		":dest" => $dest,
+		":route_id" => $route_id,
+		":time_mode" => $time_mode,
+		":timezone" => $timezone,
+		":calendar_id" => $calendar_id,
+		":calendar_group_id" => $calendar_group_id
+	));
+
+	$route_id = FreePBX::Database()->lastInsertId();
 
 	core_routing_updatepatterns($route_id, $patterns);
 	core_routing_updatetrunks($route_id, $trunks);
