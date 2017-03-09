@@ -333,7 +333,7 @@ class core_conf {
 			$cc_monitor_policy = "";
 		}
 
-		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
+		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id=-1 and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -363,7 +363,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT tech.data,tech.id from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where keyword='account' and trunks.disabled = 'off' group by data";
+		$sql = "SELECT tech.data,tech.id from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.keyword='account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -383,7 +383,7 @@ class core_conf {
 			$usedAccounts[] = $account;
 			$id = $result['id'];
 
-			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where id='$id' and keyword <> 'account' and trunks.disabled = 'off' order by flags, keyword DESC";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id='$id' and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
 				die($results2->getMessage());
@@ -549,7 +549,7 @@ class core_conf {
 		$table_name = "sip";
 		$output = "";
 
-		$sql = "SELECT tech.keyword,tech.data FROM $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) WHERE `id` LIKE 'tr-reg-%' AND tech.keyword <> 'account' AND trunks.disabled = 'off'";
+		$sql = "SELECT tech.keyword,tech.data FROM $table_name as tech LEFT OUTER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) WHERE `id` LIKE 'tr-reg-%' AND tech.keyword <> 'account' AND (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -572,7 +572,7 @@ class core_conf {
 		$table_name = "iax";
 		$additional = "";
 		$output = "";
-		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
+		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id = -1 and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -608,7 +608,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT tech.data,tech.id from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where keyword='account' and trunks.disabled = 'off' group by data";
+		$sql = "SELECT tech.data,tech.id from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.keyword='account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) group by data";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -618,7 +618,7 @@ class core_conf {
 			$account = $result['data'];
 			$id = $result['id'];
 			$output .= "[$account]\n";
-			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-peer-',trunks.trunkid) where id='$id' and keyword <> 'account' and trunks.disabled = 'off' order by flags, keyword DESC";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id='$id' and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
 				die($results2_pre->getMessage());
@@ -716,7 +716,7 @@ class core_conf {
 
 		$table_name = "iax";
 		$output = "";
-		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and trunks.disabled = 'off'";
+		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) where tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -739,7 +739,7 @@ class core_conf {
 		$additional = "";
 		$output = '';
 
-		$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = -1 and trunks.disabled = 'off'";
+		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid) where tech.keyword <> 'account' and tech.id = -1 and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
@@ -765,8 +765,7 @@ class core_conf {
 			$id = $result['id'];
 			$output .= ";;;;;;[$account]\n";
 
-			$sql = "SELECT keyword,data from $table_name where id=$id and keyword <> 'account' and flags <> 1 order by keyword DESC";
-			$sql = "SELECT tech.keyword,tech.data from $table_name tech INNER JOIN trunks on tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-reg-',trunks.trunkid) where keyword <> 'account' and tech.id = $id and trunks.disabled = 'off'";
+			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.keyword <> 'account' and tech.id = $id and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 
 			$results2 = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2)) {
