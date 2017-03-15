@@ -363,7 +363,7 @@ class core_conf {
 			}
 		}
 
-		$sql = "SELECT tech.data,tech.id from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.keyword='account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) group by data";
+		$sql = "SELECT tech.data,tech.id from $table_name as tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.keyword='account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) group by data,id";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
