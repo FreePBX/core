@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.14</version>
+	<version>13.0.118.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118.15* FREEPBX-14349 Core prompt replacement
 		*13.0.118.14* Fix error in strict versions of mysql
 		*13.0.118.13* FREEPBX-14017 Left join even if not a trunk
 		*13.0.118.12* FREEPBX-14017 fwconsole trunk manipulation causes trunks to disappear from GUI - cant add them back
