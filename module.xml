@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.15</version>
+	<version>13.0.118.16</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.118.16* FREEPBX-14262 option for Terminate call not visible for french language
 		*13.0.118.15* FREEPBX-14349 Core prompt replacement
 		*13.0.118.14* Fix error in strict versions of mysql
 		*13.0.118.13* FREEPBX-14017 Left join even if not a trunk
