@@ -817,7 +817,7 @@ function core_destinations() {
 	global $amp_conf;
 	//static destinations
 	$extens = array();
-	$category = _("Terminate Call");
+	$category = "Terminate Call";
 	$ds_id = 'blackhole';
 	$extens[] = array('destination' => 'app-blackhole,hangup,1', 'description' => _("Hangup"), 'category' => $category, 'id' => $ds_id);
 	$extens[] = array('destination' => 'app-blackhole,congestion,1', 'description' => _("Congestion"), 'category' => $category, 'id' => $ds_id);
