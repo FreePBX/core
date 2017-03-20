@@ -5434,8 +5434,8 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 	global $amp_conf;
 	global $db;
 
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `calendar_id`, `calendar_group_id`) SET
-	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone, :calendar_id, :calendar_group_id";
+	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
+	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 
 	$sth = FreePBX::Database()->prepare($sql);
 	$sth->execute(array(
@@ -5448,11 +5448,8 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 		":mohclass" => $mohclass,
 		":time_group_id" => $time_group_id,
 		":dest" => $dest,
-		":route_id" => $route_id,
 		":time_mode" => $time_mode,
-		":timezone" => $timezone,
-		":calendar_id" => $calendar_id,
-		":calendar_group_id" => $calendar_group_id
+		":timezone" => $timezone
 	));
 
 	$route_id = FreePBX::Database()->lastInsertId();
