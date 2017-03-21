@@ -877,7 +877,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 
-		//http://issues.freepbx.org/browse/FREEPBX-8643
+		//http://issues.freepbx.org/browse/FREEPBX-12151
 		if(isset($config['mailbox'])) {
 			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "solicited");
 			switch($mwisub) {
