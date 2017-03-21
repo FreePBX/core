@@ -168,7 +168,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"mwi_subscription" => array(
-				"value" => version_compare($this->version,'13.9.1','ge') ? "auto" : "solicited",
+				"value" => version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited",
 				"flag" => $flag++
 			),
 			"mediaencryption" => array(
@@ -218,15 +218,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		unset($select);
 
-		$def = 'solicited';
-		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Solicited is the default and should only be changed if you see errors in the Asterisk logs");
+		$def = 'unsolicited';
+		$tt = _("For Message Waiting indicators there are two types: Solicited and Unsolicited. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Unsolicited is the default and should only be changed if you see errors in the Asterisk logs");
 		if (version_compare($this->version,'13.9.1','ge')) {
 			$select[] = array('value' => 'auto', 'text' => _('Auto'));
 			$def = 'auto';
 			$tt = _("For Message Waiting indicators there are three types: Auto, Solicited and Unsolicited. Auto means the PBX will try to automatically determine the type of MWI the phone uses. Solicited means Subscribe 200 then Notify 200. Unsolicited means only Notify 200. No need to Subscribe. Auto is the default and should only be changed if you see errors in the Asterisk logs");
 		}
-		$select[] = array('value' => 'solicited', 'text' => _('Solicited'));
 		$select[] = array('value' => 'unsolicited', 'text' => _('Unsolicited'));
+		$select[] = array('value' => 'solicited', 'text' => _('Solicited'));
 		$tmparr['mwi_subscription'] = array('prompttext' => _('MWI Subscription Type'), 'value' => $def, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
@@ -879,7 +879,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		//http://issues.freepbx.org/browse/FREEPBX-12151
 		if(isset($config['mailbox'])) {
-			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "solicited");
+			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
 			switch($mwisub) {
 				case "solicited":
 					$aor[] = "mailboxes=".$config['mailbox'];
