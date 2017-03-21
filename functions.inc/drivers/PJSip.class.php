@@ -333,6 +333,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.conf']['global'][] = "{$el['key']}={$el['value']}";
 			}
 		}
+		$conf['pjsip.conf']['global'][] = "#include pjsip_custom_post.conf";
 
 		$trunks = $this->getAllTrunks();
 		foreach($trunks as $trunk) {
