@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.118.18</version>
+	<version>13.0.119</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.119* FREEPBX-12151 PJSIP MWI Auto subscription
 		*13.0.118.18* FREEPBX-14390 Add support for users to add/modify pjsip global context			
 		*13.0.118.17* FREEPBX-14328 System default language file not playing for SIP anonymous
 		*13.0.118.16* FREEPBX-14262 option for Terminate call not visible for french language
