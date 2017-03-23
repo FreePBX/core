@@ -94,6 +94,29 @@ $fcc->setDefault('**');
 $fcc->update();
 unset($fcc);
 
+// The following are from General Settings that may need to be migrated.
+// We will first create them all, the define_conf_settings() method will
+// not change the value if already set. We will update the settings
+// to the currently configured values from the globals table afer defining
+// them here and then remove them from the globals table.
+
+$globals_convert['VMX_CONTEXT'] = 'from-internal';
+$globals_convert['VMX_PRI'] = '1';
+$globals_convert['VMX_TIMEDEST_CONTEXT'] = '';
+$globals_convert['VMX_TIMEDEST_EXT'] = 'dovm';
+$globals_convert['VMX_TIMEDEST_PRI'] = '1';
+$globals_convert['VMX_LOOPDEST_CONTEXT'] = '';
+$globals_convert['VMX_LOOPDEST_EXT'] = 'dovm';
+$globals_convert['VMX_LOOPDEST_PRI'] = '1';
+$globals_convert['MIXMON_DIR'] = '';
+$globals_convert['MIXMON_POST'] = '';
+$globals_convert['MIXMON_FORMAT'] = 'wav';
+
+$globals_convert['DIAL_OPTIONS'] = 'Ttr';
+$globals_convert['TRUNK_OPTIONS'] = 'T';
+$globals_convert['RINGTIMER'] = '15';
+$globals_convert['TONEZONE'] = 'us';
+
 // OUTBOUND_CID_UPDATE
 //
 $set['value'] = true;
