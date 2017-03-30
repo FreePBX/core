@@ -371,13 +371,13 @@ $(document).ready(function() {
 			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 				return warnInvalid(theForm.channelid, msgInvalidTrunkName);
 
-			if (theForm.channelid.value == theForm.usercontext.value)
+			if (theForm.channelid.value.toLowerCase() == theForm.usercontext.value.toLowerCase())
 				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 		} else if (tech == 'custom' || tech == 'dundi') {
 			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
 				return warnInvalid(theForm.channelid, msgInvalidChannelName);
 
-			if (theForm.channelid.value == theForm.usercontext.value)
+			if (theForm.channelid.value.toLowerCase() == theForm.usercontext.value.toLowerCase())
 				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
 		} else if (tech == 'pjsip') {
 			// If Registration is seto to 'Receive', we don't need a server definition
