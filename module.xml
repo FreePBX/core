@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.119.1</version>
+	<version>13.0.119.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.119.2* FREEPBX-14492 "Require RTP (Media) Encryption" field not importing using bulk handler
 		*13.0.119.1* FREEPBX-13990 Add case insensitive validation for SIP trunk peer names, FREEPBX-12425 Bulk Handler - Sensible default for technology should be SIP	
 		*13.0.119* FREEPBX-12151 PJSIP MWI Auto subscription
 		*13.0.118.18* FREEPBX-14390 Add support for users to add/modify pjsip global context			
