@@ -175,7 +175,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
-			"mediaencryptionoptimistic'" => array(
+			"mediaencryptionoptimistic" => array(
 				"value" => "no",
 				"flag" => $flag++
 			),
