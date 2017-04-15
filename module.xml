@@ -146,6 +146,45 @@
 			<field name="description" type="string" length="40" default=""/>
 			<field name="did" type="string" length="60" default=""/>
 		</table>
+		<table name="outbound_route_patterns">
+			<field name="route_id" type="integer" primarykey="true"/>
+			<field name="match_pattern_prefix" type="string" length="60" default="" primarykey="true"/>
+			<field name="match_pattern_pass" type="string" length="60" default="" primarykey="true"/>
+			<field name="match_cid" type="string" length="60" default="" primarykey="true"/>
+			<field name="prepend_digits" type="string" length="100" default="" primarykey="true"/>
+		</table>
+		<table name="outbound_route_sequence">
+			<field name="route_id" type="integer" primarykey="true"/>
+			<field name="seq" type="integer" primarykey="true"/>
+		</table>
+		<table name="outbound_route_trunks">
+			<field name="route_id" type="integer" primarykey="true"/>
+			<field name="trunk_id" type="integer" primarykey="true"/>
+			<field name="seq" type="integer" primarykey="true"/>
+		</table>
+		<table name="outbound_routes">
+			<field name="route_id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="name" type="string" length="40" notnull="false"/>
+			<field name="outcid" type="string" length="40" notnull="false"/>
+			<field name="outcid_mode" type="string" length="20" notnull="false"/>
+			<field name="password" type="string" length="30" notnull="false"/>
+			<field name="emergency_route" type="string" length="4" notnull="false"/>
+			<field name="intracompany_route" type="string" length="4" notnull="false"/>
+			<field name="mohclass" type="string" length="80" notnull="false"/>
+			<field name="time_group_id" type="integer" notnull="false"/>
+			<field name="dest" type="string" length="255" notnull="false"/>
+			<field name="time_mode" type="string" length="20" default="" notnull="false"/>
+			<field name="calendar_id" type="string" length="255" notnull="false"/>
+			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
+			<field name="timezone" type="string" length="255" notnull="false"/>
+		</table>
+		<table name="trunk_dialpatterns">
+			<field name="trunkid" type="integer" default="0" primarykey="true"/>
+			<field name="match_pattern_prefix" type="string" length="50" default="" primarykey="true"/>
+			<field name="match_pattern_pass" type="string" length="50" default="" primarykey="true"/>
+			<field name="prepend_digits" type="string" length="50" default="" primarykey="true"/>
+			<field name="seq" type="integer" default="0" primarykey="true"/>
+		</table>
 	</database>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
