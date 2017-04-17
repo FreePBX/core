@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1rc1.6</version>
+	<version>14.0.1rc1.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1rc1.7* Merge from 13 to 14
 		*14.0.1rc1.6* FREEPBX-14477 Advanced settings language selection broken
 		*14.0.1rc1.5* FREEPBX-14430 Add values that were removed but are required to define conf settings
 		*14.0.1rc1.4* FREEPBX-14379 Cannot Create Outbound Routes
