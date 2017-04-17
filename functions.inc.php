@@ -716,7 +716,7 @@ class core_conf {
 
 		$table_name = "iax";
 		$output = "";
-		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) where tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
+		$sql = "SELECT tech.keyword,tech.data from $table_name as tech LEFT OUTER JOIN trunks on tech.id = CONCAT('tr-reg-',trunks.trunkid) WHERE `id` LIKE 'tr-reg-%' AND tech.keyword <> 'account' AND (trunks.disabled = 'off' OR trunks.disabled IS NULL)";
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
