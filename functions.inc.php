@@ -2061,7 +2061,7 @@ function core_do_get_config($engine) {
 			$timezone = $route['timezone'];
 			if (is_array($times) && count($times)) {
 				foreach ($times as $time) {
-					if(!empty($timezone)) {
+					if(!empty($timezone) && $timezone != 'default') {
 						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1].$delim.$timezone,$comment);
 					} else {
 						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
