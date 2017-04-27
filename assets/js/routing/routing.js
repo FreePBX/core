@@ -320,6 +320,11 @@ $("#duplicate").click(function(e){
 	//$("#action").val("copyroute");
 });
 $("#routeEdit").submit(function(){
+	tmp_route_name  = $("#routename").val().trim();
+	if($.inArray(tmp_route_name, routing_names) != -1){
+		alert(_("The Route Name '" + tmp_route_name  + "' already used, please use a different name."));
+		return false;
+	}
 	var patlen = 0;
 	if($("#outcid_modeyes").is(":checked") && $("#outcid").val().trim() === "") {
 		warnInvalid($("#outcid"), _("Route CID must be set if Override Extension is set to yes"));

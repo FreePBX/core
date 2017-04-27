@@ -32,7 +32,11 @@ if ($route_seq != 0) {
 }
 
 $last_seq = isset($last_seq)?$last_seq:'';
+$route_names = array();
 foreach ($routepriority as $key => $route) {
+	if($request['id'] != $route['route_id']){
+		$route_names[] = $route['name'];
+	}
 	if ($key == 0 && $route_seq != 0) continue;
 	if ($key == ($route_seq+1)) continue;
 	if ($route_seq == $key) {
@@ -621,3 +625,15 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	<!-- END Dialplan Wizard-->
 
 </div>
+<script>
+var routing_names = new Array();
+<?php
+if(!empty($route_names)){
+	echo "routing_names = [";
+	foreach($route_names as $tmp_name){
+		echo '"'.$tmp_name.'",';
+	}
+	echo "];";
+}
+?>
+</script>
