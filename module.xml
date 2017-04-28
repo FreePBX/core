@@ -1,15 +1,16 @@
 <module>
 	<rawname>core</rawname>
 	<repo>standard</repo>
-	<category>Admin</category>
+	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.119.6</version>
+	<version>13.0.119.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.119.7* Revert menu change
 		*13.0.119.6* FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 		*13.0.119.5* FREEPBX-14644 Core Time Conditions sets "default" in the dialplan
 		*13.0.119.4* FREEPBX-14455 iax_registrations.conf has extra properties
