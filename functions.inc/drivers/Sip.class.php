@@ -134,6 +134,10 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"rtcp_mux" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -425,12 +429,20 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				$tmparr['force_avp'] = array('prompttext' => _('Force AVP'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			}
 
-			if (version_compare($this->version,'11','ge')) {
+			if (version_compare($this->version,'13.15.0','ge')) {
 				unset($select);
 				$select[] = array('value' => 'no', 'text' => _('No'));
 				$select[] = array('value' => 'yes', 'text' => _('Yes'));
 				$tt = _("Whether to Enable ICE Support. Defaults to no. ICE (Interactive Connectivity Establishment) is a protocol for Network Address Translator(NAT) traversal for UDP-based multimedia sessions established with the offer/answer model. This option is commonly enabled in WebRTC setups");
 				$tmparr['icesupport'] = array('prompttext' => _('Enable ICE Support'),'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			}
+
+			if ((version_compare($this->version,'13.15.0','ge') && version_compare($this->version,'14.0','lt')) || version_compare($this->version,'14.4.0','ge')) {
+				unset($select);
+				$select[] = array('value' => 'no', 'text' => _('No'));
+				$select[] = array('value' => 'yes', 'text' => _('Yes'));
+				$tt = _("If enabled, then Asterisk will attempt to use rtcp-mux with whatever it communicates with. Asterisk follows the rules set forth in RFC 5761 with regards to falling back to standard RTCP behavior if the far end does not indicate support for rtcp-mux. As a result the following must be enabled to use WebRTC");
+				$tmparr['rtcp_mux'] = array('prompttext' => _('Enable rtcp Mux'),'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			}
 
 			unset($select);

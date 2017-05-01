@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.119.7</version>
+	<version>13.0.119.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.119.8* FREEPBX-14681 Support rtcp Mux
 		*13.0.119.7* Revert menu change
 		*13.0.119.6* FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 		*13.0.119.5* FREEPBX-14644 Core Time Conditions sets "default" in the dialplan
