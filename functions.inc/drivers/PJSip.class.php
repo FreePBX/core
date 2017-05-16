@@ -182,7 +182,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"device_state_busy_at" => array(
 				"value" => "0",
 				"flag" => $flag++
-			)
+			),
+			"rtcp_mux" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -518,6 +522,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
 					$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
 				}
+				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
+				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
+                                        $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
+                                }
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
@@ -805,7 +813,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		foreach ($this->getAllDevs() as $dev) {
 			$this->generateEndpoint($dev, $retarr);
 		}
-
 		// Check to see if 'Allow Guest' is enabled in SIP Settings. If it is,
 		// we need to create the magic 'anonymous' endpoint.
 		$allowguest = $this->freepbx->Sipsettings->getConfig('allowguest');
@@ -921,6 +928,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['avpf'])) {
 			$endpoint[] = "use_avpf=".$config['avpf'];
+		}
+
+		if (!empty($config['rtcp_mux']) && ((version_compare($this->version,'13.15.0','ge') && version_compare($this->version,'14.0','lt')) || version_compare($this->version,'14.4.0','ge'))) {
+			$endpoint[] = "rtcp_mux=".$config['rtcp_mux'];
 		}
 
 		if (!empty($config['icesupport'])) {
@@ -1222,7 +1233,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendpai" => "no"
+				"sendpai" => "no",
+				"inband_progress" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';

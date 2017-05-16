@@ -189,7 +189,9 @@ $("[id='routinggetlocalprefixes']").click(function(){
 		patterns.push({match:'1855NXXXXXX'});
 		//844 Since 2013
 		patterns.push({match:'1844NXXXXXX'});
-		//Future not implimented 833,822,880-887,889
+		//833 Since 2017
+		patterns.push({match:'1833NXXXXXX'});
+		//Future not implimented 822,880-887,889
 	}
 	if ($('#fwinfo').prop('checked')){
 		//Community Services
@@ -323,6 +325,10 @@ $("#routeEdit").submit(function(){
 	var patlen = 0;
 	if($("#outcid_modeyes").is(":checked") && $("#outcid").val().trim() === "") {
 		warnInvalid($("#outcid"), _("Route CID must be set if Override Extension is set to yes"));
+		return false;
+	}
+	if($("#emergency").is(":checked") && $("#intracompany").is(":checked")){
+		alert(_("Route Type: Emergency and Intra company cann't be selected at the same time."));
 		return false;
 	}
 	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
