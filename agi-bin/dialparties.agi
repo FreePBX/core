@@ -733,6 +733,53 @@ if (! $ds) {
 		$AGI->set_variable('DIALSTATUS','NOANSWER');
 	}
 }
+// Added for RVOL value set based on Rvol MODE{yes,no,never,force,dontcare}
+//we just need to set the RVOl=RVOLPARENT base on RVOL_MODE
+// get all varible needed.
+$rvol_mode    = get_var( $AGI, "RVOL_MODE" );
+$rvol_mode    = trim($rvol_mode);
+
+$rvol    = get_var( $AGI, "RVOL" );
+$rvol    = trim($rvol);
+
+$rvol_parent    = get_var( $AGI, "RVOLPARENT" );
+$rvol_parent    = trim($rvol_parent);
+
+debug("RVOL_MODE '$rvol_mode' ", 1);
+debug("RVOL is: $rvol", 1);
+debug("RVOLPARENT is: $rvol_parent", 1);
+
+switch($rvol_mode){
+	case "force":
+		//set RVOL=RVOLPARENT
+		$AGI->set_variable('__RVOL',$rvol_parent);
+		break;
+
+	case "yes":
+		//set RVOL=RVOLPARENT
+		$AGI->set_variable('__RVOL',$rvol_parent);
+		break;
+
+	case "no":
+		//should not override set again same value
+		$AGI->set_variable('__RVOL',$rvol);
+		break;
+
+	case "never":
+		//should not override set again same value
+		$AGI->set_variable('__RVOL',$rvol);
+		break;
+
+	case "dontcare":
+		//just dontcare !!!!!!
+		break;
+	default :
+		//Do Nothing
+		break;
+
+}
+//END OF RVOL MODIFICATION
+
 
 // EOF dialparties.agi
 exit( 0 );
