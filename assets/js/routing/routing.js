@@ -327,6 +327,10 @@ $("#routeEdit").submit(function(){
 		warnInvalid($("#outcid"), _("Route CID must be set if Override Extension is set to yes"));
 		return false;
 	}
+	if($("#emergency").is(":checked") && $("#intracompany").is(":checked")){
+		alert(_("Route Type: Emergency and Intra company cann't be selected at the same time."));
+		return false;
+	}
 	$("#dptable").find('input').each(function(){patlen += $(this).val().length;});
 	if($("[name='pattern_file']").val().length > 0){
 		patlen += 1;
