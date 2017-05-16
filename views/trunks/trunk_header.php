@@ -271,7 +271,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 									<div class="row">
 										<div class="col-md-12">
-											<span id="hcid-help" class="help-block fpbx-help-block"><?php echo _("Hide the outbound Caller ID, The same as adding hidden to Outbound CID")?></span>
+											<span id="hcid-help" class="help-block fpbx-help-block"><?php echo _("Hide the outbound Caller ID, The same as adding hidden to Outbound CID. This option will work only if the 'CID Options' set as 'Force Trunk CID'.")?></span>
 										</div>
 									</div>
 								</div>
