@@ -63,8 +63,8 @@ $at = ($at != "none" && $at != "inherit") ? $at : '';
 $ext->add($mcontext,$exten,'', new ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
 
 //Now set Alert Info
-$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"!="" & "${ALERT_INFO}"!=""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${RVOL}'));
-$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"="" & "${ALERT_INFO}"!="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
+$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"!=""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${RVOL}'));
+$ext->add($mcontext,$exten,'', new ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'ALERT_INFO=${ALERT_INFO}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
 $ext->add($mcontext,$exten,'', new ext_gosubif('$["${ALERT_INFO}"!="" & "${ALERT_INFO}"!=" "]', 'func-set-sipheader,s,1', false, 'Alert-Info,${ALERT_INFO}'));
 // This is now broken. SIPADDHEADER needs to be a hash. TODO figure out how to fix this
 // $ext->add($mcontext,$exten,'', new ext_execif('$["${SIPADDHEADER}"!=""]', 'SIPAddHeader', '${SIPADDHEADER}'));
