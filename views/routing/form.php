@@ -629,11 +629,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 var routing_names = new Array();
 <?php
 if(!empty($route_names)){
-	echo "routing_names = [";
-	foreach($route_names as $tmp_name){
-		echo '"'.$tmp_name.'",';
-	}
-	echo "];";
+	echo "routing_names = " . json_encode($route_names) . ";";
 }
 ?>
 </script>
