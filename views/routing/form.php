@@ -626,7 +626,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 
 </div>
 <script>
-var routing_names = new Array();
+var routing_names = [];
 <?php
 if(!empty($route_names)){
 	echo "routing_names = " . json_encode($route_names) . ";";
