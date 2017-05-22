@@ -1439,8 +1439,6 @@ $set['level'] = 4;
 $set['readonly'] = 0;
 $freepbx_conf->define_conf_setting('HTTPTLSPRIVATEKEY',$set);
 
-$freepbx_conf->commit_conf_settings();
-
 if($httpupdate) {
 	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf')) {
 		$settings = array();
@@ -1526,7 +1524,6 @@ $set['type'] = CONF_TYPE_INT;
 $set['level'] = 4;
 $set['readonly'] = 0;
 $freepbx_conf->define_conf_setting('HTTPSESSIONKEEPALIVE',$set);
-$freepbx_conf->commit_conf_settings();
 
 $migrate = array("sessionlimit" => "HTTPSESSIONLIMIT","session_inactivity" => "HTTPSESSIONINACTIVITY","session_keep_alive" => "HTTPSESSIONKEEPALIVE");
 if(file_exists($amp_conf['ASTETCDIR'].'/http_custom.conf')) {
@@ -1545,6 +1542,21 @@ if(file_exists($amp_conf['ASTETCDIR'].'/http_custom.conf')) {
 	}
 	file_put_contents($amp_conf['ASTETCDIR'].'/http_custom.conf',$contents);
 }
+
+// HTTPWEBSOCKETMODE
+$set['value'] = 'auto';
+$set['defaultval'] =& $set['value'];
+$set['options'] = array('auto','sip','pjsip');
+$set['name'] = 'Force WebSocket Mode';
+$set['description'] = "If set to anything other than auto Asterisk will be forced to use the technology set here for all websocket communication. Asterisk can not work with both drivers at the same time!";
+$set['readonly'] = 1;
+$set['hidden'] = 0;
+$set['level'] = 5;
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_SELECT;
+$freepbx_conf->define_conf_setting('HTTPWEBSOCKETMODE',$set);
+
+unset($set);
 //
 // CATEGORY: GUI Behavior
 //
@@ -1578,7 +1590,6 @@ $set['level'] = 1;
 $set['readonly'] = 0;
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('ENABLEOLDDIALPATTERNS',$set);
-$freepbx_conf->commit_conf_settings();
 
 unset($set);
 // RSSFEEDS
@@ -1597,7 +1608,6 @@ $set['options'] = '';
 $set['module'] = '';
 $set['type'] = CONF_TYPE_TEXTAREA;
 $freepbx_conf->define_conf_setting('RSSFEEDS',$set);
-$freepbx_conf->commit_conf_settings();
 
 unset($set);
 
@@ -1624,19 +1634,16 @@ $set['options'] = array("inherit","ring1","ring2","ring3","ring4","ring5");
 $set['module'] = '';
 $set['type'] = CONF_TYPE_CSELECT;
 $freepbx_conf->define_conf_setting('INTERNALALERTINFO',$set);
-$freepbx_conf->commit_conf_settings();
 
 $set['name'] = 'Attended Transfer Alert Info';
 $set['description'] = "Alert Info to use on Attended Transfer Calls. 'Inherit' will use the previously set Alert Info. Note: Attended Transfer detection only works in Asterisk 12 or higher";
 $set['value'] = $ATTTRANSALERTINFO;
 $freepbx_conf->define_conf_setting('ATTTRANSALERTINFO',$set);
-$freepbx_conf->commit_conf_settings();
 
 $set['name'] = 'Blind Transfer Alert Info';
 $set['description'] = "Alert Info to use on Blind Transfer Calls. 'Inherit' will use the previously set Alert Info";
 $set['value'] = $BLINDTRANSALERTINFO;
 $freepbx_conf->define_conf_setting('BLINDTRANSALERTINFO',$set);
-$freepbx_conf->commit_conf_settings();
 
 $timezone = 'UTC';
 if (is_link('/etc/localtime')) {

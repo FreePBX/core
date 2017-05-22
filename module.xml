@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.119.10</version>
+	<version>13.0.119.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.119.11* FREEPBX-14333 Configurable force_websocket mode
 		*13.0.119.10* FREEPBX-14809 - in macro-dial and macro-dial-one ensure ALERT_INFO
 		*13.0.119.9* FREEPBX-14688 FREEPBX-14558 FREEPBX-14559 FREEPBX-14596 FREEPBX-14194
 		*13.0.119.8* FREEPBX-14681 Support rtcp Mux
