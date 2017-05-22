@@ -379,6 +379,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'retry_interval' => $trunk['retry_interval'],
 					'max_retries' => $trunk['max_retries'],
 					'expiration' => $trunk['expiration'],
+					'line' => 'yes',
+					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
 				if(!empty($trunk['contact_user'])) {
