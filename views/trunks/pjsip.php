@@ -764,6 +764,33 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
                         </div>
                 </div>
                 <!--END inpand_progress-->
+  <!--Send direct_media-->
+                <div class="element-container">
+                        <div class="row">
+                                <div class="col-md-12">
+                                        <div class="row">
+                                                <div class="form-group">
+                                                        <div class="col-md-3">
+                                                                <label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
+                                                                <i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
+                                                        </div>
+                                                        <div class="col-md-9 radioset">
+                            <input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
+                            <label for="direct_mediayes"><?php echo _("Yes");?></label>
+                            <input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
+                            <label for="direct_mediano"><?php echo _("No");?></label>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="row">
+                                <div class="col-md-12">
+                                        <span id="direct_media-help" class="help-block fpbx-help-block"><?php echo _("Determines whether media may flow directly between endpoints..")?></span>
+                                </div>
+                        </div>
+                </div>
+                <!--END direct_media-->
 
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
