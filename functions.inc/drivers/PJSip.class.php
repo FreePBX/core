@@ -528,6 +528,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
                                         $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
                                 }
+				
+				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
+				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
+                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
+                                }
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
@@ -1236,7 +1241,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"dtmfmode" => "rfc4733",
 				"language" => "",
 				"sendpai" => "no",
-				"inband_progress" => "no"
+				"inband_progress" => "no",
+				"direct_media" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';

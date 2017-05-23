@@ -1376,7 +1376,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"recording_ondemand" => "disabled",
 			"recording_priority" => "10",
 			"answermode" => "disabled",
-			"intercommode" => "yes"
+			"intercommode" => "yes",
+			"cid_masquerade" => ""
 		);
 	}
 
@@ -2793,6 +2794,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($device['id']);
 					unset($device['name']);
 					unset($device['account']);
+				}
+				$tmp_user_data = $this->getUser($user['extension']);
+				if(isset($tmp_user_data['cid_masquerade'])) {
+					$user['cid_masquerade'] = $tmp_user_data['cid_masquerade'];
 				}
 				$data[$user['extension']] = array_merge($user, $device);
 			}

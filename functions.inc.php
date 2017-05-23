@@ -1020,6 +1020,7 @@ function core_do_get_config($engine) {
 	switch($engine) {
 		case "asterisk":
 		$ast_ge_10 = version_compare($version, '10', 'ge');
+		$ast_ge_137 = version_compare($version, '13.7', 'ge');
 
 		// Now add to sip_general_addtional.conf
 		//
@@ -1027,6 +1028,9 @@ function core_do_get_config($engine) {
 		if (isset($core_conf) && is_a($core_conf, "core_conf")) {
 			$useragent = $amp_conf['SIPUSERAGENT'] . '-' . getversion() . "($version)";
 			$core_conf->addSipGeneral('useragent', $useragent);
+			if($ast_ge_137 && $amp_conf['HTTPWEBSOCKETMODE'] !== 'auto') {
+				$core_conf->addSipGeneral('websocket_enabled', ($amp_conf['HTTPWEBSOCKETMODE'] == 'sip' ? 'true' : 'false'));
+			}
 			$core_conf->addIaxGeneral('disallow','all');
 			$core_conf->addIaxGeneral('allow','ulaw');
 			$core_conf->addIaxGeneral('allow','alaw');
