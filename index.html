@@ -1,0 +1,222 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+    <meta name="application-name" content="Crowd" display-name="Crowd">
+    <title>Atlassian Crowd - Login</title>
+    <link rel="shortcut icon" href="/console/favicon.ico">
+
+    <script>
+window.WRM=window.WRM||{};window.WRM._unparsedData=window.WRM._unparsedData||{};window.WRM._unparsedErrors=window.WRM._unparsedErrors||{};
+WRM._unparsedData["com.atlassian.plugins.atlassian-plugins-webresource-plugin:context-path.context-path"]="\"\"";
+WRM._unparsedData["com.atlassian.analytics.analytics-client:policy-update-init.policy-update-data-provider"]="false";
+WRM._unparsedData["com.atlassian.analytics.analytics-client:programmatic-analytics-init.programmatic-analytics-data-provider"]="false";
+if(window.WRM._dataArrived)window.WRM._dataArrived();</script>
+<link type="text/css" rel="stylesheet" href="/s/43f677f30f48783db6eb8227ce5bad3c-CDN/727/1/b84d229ee656e5004e69c63584cae52e/_/download/contextbatch/css/atl.admin,-_super/batch.css?analytics-enabled=true&amp;analytics-uploadable=true&amp;nps-acknowledged=true&amp;supportedApplication=true" data-wrm-key="atl.admin,-_super" data-wrm-batch-type="context" media="all">
+<script type="text/javascript" src="/s/d41d8cd98f00b204e9800998ecf8427e-CDN/727/1/62203b88c44cc9a786b3251dc520e981/_/download/contextbatch/js/_super/batch.js" data-wrm-key="_super" data-wrm-batch-type="context" data-initially-rendered></script>
+<script type="text/javascript" src="/s/4671b289e393608cdac0d709b28fe593-CDN/727/1/b84d229ee656e5004e69c63584cae52e/_/download/contextbatch/js/atl.admin,-_super/batch.js?analytics-enabled=true&amp;analytics-uploadable=true&amp;locale=en-US&amp;nps-acknowledged=true&amp;supportedApplication=true" data-wrm-key="atl.admin,-_super" data-wrm-batch-type="context" data-initially-rendered></script>
+
+    <meta name="help.url" content="Logging+in+to+Crowd"/>
+    <meta name="bodyCssClass" content="aui-page-focused aui-page-focused-medium"/>
+    <meta name="decorator" content="atl.general"/>
+    <!--[if lte IE 9]><script>
+        AJS.$(function () {
+            AJS.$('[autofocus]:not(:focus)').eq(0).focus();
+        });
+    </script><![endif]-->
+    <script>
+        // Sets the help link. Called from tabbed pages to change the help link when different tabs are selected.
+        function setHelpLink(helpHref) {
+            document.getElementById('helpLink').href = 'https://docs.atlassian.com/crowd/docs-0211/' + helpHref;
+        }
+    </script>
+</head>
+
+<body class='aui-page-focused aui-page-focused-medium'>
+    <div id="page">
+        <header id="header" role="banner">
+            <nav class="aui-header aui-dropdown2-trigger-group" role="navigation">
+                <div class="aui-header-inner">
+                    <div class="aui-header-primary">
+                        <h1 id="logo" class="aui-header-logo aui-header-logo-crowd"><a href="/"><span class="aui-header-logo-device">Crowd</span></a></h1>
+                        <ul class="aui-nav">
+                            
+                        </ul>
+                    </div>
+                </div><!-- .aui-header-inner-->
+                <div class="aui-header-secondary">
+                    <ul class="aui-nav">
+                        <li>
+                            <a id="helpLink" href="https://docs.atlassian.com/crowd/docs-0211/Logging+in+to+Crowd" target="_crowdhelp">
+                                <span class="aui-icon aui-icon-small aui-iconfont-help">Help</span>
+                            </a>
+                        </li>
+                        
+                        
+                    </ul>
+                </div>
+            </nav><!-- .aui-header -->
+        </header>
+
+        <section id="content" role="main">
+            <div class="aui-page-panel">
+                <div class="aui-page-panel-inner">
+                    
+                    <section class="aui-page-panel-content">
+                        <h1>Log in to Crowd Console</h1>
+
+
+
+
+
+    <!-- The double use of console is necessary to get Webwork 2.2.6 to render the form action url properly. -->
+    
+    
+    
+    
+    
+    
+
+
+
+<form id="login" class="aui" action="/console/j_security_check" method="post"><div class="field-group">
+    
+
+<label for="j_username">
+    Username
+    
+</label>
+
+
+
+<input type="text"
+        name="j_username"
+        
+        
+        value=""
+        
+        
+        
+        
+        
+        id="j_username"
+        
+        class="text"
+        autofocus
+        
+        
+
+
+/>
+
+    
+    
+
+
+
+
+
+</div>
+
+
+
+    
+        
+        
+    
+
+
+
+
+
+    
+
+<div class="field-group">
+    
+
+<label for="j_password">
+    Password
+    
+</label>
+
+
+
+<input type="password"
+        name="j_password"
+        
+        
+        
+        
+        
+        
+        
+        
+        id="j_password"
+        
+        class="password"
+        
+        
+        
+
+
+/>
+
+    
+    
+
+
+
+
+
+</div>
+        
+            <div class="buttons-container"><div class="buttons"><input type="submit"  class="aui-button aui-button-primary" aria-disabled="false" value="Log in" />
+                    
+                    
+                        <a href="/console/forgottenlogindetails!default.action" id="forgottenlogindetails" class="aui-button aui-button-link" tabindex="0">Can&#39;t access your account?</a></div></div>
+            
+        
+        
+            
+
+
+<input type="hidden"
+       name="atl_token"
+         value="b1e06ce27a59fa62835d66cfc466e64eba246353"
+         id="atl_token"
+        /></form>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <footer id="footer" role="contentinfo">
+            <div class="footer-body">
+                <p>
+                    Powered by <a href="https://www.atlassian.com/software/crowd/">Atlassian Crowd</a>
+                    Version:&nbsp;2.11.2 (Build:#727 - 2017-03-31) 
+                </p>
+                
+                <ul>
+                    <li><a href="https://jira.atlassian.com/browse/CWD">Report a bug</a></li>
+                    <li><a href="https://jira.atlassian.com/browse/CWD">Request a feature</a></li>
+                    <li><a href="/about.jsp">About</a></li>
+                    <li><a href="https://www.atlassian.com/about/contact.jsp">Contact Atlassian</a></li>
+                </ul>
+                <div id="footer-logo"><a href="https://www.atlassian.com/">Atlassian</a></div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+
+</html>
