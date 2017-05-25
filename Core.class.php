@@ -1443,7 +1443,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"flag" => $flag++
 			),
 			"callerid" => array(
-				"value" => "device <".$number.">",
+				"value" => "$displayname <".$number.">",
 				"flag" => $flag++
 			)
 		);
