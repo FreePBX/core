@@ -22,6 +22,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	private $_global = array();
 	private $_registration = array();
 	private $_identify = array();
+	private $_customEndpoints = array();
 
 	public function __construct($freepbx) {
 		parent::__construct($freepbx);
@@ -655,6 +656,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {string} $value   The Value
 	 */
 	public function addEndpoint($section, $key, $value) {
+		if (!array_key_exists($section, $this->_endpoint)) {
+			$this->_customEndpoints[] = $section;
+		}
 		$this->_endpoint[$section][] = array('key' => $key, 'value' => $value);
 	}
 
@@ -832,6 +836,21 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "allow=all";
 			$endpoint[] = "transport=udp,tcp,ws,wss";
 			$retarr["pjsip.endpoint.conf"]["anonymous"] = $endpoint;
+		}
+
+		// add endpoint sections not present in devices
+		foreach ($this->_customEndpoints as $section) {
+			if (empty($this->_endpoint[$section]) || !is_array($this->_endpoint[$section])) {
+				continue;
+			}
+			$custom = array("type=endpoint");
+			foreach ($this->_endpoint[$section] as $entry) {
+				$custom[] = "{$entry['key']}={$entry['value']}";
+			}
+			if (isset($retarr["pjsip.endpoint.conf"][$section])) {
+				throw new \Exception("Custom endpoint $section already exists.");
+			}
+			$retarr["pjsip.endpoint.conf"][$section] = $custom;
 		}
 
 		return $retarr;
