@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.119.12</version>
+	<version>13.0.120.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.1* FREEPBX-14849, FREEPBX-14717, FREEPBX-14565, FREEPBX-14735
 		*13.0.119.12* FREEPBX-14812 Implement PJSIP registration 'line' option
 		*13.0.119.11* FREEPBX-14333 Configurable force_websocket mode
 		*13.0.119.10* FREEPBX-14809 - in macro-dial and macro-dial-one ensure ALERT_INFO
