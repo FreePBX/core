@@ -38,7 +38,6 @@ if($extdisplay){
 	$description = htmlspecialchars($description);
 	$extension   = htmlspecialchars($extension);
 	$cidnum      = htmlspecialchars($cidnum);
-	$alertinfo   = htmlspecialchars($alertinfo);
 	$grppre      = htmlspecialchars($grppre);
 	$heading = '<h2>'._("Route").': ';
 	if($description){
