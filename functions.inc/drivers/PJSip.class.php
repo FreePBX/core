@@ -999,6 +999,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
+		$endpoint[] = "bind_rtp_to_media_address=yes";
+
 		if($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
 			$l = $this->freepbx->Soundlang->getLanguage();
 			if(!empty($l)) {
