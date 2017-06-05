@@ -1001,7 +1001,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
+		$binds = \FreePBX::Sipsettings()->getBinds();
+		if (!isset($binds['pjsip'])) {
+			$bindaddr = "0.0.0.0";
+		} else {
+			$bindaddr = key($binds['pjsip']);
+		}
 		$endpoint[] = "bind_rtp_to_media_address=yes";
+		$endpoint[] = "media_address=$bindaddr";
+
 
 		if($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage')) {
 			$l = $this->freepbx->Soundlang->getLanguage();
