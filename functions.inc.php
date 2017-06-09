@@ -1731,6 +1731,7 @@ function core_do_get_config($engine) {
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gosubif('$["${PREFIX_TRUNK_'.$trunkprops['trunkid'].'}" != ""]','sub-flp-'.$trunkprops['trunkid'].',s,1'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_TRUNK',$trunkprops['trunkid']));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'hangit',new ext_hangup());
 					break;
