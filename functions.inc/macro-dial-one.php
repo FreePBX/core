@@ -97,14 +97,16 @@ $ext->add($mcontext,$exten,'godial', new ext_macro('dialout-one-predial-hook'));
 
 //dont allow inbound callers to transfer around inside the system
 $ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}I'));
-$ext->add($mcontext,$exten,'dialapp', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}b(func-apply-sipheaders^s^1)'));
+$ext->add($mcontext,$exten,'dialapp', new ext_noop(''));
+$ext->add($mcontext,$exten,'', new ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}b(func-apply-sipheaders^s^1)'));
 $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
 $ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
 $ext->add($mcontext,$exten,'', new ext_gosubif('$[("${SCREEN}"!=""&("${DIALSTATUS}"="TORTURE"|"${DIALSTATUS}"="DONTCALL"))|"${DIALSTATUS}"="ANSWER"]','s-${DIALSTATUS},1'));
 
 $ext->add($mcontext,$exten,'', new ext_macroexit());
-$ext->add($mcontext,$exten,'nodial', new ext_execif('$["${DIALSTATUS}" = ""]', 'Set', 'DIALSTATUS=NOANSWER'));
+$ext->add($mcontext,$exten,'nodial', new ext_noop(''));
+$ext->add($mcontext,$exten,'', new ext_execif('$["${DIALSTATUS}" = ""]', 'Set', 'DIALSTATUS=NOANSWER'));
 $ext->add($mcontext,$exten,'', new ext_noop('Returned from dial-one with nothing to call and DIALSTATUS: ${DIALSTATUS}'));
 $ext->add($mcontext,$exten,'', new ext_macroexit());
 
