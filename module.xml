@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.3</version>
+	<version>13.0.120.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.4* Fix a bug in pjsip contacts in dialparties
 		*13.0.120.3* FREEPBX-14735 - fix error on 0.0.0.0
 		*13.0.120.2* FREEPBX-14819 FREEPBX-14919 FREEPBX-14861
 		*13.0.120.1* FREEPBX-14849, FREEPBX-14717, FREEPBX-14565, FREEPBX-14735
