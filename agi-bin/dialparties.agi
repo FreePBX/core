@@ -684,30 +684,27 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 //dont allow inbound callers to transfer around inside the system
 $dir = get_var( $AGI, "DIRECTION" );
 $dialopts = ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
-
 if (!strlen($ds)) {
 	$AGI->noop('');
 } else {
-	$ds_seperator = ',';
-
 	if (($rgmethod == "hunt") || ($rgmethod == "memoryhunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
-		$ds = $ds_seperator;
+		$ds = ',';
 		if ($timer) {
 			$ds .= $timer;
 		}
-		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
+		$ds .= ',' . $dialopts; // pound to transfer, provide ringing
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_variable("HuntMembers",$loops);
 		$AGI->set_priority("huntdial"); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
 	} else {
-		$ds .= $ds_seperator;
+		$ds .= ',';
 		if ($timer) {
 			$ds .= $timer;
 			if (trim($use_confirmation) != "FALSE") {
 				$AGI->set_variable('__RT',$timer);
 			}
 		}
-		$ds .= $ds_seperator . $dialopts; // pound to transfer, provide ringing
+		$ds .= ',' . $dialopts; // pound to transfer, provide ringing
 		if ($screen) {
 			$ds .= "p";
 		}
@@ -776,10 +773,11 @@ switch($rvol_mode){
 	default :
 		//Do Nothing
 		break;
-
 }
 //END OF RVOL MODIFICATION
 
+$AGI->set_variable('TIMEOUT',$timer);
+$AGI->set_variable('DIALOPTS',$dialopts);
 
 // EOF dialparties.agi
 exit( 0 );
@@ -830,7 +828,12 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 				if (substr($ds, 0, 5) === "PJSIP") {
 					debug("Discovered PJSIP Endpoint $ds", 2);
 					$ds = get_var($agi, "PJSIP_DIAL_CONTACTS(".substr($ds, 6).")");
-					debug("Ended up with real PJSIP Dial string $ds", 3);
+					if(!empty($ds)) {
+						debug("Ended up with real PJSIP Dial string $ds", 3);
+					} else {
+						debug("Ended up with no PJSIP contacts", 3);
+						continue;
+					}
 				}
 				$dialstring .= $ds.'&';
 			} else {
