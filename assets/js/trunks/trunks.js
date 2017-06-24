@@ -399,6 +399,18 @@ $(document).ready(function() {
 				return false;
 			}
 		}
+		if (!isEmpty(theForm.channelid.value)) {
+			var tmp_channelid_index = $.inArray(theForm.channelid.value.trim(), trunk_channelids);
+			if(tmp_channelid_index != -1) {
+				return warnInvalid(theForm.channelid, theForm.channelid.value.trim()  + _(" already used in ") + trunk_names[tmp_channelid_index] + _(",please use a different Trunk Name."));
+			}
+		}
+		if (!isEmpty(theForm.usercontext.value)) {
+			var tmp_usercontext_index = $.inArray(theForm.usercontext.value.trim(), trunk_usercontexts);
+			if(tmp_usercontext_index != -1) {
+				return warnInvalid(theForm.usercontext, theForm.usercontext.value.trim()  + _(" already used in ") + trunk_names[tmp_usercontext_index] + _(",please use a different USER Context."));
+			}
+		}
 
 		clearPatterns();
 		if (validatePatterns()) {

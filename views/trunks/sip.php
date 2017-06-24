@@ -1,3 +1,34 @@
+<?php
+$trunk_list = \FreePBX::Core()->listTrunks();
+if($trunk_list){
+	$trunk_names = array();
+	$trunk_channelids = array();
+	$trunk_usercontexts = array();
+	foreach($trunk_list as $tmp_trunk){
+		if($extdisplay !=  'OUT_' . $tmp_trunk['trunkid']){
+			$trunk_channelids[] = $tmp_trunk['channelid'];
+			$trunk_usercontexts[] = $tmp_trunk['usercontext'];
+			$trunk_names[] = $tmp_trunk['name'];
+              	}
+	}
+}
+?>
+<script>
+var trunk_names = [];
+var trunk_channelids = [];
+var trunk_usercontexts = [];
+<?php
+if(!empty($trunk_names)){
+		echo "trunk_names = " . json_encode($trunk_names) . ";";
+}
+if(!empty($trunk_channelids)){
+		echo "trunk_channelids = " . json_encode($trunk_channelids) . ";";
+}
+if(!empty($trunk_usercontexts)){
+		echo "trunk_usercontexts = " . json_encode($trunk_usercontexts) . ";";
+}
+?>
+</script>
 <ul class="nav nav-tabs" role="tablist">
 	<li role="presentation" data-name="sipoutset" class="change-tab active">
 		<a href="#sipoutset" aria-controls="sipoutset" role="tab" data-toggle="tab">
