@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1rc1.12</version>
+	<version>14.0.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1* Stable release
 		*14.0.1rc1.12* Bump from 13
 		*14.0.1rc1.11* FREEPBX-10489, FREEPBX-10139
 		*14.0.1rc1.10* FREEPBX-14735
