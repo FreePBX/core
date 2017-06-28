@@ -398,13 +398,21 @@ $(document).ready(function() {
 		}
 		if (!isEmpty(theForm.channelid.value)) {
 			var tmp_channelid_index = $.inArray(theForm.channelid.value.trim(), trunk_channelids);
-			if(tmp_channelid_index != -1) {
+			var tmp_channelid_index_2 = $.inArray(theForm.channelid.value.trim(), trunk_usercontexts);
+			if(tmp_channelid_index != -1 || tmp_channelid_index_2 != -1) {
+				if(tmp_channelid_index == -1) {
+					tmp_channelid_index = tmp_channelid_index_2;
+				}
 				return warnInvalid(theForm.channelid, theForm.channelid.value.trim()  + _(" already used in ") + trunk_names[tmp_channelid_index] + _(",please use a different Trunk Name."));
 			}
 		}
 		if (!isEmpty(theForm.usercontext.value)) {
 			var tmp_usercontext_index = $.inArray(theForm.usercontext.value.trim(), trunk_usercontexts);
-			if(tmp_usercontext_index != -1) {
+			var tmp_usercontext_index_2 = $.inArray(theForm.usercontext.value.trim(), trunk_channelids);
+			if(tmp_usercontext_index != -1 || tmp_usercontext_index_2 != -1) {
+				if(tmp_usercontext_index == -1) {
+					 tmp_usercontext_index = tmp_usercontext_index_2;
+				}
 				return warnInvalid(theForm.usercontext, theForm.usercontext.value.trim()  + _(" already used in ") + trunk_names[tmp_usercontext_index] + _(",please use a different USER Context."));
 			}
 		}
