@@ -111,6 +111,8 @@ $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $s = 'ANSWER';
 $ext->add($c,$s,'answered', new ext_noop('Call successfully answered - Hanging up now'));
+//FREEPBX-14952 Caller Post Hangup Destination option under Virtual Queue is broken.
+$ext->add($c,$s,'', new ext_gotoif('$["${CALLER_DEST}"!=""&&"${DIALSTATUS}"="ANSWER"]','${CUT(CALLER_DEST,^,1)},${CUT(CALLER_DEST,^,2)},${CUT(CALLER_DEST,^,3)}'));
 $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $ext->add($c,'h','', new ext_macro('hangupcall'));
