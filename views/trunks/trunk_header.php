@@ -42,7 +42,7 @@ switch($tech){
 	default:
 	break;
 }
-if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_FIELD']){
+//FREEPBX-15008 Consider enabling DISPLAY_MONITOR_TRUNK_FAILURES_FIELD by default
 	$mtfhtml = '<!--MONITOR TRUNK FAILURES-->';
 	$mtfhtml .= '<div class="element-container">';
 	$mtfhtml .= '	<div class="row">';
@@ -80,7 +80,7 @@ if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_
 	$mtfhtml .= '	</div>';
 	$mtfhtml .= '</div>';
 	$mtfhtml .= '<!--END MONITOR TRUNK FAILURES-->';
-}
+
 $dpmrtop = _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occurred. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.").'<br /><br />';
 $dpmrhtml .= '<b>' . _("Rules:") . '</b><br />';
 $dpmrhtml .= '<strong>X</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 0-9") . '<br />';
