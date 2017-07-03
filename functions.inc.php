@@ -2414,10 +2414,7 @@ function core_do_get_config($engine) {
 		$context = 'sub-diversion-header';
 		$exten = 's';
 		$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
-		$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL(channeltype)}"="PJSIP"]', 'pjsip'));
-		$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
-		$ext->add($context, $exten, '', new ext_return(''));
-		$ext->add($context, $exten, 'pjsip', new ext_set('PJSIP_HEADER(add,Diversion)','\;privacy=off\;screen=no\;reason=${DIVERSION_REASON})'));
+		$ext->add($context, $exten, '', new ext_gosub('1','s','func-set-sipheader','Diversion,<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
 		$ext->add($context, $exten, '', new ext_return(''));
 	}
 
