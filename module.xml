@@ -229,6 +229,6 @@
 		</bulkhandler>
 	</hooks>
 	<supported>
-		<version>14.0</version>
+		<version>15.0</version>
 	</supported>
 </module>
