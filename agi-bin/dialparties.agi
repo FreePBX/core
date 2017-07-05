@@ -174,7 +174,8 @@ if ( ($use_confirmation != "FALSE") && ($rgmethod != "ringall") && ($rgmethod !=
 	debug("Unsupported RingMethod with Confirm Calls is set to True: '$rgmethod' resetting to ringall", 1);
 	$rgmethod	= "ringall";
 }
-
+// store all numbers to an array ($longringall for ringallv2 (long numbers : means grouplist having more than 80 charaters)
+$longringall = array();
 // Start with Arg Count set to 3 as two args are used
 $arg_cnt = 3;
 while($arg = get_var($AGI,"ARG". $arg_cnt)) {
@@ -186,6 +187,7 @@ while($arg = get_var($AGI,"ARG". $arg_cnt)) {
 	$extarray = preg_split( '/-/', $arg );
 	foreach ( $extarray as $k ) {
 		$ext[] = $k;
+		$longringall[] = $k;
 		debug("Added extension $k to extension map", 3);
 	}
 	$arg_cnt++;
@@ -574,7 +576,12 @@ foreach ( $ext as $k ) {
 $dial_filtered = implode('-',array_keys($dsarray));
 $AGI->set_variable('FILTERED_DIAL',$dial_filtered);
 debug("Filtered ARG3: $dial_filtered", 3);
-
+//FREEPBX-15219 FMFM with long list of numbers and ringallv2-prim fails
+if ($rgmethod == 'ringallv2') {
+	$longringallgp = implode('-',$longringall);
+	$AGI->set_variable('FMGL_DIAL',$longringallgp);
+	debug("RING ALL V2 : $longringallgp", 3);
+}
 $dshunt		= '';
 $loops		= 0;
 $myhuntmember	= "";

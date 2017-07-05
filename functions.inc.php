@@ -1199,7 +1199,8 @@ function core_do_get_config($engine) {
 		$exten = '_FMGL-.';
 		$ext->add($context, $exten, '', new ext_nocdr(''));
 		$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
-
+		//FREEPBX-15219 FMFM with long list of numbers and ringallv2-prim fails
+		$ext->add($context, $exten, '', new ext_set('DIALNUMS','${IF($[${LEN(${FMGL_DIAL})}>0]?${FMGL_DIAL}:${EXTEN:5}})'));
 		$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
 		$ext->add($context, $exten, 'start', new ext_gotoif('$["${' .$fm_dnd. '}" = "DND"]','dodnd'));
 		$ext->add($context, $exten, '', new ext_wait('1'));
@@ -1210,7 +1211,7 @@ function core_do_get_config($engine) {
 		} else {
 			$ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
 		}
-		$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
+		$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${DIALNUMS}'));
 		$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
 		$ext->add($context, $exten, '', new ext_hangup(''));
 		// n+10(dodnd):
