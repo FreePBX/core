@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.6</version>
+	<version>13.0.120.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.7* FREEPBX-15219 FREEPBX-15090 FREEPBX-14587 FREEPBX-13726
 		*13.0.120.6* FREEPBX-12215 use proper methods to set headers
 		*13.0.120.5* FREEPBX-14861 FREEPBX-14587
 		*13.0.120.4* Fix a bug in pjsip contacts in dialparties
