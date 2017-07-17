@@ -41,6 +41,8 @@ $ext->add($c,$s,'', new ext_macroexit());
 
 //Ringall
 $ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial')); // dialparties will set the priority to 10 if $ds is not null
+$ext->add($c,$s,'', new ext_noop('ringall array ${FMGL_DIAL} '));
+$ext->add($c,$s,'', new ext_set('__FMGL_DIAL','${FMGL_DIAL}'));
 $ext->add($c,$s,'', new ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
 $ext->add($c,$s,'', new ext_set('ITER','1'));
 $ext->add($c,$s,'ndloopbegin', new ext_set('EXTTOCALL','${CUT(FILTERED_DIAL,-,${ITER})}'));
