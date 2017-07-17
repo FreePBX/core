@@ -570,7 +570,40 @@ foreach ( $ext as $k ) {
 		}
 	}
 } // end foreach ( $ext as $k )
-
+//FREEPBX-13726 Follow-me firstnotonphone strategy no longer works as expected
+//if $rgmethod= firstnotonphone then rearrage the number according to their status
+$extenavail  = array();
+$dsarraynew  = array();
+$extarraynew = array();
+if($rgmethod == 'firstnotonphone'){
+	foreach($ext as $k){
+		$status = is_ext_avail($k);
+		if($status == 0){ // taking only the available extensions first
+			$extenavail[]= $k;
+			$dsarraynew[$k] = 1;
+		}
+	}
+	debug("ONLY available extensions ".print_r($extenavail,true), 3);
+//now we should append other numbers to this array. incase noting is available !!!
+	foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier 
+		if(!in_array($key,$extenavail)){
+			$extenavail[] = $key;
+			$dsarraynew[$key] = $k;
+		}
+	}
+	unset($ext);
+	unset($dsarray);
+	$dsarray = $dsarraynew; // reassigning the filtered array
+	$ext =  $extenavil;
+	foreach($extenavail as $filtred){
+		if(in_array($filtred.'#',$extarray)){
+			$extarraynew[] = $filtred.'#';
+		}else{
+			$extarraynew[] = $filtred;
+		}
+	}
+	$extarray = $extarraynew;
+}
 $dial_filtered = implode('-',array_keys($dsarray));
 $AGI->set_variable('FILTERED_DIAL',$dial_filtered);
 debug("Filtered ARG3: $dial_filtered", 3);
