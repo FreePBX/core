@@ -526,13 +526,21 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
-                                }
-				
+					$conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
+				}
+
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
-                                }
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
+				}
+
+				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
+				}
+
+				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
+				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
@@ -1252,7 +1260,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"language" => "",
 				"sendpai" => "no",
 				"inband_progress" => "no",
-				"direct_media" => "no"
+				"direct_media" => "no",
+				"rtp_symmetric" => "no",
+				"rewrite_contact" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
