@@ -3872,7 +3872,9 @@ function core_do_get_config($engine) {
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
-
+	//FREEPBX-13830 and FREEPBX-13025 Call recording stopped after a atxfer (attendend transfer)
+	$ext->add($mcontext, $exten,'', new ext_noop('${CDR(dstchannel)} monior file= ${MIXMONITOR_FILENAME}'));
+	$ext->add($mcontext, $exten,'', new ext_AGI('attendedtransfer-rec-restart.php,${CDR(dstchannel)},${MIXMONITOR_FILENAME}'));
 	$ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
 	/*
