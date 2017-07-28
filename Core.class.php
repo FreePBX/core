@@ -813,6 +813,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 							$val = trim($val);
 						break;
 					}
+					//FREEPBX-11431 Call Forward Ringtimer Default - Setting does not work
+					// lets add CFRINGTIMERDEFAULT value in to asteriskDB so that we can use latter in the dialplan
+					if($key === 'CFRINGTIMERDEFAULT'){
+						$astman = $this->FreePBX->astman;
+						if ($astman->connected()){
+							$astman->database_put("FREEPBXCONF",'CFRINGTIMERDEFAULT',$val);
+						}
+					}
+
 					$freepbx_conf->set_conf_values(array($key => $val),true,$amp_conf['AS_OVERRIDE_READONLY']);
 					$status = $freepbx_conf->get_last_update_status();
 					if ($status[$key]['saved']) {

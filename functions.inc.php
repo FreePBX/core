@@ -5988,7 +5988,7 @@ function core_users_configpageload() {
 				$cfringtimer = 0;
 			}
 		}
-		$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the current Ring Time. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false), $category);
+		$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the advancedsettings Call Forward Ringtimer Default. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false), $category);
 		if (!isset($callwaiting)) {
 			if ($amp_conf['ENABLECW']) {
 				$callwaiting = 'enabled';
