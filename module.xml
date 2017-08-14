@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.8</version>
+	<version>13.0.120.9</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.9* FREEPBX-15535 FREEPBX-15090
 		*13.0.120.8* FREEPBX-14060 On extension creation voicemail tooltip needed
 		*13.0.120.7* FREEPBX-15219 FREEPBX-15090 FREEPBX-14587 FREEPBX-13726
 		*13.0.120.6* FREEPBX-12215 use proper methods to set headers
