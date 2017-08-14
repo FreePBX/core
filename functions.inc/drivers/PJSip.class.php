@@ -171,7 +171,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited",
 				"flag" => $flag++
 			),
-			"mediaencryption" => array(
+			"media_encryption" => array(
 				"value" => "no",
 				"flag" => $flag++
 			),
@@ -425,7 +425,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			$qualify_frequency = 60;
 			if (isset($trunk['qualify_frequency'])) {
-				if( is_int($trunk['qualify_frequency']) && $trunk['qualify_frequency']  >= 0) {
+				if(is_numeric($trunk['qualify_frequency']) &&  is_int($trunk['qualify_frequency']*1) && $trunk['qualify_frequency']  >= 0) {
 					$qualify_frequency = $trunk['qualify_frequency'];
 				}
 			}
@@ -1249,8 +1249,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
+			if(!is_numeric($dispvars['qualify_frequency']) ||  !is_int($dispvars['qualify_frequency']*1) || $dispvars['qualify_frequency'] < 0) {
+					$dispvars['qualify_frequency'] = 60;
+			}
 
-			$dispvars['qualify_frequency'] = !empty($dispvars['qualify_frequency']) ? $dispvars['qualify_frequency'] : 60;
 		} else {
 			$dispvars = array(
 				"auth_rejection_permanent" => "on",

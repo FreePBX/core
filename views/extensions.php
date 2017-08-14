@@ -99,4 +99,9 @@
   $("form").submit(function() {
     return frm_extensions_onsubmit(this);
   });
+  $(document).ready(function() {
+	if(typeof frm_extensions_showVmPwdToolTip !== 'undefined'){
+		frm_extensions_showVmPwdToolTip();
+	}
+  });
 </script>
