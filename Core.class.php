@@ -1372,7 +1372,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"recording_ondemand" => "disabled",
 			"recording_priority" => "10",
 			"answermode" => "disabled",
-			"intercommode" => "yes",
+			"intercom" => "enabled",
 			"cid_masquerade" => ""
 		);
 	}
