@@ -281,7 +281,7 @@
 		<devices needsenginedb="yes">Devices</devices>
 		<did needsenginedb="yes" category="Connectivity">Inbound Routes</did>
 		<dahdichandids category="Connectivity">DAHDI Channel DIDs</dahdichandids>
-		<routing category="Connectivity">Outbound Routes</routing>
+		<routing category="Connectivity" needsenginedb="yes">Outbound Routes</routing>
 		<trunks needsenginedb="yes" category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>
 		<ampusers category="Admin">Administrators</ampusers>
