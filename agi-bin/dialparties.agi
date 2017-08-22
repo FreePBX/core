@@ -611,6 +611,10 @@ $AGI->set_variable('FILTERED_DIAL',$dial_filtered);
 debug("Filtered ARG3: $dial_filtered", 3);
 //FREEPBX-15219 FMFM with long list of numbers and ringallv2-prim fails
 if ($rgmethod == 'ringallv2') {
+	//FREEPBX-15640
+	if(($key = array_search($fmgrp, $longringall)) !== false) {
+		unset($longringall[$key]);
+	}
 	$longringallgp = implode('-',$longringall);
 	$AGI->set_variable('FMGL_DIAL',$longringallgp);
 	debug("RING ALL V2 : $longringallgp", 3);
