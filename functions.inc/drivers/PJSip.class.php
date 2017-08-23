@@ -568,6 +568,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
                                         $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
                                 }
+				if(!empty($trunk['direct_media']) {
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = ($trunk['direct_media'] === "no" ? "no" : "yes");
+				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
