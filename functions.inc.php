@@ -1191,7 +1191,8 @@ function core_do_get_config($engine) {
 		$exten = '_FMGL-.';
 		$ext->add($context, $exten, '', new ext_nocdr(''));
 		$ext->add($context, $exten, '', new ext_noop_trace('In FMGL ${FMGRP} with ${EXTEN:5}'));
-
+		//FREEPBX-15219 FMFM with long list of numbers and ringallv2-prim fails
+		$ext->add($context, $exten, '', new ext_set('DIALNUMS','${IF($[${LEN(${FMGL_DIAL})}>0]?${FMGL_DIAL}:${EXTEN:5})}'));
 		$ext->add($context, $exten, '', new ext_set('ENDLOOP', '$[${EPOCH} + ${FMPRERING} + 2]'));
 		$ext->add($context, $exten, 'start', new ext_gotoif('$["${' .$fm_dnd. '}" = "DND"]','dodnd'));
 		$ext->add($context, $exten, '', new ext_wait('1'));
@@ -1202,7 +1203,7 @@ function core_do_get_config($engine) {
 		} else {
 			$ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
 		}
-		$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${EXTEN:5}'));
+		$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${DIALNUMS}'));
 		$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
 		$ext->add($context, $exten, '', new ext_hangup(''));
 		// n+10(dodnd):
@@ -2272,6 +2273,11 @@ function core_do_get_config($engine) {
 
 	$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','0'));
 	$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
+	//FREEPBX-15217 QUEUE call confirm -> default voice prompt can not override the findmefollowme confirm file
+	//if the {ALT_CONFIRM_MSG}= default| then we should play default msg
+	$ext->add($context, $exten, '', new ext_noop('${ALT_CONFIRM_MSG} and arv= ${ARG1}'));
+	$ext->add($context, $exten, '', new ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ARG1='));
+	$ext->add($context, $exten, '', new ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ALT_CONFIRM_MSG='));
 	$ext->add($context, $exten, '', new ext_setvar('MSG1','${IF($["${ARG1}${ALT_CONFIRM_MSG}"=""]?incoming-call-1-accept-2-decline:${IF($[${LEN(${ALT_CONFIRM_MSG})}>0]?${ALT_CONFIRM_MSG}:${ARG1})})}'));
 	$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
 	$ext->add($context, $exten, '', new ext_read('INPUT', '', 1, '', '', 4));
@@ -2414,10 +2420,7 @@ function core_do_get_config($engine) {
 		$context = 'sub-diversion-header';
 		$exten = 's';
 		$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
-		$ext->add($context, $exten, '', new ext_gotoif('$["${CHANNEL(channeltype)}"="PJSIP"]', 'pjsip'));
-		$ext->add($context, $exten, '', new ext_sipaddheader('Diversion', '<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
-		$ext->add($context, $exten, '', new ext_return(''));
-		$ext->add($context, $exten, 'pjsip', new ext_set('PJSIP_HEADER(add,Diversion)','\;privacy=off\;screen=no\;reason=${DIVERSION_REASON})'));
+		$ext->add($context, $exten, '', new ext_gosub('1','s','func-set-sipheader','Diversion,<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
 		$ext->add($context, $exten, '', new ext_return(''));
 	}
 
@@ -3869,7 +3872,9 @@ function core_do_get_config($engine) {
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
-
+	//FREEPBX-13830 and FREEPBX-13025 Call recording stopped after a atxfer (attendend transfer)
+	$ext->add($mcontext, $exten,'', new ext_noop('${CDR(dstchannel)} monior file= ${MIXMONITOR_FILENAME}'));
+	$ext->add($mcontext, $exten,'', new ext_AGI('attendedtransfer-rec-restart.php,${CDR(dstchannel)},${MIXMONITOR_FILENAME}'));
 	$ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
 	/*
@@ -5970,7 +5975,7 @@ function core_users_configpageload() {
 				$cfringtimer = 0;
 			}
 		}
-		$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the current Ring Time. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false), $category);
+		$currentcomponent->addguielem($section, new gui_selectbox('cfringtimer', $currentcomponent->getoptlist('cfringtime'), $cfringtimer, _("Call Forward Ring Time"), _("Number of seconds to ring during a Call Forward, Call Forward Busy or Call Forward Unavailable call prior to continuing to voicemail or specified destination. Setting to Always will not return, it will just continue to ring. Default will use the advancedsettings Call Forward Ringtimer Default. If voicemail is disabled and their is not destination specified, it will be forced into Always mode"), false), $category);
 		if (!isset($callwaiting)) {
 			if ($amp_conf['ENABLECW']) {
 				$callwaiting = 'enabled';

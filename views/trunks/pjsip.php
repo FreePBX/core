@@ -738,60 +738,113 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 		</div>
 		<!--END Send RPID/PAI-->
 		<!--Send Inband_progress-->
-                <div class="element-container">
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <div class="row">
-                                                <div class="form-group">
-                                                        <div class="col-md-3">
-                                                                <label class="control-label" for="inband_progress"><?php echo _("Inband Progress") ?></label>
-                                                                <i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
-                                                        </div>
-                                                        <div class="col-md-9 radioset">
-                            <input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ($inband_progress == "yes"?"CHECKED":"") ?>>
-                            <label for="inband_progressyes"><?php echo _("Yes");?></label>
-                            <input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ($inband_progress == "yes"?"":"CHECKED") ?>>
-                            <label for="inband_progressno"><?php echo _("No");?></label>
-                                                        </div>
-                                                </div>
-                                        </div>
-                                </div>
-                        </div>
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <span id="inband_progress-help" class="help-block fpbx-help-block"><?php echo _("Determines whether chan_pjsip will indicate ringing using inband progress.")?></span>
-                                </div>
-                        </div>
-                </div>
-                <!--END inpand_progress-->
-  <!--Send direct_media-->
-                <div class="element-container">
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <div class="row">
-                                                <div class="form-group">
-                                                        <div class="col-md-3">
-                                                                <label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
-                                                                <i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
-                                                        </div>
-                                                        <div class="col-md-9 radioset">
-                            <input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
-                            <label for="direct_mediayes"><?php echo _("Yes");?></label>
-                            <input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
-                            <label for="direct_mediano"><?php echo _("No");?></label>
-                                                        </div>
-                                                </div>
-                                        </div>
-                                </div>
-                        </div>
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <span id="direct_media-help" class="help-block fpbx-help-block"><?php echo _("Determines whether media may flow directly between endpoints..")?></span>
-                                </div>
-                        </div>
-                </div>
-                <!--END direct_media-->
-
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="inband_progress"><?php echo _("Inband Progress") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ($inband_progress == "yes"?"CHECKED":"") ?>>
+								<label for="inband_progressyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ($inband_progress == "yes"?"":"CHECKED") ?>>
+								<label for="inband_progressno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="inband_progress-help" class="help-block fpbx-help-block"><?php echo _("Determines whether chan_pjsip will indicate ringing using inband progress.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END inpand_progress-->
+		<!--Send direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
+								<label for="direct_mediayes"><?php echo _("Yes");?></label>
+								<input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
+								<label for="direct_mediano"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="direct_media-help" class="help-block fpbx-help-block"><?php echo _("Determines whether media may flow directly between endpoints.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END direct_media-->
+		<!--Send direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symmetric") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricyes" value="yes" <?php echo ($rtp_symmetric == "yes"?"CHECKED":"") ?>>
+								<label for="rtp_symmetricyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricno" value = "no" <?php echo ($rtp_symmetric == "yes"?"":"CHECKED") ?>>
+								<label for="rtp_symmetricno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END direct_media-->
+		<!--Send direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="rewrite_contact"><?php echo _("Rewrite Contact") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="rewrite_contact"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="rewrite_contact" id="rewrite_contactyes" value="yes" <?php echo ($rewrite_contact == "yes"?"CHECKED":"") ?>>
+								<label for="rewrite_contactyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="rewrite_contact" id="rewrite_contactno" value = "no" <?php echo ($rewrite_contact == "yes"?"":"CHECKED") ?>>
+								<label for="rewrite_contactno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="rewrite_contact-help" class="help-block fpbx-help-block"><?php echo _("Allow Contact header to be rewritten with the source IP address-port.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END direct_media-->
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
 		<br/>

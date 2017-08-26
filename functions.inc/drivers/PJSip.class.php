@@ -171,7 +171,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited",
 				"flag" => $flag++
 			),
-			"mediaencryption" => array(
+			"media_encryption" => array(
 				"value" => "no",
 				"flag" => $flag++
 			),
@@ -423,10 +423,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
 				}
 			}
+			$qualify_frequency = 60;
+			if (isset($trunk['qualify_frequency'])) {
+				if(is_numeric($trunk['qualify_frequency']) &&  is_int($trunk['qualify_frequency']*1) && $trunk['qualify_frequency']  >= 0) {
+					$qualify_frequency = $trunk['qualify_frequency'];
+				}
+			}
 
 			$conf['pjsip.aor.conf'][$tn] = array(
 				'type' => 'aor',
-				'qualify_frequency' => !empty($trunk['qualify_frequency']) ? $trunk['qualify_frequency'] : 60
+				'qualify_frequency' => $qualify_frequency
 			);
 
 			// We only have a contact if we're sending, or not using registrations
@@ -526,13 +532,21 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
-                                }
-				
+					$conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
+				}
+
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
-                                }
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
+				}
+
+				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
+				}
+
+				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
+				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
@@ -1041,7 +1055,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[] = "minimum_expiration=".$config['minimum_expiration'];
 		}
 
-		if (!empty($config['qualifyfreq']))
+		if (isset($config['qualifyfreq']))
 			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
 
 		if (isset($retarr["pjsip.endpoint.conf"][$endpointname])) {
@@ -1235,8 +1249,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
+			if(!is_numeric($dispvars['qualify_frequency']) ||  !is_int($dispvars['qualify_frequency']*1) || $dispvars['qualify_frequency'] < 0) {
+					$dispvars['qualify_frequency'] = 60;
+			}
 
-			$dispvars['qualify_frequency'] = !empty($dispvars['qualify_frequency']) ? $dispvars['qualify_frequency'] : 60;
 		} else {
 			$dispvars = array(
 				"auth_rejection_permanent" => "on",
@@ -1252,7 +1268,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"language" => "",
 				"sendpai" => "no",
 				"inband_progress" => "no",
-				"direct_media" => "no"
+				"direct_media" => "no",
+				"rtp_symmetric" => "no",
+				"rewrite_contact" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';

@@ -41,6 +41,8 @@ $ext->add($c,$s,'', new ext_macroexit());
 
 //Ringall
 $ext->add($c,$s,'normdial', new ext_noop('Returned from dialparties with groups to dial')); // dialparties will set the priority to 10 if $ds is not null
+$ext->add($c,$s,'', new ext_noop('ringall array ${FMGL_DIAL} '));
+$ext->add($c,$s,'', new ext_set('__FMGL_DIAL','${FMGL_DIAL}'));
 $ext->add($c,$s,'', new ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
 $ext->add($c,$s,'', new ext_set('ITER','1'));
 $ext->add($c,$s,'ndloopbegin', new ext_set('EXTTOCALL','${CUT(FILTERED_DIAL,-,${ITER})}'));
@@ -111,6 +113,8 @@ $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $s = 'ANSWER';
 $ext->add($c,$s,'answered', new ext_noop('Call successfully answered - Hanging up now'));
+//FREEPBX-14952 Caller Post Hangup Destination option under Virtual Queue is broken.
+$ext->add($c,$s,'', new ext_gotoif('$["${CALLER_DEST}"!=""&&"${DIALSTATUS}"="ANSWER"]','${CUT(CALLER_DEST,^,1)},${CUT(CALLER_DEST,^,2)},${CUT(CALLER_DEST,^,3)}'));
 $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $ext->add($c,'h','', new ext_macro('hangupcall'));
