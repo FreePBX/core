@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.11</version>
+	<version>13.0.120.12</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.12* FREEPBX-13837
 		*13.0.120.11* FREEPBX-15640 Issue with Follow me ringallv2 strategy
 		*13.0.120.10* FREEPBX-15588
 		*13.0.120.9* FREEPBX-15535 FREEPBX-15090
