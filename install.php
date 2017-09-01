@@ -112,7 +112,7 @@ $globals_convert['MIXMON_DIR'] = '';
 $globals_convert['MIXMON_POST'] = '';
 $globals_convert['MIXMON_FORMAT'] = 'wav';
 
-$globals_convert['DIAL_OPTIONS'] = 'Ttr';
+$globals_convert['DIAL_OPTIONS'] = 'HhTtr';
 $globals_convert['TRUNK_OPTIONS'] = 'T';
 $globals_convert['RINGTIMER'] = '15';
 $globals_convert['TONEZONE'] = 'us';
@@ -337,7 +337,7 @@ $set['module'] = '';
 $set['category'] = 'Dialplan and Operational';
 $set['emptyok'] = 1;
 $set['name'] = 'Asterisk Dial Options';
-$set['description'] = "Options to be passed to the Asterisk Dial Command when making internal calls or for calls ringing internal phones. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. If 'Disallow transfer features for inbound callers' is set to 'Yes' the T option is removed for inbound callers. The r option allows Asterisk to generate ringing back to the calling phones which is needed by some phones and sometimes needed in complex dialplan features that may otherwise result in silence to the caller.";
+$set['description'] = "Options to be passed to the Asterisk Dial Command when making internal calls or for calls ringing internal phones. The options are documented in Asterisk documentation, a subset of which are described here. The default options T and t allow the calling and called users to transfer a call with ##. If 'Disallow transfer features for inbound callers' is set to 'Yes' the T option is removed for inbound callers. The r option allows Asterisk to generate ringing back to the calling phones which is needed by some phones and sometimes needed in complex dialplan features that may otherwise result in silence to the caller. The H and t options allow the in-Call disconnect feature code to function";
 $set['type'] = CONF_TYPE_TEXT;
 $freepbx_conf->define_conf_setting('DIAL_OPTIONS',$set);
 
