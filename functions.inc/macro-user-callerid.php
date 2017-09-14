@@ -49,13 +49,20 @@ $ext->add($context, $exten, '', new ext_execif('$["${ARG1}"="LIMIT" & ${LEN(${AM
 * or where you might set the CID account code based on a user instead of the device settings.
 */
 
-$ext->add($context, $exten, 'report', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
-$ext->add($context, $exten, 'report2', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?6:$[ ${TTL} - 1 ])}'));
+$ext->add($context, $exten, 'report', new ext_noop('Macro Depth is ${MACRO_DEPTH}'));
+$ext->add($context, $exten, '', new ext_gotoif('$["${MACRO_DEPTH}" = "" | ${MACRO_DEPTH} < 6 ]', 'report2','macroerror'));
+$ext->add($context, $exten, 'report2', new ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
+$ext->add($context, $exten, 'report3', new ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
 $ext->add($context, $exten, '', new ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
 $ext->add($context, $exten, '', new ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
 $ext->add($context, $exten, '', new ext_answer());
 $ext->add($context, $exten, '', new ext_wait('1'));
 $ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_0'));
+$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+$ext->add($context, $exten, 'macroerror', new ext_noop('Macro Limit Reached. Aborting Call'));
+$ext->add($context, $exten, '', new ext_answer());
+$ext->add($context, $exten, '', new ext_wait('1'));
+$ext->add($context, $exten, '', new ext_gosub('1', 'lang-playback', $context, 'hook_2'));
 $ext->add($context, $exten, '', new ext_macro('hangupcall'));
 $ext->add($context, $exten, 'limit', new ext_answer());
 $ext->add($context, $exten, '', new ext_wait('1'));
@@ -87,8 +94,12 @@ $ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&an-error-has-occ
 $ext->add($context, $lang, '', new ext_return());
 $ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&your&simul-call-limit-reached&goodbye'));
 $ext->add($context, $lang, '', new ext_return());
+$ext->add($context, $lang, 'hook_2', new ext_playback('im-sorry&an-error-has-occurred'));
+$ext->add($context, $lang, '', new ext_return());
 $lang = 'ja'; //Japanese
 $ext->add($context, $lang, 'hook_0', new ext_playback('im-sorry&call-forwarding&jp-no&an-error-has-occured'));
 $ext->add($context, $lang, '', new ext_return());
 $ext->add($context, $lang, 'hook_1', new ext_playback('beep&im-sorry&simul-call-limit-reached'));
+$ext->add($context, $lang, '', new ext_return());
+$ext->add($context, $lang, 'hook_2', new ext_playback('im-sorry&an-error-has-occured'));
 $ext->add($context, $lang, '', new ext_return());

@@ -2224,14 +2224,20 @@ function core_do_get_config($engine) {
 	}
 
 	if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
-		$states = array(
-			'available' => 'Available',
-			'chat' => 'Chatty',
-			'away' => 'Away',
-			'dnd' => 'DND',
-			'xa' => 'Extended Away',
-			'unavailable' => 'Unavailable'
-		);
+		if(function_exists('presencestate_types_get')) {
+			modgettext::push_textdomain("presencestate");
+			$states = presencestate_types_get();
+			modgettext::pop_textdomain();
+		} else {
+			$states = array(
+				'available' => 'Available',
+				'chat' => 'Chatty',
+				'away' => 'Away',
+				'dnd' => 'DND',
+				'xa' => 'Extended Away',
+				'unavailable' => 'Unavailable'
+			);
+		}
 
 		$context = 'sub-presencestate-display';
 
