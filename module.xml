@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.10</version>
+	<version>14.0.1.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.11* Fix pjsip media encryption name
 		*14.0.1.10* FREEPBX-15840
 		*14.0.1.9* FREEPBX-15631
 		*14.0.1.8* FREEPBX-13837
