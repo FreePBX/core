@@ -196,7 +196,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = parent::getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection);
-		unset($tmparr['videosupport'],$tmparr['session-timers'],$tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
+		unset($tmparr['videosupport'],$tmparr['sessiontimers'],$tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
 		if (version_compare($this->version,'12.5.0','ge')) {
 			$tt = _("Account Code for this extension");
 			$tmparr['accountcode'] = array('prompttext' => _("Account Code"), 'value' => '', 'tt' => $tt, 'level' => 1);
@@ -243,8 +243,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => _('None'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
-		$tt = _("Allow Non-Encrypted Media (Opportunistic SRTP) ").' [media_encryption]';
-		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tt = _("Determines whether res_pjsip will use and enforce usage of media encryption for this endpoint.").' [media_encryption]';
+		$tmparr['media_encryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -258,7 +258,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';
+		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is not set to None.").' [media_encryption_optimistic]';
 		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Allow Non-Encrypted Media (Opportunistic SRTP)'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		$tt = _("The number of in-use channels which will cause busy to be returned as device state. This should be left at 0 unless you know what you are doing");
