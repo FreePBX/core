@@ -2758,6 +2758,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		case "dids":
 			foreach ($rawData as $data) {
 				$exists = $this->getDID($data['extension'], $data['cidnum']);
+				//FREEPBX-15285 bulk handler for did's check case on destination
+				$data['destination'] = strtolower($data['destination']);
 				if(!$replaceExisting && !empty($exists)) {
 					return array("status" => false, "message" => _("DID already exists"));
 				} elseif($replaceExisting && !empty($exists)) {
