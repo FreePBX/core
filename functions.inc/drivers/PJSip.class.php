@@ -421,17 +421,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
 				}
 			}
-			$qualify_frequency = 60;
-			if (isset($trunk['qualify_frequency'])) {
-				if(is_numeric($trunk['qualify_frequency']) &&  is_int($trunk['qualify_frequency']*1) && $trunk['qualify_frequency']  >= 0) {
-					$qualify_frequency = $trunk['qualify_frequency'];
-				}
-			}
 
 			$conf['pjsip.aor.conf'][$tn] = array(
-				'type' => 'aor',
-				'qualify_frequency' => $qualify_frequency
+				'type' => 'aor'
 			);
+
+			if (isset($trunk['qualify_frequency']) && is_numeric($trunk['qualify_frequency'])) {
+				$conf['pjsip.aor.conf'][$tn]['qualify_frequency'] = abs((int)$trunk['qualify_frequency']);
+			}
 
 			// We only have a contact if we're sending, or not using registrations
 			if ($trunk['registration'] == "send" || $trunk['registration'] == "none") {
@@ -1045,8 +1042,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[] = "minimum_expiration=".$config['minimum_expiration'];
 		}
 
-		if (isset($config['qualifyfreq']))
-			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
+		if (isset($config['qualifyfreq']) && is_numeric($config['qualifyfreq'])) {
+			$aor[] = "qualify_frequency=".abs((int)$config['qualifyfreq']);
+		}
 
 		if (isset($retarr["pjsip.endpoint.conf"][$endpointname])) {
 			throw new \Exception("Endpoint $endpointname already exists.");
@@ -1238,9 +1236,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!isset($dispvars['codecs'][$codec])) {
 					$dispvars['codecs'][$codec] = false;
 				}
-			}
-			if(!is_numeric($dispvars['qualify_frequency']) ||  !is_int($dispvars['qualify_frequency']*1) || $dispvars['qualify_frequency'] < 0) {
-					$dispvars['qualify_frequency'] = 60;
 			}
 
 		} else {
