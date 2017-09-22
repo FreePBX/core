@@ -251,6 +251,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	$trunkhtml .= '</table>';
 ?>
 <form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="?display=routing" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
+	<input type="password" style="display:none!important"/>
 	<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="id" name="id" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
@@ -356,7 +357,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 								</div>
 								<div class="col-md-9">
 									<div class="input-group">
-										<input type="password" class="form-control toggle-password clicktoedit" id="routepass" name="routepass" value="<?php echo $routepass;?>">
+										<input type="password" class="form-control toggle-password clicktoedit" id="routepass" name="routepass" value="<?php echo $routepass;?>" autocomplete="new-password">
 										<span class="input-group-btn">
 											<button data-id="routepass" class="btn btn-default toggle-password" type="button"><i class="fa fa-2x fa-eye" style="margin-top: -2px;"></i></button>
 										</span>
