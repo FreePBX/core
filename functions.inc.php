@@ -4506,6 +4506,9 @@ function core_sipname_check($sipname, $extension) {
 function core_users_add($vars, $editmode=false) {
 	_core_backtrace();
 	try {
+		$vars['noanswer_dest'] = !empty($vars['noanswer_dest']) && !empty($vars[$vars[$vars['noanswer_dest']].'0']) && $vars[$vars[$vars['noanswer_dest']].'0'] != '' ? $vars[$vars[$vars['noanswer_dest']].'0'] : "";
+		$vars['busy_dest'] = !empty($vars['busy_dest']) && !empty($vars[$vars[$vars['busy_dest']].'1']) && $vars[$vars[$vars['busy_dest']].'1'] != '' ? $vars[$vars[$vars['busy_dest']].'1'] : "";
+		$vars['chanunavail_dest'] = !empty($vars['chanunavail_dest']) && !empty($vars[$vars[$vars['chanunavail_dest']].'2']) && $vars[$vars[$vars['chanunavail_dest']].'2'] != '' ? $vars[$vars[$vars['chanunavail_dest']].'2'] : "";
 		return FreePBX::Core()->addUser($vars['extension'], $vars, $editmode);
 	} catch(Exception $e) {
 		echo "<script>javascript:alert('".$e->getMessage()."');</script>";
