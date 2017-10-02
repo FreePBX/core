@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.14</version>
+	<version>14.0.1.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.15* FREEPBX-15956
 		*14.0.1.14* FREEPBX-15903
 		*14.0.1.13* Merge from 13
 		*14.0.1.12* FREEPBX-15339 FREEPBX-15637 FREEPBX-15285
