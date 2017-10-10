@@ -4,23 +4,23 @@ foreach($transports as $tp) {
 }
 $seq = 1;
 $codechtml = '<ul class="sortable">';
-	foreach ($codecs as $codec => $codec_state) {
-		$tabindex++;
-		$codec_trans = _($codec);
-		$codec_checked = $codec_state ? 'checked' : '';
-		$codechtml .= '<li><a href="#">'
-			. '<img src="assets/sipsettings/images/arrow_up_down.png" height="16" width="16" border="0" alt="move" style="float:none; margin-left:-6px; margin-bottom:-3px;cursor:move" /> '
-			. '<input type="checkbox" '
-			. ($codec_checked ? 'value="'. $seq++ . '" ' : '')
-			. 'name="codec[' . $codec . ']" '
-			. 'id="'. $codec . '" '
-			. 'class="audio-codecs" tabindex="' . $tabindex. '" '
-			. $codec_checked
-			. ' />'
-			. '<label for="'. $codec . '"> '
-			. '<small>' . $codec_trans . '</small>'
-			. ' </label></a></li>';
-	}
+foreach ($codecs as $codec => $codec_state) {
+	$tabindex++;
+	$codec_trans = _($codec);
+	$codec_checked = $codec_state ? 'checked' : '';
+	$codechtml .= '<li><a href="#">'
+	. '<img src="assets/sipsettings/images/arrow_up_down.png" height="16" width="16" border="0" alt="move" style="float:none; margin-left:-6px; margin-bottom:-3px;cursor:move" /> '
+	. '<input type="checkbox" '
+	. ($codec_checked ? 'value="'. $seq++ . '" ' : '')
+	. 'name="codec[' . $codec . ']" '
+	. 'id="'. $codec . '" '
+	. 'class="audio-codecs" tabindex="' . $tabindex. '" '
+	. $codec_checked
+	. ' />'
+	. '<label for="'. $codec . '"> '
+	. '<small>' . $codec_trans . '</small>'
+	. ' </label></a></li>';
+}
 $codechtml .= '</ul>';
 $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge");
 ?>
@@ -110,8 +110,10 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 					<label for="registrationnone"><?php echo _("None");?></label>
 				</div>
 				<div class="col-md-12">
-					<span id="registration-help" class="help-block fpbx-help-block"><?php echo _("You normally <strong>Send</strong> registration, which tells the remote server where to send your calls. If the other server is not on a fixed address, it will need to register to this server (<strong>Receive</strong>), so this server can send calls to it. You would select <strong>None</strong> if both machines have a fixed address and do not require registration.")."<br>"._("<strong>Warning:</strong> If you select 'None', registration attempts for the Username and Secret specified above will be rejected. Setting this incorrectly may result in firewall services detecting this as an attack and blocking the machine trying to register. Do not change this unless you control both servers, and are sure it is required!")?></span>
-					</div>
+					<span id="registration-help" class="help-block fpbx-help-block">
+						<?php echo _("You normally <strong>Send</strong> registration, which tells the remote server where to send your calls. If the other server is not on a fixed address, it will need to register to this server (<strong>Receive</strong>), so this server can send calls to it. You would select <strong>None</strong> if both machines have a fixed address and do not require registration.")."<br>"._("<strong>Warning:</strong> If you select 'None', registration attempts for the Username and Secret specified above will be rejected. Setting this incorrectly may result in firewall services detecting this as an attack and blocking the machine trying to register. Do not change this unless you control both servers, and are sure it is required!")?>
+					</span>
+				</div>
 			</div>
 		</div>
 		<div class="element-container">
@@ -307,6 +309,33 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 		</div>
 		<!--END FORBIDDEN RETRY INTERVAL-->
+		<!--FATAL RETRY INTERVAL-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="fatal_retry_interval"><?php echo _("Fatal Retry Interval") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="fatal_retry_interval"></i>
+							</div>
+							<div class="col-md-9">
+								<div class="input-group">
+									<input type="number" class="form-control" name="fatal_retry_interval" id="fatal_retry_interval" value="<?php echo $fatal_retry_interval?>"/>
+									<span class="input-group-addon"><?php echo _("Seconds")?></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="fatal_retry_interval-help" class="help-block fpbx-help-block"><?php echo _("How long to wait before retry when receiving a fatal response. If 'Forbidden Retry Interval' is also set then 'Forbidden Retry Interval' takes precedence over this one when a 403 is received. Also, if 'Permanent Auth Rejection' is enabled then a 401 and 407 become subject to this retry interval.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END FATAL RETRY INTERVAL-->
 		<!--RETRY INTERVAL-->
 		<div class="element-container">
 			<div class="row">
@@ -525,7 +554,9 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="client_uri-help" class="help-block fpbx-help-block"><?php echo  _("Client SIP URI used when attemping outbound registration. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?></span>
+					<span id="client_uri-help" class="help-block fpbx-help-block">
+						<?php echo  _("Client SIP URI used when attemping outbound registration. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -549,7 +580,9 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="server_uri-help" class="help-block fpbx-help-block"><?php echo _("SIP URI of the server to register against. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?></span>
+					<span id="server_uri-help" class="help-block fpbx-help-block">
+						<?php echo _("SIP URI of the server to register against. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -573,10 +606,13 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="aor_contact-help" class="help-block fpbx-help-block"><?php echo _("Permanent contacts assigned to AoR. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?></span>
+					<span id="aor_contact-help" class="help-block fpbx-help-block">
+						<?php echo _("Permanent contacts assigned to AoR. This setting is automatically generated by the PBX if left blank").'<br/>'._("sip:[username]@[ip]:[port]")?>
+					</span>
 				</div>
 			</div>
-		</div><!--END AOR CONTACT-->
+		</div>
+		<!--END AOR CONTACT-->
 		<!--MATCH-->
 		<div class="element-container">
 			<div class="row">
@@ -600,6 +636,33 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 				</div>
 			</div>
 		</div><!--MATCH-->
+		<!--Support Path-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="support_path"><?php echo _("Support Path") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="support_path"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="support_path" id="support_pathyes" value="yes" <?php echo ($support_path == "yes"?"CHECKED":"") ?>>
+								<label for="support_pathyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="support_path" id="support_pathno" value="no" <?php echo ($support_path == "yes"?"":"CHECKED") ?>>
+								<label for="support_pathno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="support_path-help" class="help-block fpbx-help-block"><?php echo _("When this option is enabled, outbound REGISTER requests will advertise support for Path headers so that intervening proxies can add to the Path header as necessary.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Support Path-->
 		<!--Support T.38 UDPTL-->
 		<div class="element-container">
 			<div class="row">
@@ -611,10 +674,10 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="t38_udptl" id="t38_udptlyes" value="yes" <?php echo ($t38_udptl == "yes"?"CHECKED":"") ?>>
-		            <label for="t38_udptlyes"><?php echo _("Yes");?></label>
-		            <input type="radio" name="t38_udptl" id="t38_udptlno" value="no" <?php echo ($t38_udptl == "yes"?"":"CHECKED") ?>>
-		            <label for="t38_udptlno"><?php echo _("No");?></label>
+								<input type="radio" name="t38_udptl" id="t38_udptlyes" value="yes" <?php echo ($t38_udptl == "yes"?"CHECKED":"") ?>>
+								<label for="t38_udptlyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="t38_udptl" id="t38_udptlno" value="no" <?php echo ($t38_udptl == "yes"?"":"CHECKED") ?>>
+								<label for="t38_udptlno"><?php echo _("No");?></label>
 							</div>
 						</div>
 					</div>
@@ -638,12 +701,12 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_ec"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo (!isset($t38_udptl_ec) || $t38_udptl_ec == "none" || $t38_udptl_ec == "" ?"CHECKED":"") ?>>
-		            <label for="t38_udptl_ecnone"><?php echo _("None");?></label>
-		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ($t38_udptl_ec == "fec"?"CHECKED":"") ?>>
-		            <label for="t38_udptl_ecfec"><?php echo _("Forward");?></label>
-		            <input type="radio" name="t38_udptl_ec" id="t38_udptl_ecred" value="redundancy" <?php echo ($t38_udptl_ec == "redundancy"?"CHECKED":"") ?>>
-		            <label for="t38_udptl_ecred"><?php echo _("Redundancy");?></label>
+								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo (!isset($t38_udptl_ec) || $t38_udptl_ec == "none" || $t38_udptl_ec == "" ?"CHECKED":"") ?>>
+								<label for="t38_udptl_ecnone"><?php echo _("None");?></label>
+								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ($t38_udptl_ec == "fec"?"CHECKED":"") ?>>
+								<label for="t38_udptl_ecfec"><?php echo _("Forward");?></label>
+								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecred" value="redundancy" <?php echo ($t38_udptl_ec == "redundancy"?"CHECKED":"") ?>>
+								<label for="t38_udptl_ecred"><?php echo _("Redundancy");?></label>
 							</div>
 						</div>
 					</div>
@@ -667,10 +730,10 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_nat"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="t38_udptl_nat" id="t38_udptl_natyes" value="yes" <?php echo ($t38_udptl_nat == "yes"?"CHECKED":"") ?>>
-		            <label for="t38_udptl_natyes"><?php echo _("Yes");?></label>
-		            <input type="radio" name="t38_udptl_nat" id="t38_udptl_natno" value = "no" <?php echo ($t38_udptl_nat == "yes"?"":"CHECKED") ?>>
-		            <label for="t38_udptl_natno"><?php echo _("No");?></label>
+								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natyes" value="yes" <?php echo ($t38_udptl_nat == "yes"?"CHECKED":"") ?>>
+								<label for="t38_udptl_natyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natno" value = "no" <?php echo ($t38_udptl_nat == "yes"?"":"CHECKED") ?>>
+								<label for="t38_udptl_natno"><?php echo _("No");?></label>
 							</div>
 						</div>
 					</div>
@@ -694,10 +757,10 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="fax_detect"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="fax_detect" id="fax_detectyes" value="yes" <?php echo ($fax_detect == "yes"?"CHECKED":"") ?>>
-		            <label for="fax_detectyes"><?php echo _("Yes");?></label>
-		            <input type="radio" name="fax_detect" id="fax_detectno" value="no" <?php echo ($fax_detect == "yes"?"":"CHECKED") ?>>
-		            <label for="fax_detectno"><?php echo _("No");?></label>
+								<input type="radio" name="fax_detect" id="fax_detectyes" value="yes" <?php echo ($fax_detect == "yes"?"CHECKED":"") ?>>
+								<label for="fax_detectyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="fax_detect" id="fax_detectno" value="no" <?php echo ($fax_detect == "yes"?"":"CHECKED") ?>>
+								<label for="fax_detectno"><?php echo _("No");?></label>
 							</div>
 						</div>
 					</div>
@@ -721,10 +784,10 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
 							</div>
 							<div class="col-md-9 radioset">
-		            <input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ($sendrpid == "yes"?"CHECKED":"") ?>>
-		            <label for="sendrpidyes"><?php echo _("Yes");?></label>
-		            <input type="radio" name="sendrpid" id="sendrpidno" value = "no" <?php echo ($sendrpid == "yes"?"":"CHECKED") ?>>
-		            <label for="sendrpidno"><?php echo _("No");?></label>
+								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ($sendrpid == "yes"?"CHECKED":"") ?>>
+								<label for="sendrpidyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="sendrpid" id="sendrpidno" value = "no" <?php echo ($sendrpid == "yes"?"":"CHECKED") ?>>
+								<label for="sendrpidno"><?php echo _("No");?></label>
 							</div>
 						</div>
 					</div>
@@ -738,59 +801,59 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 		</div>
 		<!--END Send RPID/PAI-->
 		<!--Send Inband_progress-->
-                <div class="element-container">
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <div class="row">
-                                                <div class="form-group">
-                                                        <div class="col-md-3">
-                                                                <label class="control-label" for="inband_progress"><?php echo _("Inband Progress") ?></label>
-                                                                <i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
-                                                        </div>
-                                                        <div class="col-md-9 radioset">
-                            <input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ($inband_progress == "yes"?"CHECKED":"") ?>>
-                            <label for="inband_progressyes"><?php echo _("Yes");?></label>
-                            <input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ($inband_progress == "yes"?"":"CHECKED") ?>>
-                            <label for="inband_progressno"><?php echo _("No");?></label>
-                                                        </div>
-                                                </div>
-                                        </div>
-                                </div>
-                        </div>
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <span id="inband_progress-help" class="help-block fpbx-help-block"><?php echo _("Determines whether chan_pjsip will indicate ringing using inband progress.")?></span>
-                                </div>
-                        </div>
-                </div>
-                <!--END inpand_progress-->
-  <!--Send direct_media-->
-                <div class="element-container">
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <div class="row">
-                                                <div class="form-group">
-                                                        <div class="col-md-3">
-                                                                <label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
-                                                                <i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
-                                                        </div>
-                                                        <div class="col-md-9 radioset">
-                            <input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
-                            <label for="direct_mediayes"><?php echo _("Yes");?></label>
-                            <input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
-                            <label for="direct_mediano"><?php echo _("No");?></label>
-                                                        </div>
-                                                </div>
-                                        </div>
-                                </div>
-                        </div>
-                        <div class="row">
-                                <div class="col-md-12">
-                                        <span id="direct_media-help" class="help-block fpbx-help-block"><?php echo _("Determines whether media may flow directly between endpoints..")?></span>
-                                </div>
-                        </div>
-                </div>
-                <!--END direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="inband_progress"><?php echo _("Inband Progress") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ($inband_progress == "yes"?"CHECKED":"") ?>>
+								<label for="inband_progressyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ($inband_progress == "yes"?"":"CHECKED") ?>>
+								<label for="inband_progressno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="inband_progress-help" class="help-block fpbx-help-block"><?php echo _("Determines whether chan_pjsip will indicate ringing using inband progress.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END inpand_progress-->
+		<!--Send direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
+								<label for="direct_mediayes"><?php echo _("Yes");?></label>
+								<input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
+								<label for="direct_mediano"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="direct_media-help" class="help-block fpbx-help-block"><?php echo _("Determines whether media may flow directly between endpoints..")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END direct_media-->
 
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
