@@ -2924,6 +2924,20 @@ function core_do_get_config($engine) {
 	$context = 'macro-outbound-callerid';
 	$exten = 's';
 
+	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
+	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
+	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
+	/*
+	-- Executing [s@macro-outbound-callerid:1] NoOp("Local/9512594723@from-internal-00000017;2", "1000") in new stack
+	-- Executing [s@macro-outbound-callerid:2] NoOp("Local/9512594723@from-internal-00000017;2", "TRUE") in new stack
+	-- Executing [s@macro-outbound-callerid:3] NoOp("Local/9512594723@from-internal-00000017;2", "off") in new stack
+	 */
+	/*
+	-- Executing [s@macro-outbound-callerid:1] NoOp("Local/9512594723@from-internal-0000001a;2", "777") in new stack
+	-- Executing [s@macro-outbound-callerid:2] NoOp("Local/9512594723@from-internal-0000001a;2", "TRUE") in new stack
+	-- Executing [s@macro-outbound-callerid:3] NoOp("Local/9512594723@from-internal-0000001a;2", "off") in new stack
+	 */
+
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 	//
@@ -2940,6 +2954,8 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
+	//FREEPBX-13173 if we are masquerading we need to reset the CID otherwise we will masquerade out as the masquerade
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CIDMASQUERADING}" = "TRUE"]', 'normcid'));
 	// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
 	// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
 	// is set for this CID, then it must be internal
@@ -2947,7 +2963,7 @@ function core_do_get_config($engine) {
 	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-	$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = ""]', 'bypass'));
 
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
