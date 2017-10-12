@@ -2927,16 +2927,6 @@ function core_do_get_config($engine) {
 	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
 	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
 	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
-	/*
-	-- Executing [s@macro-outbound-callerid:1] NoOp("Local/9512594723@from-internal-00000017;2", "1000") in new stack
-	-- Executing [s@macro-outbound-callerid:2] NoOp("Local/9512594723@from-internal-00000017;2", "TRUE") in new stack
-	-- Executing [s@macro-outbound-callerid:3] NoOp("Local/9512594723@from-internal-00000017;2", "off") in new stack
-	 */
-	/*
-	-- Executing [s@macro-outbound-callerid:1] NoOp("Local/9512594723@from-internal-0000001a;2", "777") in new stack
-	-- Executing [s@macro-outbound-callerid:2] NoOp("Local/9512594723@from-internal-0000001a;2", "TRUE") in new stack
-	-- Executing [s@macro-outbound-callerid:3] NoOp("Local/9512594723@from-internal-0000001a;2", "off") in new stack
-	 */
 
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
