@@ -2940,6 +2940,7 @@ function core_do_get_config($engine) {
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
+
 	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
