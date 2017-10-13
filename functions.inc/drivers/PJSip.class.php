@@ -1257,6 +1257,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"expiration" => 3600,
 				"retry_interval" => 60,
 				"forbidden_retry_interval" => 10,
+				"fatal_retry_interval" => 0,
 				"max_retries" => 10,
 				"context" => "from-pstn",
 				"transport" => null,
@@ -1268,7 +1269,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
-				"rewrite_contact" => "no"
+				"rewrite_contact" => "no",
+				"support_path" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
