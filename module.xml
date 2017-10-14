@@ -3,36 +3,17 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1</version>
+	<version>15.0.1alpha1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.1* Stable release
-		*14.0.1rc1.12* Bump from 13
-		*14.0.1rc1.11* FREEPBX-10489, FREEPBX-10139
-		*14.0.1rc1.10* FREEPBX-14735
-		*14.0.1rc1.9* FREEPBX-13068
-		*14.0.1rc1.8* Merge from 13 to 14
-		*14.0.1rc1.7* Merge from 13 to 14
-		*14.0.1rc1.6* FREEPBX-14477 Advanced settings language selection broken
-		*14.0.1rc1.5* FREEPBX-14430 Add values that were removed but are required to define conf settings
-		*14.0.1rc1.4* FREEPBX-14379 Cannot Create Outbound Routes
-		*14.0.1rc1.3* Merge from 13 to 14
-		*14.0.1rc1.2* FREEPBX-14017 Generate files correctly
-		*14.0.1rc1.1* Invalid key-ing
-		*14.0.1rc1* RC1
-		*14.0.1beta9 FREEPBX-14197 When adding an extension display the extension
-		*14.0.1beta8* FREEPBX-14050 Add detail to tool tip for 'block foreign CIDs' on trunk page
-		*14.0.1beta3* Fix dialparties issue
-		*14.0.1beta2* Feature parity with 13
-		*14.0.1beta1* Prepare for Beta
-		*14.0.1alpha1* Inital Release
+		*15.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>14.0</version>
+		<version>15.0</version>
 	</depends>
 	<database>
 		<table name="trunks">
