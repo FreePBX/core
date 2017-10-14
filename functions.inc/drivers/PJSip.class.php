@@ -196,7 +196,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 	public function getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection) {
 		$tmparr = parent::getDeviceDisplay($display, $deviceInfo, $currentcomponent, $primarySection);
-		unset($tmparr['videosupport'],$tmparr['session-timers'],$tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
+		unset($tmparr['videosupport'],$tmparr['sessiontimers'],$tmparr['force_avp'],$tmparr['permit'],$tmparr['deny'], $tmparr['accountcode'], $tmparr['encryption'], $tmparr['type'], $tmparr['qualify'],$tmparr['port'],$tmparr['canreinvite'],$tmparr['host'],$tmparr['nat']);
 		if (version_compare($this->version,'12.5.0','ge')) {
 			$tt = _("Account Code for this extension");
 			$tmparr['accountcode'] = array('prompttext' => _("Account Code"), 'value' => '', 'tt' => $tt, 'level' => 1);
@@ -241,10 +241,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
+		$select[] = array('value' => 'auto', 'text' => _('Auto'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
-		$tt = _("Allow Non-Encrypted Media (Opportunistic SRTP) ").' [media_encryption]';
-		$tmparr['mediaencryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
+		$tt = _("Determines whether res_pjsip will use and enforce usage of media encryption for this endpoint. Auto will enable SRTP via in-SDP encryption if TLS is enabled in SIPSettings").' [media_encryption]';
+		$tmparr['media_encryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'auto', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -258,7 +259,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
-		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is set to SRTP via in-SDP or DTLS-SRTP.").' [media-encryption_optimistic]';
+		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is not set to None.").' [media_encryption_optimistic]';
 		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Allow Non-Encrypted Media (Opportunistic SRTP)'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		$tt = _("The number of in-use channels which will cause busy to be returned as device state. This should be left at 0 unless you know what you are doing");
@@ -423,17 +424,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
 				}
 			}
-			$qualify_frequency = 60;
-			if (isset($trunk['qualify_frequency'])) {
-				if(is_numeric($trunk['qualify_frequency']) &&  is_int($trunk['qualify_frequency']*1) && $trunk['qualify_frequency']  >= 0) {
-					$qualify_frequency = $trunk['qualify_frequency'];
-				}
-			}
 
 			$conf['pjsip.aor.conf'][$tn] = array(
-				'type' => 'aor',
-				'qualify_frequency' => $qualify_frequency
+				'type' => 'aor'
 			);
+
+			if (isset($trunk['qualify_frequency']) && is_numeric($trunk['qualify_frequency'])) {
+				$conf['pjsip.aor.conf'][$tn]['qualify_frequency'] = abs((int)$trunk['qualify_frequency']);
+			}
 
 			// We only have a contact if we're sending, or not using registrations
 			if ($trunk['registration'] == "send" || $trunk['registration'] == "none") {
@@ -539,7 +537,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
 				}
-
+				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
+		            $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
+	             }
 				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
 				}
@@ -970,9 +970,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$identify[] = "match=".$config['match'];
 		}
 
-		if (!empty($config['mediaencryption'])) {
-			$endpoint[] = "media_encryption=".$config['mediaencryption'];
-		} else {
+		if (!empty($config['media_encryption']) && $config['media_encryption'] != 'auto') {
+			$endpoint[] = "media_encryption=".$config['media_encryption'];
+		} elseif($config['media_encryption'] == 'auto') {
 			// Automatically enable sdes if possible
 			//
 			// Requires sipsettings 13.0.16 or higher
@@ -1055,8 +1055,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[] = "minimum_expiration=".$config['minimum_expiration'];
 		}
 
-		if (isset($config['qualifyfreq']))
-			$aor[] = "qualify_frequency=".$config['qualifyfreq'];
+		if (isset($config['qualifyfreq']) && is_numeric($config['qualifyfreq'])) {
+			$aor[] = "qualify_frequency=".abs((int)$config['qualifyfreq']);
+		}
 
 		if (isset($retarr["pjsip.endpoint.conf"][$endpointname])) {
 			throw new \Exception("Endpoint $endpointname already exists.");
@@ -1249,9 +1250,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
-			if(!is_numeric($dispvars['qualify_frequency']) ||  !is_int($dispvars['qualify_frequency']*1) || $dispvars['qualify_frequency'] < 0) {
-					$dispvars['qualify_frequency'] = 60;
-			}
 
 		} else {
 			$dispvars = array(
@@ -1259,6 +1257,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"expiration" => 3600,
 				"retry_interval" => 60,
 				"forbidden_retry_interval" => 10,
+				"fatal_retry_interval" => 0,
 				"max_retries" => 10,
 				"context" => "from-pstn",
 				"transport" => null,
@@ -1270,7 +1269,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
-				"rewrite_contact" => "no"
+				"rewrite_contact" => "no",
+				"support_path" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';

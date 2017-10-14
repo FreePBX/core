@@ -1386,7 +1386,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"recording_priority" => "10",
 			"answermode" => "disabled",
 			"intercom" => "enabled",
-			"cid_masquerade" => ""
+			"cid_masquerade" => "",
+			"noanswer_dest" => "",
+			"busy_dest" => "",
+			"chanunavail_dest" => ""
 		);
 	}
 
@@ -2262,9 +2265,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"noanswer_cid" => isset($settings['noanswer_cid']) ? $settings['noanswer_cid'] : "",
 				"busy_cid" => isset($settings['busy_cid']) ? $settings['busy_cid'] : "",
 				"chanunavail_cid" => isset($settings['chanunavail_cid']) ? $settings['chanunavail_cid'] : "",
-				"noanswer_dest" => !empty($settings['noanswer_dest']) && !empty($settings[$settings[$settings['noanswer_dest']].'0']) && $settings[$settings[$settings['noanswer_dest']].'0'] != '' ? $settings[$settings[$settings['noanswer_dest']].'0'] : "",
-				"busy_dest" => !empty($settings['busy_dest']) && !empty($settings[$settings[$settings['busy_dest']].'1']) && $settings[$settings[$settings['busy_dest']].'1'] != '' ? $settings[$settings[$settings['busy_dest']].'1'] : "",
-				"chanunavail_dest" => !empty($settings['chanunavail_dest']) && !empty($settings[$settings[$settings['chanunavail_dest']].'2']) && $settings[$settings[$settings['chanunavail_dest']].'2'] != '' ? $settings[$settings[$settings['chanunavail_dest']].'2'] : ""
+				"noanswer_dest" => !empty($settings['noanswer_dest'])? $settings['noanswer_dest']: "",
+				"busy_dest" => !empty($settings['busy_dest']) ? $settings['busy_dest'] : "",
+				"chanunavail_dest" => !empty($settings['chanunavail_dest']) ? $settings['chanunavail_dest'] : ""
 			));
 		} catch(\Exception $e) {
 			throw new \Exception("Unable to insert into users: ".addSlashes($e->getMessage()));
@@ -2759,6 +2762,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		case "dids":
 			foreach ($rawData as $data) {
 				$exists = $this->getDID($data['extension'], $data['cidnum']);
+				//FREEPBX-15285 bulk handler for did's check case on destination
+				$data['destination'] = strtolower($data['destination']);
 				if(!$replaceExisting && !empty($exists)) {
 					return array("status" => false, "message" => _("DID already exists"));
 				} elseif($replaceExisting && !empty($exists)) {

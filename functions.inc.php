@@ -2462,14 +2462,15 @@ function core_do_get_config($engine) {
 		$exten = 's';
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_execif('$["${INTRACOMPANYROUTE}" = "YES" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', 'CALLERID(num)=${DB(AMPUSER/${AMPUSER}/cidnum)}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
 		$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
-		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 		$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
-		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 		$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
 		$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
 		$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -2924,6 +2925,10 @@ function core_do_get_config($engine) {
 	$context = 'macro-outbound-callerid';
 	$exten = 's';
 
+	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
+	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
+	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
+
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 	//
@@ -2936,10 +2941,13 @@ function core_do_get_config($engine) {
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
+
 	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
+	//FREEPBX-13173 if we are masquerading we need to reset the CID otherwise we will masquerade out as the masquerade
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CIDMASQUERADING}" = "TRUE"]', 'normcid'));
 	// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
 	// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
 	// is set for this CID, then it must be internal
@@ -2947,7 +2955,7 @@ function core_do_get_config($engine) {
 	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-	$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = ""]', 'bypass'));
 
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
@@ -4489,6 +4497,9 @@ function core_sipname_check($sipname, $extension) {
 function core_users_add($vars, $editmode=false) {
 	_core_backtrace();
 	try {
+		$vars['noanswer_dest'] = !empty($vars['noanswer_dest']) && !empty($vars[$vars[$vars['noanswer_dest']].'0']) && $vars[$vars[$vars['noanswer_dest']].'0'] != '' ? $vars[$vars[$vars['noanswer_dest']].'0'] : "";
+		$vars['busy_dest'] = !empty($vars['busy_dest']) && !empty($vars[$vars[$vars['busy_dest']].'1']) && $vars[$vars[$vars['busy_dest']].'1'] != '' ? $vars[$vars[$vars['busy_dest']].'1'] : "";
+		$vars['chanunavail_dest'] = !empty($vars['chanunavail_dest']) && !empty($vars[$vars[$vars['chanunavail_dest']].'2']) && $vars[$vars[$vars['chanunavail_dest']].'2'] != '' ? $vars[$vars[$vars['chanunavail_dest']].'2'] : "";
 		return FreePBX::Core()->addUser($vars['extension'], $vars, $editmode);
 	} catch(Exception $e) {
 		echo "<script>javascript:alert('".$e->getMessage()."');</script>";
