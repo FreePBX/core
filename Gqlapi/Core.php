@@ -6,76 +6,22 @@ use GraphQL\Type\Definition\Type;
 use FreePBX\modules\Gqlapi\includes\Base;
 
 class Core extends Base {
+	public function constructMutation() {
+		return [
+			'createDevice' => [
+				'type' => $this->typeContainer->get('device')->getReference(),
+				'args' => [
+					'id' => [
+						'type' => Type::int()
+					]
+				],
+				'resolve' => function ($root, $args) {
+					return $this->freepbx->Core->getDevice($args['id']);
+				},
+			],
+		];
+	}
 	public function constructQuery() {
-		/*
-		$deviceTypeEdge = new ObjectType([
-			'name' => 'Edge',
-			'fields' => [
-				'node' => [
-					'type' => $deviceType,
-					'resolve' => function($nodes) {
-						return $nodes;
-					}
-				],
-				'cursor' => [
-					'type' => Type::string(),
-					'resolve' => function($node) {
-						return $node['cursor'];
-					}
-				]
-			]
-		]);
-
-		$pageInfo = new ObjectType([
-			'name' => 'PageInfo',
-			'fields' => [
-				'startCursor' => [
-					'type' => Type::string(),
-					'resolve' => function($nodes) {
-						return base64_encode('cursor'.(count($nodes)-1));
-					}
-				],
-				'endCursor' => [
-					'type' => Type::string(),
-					'resolve' => function($nodes) {
-						return base64_encode('cursor0');
-					}
-				],
-				'hasNextPage' => [
-					'type' => Type::boolean(),
-					'resolve' => function($nodes) {
-						return false;
-					}
-				]
-			]
-		]);
-
-		$Connection = new ObjectType([
-			'name' => 'Connection',
-			'fields' => [
-				'edges' => [
-					'type' => Type::listOf($deviceTypeEdge),
-					'resolve' => function($nodes) {
-						return $nodes;
-					}
-				],
-				'totalCount' => [
-					'type' => Type::int(),
-					'resolve' => function($nodes) {
-						return count($nodes);
-					}
-				],
-				'pageInfo' => [
-					'type' => $pageInfo,
-					'resolve' => function($devices) {
-						return $devices;
-					}
-				]
-			]
-		]);
-		*/
-
-
 		$user = $this->typeContainer->get('device');
 		$user->addField('user',[
 			'type' => 'objectReference-user',
@@ -138,27 +84,7 @@ class Core extends Base {
 				'resolve' => function($root, $args) {
 					return $this->freepbx->Core->getUser($args['id']);
 				}
-			],
-			/*
-			'devicesConnection' => [
-				'type' => $Connection,
-				'args' => [
-					'id' => [
-						'type' => Type::int(),
-						'description' => 'Device ID',
-					]
-				],
-				'resolve' => function($root, $args) {
-					$devices = $this->freepbx->Core->getAllDevicesByType();
-					$final = [];
-					foreach($devices as $k => $d) {
-						$final[$k] = $d;
-						$final[$k]['cursor'] = base64_encode('cursor'.$k);
-					}
-					return $final;
-				}
 			]
-			*/
 		];
 	}
 
@@ -181,6 +107,7 @@ class Core extends Base {
 		$this->getUserType();
 		$this->getDeviceType();
 		$this->getExtensionType();
+		$this->getDeviceDrivers();
 	}
 
 	private function getUserType() {
@@ -235,7 +162,13 @@ class Core extends Base {
 					'type' => Type::id()
 				],
 				'tech' => [
-					'type' => Type::string()
+					'type' => $this->typeContainer->get('tech_driver')->getReference(),
+					'resolve' => function($row) {
+						$dc = $this->freepbx->Core->getDriver($row['tech']);
+						$out = $dc->getDevice($row['id']);
+						$out['tech'] = $row['tech'];
+						return $out;
+					}
 				],
 				'dial' => [
 					'type' => Type::string()
@@ -268,5 +201,29 @@ class Core extends Base {
 				}
 			],
 		]);
+	}
+
+	private function getDeviceDrivers() {
+		$drivers = $this->freepbx->Core->getAllDriversInfo();
+		$dr = $this->typeContainer->get('tech_driver');
+		$dr->addField('id', [
+			'type' => Type::id(),
+			'resolve' => function($row) {
+				return $row['tech'];
+			}
+		]);
+		$settings = [];
+		foreach($drivers as $driver) {
+			$dc = $this->freepbx->Core->getDriver($driver['rawName']);
+			$flag = 1;
+			$settings = $dc->getDefaultDeviceSettings(0, '', $flag);
+			if(is_array($settings)) {
+				foreach($settings['settings'] as $keyword => $setting) {
+					$dr->addField($keyword, [
+						'type' => Type::string()
+					]);
+				}
+			}
+		}
 	}
 }
