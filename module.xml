@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.16</version>
+	<version>14.0.1.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.17* FREEPBX-15824 positioning
 		*14.0.1.16* FREEPBX-13173 FREEPBX-6753 FREEPBX-15550 FREEPBX-15824 FREEPBX-15840
 		*14.0.1.15* FREEPBX-15956
 		*14.0.1.14* FREEPBX-15903
