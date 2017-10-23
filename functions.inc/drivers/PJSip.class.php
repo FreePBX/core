@@ -99,7 +99,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
-			"sendpid" => array(
+			"sendrpid" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
