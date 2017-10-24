@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.18</version>
+	<version>13.0.120.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.19* FREEPBX-16016 Bulk handler breaks RPID settings on extension import
 		*13.0.120.18* FREEPBX-15824 positioning
 		*13.0.129.17* FREEPBX-15824
 		*13.0.120.16* FREEPBX-15903
