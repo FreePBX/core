@@ -42,11 +42,11 @@ class Sip extends \FreePBX\modules\Core\Driver {
 				"value" => "dynamic",
 				"flag" => $flag++
 			),
-			"trustpid" => array(
+			"trustrpid" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
 			),
-			"sendpid" => array(
+			"sendrpid" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_SENDRPID'),
 				"flag" => $flag++
 			),
