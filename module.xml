@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.18</version>
+	<version>14.0.1.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.19* Remove automatically setting up media encryption for pjsip
 		*14.0.1.18* FREEPBX-16016 Bulk handler breaks RPID settings on extension import
 		*14.0.1.17* FREEPBX-15824 positioning
 		*14.0.1.16* FREEPBX-13173 FREEPBX-6753 FREEPBX-15550 FREEPBX-15824 FREEPBX-15840
