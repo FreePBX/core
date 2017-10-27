@@ -959,15 +959,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['mediaencryption'])) {
 			$endpoint[] = "media_encryption=".$config['mediaencryption'];
-		} else {
-			// Automatically enable sdes if possible
-			//
-			// Requires sipsettings 13.0.16 or higher
-			if ($this->freepbx->Modules->moduleHasMethod('Sipsettings', 'getTLSConfig')) {
-				if (\FreePBX::Sipsettings()->getTLSConfig()) {
-					$endpoint[] = "media_encryption=sdes";
-				}
-			}
 		}
 
 		if (!empty($config['timers'])) {
