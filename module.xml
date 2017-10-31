@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.19</version>
+	<version>14.0.1.20</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.20* Restrict modules in attendedtransfer-rec
 		*14.0.1.19* Remove automatically setting up media encryption for pjsip
 		*14.0.1.18* FREEPBX-16016 Bulk handler breaks RPID settings on extension import
 		*14.0.1.17* FREEPBX-15824 positioning
@@ -25,7 +26,7 @@
 		*14.0.1.7* FREEPBX-15640 Issue with Follow me ringallv2 strategy
 		*14.0.1.6* FREEPBX-15588
 		*14.0.1.4* FREEPBX-15535 FREEPBX-15090 FREEPBX-13025 FREEPBX-13830 REEPBX-15459 FREEPBX-15459
-		*14.0.1.3* FREEPBX-15216 
+		*14.0.1.3* FREEPBX-15216
 		*14.0.1.2* FREEPBX-13739 FREEPBX-15217 FREEPBX-15008 FREEPBX-14952
 		*14.0.1.1* FREEPBX-12215 use proper methods to set headers
 		*14.0.1* Stable release
