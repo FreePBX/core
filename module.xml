@@ -234,7 +234,11 @@
 			<display>users</display>
 			<view>add</view>
 		</users>
- 	</popovers>
+		<trunks>
+			<display>trunks</display>
+			<view>quick</view>
+		 </trunks>
+ 	 </popovers>
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>

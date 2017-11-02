@@ -806,6 +806,8 @@ function core_destination_popovers() {
 		$ret['users'] = 'Users';
 	} else {
 		$ret['extensions'] = 'Extensions';
+		// adding trunk in popover
+		$ret['trunks'] = 'Trunks';
 	}
 	return $ret;
 }

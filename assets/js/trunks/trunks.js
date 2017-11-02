@@ -329,8 +329,103 @@ function validatePatterns() {
     return true;
   }
 }
+function checkvalid() {
+		var theForm = document.trunkEdit;
 
-//document.trunkEdit.trunk_name.focus();
+		defaultEmptyOK = true;
+		if(typeof trunknames[$("#trunk_name").val()] != "undefined"){
+			return warnInvalid($("#trunk_name"), _("Trunk names must be unique"));
+		}
+
+		if (isEmpty($.trim($('#trunkEdit input[name="outcid"]').val()))) {
+			if ($('#trunkEdit input[name="keepcid"]').val() == 'on' || $('#trunkEdit input[name="keepcid"]').val() == 'all') {
+				return warnInvalid(theForm.outcid, msgCIDValueRequired);
+			} else {
+				if (confirm(msgCIDValueEmpty) === false) {
+					return false;
+				}
+			}
+		}
+
+		if (!isCallerID($('#trunkEdit input[name="outcid"]').val()))
+			return warnInvalid(theForm.outcid, msgInvalidOutboundCID);
+
+		if (!isInteger($('#trunkEdit input[name="maxchans"]').val()))
+			return warnInvalid(theForm.maxchans, msgInvalidMaxChans);
+
+		if (!isDialIdentifierSpecial($('#dialoutprefix').val())) {
+			if (confirm(msgInvalidOutboundDialPrefix) === false) {
+				$('#dialoutprefix').focus();
+				return false;
+			}
+		}
+
+		if (isEmpty($.trim($('#trunkEdit input[name="trunk_name"]').val()))) {
+			return warnInvalid(theForm.trunk_name, msgInvalidTrunkName);
+		}
+
+		if(tech != 'enum' && tech != 'custom' && tech != 'dundi' && tech != 'pjsip') {
+			defaultEmptyOK = true;
+			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+				return warnInvalid(theForm.channelid, msgInvalidTrunkName);
+
+			if (theForm.channelid.value.toLowerCase() == theForm.usercontext.value.toLowerCase())
+				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+		} else if (tech == 'custom' || tech == 'dundi') {
+			if (isEmpty(theForm.channelid.value) || isWhitespace(theForm.channelid.value))
+				return warnInvalid(theForm.channelid, msgInvalidChannelName);
+
+			if (theForm.channelid.value.toLowerCase() == theForm.usercontext.value.toLowerCase())
+				return warnInvalid(theForm.usercontext, msgInvalidTrunkAndUserSame);
+		} else if (tech == 'pjsip') {
+			// If Registration is seto to 'Receive', we don't need a server definition
+			if ($("input[name=registration]:checked").val() !== "receive") {
+				if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
+					return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
+				}
+				if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
+					return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
+				}
+			}
+		}
+
+		if(tech == 'sip' || tech.substr(0,3) == 'iax') {
+			if ((isEmpty(theForm.usercontext.value) || isWhitespace(theForm.usercontext.value)) && (!isEmpty(theForm.userconfig.value) && !isWhitespace(theForm.userconfig.value)) && (theForm.userconfig.value != "secret=***password***\ntype=user\ncontext=from-trunk")) {
+				if (confirm(msgConfirmBlankContext) === false)
+				return false;
+			}
+		}
+		if (!isEmpty(theForm.channelid.value)) {
+			var tmp_channelid_index = $.inArray(theForm.channelid.value.trim(), trunk_channelids);
+			var tmp_channelid_index_2 = $.inArray(theForm.channelid.value.trim(), trunk_usercontexts);
+			if(tmp_channelid_index != -1 || tmp_channelid_index_2 != -1) {
+				if(tmp_channelid_index == -1) {
+					tmp_channelid_index = tmp_channelid_index_2;
+				}
+				return warnInvalid(theForm.channelid, theForm.channelid.value.trim()  + _(" already used in ") + trunk_names[tmp_channelid_index] + _(",please use a different Trunk Name."));
+			}
+		}
+		if (!isEmpty(theForm.usercontext.value)) {
+			var tmp_usercontext_index = $.inArray(theForm.usercontext.value.trim(), trunk_usercontexts);
+			var tmp_usercontext_index_2 = $.inArray(theForm.usercontext.value.trim(), trunk_channelids);
+			if(tmp_usercontext_index != -1 || tmp_usercontext_index_2 != -1) {
+				if(tmp_usercontext_index == -1) {
+					 tmp_usercontext_index = tmp_usercontext_index_2;
+				}
+				return warnInvalid(theForm.usercontext, theForm.usercontext.value.trim()  + _(" already used in ") + trunk_names[tmp_usercontext_index] + _(",please use a different USER Context."));
+			}
+		}
+
+		clearPatterns();
+		if (validatePatterns()) {
+			if ($(this).prop('name') === 'duplicate') {
+				theForm.action.value = 'copytrunk';
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 $(document).ready(function() {
 	$('#submit, #duplicate').click(function() {
