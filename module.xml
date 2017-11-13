@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.20</version>
+	<version>14.0.1.21</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.1.21* FREEPBX-15956
 		*14.0.1.20* Restrict modules in attendedtransfer-rec
 		*14.0.1.19* Remove automatically setting up media encryption for pjsip
 		*14.0.1.18* FREEPBX-16016 Bulk handler breaks RPID settings on extension import
