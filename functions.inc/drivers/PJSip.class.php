@@ -957,8 +957,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$identify[] = "match=".$config['match'];
 		}
 
-		if (!empty($config['mediaencryption'])) {
-			$endpoint[] = "media_encryption=".$config['mediaencryption'];
+		if (!empty($config['media_encryption'])) {
+			$endpoint[] = "media_encryption=".$config['media_encryption'];
 		}
 
 		if (!empty($config['timers'])) {
