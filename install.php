@@ -995,7 +995,7 @@ foreach($res as $row) {
 			":id" => $row['id']
 		));
 	} catch(\Exception $e) {
-		if(!$e->getCode() == 23000) {
+		if($e->getCode() != 23000) {
 			throw $e;
 		}
 		//already exists!
