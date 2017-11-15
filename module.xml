@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.22</version>
+	<version>13.0.120.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.120.23* FREEPBX-16262 ignore conflicting values
 		*13.0.120.22* FREEPBX-16262 Migrate mediaencryption to media_encryption
 		*13.0.120.21* FREEPBX-15956
 		*13.0.120.20* FREEPBX-15956 remove automatically enabling sdes encryption when creating pjsip endpoint

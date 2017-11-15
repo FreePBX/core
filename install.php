@@ -1720,12 +1720,24 @@ $sth->execute();
 $res = $sth->fetchAll(\PDO::FETCH_ASSOC);
 foreach($res as $row) {
 	$sth1 = \FreePBX::Database()->prepare("UPDATE sip SET `keyword` = :keyword, `data` = :data WHERE `keyword` = :oldkeyword AND `id` = :id");
-	$sth1->execute(array(
-		":oldkeyword" => $row['keyword'],
-		":keyword" => 'media_encryption',
-		":data" => ($row['data'] == 'auto') ? 'no' : $row['data'],
-		":id" => $row['id']
-	));
+	try {
+		$sth1->execute(array(
+			":oldkeyword" => $row['keyword'],
+			":keyword" => 'media_encryption',
+			":data" => ($row['data'] == 'auto') ? 'no' : $row['data'],
+			":id" => $row['id']
+		));
+	} catch(\Exception $e) {
+		if(!$e->getCode() == 23000) {
+			throw $e;
+		}
+		//already exists!
+		$sth2 = \FreePBX::Database()->prepare("DELETE FROM sip WHERE `keyword` = 'mediaencryption' AND `id` = :id");
+		$sth2->execute(array(
+			":id" => $row['id']
+		));
+	}
+
 }
 
 $sth = \FreePBX::Database()->prepare("UPDATE sip SET keyword = 'media_encryption_optimistic' WHERE `keyword` = 'mediaencryptionoptimistic'");
