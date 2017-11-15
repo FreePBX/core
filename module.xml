@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.1.22</version>
+	<version>14.0.1.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.1.23* FREEPBX-16262 ignore conflicting values
 		*14.0.1.22* FREEPBX-16262 Migrate mediaencryption to media_encryption
 		*14.0.1.21* FREEPBX-15956
 		*14.0.1.20* Restrict modules in attendedtransfer-rec
