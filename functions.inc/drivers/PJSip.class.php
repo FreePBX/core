@@ -175,7 +175,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
-			"mediaencryptionoptimistic" => array(
+			"media_encryption_optimistic" => array(
 				"value" => "no",
 				"flag" => $flag++
 			),
@@ -259,7 +259,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is not set to None.").' [media_encryption_optimistic]';
-		$tmparr['mediaencryptionoptimistic'] = array('prompttext' => _('Allow Non-Encrypted Media (Opportunistic SRTP)'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		$tmparr['media_encryption_optimistic'] = array('prompttext' => _('Allow Non-Encrypted Media (Opportunistic SRTP)'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		$tt = _("The number of in-use channels which will cause busy to be returned as device state. This should be left at 0 unless you know what you are doing");
 		$tmparr['device_state_busy_at'] = array('prompttext' => _('Device State Busy at'), 'value' => '0', 'tt' => $tt, 'level' => 1);
@@ -981,8 +981,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "outbound_proxy=".$config['outbound_proxy'];
 		}
 
-		if (!empty($config['mediaencryptionoptimistic'])) {
-			$endpoint[] = "media_encryption_optimistic=".$config['mediaencryptionoptimistic'];
+		if (!empty($config['media_encryption_optimistic'])) {
+			$endpoint[] = "media_encryption_optimistic=".$config['media_encryption_optimistic'];
 		}
 
 		if(!empty($config['device_state_busy_at']) && is_numeric($config['device_state_busy_at']) && $config['device_state_busy_at'] > 0) {

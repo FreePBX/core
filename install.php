@@ -980,3 +980,21 @@ if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['
 if(FreePBX::Modules()->checkStatus("sysadmin")) {
 	touch("/var/spool/asterisk/incron/core.logrotate");
 }
+
+outn(_("Migrating old media encryption values..."));
+$sth = \FreePBX::Database()->prepare("SELECT * FROM sip WHERE `keyword` = 'mediaencryption'");
+$sth->execute();
+$res = $sth->fetchAll(\PDO::FETCH_ASSOC);
+foreach($res as $row) {
+	$sth1 = \FreePBX::Database()->prepare("UPDATE sip SET `keyword` = :keyword, `data` = :data WHERE `keyword` = :oldkeyword AND `id` = :id");
+	$sth1->execute(array(
+		":oldkeyword" => $row['keyword'],
+		":keyword" => 'media_encryption',
+		":data" => ($row['data'] == 'auto') ? 'no' : $row['data'],
+		":id" => $row['id']
+	));
+}
+
+$sth = \FreePBX::Database()->prepare("UPDATE sip SET keyword = 'media_encryption_optimistic' WHERE `keyword` = 'mediaencryptionoptimistic'");
+$sth->execute();
+out(_("done"));
