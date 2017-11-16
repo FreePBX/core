@@ -62,6 +62,7 @@ switch($request['view']){
 							'dest' => $dest,
 							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 							);
+							$subhead .= ": ". $routename;
 		}else{
 			$route_seq = $last_seq+1;
 			if (!isset($dialpattern_array)) {
