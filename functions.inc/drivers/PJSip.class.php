@@ -187,6 +187,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"bundle" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -239,6 +243,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("When enabled, Asterisk condenses message waiting notifications from multiple mailboxes into a single NOTIFY. If it is disabled, individual NOTIFYs are sent for each mailbox.");
 		$tmparr['aggregate_mwi'] = array('prompttext' => _('Aggregate MWI'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
+
+		if(version_compare($this->version,'15.0','ge')) {
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("With this option enabled, Asterisk will attempt to negotiate the use of bundle. If negotiated this will result in multiple RTP streams being carried over the same underlying transport. Note that enabling bundle will also enable the rtcp_mux option");
+			$tmparr['bundle'] = array('prompttext' => _('Enable RTP bundling'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			unset($select);
+		}
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
@@ -952,6 +964,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['rtcp_mux']) && ((version_compare($this->version,'13.15.0','ge') && version_compare($this->version,'14.0','lt')) || version_compare($this->version,'14.4.0','ge'))) {
 			$endpoint[] = "rtcp_mux=".$config['rtcp_mux'];
+		}
+
+		if (!empty($config['bundle']) && version_compare($this->version,'15.0','ge')) {
+			$endpoint[] = "bundle=".$config['bundle'];
 		}
 
 		if (!empty($config['icesupport'])) {
