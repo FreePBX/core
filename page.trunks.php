@@ -393,7 +393,7 @@ if (!$tech && !$extdisplay) {
 	$trunk_types = \FreePBX::Core()->listTrunkTypes();
 
 	$displayvars['trunk_types'] = $trunk_types;
-	if($_REQUEST['fw_popover'] ==1){
+	if ($_REQUEST['fw_popover'] == 1) {
 		show_view(dirname(__FILE__).'/views/trunks/popover_main.php',$displayvars);
 	}else{
 	        show_view(dirname(__FILE__).'/views/trunks/main.php',$displayvars);

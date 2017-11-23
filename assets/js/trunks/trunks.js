@@ -428,7 +428,7 @@ function checkvalid() {
 	}
 
 $(document).ready(function() {
-	$('#submit, #duplicate').click(function() {
+	$('#duplicate').click(function() {
 		var theForm = document.trunkEdit;
 
 		defaultEmptyOK = true;
