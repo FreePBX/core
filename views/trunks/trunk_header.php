@@ -189,15 +189,6 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 
 ?>
 <div class="container-fluid">
-<?php if (!empty($_REQUEST['fw_popover'])) { ?>
-	<script>
-		$(document).ready(function(){
-			$('[name="fw_popover_process"]').val('true');
-			$('<input>').attr({type: 'hidden', name: 'fw_popover'}).val('1').appendTo('.popover-form');
-		});
-	</script>
-<?php
-      }?>
 	<h1><?php echo $pageheading ?></h1>
 	<?php echo $pageinfoinuse ?>
 	<?php echo $pageinfohelp ?>

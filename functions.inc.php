@@ -808,6 +808,7 @@ function core_destination_popovers() {
 		$ret['extensions'] = 'Extensions';
 		// adding trunk in popover
 		$ret['trunks'] = 'Trunks';
+		$ret['did'] = 'Did';
 	}
 	return $ret;
 }
@@ -876,9 +877,15 @@ function core_destinations() {
 		}
 	}
 
+	$didlist = core_did_list();
+        if (is_array($didlist)) {
+		foreach ($didlist as $did) {
+			$extens[] = array('destination' => $did['extension'], 'description' => $did['description'].'('.$did['extension'].')', 'category' => 'Did', 'id' => 'did');
+		}
+	}
 	return $extens;
-}
 
+	}
 function core_getdest($exten) {
 	$dests[] = 'from-did-direct,'.$exten.',1';
 	$dests[] = 'ext-trunk,'.$exten.',1';
