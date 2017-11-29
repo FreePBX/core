@@ -191,6 +191,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"maximum_expiration" => array(
+			        "value" => "7200",
+			        "flag" => $flag++
+			)
+
 		);
 		return array(
 			"dial" => $dial,
