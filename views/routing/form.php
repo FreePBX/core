@@ -22,7 +22,7 @@ if (function_exists('music_list')){
 }
 
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
-	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id));
+	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id, 'time_mode' => $time_mode,'timezone' => $timezone,'calendar_id' => $calendar_id,'calendar_group_id' => $calendar_group_id));
 }
 $routepriority = core_routing_list();
 $routeseqopts = '';
@@ -207,7 +207,7 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 				$trunkhtml .= '<td>';
 				$trunkhtml .= '<div class="input-group">';
 				$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
-			    $trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
+			 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
 				$trunkhtml .= '<option value=""></option>';
 				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off') {
@@ -218,6 +218,7 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 				}
 
 				$trunkhtml .= '</select>';
+				$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash"></i></button></span>';
 				$trunkhtml .= '</div>';
 				$trunkhtml .= '</td>';
 				$trunkhtml .= '</tr>';
@@ -242,6 +243,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		}
 	}
 	$trunkhtml .= '</select>';
+	$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash"></i></button></span>';
 	$trunkhtml .= '</div>';
 	$trunkhtml .= '</td>';
 	$trunkhtml .= '</tr>';

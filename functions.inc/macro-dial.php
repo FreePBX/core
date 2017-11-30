@@ -69,6 +69,7 @@ $ext->add($c,$s,'a30', new ext_set('HuntMember', 'HuntMember${HuntLoop}'));
 $ext->add($c,$s,'', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $[$["${RingGroupMethod}" = "hunt" ] | $["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]]]', 'a32', 'a35'));
 $ext->add($c,$s,'a32', new ext_set('CT_EXTEN', '${CUT(FILTERED_DIAL,,$[${HuntLoop} + 1])}'));
 $ext->add($c,$s,'', new ext_set('EXTTOCALL','${CT_EXTEN}')); //keep all variables consistent
+$ext->add($c,$s,'', new ext_set('__PICKUPMARK','${CT_EXTEN}')); //FREEPBX-10139 directed pickup and followme issue
 $ext->add($c,$s,'', new ext_set('DB(CALLTRACE/${CT_EXTEN})', '${CALLTRACE_HUNT}'));
 $ext->add($c,$s,'', new ext_goto('huntstart', 's'));
 $ext->add($c,$s,'a35', new ext_gotoif('$[$["${CALLTRACE_HUNT}" != "" ] & $["${RingGroupMethod}" = "memoryhunt" ]]', 'a36', 'a50'));
@@ -112,6 +113,8 @@ $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $s = 'ANSWER';
 $ext->add($c,$s,'answered', new ext_noop('Call successfully answered - Hanging up now'));
+//FREEPBX-14952 Caller Post Hangup Destination option under Virtual Queue is broken.
+$ext->add($c,$s,'', new ext_gotoif('$["${CALLER_DEST}"!=""&&"${DIALSTATUS}"="ANSWER"]','${CUT(CALLER_DEST,^,1)},${CUT(CALLER_DEST,^,2)},${CUT(CALLER_DEST,^,3)}'));
 $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $ext->add($c,'h','', new ext_macro('hangupcall'));

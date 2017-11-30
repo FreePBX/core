@@ -2,14 +2,16 @@
 <?php case "extensions":?>
 	<?php if($show) { ?>
 		<div id="toolbar-all">
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-				<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
-					<li><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></strong></a></li>
-				<?php } ?>
-			</ul>
+			<div class="dropdown">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
+						<li><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></strong></a></li>
+					<?php } ?>
+				</ul>
+			</div>
 			<a href="?display=extensions" class="btn"><i class="fa fa-list"></i> <?php echo _("List All Extensions")?></a>
 		</div>
 		<table data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-toolbar="#toolbar-all" data-cache="false" data-toggle="table" data-search="true" class="table" id="table-all-side">
@@ -59,12 +61,14 @@
 		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 			<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Device")?> <span class="caret"></span>
 		</button>
-		<a href="?display=devices<?php echo isset($popover)?$popover:''?>" class="btn"><i class="fa fa-list"></i> <?php echo _('List Devices')?></a>
-		<ul class="dropdown-menu" role="menu">
-			<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
-				<li><a href="?display=devices&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo isset($popover)?$popover:''?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_("Add New %s Device"), $driver['shortName'])?></strong></a></li>
-			<?php } ?>
-		</ul>
+		<div class="dropdown">
+			<a href="?display=devices<?php echo isset($popover)?$popover:''?>" class="btn"><i class="fa fa-list"></i> <?php echo _('List Devices')?></a>
+			<ul class="dropdown-menu" role="menu">
+				<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
+					<li><a href="?display=devices&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo isset($popover)?$popover:''?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_("Add New %s Device"), $driver['shortName'])?></strong></a></li>
+				<?php } ?>
+			</ul>
+		</div>
 	</div>
 	<table data-url="ajax.php?module=core&amp;command=getDeviceGrid&amp;type=all" data-toolbar="#toolbar-all" data-cache="false" data-toggle="table" data-search="true" class="table" id="table-all-devices-side">
 		<thead>

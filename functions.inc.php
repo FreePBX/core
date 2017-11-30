@@ -327,7 +327,7 @@ class core_conf {
 		}
 		// TODO: Temporary Kludge until CCSS is fixed
 		//
-		if (function_exists('campon_get_config') && version_compare($ast_version, "1.8", "ge")) {
+		if (function_exists('campon_get_config')) {
 			$cc_monitor_policy = "cc_monitor_policy=generic\n";
 		} else {
 			$cc_monitor_policy = "";
@@ -754,7 +754,6 @@ class core_conf {
 		}
 
 		$sql = "SELECT data,id from $table_name where keyword='account' and flags <> 1 group by data,id";
-
 		$results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 		if(DB::IsError($results)) {
 			die($results->getMessage());
@@ -1020,11 +1019,6 @@ function core_do_get_config($engine) {
 
 	switch($engine) {
 		case "asterisk":
-
-		$ast_ge_14 = version_compare($version, '1.4', 'ge');
-		$ast_lt_16 = version_compare($version, '1.6', 'lt');
-		$ast_lt_161 = version_compare($version, '1.6.1', 'lt');
-		$ast_ge_162 = version_compare($version, '1.6.2', 'ge');
 		$ast_ge_10 = version_compare($version, '10', 'ge');
 		$ast_ge_137 = version_compare($version, '13.7', 'ge');
 
@@ -1042,9 +1036,7 @@ function core_do_get_config($engine) {
 			$core_conf->addIaxGeneral('allow','alaw');
 			$core_conf->addIaxGeneral('allow','gsm');
 			$core_conf->addIaxGeneral('mailboxdetail','yes');
-			if ($ast_ge_14) {
-				$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
-			}
+			$core_conf->addIaxGeneral('tos','ef'); // Recommended setting from doc/ip-tos.txt
 
 			$fcc = new featurecode($modulename, 'blindxfer');
 			$code = $fcc->getCodeActive();
@@ -1235,7 +1227,7 @@ function core_do_get_config($engine) {
 		//         if it is. So we simply assign the variable $ext_pickup which one it is, and use that variable when
 		//         creating all the extensions below. So those are "$ext_pickup" on purpose!
 		//
-		if ($fc_pickup != '' && $ast_ge_14) {
+		if ($fc_pickup != '') {
 			$ext->addInclude('from-internal-additional', 'app-pickup');
 			$fclen = strlen($fc_pickup);
 			$ext_pickup = (strstr($engineinfo['raw'], 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
@@ -2063,7 +2055,7 @@ function core_do_get_config($engine) {
 	$routes = \FreePBX::Core()->getAllRoutes();
 	$trunk_table = core_trunks_listbyid();
 	$trunk_type_needed = array(); // track which macros need to be generated
-	$delim = $ast_lt_16 ? '|' : ',';
+	$delim = ',';
 	foreach ($routes as $route) {
 		$add_extra_pri1 = array();
 		$context = 'outrt-'.$route['route_id'];
@@ -2072,9 +2064,14 @@ function core_do_get_config($engine) {
 
 		if (function_exists('timeconditions_timegroups_get_times') && $route['time_group_id'] !== null) {
 			$times = timeconditions_timegroups_get_times($route['time_group_id'],true);
+			$timezone = $route['timezone'];
 			if (is_array($times) && count($times)) {
 				foreach ($times as $time) {
-					$ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
+					if(!empty($timezone) && $timezone != 'default') {
+						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1].$delim.$timezone,$comment);
+					} else {
+						$ext->addInclude('outbound-allroutes',$context.$delim.$time[1],$comment);
+					}
 				}
 			} else {
 				$ext->addInclude('outbound-allroutes',$context,$comment);
@@ -2282,12 +2279,13 @@ function core_do_get_config($engine) {
 
 	$ext->add($context, $exten, '', new ext_setvar('LOOPCOUNT','0'));
 	$ext->add($context, $exten, '', new ext_setvar('__MACRO_RESULT','ABORT'));
+	//FREEPBX-15217 QUEUE call confirm -> default voice prompt can not override the findmefollowme confirm file
+	//if the {ALT_CONFIRM_MSG}= default| then we should play default msg
+	$ext->add($context, $exten, '', new ext_noop('${ALT_CONFIRM_MSG} and arv= ${ARG1}'));
+	$ext->add($context, $exten, '', new ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ARG1='));
+	$ext->add($context, $exten, '', new ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ALT_CONFIRM_MSG='));
 	$ext->add($context, $exten, '', new ext_setvar('MSG1','${IF($["${ARG1}${ALT_CONFIRM_MSG}"=""]?incoming-call-1-accept-2-decline:${IF($[${LEN(${ALT_CONFIRM_MSG})}>0]?${ALT_CONFIRM_MSG}:${ARG1})})}'));
-	if ($ast_ge_14) {
-		$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
-	} else {
-		$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${LANGUAGE},macro-confirm'));
-	}
+	$ext->add($context, $exten, 'start', new ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
 	$ext->add($context, $exten, '', new ext_read('INPUT', '', 1, '', '', 4));
 	$ext->add($context, $exten, '', new ext_gotoif('$[${LEN(${INPUT})} > 0]', '${INPUT},1', 't,1'));
 
@@ -2328,11 +2326,9 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_gotoif('$[ ${LOOPCOUNT} < 5 ]', 's,start','noanswer,1'));
 
 	$exten = '_X';
-	if ($ast_ge_14) {
-		$ext->add($context, $exten, '', new ext_background('invalid,m,${CHANNEL(language)},macro-confirm'));
-	} else {
-		$ext->add($context, $exten, '', new ext_background('invalid,m,${LANGUAGE},macro-confirm'));
-	}
+
+	$ext->add($context, $exten, '', new ext_background('invalid,m,${CHANNEL(language)},macro-confirm'));
+
 	if ($amp_conf['AST_FUNC_SHARED']) {
 		$ext->add($context, $exten, '', new ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" | "${SHARED(ANSWER_STATUS,${FORCE_CONFIRM})}"=""]', 'toolate,1'));
 	} else {
@@ -2466,6 +2462,7 @@ function core_do_get_config($engine) {
 		$exten = 's';
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_execif('$["${INTRACOMPANYROUTE}" = "YES" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', 'CALLERID(num)=${DB(AMPUSER/${AMPUSER}/cidnum)}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
@@ -2928,6 +2925,10 @@ function core_do_get_config($engine) {
 	$context = 'macro-outbound-callerid';
 	$exten = 's';
 
+	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
+	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
+	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
+
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 	//
@@ -2940,10 +2941,13 @@ function core_do_get_config($engine) {
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
+
 	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
+	//FREEPBX-13173 if we are masquerading we need to reset the CID otherwise we will masquerade out as the masquerade
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CIDMASQUERADING}" = "TRUE"]', 'normcid'));
 	// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
 	// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
 	// is set for this CID, then it must be internal
@@ -2951,7 +2955,7 @@ function core_do_get_config($engine) {
 	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-	$ext->add($context, $exten, '', new ext_gotoif('$["foo${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "foo"]', 'bypass'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = ""]', 'bypass'));
 
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
@@ -3283,15 +3287,9 @@ function core_do_get_config($engine) {
 	//
 
 	//$ext->add('macro-vm', 'vmx', '', new ext_trysystem('/bin/ls ${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.[wW][aA][vV]'));
-	if ($ast_ge_14) {
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
-	} else {
-		$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" = "SUCCESS"]','tmpgreet'));
-		$ext->add('macro-vm', 'vmx', '',new ext_agi('checksound.agi,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}'));
-		$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${SYSTEMSTATUS}" != "SUCCESS"]','nofile'));
-	}
+	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
+
 
 	$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
 	$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
@@ -3647,18 +3645,9 @@ function core_do_get_config($engine) {
 	if ($intercom_code != '') {
 		$exten = 'clrheader';
 		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPURI})}&"${SIPURI}"="${SIP_URI_OPTIONS}"]', 'Set','SIP_URI_OPTIONS='));
-		if ($ast_ge_162) {
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
-		} else {
-			$ext->add($mcontext, $exten, '', new ext_set('SP', '0'));
-			$ext->add($mcontext, $exten, '', new ext_set('ITER', '1'));
-			$ext->add($mcontext, $exten, 'begin', new ext_execif('$[${ITER} > 9]', 'Set','SP=' ));
-			$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPADDHEADER${SP}${ITER}})}=0]', 'Return'));
-			$ext->add($mcontext, $exten, '', new ext_execif('$["${SIPADDHEADER${SP}${ITER}}"="${ALERTINFO}"|"${SIPADDHEADER${SP}${ITER}}"="${CALLINFO}"]', 'Set','SIPADDHEADER${SP}${ITER}='));
-			$ext->add($mcontext, $exten, '', new ext_setvar('ITER', '$[${ITER} + 1]'));
-			$ext->add($mcontext, $exten, '', new ext_gotoif('$[${ITER} < 100]', 'begin'));
-		}
+
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
 		$ext->add($mcontext,$exten,'', new ext_return(''));
 	}
 
@@ -3897,7 +3886,9 @@ function core_do_get_config($engine) {
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
-
+	//FREEPBX-13830 and FREEPBX-13025 Call recording stopped after a atxfer (attendend transfer)
+	$ext->add($mcontext, $exten,'', new ext_noop('${CDR(dstchannel)} monior file= ${MIXMONITOR_FILENAME}'));
+	$ext->add($mcontext, $exten,'', new ext_AGI('attendedtransfer-rec-restart.php,${CDR(dstchannel)},${MIXMONITOR_FILENAME}'));
 	$ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
 	/*
@@ -5433,25 +5424,30 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '') {
-	global $db;
-
-	$route_id = $db->escapeSimple($route_id);
-	$name = $db->escapeSimple($name);
-	$outcid = $db->escapeSimple($outcid);
-	$outcid_mode = trim($outcid) == '' ? '' : $db->escapeSimple($outcid_mode);
-	$password = $db->escapeSimple($password);
-	$emergency_route = strtoupper($db->escapeSimple($emergency_route));
-	$intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
-	$mohclass = $db->escapeSimple($mohclass);
-	$seq = $db->escapeSimple($seq);
-	$time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-	$dest = $db->escapeSimple($dest);
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	$sql = "UPDATE `outbound_routes` SET
-	`name`='$name', `outcid`='$outcid', `outcid_mode`='$outcid_mode', `password`='$password',
-	`emergency_route`='$emergency_route', `intracompany_route`='$intracompany_route', `mohclass`='$mohclass',
-	`time_group_id`=$time_group_id, `dest`='$dest' WHERE `route_id` = ".q($route_id);
-	sql($sql);
+	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
+	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
+	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
+	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
+
+	$sth = FreePBX::Database()->prepare($sql);
+	$sth->execute(array(
+		":name" => $name,
+		":outcid" => $outcid,
+		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+		":password" => $password,
+		":emergency_route" => strtoupper($emergency_route),
+		":intracompany_route" => strtoupper($intracompany_route),
+		":mohclass" => $mohclass,
+		":time_group_id" => $time_group_id,
+		":dest" => $dest,
+		":route_id" => $route_id,
+		":time_mode" => $time_mode,
+		":timezone" => $timezone,
+		":calendar_id" => $calendar_id,
+		":calendar_group_id" => $calendar_group_id
+	));
 
 	core_routing_updatepatterns($route_id, $patterns, true);
 	core_routing_updatetrunks($route_id, $trunks, true);
@@ -5461,30 +5457,29 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	global $amp_conf;
 	global $db;
 
-	$name = $db->escapeSimple($name);
-	$outcid = $db->escapeSimple($outcid);
-	$outcid_mode = $db->escapeSimple($outcid_mode);
-	$password = $db->escapeSimple($password);
-	$emergency_route = strtoupper($db->escapeSimple($emergency_route));
-	$intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
-	$mohclass = $db->escapeSimple($mohclass);
-	$time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-	$dest = $db->escapeSimple($dest);
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`)
-	VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id, '$dest')";
-	sql($sql);
+	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
+	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 
-	// TODO: sqlite_last_insert_rowid() un-tested and php5 ???
-	//
-	if(method_exists($db,'insert_id')) {
-		$route_id = $db->insert_id();
-	} else {
-		$route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
-	}
+	$sth = FreePBX::Database()->prepare($sql);
+	$sth->execute(array(
+		":name" => $name,
+		":outcid" => $outcid,
+		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+		":password" => $password,
+		":emergency_route" => strtoupper($emergency_route),
+		":intracompany_route" => strtoupper($intracompany_route),
+		":mohclass" => $mohclass,
+		":time_group_id" => $time_group_id,
+		":dest" => $dest,
+		":time_mode" => $time_mode,
+		":timezone" => $timezone
+	));
+
+	$route_id = FreePBX::Database()->lastInsertId();
 
 	core_routing_updatepatterns($route_id, $patterns);
 	core_routing_updatetrunks($route_id, $trunks);
@@ -6096,12 +6091,12 @@ function core_users_configpageload() {
 }
 
 function core_users_configprocess() {
-
+	global $astman;
 	//create vars from the request
 	extract($_REQUEST);
 
 	//make sure we can connect to Asterisk Manager
-	if (!checkAstMan()) {
+	if (!$astman || !$astman->connected()) {
 		return false;
 	}
 
@@ -6347,11 +6342,12 @@ function core_devices_configpageload() {
 }
 
 function core_devices_configprocess() {
+	global $astman;
 	if ( !class_exists('agi_asteriskmanager') )
 	include 'common/php-asmanager.php';
 
 	//make sure we can connect to Asterisk Manager
-	if (!checkAstMan()) {
+	if (!$astman || !$astman->connected()) {
 		return false;
 	}
 

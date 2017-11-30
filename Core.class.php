@@ -1038,6 +1038,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
 			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
 			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
+			$time_mode = isset($request['time_mode']) ? $request['time_mode'] : '';
+			$timezone = isset($request['timezone']) ? $request['timezone'] : '';
+			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
+			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
@@ -1058,12 +1062,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 					needreload();
 				break;
 				case "delroute":
@@ -1355,7 +1359,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			die_freepbx('Fields are empty');
 		}
 		$fields['account'] = array("value" => $account, "flag" => $flag++);
-		$fields['callerid'] = array("value" => (isset($_REQUEST['description']) && $_REQUEST['description']) ? $_REQUEST['description']." <".$account.'>' : 'device'." <".$account.'>', "flag" => $flag++);
+		$fields['callerid'] = array("value" => (isset($_REQUEST['name']) && $_REQUEST['name']) ? $_REQUEST['name']." <".$account.'>' : 'device'." <".$account.'>', "flag" => $flag++);
 		return $fields;
 	}
 
@@ -1451,7 +1455,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				"flag" => $flag++
 			),
 			"callerid" => array(
-				"value" => "device <".$number.">",
+				"value" => "$displayname <".$number.">",
 				"flag" => $flag++
 			)
 		);
@@ -1833,6 +1837,44 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$stmt->execute();
 		$routes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		return $routes;
+	}
+
+	/**
+     * Get a route
+     */
+	public function getRoute($id) {
+		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$route = $stmt->fetchObject();
+		return $route;
+	}
+
+	/**
+     * Delete a route
+     */
+	public function delRoute($id) {
+		$sql = "DELETE FROM outbound_routes WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_patterns WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_trunks WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+		$sql = "DELETE FROM outbound_route_sequence WHERE route_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($id));
+	}
+
+	/**
+	 * Delete trunk association from
+	 */
+	public function delRouteTrunk($routeId, $trunkId) {
+		$sql = "DELETE FROM outbound_route_trunks WHERE route_id = ? AND trunk_id = ?";
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute(array($routeId, $trunkId));
 	}
 
 	/**
@@ -2716,6 +2758,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		case "dids":
 			foreach ($rawData as $data) {
 				$exists = $this->getDID($data['extension'], $data['cidnum']);
+				//FREEPBX-15285 bulk handler for did's check case on destination
+				$data['destination'] = strtolower($data['destination']);
 				if(!$replaceExisting && !empty($exists)) {
 					return array("status" => false, "message" => _("DID already exists"));
 				} elseif($replaceExisting && !empty($exists)) {

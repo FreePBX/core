@@ -54,6 +54,13 @@ $(function() {
 			});
 		}
 	});
+	$(".deltrunkrow").on("click",function(e){
+		e.preventDefault();
+		if($(".deltrunkrow").length > 1){
+			$(this).closest('tr').remove();
+		}
+		bindToLast();
+	});
 });
 
 $('#routes').on("post-body.bs.table", function () {

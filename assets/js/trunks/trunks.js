@@ -337,6 +337,9 @@ $(document).ready(function() {
 		var theForm = document.trunkEdit;
 
 		defaultEmptyOK = true;
+		if(typeof trunknames[$("#trunk_name").val()] != "undefined"){
+			return warnInvalid($("#trunk_name"), _("Trunk names must be unique"));
+		}
 
 		if (isEmpty($.trim($('#trunkEdit input[name="outcid"]').val()))) {
 			if ($('#trunkEdit input[name="keepcid"]').val() == 'on' || $('#trunkEdit input[name="keepcid"]').val() == 'all') {

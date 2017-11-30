@@ -34,21 +34,6 @@ $cfignore    = strtoupper(trim($cfignore));
 $ampuser = get_var( $AGI, "AMPUSER" );
 $ampuser = trim($ampuser);
 
-$ast_ge_16   = version_compare($ast_version, "1.6", "ge");
-$has_extension_state = (get_var( $AGI, "HAS_EXTENSION_STATE" ) || $ast_ge_16);
-// If we are 1.6 then we have the EXTENSION_STATE() function and don't need to use the manager
-//
-if (!$has_extension_state) {
-  require_once "phpagi-asmanager.php";
-  $ampmgruser  = get_var( $AGI, "AMPMGRUSER" );
-  $ampmgrpass  = get_var( $AGI, "AMPMGRPASS" );
-  $astmgrhost  = get_var( $AGI, "ASTMANAGERHOST" );
-  $astman = $AGI->new_AsteriskManager();
-	if (!$astman->connect(!empty($astmgrhost) ? $astmgrhost : "127.0.0.1", $ampmgruser , $ampmgrpass,'off')) {
-		exit (1);
-	}
-}
-
 // Caller ID info is stored in $request in AGI class, passed from Asterisk
 $cidnum = $AGI->request['agi_callerid'];
 $cidname = $AGI->request['agi_calleridname'];
@@ -789,13 +774,54 @@ if (! $ds) {
 		$AGI->set_variable('DIALSTATUS','NOANSWER');
 	}
 }
+// Added for RVOL value set based on Rvol MODE{yes,no,never,force,dontcare}
+//we just need to set the RVOl=RVOLPARENT base on RVOL_MODE
+// get all varible needed.
+$rvol_mode    = get_var( $AGI, "RVOL_MODE" );
+$rvol_mode    = trim($rvol_mode);
+
+$rvol    = get_var( $AGI, "RVOL" );
+$rvol    = trim($rvol);
+
+$rvol_parent    = get_var( $AGI, "RVOLPARENT" );
+$rvol_parent    = trim($rvol_parent);
+
+debug("RVOL_MODE '$rvol_mode' ", 1);
+debug("RVOL is: $rvol", 1);
+debug("RVOLPARENT is: $rvol_parent", 1);
+
+switch($rvol_mode){
+	case "force":
+		//set RVOL=RVOLPARENT
+		$AGI->set_variable('__RVOL',$rvol_parent);
+		break;
+
+	case "yes":
+		//set RVOL=RVOLPARENT
+		$AGI->set_variable('__RVOL',$rvol_parent);
+		break;
+
+	case "no":
+		//should not override set again same value
+		$AGI->set_variable('__RVOL',$rvol);
+		break;
+
+	case "never":
+		//should not override set again same value
+		$AGI->set_variable('__RVOL',$rvol);
+		break;
+
+	case "dontcare":
+		//just dontcare !!!!!!
+		break;
+	default :
+		//Do Nothing
+		break;
+}
+//END OF RVOL MODIFICATION
 
 $AGI->set_variable('TIMEOUT',$timer);
 $AGI->set_variable('DIALOPTS',$dialopts);
-
-if (!$has_extension_state) {
-	$astman->disconnect();
-}
 
 // EOF dialparties.agi
 exit( 0 );
@@ -870,9 +896,7 @@ function debug($string, $level=3) {
 
 function is_ext_avail( $extnum ) {
 	global $ampuser;
-	global $astman;
 	global $AGI;
-	global $has_extension_state;
 
 	if($extnum == $ampuser) {
 		$status = 1;
@@ -881,41 +905,35 @@ function is_ext_avail( $extnum ) {
 		return $status;
 	}
 
-	if ($has_extension_state) {
-		$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
-		switch ($extstate_result) {
-			case "NOT_INUSE":
-				$status = 0;
-				break;
-			case "INUSE":
-				$status = 1;
-				break;
-			case "BUSY":
-				$status = 2;
-				break;
-			case "RINGING":
-				$status = 8;
-				break;
-			case "RINGINUSE":
-				$status = 9;
-				break;
-			case "HOLDINUSE":
-				$status = 17;
-				break;
-			case "ONHOLD":
-				$status = 16;
-				break;
-			case "UNAVAILABLE":
-			case "UNKNOWN":
-			default:
-				$status = 4;
-		}
-		debug("EXTENSION_STATE: $status ($extstate_result)", 1);
-	} else {
-		$status = $astman->ExtensionState( $extnum, 'from-internal' );
-		$status = $status['Status'];
-		debug("ExtensionState: $status", 1);
+	$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
+	switch ($extstate_result) {
+		case "NOT_INUSE":
+			$status = 0;
+			break;
+		case "INUSE":
+			$status = 1;
+			break;
+		case "BUSY":
+			$status = 2;
+			break;
+		case "RINGING":
+			$status = 8;
+			break;
+		case "RINGINUSE":
+			$status = 9;
+			break;
+		case "HOLDINUSE":
+			$status = 17;
+			break;
+		case "ONHOLD":
+			$status = 16;
+			break;
+		case "UNAVAILABLE":
+		case "UNKNOWN":
+		default:
+			$status = 4;
 	}
+	debug("EXTENSION_STATE: $status ($extstate_result)", 1);
+
 	return $status;
 }
-?>

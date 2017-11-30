@@ -20,6 +20,7 @@ $ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 // make sure AMPUSER is set if it doesn't get set below
 $ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
+//REALCALLERIDNUM Inheriting because of: http://issues.freepbx.org/browse/FREEPBX-13173
 $ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
 $ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLERIDNUM}/user)}'));
 
@@ -27,6 +28,7 @@ $ext->add($context, $exten, '', new ext_set('AMPUSER', '${DB(DEVICE/${REALCALLER
 $ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSER}" = "none"]', 'limit'));
 
 $ext->add($context, $exten, '', new ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
+$ext->add($context, $exten, '', new ext_execif('$["${ARG2}" != "EXTERNAL" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', '__CIDMASQUERADING=TRUE'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${AMPUSERCIDNAME:1:2}" = ""]', 'report'));
 
 // user may masquerade as a different user internally, so set the internal cid as indicated

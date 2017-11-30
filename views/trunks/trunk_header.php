@@ -42,7 +42,7 @@ switch($tech){
 	default:
 	break;
 }
-if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_FIELD']){
+//FREEPBX-15008 Consider enabling DISPLAY_MONITOR_TRUNK_FAILURES_FIELD by default
 	$mtfhtml = '<!--MONITOR TRUNK FAILURES-->';
 	$mtfhtml .= '<div class="element-container">';
 	$mtfhtml .= '	<div class="row">';
@@ -80,7 +80,7 @@ if($failtrunk_enable && $failtrunk || $amp_conf['DISPLAY_MONITOR_TRUNK_FAILURES_
 	$mtfhtml .= '	</div>';
 	$mtfhtml .= '</div>';
 	$mtfhtml .= '<!--END MONITOR TRUNK FAILURES-->';
-}
+
 $dpmrtop = _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occurred. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.").'<br /><br />';
 $dpmrhtml .= '<b>' . _("Rules:") . '</b><br />';
 $dpmrhtml .= '<strong>X</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 0-9") . '<br />';
@@ -295,7 +295,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 									<div class="row">
 										<div class="col-md-12">
-											<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("CallerID for calls placed out on this trunk<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span>
+											<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("Depending on the CID Option chosen, this CallerID will be used for calls placed through this trunk.<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX).")?></span>
 										</div>
 									</div>
 								</div>
@@ -329,7 +329,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 									<div class="row">
 										<div class="col-md-12">
-											<span id="keepcid-help" class="help-block fpbx-help-block"><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: blocks any CID that is the result of a forwarded call from off the system. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.") . _("Intra-Company Routes will always trasmit an extension's internal number and name.")?></span>
+											<span id="keepcid-help" class="help-block fpbx-help-block"><?php echo _("Determines what CIDs will be allowed out this trunk. IMPORTANT: EMERGENCY CIDs defined on an extension/device will ALWAYS be used if this trunk is part of an EMERGENCY Route regardless of these settings.<br />Allow Any CID: all CIDs including foreign CIDS from forwarded external calls will be transmitted.<br />Block Foreign CIDs: Sets any CID that is the result of a forwarded call from off the system to the Outbound CallerID defined for the trunk. If no Outbound CallerID is defined for the trunk, the Foreign CID will be sent unchanged. CIDs defined for extensions/users are transmitted.<br />Remove CNAM: this will remove CNAM from any CID sent out this trunk<br />Force Trunk CID: Always use the CID defined for this trunk except if part of any EMERGENCY Route with an EMERGENCY CID defined for the extension/device.") . _("Intra-Company Routes will always trasmit an extension's internal number and name.")?></span>
 										</div>
 									</div>
 								</div>

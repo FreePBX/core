@@ -27,10 +27,10 @@ foreach($routelist as $route){
 	}else{
 		$attributes .= '<i class="fa fa-lg fa-key fa-border text-muted" rel="Password Set" title="'._("Password Protected").'"></i>&nbsp;';
 	}
-	if($time_group_id != ''){
+	if($time_group_id != 0){
 		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-success" rel="Time Group Assigned" title="'._("Time Group Assigned").'"></i>&nbsp;';
 	}else{
-		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-muted" rel="Time Group Assigned" title="'._("Time Group Assigned").'"></i>&nbsp;';
+		$attributes .= '<i class="fa fa-lg fa-clock-o fa-border text-muted" rel="Time Group Assigned" title="'._("Time Group NOT Assigned").'"></i>&nbsp;';
 	}
 	$cidicon = '';
 	if($route['outcid_mode'] == "override_extension"){

@@ -37,9 +37,7 @@ include '/etc/freepbx.conf';
 	$intercom_code = get_var( "INTERCOMCODE" );
 	$campon_toggle = get_var( "CAMPONTOGGLE" );
 
-	$ast_version14 = version_compare($ast_version, "1.4", "ge");
-
-	$DEVSTATE = version_compare($ast_version, "1.6", "ge") ? "DEVICE_STATE" : "DEVSTATE";
+	$DEVSTATE =  "DEVICE_STATE";
 
 	$action      = get_action();
 	$this_device = get_this_device();
@@ -149,15 +147,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		set_user_devices($user, $new_devices);
 		set_hint($user, $new_devices);
 		set_queue_hint($user, $device);
-		if (version_compare(get_var("ASTVERSION"), "1.8.0", "ge")) {
-			$user_event_body = "\"UserDeviceAdded,Data: {$user}\\\\,{$device}\"";
-		} else if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
- 			$user_event_body = "\"UserDeviceAdded|Data: {$user}\\,{$device}\"";
- 		} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
- 			$user_event_body = "UserDeviceAdded,\"Data: {$user}\\\\,{$device}\"";
- 		} else {
- 			$user_event_body = "\"UserDeviceAdded|Data: {$user},{$device}\"";
- 		}
+		$user_event_body = "\"UserDeviceAdded,Data: {$user}\\\\,{$device}\"";
 
     $agi->exec("UserEvent", $user_event_body);
 
@@ -208,15 +198,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			set_user_devices($current_user, $new_devices);
 			set_hint($current_user, $new_devices);
 
-			if(version_compare(get_var("ASTVERSION"), "1.8.0", "ge")) {
-				$user_event_body = "\"UserDeviceRemoved,Data: {$current_user}\\\\,{$device}\"";
-			} else if(version_compare(get_var("ASTVERSION"), "1.6.1", "ge")) {
-				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user}\\,{$device}\"";
- 			} else if(version_compare(get_var("ASTVERSION"), "1.6.0", "ge")) {
- 				$user_event_body = "UserDeviceRemoved,\"Data: {$current_user}\\\\,{$device}\"";
- 			} else {
- 				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user},{$device}\"";
- 			}
+			$user_event_body = "\"UserDeviceRemoved,Data: {$current_user}\\\\,{$device}\"";
 
      	$agi->exec("UserEvent", $user_event_body);
 
@@ -253,7 +235,6 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 	function set_queue_hint($user, $device) {
 		global $astman;
-		global $ast_version14;
 		global $queue_toggle;
 		global $queue_pause_toggle;
 		global $que_devstate;
@@ -266,7 +247,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			return true;
 		}
 
-		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
+		$dp_pre =  'dialplan ';
 
 		$queues = get_user_queue_assignments($user);
 		if ($que_devstate && $queue_toggle != '' && !empty($queues)) {
@@ -293,7 +274,6 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 	function remove_queue_hint($device, $current_user) {
 		global $astman;
-		global $ast_version14;
 		global $queue_toggle;
 		global $queue_pause_toggle;
 		global $que_devstate;
@@ -306,7 +286,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			return true;
 		}
 
-		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
+		$dp_pre = 'dialplan ';
 
 		if ($que_devstate && $queue_toggle != '') {
 			cli_debug("removing $queue_toggle*$device@ext-queues hint",1);
@@ -337,10 +317,8 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		global $dnd_devstate;
 		global $intercom_code;
 		global $campon_toggle;
-		global $ast_version14;
 
-		// If Asterisk version >= 1.4, syntax change is 'dialplan add extension ...' vs. 'add extension ...'
-		$dp_pre = ($ast_version14) ? 'dialplan ' : '';
+		$dp_pre = 'dialplan ';
 
 		if ($devices) {
 			$dial_string = get_dial_string($devices);

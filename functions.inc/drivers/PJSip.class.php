@@ -187,6 +187,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"bundle" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"maximum_expiration" => array(
+			        "value" => "7200",
+			        "flag" => $flag++
+			)
+
 		);
 		return array(
 			"dial" => $dial,
@@ -240,10 +249,18 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['aggregate_mwi'] = array('prompttext' => _('Aggregate MWI'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
+		if(version_compare($this->version,'15.0','ge')) {
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("With this option enabled, Asterisk will attempt to negotiate the use of bundle. If negotiated this will result in multiple RTP streams being carried over the same underlying transport. Note that enabling bundle will also enable the rtcp_mux option");
+			$tmparr['bundle'] = array('prompttext' => _('Enable RTP bundling'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			unset($select);
+		}
+
 		$select[] = array('value' => 'no', 'text' => _('None'));
 		$select[] = array('value' => 'sdes', 'text' => _('SRTP via in-SDP (recommended)'));
 		$select[] = array('value' => 'dtls', 'text' => _('DTLS-SRTP (not recommended)'));
-		$tt = _("Determines whether res_pjsip will use and enforce usage of media encryption for this endpoint.").' [media_encryption]';
+		$tt = _("Determines whether res_pjsip will use and enforce usage of media encryption for this endpoint. Auto will enable SRTP via in-SDP encryption if TLS is enabled in SIPSettings.").' [media_encryption]';
 		$tmparr['media_encryption'] = array('prompttext' => _('Media Encryption'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
@@ -379,6 +396,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'retry_interval' => $trunk['retry_interval'],
 					'max_retries' => $trunk['max_retries'],
 					'expiration' => $trunk['expiration'],
+					'line' => 'yes',
+					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
 				if(!empty($trunk['contact_user'])) {
@@ -459,7 +478,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
-				'aors' => $tn
+				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
@@ -527,13 +546,23 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
-                                }
+					$conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
+				}
 
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
-                                }
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
+				}
+				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
+		            $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
+	             }
+				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
+				}
+
+				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
+				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
@@ -942,6 +971,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "rtcp_mux=".$config['rtcp_mux'];
 		}
 
+		if (!empty($config['bundle']) && version_compare($this->version,'15.0','ge')) {
+			$endpoint[] = "bundle=".$config['bundle'];
+		}
+
 		if (!empty($config['icesupport'])) {
 			$endpoint[] = "ice_support=".$config['icesupport'];
 		}
@@ -1246,6 +1279,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"sendpai" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
+				"rtp_symmetric" => "no",
+				"rewrite_contact" => "no",
 				"support_path" => "no"
 			);
 			if(version_compare($this->version,'13','ge')) {

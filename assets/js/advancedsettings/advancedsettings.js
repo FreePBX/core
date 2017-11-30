@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var lang = $('#UIDEFAULTLANG').val();
 	$('form[name=submitSettings]').submit(function() {
 		if($('#UIDEFAULTLANG').val() != lang) {
-			$.cookie('lang', $('#UIDEFAULTLANG').val());
+			Cookies.set('lang', $('#UIDEFAULTLANG').val(), { path: '' });
 		}
 		var msgInvalidAsteriskManagerPassword = _("Please enter a valid Asterisk Manager Password");
 		var passwordPattern = /^[a-z0-9!"#$%&'()*+,.\/:;<=>?@\[\] ^_`{|}~-]*$/i;
@@ -126,7 +126,7 @@ $(':input').change(function(){
 			var vid = $(this).attr('name');
 			var vval = $("input[name="+vid+"]:checked").val();
 			var dval = $("#"+vid+"default").val();
-			if((vval == 'true' && dval == 1)||(vval == 'false' && dval == 0)){
+			if((vval == 'true' && dval == 1)||(vval == 'false' && dval === 0)){
 				$("a[data-for='"+vid+"']").addClass('hidden');
 			}else{
 				$("a[data-for='"+vid+"']").removeClass('hidden');
