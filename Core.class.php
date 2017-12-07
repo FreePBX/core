@@ -1385,6 +1385,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"cid_masquerade" => "",
 			"noanswer_dest" => "",
 			"busy_dest" => "",
+			"concurrency_limit" => "",
 			"chanunavail_dest" => ""
 		);
 	}
@@ -2690,7 +2691,16 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				foreach ($settings as $key => $value) {
 					if (isset($data[$key])) {
 						/* Override default setting with our value. */
-						$settings[$key] = $data[$key];
+						// if concurrency_limit is "" dont override
+						if ($key == 'concurrency_limit') {
+							if ($data[$key] != "") {// there is some valid value
+								$settings[$key] = $data[$key];
+							} else { // unsetting.. So while adding it will set default value
+								unset($settings[$key]);
+							}
+						} else {
+							$settings[$key] = $data[$key];
+						}
 					}
 				}
 
@@ -2769,6 +2779,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				if(isset($tmp_user_data['cid_masquerade'])) {
 					$user['cid_masquerade'] = $tmp_user_data['cid_masquerade'];
 				}
+				if(isset($tmp_user_data['concurrency_limit'])) {
+                    $user['concurrency_limit'] = $tmp_user_data['concurrency_limit'];;
+                }
 				$data[$user['extension']] = array_merge($user, $device);
 			}
 
