@@ -239,7 +239,14 @@
 			<display>users</display>
 			<view>add</view>
 		</users>
- 	</popovers>
+		<trunks>
+			<display>trunks</display>
+		 </trunks>
+		 <did>
+			<display>did</display>
+			<view>form</view>
+		 </did>
+ 	 </popovers>
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
