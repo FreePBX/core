@@ -386,7 +386,7 @@ class core_conf {
 			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id='$id' and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
-				die($results2->getMessage());
+				throw new \Exception($results2_pre->getMessage());
 			}
 
 			// Move all 'disallow=all' and 'deny' to the top to avoid errors
