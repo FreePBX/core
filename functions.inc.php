@@ -386,7 +386,7 @@ class core_conf {
 			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id='$id' and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
-				die($results2->getMessage());
+				throw new \Exception($results2_pre->getMessage());
 			}
 
 			// Move all 'disallow=all' and 'deny' to the top to avoid errors
@@ -4916,63 +4916,14 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 
 //get unique trunks
 function core_trunks_getDetails($trunkid='') {
-	global $db;
-	global $amp_conf;
-	global $astman;
-
 	if ($trunkid != '') {
-		$sql = "SELECT * FROM `trunks` WHERE `trunkid` = ?";
-		$trunk = $db->getRow($sql,array($trunkid),DB_FETCHMODE_ASSOC);
-		$tech = strtolower($trunk['tech']);
-		switch ($tech) {
-			case 'iax2':
-			$trunk['tech'] = 'iax';
-			break;
-			default:
-			$trunk['tech'] = $tech;
-			break;
-		}
-		if ($astman) {
-			$trunk['dialopts'] = $astman->database_get("TRUNK",$trunkid . "/dialopts");
-		}
-	} else {
-		$sql = "SELECT * FROM `trunks` ORDER BY tech, name";
-		$trunk = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-		if ($astman) {
-			$tops = $astman->database_show('TRUNK');
-			foreach ($trunk as $i => $t) {
-				if (isset($tops['/TRUNK/' . $t['trunkid'] . '/dialopts'])) {
-					$trunk[$i]['dialopts'] = $tops['/TRUNK/' . $t['trunkid'] . '/dialopts'];
-				} else {
-					$trunk[$i]['dialopts'] = false;
-				}
-			}
-		}
+		return \FreePBX::Core()->getTrunkByID($trunkid);
 	}
-	return $trunk;
+	return \FreePBX::Core()->listTrunks();
 }
 
 function core_trunks_listbyid() {
-	$result = sql('SELECT * from `trunks` ORDER BY `trunkid`','getAll',DB_FETCHMODE_ASSOC);
-	$trunk_list = array();
-	foreach ($result as $trunk) {
-		if ($trunk['name'] == '') {
-			$tech = strtoupper($trunk['tech']);
-			switch ($tech) {
-				case 'IAX':
-				$trunk['name'] = 'IAX2/'.$trunk['channelid'];
-				break;
-				case 'CUSTOM':
-				$trunk['name'] = 'AMP:'.$trunk['channelid'];
-				break;
-				default:
-				$trunk['name'] = $tech.'/'.$trunk['channelid'];
-				break;
-			}
-		}
-		$trunk_list[$trunk['trunkid']] = $trunk;
-	}
-	return $trunk_list;
+	return \FreePBX::Core()->listTrunks();
 }
 
 function core_trunks_list($assoc = false) {
@@ -5030,44 +4981,13 @@ function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
 
 
 function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
-	global $db;
-
-	$trunknum =  $db->escapeSimple($trunknum);
-	$filter_prepend = '/[^0-9+*#wW]/';
-	$filter_prefix = '/[^0-9*#+xnzXNZ\-\[\]]/';
-	$filter_match =  '/[^0-9.*#+xnzXNZ\-\[\]]/';
-
-	$insert_pattern = array();
-	$seq = 0;
-	foreach ($patterns as $pattern) {
-		$match_pattern_prefix = $db->escapeSimple(preg_replace($filter_prefix,'',strtoupper(trim($pattern['match_pattern_prefix']))));
-		$match_pattern_pass = $db->escapeSimple(preg_replace($filter_match,'',strtoupper(trim($pattern['match_pattern_pass']))));
-		$prepend_digits = $db->escapeSimple(str_replace('W', 'w', preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits'])))));
-		if ($match_pattern_prefix.$match_pattern_pass == '') {
-			continue;
-		}
-		// if duplicate prepend, get rid of subsequent since they will never be checked
-		$hash_index = md5($match_pattern_prefix.$match_pattern_pass);
-		if (!isset($insert_pattern[$hash_index])) {
-			$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $prepend_digits, $seq);
-			$seq++;
-		}
-	}
-
-	if ($delete) {
-		sql('DELETE FROM `trunk_dialpatterns` WHERE `trunkid`='.q($trunknum));
-	}
-	$compiled = $db->prepare('INSERT INTO `trunk_dialpatterns` (`trunkid`, `match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`, `seq`) VALUES ('.$trunknum.',?,?,?,?)');
-	$result = $db->executeMultiple($compiled,$insert_pattern);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating trunk_dialpatterns');
-	}
+	return \FreePBX::Core()->updateTrunkDialRules($trunknum, $patterns, $delete);
 }
 
 function core_trunks_list_dialrules() {
 	$rule_hash = array();
 
-	$patterns = core_trunks_get_dialrules();
+	$patterns = \FreePBX::Core()->getAllTrunkDialRules();
 	foreach ($patterns as $pattern) {
 		//$rule_hash[$pattern['trunkid']][] = $pattern['prepend_digits'].'^'.$pattern['match_pattern_prefix'].'|'.$pattern['match_pattern_pass'];
 		$rule_hash[$pattern['trunkid']][] = $pattern;
@@ -5075,138 +4995,42 @@ function core_trunks_list_dialrules() {
 	return $rule_hash;
 }
 
-/* THIS HAS BEEN DEPRECATED BUT WILL REMAIN IN FOR A FEW RELEASES */
-function core_trunks_parse_conf($filename, &$conf, &$section) {
-	if (is_null($conf)) {
-		$conf = array();
-	}
-	if (is_null($section)) {
-		$section = "general";
-	}
-
-	if (file_exists($filename)) {
-		$fd = fopen($filename, "r");
-		while ($line = fgets($fd, 1024)) {
-			if (preg_match("/^\s*([a-zA-Z0-9-_]+)\s*=\s*(.*?)\s*([;#].*)?$/",$line,$matches)) {
-				// name = value
-				// option line
-				$conf[$section][ $matches[1] ] = $matches[2];
-			} else if (preg_match("/^\s*\[(.+)\]/",$line,$matches)) {
-				// section name
-				$section = strtolower($matches[1]);
-			} else if (preg_match("/^\s*#include\s+(.*)\s*([;#].*)?/",$line,$matches)) {
-				// include another file
-
-				if ($matches[1][0] == "/") {
-					// absolute path
-					$filename = $matches[1];
-				} else {
-					// relative path
-					$filename =  dirname($filename)."/".$matches[1];
-				}
-
-				core_trunks_parse_conf($filename, $conf, $section);
-			}
-		}
-	}
-}
-
 function core_trunks_getTrunkTrunkName($trunknum) {
-	$name = sql("SELECT `name` FROM `trunks` WHERE `trunkid` = $trunknum", "getOne");
-	return $name;
+	return \FreePBX::Core()->getTrunkTrunkNameByID($trunknum);
 }
 
 function core_trunks_getTrunkPeerDetails($trunknum) {
-	global $db;
-
-	$tech = core_trunks_getTrunkTech($trunknum);
-
-	if (!core_trunk_has_registrations($tech)) {
-		return '';
-	}
-	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-peer-$trunknum' ORDER BY flags, keyword DESC","getAll");
-
-	foreach ($results as $result) {
-		if ($result[0] != 'account') {
-			if (isset($confdetail))
-			$confdetail .= $result[0] .'='. $result[1] . "\n";
-			else
-			$confdetail = $result[0] .'='. $result[1] . "\n";
-		}
-	}
-	return $confdetail;
+	return \FreePBX::Core()->getTrunkPeerDetailsByID($trunknum);
 }
 
 function core_trunks_getTrunkUserContext($trunknum) {
-	$usercontext = sql("SELECT `usercontext` FROM `trunks` WHERE `trunkid` = $trunknum", "getOne");
-	return ((isset($usercontext)) ? $usercontext : '');
+	return \FreePBX::Core()->getTrunkUserContext($trunknum);
 }
 
 function core_trunks_getTrunkUserConfig($trunknum) {
-	global $db;
-
-	$tech = core_trunks_getTrunkTech($trunknum);
-	if (!core_trunk_has_registrations($tech)) {
-		return '';
-	}
-
-	$results = sql("SELECT keyword,data FROM $tech WHERE `id` = 'tr-user-$trunknum' ORDER BY flags, keyword DESC","getAll");
-
-	foreach ($results as $result) {
-		if ($result[0] != 'account') {
-			if (isset($confdetail))
-			$confdetail .= $result[0] .'='. $result[1] . "\n";
-			else
-			$confdetail = $result[0] .'='. $result[1] . "\n";
-		}
-	}
-	return isset($confdetail)?$confdetail:null;
+	return \FreePBX::Core()->getTrunkUserConfigByID($trunknum);
 }
 
 //get trunk account register string
 function core_trunks_getTrunkRegister($trunknum) {
-	$tech = core_trunks_getTrunkTech($trunknum);
-	if (!core_trunk_has_registrations($tech)){
-		return '';
-	}
-
-	$results = sql("SELECT `keyword`, `data` FROM $tech WHERE `id` = 'tr-reg-$trunknum'","getAll");
-
-	foreach ($results as $result) {
-		$register = $result[1];
-	}
-	return isset($register)?$register:null;
+	return \FreePBX::Core()->getTrunkRegisterStringByID($trunknum);
 }
 
 function core_trunks_get_dialrules($trunknum = false) {
-	global $db;
 	if ($trunknum === false) {
-		$sql = "SELECT * FROM `trunk_dialpatterns` ORDER BY `trunkid`, `seq`";
+		return \FreePBX::Core()->getAllTrunkDialRules();
 	} else {
-		$trunknum = q($db->escapeSimple($trunknum));
-		$sql = "SELECT * FROM `trunk_dialpatterns` WHERE `trunkid` = $trunknum  ORDER BY `seq`";
+		return \FreePBX::Core()->getTrunkDialRulesByID($trunknum);
 	}
-	$patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	return $patterns;
 }
-
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
-	$sql = 'SELECT a.seq, b.name FROM outbound_route_trunks a JOIN outbound_routes b ON a.route_id = b.route_id WHERE trunk_id = '.$trunknum;
-	$results = sql( $sql, "getAll" ,DB_FETCHMODE_ASSOC);
-
-	$routes = array();
-	foreach ($results as $entry) {
-		$routes[$entry['name']] = $entry['seq'];
-	}
-	return $routes;
+	return \FreePBX::Core()->getTrunkRoutesByID($trunknum);
 }
 
 function core_trunks_delete_dialrules($trunknum) {
-	global $db;
-	$trunknum = q($db->escapeSimple($trunknum));
-	sql("DELETE FROM `trunk_dialpatterns` WHERE `trunkid` = $trunknum");
+	return \FreePBX::Core()->deleteTrunkDialRulesByID($trunknum);
 }
 
 
@@ -5220,14 +5044,7 @@ function core_trunks_addDialRules($trunknum, $dialrules) {
 }
 
 function core_trunk_has_registrations($type = ''){
-	$types = array(
-		'zap',
-		'dahdi',
-		'custom',
-		''
-	);
-	return !in_array($type, $types);
-
+	return \FreePBX::Core()->trunkHasRegistrations($type);
 }
 
 function core_trunks_deleteDialRules($trunknum) {
@@ -5262,10 +5079,7 @@ function core_trunks_readDialRulesFile() {
 // function core_routing_getroutemohsilence($route)
 // function core_routing_getroutecid($route)
 function core_routing_get($route_id) {
-	global $db;
-	$sql = 'SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id='.q($db->escapeSimple($route_id));
-	$route = sql($sql,"getRow",DB_FETCHMODE_ASSOC);
-	return $route;
+	return \FreePBX::Core()->getRouteByID($route_id);
 }
 
 // function core_routing_getroutenames()
@@ -5389,11 +5203,7 @@ function core_routing_renamebyid($route_id, $new_name) {
 
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
-	global $db;
-	$route_id = q($db->escapeSimple($route_id));
-	$sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = $route_id ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
-	$patterns = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-	return $patterns;
+	return \FreePBX::Core()->getRoutePatternsByID($route_id);
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5422,14 +5232,7 @@ function core_routing_formatpattern($pattern) {
 
 // function core_routing_getroutetrunks($route)
 function core_routing_getroutetrunksbyid($route_id) {
-	global $db;
-	$route_id = q($db->escapeSimple($route_id));
-	$sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = $route_id ORDER BY `seq`";
-	$trunks = $db->getCol($sql);
-	if(DB::IsError($trunks)) {
-		die_freepbx($trunks->getDebugInfo());
-	}
-	return $trunks;
+	return FreePBX::Core()->getRouteTrunksByID($route_id);
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
@@ -5538,23 +5341,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 }
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
-	global $db;
-	$dbh = \FreePBX::Database();
-	$insert_trunk = array();
-	$seq = 0;
-	foreach ($trunks as $trunk) {
-		$insert_trunk[] = array( $route_id,$trunk, $seq);
-		$seq++;
-	}
-	if ($delete) {
-		sql('DELETE FROM `outbound_route_trunks` WHERE `route_id`='.q($route_id));
-	}
-	$stmt = $dbh->prepare('INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
-	$ret = array();
-	foreach($insert_trunk as $t){
-		$ret[] = $stmt->execute($t);
-	}
-	return $ret;
+	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
 }
 
 /* callback to Time Groups Module so it can display usage information

@@ -1620,7 +1620,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 */
 	public function deleteTrunk($trunknum, $tech = null, $edit = false){
 		if ($tech === null) { // in EditTrunk, we get this info anyways
-			$tech = \core_trunks_getTrunkTech($trunknum);
+			$tech = $this->getTrunkTech($trunknum);
 		}
 
 		// conditionally, delete from iax or sip
@@ -1663,7 +1663,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * List All Trunks
 	 * @return array Array of Trunks
 	 */
-	public function listTrunks(){
+	public function listTrunks() {
 		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute();
@@ -1673,20 +1673,237 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			if ($trunk['name'] == '') {
 				$tech = strtoupper($trunk['tech']);
 				switch ($tech) {
-					case 'IAX':
-					$trunk['name'] = 'IAX2/'.$trunk['channelid'];
-					break;
 					case 'CUSTOM':
-					$trunk['name'] = 'AMP:'.$trunk['channelid'];
+						$trunk['name'] = 'AMP:'.$trunk['channelid'];
 					break;
 					default:
-					$trunk['name'] = $tech.'/'.$trunk['channelid'];
+						$trunk['name'] = $tech.'/'.$trunk['channelid'];
 					break;
 				}
 			}
+			$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
 			$trunk_list[$trunk['trunkid']] = $trunk;
 		}
 		return $trunk_list;
+	}
+
+	public function trunkHasRegistrations($type = ''){
+		$types = array(
+			'zap',
+			'dahdi',
+			'custom',
+			''
+		);
+		return !in_array($type, $types);
+	}
+
+	public function deleteTrunkDialRulesByID($trunknum) {
+		$sql = "DELETE FROM `trunk_dialpatterns` WHERE `trunkid` = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($trunknum));
+	}
+
+	public function getTrunkRoutesByID($trunknum) {
+		$sql = 'SELECT a.seq, b.name FROM outbound_route_trunks a JOIN outbound_routes b ON a.route_id = b.route_id WHERE trunk_id = ?';
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($trunknum));
+		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+
+		$routes = array();
+		foreach ($results as $entry) {
+			$routes[$entry['name']] = $entry['seq'];
+		}
+		return $routes;
+	}
+
+	public function updateRouteTrunks($route_id, &$trunks, $delete = false) {
+		$insert_trunk = array();
+		$seq = 0;
+		foreach ($trunks as $trunk) {
+			$insert_trunk[] = array( $route_id,$trunk, $seq);
+			$seq++;
+		}
+		if ($delete) {
+			$sth = $this->database->prepare("DELETE FROM `outbound_route_trunks` WHERE `route_id`= ?");
+			$sth->execute(array($route_id));
+		}
+		$stmt = $this->database->prepare('INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
+		$ret = array();
+		foreach($insert_trunk as $t){
+			$ret[] = $stmt->execute($t);
+		}
+		return $ret;
+	}
+
+	public function updateTrunkDialRules($trunknum, &$patterns, $delete = false) {
+		$filter_prepend = '/[^0-9+*#wW]/';
+		$filter_prefix = '/[^0-9*#+xnzXNZ\-\[\]]/';
+		$filter_match =  '/[^0-9.*#+xnzXNZ\-\[\]]/';
+
+		$insert_pattern = array();
+		$seq = 0;
+		foreach ($patterns as $pattern) {
+			$match_pattern_prefix = preg_replace($filter_prefix,'',strtoupper(trim($pattern['match_pattern_prefix'])));
+			$match_pattern_pass = preg_replace($filter_match,'',strtoupper(trim($pattern['match_pattern_pass'])));
+			$prepend_digits = str_replace('W', 'w', preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits']))));
+			if ($match_pattern_prefix.$match_pattern_pass == '') {
+				continue;
+			}
+			// if duplicate prepend, get rid of subsequent since they will never be checked
+			$hash_index = md5($match_pattern_prefix.$match_pattern_pass);
+			if (!isset($insert_pattern[$hash_index])) {
+				$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $prepend_digits, $seq);
+				$seq++;
+			}
+		}
+
+		if ($delete) {
+			$sth = $this->database->prepare("DELETE FROM `trunk_dialpatterns` WHERE `trunkid`= ?");
+			$sth->execute(array($trunknum));
+		}
+		$sth = $this->database->prepare('INSERT INTO `trunk_dialpatterns` (`trunkid`, `match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`, `seq`) VALUES (?,?,?,?,?)');
+		foreach($insert_pattern as $pattern) {
+			array_unshift($pattern, $trunknum);
+			$sth->execute($pattern);
+		}
+	}
+
+	public function getRouteByID($route_id) {
+		$sql = 'SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id=?';
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($route_id));
+		return $sth->fetch(\PDO::FETCH_ASSOC);
+	}
+
+	public function getAllTrunkDialRules() {
+		$sql = "SELECT * FROM `trunk_dialpatterns` ORDER BY `trunkid`, `seq`";
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function getRouteTrunksByID($route_id) {
+		$sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = ? ORDER BY `seq`";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($route_id));
+		$res = $sth->fetchAll(\PDO::FETCH_COLUMN);
+		return $res;
+	}
+
+	public function getRoutePatternsByID($route_id) {
+		$sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = ? ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($route_id));
+		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function getTrunkDialRulesByID($trunkid) {
+		$sql = "SELECT * FROM `trunk_dialpatterns` WHERE `trunkid` = ?  ORDER BY `seq`";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($trunkid));
+		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function getTrunkTrunkNameByID() {
+		$name = "SELECT `name` FROM `trunks` WHERE `trunkid` = ?";
+		$sth = $this->database->prepare($name);
+		$sth->execute(array($trunknum));
+		$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		return isset($results['name']) ? $results['name'] : false;
+	}
+
+	public function getTrunkPeerDetailsByID($trunkid) {
+		$tech = $this->getTrunkTech($trunkid);
+		if (!$this->trunkHasRegistrations($tech)){
+			return '';
+		}
+
+		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array('tr-peer-'.$trunkid));
+		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($results as $result) {
+			if ($result['keyword'] != 'account') {
+				if (isset($confdetail)) {
+					$confdetail .= $result['keyword'] .'='. $result['data'] . "\n";
+				} else {
+					$confdetail = $result['keyword'] .'='. $result['data'] . "\n";
+				}
+			}
+		}
+		return isset($confdetail)?$confdetail:null;
+	}
+
+	public function getTrunkUserContext($trunkid) {
+		$sql = "SELECT `usercontext` FROM `trunks` WHERE `trunkid` = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($trunkid));
+		$results = $sth->fetch(\PDO::FETCH_ASSOC);
+
+		return ((isset($results['usercontext'])) ? $results['usercontext'] : '');
+	}
+
+	public function getTrunkUserConfigByID($trunkid) {
+		$tech = $this->getTrunkTech($trunkid);
+		if (!$this->trunkHasRegistrations($tech)){
+			return '';
+		}
+
+		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array('tr-user-'.$trunkid));
+		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($results as $result) {
+			if ($result['keyword'] != 'account') {
+				if (isset($confdetail)) {
+					$confdetail .= $result['keyword'] .'='. $result['data'] . "\n";
+				} else {
+					$confdetail = $result['keyword'] .'='. $result['data'] . "\n";
+				}
+			}
+		}
+		return isset($confdetail)?$confdetail:null;
+	}
+
+	public function getTrunkRegisterStringByID($trunkid) {
+		$tech = $this->getTrunkTech($trunkid);
+		if (!$this->trunkHasRegistrations($tech)){
+			return '';
+		}
+
+		$sql = "SELECT `data` FROM $tech WHERE `id` = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array('tr-reg-'.$trunkid));
+		$result = $sth->fetch(\PDO::FETCH_ASSOC);
+		return isset($result['data'])?$result['data']:null;
+	}
+
+	public function getTrunkByID($trunkid) {
+		$sql = 'SELECT * from `trunks` WHERE `trunkid` = ?';
+		$stmt = $this->database->prepare($sql);
+		$ret  = $stmt->execute(array($trunkid));
+		$trunk = $stmt->fetch(\PDO::FETCH_ASSOC);
+		if ($trunk['name'] == '') {
+			$tech = strtoupper($trunk['tech']);
+			switch ($tech) {
+				case 'CUSTOM':
+					$trunk['name'] = 'AMP:'.$trunk['channelid'];
+				break;
+				default:
+					$trunk['name'] = $tech.'/'.$trunk['channelid'];
+				break;
+			}
+		}
+		$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
+		return $trunk;
+	}
+
+	public function getTrunkByChannelID($trunkid) {
+		$sql = 'SELECT * from `trunks` WHERE `channelid` = ?';
+		$stmt = $this->database->prepare($sql);
+		$ret  = $stmt->execute(array($trunkid));
+		$result = $stmt->fetch(\PDO::FETCH_ASSOC);
+		return $result;
 	}
 
 	/**
