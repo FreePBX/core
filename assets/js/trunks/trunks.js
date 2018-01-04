@@ -195,7 +195,6 @@ $(document).ready(function(){
   $("#dial-pattern-clear").click(function(){
     clearAllPatterns();
   });
-	$('#trunk_name').val($('#trunk_name').val().replace(" ","_"));
 });
 
 function patternsRemove(idx) {
@@ -329,11 +328,7 @@ function validatePatterns() {
     return true;
   }
 }
-
-//document.trunkEdit.trunk_name.focus();
-
-$(document).ready(function() {
-	$('#submit, #duplicate').click(function() {
+function checkvalid() {
 		var theForm = document.trunkEdit;
 
 		defaultEmptyOK = true;
@@ -429,7 +424,13 @@ $(document).ready(function() {
 		} else {
 			return false;
 		}
+	}
+
+$(document).ready(function() {
+	$('#duplicate').click(function() {
+		checkvalid();
 	});
+
 	if($("#outcid").length) {
 		var cidval = $("#outcid").val();
 		if(cidval.indexOf('hidden') > -1){
