@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.120.26</version>
+	<version>13.0.121</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.121* Move more procedural functions to class based functions
 		*13.0.120.26* Fix upreported issue on forums
 		*13.0.120.25* FREEPBX-16291 Bulk Handler missing fields 
 		*13.0.120.24* FREEPBX-16240 Add label to header
