@@ -2167,6 +2167,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			} elseif(!empty($result['tech']) && $type == "virtual") {
 				continue;
 			}
+			$result['cwtone'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/cwtone']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/cwtone'] : "";
 			$result['recording_in_external'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/external']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/external'] : "";
 			$result['recording_out_external'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/external']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/out/external'] : "";
 			$result['recording_in_internal'] = isset($dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/internal']) ? $dbfamily['/AMPUSER/'.$result['extension'].'/recording/in/internal'] : "";
@@ -2499,6 +2500,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$astman = $this->FreePBX->astman;
 		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
+			$astman->database_put("AMPUSER",$extension."/cwtone",isset($settings['cwtone']) ? $settings['cwtone'] : '');
 			$astman->database_put("AMPUSER",$extension."/rvolume",isset($settings['rvolume']) ? $settings['rvolume'] : '');
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
@@ -2692,6 +2694,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
 
 			$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
+
+			$results['cwtone'] = $astman->database_get("AMPUSER",$extension."/cwtone");
 
 			$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
 			$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
