@@ -539,10 +539,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
-				//yes,no
-				if(!empty($trunk['sendrpid']) && $trunk['sendrpid'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
-					$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
+				//yes,pai,both,no
+				if (isset($trunk['sendrpid'])) {
+					if ($trunk['sendrpid'] == "yes" || $trunk['sendrpid'] == "both") {
+						$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
+					}
+					if ($trunk['sendrpid'] == "pai" || $trunk['sendrpid'] == "both") {
+						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
+					}
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
@@ -1276,7 +1280,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendpai" => "no",
+				"sendrpid" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",

@@ -783,11 +783,13 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<label class="control-label" for="sendrpid"><?php echo _("Send RPID/PAI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
 							</div>
-							<div class="col-md-9 radioset">
-								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ($sendrpid == "yes"?"CHECKED":"") ?>>
-								<label for="sendrpidyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="sendrpid" id="sendrpidno" value = "no" <?php echo ($sendrpid == "yes"?"":"CHECKED") ?>>
-								<label for="sendrpidno"><?php echo _("No");?></label>
+							<div class="col-md-9">
+								<select name="sendrpid" id="sendrpid" class="form-control">
+									<option value="no" <?php echo isset($sendrpid) && $sendrpid == "no" ? "selected" : ""?>><?php echo _("No")?></option>
+									<option value="yes" <?php echo isset($sendrpid) && $sendrpid == "yes" ? "selected" : ""?>><?php echo _("Send Remote-Party-ID header")?></option>
+									<option value="pai" <?php echo isset($sendrpid) && $sendrpid == "pai" ? "selected" : ""?>><?php echo _("Send P-Asserted-Identity header")?></option>
+									<option value="both" <?php echo isset($sendrpid) && $sendrpid == "both" ? "selected" : ""?>><?php echo _("Both")?></option>
+								</select>
 							</div>
 						</div>
 					</div>
@@ -795,7 +797,7 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="sendrpid-help" class="help-block fpbx-help-block"><?php echo _("Send the P-Asserted-Identity and Remote-Party-ID header")?></span>
+					<span id="sendrpid-help" class="help-block fpbx-help-block"><?php echo _("Send the P-Asserted-Identity and/or Remote-Party-ID header")?></span>
 				</div>
 			</div>
 		</div>
