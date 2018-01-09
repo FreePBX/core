@@ -3,18 +3,62 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.1alpha2</version>
+	<version>14.0.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*15.0.1alpha2* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
-		*15.0.1alpha1* Inital Release
+		*14.0.3* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
+		*14.0.2* Migrate more settings from procedurals to objects
+		*14.0.1.25* Popover changes: extensions and trunks 
+		*14.0.1.24* FREEPBX-16240 Add label to header, FREEPBX-16296 Extension Import ignores Max Reg field for PJSIP Extensions
+		*14.0.1.23* FREEPBX-16262 ignore conflicting values
+		*14.0.1.22* FREEPBX-16262 Migrate mediaencryption to media_encryption
+		*14.0.1.21* FREEPBX-15956
+		*14.0.1.20* Restrict modules in attendedtransfer-rec
+		*14.0.1.19* Remove automatically setting up media encryption for pjsip
+		*14.0.1.18* FREEPBX-16016 Bulk handler breaks RPID settings on extension import
+		*14.0.1.17* FREEPBX-15824 positioning
+		*14.0.1.16* FREEPBX-13173 FREEPBX-6753 FREEPBX-15550 FREEPBX-15824 FREEPBX-15840
+		*14.0.1.15* FREEPBX-15956
+		*14.0.1.14* FREEPBX-15903
+		*14.0.1.13* Merge from 13
+		*14.0.1.12* FREEPBX-15339 FREEPBX-15637 FREEPBX-15285
+		*14.0.1.11* Fix pjsip media encryption name
+		*14.0.1.10* FREEPBX-15840
+		*14.0.1.9* FREEPBX-15631
+		*14.0.1.8* FREEPBX-13837
+		*14.0.1.7* FREEPBX-15640 Issue with Follow me ringallv2 strategy
+		*14.0.1.6* FREEPBX-15588
+		*14.0.1.4* FREEPBX-15535 FREEPBX-15090 FREEPBX-13025 FREEPBX-13830 REEPBX-15459 FREEPBX-15459
+		*14.0.1.3* FREEPBX-15216
+		*14.0.1.2* FREEPBX-13739 FREEPBX-15217 FREEPBX-15008 FREEPBX-14952
+		*14.0.1.1* FREEPBX-12215 use proper methods to set headers
+		*14.0.1* Stable release
+		*14.0.1rc1.12* Bump from 13
+		*14.0.1rc1.11* FREEPBX-10489, FREEPBX-10139
+		*14.0.1rc1.10* FREEPBX-14735
+		*14.0.1rc1.9* FREEPBX-13068
+		*14.0.1rc1.8* Merge from 13 to 14
+		*14.0.1rc1.7* Merge from 13 to 14
+		*14.0.1rc1.6* FREEPBX-14477 Advanced settings language selection broken
+		*14.0.1rc1.5* FREEPBX-14430 Add values that were removed but are required to define conf settings
+		*14.0.1rc1.4* FREEPBX-14379 Cannot Create Outbound Routes
+		*14.0.1rc1.3* Merge from 13 to 14
+		*14.0.1rc1.2* FREEPBX-14017 Generate files correctly
+		*14.0.1rc1.1* Invalid key-ing
+		*14.0.1rc1* RC1
+		*14.0.1beta9 FREEPBX-14197 When adding an extension display the extension
+		*14.0.1beta8* FREEPBX-14050 Add detail to tool tip for 'block foreign CIDs' on trunk page
+		*14.0.1beta3* Fix dialparties issue
+		*14.0.1beta2* Feature parity with 13
+		*14.0.1beta1* Prepare for Beta
+		*14.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>15.0</version>
+		<version>14.0</version>
 	</depends>
 	<database>
 		<table name="trunks">
@@ -181,7 +225,7 @@
 		<devices needsenginedb="yes">Devices</devices>
 		<did needsenginedb="yes" category="Connectivity">Inbound Routes</did>
 		<dahdichandids category="Connectivity">DAHDI Channel DIDs</dahdichandids>
-		<routing category="Connectivity">Outbound Routes</routing>
+		<routing category="Connectivity" needsenginedb="yes">Outbound Routes</routing>
 		<trunks needsenginedb="yes" category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>
 		<ampusers category="Admin">Administrators</ampusers>
@@ -197,7 +241,14 @@
 			<display>users</display>
 			<view>add</view>
 		</users>
- 	</popovers>
+		<trunks>
+			<display>trunks</display>
+		 </trunks>
+		 <did>
+			<display>did</display>
+			<view>form</view>
+		 </did>
+ 	 </popovers>
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
@@ -211,6 +262,6 @@
 		</bulkhandler>
 	</hooks>
 	<supported>
-		<version>15.0</version>
+		<version>14.0</version>
 	</supported>
 </module>
