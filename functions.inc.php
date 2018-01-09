@@ -386,7 +386,7 @@ class core_conf {
 			$sql = "SELECT tech.keyword,tech.data from $table_name tech LEFT OUTER JOIN trunks on (tech.id = CONCAT('tr-peer-',trunks.trunkid) OR tech.id = CONCAT('tr-user-',trunks.trunkid)) where tech.id='$id' and tech.keyword <> 'account' and (trunks.disabled = 'off' OR trunks.disabled IS NULL) order by flags, keyword DESC";
 			$results2_pre = $db->getAll($sql, DB_FETCHMODE_ASSOC);
 			if(DB::IsError($results2_pre)) {
-				throw new \Exception($results2_pre->getMessage());
+				die($results2->getMessage());
 			}
 
 			// Move all 'disallow=all' and 'deny' to the top to avoid errors
@@ -4692,24 +4692,24 @@ function core_dahdichandids_get($channel) {
 * @pram boolean; true disables trunk, false is enables trunk
 */
 function core_trunks_disable($trunk, $switch) {
+	if(empty($trunk)){
+		return false;
+	}
 	switch ($trunk) {
 		case 'all':
 		case '*':
-		$trunks = core_trunks_getDetails();
+			$trunks = core_trunks_getDetails();
 		break;
 		case 'reg':
 		case 'registered':
-		foreach (core_trunks_getDetails() as $t) {
-			if($reg = core_trunks_getTrunkRegister($t['trunkid'])) {
-				$trunks[] = $t;
+			foreach (core_trunks_getDetails() as $t) {
+				if($reg = core_trunks_getTrunkRegister($t['trunkid'])) {
+					$trunks[] = $t;
+				}
 			}
-		}
-		break;
-		case '':
-		return false;//cannot call without a trunk
 		break;
 		default:
-		$trunks[] = core_trunks_getDetails($trunk);
+			$trunks[] = core_trunks_getDetails($trunk);
 		break;
 	}
 
@@ -4717,33 +4717,14 @@ function core_trunks_disable($trunk, $switch) {
 	if (empty($trunks)) {
 		return false;
 	}
-
+	$freepbx = FreePBX::Create();
 	foreach ($trunks as $t) {
-		$trunk			= core_trunks_getDetails($t['trunkid']);
-		$regstring 		= core_trunks_getTrunkRegister($t['trunkid']);
-		$userconfig		= core_trunks_getTrunkUserConfig($t['trunkid']);
-		$peerdetails	= core_trunks_getTrunkPeerDetails($t['trunkid']);
-		$disabled		= $switch ? 'on' : 'off';
-
-		core_trunks_edit(
-		$trunk['trunkid'],
-		$trunk['channelid'],
-		$trunk['dialoutprefix'],
-		$trunk['maxchans'],
-		$trunk['outcid'],
-		$peerdetails,
-		$trunk['usercontext'],
-		$userconfig,
-		$regstring,
-		$trunk['keepcid'],
-		$trunk['failscript'],
-		$disabled,
-		$trunk['name'],
-		$trunk['provider'],
-		$trunk['continue']
-	);
-
-}
+		if($switch){
+				$freepbx->Core->disableTrunk($t);
+				continue;
+		}
+		$freepbx->Core->enableTrunk($t);
+	}
 }
 
 // we're adding ,don't require a $trunknum
