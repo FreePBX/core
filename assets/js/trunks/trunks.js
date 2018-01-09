@@ -394,7 +394,7 @@ function checkvalid() {
 				return false;
 			}
 		}
-		if (!isEmpty(theForm.channelid.value)) {
+		if (typeof theForm.channelid !== "undefined" && !isEmpty(theForm.channelid.value)) {
 			var tmp_channelid_index = $.inArray(theForm.channelid.value.trim(), trunk_channelids);
 			var tmp_channelid_index_2 = $.inArray(theForm.channelid.value.trim(), trunk_usercontexts);
 			if(tmp_channelid_index != -1 || tmp_channelid_index_2 != -1) {
@@ -404,7 +404,7 @@ function checkvalid() {
 				return warnInvalid(theForm.channelid, theForm.channelid.value.trim()  + _(" already used in ") + trunk_names[tmp_channelid_index] + _(",please use a different Trunk Name."));
 			}
 		}
-		if (!isEmpty(theForm.usercontext.value)) {
+		if (typeof theForm.channelid !== "undefined" && !isEmpty(theForm.usercontext.value)) {
 			var tmp_usercontext_index = $.inArray(theForm.usercontext.value.trim(), trunk_usercontexts);
 			var tmp_usercontext_index_2 = $.inArray(theForm.usercontext.value.trim(), trunk_channelids);
 			if(tmp_usercontext_index != -1 || tmp_usercontext_index_2 != -1) {
