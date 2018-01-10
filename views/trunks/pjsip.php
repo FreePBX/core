@@ -587,6 +587,32 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 		</div>
 		<!--END SERVERURI-->
+        <!--MEDIA ADDRESS -->
+        <div class="element-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <label class="control-label" for="media_address"><?php echo _("Media Address") ?></label>
+                                <i class="fa fa-question-circle fpbx-help-icon" data-for="media_address"></i>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="media_address" id="media_address" value="<?php echo $media_address?>"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+					<span id="media_address-help" class="help-block fpbx-help-block">
+						<?php echo _("This address will be provided to clients. If blank, will use the default settings")?>
+					</span>
+                </div>
+            </div>
+        </div>
+        <!--END MEDIA ADDRESS-->
                 <!--AOR -->
                 <div class="element-container">
                         <div class="row">

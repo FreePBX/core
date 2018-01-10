@@ -571,6 +571,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
 
+			if(!empty($trunk['media_address']))
+			{
+				$conf['pjsip.endpoint.conf'][$tn]['media_address'] = $trunk['media_address'];
+			}
+
 			if(!empty($this->_endpoint[$tn]) && is_array($this->_endpoint[$tn])) {
 				foreach($this->_endpoint[$tn] as $el) {
 					$conf["pjsip.endpoint.conf"][$tn][] = "{$el['key']}={$el['value']}";
@@ -1285,7 +1290,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
 				"rewrite_contact" => "no",
-				"support_path" => "no"
+				"support_path" => "no",
+				"media_address" => ""
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
