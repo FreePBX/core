@@ -478,7 +478,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
-				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn
+				'aors' => $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
@@ -539,14 +539,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
-				//yes,pai,both,no
-				if (isset($trunk['sendrpid'])) {
-					if ($trunk['sendrpid'] == "yes" || $trunk['sendrpid'] == "both") {
-						$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
-					}
-					if ($trunk['sendrpid'] == "pai" || $trunk['sendrpid'] == "both") {
-						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
-					}
+				//yes,no
+				if(!empty($trunk['sendrpid']) && $trunk['sendrpid'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
+					$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
@@ -800,8 +796,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				if(version_compare($this->version,'13.8','ge')) {
-					$transport[$t]['allow_reload'] = "yes";
+					$transport[$t]['allow_reload'] = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
 				}
+				
+				// Based on this document : https://wiki.asterisk.org/wiki/display/AST/IP+Quality+of+Service
+				// Transport sip protocol.
+				$transport[$t]['tos'] = "cs3";	// Decimal value: 96
+				$transport[$t]['cos'] = "3";	// 802.1p uses 3 bits of the VLAN header, this parameter can take integer values from 0 to 7.
 
 				// Add the Generic localnet settings.
 				//TODO: This should call a method and not the config direct.
@@ -903,6 +904,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// Endpoint
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
+		$endpoint[] = "tos_audio=ef";
+		$endpoint[] = "tos_video=af41";
+		$endpoint[] = "cos_audio=5";
+		$endpoint[] = "cos_video=4";
 
 		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
@@ -1280,7 +1285,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendrpid" => "no",
+				"sendpai" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
