@@ -831,8 +831,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 */
 	public function getDefaultSIPCodecs() {
 		// Grab the default Codecs from the sipsettings module.
-		$codecs = $this->freepbx->Sipsettings->getConfig('voicecodecs');
-
+		$codecs 	= $this->freepbx->Sipsettings->getConfig('voicecodecs');
+		$vcodecs 	= $this->freepbx->Sipsettings->getConfig('vcodec');
+		
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
 			// Grab the default codecs from BMO
@@ -840,6 +841,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if ($en) {
 					$codecs[$c] = $en;
 				}
+			}
+		}
+		
+		if (!empty($vcodecs)) {
+			// Sipsettings doesn't have any video codecs yet.
+			$idx = count($codecs) + 1 ;
+			foreach ($vcodecs as $vc => $value) {
+					$codecs[$vc] = $idx++;
 			}
 		}
 
@@ -880,6 +889,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {array} &$retarr Returned Array
 	 */
 	private function generateEndpoint($config, &$retarr) {
+		
 		// Validate $config array
 		$this->validateEndpoint($config);
 		if($config['sipdriver'] != 'chan_pjsip') {
