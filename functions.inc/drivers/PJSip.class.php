@@ -800,8 +800,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				if(version_compare($this->version,'13.8','ge')) {
-					$transport[$t]['allow_reload'] = "yes";
+					$transport[$t]['allow_reload'] = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
 				}
+
+				// Based on this document : https://wiki.asterisk.org/wiki/display/AST/IP+Quality+of+Service
+				// Transport sip protocol.
+				$transport[$t]['tos'] = "cs3";	// Decimal value: 96
+				$transport[$t]['cos'] = "3";	// 802.1p uses 3 bits of the VLAN header, this parameter can take integer values from 0 to 7.
 
 				// Add the Generic localnet settings.
 				//TODO: This should call a method and not the config direct.
@@ -831,6 +836,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function getDefaultSIPCodecs() {
 		// Grab the default Codecs from the sipsettings module.
 		$codecs = $this->freepbx->Sipsettings->getConfig('voicecodecs');
+		$vcodecs = $this->freepbx->Sipsettings->getConfig('vcodec');
 
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
@@ -839,6 +845,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if ($en) {
 					$codecs[$c] = $en;
 				}
+			}
+		}
+
+		if (!empty($vcodecs)) {
+			// Sipsettings doesn't have any video codecs yet.
+			$idx = count($codecs) + 1 ;
+			foreach ($vcodecs as $vc => $value) {
+				$codecs[$vc] = $idx++;
 			}
 		}
 
@@ -903,6 +917,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// Endpoint
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
+		$endpoint[] = "tos_audio=ef";
+		$endpoint[] = "tos_video=af41";
+		$endpoint[] = "cos_audio=5";
+		$endpoint[] = "cos_video=4";
 
 		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
@@ -1280,7 +1298,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendrpid" => "no",
+				"send_rpid" => "no",
+				"send_pai" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
