@@ -1817,6 +1817,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return isset($results['name']) ? $results['name'] : false;
 	}
 
+	public function getTrunkDetails($trunkid) {
+		$tech = $this->getTrunkTech($trunkid);
+		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($trunkid));
+		return $sth->fetchAll(\PDO::FETCH_KEY_PAIR);
+	}
+
 	public function getTrunkPeerDetailsByID($trunkid) {
 		$tech = $this->getTrunkTech($trunkid);
 		if (!$this->trunkHasRegistrations($tech)){
@@ -2229,6 +2237,144 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			return array();
 		}
 		return $results;
+	}
+
+	public function addTrunk($name, $tech, $settings, $editmode=false) {
+		$settings['tech'] = $tech;
+		$name = empty($name) ? $settings['channelid'] : $name;
+
+		// find the next available ID
+		if(!$editmode) {
+			$trunknum = 1;
+
+			// This is pretty ugle, will fix when we redo trunks and routes with proper uniqueids.
+			// get the list, sort them, then look for a hole and use it, or overflow to the end if
+			// not and use that
+			//
+			$trunk_hash = array();
+			foreach($this->listTrunks() as $trunk) {
+				$trunknum = ltrim($trunk['trunkid'],"OUT_");
+				$trunk_hash[] = $trunknum;
+			}
+			sort($trunk_hash);
+			$trunknum = 1;
+			foreach ($trunk_hash as $trunk_id) {
+				if ($trunk_id != $trunknum) {
+					break;
+				}
+				$trunknum++;
+			}
+		} else {
+			$trunknum = $settings['trunknum'];
+			unset($settings['trunknum']);
+		}
+
+		$nonull = array('failtrunk','outcid','dialoutprefix');
+		foreach($nonull as $item) {
+			$settings[$item] = !is_null($settings[$item]) ? $settings[$item] : ""; // can't be NULL
+		}
+
+		$disable_flag = ($settings['disabletrunk'] == "on")?1:0;
+
+		switch (strtolower($tech)) {
+			case "iax":
+			case "iax2":
+				$this->addSipOrIaxTrunk($settings['peerdetails'],'iax',$settings['channelid'],$trunknum,$disable_flag,'peer');
+				if ($settings['usercontext'] != ""){
+					$this->addSipOrIaxTrunk($settings['userconfig'],'iax',$settings['usercontext'],$trunknum,$disable_flag,'user');
+				}
+				if ($settings['register'] != ""){
+					$this->addTrunkRegister($trunknum,'iax',$settings['register'],$disable_flag);
+				}
+			break;
+			case "sip":
+				$this->addSipOrIaxTrunk($settings['peerdetails'],'sip',$settings['channelid'],$trunknum,$disable_flag,'peer');
+				if ($settings['usercontext'] != ""){
+					$this->addSipOrIaxTrunk($settings['userconfig'],'sip',$settings['usercontext'],$trunknum,$disable_flag,'user');
+				}
+				if ($settings['register'] != ""){
+					$this->addTrunkRegister($trunknum,'sip',$settings['register'],$disable_flag);
+				}
+			break;
+			case "pjsip":
+				$pjsip = $this->getDriver('pjsip');
+				if($pjsip !== false) {
+					$pjsip->addTrunk($trunknum,$settings);
+				}
+			break;
+		}
+
+		$sql = "INSERT INTO `trunks`
+		(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`, `continue`)
+		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array(
+			$trunknum,
+			$name,
+			$settings['tech'],
+			$settings['outcid'],
+			$settings['keepcid'],
+			$settings['maxchans'],
+			$settings['failtrunk'],
+			$settings['dialoutprefix'],
+			$settings['channelid'],
+			$settings['usercontext'],
+			$settings['provider'],
+			$settings['disabletrunk'],
+			$settings['continue']
+		));
+
+		if ($settings['dialopts'] !== false) {
+			$this->freepbx->astman->database_put("TRUNK", $settings['trunknum'] . '/dialopts',$settings['dialopts']);
+		} else {
+			$this->freepbx->astman->database_del("TRUNK", $settings['trunknum'] . '/dialopts');
+		}
+		return $trunknum;
+	}
+
+	public function addSipOrIaxTrunk($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
+		switch ($type) {
+			case 'peer':
+			$trunknum = 'tr-peer-'.$trunknum;
+			break;
+			case 'user':
+			$trunknum = 'tr-user-'.$trunknum;
+			break;
+		}
+
+		$confitem['account'] = $channelid;
+		$gimmieabreak = nl2br($config);
+		$lines = preg_split('#<br />#',$gimmieabreak);
+		foreach ($lines as $line) {
+			$line = trim($line);
+			if (count(preg_split('/=/',$line)) > 1) {
+				$tmp = preg_split('/=/',$line,2);
+				$key=trim($tmp[0]);
+				$value=trim($tmp[1]);
+				if (isset($confitem[$key]) && !empty($confitem[$key]))
+				$confitem[$key].="&".$value;
+				else
+				$confitem[$key]=$value;
+			}
+		}
+		$sth = $this->database->prepare("INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
+		// rember 1=disabled so we start at 2 (1 + the first 1)
+		$seq = 1;
+		foreach($confitem as $k=>$v) {
+			$seq = ($disable_flag == 1) ? 1 : $seq+1;
+			$sth->execute(array($k,$v,$seq));
+		}
+
+	}
+
+	public function addTrunkRegister($trunknum,$tech,$reg,$disable_flag=0) {
+		$sql = "INSERT INTO $tech (id, keyword, data, flags) values (:id,'register',:data,:flags)";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array(
+			':id' => 'tr-reg-'.$trunknum,
+			':data' => $reg,
+			':flags' => $disable_flag
+		));
 	}
 
 	/**

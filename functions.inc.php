@@ -4729,32 +4729,23 @@ function core_trunks_disable($trunk, $switch) {
 
 // we're adding ,don't require a $trunknum
 function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue="off", $dialopts=false) {
-	global $db;
-	$name = trim($name) == "" ? $channelid : $name;
-
-	// find the next available ID
-	$trunknum = 1;
-
-	// This is pretty ugle, will fix when we redo trunks and routes with proper uniqueids.
-	// get the list, sort them, then look for a hole and use it, or overflow to the end if
-	// not and use that
-	//
-	$trunk_hash = array();
-	foreach(core_trunks_list() as $trunk) {
-		$trunknum = ltrim($trunk[0],"OUT_");
-		$trunk_hash[] = $trunknum;
-	}
-	sort($trunk_hash);
-	$trunknum = 1;
-	foreach ($trunk_hash as $trunk_id) {
-		if ($trunk_id != $trunknum) {
-			break;
-		}
-		$trunknum++;
-	}
-
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
-	return $trunknum;
+	$settings = array(
+		"channelid" => $channelid,
+		"dialoutprefix" => $dialoutprefix,
+		"maxchans" => $maxchans,
+		"outcid" => $outcid,
+		"peerdetails" => $peerdetails,
+		"usercontext" => $usercontext,
+		"userconfig" => $userconfig,
+		"register" => $register,
+		"keepcid" => $keepcid,
+		"failtrunk" => $failtrunk,
+		"disabletrunk" => $disabletrunk,
+		"provider" => $provider,
+		"continue" => $continue,
+		"dialopts" => $dialopts
+	);
+	return FreePBX::Core()->addTrunk($name, $tech, $settings);
 }
 
 function core_trunks_del($trunknum, $tech = null , $edit = false) {
@@ -4763,89 +4754,60 @@ function core_trunks_del($trunknum, $tech = null , $edit = false) {
 }
 
 function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off', $dialopts = false) {
-	global $db;
-	$name = trim($name) == "" ? $channelid : $name;
-
-	$tech = core_trunks_getTrunkTech($trunknum);
+	$tech = FreePBX::Core()->getTrunkTech($trunknum);
 	if ($tech == "") {
 		return false;
 	}
-	core_trunks_del($trunknum, $tech, true);
-	core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts);
+	$settings = array(
+		"trunknum" => $trunknum,
+		"channelid" => $channelid,
+		"dialoutprefix" => $dialoutprefix,
+		"maxchans" => $maxchans,
+		"outcid" => $outcid,
+		"peerdetails" => $peerdetails,
+		"usercontext" => $usercontext,
+		"userconfig" => $userconfig,
+		"register" => $register,
+		"keepcid" => $keepcid,
+		"failtrunk" => $failtrunk,
+		"disabletrunk" => $disabletrunk,
+		"provider" => $provider,
+		"continue" => $continue,
+		"dialopts" => $dialopts
+	);
+	\FreePBX::Core()->deleteTrunk($trunknum, $tech, true);
+	if($tech == 'pjsip') {
+		$settings = array_merge($_REQUEST,$settings);
+	}
+	return FreePBX::Core()->addTrunk($name, $tech, $settings);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
 // This is not obsolete 8-( 2013-12-31.
 function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts=false) {
-	global $db, $astman;
-
-	if  (is_null($dialoutprefix)) $dialoutprefix = ""; // can't be NULL
-
-	//echo  "backendAddTrunk($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register)";
-
-	// change iax to "iax2" (only spot we actually store iax2, since its used by Dial()..)
-	$techtemp = ((strtolower($tech) == "iax") ? "iax2" : $tech);
-	$outval = (($techtemp == "custom") ? "AMP:".$channelid : strtoupper($techtemp).'/'.$channelid);
-	unset($techtemp);
-
-	$disable_flag = ($disabletrunk == "on")?1:0;
-
-	switch (strtolower($tech)) {
-		case "iax":
-		case "iax2":
-		core_trunks_addSipOrIax($peerdetails,'iax',$channelid,$trunknum,$disable_flag,'peer');
-		if ($usercontext != ""){
-			core_trunks_addSipOrIax($userconfig,'iax',$usercontext,$trunknum,$disable_flag,'user');
-		}
-		if ($register != ""){
-			core_trunks_addRegister($trunknum,'iax',$register,$disable_flag);
-		}
-		break;
-		case "sip":
-		core_trunks_addSipOrIax($peerdetails,'sip',$channelid,$trunknum,$disable_flag,'peer');
-		if ($usercontext != ""){
-			core_trunks_addSipOrIax($userconfig,'sip',$usercontext,$trunknum,$disable_flag,'user');
-		}
-		if ($register != ""){
-			core_trunks_addRegister($trunknum,'sip',$register,$disable_flag);
-		}
-		break;
-		case "pjsip":
-		$pjsip = FreePBX::Core()->getDriver('pjsip');
-		if($pjsip !== false) {
-			$displayvars = $pjsip->addTrunk($trunknum);
-		}
-		break;
+	$settings = array(
+		"trunknum" => $trunknum,
+		"channelid" => $channelid,
+		"dialoutprefix" => $dialoutprefix,
+		"maxchans" => $maxchans,
+		"outcid" => $outcid,
+		"peerdetails" => $peerdetails,
+		"usercontext" => $usercontext,
+		"userconfig" => $userconfig,
+		"register" => $register,
+		"keepcid" => $keepcid,
+		"failtrunk" => $failtrunk,
+		"disabletrunk" => $disabletrunk,
+		"name" => $name,
+		"provider" => $provider,
+		"continue" => $continue,
+		"dialopts" => $dialopts
+	);
+	if($tech == 'pjsip') {
+		$settings = array_merge($_REQUEST,$settings);
 	}
-
-	$sql = "
-	INSERT INTO `trunks`
-	(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`, `continue`)
-	VALUES (
-	'$trunknum',
-	'".$db->escapeSimple($name)."',
-	'".$db->escapeSimple($tech)."',
-	'".$db->escapeSimple($outcid)."',
-	'".$db->escapeSimple($keepcid)."',
-	'".$db->escapeSimple($maxchans)."',
-	'".$db->escapeSimple($failtrunk)."',
-	'".$db->escapeSimple($dialoutprefix)."',
-	'".$db->escapeSimple($channelid)."',
-	'".$db->escapeSimple($usercontext)."',
-	'".$db->escapeSimple($provider)."',
-	'".$db->escapeSimple($disabletrunk)."',
-	'".$db->escapeSimple($continue)."'
-	)";
-	sql($sql);
-
-	if ($astman) {
-		if ($dialopts !== false) {
-			$astman->database_put("TRUNK", $trunknum . '/dialopts',$dialopts);
-		} else {
-			$astman->database_del("TRUNK", $trunknum . '/dialopts');
-		}
-	}
+	return FreePBX::Core()->addTrunk($tech, $settings, true);
 }
 
 //TODO: replace with NEW table
@@ -4854,45 +4816,9 @@ function core_trunks_getTrunkTech($trunknum) {
 	return FreePBX::Core()->getTrunkTech($trunknum);
 }
 
-
 //add trunk info to sip or iax table
 function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
-	global $db;
-	switch ($type) {
-		case 'peer':
-		$trunknum = 'tr-peer-'.$trunknum;
-		break;
-		case 'user':
-		$trunknum = 'tr-user-'.$trunknum;
-		break;
-	}
-
-	$confitem['account'] = $channelid;
-	$gimmieabreak = nl2br($config);
-	$lines = preg_split('#<br />#',$gimmieabreak);
-	foreach ($lines as $line) {
-		$line = trim($line);
-		if (count(preg_split('/=/',$line)) > 1) {
-			$tmp = preg_split('/=/',$line,2);
-			$key=trim($tmp[0]);
-			$value=trim($tmp[1]);
-			if (isset($confitem[$key]) && !empty($confitem[$key]))
-			$confitem[$key].="&".$value;
-			else
-			$confitem[$key]=$value;
-		}
-	}
-	// rember 1=disabled so we start at 2 (1 + the first 1)
-	$seq = 1;
-	foreach($confitem as $k=>$v) {
-		$seq = ($disable_flag == 1) ? 1 : $seq+1;
-		$dbconfitem[]=array($db->escapeSimple($k),$db->escapeSimple($v),$seq);
-	}
-	$compiled = $db->prepare("INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
-	$result = $db->executeMultiple($compiled,$dbconfitem);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getMessage()."<br><br>INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,'$disable_flag')");
-	}
+	return FreePBX::Core()->addSipOrIaxTrunk($config,$table,$channelid,$trunknum,$disable_flag,$type);
 }
 
 //get unique trunks
@@ -4909,12 +4835,7 @@ function core_trunks_listbyid() {
 
 function core_trunks_list($assoc = false) {
 	// TODO: $assoc default to true, eventually..
-
-	global $db;
-	global $amp_conf;
-
-	$sql = "SELECT `trunkid` , `tech` , `channelid` , `disabled` FROM `trunks` ORDER BY `trunkid`";
-	$trunks = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
+	$trunks = \FreePBX::Core()->listTrunks();
 
 	$unique_trunks = array();
 	foreach ($trunks as $trunk) {
@@ -4955,9 +4876,7 @@ function core_trunks_list($assoc = false) {
 }
 
 function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
-	global $db;
-	$reg = $db->escapeSimple(trim($reg));
-	sql("INSERT INTO $tech (id, keyword, data, flags) values ('tr-reg-$trunknum','register','$reg','$disable_flag')");
+	return \FreePBX::Core()->addTrunkRegister($trunknum,$tech,$reg,$disable_flag);
 }
 
 
