@@ -959,7 +959,106 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 				</div>
 			</div>
 		</div>
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="rrewrite_contact"><?php echo _("Rewrite Contact") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="rewrite_contact"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="rewrite_contact" id="rewrite_contactyes" value="yes" <?php echo ($rewrite_contact == "yes"?"CHECKED":"") ?>>
+								<label for="rewrite_contactyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="rewrite_contact" id="rewrite_contactno" value = "no" <?php echo ($rewrite_contact == "yes"?"":"CHECKED") ?>>
+								<label for="rewrite_contactno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="rewrite_contact-help" class="help-block fpbx-help-block"><?php echo _("Allow Contact header to be rewritten with the source IP address-port")?></span>
+				</div>
+			</div>
+		</div>
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symetric") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricyes" value="yes" <?php echo ($rtp_symmetric == "yes"?"CHECKED":"") ?>>
+								<label for="rtp_symmetricyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricno" value = "no" <?php echo ($rtp_symmetric == "yes"?"":"CHECKED") ?>>
+								<label for="rtp_symmetricno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric")?></span>
+				</div>
+			</div>
+		</div>
 		<!--END direct_media-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label for="media_encryption"><?php echo _('Media Encryption')?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="media_encryption"></i>
+							</div>
+							<div class="col-md-9">
+								<select name="media_encryption" class="form-control " id="media_encryption">
+									<option value="no" <?php echo (empty($media_encryption) || $media_encryption == "no"?"selected":"")?>><?php echo _('None')?></option>
+									<option value="sdes" <?php echo ($media_encryption == "sdes"?"selected":"")?>><?php echo _('SRTP via in-SDP (recommended)')?></option>
+									<!--<option value="dtls">DTLS-SRTP (not recommended)</option>-->
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="media_encryption-help" class="help-block fpbx-help-block"><?php echo sprintf(_('Determines whether res_pjsip will use and enforce usage of media encryption for this endpoint. %s'),'[media_encryption]')?></span>
+				</div>
+			</div>
+		</div>
+		<!--MATCH-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="message_context"><?php echo _("Message Context")?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="message_context"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="text" class="form-control" name="message_context" id="message_context" value="<?php echo $message_context?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="message_context-help" class="help-block fpbx-help-block"><?php echo _("Context to route incoming MESSAGE requests to")?></span>
+				</div>
+			</div>
+		</div><!--MATCH-->
 	</div><!--END ADVANCED TAB-->
 	<div role="tabpanel" id="pjscodecs" class="tab-pane">
 		<br/>

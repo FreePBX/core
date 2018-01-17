@@ -554,18 +554,24 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
-				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
-				}
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
-		            $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
-	             }
-				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
 				}
 
 				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
+				}
+
+				if(!empty($trunk['media_encryption']) && $trunk['media_encryption'] !== "no"){
+					$conf['pjsip.endpoint.conf'][$tn]['media_encryption'] = $trunk['media_encryption'];
+				}
+
+				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = $trunk['rtp_symmetric'];
+				}
+
+				if(!empty($trunk['message_context'])) {
+					$conf['pjsip.endpoint.conf'][$tn]['message_context'] = $trunk['message_context'];
 				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
@@ -805,8 +811,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				if(version_compare($this->version,'13.8','ge')) {
-					$transport[$t]['allow_reload'] = "yes";
+					$transport[$t]['allow_reload'] = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
 				}
+
+				// Based on this document : https://wiki.asterisk.org/wiki/display/AST/IP+Quality+of+Service
+				// Transport sip protocol.
+				$transport[$t]['tos'] = "cs3";	// Decimal value: 96
+				$transport[$t]['cos'] = "3";	// 802.1p uses 3 bits of the VLAN header, this parameter can take integer values from 0 to 7.
 
 				// Add the Generic localnet settings.
 				//TODO: This should call a method and not the config direct.
@@ -836,6 +847,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function getDefaultSIPCodecs() {
 		// Grab the default Codecs from the sipsettings module.
 		$codecs = $this->freepbx->Sipsettings->getConfig('voicecodecs');
+		$vcodecs = $this->freepbx->Sipsettings->getConfig('vcodec');
 
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
@@ -844,6 +856,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if ($en) {
 					$codecs[$c] = $en;
 				}
+			}
+		}
+
+		if (!empty($vcodecs)) {
+			// Sipsettings doesn't have any video codecs yet.
+			$idx = count($codecs) + 1 ;
+			foreach ($vcodecs as $vc => $value) {
+				$codecs[$vc] = $idx++;
 			}
 		}
 
@@ -908,6 +928,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// Endpoint
 		$endpoint[] = "aors=$aorname";
 		$endpoint[] = "auth=$authname";
+		$endpoint[] = "tos_audio=ef";
+		$endpoint[] = "tos_video=af41";
+		$endpoint[] = "cos_audio=5";
+		$endpoint[] = "cos_video=4";
 
 		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
@@ -1187,22 +1211,40 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * Add PJSip Trunk
 	 * @param {int} $trunknum The Trunk Number
 	 */
-	public function addTrunk($trunknum) {
+	public function addTrunk($trunknum,$settings) {
 		// These are the vars we DON'T care about that are being submitted from the PJSip page
-		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
+		$ignore = array(
+			'tech',
+			'outcid',
+			'keepcid',
+			'maxhans',
+			'failtrunk',
+			'dialoutprefix',
+			'channelid',
+			'usercontext',
+			'provider',
+			'disabledtrunk',
+			'continue',
+			'display',
+			'action',
+			'Submit',
+			'prepend_digit',
+			'pattern_prefix',
+			'pattern_pass'
+		);
 		// We care about the arrays later
 
 		//this is really BAD, why do we always have to set to the dang _REQUESTER argh!
-		if(empty($_REQUEST['codec'])) {
+		if(empty($settings['codec'])) {
 			$defaultCodecs = $this->freepbx->Sipsettings->getCodecs('audio');
-			$_REQUEST['codecs'] = implode(",",array_keys($defaultCodecs));
+			$settings['codecs'] = implode(",",array_keys($defaultCodecs));
 		} else {
-			$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
+			$settings['codecs'] = implode(",",array_keys($settings['codec']));
 		}
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
-		foreach ($_REQUEST as $k => $v) {
+		foreach ($settings as $k => $v) {
 			// Skip this value if we don't care about it.
-			if (in_array($k, $ignore) || is_array($v))
+			if (in_array($k, $ignore) || is_array($v) || is_null($v))
 				continue;
 
 			// Otherwise, we can insert it.
@@ -1210,8 +1252,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$ins->bindParam(':data', $v);
 			$ins->execute();
 		}
-
-		// TODO: prepend, pattern_prefix and pattern_pass
 	}
 
 	/**
@@ -1285,13 +1325,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendrpid" => "no",
+				"send_rpid" => "no",
+				"send_pai" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
 				"rewrite_contact" => "no",
 				"support_path" => "no",
-				"media_address" => ""
+				"media_address" => "",
+				"media_encryption" => "no",
+				"message_context" => ""
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
