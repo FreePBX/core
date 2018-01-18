@@ -852,7 +852,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			// Sipsettings doesn't have any video codecs yet.
 			$idx = count($codecs) + 1 ;
 			foreach ($vcodecs as $vc => $value) {
-					$codecs[$vc] = $idx++;
+				$codecs[$vc] = $idx++;
 			}
 		}
 
@@ -1299,7 +1299,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"qualify_frequency" => 60,
 				"dtmfmode" => "rfc4733",
 				"language" => "",
-				"sendpai" => "no",
+				"send_rpid" => "no",
+				"send_pai" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
