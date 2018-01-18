@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5</version>
+	<version>14.0.5.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.1* Fix : New video codecs are not updated in PJSIP
 		*14.0.5* FREEPBX-12299 Default or configurable tos / cos for PJSIP tranport (SIP) and endpoints (RTP) audio/video)
 		*14.0.4* FREEPBX-16526 regression checks coming into play 
 		*14.0.3* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
