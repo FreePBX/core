@@ -554,18 +554,24 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
-				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
-				}
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
-		            $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
-	             }
-				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = "yes";
+					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
 				}
 
 				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
+				}
+
+				if(!empty($trunk['media_encryption']) && $trunk['media_encryption'] !== "no"){
+					$conf['pjsip.endpoint.conf'][$tn]['media_encryption'] = $trunk['media_encryption'];
+				}
+
+				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = $trunk['rtp_symmetric'];
+				}
+
+				if(!empty($trunk['message_context'])) {
+					$conf['pjsip.endpoint.conf'][$tn]['message_context'] = $trunk['message_context'];
 				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
@@ -1201,22 +1207,40 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * Add PJSip Trunk
 	 * @param {int} $trunknum The Trunk Number
 	 */
-	public function addTrunk($trunknum) {
+	public function addTrunk($trunknum,$settings) {
 		// These are the vars we DON'T care about that are being submitted from the PJSip page
-		$ignore = array('display', 'action', 'Submit', 'prepend_digit', 'pattern_prefix', 'pattern_pass');
+		$ignore = array(
+			'tech',
+			'outcid',
+			'keepcid',
+			'maxhans',
+			'failtrunk',
+			'dialoutprefix',
+			'channelid',
+			'usercontext',
+			'provider',
+			'disabledtrunk',
+			'continue',
+			'display',
+			'action',
+			'Submit',
+			'prepend_digit',
+			'pattern_prefix',
+			'pattern_pass'
+		);
 		// We care about the arrays later
 
 		//this is really BAD, why do we always have to set to the dang _REQUESTER argh!
-		if(empty($_REQUEST['codec'])) {
+		if(empty($settings['codec'])) {
 			$defaultCodecs = $this->freepbx->Sipsettings->getCodecs('audio');
-			$_REQUEST['codecs'] = implode(",",array_keys($defaultCodecs));
+			$settings['codecs'] = implode(",",array_keys($defaultCodecs));
 		} else {
-			$_REQUEST['codecs'] = implode(",",array_keys($_REQUEST['codec']));
+			$settings['codecs'] = implode(",",array_keys($settings['codec']));
 		}
 		$ins = $this->db->prepare("INSERT INTO `pjsip` (`id`, `keyword`, `data`, `flags`) VALUES ( $trunknum, :keyword, :data, 0 )");
-		foreach ($_REQUEST as $k => $v) {
+		foreach ($settings as $k => $v) {
 			// Skip this value if we don't care about it.
-			if (in_array($k, $ignore) || is_array($v))
+			if (in_array($k, $ignore) || is_array($v) || is_null($v))
 				continue;
 
 			// Otherwise, we can insert it.
@@ -1224,8 +1248,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$ins->bindParam(':data', $v);
 			$ins->execute();
 		}
-
-		// TODO: prepend, pattern_prefix and pattern_pass
 	}
 
 	/**
@@ -1305,7 +1327,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"direct_media" => "no",
 				"rtp_symmetric" => "no",
 				"rewrite_contact" => "no",
-				"support_path" => "no"
+				"support_path" => "no",
+				"media_encryption" => "no",
+				"message_context" => ""
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
