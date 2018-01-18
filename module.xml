@@ -12,10 +12,10 @@
 	<changelog>
 		*14.0.5.1* FREEPBX-12299 Default or configurable tos / cos for PJSIP tranport (SIP) and endpoints (RTP) audio/video)
 		*14.0.5* More PJSIP methods
-		*14.0.4* FREEPBX-16526 regression checks coming into play 
-		*14.0.3* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
+		*14.0.4* FREEPBX-16526 regression checks coming into play
+		*14.0.3* FREEPBX-16419 Fix trunks disable to use method to disable trunks.
 		*14.0.2* Migrate more settings from procedurals to objects
-		*14.0.1.25* Popover changes: extensions and trunks 
+		*14.0.1.25* Popover changes: extensions and trunks
 		*14.0.1.24* FREEPBX-16240 Add label to header, FREEPBX-16296 Extension Import ignores Max Reg field for PJSIP Extensions
 		*14.0.1.23* FREEPBX-16262 ignore conflicting values
 		*14.0.1.22* FREEPBX-16262 Migrate mediaencryption to media_encryption
