@@ -478,7 +478,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
 				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
-				'aors' => $tn
+				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
@@ -539,10 +539,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
-				//yes,no
-				if(!empty($trunk['sendrpid']) && $trunk['sendrpid'] === "yes"){
-					$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
-					$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
+				//yes,pai,both,no
+				if (isset($trunk['sendrpid'])) {
+					if ($trunk['sendrpid'] == "yes" || $trunk['sendrpid'] == "both") {
+						$conf['pjsip.endpoint.conf'][$tn]['send_rpid'] = "yes";
+					}
+					if ($trunk['sendrpid'] == "pai" || $trunk['sendrpid'] == "both") {
+						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
+					}
 				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
@@ -798,7 +802,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(version_compare($this->version,'13.8','ge')) {
 					$transport[$t]['allow_reload'] = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
 				}
-				
+
 				// Based on this document : https://wiki.asterisk.org/wiki/display/AST/IP+Quality+of+Service
 				// Transport sip protocol.
 				$transport[$t]['tos'] = "cs3";	// Decimal value: 96
@@ -833,7 +837,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// Grab the default Codecs from the sipsettings module.
 		$codecs 	= $this->freepbx->Sipsettings->getConfig('voicecodecs');
 		$vcodecs 	= $this->freepbx->Sipsettings->getConfig('videocodecs');
-		
+
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
 			// Grab the default codecs from BMO
@@ -843,7 +847,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 			}
 		}
-		
+
 		if (!empty($vcodecs)) {
 			// Sipsettings doesn't have any video codecs yet.
 			$idx = count($codecs) + 1 ;
@@ -889,7 +893,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {array} &$retarr Returned Array
 	 */
 	private function generateEndpoint($config, &$retarr) {
-		
+
 		// Validate $config array
 		$this->validateEndpoint($config);
 		if($config['sipdriver'] != 'chan_pjsip') {
