@@ -929,6 +929,38 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "cos_audio=5";
 		$endpoint[] = "cos_video=4";
 
+		// t38_udptl
+		$chan_sip_settings 	= $this->freepbx->Sipsettings->getChanSipSettings();
+		$t38_methode 		= $chan_sip_settings["t38pt_udptl"];
+		$t38_methode		= empty($t38_methode) ? "no" : $t38_methode	;
+		
+		switch ($t38_methode) {
+			
+			case "yes":
+				$endpoint[] = "t38_udptl=yes";		
+				$endpoint[] = "t38_udptl_ec=redundancy";
+				$endpoint[] = "t38_udptl_maxdatagram=400";
+				$endpoint[] = "t38_udptl_nat=yes";
+			break;
+			case "fec":
+				$endpoint[] = "t38_udptl=yes";		
+				$endpoint[] = "t38_udptl_ec=fec";
+				$endpoint[] = "t38_udptl_nat=yes";
+			break;
+			case "redundancy":
+				$endpoint[] = "t38_udptl=yes";		
+				$endpoint[] = "t38_udptl_ec=redundancy";
+				$endpoint[] = "t38_udptl_nat=yes";
+			break;
+			case "none":
+				$endpoint[] = "t38_udptl=yes";		
+				$endpoint[] = "t38_udptl_ec=none";
+				$endpoint[] = "t38_udptl_nat=yes";
+			break;
+			default:
+				// $endpoint[] = "t38_udptl=no";
+		}
+		
 		if (!empty($config['disallow'])) {
 			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
 		}
