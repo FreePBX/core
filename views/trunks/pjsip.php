@@ -1,28 +1,28 @@
 <?php
-foreach($transports as $tp) {
-	$transportopts .= '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
-}
-$seq = 1;
-$codechtml = '<ul class="sortable">';
-foreach ($codecs as $codec => $codec_state) {
-	$tabindex++;
-	$codec_trans = _($codec);
-	$codec_checked = $codec_state ? 'checked' : '';
-	$codechtml .= '<li><a href="#">'
-	. '<img src="assets/sipsettings/images/arrow_up_down.png" height="16" width="16" border="0" alt="move" style="float:none; margin-left:-6px; margin-bottom:-3px;cursor:move" /> '
-	. '<input type="checkbox" '
-	. ($codec_checked ? 'value="'. $seq++ . '" ' : '')
-	. 'name="codec[' . $codec . ']" '
-	. 'id="'. $codec . '" '
-	. 'class="audio-codecs" tabindex="' . $tabindex. '" '
-	. $codec_checked
-	. ' />'
-	. '<label for="'. $codec . '"> '
-	. '<small>' . $codec_trans . '</small>'
-	. ' </label></a></li>';
-}
-$codechtml .= '</ul>';
-$ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge");
+	foreach($transports as $tp) {
+		$transportopts .= '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
+	}
+	$seq = 1;
+	$codechtml = '<ul class="sortable">';
+	foreach ($codecs as $codec => $codec_state) {
+		$tabindex++;
+		$codec_trans = _($codec);
+		$codec_checked = $codec_state ? 'checked' : '';
+		$codechtml .= '<li><a href="#">'
+		. '<img src="assets/sipsettings/images/arrow_up_down.png" height="16" width="16" border="0" alt="move" style="float:none; margin-left:-6px; margin-bottom:-3px;cursor:move" /> '
+		. '<input type="checkbox" '
+		. ($codec_checked ? 'value="'. $seq++ . '" ' : '')
+		. 'name="codec[' . $codec . ']" '
+		. 'id="'. $codec . '" '
+		. 'class="audio-codecs" tabindex="' . $tabindex. '" '
+		. $codec_checked
+		. ' />'
+		. '<label for="'. $codec . '"> '
+		. '<small>' . $codec_trans . '</small>'
+		. ' </label></a></li>';
+	}
+	$codechtml .= '</ul>';
+	$ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge");
 ?>
 
 <h3><?php echo _("PJSIP Settings")?></h3>
@@ -833,13 +833,15 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 								<label class="control-label" for="sendrpid"><?php echo _("Send RPID/PAI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
 							</div>
-							<div class="col-md-9">
-								<select name="sendrpid" id="sendrpid" class="form-control">
-									<option value="no" <?php echo isset($sendrpid) && $sendrpid == "no" ? "selected" : ""?>><?php echo _("No")?></option>
-									<option value="yes" <?php echo isset($sendrpid) && $sendrpid == "yes" ? "selected" : ""?>><?php echo _("Send Remote-Party-ID header")?></option>
-									<option value="pai" <?php echo isset($sendrpid) && $sendrpid == "pai" ? "selected" : ""?>><?php echo _("Send P-Asserted-Identity header")?></option>
-									<option value="both" <?php echo isset($sendrpid) && $sendrpid == "both" ? "selected" : ""?>><?php echo _("Both")?></option>
-								</select>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="sendrpid" id="sendrpidno" value="no" <?php echo ($sendrpid == "no"?"CHECKED":"") ?>>
+								<label for="sendrpidno"><?php echo _("No")?></label>
+								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ($sendrpid == "yes"?"CHECKED":"") ?>>
+								<label for="sendrpidyes"><?php echo _("Send Remote-Party-ID header")?></label>
+								<input type="radio" name="sendrpid" id="sendrpidpai" value="pai" <?php echo ($sendrpid == "pai"?"CHECKED":"") ?>>
+								<label for="sendrpidpai"><?php echo _("Send P-Asserted-Identity header")?></label>
+								<input type="radio" name="sendrpid" id="sendrpidboth" value="both" <?php echo ($sendrpid == "both"?"CHECKED":"") ?>>
+								<label for="sendrpidboth"><?php echo _("Both")?></label>
 							</div>
 						</div>
 					</div>
@@ -906,59 +908,6 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 		</div>
 		<!--END direct_media-->
-		<!--Send direct_media-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symmetric") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
-							</div>
-							<div class="col-md-9 radioset">
-								<input type="radio" name="rtp_symmetric" id="rtp_symmetricyes" value="yes" <?php echo ($rtp_symmetric == "yes"?"CHECKED":"") ?>>
-								<label for="rtp_symmetricyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="rtp_symmetric" id="rtp_symmetricno" value = "no" <?php echo ($rtp_symmetric == "yes"?"":"CHECKED") ?>>
-								<label for="rtp_symmetricno"><?php echo _("No");?></label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric.")?></span>
-				</div>
-			</div>
-		</div>
-		<!--END direct_media-->
-		<!--Send direct_media-->
-		<div class="element-container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-3">
-								<label class="control-label" for="rewrite_contact"><?php echo _("Rewrite Contact") ?></label>
-								<i class="fa fa-question-circle fpbx-help-icon" data-for="rewrite_contact"></i>
-							</div>
-							<div class="col-md-9 radioset">
-								<input type="radio" name="rewrite_contact" id="rewrite_contactyes" value="yes" <?php echo ($rewrite_contact == "yes"?"CHECKED":"") ?>>
-								<label for="rewrite_contactyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="rewrite_contact" id="rewrite_contactno" value = "no" <?php echo ($rewrite_contact == "yes"?"":"CHECKED") ?>>
-								<label for="rewrite_contactno"><?php echo _("No");?></label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<span id="rewrite_contact-help" class="help-block fpbx-help-block"><?php echo _("Allow Contact header to be rewritten with the source IP address-port.")?></span>
-				</div>
-			</div>
-		</div>
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
