@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.4</version>
+	<version>14.0.5.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.05.5* Remove duplication
 		*14.0.5.4* FREEPBX-16672 FREEPBX-16673 FREEPBX-16671 
 		*14.0.5.3* Bugfix/FREEPBX-16672 =&amp;gt; managing t38 for pjsip 
 		*14.0.5.2* Bugfix/FREEPBX-12299
