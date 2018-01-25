@@ -3,18 +3,19 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.7</version>
+	<version>14.0.5.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.5.7* FREEPBX-16613 Add Device Menu Fails to open when editing a device
+		*14.0.5.8* FREEPBX-16613 Add Device Menu Fails to open when editing a device
+		*14.0.5.7* add support for pjsip media_address in trunk configuration
 		*14.0.5.6* FREEPBX-16714 fix js errors
 		*14.0.5.5* Remove duplication
-		*14.0.5.4* FREEPBX-16672 FREEPBX-16673 FREEPBX-16671 
-		*14.0.5.3* Bugfix/FREEPBX-16672 =&amp;gt; managing t38 for pjsip 
+		*14.0.5.4* FREEPBX-16672 FREEPBX-16673 FREEPBX-16671
+		*14.0.5.3* Bugfix/FREEPBX-16672 =&amp;gt; managing t38 for pjsip
 		*14.0.5.2* Bugfix/FREEPBX-12299
 		*14.0.5.1* FREEPBX-12299 Default or configurable tos / cos for PJSIP tranport (SIP) and endpoints (RTP) audio/video)
 		*14.0.5* More PJSIP methods
