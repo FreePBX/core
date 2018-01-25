@@ -58,10 +58,10 @@
 <?php case "devices":?>
 <?php if($show) { ?>
 	<div id="toolbar-all">
-		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-			<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Device")?> <span class="caret"></span>
-		</button>
 		<div class="dropdown">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Device")?> <span class="caret"></span>
+			</button>
 			<a href="?display=devices<?php echo isset($popover)?$popover:''?>" class="btn"><i class="fa fa-list"></i> <?php echo _('List Devices')?></a>
 			<ul class="dropdown-menu" role="menu">
 				<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
