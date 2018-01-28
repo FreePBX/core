@@ -2299,6 +2299,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			case "pjsip":
 				$pjsip = $this->getDriver('pjsip');
 				if($pjsip !== false) {
+					$settings = array_merge($settings, $_POST);
 					$pjsip->addTrunk($trunknum,$settings);
 				}
 			break;
