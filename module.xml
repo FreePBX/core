@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.9</version>
+	<version>14.0.5.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.10* FREEPBX-15459 Remove in call disconnect feature code
 		*14.0.5.9* FREEPBX-16756 pjsip not saving settings
 		*14.0.5.8* FREEPBX-16613 Add Device Menu Fails to open when editing a device
 		*14.0.5.7* add support for pjsip media_address in trunk configuration
