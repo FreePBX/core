@@ -1078,11 +1078,6 @@ function core_do_get_config($engine) {
 				*/
 			}
 
-			$fcc = new featurecode($modulename, 'disconnect');
-			$code = $fcc->getCodeActive();
-			unset($fcc);
-			$core_conf->addFeatureMap('disconnect',$code);
-
 			$fcc = new featurecode($modulename, 'pickupexten');
 			$code = $fcc->getCodeActive();
 			unset($fcc);
@@ -2506,7 +2501,7 @@ function core_do_get_config($engine) {
 		}
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1)'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
