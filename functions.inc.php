@@ -1655,7 +1655,7 @@ function core_do_get_config($engine) {
 				} else {
 					// If we return from teh macro, it means we are suppose to return to the IVR
 					//
-					$ext->add('ext-local', $exten['extension'], '', new ext_goto('1','return','${IVR_CONTEXT}'));
+					$ext->add('ext-local', $exten['extension'], '', new ext_gotoif('$["${IVR_CONTEXT}" != ""]', '${IVR_CONTEXT},return,1'));
 				}
 
 				// Create the hints if running in normal mode
