@@ -23,7 +23,6 @@ debug("Starting New Dialparties.agi", 1);
 
 // Get required channels variables that used to come from amportal.conf
 $cwinusebusy = get_var( $AGI, "CWINUSEBUSY" );
-$ast_version = get_var( $AGI, "ASTVERSION" );
 
 $cwignore    = get_var( $AGI, "CWIGNORE" );
 $cwignore    = strtoupper(trim($cwignore));
@@ -249,8 +248,7 @@ if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == 
 // mode and all is well. That means the loop below needs to be modified to detect the first
 // extension and do this if the case.
 
-$count = 0;
-foreach ($ext as $k) {
+foreach ($ext as $kk => $k) {
 	$cf = $AGI->database_get('CF',$k);
 	$cf = $cf['data'];
 	//
@@ -281,11 +279,11 @@ foreach ($ext as $k) {
 		  } else {
 		    // append a hash sign so we can send out on chan_local below unless cfingore is set
 		    if ($cfignore) {
-			    unset($ext[$count]);
+			    unset($ext[$kk]);
 			    debug("Extension $k has call forward set to $cf", 1);
 			    $AGI->set_variable('DIALSTATUS','NOANSWER');
 		    } else {
-			    $ext[$count] = $cf.'#';
+			    $ext[$kk] = $cf.'#';
 			    debug("Extension $k has call forward set to $cf", 1);
 					// This only really needs to be set if we are setting Diversion Headers, but it's not worth the hassle of
 					// checking the amportal.conf settings here and there is no harm done in setting it other than minor overhead
@@ -311,7 +309,7 @@ foreach ($ext as $k) {
 		    // if this is the primary extension and CF enabled, then cancel mastermode
 		    // whether it is or not, no need to check.
 		    //
-		    if ($count == 0) {
+		    if ($kk == 0) {
 			    $mastermode = 0;
 			    $pr_dialstatus = ""; // not relevant if not mastermode, clear it so dnd doesn't propagate, and other
 			    debug("Primary ext is CF so disabling mastermode if it was set", 4);
@@ -322,7 +320,6 @@ foreach ($ext as $k) {
 	else {
 		debug("Extension $k cf is disabled", 3);
 	}
-	$count++;
 }
 
 // IF DND AND we process it as a DND (no CF enabled) then we need to some how flag that ALL THE REST
@@ -572,7 +569,7 @@ if($rgmethod == 'firstnotonphone'){
 	}
 	debug("ONLY available extensions ".print_r($extenavail,true), 3);
 //now we should append other numbers to this array. incase noting is available !!!
-	foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier 
+	foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier
 		if(!in_array($key,$extenavail)){
 			$extenavail[] = $key;
 			$dsarraynew[$key] = $k;
