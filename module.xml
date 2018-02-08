@@ -3,17 +3,18 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122</version>
+	<version>13.0.122.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*13.0.122* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
+		*13.0.122.1* FREEPBX-16858
+		*13.0.122* FREEPBX-16419 Fix trunks disable to use method to disable trunks.
 		*13.0.121* Move more procedural functions to class based functions
 		*13.0.120.26* Fix upreported issue on forums
-		*13.0.120.25* FREEPBX-16291 Bulk Handler missing fields 
+		*13.0.120.25* FREEPBX-16291 Bulk Handler missing fields
 		*13.0.120.24* FREEPBX-16240 Add label to header
 		*13.0.120.23* FREEPBX-16262 ignore conflicting values
 		*13.0.120.22* FREEPBX-16262 Migrate mediaencryption to media_encryption
