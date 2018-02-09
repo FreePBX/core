@@ -1078,6 +1078,11 @@ function core_do_get_config($engine) {
 				*/
 			}
 
+			$fcc = new featurecode($modulename, 'disconnect');
+			$code = $fcc->getCodeActive();
+			unset($fcc);
+			$core_conf->addFeatureMap('disconnect',$code);
+
 			$fcc = new featurecode($modulename, 'pickupexten');
 			$code = $fcc->getCodeActive();
 			unset($fcc);
