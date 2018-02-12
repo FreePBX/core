@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.14</version>
+	<version>14.0.5.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.15* FREEPBX-16784 Remove requirement for PJSip trunks to have a port 
 		*14.0.5.14* Revert FREEPBX-15459
 		*14.0.5.13* FREEPBX-16858
 		*14.0.5.12* FREEPBX-16645 Adding check to validate if IVR_CONTEXT is set or not 
