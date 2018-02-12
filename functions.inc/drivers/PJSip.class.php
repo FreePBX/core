@@ -370,12 +370,20 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 			// Have we been asked to send registrations?
 			if ($trunk['registration'] === "send") {
+				$retries = (int) $trunk['max_retries'];
+				// Sane limit.
+				if ($retries > 1000000) {
+					$retries = 1000000;
+				}
+				if ($retries < 10) {
+					$retries = 10;
+				}
 				$conf['pjsip.registration.conf'][$tn] = array(
 					'type' => 'registration',
 					'transport' => $trunk['transport'],
 					'outbound_auth' => $tn,
 					'retry_interval' => $trunk['retry_interval'],
-					'max_retries' => $trunk['max_retries'],
+					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);

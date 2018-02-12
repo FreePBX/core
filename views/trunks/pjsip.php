@@ -409,7 +409,7 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="max_retries-help" class="help-block fpbx-help-block"><?php echo _("How many times Asterisk will attempt to re-attempt registration before permanently giving up.")?></span>
+					<span id="max_retries-help" class="help-block fpbx-help-block"><?php echo _("How many times Asterisk will attempt to re-attempt registration before permanently giving up. Maximum of 1000000.")?></span>
 				</div>
 			</div>
 		</div>
