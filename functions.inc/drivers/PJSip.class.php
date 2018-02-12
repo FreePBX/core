@@ -348,8 +348,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$trunks = $this->getAllTrunks();
 		foreach($trunks as $trunk) {
 			$tn = $trunk['trunk_name'];
-			//prevent....special people
-			$trunk['sip_server_port'] = !empty($trunk['sip_server_port']) ? $trunk['sip_server_port'] : '5060';
 
 			// Checkboxes aren't saved if they're unchecked.
 			if (!isset($trunk['auth_rejection_permanent'])) {
@@ -372,12 +370,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 			// Have we been asked to send registrations?
 			if ($trunk['registration'] === "send") {
+				$retries = abs((int) $trunk['max_retries']);
+				// Sane limit.
+				if ($retries > 1000000) {
+					$retries = 1000000;
+				}
 				$conf['pjsip.registration.conf'][$tn] = array(
 					'type' => 'registration',
 					'transport' => $trunk['transport'],
 					'outbound_auth' => $tn,
 					'retry_interval' => $trunk['retry_interval'],
-					'max_retries' => $trunk['max_retries'],
+					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
@@ -389,7 +392,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				} else if(!empty($trunk['server_uri'])) {
 					$conf['pjsip.registration.conf'][$tn]['server_uri'] = $trunk['server_uri'];
 				} else {
-					$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					if (!empty($trunk['sip_server_port'])) {
+						$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					} else {
+						$conf['pjsip.registration.conf'][$tn]['server_uri'] = 'sip:'.$trunk['sip_server'];
+					}
 				}
 
 				if(empty($trunk['client_uri']) && empty($trunk['sip_server'])) {
@@ -397,7 +404,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				} else if(!empty($trunk['client_uri'])) {
 					$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
 				} else {
-					$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					if (!empty($trunk['sip_server_port'])) {
+						$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+					} else {
+						$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'];
+					}
 				}
 				if(!empty($this->_registration[$tn]) && is_array($this->_registration[$tn])) {
 					foreach($this->_registration[$tn] as $el) {
@@ -437,9 +448,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				} else {
 					// If there is no username, don't add the @
 					if ($trunk['username']) {
-						$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+						if (!empty($trunk['sip_server_port'])) {
+							$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+						} else {
+							$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'];
+						}
 					} else {
-						$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+						if (!empty($trunk['sip_server_port'])) {
+							$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
+						} else {
+							$conf['pjsip.aor.conf'][$tn]['contact'] = 'sip:'.$trunk['sip_server'];
+						}
 					}
 				}
 			} elseif ($trunk['registration'] == "receive") {
