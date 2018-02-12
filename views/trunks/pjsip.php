@@ -167,7 +167,7 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server_port"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="number" class="form-control" name="sip_server_port" id="sip_server_port" value="<?php echo !empty($sip_server_port) ? $sip_server_port : '5060'?>"/>
+						<input type="number" class="form-control" name="sip_server_port" id="sip_server_port" value="<?php echo !empty($sip_server_port) ? $sip_server_port : ''?>"/>
 					</div>
 				</div>
 				<div class="col-md-12">
