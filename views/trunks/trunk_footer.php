@@ -98,5 +98,4 @@ var msgInvalidServerURI = "<?php echo _('You Must define a Server URI')?>";
 var msgInvalidClientURI = "<?php echo _('You must defined a Client URI')?>";
 var msgInvalidAORContact = "<?php echo _('You must define a(n) AOR Contact')?>";
 var msgInvalidSIPServer = "<?php echo _('You must define a SIP Server')?>";
-var msgInvalidSIPServerPort = "<?php echo _('You must define a SIP Port')?>";
 </script>

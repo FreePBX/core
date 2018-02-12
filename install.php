@@ -89,7 +89,9 @@ $fcc->update();
 unset($fcc);
 
 $fcc = new featurecode('core', 'disconnect');
-$fcc->delete();
+$fcc->setDescription('In-Call Asterisk Disconnect Code');
+$fcc->setDefault('**');
+$fcc->update();
 unset($fcc);
 
 // The following are from General Settings that may need to be migrated.

@@ -382,9 +382,6 @@ function checkvalid() {
 				if (isEmpty($('#trunkEdit input[name="sip_server"]').val())) {
 					return warnInvalid(theForm.sip_server, msgInvalidSIPServer);
 				}
-				if (isEmpty($('#trunkEdit input[name="sip_server_port"]').val())) {
-					return warnInvalid(theForm.sip_server_port, msgInvalidSIPServerPort);
-				}
 			}
 		}
 
