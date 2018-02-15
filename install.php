@@ -1743,3 +1743,9 @@ foreach($res as $row) {
 $sth = \FreePBX::Database()->prepare("UPDATE sip SET keyword = 'media_encryption_optimistic' WHERE `keyword` = 'mediaencryptionoptimistic'");
 $sth->execute();
 out(_("done"));
+
+if(!\FreePBX::Core()->getConfig('migratesendrpid')) {
+	$sql = "UPDATE pjsip SET `data` = 'both' WHERE `keyword` = 'sendrpid' AND `data` = 'yes'";
+	\FreePBX::Database()->query($sql);
+	\FreePBX::Core()->setConfig('migratesendrpid',true);
+}
