@@ -442,11 +442,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function install() {
-		if(!$this->getConfig('migratesendrpid')) {
-			$sql = "UPDATE pjsip SET `data` = 'both' WHERE `keyword` = 'sendrpid' AND `data` = 'yes'";
-			$this->database->query($sql);
-			$this->setConfig('migratesendrpid',true);
-		}
 	}
 
 	public function uninstall() {
