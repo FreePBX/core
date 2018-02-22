@@ -4779,7 +4779,7 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 	if($tech == 'pjsip') {
 		$settings = array_merge($_REQUEST,$settings);
 	}
-	return FreePBX::Core()->addTrunk($name, $tech, $settings);
+	return FreePBX::Core()->addTrunk($name, $tech, $settings, true);
 }
 
 // just used internally by addTrunk() and editTrunk()

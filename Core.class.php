@@ -442,11 +442,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function install() {
-		if(!$this->getConfig('migratesendrpid')) {
-			$sql = "UPDATE pjsip SET `data` = 'both' WHERE `keyword` = 'sendrpid' AND `data` = 'yes'";
-			$this->database->query($sql);
-			$this->setConfig('migratesendrpid',true);
-		}
 	}
 
 	public function uninstall() {
@@ -2327,9 +2322,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		));
 
 		if ($settings['dialopts'] !== false) {
-			$this->freepbx->astman->database_put("TRUNK", $settings['trunknum'] . '/dialopts',$settings['dialopts']);
+			$this->freepbx->astman->database_put("TRUNK", $trunknum . '/dialopts',$settings['dialopts']);
 		} else {
-			$this->freepbx->astman->database_del("TRUNK", $settings['trunknum'] . '/dialopts');
+			$this->freepbx->astman->database_del("TRUNK", $trunknum . '/dialopts');
 		}
 		return $trunknum;
 	}
