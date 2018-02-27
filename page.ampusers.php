@@ -166,6 +166,9 @@ uasort($module_list, function($a, $b) {
 $selected = array();
 $unselected = array();
 foreach ($module_list as $key => $val) {
+	if ($key == "wiki") {//FREEPBX-16966
+               continue;
+       }
 	if(!empty($user['sections']) && is_array($user['sections']) && (in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*')){
 		$selected[] = '<li data-id="'.$key.'" class="label label-info" style="display:inline-block">'.$val['name'].'</li>';
 		$selected[] = '<input type="hidden" name="sections[]" value="'.$key.'">';
