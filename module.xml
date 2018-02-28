@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.20</version>
+	<version>14.0.5.21</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.21* FREEPBX-16165 typo in On Demand Recording help text 
 		*14.0.5.20* FREEPBX-15767 Showing a part of code using French Language (extension -quick create) 
 		*14.0.5.19* FREEPBX-15778 PBXact Basic Mode Inbound Route 
 		*14.0.5.18* FREEPBX-12244 Module Administrators allow create extensions when is disable the feature
