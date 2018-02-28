@@ -3,7 +3,7 @@
 <?php case "extensions":?>
 	<?php if($show) { ?>
 		<div id="toolbar-all">
-			<?php if(in_array("999",$ret[sections]) || in_array("*",$ret[sections])){ ?>
+			<?php if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 				<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
 			</button>
@@ -25,7 +25,7 @@
 		</table>
 	<?php } else { ?>
 		<div class="bootnav" style="margin-top:15px">
-				<?php if(in_array("999",$ret[sections]) || in_array("*",$ret[sections])){ ?>
+				<?php if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 				<div class="list-group">
 				<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
 					<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?>" class="list-group-item"><?php echo sprintf(_("Add New %s Extension"), $driver['shortName'])?></a>

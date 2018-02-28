@@ -17,7 +17,7 @@ if($display_mode == "basic") { ?>
 					<div class="display no-border">
 						<h1><?php echo _("Extensions")?></h1>
 						<div id="toolbar-sip">
-						<?php  if(in_array("999",$ret[sections]) || in_array("*",$ret[sections])){ ?>
+						<?php  if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 							<a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=sip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a>
 						<?php } ?>
 							<button id="remove-sip" class="btn btn-danger btn-remove" data-type="extensions" data-section="sip" disabled>
@@ -100,7 +100,7 @@ if($display_mode == "basic") { ?>
 						<div class="tab-content display">
 							<div role="tabpanel" id="alldids" class="tab-pane active">
 								<div id="toolbar-all">
-									<?php  if(in_array("999",$ret[sections]) || in_array("*",$ret[sections])){ ?>
+									<?php  if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 										<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
 									</button>
@@ -136,7 +136,7 @@ if($display_mode == "basic") { ?>
 							<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 								<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
 									<div id="toolbar-<?php echo $driver['rawName']?>">
-										 <?php if(in_array("999",$ret[sections]) || in_array("*",$ret[sections])){ ?>
+										 <?php if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 										<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></a>
 										<?php } ?>
 										<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
