@@ -85,7 +85,7 @@ foreach($drivers as $driver) {
 				<label class="control-label" for="outboundcid"><?php echo _('Outbound Caller ID')?></label>
 				<i class="fa fa-question-circle fpbx-help-icon" data-for="outboundcid"></i>
 			</div>
-			<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder='"<?php echo _('Caller Name')?>" <#######>' data-for="outboundcid"></div>
+			<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder="<?php echo _('Caller Name')?> <#######>" data-for="outboundcid"></div>
 		</div>
 	</div>
 	<div class="row">
