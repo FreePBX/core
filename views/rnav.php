@@ -1,7 +1,9 @@
+<?php $ret = core_getAmpUser($_SESSION['AMP_user']->username); ?>
 <?php switch($display) {?>
 <?php case "extensions":?>
 	<?php if($show) { ?>
 		<div id="toolbar-all">
+			<?php if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
 			<div class="dropdown">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 					<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
@@ -12,6 +14,7 @@
 					<?php } ?>
 				</ul>
 			</div>
+			<?php  } ?>
 			<a href="?display=extensions" class="btn"><i class="fa fa-list"></i> <?php echo _("List All Extensions")?></a>
 		</div>
 		<table data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-toolbar="#toolbar-all" data-cache="false" data-toggle="table" data-search="true" class="table" id="table-all-side">
@@ -24,11 +27,13 @@
 		</table>
 	<?php } else { ?>
 		<div class="bootnav" style="margin-top:15px">
-			<div class="list-group">
+				<?php if(in_array("999",$ret['sections']) || in_array("*",$ret['sections'])){ ?>
+				<div class="list-group">
 				<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
 					<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?>" class="list-group-item"><?php echo sprintf(_("Add New %s Extension"), $driver['shortName'])?></a>
 				<?php } ?>
 			</div>
+			<?php } ?>
 		</div>
 	<?php } ?>
 <?php break;?>
