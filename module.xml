@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.5</version>
+	<version>13.0.122.6</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.6* FREEPBX-15778 PBXact Basic Mode Inbound Route 
 		*13.0.122.5* FREEPBX-12244 Module Administrators allow create extensions when is disable the feature 
 		*13.0.122.4* FREEPBX-16946
 		*13.0.122.3* Move upgrade code to install from class
