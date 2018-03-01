@@ -5446,7 +5446,6 @@ function core_getAmpUser($username) {
 		$user["sections"] = explode(";",$results[0][5]);
 		return $user;
 	} else {
-
 		return false;
 	}
 }
