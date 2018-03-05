@@ -166,7 +166,7 @@ uasort($module_list, function($a, $b) {
 $selected = array();
 $unselected = array();
 foreach ($module_list as $key => $val) {
-	if ($key == "wiki" || $key == "irc") {//FREEPBX-16966
+	if ($key == "wiki") {//FREEPBX-16966
                continue;
        }
 	if(!empty($user['sections']) && is_array($user['sections']) && (in_array($key,array_values($user['sections'])) || $user['sections'][0] == '*')){
