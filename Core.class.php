@@ -1036,7 +1036,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$mohsilence = isset($request['mohsilence']) ? $request['mohsilence'] : '';
 			$outcid = isset($request['outcid']) ? $request['outcid'] : '';
 			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
-			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
+			$time_group_id = $time_group_id = isset($request['time_group_id']) && !empty($request['time_group_id']) ? $request['time_group_id'] : NULL;
 			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
 			$time_mode = isset($request['time_mode']) ? $request['time_mode'] : '';
 			$timezone = isset($request['timezone']) ? $request['timezone'] : '';
