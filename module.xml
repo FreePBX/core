@@ -3,25 +3,26 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.23</version>
+	<version>14.0.5.24</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.24* FREEPBX-16086
 		*14.0.5.23* If sections are empty allow extension creation
 		*14.0.5.22* FREEPBX-16980 if not logging in as a user then return empty array
-		*14.0.5.21* FREEPBX-16165 typo in On Demand Recording help text 
-		*14.0.5.20* FREEPBX-15767 Showing a part of code using French Language (extension -quick create) 
-		*14.0.5.19* FREEPBX-15778 PBXact Basic Mode Inbound Route 
+		*14.0.5.21* FREEPBX-16165 typo in On Demand Recording help text
+		*14.0.5.20* FREEPBX-15767 Showing a part of code using French Language (extension -quick create)
+		*14.0.5.19* FREEPBX-15778 PBXact Basic Mode Inbound Route
 		*14.0.5.18* FREEPBX-12244 Module Administrators allow create extensions when is disable the feature
 		*14.0.5.17* FREEPBX-16946
 		*14.0.5.16* FREEPBX-16803 save trunk settings correctly
-		*14.0.5.15* FREEPBX-16784 Remove requirement for PJSip trunks to have a port 
+		*14.0.5.15* FREEPBX-16784 Remove requirement for PJSip trunks to have a port
 		*14.0.5.14* Revert FREEPBX-15459
 		*14.0.5.13* FREEPBX-16858
-		*14.0.5.12* FREEPBX-16645 Adding check to validate if IVR_CONTEXT is set or not 
+		*14.0.5.12* FREEPBX-16645 Adding check to validate if IVR_CONTEXT is set or not
 		*14.0.5.11* FREEPBX-16018
 		*14.0.5.10* FREEPBX-15459 Remove in call disconnect feature code
 		*14.0.5.9* FREEPBX-16756 pjsip not saving settings
