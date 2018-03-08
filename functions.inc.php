@@ -4720,10 +4720,10 @@ function core_trunks_disable($trunk, $switch) {
 	$freepbx = FreePBX::Create();
 	foreach ($trunks as $t) {
 		if($switch){
-				$freepbx->Core->disableTrunk($t);
+				$freepbx->Core->disableTrunk($t['trunkid']);
 				continue;
 		}
-		$freepbx->Core->enableTrunk($t);
+		$freepbx->Core->enableTrunk($t['trunkid']);
 	}
 }
 
