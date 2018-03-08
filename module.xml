@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.10</version>
+	<version>13.0.122.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.11* FREEPBX-16782 Fix disabling registered trunks 
 		*13.0.122.10* FREEPBX-16966 Remove option from Menu selections 
 		*13.0.122.9* If sections are empty then allow creation
 		*13.0.122.8* FREEPBX-16980 if not logging in as a user then return empty array
