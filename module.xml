@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.25</version>
+	<version>14.0.5.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.26* FREEPBX-16782 Fix disabling registered trunks 
 		*14.0.5.25* FREEPBX-16966 Remove option from Menu selections 
 		*14.0.5.24* FREEPBX-16086
 		*14.0.5.23* If sections are empty allow extension creation
