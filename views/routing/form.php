@@ -310,7 +310,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("Optional Route CID to be used for this route <br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX). <br/><br/>If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force it's CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></span>
+						<span id="outcid-help" class="help-block fpbx-help-block"><?php echo _("Optional Route CID to be used for this route <br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: \"hidden\" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX). <br/><br/>If set, this will override all CIDS specified except:<ul><li>extension/device EMERGENCY CIDs if this route is checked as an EMERGENCY Route</li><li>trunk CID if trunk is set to force its CID</li><li>Forwarded call CIDs (CF, Follow Me, Ring Groups, etc)</li><li>Extension/User CIDs if checked</li></ul>")?></span>
 					</div>
 				</div>
 			</div>
