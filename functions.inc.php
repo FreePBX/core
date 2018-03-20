@@ -354,9 +354,7 @@ class core_conf {
 				case 'allow':
 				case 'disallow':
 				case 'accountcode':
-					if ($option != '') {
-						$additional .= $result['keyword']."=$option\n";
-					}
+							$additional .= $result['keyword']."=$option\n";
 				break;
 				default:
 					$additional .= $result['keyword']."=$option\n";
@@ -452,7 +450,6 @@ class core_conf {
 					case 'allow':
 					case 'disallow':
 					case 'accountcode':
-					if ($option != '')
 					$output .= $result2['keyword']."=".$result2['data']."\n";
 					break;
 					case 'callerid':
@@ -594,9 +591,7 @@ class core_conf {
 				case 'allow':
 				case 'disallow':
 				case 'accountcode':
-					if ($option != '') {
 						$additional .= $result['keyword']."=$option\n";
-					}
 				break;
 				case 'requirecalltoken':
 					if ($option != '') {
@@ -661,9 +656,7 @@ class core_conf {
 					case 'allow':
 					case 'disallow':
 					case 'accountcode':
-						if ($option != '') {
 							$output .= $result2['keyword']."=".$result2['data']."\n";
-						}
 					break;
 					case 'requirecalltoken':
 						if ($option != '') {
@@ -5714,7 +5707,7 @@ function core_users_configpageload() {
 		$did_count = 0;
 		foreach ($dids as $did) {
 			$did_dest = preg_split('/,/',$did['destination']);
-			if (isset($did_dest[1]) && $did_dest[1] === $extdisplay) {
+				if (isset($did_dest[1]) && ($did_dest[0] == 'from-did-direct') && $did_dest[1] === $extdisplay) {
 
 				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
