@@ -480,6 +480,31 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tmparr['deny'] = array('prompttext' => _('Deny'), 'value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.")." "._("You may add multiple subnets, separate them with an &amp;.");
 		$tmparr['permit'] = array('prompttext' => _('Permit'), 'value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
+		
+		if (function_exists('endpoint_getExtensionAssignment')) {
+			$ret = endpoint_getExtensionAssignment($deviceInfo['id']);
+			if (!empty($ret)) {
+				/* EPM has phone configured with this extn so give warning to user to reconfigure EPM phone also if sip tech type is changing..*/
+				$epm_pres=true;
+			}
+		}
+
+		if (isset($epm_pres) && $epm_pres) {
+		$currentcomponent->addjsfunc('changeDriver()',"
+		if (confirm('"._('Extension is configured in EPM Changing SIP Channel Driver means you need to reconfigure the EPM for this extension again. Are you Sure you want to reconfigure EPM again after changing the SIP Channel Driver(as EPM might delete this extension automatically after changing SIP channel driver)  ?')."')) {
+		if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit submit to resave the device when you are done to propagate the new settings)')."')) {
+			if($('#devinfo_sipdriver').val() == 'chan_sip') {
+				$('#devinfo_sipdriver').val('chan_pjsip');
+			} else {
+				$('#devinfo_sipdriver').val('chan_sip');
+			}
+			$('form[name=frm_".$display."]').append('<input type=\"hidden\" name=\"changesipdriver\" value=\"yes\">');
+			$('form[name=frm_".$display."]').submit();
+		}
+		}
+		",0);
+
+		} else {
 		$currentcomponent->addjsfunc('changeDriver()',"
 		if(confirm('"._('Are you Sure you want to Change the SIP Channel Driver? (The Page will Refresh, then you MUST hit submit to resave the device when you are done to propagate the new settings)')."')) {
 			if($('#devinfo_sipdriver').val() == 'chan_sip') {
@@ -491,6 +516,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 			$('form[name=frm_".$display."]').submit();
 		}
 		",0);
+		}
 		$currentcomponent->addjsfunc('pickupGroup()',"
 		var val = $('#devinfo_pickupgroup').val();
 		if(isEmpty(val) && val != '0') {
