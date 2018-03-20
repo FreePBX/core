@@ -404,6 +404,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				} else if(!empty($trunk['client_uri'])) {
 					$conf['pjsip.registration.conf'][$tn]['client_uri'] = $trunk['client_uri'];
 				} else {
+					// FREEPBX-17062 - If we are doing inbound or both auth, the username must be the trunk name
+					if ($trunk['authentication'] == "inbound" || $trunk['authentication'] == "both" || empty($trunk['username'])) {
+						$trunk['username'] = $tn;
+					}
 					if (!empty($trunk['sip_server_port'])) {
 						$conf['pjsip.registration.conf'][$tn]['client_uri'] = 'sip:'.$trunk['username'].'@'.$trunk['sip_server'].':'.$trunk['sip_server_port'];
 					} else {
