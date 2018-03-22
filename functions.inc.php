@@ -5791,7 +5791,7 @@ function core_users_configpageload() {
 		$did_count = 0;
 		foreach ($dids as $did) {
 			$did_dest = preg_split('/,/',$did['destination']);
-			if (isset($did_dest[1]) && $did_dest[1] === $extdisplay) {
+			if (isset($did_dest[1]) && ($did_dest[0] == 'from-did-direct') && $did_dest[1] === $extdisplay) {
 
 				$did_title = ($did['description'] != '') ? $did['description'] : _("DID / CID");
 
