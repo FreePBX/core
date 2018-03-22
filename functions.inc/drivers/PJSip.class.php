@@ -1314,7 +1314,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * Get All Trunks
 	 */
 	public function getAllTrunks() {
-		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
+		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip as tech LEFT OUTER JOIN trunks on (tech.id = trunks.trunkid) OR (tech.id = trunks.trunkid)  where  trunks.disabled = 'off' OR trunks.disabled IS NULL");
 		$get->execute();
 		$result = $get->fetchAll(\PDO::FETCH_ASSOC);
 		$final = array();
