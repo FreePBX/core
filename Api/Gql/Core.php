@@ -1,11 +1,38 @@
 <?php
 
-namespace FreePBX\modules\Core\Gqlapi;
+namespace FreePBX\modules\Core\Api\Gql;
 
 use GraphQL\Type\Definition\Type;
-use FreePBX\modules\Gqlapi\includes\Base;
+use FreePBX\modules\Api\Gql\Base;
 
 class Core extends Base {
+	protected $module = 'core';
+	public static function getScopes() {
+		return [
+			'read:user' => [
+				'description' => _('Read User (User/Device Mode) Information'),
+			],
+			'read:device' => [
+				'description' => _('Read Device (User/Device Mode) Information'),
+			],
+			'read:extension' => [
+				'description' => _('Read Extension Information'),
+			],
+			'read:advancedsettings' => [
+				'description' => _('Read Advanced Settings'),
+			],
+			'read:asteriskmodules' => [
+				'description' => _('Read Asterisk Modules'),
+			],
+			'read:did' => [
+				'description' => _('Read Inbound Route Information'),
+			],
+			'read:routing' => [
+				'description' => _('Read Outbound Route Information'),
+			]
+		];
+	}
+
 	public function constructMutation() {
 		return [
 			'createDevice' => [
@@ -21,41 +48,25 @@ class Core extends Base {
 			],
 		];
 	}
-	public function constructQuery() {
-		$user = $this->typeContainer->get('device');
-		$user->addField('user',[
-			'type' => 'objectReference-user',
-			'resolve' => function($device) {
-				return $this->freepbx->Core->getUser($device['user']);
-			}
-		]);
 
-		return [
-			'devices' => [
-				'type' => $this->typeContainer->get('device')->getListReference(),
-				'resolve' => function($root, $args) {
-					return $this->freepbx->Core->getAllDevicesByType();
+	public function constructQuery() {
+		$query = [];
+		if($this->checkScope("read:user")) {
+			$user = $this->typeContainer->get('device');
+			$user->addField('user',[
+				'type' => $this->typeContainer->get('user')->getReference(),
+				'resolve' => function($device) {
+					return $this->freepbx->Core->getUser($device['user']);
 				}
-			],
-			'device' => [
-				'type' => $this->typeContainer->get('device')->getReference(),
-				'args' => [
-					'id' => [
-						'type' => Type::int(),
-						'description' => 'Device ID',
-					]
-				],
-				'resolve' => function($root, $args) {
-					return $this->freepbx->Core->getDevice($args['id']);
-				}
-			],
-			'users' => [
+			]);
+
+			$query['users'] = [
 				'type' => $this->typeContainer->get('user')->getListReference(),
 				'resolve' => function($root, $args) {
 					return $this->freepbx->Core->getAllUsers();
 				}
-			],
-			'user' => [
+			];
+			$query['user'] = [
 				'type' => $this->typeContainer->get('user')->getReference(),
 				'args' => [
 					'id' => [
@@ -66,14 +77,38 @@ class Core extends Base {
 				'resolve' => function($root, $args) {
 					return $this->freepbx->Core->getUser($args['id']);
 				}
-			],
-			'extensions' => [
+			];
+		}
+
+		if($this->checkScope("read:device")) {
+			$query['devices'] = [
+				'type' => $this->typeContainer->get('device')->getListReference(),
+				'resolve' => function($root, $args) {
+					return $this->freepbx->Core->getAllDevicesByType();
+				}
+			];
+			$query['device'] = [
+				'type' => $this->typeContainer->get('device')->getReference(),
+				'args' => [
+					'id' => [
+						'type' => Type::int(),
+						'description' => 'Device ID',
+					]
+				],
+				'resolve' => function($root, $args) {
+					return $this->freepbx->Core->getDevice($args['id']);
+				}
+			];
+		}
+
+		if($this->checkScope("read:extension")) {
+			$query['extensions'] = [
 				'type' => $this->typeContainer->get('extension')->getListReference(),
 				'resolve' => function($root, $args) {
 					return $this->freepbx->Core->getAllUsers();
 				}
-			],
-			'extension' => [
+			];
+			$query['extension'] = [
 				'type' => $this->typeContainer->get('extension')->getReference(),
 				'args' => [
 					'id' => [
@@ -84,8 +119,10 @@ class Core extends Base {
 				'resolve' => function($root, $args) {
 					return $this->freepbx->Core->getUser($args['id']);
 				}
-			]
-		];
+			];
+		}
+
+		return $query;
 	}
 
 	public function postInitReferences() {
