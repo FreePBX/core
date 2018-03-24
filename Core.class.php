@@ -1954,6 +1954,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//get all info about device
 		$devinfo = $this->getDevice($account);
 		if (empty($devinfo)) {
+			//FREEPBX-15389 calling processHooks for Virtual extension
+			$this->freepbx->Hooks->processHooks($account, $editmode);
 			return true;
 		}
 
