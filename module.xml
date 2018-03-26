@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.5.30</version>
+	<version>14.0.5.31</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.5.31* Fixing FREEPBX-17041 Allowing mohclass to be empty while adding inbound routes 
 		*14.0.5.30* FREEPBX-15389 Park Pro leaving permissions of deleted extensions in database 
 		*14.0.5.29* FREEPBX-17036 Disabled PJSIP Trunks still accepting/processing calls. 
 		*14.0.5.28* FREEPBX-15499 Need to add a checklist for Required fields while uploading bulk handler and do proper error handling. 
