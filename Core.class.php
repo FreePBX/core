@@ -1334,6 +1334,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$fields = array();
 		$tech = strtoupper($tech);
 		foreach ($_REQUEST as $req=>$data) {
+			if($tech == 'VIRTUAL'){
+				$fields[$keyword] = array("value" => $data, "flag" => $flag++);
+				continue;
+			}
 			if ( substr($req, 0, 8) == 'devinfo_' ) {
 				$keyword = substr($req, 8);
 				$data = trim($data);
@@ -1472,7 +1476,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param {bool} $editmode=false   If edited, (this is so it doesnt destroy the AsteriskDB)
 	 */
 	public function addDevice($id,$tech,$settings=array(),$editmode=false) {
-		if ($tech == '' || trim($tech) == 'virtual') {
+		if ($tech == '') {
 			return true;
 		}
 
@@ -1509,13 +1513,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$settings['description']['value'] = trim($settings['description']['value']);
 
 		//insert into devices table
-		$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (?,?,?,?,?,?,?)";
-		$sth = $this->database->prepare($sql);
-		try {
-			$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value']));
-		} catch(\Exception $e) {
-			die_freepbx("Could Not Insert Device", $e->getMessage());
-			return false;
+		if($tech != 'virtual'){
+			$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (?,?,?,?,?,?,?)";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value']));
+			} catch(\Exception $e) {
+				die_freepbx("Could Not Insert Device", $e->getMessage());
+				return false;
+			}
 		}
 
 		$astman = $this->FreePBX->astman;
@@ -1954,9 +1960,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//get all info about device
 		$devinfo = $this->getDevice($account);
 		if (empty($devinfo)) {
-			//FREEPBX-15389 calling processHooks for Virtual extension
-			$this->freepbx->Hooks->processHooks($account, $editmode);
-			return true;
+			$devinfo['tech'] = "virtual";
 		}
 
 		//delete details to astdb
