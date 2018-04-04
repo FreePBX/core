@@ -17,6 +17,7 @@ $ext      = array();	// Hash that will contain our list of extensions to call
 $ext_hunt = array();	// Hash that will contain our list of extensions to call used by huntgroup
 $screen   = false;	// Initialize screen variable
 $dsarray  = array();	// This will hold all the dial strings, used to check for duplicate extensions
+$signore  = false;
 
 $AGI = new AGI();
 debug("Starting New Dialparties.agi", 1);
@@ -29,6 +30,9 @@ $cwignore    = strtoupper(trim($cwignore));
 
 $cfignore    = get_var( $AGI, "CFIGNORE" );
 $cfignore    = strtoupper(trim($cfignore));
+
+$signore    = get_var( $AGI, "SIGNORE" );
+$signore    = strtoupper(trim($signore));
 
 $ampuser = get_var( $AGI, "AMPUSER" );
 $ampuser = trim($ampuser);
@@ -223,7 +227,7 @@ $already_screened = get_var( $AGI, "SCREEN" ); // If this is the second pass thr
 $from_outside     = get_var( $AGI, "FROM_DID" );
 // If this isn't a ring group, check to see if the user has call screening on
 // Only screen calls if the primary extension is called, or it's follow-me is called, not ring groups
-if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && !$already_screened && !($nodest != '' && $fmgrp != $nodest)) {
+if(($from_outside != '') && isset($ext[0]) && ($rgmethod == "none" || $fmgrp == $ext[0]) && $signore == false  && !$already_screened && !($nodest != '' && $fmgrp != $nodest)) {
 	$screen_call = $AGI->database_get('AMPUSER', $ext[0]."/screen");
 	$screen_call = $screen_call['data'];
 	if (strlen($screen_call)) {
