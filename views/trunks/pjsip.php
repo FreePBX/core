@@ -939,7 +939,7 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-md-3">
-								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symetric") ?></label>
+								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symmetric") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
 							</div>
 							<div class="col-md-9 radioset">
@@ -954,7 +954,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric")?></span>
+					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric. This should almost always be on.")?></span>
 				</div>
 			</div>
 		</div>

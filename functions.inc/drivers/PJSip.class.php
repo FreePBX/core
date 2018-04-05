@@ -1384,7 +1384,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"sendrpid" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
-				"rtp_symmetric" => "no",
+				// Always yes. --mjordan
+				"rtp_symmetric" => "yes",
 				"rewrite_contact" => "no",
 				"support_path" => "no",
 				"media_address" => "",
