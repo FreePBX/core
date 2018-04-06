@@ -17,7 +17,7 @@ class Trunks extends Base {
 
 	public function constructQuery() {
 		$query = [];
-		if($this->checkScope("read:trunk")) {
+		if($this->checkReadScope("trunk")) {
 			$trunk = $this->typeContainer->get('trunk');
 			$query['trunks'] = [
 				'type' => $this->typeContainer->get('trunk')->getListReference(),
@@ -28,7 +28,7 @@ class Trunks extends Base {
 			$query['trunk'] = [
 				'type' => $this->typeContainer->get('trunk')->getReference(),
 				'args' => [
-					'trunkid' => [
+					'id' => [
 						'type' => Type::int(),
 						'description' => 'Trunk ID',
 					]

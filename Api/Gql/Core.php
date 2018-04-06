@@ -51,7 +51,7 @@ class Core extends Base {
 
 	public function constructQuery() {
 		$query = [];
-		if($this->checkScope("read:user")) {
+		if($this->checkReadScope("user")) {
 			$user = $this->typeContainer->get('device');
 			$user->addField('user',[
 				'type' => $this->typeContainer->get('user')->getReference(),
@@ -80,7 +80,7 @@ class Core extends Base {
 			];
 		}
 
-		if($this->checkScope("read:device")) {
+		if($this->checkReadScope("device")) {
 			$query['devices'] = [
 				'type' => $this->typeContainer->get('device')->getListReference(),
 				'resolve' => function($root, $args) {
@@ -101,7 +101,7 @@ class Core extends Base {
 			];
 		}
 
-		if($this->checkScope("read:extension")) {
+		if($this->checkReadScope("extension")) {
 			$query['extensions'] = [
 				'type' => $this->typeContainer->get('extension')->getListReference(),
 				'resolve' => function($root, $args) {
