@@ -130,11 +130,15 @@ if (($amp_conf["AUTHTYPE"] != "database") && ($amp_conf["AUTHTYPE"] != "usermana
 $prev_category = NULL;
 
 if(is_array($active_modules)){
+	$del_recording = false;
 	$dis = ($amp_conf['AMPEXTENSIONS'] == 'deviceanduser')?_("Add Device"):_("Add Extension");
 	$active_modules['au']['items'][] = array('name' => _("Apply Changes Bar"), 'display' => '99');
 	$active_modules['au']['items'][] = array('name' => $dis, 'display' => '999');
 
 	foreach($active_modules as $key => $module) {
+		if (in_array("recording_report", $module)) {
+			 $del_recording = true;
+		}
 		//create an array of module sections to display
 		if (isset($module['items']) && is_array($module['items'])) {
 			foreach($module['items'] as $itemKey => $item) {
@@ -159,6 +163,11 @@ $module_list['*'] = array(
 	"name" => _("ALL SECTIONS")
 );
 
+if ($del_recording == true) {
+	$module_list['delete_recording'] = array(
+		"name" => _("Delete Call Recordings")
+	);
+}
 uasort($module_list, function($a, $b) {
 	return(strnatcmp($a['name'],$b['name']));
 });
