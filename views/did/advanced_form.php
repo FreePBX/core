@@ -144,7 +144,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<span id="cidnum-help" class="help-block fpbx-help-block"><?php echo _("Define the CallerID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous and Unavailable in order to catch these special cases if the Telco transmits them.")?></span>
+						<span id="cidnum-help" class="help-block fpbx-help-block"><?php echo _("Define the CallerID Number to be matched on incoming calls.<br><br>Leave this field blank to match any or no CID info. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous, Unavailable and Withheld in order to catch these special cases if the Telco transmits them.")?></span>
 					</div>
 				</div>
 			</div>
