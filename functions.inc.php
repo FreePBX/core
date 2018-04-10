@@ -1487,7 +1487,9 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_ringing(''));
 					$ext->add($context, $exten, '', new ext_setvar('__RINGINGSENT','TRUE'));
 				}
-
+				if( $item['fanswer'] === "CHECKED") {
+					$ext->add($context, $exten, '', new ext_answer());
+				}
 				//Block collect Calls
 				if ($item['reversal'] === "CHECKED") {
 					$ext->add($context, $exten, '', new ext_setvar('__REVERSAL_REJECT','TRUE'));

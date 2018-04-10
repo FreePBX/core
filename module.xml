@@ -182,6 +182,7 @@
 			<field name="privacyman" type="boolean" notnull="false"/>
 			<field name="alertinfo" type="string" length="255" notnull="false"/>
 			<field name="ringing" type="string" length="20" notnull="false"/>
+			<field name="fanswer" type="string" length="20" notnull="false"/>
 			<field name="mohclass" type="string" length="80" default="default"/>
 			<field name="description" type="string" length="80" notnull="false"/>
 			<field name="grppre" type="string" length="80" notnull="false"/>
