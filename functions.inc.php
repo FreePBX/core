@@ -4,7 +4,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	Copyright 2006-2014 Schmooze Com Inc.
 //
-
+use FreePBX\modules\Core\Dialplan as Dialplan;
 class core_conf {
 	var $_sip_general    = array();
 	var $_sip_additional = array();
@@ -1138,7 +1138,7 @@ function core_do_get_config($engine) {
 		}
 
 		// FREEPBX-7280 - macro-dial
-		include 'functions.inc/macro-dial.php';
+		Dialplan\macroDial::add($ext);
 
 		/* This needs to be before outbound-routes since they can have a wild-card in them
 		*
@@ -2779,8 +2779,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, 'h', '', new ext_hangup());
 
 	//[macro-user-callerid] Moved to external file
-	include 'functions.inc/macro-user-callerid.php';
-
+	Dialplan\macroUserCallerid::add($ext);
 	/*
 	* arg1 = trunk number, arg2 = number
 	*
@@ -3917,9 +3916,8 @@ function core_do_get_config($engine) {
 
 	/* macro-hangupcall */
 
-
-	include 'functions.inc/macro-dial-one.php';
-	include 'functions.inc/func-sipheaders.php';
+	Dialplan\macroDialone::add($ext);
+	Dialplan\funcSipheaders::add($ext);
 	break;
 	}
 }
