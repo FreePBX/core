@@ -57,6 +57,7 @@ if($extdisplay){
 	$formdata['pricid'] = $pricid;
 	$formdata['alertinfo'] = $alertinfo;
 	$formdata['ringing'] = $ringing;
+	$formdata['fanswer'] = $fanswer;
 	$formdata['reversal'] = $reversal;
 	$formdata['delay_answer'] = $delay_answer;
 	$formdata['privacyman'] = $privacyman;

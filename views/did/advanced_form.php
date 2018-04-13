@@ -334,6 +334,33 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 				</div>
 			</div>
 			<!--END Reject Reverse Charges-->
+			<!-- Force Answer-->
+			<div class="element-container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">
+									<label class="control-label" for="reversalw"><?php echo _("Force Answer") ?></label>
+									<i class="fa fa-question-circle fpbx-help-icon" data-for="fanswer"></i>
+								</div>
+								<div class="col-md-9 radioset">
+									<input type="radio" name="fanswer" id="fansweryes" value="CHECKED" <?php echo ($fanswer == "CHECKED"?"CHECKED":"") ?>>
+									<label for="fansweryes"><?php echo _("Yes");?></label>
+									<input type="radio" name="fanswer" id="fanswerno" value="" <?php echo ($fanswer == "CHECKED"?"":"CHECKED") ?>>
+									<label for="fanswerno"><?php echo _("No");?></label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="fanswer-help" class="help-block fpbx-help-block"><?php echo _("Set to Yes to force the call to be answered at this time")?></span>
+					</div>
+				</div>
+			</div>
+			<!--END  Force Answer-->
 			<!--Pause Before Answer-->
 			<div class="element-container">
 				<div class="row">
