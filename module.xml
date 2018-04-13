@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.6</version>
+	<version>14.0.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.7* Fix FREEPBX-16357 Enabling Other tab in basic mode to display Endpoint 
 		*14.0.6* Fix PJSIP Nat Issue
 		*14.0.5.31* Fixing FREEPBX-17041 Allowing mohclass to be empty while adding inbound routes 
 		*14.0.5.30* FREEPBX-15389 Park Pro leaving permissions of deleted extensions in database 
