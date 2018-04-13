@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.14</version>
+	<version>13.0.122.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.15* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default 
 		*13.0.122.14* FREEPBX-17055 Quick extension creation page allignment is broken for french language issue fix 
 		*13.0.122.13* FREEPBX-15389 Park Pro leaving permissions of deleted extensions in database 
 		*13.0.122.12* FREEPBX-16787 - Extension's Add Inbound CID shows wrong numbers
