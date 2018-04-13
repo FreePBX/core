@@ -37,7 +37,7 @@ if($display_mode == "basic") { ?>
 						</table>
 					</div>
 				<?php } else {
-					echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php", array("hideCategory" => array("advanced","other","findmefollow")));
+					echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php", array("hideCategory" => array("advanced","findmefollow")));
 				} ?>
 			</div>
 		</div>
