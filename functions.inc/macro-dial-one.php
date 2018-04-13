@@ -11,7 +11,7 @@ $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', '${ARG3}'));
 $ext->add($mcontext,$exten,'setexttocall', new ext_execif('$[${LEN(${EXTTOCALL})}=0 & ${LEN(${DEXTEN})}>0]', 'Set', '__EXTTOCALL=${DEXTEN}'));
 
 $ext->add($mcontext,$exten,'', new ext_set('DIALSTATUS_CW', ''));
-$ext->add($mcontext,$exten,'', new ext_gosubif('$["${FROM_DID}"!="" & "${SCREEN}"="" & "${DB(AMPUSER/${DEXTEN}/screen)}"!=""]','screen,1'));
+$ext->add($mcontext,$exten,'', new ext_gosubif('$["${FROM_DID}"!="" & "${SCREEN}"="" & "${SIGNORE}"="" & "${DB(AMPUSER/${DEXTEN}/screen)}"!=""]','screen,1'));
 $ext->add($mcontext,$exten,'', new ext_gosubif('$["${DB(CF/${DEXTEN})}"!=""]','cf,1'));
 $ext->add($mcontext,$exten,'', new ext_gotoif('$["${DEXTEN:-1}"="#" | "${DB(DND/${DEXTEN})}"=""]','skip1'));
 $ext->add($mcontext,$exten,'', new ext_set('DEXTEN', ''));
