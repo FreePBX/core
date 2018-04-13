@@ -37,7 +37,7 @@ if($display_mode == "basic") { ?>
 						</table>
 					</div>
 				<?php } else {
-					echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php", array("hideCategory" => array("advanced","other","findmefollow")));
+					echo $currentcomponent->generateconfigpage(__DIR__."/views/extensions.php", array("hideCategory" => array("advanced","findmefollow")));
 				} ?>
 			</div>
 		</div>
@@ -258,22 +258,22 @@ if($display_mode == "basic") { ?>
 		});
 	})
 	function DNDIconFormatter(value, row) {
-		return row.settings.dnd ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Do Not Disturb is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Do Not Disturb is disabled")?>"></i>';
+		return row.settings.dnd ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Do Not Disturb is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Do Not Disturb is disabled")+"'></i>";
 	}
 	function CWIconFormatter(value, row) {
-		return row.settings.cw ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Waiting is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Waiting is disabled")?>"></i>';
+		return row.settings.cw ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Call Waiting is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Call Waiting is disabled")+"'></i>";
 	}
 	function CFIconFormatter(value, row) {
-		return row.settings.cf ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding is disabled")?>"></i>';
+		return row.settings.cf ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Call Forwarding is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Call Forwarding is disabled")+"'></i>";
 	}
 	function CFBIconFormatter(value, row) {
-		return row.settings.cfb ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Busy is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Busy is disabled")?>"></i>';
+		return row.settings.cfb ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Call Forwarding Busy is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Call Forwarding Busy is disabled")+"'></i>";
 	}
 	function CFUIconFormatter(value, row) {
-		return row.settings.cfu ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Call Forwarding Unconditional is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Call Forwarding Unconditional is disabled")?>"></i>';
+		return row.settings.cfu ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Call Forwarding Unconditional is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Call Forwarding Unconditional is disabled")+"'></i>";
 	}
 	function FMFMIconFormatter(value, row) {
-		return row.settings.fmfm ? '<i class="fa fa-check-square-o" style="color:green" title="<?php echo _("Find Me/Follow Me is enabled")?>"></i>' : '<i class="fa fa-square-o" title="<?php echo _("Find Me/Follow Me is disabled")?>"></i>';
+		return row.settings.fmfm ? "<i class='fa fa-check-square-o' style='color:green' title='"+_("Find Me/Follow Me is enabled")+"'></i>" : "<i class='fa fa-square-o' title='"+_("Find Me/Follow Me is disabled")+"'></i>";
 	}
 </script>
 <?php } ?>

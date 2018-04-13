@@ -1957,6 +1957,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//get all info about device
 		$devinfo = $this->getDevice($account);
 		if (empty($devinfo)) {
+			//FREEPBX-15389 calling processHooks for Virtual extension
+			$this->freepbx->Hooks->processHooks($account, $editmode);
 			return true;
 		}
 
@@ -2966,6 +2968,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					'description' => _('Extension'),
 				),
 				'name' => array(
+					'required' => true,
 					'identifier' => _('Name'),
 					'description' => _('Name'),
 				),
@@ -2974,7 +2977,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					'description' => _('Description'),
 				),
 				'tech' => array(
-					'required' => true,
 					'identifier' => _('Device Technology'),
 					'description' => _('Device Technology'),
 				),
@@ -3026,24 +3028,25 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return array                  Message containing status
 	 */
 	public function bulkhandlerValidate($type, $rawData) {
-		$ret = NULL;
-
 		switch ($type) {
 		case 'extensions':
-			if (true) {
-				$ret = array(
-					'status' => true,
-				);
-			} else {
-				$ret = array(
-					'status' => false,
-					'message' => sprintf(_('%s records failed validation'), count($rawData))
-				);
+			foreach ($rawData as $data) {
+
+				if (empty($data['extension'])) {
+					return array("status" => false, "message" => _("Extension is missing."));
+				}
+				if (!is_numeric($data['extension'])) {
+					return array("status" => false, "message" => _("Extension is not numeric."));
+				}
+				if(empty($data['name'])){
+					return array("status" => false, "message" => _("Extension name is blank."));
+				}
 			}
+			return array("status" => true);
+
 			break;
 		}
 
-		return $ret;
 	}
 
 	/**
@@ -3061,18 +3064,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$defaulttech = \FreePBX::Sipsettings()->getSipPortOwner();
 			foreach ($rawData as $data) {
 				array_change_key_case($data, CASE_LOWER);
-				if (!is_numeric($data['extension'])) {
-					return array("status" => false, "message" => _("Extension is not numeric."));
-				}
 				if(empty($data['tech'])) {
 					if ($defaulttech == "none") {
 						$data['tech'] = 'sip';
 					} else {
 						$data['tech'] = $defaulttech;
 					}
-				}
-				if(empty($data['name'])) {
-					return array("status" => false, "message" => _("Device 'name' can not be blank."));
 				}
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
 				foreach ($settings as $key => $value) {

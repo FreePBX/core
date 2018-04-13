@@ -823,6 +823,33 @@
 			</div>
 		</div>
 		<!--END Fax Detect-->
+		<!--Trust RPID/PAI-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="trust_rpid"><?php echo _("Trust RPID/PAI") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_rpid"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="trust_rpid" id="trust_rpidyes" value="yes" <?php echo ($trust_rpid == "yes"?"CHECKED":"") ?>>
+								<label for="trust_rpidyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="trust_rpid" id="trust_rpidno" value="no" <?php echo ($trust_rpid == "yes"?"":"CHECKED") ?>>
+								<label for="trust_rpidno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="trust_rpid-help" class="help-block fpbx-help-block"><?php echo _("Trust the Remote-Party-ID and/or P-Asserted-Identity header")?></span>
+				</div>
+			 </div>
+		</div>
+		<!--END Trust RPID/PAI-->
 		<!--Send RPID/PAI-->
 		<div class="element-container">
 			<div class="row">
@@ -939,7 +966,7 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-md-3">
-								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symetric") ?></label>
+								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symmetric") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
 							</div>
 							<div class="col-md-9 radioset">
@@ -954,7 +981,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric")?></span>
+					<span id="rtp_symmetric-help" class="help-block fpbx-help-block"><?php echo _("Enforce that RTP must be symmetric. This should almost always be on.")?></span>
 				</div>
 			</div>
 		</div>

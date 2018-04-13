@@ -559,6 +559,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.endpoint.conf'][$tn]['fax_detect'] = $trunk['fax_detect'];
 				}
 				//yes,no
+				if(!empty($trunk['trust_rpid'])){
+					$conf['pjsip.endpoint.conf'][$tn]['trust_id_inbound'] = $trunk['trust_rpid'];
+				}
+				//yes,no
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
@@ -1314,7 +1318,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * Get All Trunks
 	 */
 	public function getAllTrunks() {
-		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip");
+		$get = $this->db->prepare("SELECT id, keyword, data FROM pjsip as tech LEFT OUTER JOIN trunks on (tech.id = trunks.trunkid) OR (tech.id = trunks.trunkid)  where  trunks.disabled = 'off' OR trunks.disabled IS NULL");
 		$get->execute();
 		$result = $get->fetchAll(\PDO::FETCH_ASSOC);
 		$final = array();
@@ -1384,8 +1388,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"sendrpid" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
-				"rtp_symmetric" => "no",
-				"rewrite_contact" => "no",
+				// Always yes. --mjordan
+				"rtp_symmetric" => "yes",
+				"rewrite_contact" => "yes",
 				"support_path" => "no",
 				"media_address" => "",
 				"media_encryption" => "no",
