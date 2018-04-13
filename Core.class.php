@@ -1212,6 +1212,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$action = isset($request['action'])?$request['action']:'';
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$ringing = isset($request['ringing'])?$request['ringing']:'';
+			$fanswer = isset($request['fanswer'])?$request['fanswer']:'';
 			$reversal = isset($request['reversal'])?$request['reversal']:'';
 			$description = htmlspecialchars(isset($request['description'])?$request['description']:'');
 			$privacyman = isset($request['privacyman'])?$request['privacyman']:'0';
@@ -2398,9 +2399,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
 		if (empty($existing)) {
-			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
+			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
 			$sth = $this->database->prepare($sql);
-			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'],':fanswer' => $settings['fanswer'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
 			$this->freepbx->Hooks->processHooks($settings);
 			return true;
 		} else {
@@ -2478,6 +2479,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
 			$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
 			$did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
+			$did_create['fanswer']     = isset($did_vars['fanswer'])     ? $did_vars['fanswer']     : '';
 			$did_create['reversal']     = isset($did_vars['reversal'])     ? $did_vars['reversal']     : '';
 			$did_create['mohclass']    = isset($did_vars['mohclass'])    ? $did_vars['mohclass']    : 'default';
 			$did_create['description'] = isset($did_vars['description']) ? $did_vars['description'] : '';
@@ -2511,6 +2513,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				case 'pmminlength':
 				case 'alertinfo':
 				case 'ringing':
+				case 'fanswer':
 				case 'reversal':
 				case 'mohclass':
 				case 'description':
@@ -2726,6 +2729,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$did_vars['privacyman']  = '';
 			$did_vars['alertinfo']   = '';
 			$did_vars['ringing']     = '';
+			$did_vars['fanswer']     = '';
 			$did_vars['reversal']     = '';
 			$did_vars['mohclass']    = 'default';
 			$did_vars['description'] = $settings['newdid_name'];
