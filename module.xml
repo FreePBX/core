@@ -10,20 +10,20 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*15.0.1alpha2* FREEPBX-16978 Add 'Answer' to inbound routes 
-		*15.0.1alpha2* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default 
-		*15.0.1alpha2* FREEPBX-16782 Fix disabling registered trunks 
-		*15.0.1alpha2* FREEPBX-16966 Remove option from Menu selections 
-		*15.0.1alpha2* FREEPBX-16165 typo in On Demand Recording help text 
-		*15.0.1alpha2* FREEPBX-15767 Showing a part of code using French Language (extension -quick create) 
-		*15.0.1alpha2* FREEPBX-15778 PBXact Basic Mode Inbound Route 
-		*15.0.1alpha2* FREEPBX-16784 Remove requirement for PJSip trunks to have a port 
-		*15.0.1alpha2* FREEPBX-16645 Adding check to validate if IVR_CONTEXT is set or not 
+		*15.0.1alpha2* FREEPBX-16978 Add 'Answer' to inbound routes
+		*15.0.1alpha2* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default
+		*15.0.1alpha2* FREEPBX-16782 Fix disabling registered trunks
+		*15.0.1alpha2* FREEPBX-16966 Remove option from Menu selections
+		*15.0.1alpha2* FREEPBX-16165 typo in On Demand Recording help text
+		*15.0.1alpha2* FREEPBX-15767 Showing a part of code using French Language (extension -quick create)
+		*15.0.1alpha2* FREEPBX-15778 PBXact Basic Mode Inbound Route
+		*15.0.1alpha2* FREEPBX-16784 Remove requirement for PJSip trunks to have a port
+		*15.0.1alpha2* FREEPBX-16645 Adding check to validate if IVR_CONTEXT is set or not
 		*15.0.1alpha3* add support for pjsip media_address in trunk configuration
-		*15.0.1alpha2* Bugfix/FREEPBX-16672 =&amp;gt; managing t38 for pjsip 
-		*15.0.1alpha2* Bugfix/FREEPBX-12299 
-		*15.0.1alpha2* FREEPBX-16526 regression checks coming into play 
-		*15.0.1alpha2* FREEPBX-16419 Fix trunks disable to use method to disable trunks. 
+		*15.0.1alpha2* Bugfix/FREEPBX-16672 =&amp;gt; managing t38 for pjsip
+		*15.0.1alpha2* Bugfix/FREEPBX-12299
+		*15.0.1alpha2* FREEPBX-16526 regression checks coming into play
+		*15.0.1alpha2* FREEPBX-16419 Fix trunks disable to use method to disable trunks.
 		*15.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
@@ -117,6 +117,7 @@
 			<field name="privacyman" type="boolean" notnull="false"/>
 			<field name="alertinfo" type="string" length="255" notnull="false"/>
 			<field name="ringing" type="string" length="20" notnull="false"/>
+			<field name="fanswer" type="string" length="20" notnull="false"/>
 			<field name="mohclass" type="string" length="80" default="default"/>
 			<field name="description" type="string" length="80" notnull="false"/>
 			<field name="grppre" type="string" length="80" notnull="false"/>
