@@ -14,7 +14,7 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'setexttocall', new \ext_execif('$[${LEN(${EXTTOCALL})}=0 & ${LEN(${DEXTEN})}>0]', 'Set', '__EXTTOCALL=${DEXTEN}'));
 
 		$ext->add($mcontext,$exten,'', new \ext_set('DIALSTATUS_CW', ''));
-		$ext->add($mcontext,$exten,'', new ext_gosubif('$["${FROM_DID}"!="" & "${SCREEN}"="" & "${SIGNORE}"="" & "${DB(AMPUSER/${DEXTEN}/screen)}"!=""]','screen,1'));
+		$ext->add($mcontext,$exten,'', new \ext_gosubif('$["${FROM_DID}"!="" & "${SCREEN}"="" & "${SIGNORE}"="" & "${DB(AMPUSER/${DEXTEN}/screen)}"!=""]','screen,1'));
 		$ext->add($mcontext,$exten,'', new \ext_gosubif('$["${DB(CF/${DEXTEN})}"!=""]','cf,1'));
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${DEXTEN:-1}"="#" | "${DB(DND/${DEXTEN})}"=""]','skip1'));
 		$ext->add($mcontext,$exten,'', new \ext_set('DEXTEN', ''));
@@ -103,7 +103,7 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(AMPUSER/${DEXTEN}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${DEXTEN})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 		$ext->add($mcontext,$exten,'dialapp', new \ext_noop(''));
 		// added Hh in dial options FREEPBX-15459 In-Call Asterisk Disconnect Code feature code is broken.
-		$ext->add($mcontext,$exten,'', new \ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}${CWRING}b(func-apply-sipheaders^s^1)'));
+		$ext->add($mcontext,$exten,'dial', new \ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}b(func-apply-sipheaders^s^1)'));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIALSTATUS_CW}"!=""]', 'Set', 'DIALSTATUS=${DIALSTATUS_CW}'));
@@ -222,8 +222,8 @@ class macroDialone{
 		* execution with a status of ANSWER. So we hangup at this point
 		*/
 		$exten = 's-ANSWER';
-		$ext->add($context, $exten, '', new \ext_noop('Call successfully answered - Hanging up now'));
-		$ext->add($context, $exten, '', new \ext_macro('hangupcall'));
+		$ext->add($mcontext, $exten, '', new \ext_noop('Call successfully answered - Hanging up now'));
+		$ext->add($mcontext, $exten, 'bye', new \ext_macro('hangupcall'));
 
 		$exten = 's-TORTURE';
 		$ext->add($mcontext,$exten,'', new \ext_goto('1','musiconhold','app-blackhole'));
@@ -243,7 +243,7 @@ class macroDialone{
 
 		foreach (array('s-CHANUNAVAIL', 's-NOANSWER', 's-BUSY') as $exten) {
 			$ext->add($mcontext,$exten,'', new \ext_macro('vm','${SCREEN_EXTEN},BUSY,${IVR_RETVM}'));
-			$ext->add($mcontext,$exten,'', new \ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
+			$ext->add($mcontext,$exten,'return', new \ext_execif('$["${IVR_RETVM}"!="RETURN" | "${IVR_CONTEXT}"=""]','Hangup'));
 			$ext->add($mcontext,$exten,'', new \ext_return(''));
 		}
 	}
