@@ -540,6 +540,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.endpoint.conf'][$tn]['fax_detect'] = $trunk['fax_detect'];
 				}
 				//yes,no
+				if(!empty($trunk['trust_rpid'])){
+					$conf['pjsip.endpoint.conf'][$tn]['trust_id_inbound'] = $trunk['trust_rpid'];
+				}
+				//yes,no
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
