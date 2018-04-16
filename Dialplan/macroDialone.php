@@ -102,7 +102,6 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}I'));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(AMPUSER/${DEXTEN}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${DEXTEN})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 		$ext->add($mcontext,$exten,'dialapp', new \ext_noop(''));
-		// added Hh in dial options FREEPBX-15459 In-Call Asterisk Disconnect Code feature code is broken.
 		$ext->add($mcontext,$exten,'dial', new \ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}b(func-apply-sipheaders^s^1)'));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'MacroExit'));
 
