@@ -10,4 +10,20 @@ class Virtual extends \FreePBX\modules\Core\Driver {
 			"shortName" => _("Virtual")
 		);
 	}
+	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
+                return array(
+                        "dial" => "",
+                        "settings" => array()
+                );
+        }
+	public function addDevice($id, $settings) {
+                return true;
+        }
+	public function delDevice($id) {
+                return true;
+        }
+	public function getDevice($id) {
+                return array();
+        }
+
 }
