@@ -97,7 +97,8 @@ $s = 'NOANSWER';
 $ext->add($c,$s,'', new ext_macro('vm', '${SCREEN_EXTEN},BUSY,${IVR_RETVM}'));
 $ext->add($c,$s,'', new ext_gotoif('$["${IVR_RETVM}" != "RETURN" | "${IVR_CONTEXT}" = ""]', 'bye'));
 $ext->add($c,$s,'', new ext_return());
-$ext->add($c,$s,'bye', new ext_macro('hangupcall'));
+$ext->add($c,$s,'bye', new ext_noop('checking something else to do ?${ivrreturn}? IVR return!!'));
+$ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $s = 'TORTURE';
 $ext->add($c,$s,'', new ext_goto('app-blackhole,musiconhold,1'));
@@ -112,6 +113,7 @@ $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $s = 'ANSWER';
 $ext->add($c,$s,'answered', new ext_noop('Call successfully answered - Hanging up now'));
+$ext->add($c,$s,'bye', new ext_noop('checking something else to do ?${ivrreturn}? IVR return!!'));
 $ext->add($c,$s,'', new ext_macro('hangupcall'));
 
 $ext->add($c,'h','', new ext_macro('hangupcall'));
