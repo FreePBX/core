@@ -2650,6 +2650,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$astman = $this->FreePBX->astman;
 		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
+			$astman->database_put("AMPUSER",$extension."/accountcode",!empty($settings["devinfo_accountcode"]) ? $settings["devinfo_accountcode"] : '');
 			$astman->database_put("AMPUSER",$extension."/rvolume",isset($settings['rvolume']) ? $settings['rvolume'] : '');
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
