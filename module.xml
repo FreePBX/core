@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.13</version>
+	<version>14.0.14</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.14* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID 
 		*14.0.13* FREEPBX-14431 
 		*14.0.12* FREEPBX-17175  Queues ring strategy not working if Call Screening enabled on extension 
 		*14.0.11* FREEPBX-17253 Inbound Route CID needs Withheld added 
