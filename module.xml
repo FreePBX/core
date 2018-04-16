@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.1alpha2* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID 
 		*15.0.1alpha2* FREEPBX-17253 Inbound Route CID needs Withheld added 
 		*15.0.1alpha2* FREEPBX-16978 Add 'Answer' to inbound routes
 		*15.0.1alpha2* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default
