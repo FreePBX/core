@@ -6052,7 +6052,7 @@ function core_devices_configprocess() {
 	$tech = $action = null;
 	extract($_REQUEST);
 
-	if ($tech == "virtual" || $action == "edit" && $tech == '') {
+	if ($action == "edit" && $tech == '') {
 		return true;
 	}
 	$extension = isset($extension)?$extension:null;
