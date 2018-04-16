@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.16</version>
+	<version>13.0.122.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.17* FREEPBX-10623 - Account code never deleted 
 		*13.0.122.16* FREEPBX-17275 Cant reload after update to IVR 13.0.27.8 
 		*13.0.122.15* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default 
 		*13.0.122.14* FREEPBX-17055 Quick extension creation page allignment is broken for french language issue fix 
