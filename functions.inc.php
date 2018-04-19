@@ -2931,6 +2931,8 @@ function core_do_get_config($engine) {
 	// Keep the original CallerID number, for failover to the next trunk.
 
 	$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'KEEPCID=false'));
+	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'AMPUSER=${FROMEXTEN}'));
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
