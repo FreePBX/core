@@ -26,6 +26,7 @@ $formdata = array('extdisplay' => $extdisplay,
 				'rnavsort' => isset($rnavsort) ? $rnavsort : '',
 				'didfilter' => isset($didfilter) ? $didfilter : '',
 				'rvolume' => isset($rvolume) ? $rvolume : '',
+				'indication_zone' => isset($indication_zone) ? $indication_zone : '',
 				'heading' => '<h2>'._("Add Incoming Route").'</h2>',
 	);
 
@@ -66,6 +67,7 @@ if($extdisplay){
 	$formdata['pmminlength'] = $pmminlength;
 	$formdata['mohclass'] = $mohclass;
 	$formdata['rvolume'] = $rvolume;
+	$formdata['indication_zone'] = $indication_zone;
 
 }else{
 	$extension = isset($extarray[0]) ? $extarray[0] : '';

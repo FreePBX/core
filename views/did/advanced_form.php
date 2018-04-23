@@ -1,4 +1,5 @@
 <?php
+$zonelist = core_indications_get();
 if (function_exists('music_list')) {
 	$tresults = music_list();
 	$cur = (isset($mohclass) && $mohclass != "" ? $mohclass : 'default');
@@ -280,6 +281,35 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<!--END Set Destination-->
 		</div>
 		<div role="tabpanel" id="didadvanced" class="tab-pane">
+		<!--Indication Zone Country-->
+		<div class="element-container">
+			 <div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="indication_zone"><?php echo _("Indication Zone Country") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="indication_zone"></i>
+							</div>
+							<div class="col-md-9">
+								<select class="form-control" id="indication_zone" name="indication_zone">
+								<option value="default">Default</option>
+								<?php foreach($zonelist as $key => $val) {?>
+									<option value="<?php echo $val['iso'] ?>"<?php echo ($indication_zone == $val['iso']) ? 'selected':''?>><?php echo $val['name']?></option>
+								<?php } ?>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="indication_zone-help" class="help-block fpbx-help-block"><?php echo _("Choose the country indication zone that  you would like Asterisk to use when creating the different standard telephony tones such as ringing, busy, congetstion, etc.")?></span>
+					</div>
+				</div>
+			</div>
+			<!--END Indication Zone Country-->
 			<!--Signal RINGING-->
 			<div class="element-container">
 				<div class="row">
