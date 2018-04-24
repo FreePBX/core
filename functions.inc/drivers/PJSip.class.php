@@ -556,6 +556,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
 					}
 				}
+				if(!empty($trunk['identify_by']) && $trunk['identify_by'] != "default"){
+					$conf['pjsip.endpoint.conf'][$tn]['identify_by'] = $trunk['identify_by'];
+				}
 				// FREEPBX-13047 PJSIP doesn't allow you to set inband_progress
 				if(!empty($trunk['inband_progress']) && $trunk['inband_progress'] === "yes"){
                                         $conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
@@ -1277,7 +1280,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"sendrpid" => "no",
 				"inband_progress" => "no",
 				"direct_media" => "no",
-				"support_path" => "no"
+				"support_path" => "no",
+				"identify_by" => "default"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
