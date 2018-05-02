@@ -344,9 +344,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 		$conf['pjsip.conf']['global'][] = "#include pjsip_custom_post.conf";
-
 		$trunks = $this->getAllTrunks();
 		foreach($trunks as $trunk) {
+			/**
+			 * Do not write out if disabled.
+			 */
+			if (isset($trunk['disabletrunk']) && $trunk['disabletrunk'] == "on") {
+				continue;
+			}
+
 			$tn = $trunk['trunk_name'];
 
 			// Checkboxes aren't saved if they're unchecked.
@@ -360,12 +366,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if (empty($trunk['authentication'])) {
 				$trunk['authentication'] = "outbound";
 				unset($this->_registration[$tn]);
-			}
-
-			// Make sure we're not disabled. If we are, we don't send
-			// registrations, but we still accept incoming calls.
-			if (isset($trunk['disabletrunk']) && $trunk['disabletrunk'] == "on") {
-				$trunk['registration'] = "off";
 			}
 
 			// Have we been asked to send registrations?
