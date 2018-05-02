@@ -31,7 +31,7 @@ if ($route_seq != 0) {
 	$routeseqopts .= '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
 }
 
-$last_seq = isset($last_seq)?$last_seq:'';
+$last_seq = isset($last_seq)?$last_seq:count($routepriority)-1;
 $route_names = array();
 foreach ($routepriority as $key => $route) {
 	if($request['id'] != $route['route_id']){
