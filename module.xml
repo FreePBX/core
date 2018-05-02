@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.18</version>
+	<version>13.0.122.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.19* FREEPBX-16782 Disable PJSIP write out when disabled. 
 		*13.0.122.18* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
 		*13.0.122.17* FREEPBX-10623 - Account code never deleted 
 		*13.0.122.16* FREEPBX-17275 Cant reload after update to IVR 13.0.27.8 
