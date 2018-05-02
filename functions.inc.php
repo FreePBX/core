@@ -4522,7 +4522,7 @@ function core_routing_setrouteorder($route_id, $seq) {
 		if (!ctype_digit($seq)) {
 			return false;
 		}
-		if ($seq >= count($sequence)-1) {
+		if ($seq > count($sequence)-1) {
 			unset($sequence[$key]);
 			$sequence[] = $route_id;
 			break;
