@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.16</version>
+	<version>14.0.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.17* FREEPBX-16782 Disable PJSIP write out when disabled. 
 		*14.0.16* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
 		*14.0.15* FREEPBX-10623 - Account code never deleted 
 		*14.0.14* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID 
