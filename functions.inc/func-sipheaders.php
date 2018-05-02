@@ -19,6 +19,7 @@ $c = 'func-apply-sipheaders';
 
 $ext->add($c,$e,'', new ext_noop('Applying SIP Headers to channel'));
 $ext->add($c,$e,'', new ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
+$ext->add($c,$e,'', new ext_execif('$["${HASH(SIPHEADERS,Alert-Info)}" = "unset"]', 'Set', 'Rheader=1'));
 $ext->add($c,$e,'', new ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));
 $ext->add($c,$e,'', new ext_set('sipheader', '${HASH(SIPHEADERS,${sipkey})}'));
 $driver = \FreePBX::Config()->get("ASTSIPDRIVER");
@@ -29,4 +30,5 @@ if(in_array($driver,array("both","chan_pjsip"))) {
 	$ext->add($c,$e,'', new ext_set('PJSIP_HEADER(add,${sipkey})', '${sipheader}'));
 }
 $ext->add($c,$e,'', new ext_endwhile(''));
+$ext->add($c,$e,'', new ext_execif('$["${Rheader}" = "1"]','SIPRemoveHeader','Alert-Info:'));
 $ext->add($c,$e,'', new ext_return());
