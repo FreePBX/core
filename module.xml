@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.2</version>
+	<version>14.0.18.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.3* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated 
 		*14.0.18.2* FREEPBX-17094 AlertInfo not clearing after answer? 
 		*14.0.18.1* FREEPBX-17158  PJSIP Trunk between FreePBX servers doesn't work with registration unless identify_by=auth_username is set
 		*14.0.18* FREEPBX-9493 Route Position dropdown menu missing items 
