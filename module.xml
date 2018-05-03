@@ -132,6 +132,7 @@
 			<field name="pmminlength" type="string" length="2" notnull="false"/>
 			<field name="reversal" type="string" length="10" notnull="false"/>
 			<field name="rvolume" type="string" length="2" default="" notnull="false"/>
+			<field name="indication_zone" type="string" length="20" default="default" notnull="false"/>
 		</table>
 		<table name="outbound_routes">
 			<field name="route_id" type="integer" primaryKey="true" autoincrement="true"/>
