@@ -881,6 +881,36 @@
 			</div>
 		</div>
 		<!--END Send RPID/PAI-->
+		<!--Match Inbound Authentication-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="identify_by"><?php echo _("Match Inbound Authentication") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="identify_by"></i>
+							</div>
+							<div class="col-md-9">
+								<select name="identify_by" id="identify_by" class="form-control">
+									<option value="default" <?php echo isset($identify_by) && $identify_by == "default"  ? "selected" : ""?>><?php echo _("Default")?></option>
+									<option value="username" <?php echo isset($identify_by) && $identify_by == "username" ? "selected" : ""?>><?php echo _("Username")?></option>
+									<option value="auth_username" <?php echo isset($identify_by) && $identify_by == "auth_username" ? "selected" : ""?>><?php echo _("Auth Username")?></option>
+									<option value="ip" <?php echo isset($identify_by) && $identify_by == "ip" ? "selected" : ""?>><?php echo _("Ip")?></option>
+									<option value="header" <?php echo isset($identify_by) && $identify_by == "header" ? "selected" : ""?>><?php echo _("Header")?></option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="identify_by-help" class="help-block fpbx-help-block"><?php echo _("Matches the endpoint based on the selected options.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Match Inbound Authentication-->
 		<!--Send Inband_progress-->
 		<div class="element-container">
 			<div class="row">
