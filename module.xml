@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18</version>
+	<version>14.0.18.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.1* FREEPBX-17158  PJSIP Trunk between FreePBX servers doesn't work with registration unless identify_by=auth_username is set
 		*14.0.18* FREEPBX-9493 Route Position dropdown menu missing items 
 		*14.0.17* FREEPBX-16782 Disable PJSIP write out when disabled. 
 		*14.0.16* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
