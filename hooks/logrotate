@@ -5,6 +5,7 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	size 500M
 	missingok
 	rotate 7
+	dateext
 	notifempty
 	sharedscripts
 	create 0640 asterisk asterisk
@@ -17,10 +18,10 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	size 100M
 	missingok
 	rotate 7
+	dateext
 	notifempty
 	sharedscripts
 	create 0640 asterisk asterisk
 	su asterisk asterisk
 }
 EOF
-
