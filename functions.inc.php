@@ -2931,8 +2931,7 @@ function core_do_get_config($engine) {
 	// Keep the original CallerID number, for failover to the next trunk.
 
 	$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'KEEPCID=false'));
-	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'AMPUSER=${FROMEXTEN}'));
+	$ext->add($context, $exten, '', new ext_execif('$[$["${CIDMASQUERADING}" = "TRUE"] & $[$["${AMPUSER}" = ""] | $["${AMPUSER}" = "${DB(AMPUSER/${FROMEXTEN}/cidnum)}"]]]', 'Set', 'AMPUSER=${FROMEXTEN}'));
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
@@ -2940,6 +2939,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CIDMASQUERADING}" = "TRUE"]', 'normcid'));
 	// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
 	// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
 	// is set for this CID, then it must be internal
