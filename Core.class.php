@@ -1879,6 +1879,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute(array($trunkid));
 		$trunk = $stmt->fetch(\PDO::FETCH_ASSOC);
+		if(empty($trunk)) {
+			return false;
+		}
 		if ($trunk['name'] == '') {
 			$tech = strtoupper($trunk['tech']);
 			switch ($tech) {
