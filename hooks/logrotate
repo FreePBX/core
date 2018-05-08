@@ -3,10 +3,11 @@
 if true ; then
 	cat <<- EOF > /etc/logrotate.d/freepbx-core
 	/var/log/asterisk/freepbx_dbug{
-		size 500M
+		size 250M
 		missingok
 		rotate 7
 		notifempty
+		dateext
 		sharedscripts
 		create 0640 asterisk asterisk
 	}
@@ -17,6 +18,7 @@ if true ; then
 		missingok
 		rotate 7
 		notifempty
+		dateext
 		sharedscripts
 		create 0640 asterisk asterisk
 	}
