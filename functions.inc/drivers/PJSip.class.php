@@ -1030,8 +1030,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$binds = \FreePBX::Sipsettings()->getBinds();
 		// Make sure bind address is a real IP address, not 0.0.0.0 or :: (or [::])
 		if (isset($binds['pjsip'])) {
-			$bindarr = key($binds['pjsip']);
-			if (!empty($bindarr) && $bindarr != "0.0.0.0" && $bindaddr != "::" && $bindaddr != "[::]") {
+			$bindaddr = key($binds['pjsip']);
+			if (!empty($bindaddr) && $bindaddr != "0.0.0.0" && $bindaddr != "::" && $bindaddr != "[::]") {
 				$endpoint[] = "media_address=$bindaddr";
 				$endpoint[] = "bind_rtp_to_media_address=yes";
 			}
