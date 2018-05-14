@@ -10,30 +10,30 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.18.4* FREEPBX-17209 Tonezone / ringback tone by international DID 
-		*14.0.18.3* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated 
-		*14.0.18.2* FREEPBX-17094 AlertInfo not clearing after answer? 
+		*14.0.18.4* FREEPBX-17209 Tonezone / ringback tone by international DID
+		*14.0.18.3* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated
+		*14.0.18.2* FREEPBX-17094 AlertInfo not clearing after answer?
 		*14.0.18.1* FREEPBX-17158  PJSIP Trunk between FreePBX servers doesn't work with registration unless identify_by=auth_username is set
-		*14.0.18* FREEPBX-9493 Route Position dropdown menu missing items 
-		*14.0.17* FREEPBX-16782 Disable PJSIP write out when disabled. 
-		*14.0.16* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
-		*14.0.15* FREEPBX-10623 - Account code never deleted 
-		*14.0.14* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID 
-		*14.0.13* FREEPBX-14431 
-		*14.0.12* FREEPBX-17175  Queues ring strategy not working if Call Screening enabled on extension 
-		*14.0.11* FREEPBX-17253 Inbound Route CID needs Withheld added 
-		*14.0.10* FREEPBX-16978 Add 'Answer' to inbound routes 
-		*14.0.9* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default 
-		*14.0.8* FREEPBX-17055 Quick extension creation page allignment is broken for french language issue fix 
-		*14.0.7* Fix FREEPBX-16357 Enabling Other tab in basic mode to display Endpoint 
+		*14.0.18* FREEPBX-9493 Route Position dropdown menu missing items
+		*14.0.17* FREEPBX-16782 Disable PJSIP write out when disabled.
+		*14.0.16* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls
+		*14.0.15* FREEPBX-10623 - Account code never deleted
+		*14.0.14* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID
+		*14.0.13* FREEPBX-14431
+		*14.0.12* FREEPBX-17175  Queues ring strategy not working if Call Screening enabled on extension
+		*14.0.11* FREEPBX-17253 Inbound Route CID needs Withheld added
+		*14.0.10* FREEPBX-16978 Add 'Answer' to inbound routes
+		*14.0.9* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default
+		*14.0.8* FREEPBX-17055 Quick extension creation page allignment is broken for french language issue fix
+		*14.0.7* Fix FREEPBX-16357 Enabling Other tab in basic mode to display Endpoint
 		*14.0.6* Fix PJSIP Nat Issue
-		*14.0.5.31* Fixing FREEPBX-17041 Allowing mohclass to be empty while adding inbound routes 
-		*14.0.5.30* FREEPBX-15389 Park Pro leaving permissions of deleted extensions in database 
-		*14.0.5.29* FREEPBX-17036 Disabled PJSIP Trunks still accepting/processing calls. 
-		*14.0.5.28* FREEPBX-15499 Need to add a checklist for Required fields while uploading bulk handler and do proper error handling. 
+		*14.0.5.31* Fixing FREEPBX-17041 Allowing mohclass to be empty while adding inbound routes
+		*14.0.5.30* FREEPBX-15389 Park Pro leaving permissions of deleted extensions in database
+		*14.0.5.29* FREEPBX-17036 Disabled PJSIP Trunks still accepting/processing calls.
+		*14.0.5.28* FREEPBX-15499 Need to add a checklist for Required fields while uploading bulk handler and do proper error handling.
 		*14.0.5.27* FREEPBX-16787 - Extension's Add Inbound CID shows wrong numbers
-		*14.0.5.26* FREEPBX-16782 Fix disabling registered trunks 
-		*14.0.5.25* FREEPBX-16966 Remove option from Menu selections 
+		*14.0.5.26* FREEPBX-16782 Fix disabling registered trunks
+		*14.0.5.25* FREEPBX-16966 Remove option from Menu selections
 		*14.0.5.24* FREEPBX-16086
 		*14.0.5.23* If sections are empty allow extension creation
 		*14.0.5.22* FREEPBX-16980 if not logging in as a user then return empty array
@@ -192,8 +192,8 @@
 			</key>
 		</table>
 		<table name="incoming">
-			<field name="cidnum" type="string" length="20" notnull="false"/>
-			<field name="extension" type="string" length="50"/>
+			<field name="cidnum" type="string" length="50" notnull="false"/>
+			<field name="extension" type="string" length="100"/>
 			<field name="destination" type="string" length="50" notnull="false"/>
 			<field name="privacyman" type="boolean" notnull="false"/>
 			<field name="alertinfo" type="string" length="255" notnull="false"/>
