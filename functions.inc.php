@@ -1454,8 +1454,8 @@ function core_do_get_config($engine) {
 					}
 				}
 				// always set CallerID name
-				$ext->add($context, $exten, '', new ext_set('CDR(did)','${FROM_DID}'));
-				$ext->add($context, $exten, '', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
+				$ext->add($context, $exten, 'did', new ext_set('CDR(did)','${FROM_DID}'));
+				$ext->add($context, $exten, 'callerid', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
 
 				// if VQA present and configured call it
 				if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_INBOUND']) {
