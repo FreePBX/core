@@ -6,6 +6,7 @@ if(!class_exists("\\FreePBX\\Modules\\Core\\Drivers\\Sip")) {
 }
 class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
+	//res_pjproject.so removed 5/14/2018 https://issues.freepbx.org/browse/FREEPBX-17437
 	private $PJSipModules = array("chan_pjsip.so", "res_pjsip_endpoint_identifier_anonymous.so", "res_pjsip_messaging.so",
 		"res_pjsip_pidf.so", "res_pjsip_session.so", "func_pjsip_endpoint.so", "res_pjsip_endpoint_identifier_ip.so", "res_pjsip_mwi.so",
 		"res_pjsip_pubsub.so", "res_pjsip.so", "res_pjsip_acl.so", "res_pjsip_endpoint_identifier_user.so", "res_pjsip_nat.so",
@@ -13,8 +14,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		"res_pjsip_registrar_expire.so", "res_pjsip_transport_websocket.so", "res_pjsip_caller_id.so", "res_pjsip_header_funcs.so",
 		"res_pjsip_one_touch_record_info.so", "res_pjsip_registrar.so", "res_pjsip_diversion.so", "res_pjsip_log_forwarder.so",
 		"res_pjsip_outbound_authenticator_digest.so", "res_pjsip_rfc3326.so", "res_pjsip_dtmf_info.so", "res_pjsip_logger.so",
-		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so", "res_pjsip_outbound_publish.so", "res_pjsip_config_wizard.so",
-		"res_pjproject.so");
+		"res_pjsip_outbound_registration.so", "res_pjsip_sdp_rtp.so", "res_pjsip_outbound_publish.so", "res_pjsip_config_wizard.so");
 
 	private $_endpoint = array();
 	private $_auth = array();
@@ -500,7 +500,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
+				'allow' => str_replace(',', '&', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
@@ -997,9 +997,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 
 		if (!empty($config['disallow'])) {
-			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
+			$endpoint[] = "disallow=".str_replace(',', '&', $config['disallow']); // As above.
 		}
-		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
+		$endpoint[] = "allow=".str_replace(',', '&', $config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
