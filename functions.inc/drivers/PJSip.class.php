@@ -481,7 +481,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => str_replace('&', ',', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip, valid in chan_sip
+				'allow' => str_replace(',', '&', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
@@ -906,9 +906,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "auth=$authname";
 
 		if (!empty($config['disallow'])) {
-			$endpoint[] = "disallow=".str_replace('&', ',', $config['disallow']); // As above.
+			$endpoint[] = "disallow=".str_replace(',', '&', $config['disallow']); // As above.
 		}
-		$endpoint[] = "allow=".str_replace('&', ',', $config['allow']); // & is invalid in pjsip, but valid in chan_sip
+		$endpoint[] = "allow=".str_replace(',', '&', $config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
