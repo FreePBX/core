@@ -3004,8 +3004,8 @@ function core_do_get_config($engine) {
 	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = ""]', 'bypass'));
 
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(AMPUSER/${AMPUSER}/outboundcid)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
