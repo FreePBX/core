@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.9</version>
+	<version>14.0.18.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.10* FREEPBX-17449 Alter Info : the inherit option under advanced settings is not working for Attended Transfer. 
 		*14.0.18.9* Fix incorrect CDR logging
 		*14.0.18.8* Fixing FREEPBX-17499 Adding default values in DID required parameters. 
 		*14.0.18.7* FREEPBX-7158 Device and User Mode - USEROUTCID Incorrect During Blind Transfer 
