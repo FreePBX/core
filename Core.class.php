@@ -1893,7 +1893,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 			}
 		}
-		$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
+		$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunkid . "/dialopts");
 		return $trunk;
 	}
 
