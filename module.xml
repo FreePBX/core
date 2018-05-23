@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.23</version>
+	<version>13.0.122.24</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.24* FREEPBX-13876 Incorrect CDR Logging
 		*13.0.122.23* Fix issue with trunk method
 		*13.0.122.22* FREEPBX-17094 AlertInfo not clearing after answer? 
 		*13.0.122.21* FREEPBX-17158  PJSIP Trunk between FreePBX servers doesn't work with registration unless identify_by=auth_username is set 
