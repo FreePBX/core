@@ -41,13 +41,19 @@ class Trunks extends Base {
 		return $query;
 	}
 
-	public function initReferences() {
-		$trunk = $this->typeContainer->get('trunk');
+	public function postInitTypes() {
+		$destinations = $this->typeContainer->get('destination');
+		$destinations->addType($this->typeContainer->get('trunk')->getReference());
+	}
+
+	public function initTypes() {
+		$trunk = $this->typeContainer->create('trunk');
+		$trunk->setDescription('Where you control connectivity to the PSTN and your VoIP provider(s)');
 		$trunk->addFields([
 			'id' => [
 				'type' => Type::id(),
 				'resolve' => function($row) {
-					return $row['trunkid'];
+					return isset($row['trunkid']) ? $row['trunkid'] : null;
 				}
 			],
 			'name' => [

@@ -34,19 +34,23 @@ class Core extends Base {
 	}
 
 	public function constructMutation() {
-		return [
-			'createDevice' => [
-				'type' => $this->typeContainer->get('device')->getReference(),
-				'args' => [
-					'id' => [
-						'type' => Type::int()
-					]
+		$mutation = [];
+		if($this->checkWriteScope("device")) {
+			$mutation = [
+				'createDevice' => [
+					'type' => $this->typeContainer->get('device')->getReference(),
+					'args' => [
+						'id' => [
+							'type' => Type::int()
+						]
+					],
+					'resolve' => function ($root, $args) {
+						return $this->freepbx->Core->getDevice($args['id']);
+					},
 				],
-				'resolve' => function ($root, $args) {
-					return $this->freepbx->Core->getDevice($args['id']);
-				},
-			],
-		];
+			];
+		}
+		return $mutation;
 	}
 
 	public function constructQuery() {
@@ -125,22 +129,14 @@ class Core extends Base {
 		return $query;
 	}
 
-	public function postInitReferences() {
-		$user = $this->typeContainer->get('user');
-		$user->addFields([
-			'noanswer_dest' => [
-				'type' => $this->typeContainer->get('destination')->getReference()
-			],
-			'busy_dest' => [
-				'type' => $this->typeContainer->get('destination')->getReference()
-			],
-			'chanunavail_dest' => [
-				'type' => $this->typeContainer->get('destination')->getReference()
-			]
-		]);
+	public function postInitTypes() {
+		$destinations = $this->typeContainer->get('destination');
+		$destinations->addType($this->typeContainer->get('user')->getReference());
+		//$destinations->addType($this->typeContainer->get('device')->getReference());
+		//$destinations->addType($this->typeContainer->get('extension')->getReference());
 	}
 
-	public function initReferences() {
+	public function initTypes() {
 		$this->getUserType();
 		$this->getDeviceType();
 		$this->getExtensionType();
@@ -148,7 +144,7 @@ class Core extends Base {
 	}
 
 	private function getUserType() {
-		$user = $this->typeContainer->get('user');
+		$user = $this->typeContainer->create('user');
 		$user->addFields([
 			'extension' => [
 				'type' => Type::id()
@@ -188,12 +184,23 @@ class Core extends Base {
 			],
 			'mohclass' => [
 				'type' => Type::string()
+			],
+			/*
+			'noanswer_dest' => [
+				'type' => $this->typeContainer->get('destination')->getReference()
+			],
+			'busy_dest' => [
+				'type' => $this->typeContainer->get('destination')->getReference()
+			],
+			'chanunavail_dest' => [
+				'type' => $this->typeContainer->get('destination')->getReference()
 			]
+			*/
 		]);
 	}
 
 	private function getDeviceType() {
-		$device = $this->typeContainer->get('device');
+		$device = $this->typeContainer->create('device');
 		$device->addFields([
 				'id' => [
 					'type' => Type::id()
@@ -223,7 +230,7 @@ class Core extends Base {
 	}
 
 	private function getExtensionType() {
-		$user = $this->typeContainer->get('extension');
+		$user = $this->typeContainer->create('extension');
 		$user->addFields([
 			'device' => [
 				'type' => $this->typeContainer->get('device')->getReference(),

@@ -915,8 +915,13 @@ function core_getdestinfo($dest) {
 		} else {
 			$name = isset($users[$exten]['name'])?$users[$exten]['name']:'';
 			$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-			return array('description' => sprintf(_("User Extension %s: %s"),$exten,$name),
-			'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
+			$data = $users[$exten];
+			$data['gqltype'] = 'user';
+			return array(
+				'description' => sprintf(_("User Extension %s: %s"),$exten,$name),
+				'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
+				'data' => $data
+			);
 		}
 	} else if (substr(trim($dest),0,10) == 'ext-trunk,') {
 		$exten = explode(',',$dest);
@@ -927,8 +932,13 @@ function core_getdestinfo($dest) {
 		} else {
 			$display = 'trunks';
 			$name = isset($thisexten['name']) && $thisexten['name'] ? $thisexten['name'] : '';
-			return array('description' => sprintf(_('Trunk: %s (%s)'),$name,$thisexten['tech']),
-			'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten));
+			$data = $thisexten;
+			$data['gqltype'] = 'trunk';
+			return array(
+				'description' => sprintf(_('Trunk: %s (%s)'),$name,$thisexten['tech']),
+				'edit_url' => "config.php?type=setup&display=$display&extdisplay=OUT_".urlencode($exten),
+				'data' => $data
+			);
 		}
 
 	// Check for voicemail box destinations
@@ -948,8 +958,13 @@ function core_getdestinfo($dest) {
 		}
 		$description = sprintf(_("User Extension %s: %s"),$exten, $box['name']);
 		$display = ($amp_conf['AMPEXTENSIONS'] == "deviceanduser")?'users':'extensions';
-		return array('description' => $description,
-		'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0");
+		$data = $users[$exten];
+		$data['gqltype'] = 'user';
+		return array(
+			'description' => $description,
+			'edit_url' => "config.php?type=setup&display=$display&extdisplay=".urlencode($exten)."&skip=0",
+			'data' => $data
+		);
 
 	// Check for blackhole Termination Destinations
 	//
@@ -983,8 +998,15 @@ function core_getdestinfo($dest) {
 			$description = false;
 		}
 		if ($description) {
-			return array('description' => 'Core: '.$description,
-			'edit_url' => false);
+			return array(
+				'description' => 'Core: '.$description,
+				'edit_url' => false,
+				'data' => array(
+					'gqltype' => 'coreterminations',
+					'id' => $dest,
+					'description' => $description
+				)
+			);
 		} else {
 			return array();
 		}
@@ -5494,11 +5516,7 @@ function core_devices_configprocess() {
 }
 
 function _core_backtrace() {
-	$trace = debug_backtrace();
-	$function = $trace[1]['function'];
-	$line = $trace[1]['line'];
-	$file = $trace[1]['file'];
-	freepbx_log(FPBX_LOG_WARNING,'Depreciated Function '.$function.' detected in '.$file.' on line '.$line);
+	FreePBX::Modules()->deprecatedFunction(2);
 }
 
 function core_module_repo_parameters_callback($opts) {
