@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.25</version>
+	<version>13.0.122.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.26* FREEPBX-17446 PJSip Trunk 'Permanent Auth Rejection' UI wrong 
 		*13.0.122.25* FREEPBX-17449 Alter Info : the inherit option under advanced settings is not working for Attended Transfer. 
 		*13.0.122.24* FREEPBX-13876 Incorrect CDR Logging
 		*13.0.122.23* Fix issue with trunk method
