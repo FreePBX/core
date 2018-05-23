@@ -258,7 +258,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<span id="privacyman-help" class="help-block fpbx-help-block"><?php echo _("If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be be prompted to say their name when the call reaches the user/extension.")?></span>
+						<span id="privacyman-help" class="help-block fpbx-help-block"><?php echo _("If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.")?></span>
 					</div>
 				</div>
 			</div>
