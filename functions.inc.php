@@ -89,7 +89,9 @@ class core_conf {
 			'sip_notify_additional.conf',
 			'res_odbc_additional.conf',
 			'chan_dahdi_additional.conf',
-			'http_additional.conf'
+			'http_additional.conf',
+			'indications_general_additional.conf',
+			'indications_additional.conf'
 		);
 		return $files;
 	}
@@ -141,6 +143,12 @@ class core_conf {
 			break;
 			case 'http_additional.conf':
 			return $this->generate_http_additional($version);
+			break;
+			case 'indications_general_additional.conf':
+			return $this->generate_indications_general_additional($version);
+			break;
+			case 'indications_additional.conf':
+			return $this->generate_indications_additional($version);
 			break;
 		}
 	}
@@ -212,6 +220,36 @@ class core_conf {
 			$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
 		}
 		return $output;
+	}
+	function generate_indications_general_additional($ast_version) {
+		global $amp_conf;
+		$output = '';
+		$country = $amp_conf['TONEZONE'];
+		$output .= "country=".$country."\n";
+		return $output;
+		}
+
+	function generate_indications_additional($ast_version) {
+		global $amp_conf;
+		$output = '';
+		$country = $amp_conf['TONEZONE'];
+		$didlist = \FreePBX::Core()->getAllDIDs();
+		if(is_array($didlist)){
+			foreach($didlist as $item) {
+				if($item['indication_zone'] == "default" || $item['indication_zone'] == $country){
+					continue;
+				}
+				$zonelist = core_indications_get($item['indication_zone']);
+				$output .= "[".$item['indication_zone']."]\n";
+				$output .= "description = {$zonelist['name']}\n";
+				$output .= $zonelist['conf']."\n\n";
+			}
+		}
+		$zonelist = core_indications_get($country);
+		$output .= "[".$country."]\n";
+		$output .= "description = {$zonelist['name']}\n";
+		$output .= $zonelist['conf']."\n\n";
+                return $output;
 	}
 
 	function addSipAdditional($section, $key, $value) {
@@ -1431,6 +1469,7 @@ function core_do_get_config($engine) {
 				}
 				$exten = trim($item['extension']);
 				$cidnum = trim($item['cidnum']);
+				$tonezone = trim($item['indication_zone']);
 
 				// If the user put in just a cid number for routing, we add _. pattern to catch
 				// all DIDs with that CID number. Asterisk will complain about _. being dangerous
@@ -1452,6 +1491,10 @@ function core_do_get_config($engine) {
 				$exten = (($exten == "")?"s":$exten);
 				$exten = $exten.(($cidnum == "")?"":"/".$cidnum); //if a CID num is defined, add it
 				$ext->add($context, $exten, '', new ext_setvar('__DIRECTION',($amp_conf['INBOUND_NOTRANS'] ? 'INBOUND' : '')));
+				if ($tonezone == "default") {
+					$tonezone = $amp_conf['TONEZONE'];
+				}
+				$ext->add($context, $exten, '', new ext_setvar('CHANNEL(tonezone)', $tonezone));
 				if ($cidroute) {
 					$ext->add($context, $exten, '', new ext_setvar('__FROM_DID','${EXTEN}'));
 					$ext->add($context, $exten, '', new ext_goto('1','s'));
@@ -2817,8 +2860,7 @@ function core_do_get_config($engine) {
 	// Keep the original CallerID number, for failover to the next trunk.
 
 	$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'KEEPCID=false'));
-	$ext->add($context, $exten, '', new ext_execif('$[$["${AMPUSER}" = ""] | $["${AMPUSER}" != "${FROMEXTEN}"] ]', 'Set', 'AMPUSER=${FROMEXTEN}'));
+	$ext->add($context, $exten, '', new ext_execif('$[$["${CIDMASQUERADING}" = "TRUE"] & $[$["${AMPUSER}" = ""] | $["${AMPUSER}" = "${DB(AMPUSER/${FROMEXTEN}/cidnum)}"]]]', 'Set', 'AMPUSER=${FROMEXTEN}'));
 	// If this came through a ringgroup or CF, then we want to retain original CID unless
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
@@ -2836,8 +2878,8 @@ function core_do_get_config($engine) {
 	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
-	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = ""]', 'bypass'));
 
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(AMPUSER/${AMPUSER}/outboundcid)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
@@ -4809,14 +4851,11 @@ function general_generate_indications() {
 	global $amp_conf;
 
 	$notify =& notifications::create($db);
-
-	$country = $amp_conf['TONEZONE'];
 	$filename = $amp_conf['ASTETCDIR'] . "/indications.conf";
 
-	$zonelist = core_indications_get($country);
 	$fd = fopen($filename, "w");
 
-	if (empty($zonelist) || $fd === false) {
+	if ($fd === false) {
 		$desc = sprintf(_("Failed to open %s for writing, aborting attempt to write the country indications. The file may be readonly or the permissions may be incorrect."), $filename);
 		$notify->add_error('core','INDICATIONS',_("Failed to write indications.conf"), $desc);
 		return;
@@ -4828,10 +4867,10 @@ function general_generate_indications() {
 ; this file must be done via the web gui.                                        ;
 ;--------------------------------------------------------------------------------;\n\n";
 	fwrite($fd, $indication_warning);
-	fwrite($fd, "[general]\ncountry=".$country."\n\n[".$country."]\n");
-	fwrite($fd, "description = {$zonelist['name']}\n");
-	fwrite($fd, "{$zonelist['conf']}\n\n");
-
+	fwrite($fd, "[general]\n#include indications_general_additional.conf\n");
+	fwrite($fd, "#include indications_general_custom.conf\n");
+	fwrite($fd, "#include indications_additional.conf\n");
+	fwrite($fd, "#include indications_custom.conf\n");
 	fclose($fd);
 }
 /* end page.routing.php functions */

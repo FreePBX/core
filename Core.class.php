@@ -1912,7 +1912,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				break;
 			}
 		}
-		$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
+		$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunkid . "/dialopts");
 		return $trunk;
 	}
 
@@ -2403,9 +2403,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		//
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
 		if (empty($existing)) {
-			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, description, grppre, delay_answer, pricid) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid)";
+			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, description, grppre, delay_answer, pricid, indication_zone) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid, :indication_zone)";
 			$sth = $this->database->prepare($sql);
-			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'],':fanswer' => $settings['fanswer'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid']));
+			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'],':fanswer' => $settings['fanswer'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid'], ':indication_zone' => $settings['indication_zone']));
 			$this->freepbx->Hooks->processHooks($settings);
 			return true;
 		} else {
