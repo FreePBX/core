@@ -565,12 +565,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
                                 }
 
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
-				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "yes"){
-                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "yes";
+				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
+                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
                                 }
-				if(!empty($trunk['direct_media']) {
-					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = ($trunk['direct_media'] === "no" ? "no" : "yes");
-				}
 
 				$conf['pjsip.endpoint.conf'][$tn]['dtmf_mode'] = $trunk['dtmfmode'];
 			}
