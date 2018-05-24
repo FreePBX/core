@@ -3256,4 +3256,25 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		return $tech;
 	}
+
+	/**
+	 * Filter valid codecs from list
+	 * @method filterValidCodecs
+	 * @param  string      $codecs List of codecs to check
+	 * @return string              The filtered codecs
+	 */
+	public function filterValidCodecs($codecs) {
+		$codecs = str_replace('&', ',', $codecs); //remove invalid & joiner if its there
+		$codecs = explode(",",$codecs);
+		$validCodecs = array_merge(
+			array_keys($this->freepbx->Codecs->getAudio()),
+			array_keys($this->freepbx->Codecs->getVideo()),
+			array_keys($this->freepbx->Codecs->getText()),
+			array_keys($this->freepbx->Codecs->getImage()),
+			array('all','!all')
+		);
+		$codecs = array_intersect($codecs, $validCodecs);
+		$codecs = implode(",",$codecs);
+		return $codecs;
+	}
 }

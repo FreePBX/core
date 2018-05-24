@@ -353,6 +353,11 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
+					$opt = FreePBX::Core()->filterValidCodecs($option);
+					if(!empty($opt)) {
+						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+					}
+				break;
 				case 'accountcode':
 						$additional .= $result['keyword']."=$option\n";
 				break;
@@ -449,6 +454,11 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
+						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						if(!empty($opt)) {
+							$output .= $result2['keyword']."=".$opt."\n";
+						}
+					break;
 					case 'accountcode':
 					$output .= $result2['keyword']."=".$result2['data']."\n";
 					break;
@@ -590,6 +600,11 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
+					$opt = FreePBX::Core()->filterValidCodecs($option);
+					if(!empty($opt)) {
+						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+					}
+				break;
 				case 'accountcode':
 						$additional .= $result['keyword']."=$option\n";
 				break;
@@ -655,6 +670,11 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
+						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						if(!empty($opt)) {
+							$output .= $result2['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+						}
+					break;
 					case 'accountcode':
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 					break;
