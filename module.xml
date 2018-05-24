@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.28</version>
+	<version>13.0.122.29</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.29* FREEPBX-15637
 		*13.0.122.28* FREEPBX-17492
 		*13.0.122.27* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated 
 		*13.0.122.26* FREEPBX-17446 PJSip Trunk 'Permanent Auth Rejection' UI wrong 
