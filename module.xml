@@ -117,7 +117,7 @@
 		*14.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>14.0</version>
+		<version>14.0.3.4</version>
 	</depends>
 	<database>
 		<table name="trunks">
