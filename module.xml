@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.27</version>
+	<version>13.0.122.28</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.28* FREEPBX-17492
 		*13.0.122.27* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated 
 		*13.0.122.26* FREEPBX-17446 PJSip Trunk 'Permanent Auth Rejection' UI wrong 
 		*13.0.122.25* FREEPBX-17449 Alter Info : the inherit option under advanced settings is not working for Attended Transfer. 
@@ -319,7 +320,7 @@
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
 	</changelog>
 	<depends>
-		<version>13.0.188.12</version>
+		<version>13.0.195.2</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>

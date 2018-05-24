@@ -132,11 +132,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => $this->freepbx->Config->get('DEVICE_DISALLOW'),
+				"value" => $this->filterValidCodecs($this->freepbx->Config->get('DEVICE_DISALLOW')),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => $this->freepbx->Config->get('DEVICE_ALLOW'),
+				"value" => $this->filterValidCodecs($this->freepbx->Config->get('DEVICE_ALLOW')),
 				"flag" => $flag++
 			),
 			"accountcode" => array(
@@ -481,7 +481,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => str_replace(',', '&', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
+				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
@@ -909,9 +909,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "auth=$authname";
 
 		if (!empty($config['disallow'])) {
-			$endpoint[] = "disallow=".str_replace(',', '&', $config['disallow']); // As above.
+			$endpoint[] = "disallow=".$this->filterValidCodecs($config['disallow']); // As above.
 		}
-		$endpoint[] = "allow=".str_replace(',', '&', $config['allow']); // & is invalid in pjsip
+		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
@@ -1146,7 +1146,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		// Codec allow is now mandatory
 		if (empty($config['allow'])) {
-			$config['allow'] = $this->getDefaultSIPCodecs();
+			$config['allow'] = $this->filterValidCodecs($this->getDefaultSIPCodecs());
 		}
 	}
 
