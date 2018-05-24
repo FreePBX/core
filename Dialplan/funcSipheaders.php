@@ -33,10 +33,10 @@ class funcSipheaders{
 		}
 		$ext->add($c,$e,'', new \ext_endwhile(''));
 		if (in_array($driver,array("both","chan_sip"))) {
-			$ext->add($c,$e,'', new ext_execif('$["${Rheader}" = "1"]','SIPRemoveHeader','Alert-Info:'));
+			$ext->add($c,$e,'', new \ext_execif('$["${Rheader}" = "1"]','SIPRemoveHeader','Alert-Info:'));
 		}
 		if (in_array($driver,array("both","chan_pjsip"))) {
-			$ext->add($c,$e,'', new ext_execif('$["${Rheader}" = "1"]','Set','PJSIP_HEADER(remove,Alert-Info)='));
+			$ext->add($c,$e,'', new \ext_execif('$["${Rheader}" = "1"]','Set','PJSIP_HEADER(remove,Alert-Info)='));
 		}
 		$ext->add($c,$e,'', new \ext_return());
 
