@@ -2384,6 +2384,25 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		));
 	}
 
+	/* Fill non-mandatory fields with default if not present */
+	public function addDIDDefaults(&$settings) {
+		$settings['fanswer'] = isset($settings['fanswer'])?$settings['fanswer']:'';
+		$settings['delay_answer'] = isset($settings['delay_answer'])&&$settings['delay_answer']?$settings['delay_answer']:'0';
+		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
+		$settings['privacyman'] = isset($settings['privacyman'])?$settings['privacyman']:'0';
+		$settings['pmmaxretries'] = isset($settings['pmmaxretries'])?$settings['pmmaxretries']:'';
+		$settings['pmminlength'] = isset($settings['pmminlength'])?$settings['pmminlength']:'';
+		$settings['alertinfo'] = htmlspecialchars(isset($settings['alertinfo'])?$settings['alertinfo']:'');
+		$settings['ringing'] = isset($settings['ringing'])?$settings['ringing']:'';
+		$settings['reversal'] = isset($settings['reversal'])?$settings['reversal']:'';
+		$settings['mohclass'] = isset($settings['mohclass'])?$settings['mohclass']:'default';
+		$settings['grppre'] = isset($settings['grppre'])?$settings['grppre']:'';
+		$settings['pricid'] = isset($settings['pricid'])?$settings['pricid']:'';
+		$settings['rnavsort'] = isset($settings['rnavsort'])?$settings['rnavsort']:'description';
+		$settings['didfilter'] = isset($settings['didfilter'])?$settings['didfilter']:'';
+		$settings['indication_zone'] = isset($settings['indication_zone'])?$settings['indication_zone']:'default';
+	}
+
 	/**
 	 * Add Inbound Route
 	 * @param array $settings Array of Inbound Route Settings
@@ -2393,16 +2412,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$invalidDIDChars = array('<', '>');
 		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
 		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
-		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
 
-		// XXX: Kludge for empty value
-		if ($settings['delay_answer'] == '') {
-			$settings['delay_answer'] = '0';
-		}
 		// Check to make sure the did is not being used elsewhere
 		//
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
 		if (empty($existing)) {
+			$this->addDIDDefaults($settings);
 			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, description, grppre, delay_answer, pricid, indication_zone) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid, :indication_zone)";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'],':fanswer' => $settings['fanswer'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid'], ':indication_zone' => $settings['indication_zone']));
@@ -3453,5 +3468,26 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$tech = "iax"; // same thing, here
 		}
 		return $tech;
+	}
+
+	/**
+	 * Filter valid codecs from list
+	 * @method filterValidCodecs
+	 * @param  string      $codecs List of codecs to check
+	 * @return string              The filtered codecs
+	 */
+	public function filterValidCodecs($codecs) {
+		$codecs = str_replace('&', ',', $codecs); //remove invalid & joiner if its there
+		$codecs = explode(",",$codecs);
+		$validCodecs = array_merge(
+			array_keys($this->freepbx->Codecs->getAudio()),
+			array_keys($this->freepbx->Codecs->getVideo()),
+			array_keys($this->freepbx->Codecs->getText()),
+			array_keys($this->freepbx->Codecs->getImage()),
+			array('all','!all')
+		);
+		$codecs = array_intersect($codecs, $validCodecs);
+		$codecs = implode(",",$codecs);
+		return $codecs;
 	}
 }

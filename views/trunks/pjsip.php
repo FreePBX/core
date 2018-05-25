@@ -268,8 +268,10 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="checkbox" name="auth_rejection_permanent" id="auth_rejection_permanent" <?php echo ($auth_rejection_permanent == 'on') ? 'checked' : ''?>/>
-								<label for="auth_rejection_permanent"><?php echo _("Enabled")?></label>
+								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentyes" value="on" <?php echo ($auth_rejection_permanent == "on"?"CHECKED":"") ?>>
+								<label for="auth_rejection_permanentyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentno" value="off" <?php echo ($auth_rejection_permanent == "off"?"CHECKED":"") ?>>
+								<label for="auth_rejection_permanentno"><?php echo _("No")?></label>
 							</div>
 						</div>
 					</div>

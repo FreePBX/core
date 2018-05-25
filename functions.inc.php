@@ -394,6 +394,11 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
+					$opt = FreePBX::Core()->filterValidCodecs($option);
+					if(!empty($opt)) {
+						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+					}
+				break;
 				case 'accountcode':
 						$additional .= $result['keyword']."=$option\n";
 				break;
@@ -490,6 +495,11 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
+						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						if(!empty($opt)) {
+							$output .= $result2['keyword']."=".$opt."\n";
+						}
+					break;
 					case 'accountcode':
 					$output .= $result2['keyword']."=".$result2['data']."\n";
 					break;
@@ -631,6 +641,11 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
+					$opt = FreePBX::Core()->filterValidCodecs($option);
+					if(!empty($opt)) {
+						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+					}
+				break;
 				case 'accountcode':
 						$additional .= $result['keyword']."=$option\n";
 				break;
@@ -696,6 +711,11 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
+						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						if(!empty($opt)) {
+							$output .= $result2['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+						}
+					break;
 					case 'accountcode':
 							$output .= $result2['keyword']."=".$result2['data']."\n";
 					break;
@@ -1508,8 +1528,8 @@ function core_do_get_config($engine) {
 					}
 				}
 				// always set CallerID name
-				$ext->add($context, $exten, '', new ext_set('CDR(did)','${FROM_DID}'));
-				$ext->add($context, $exten, '', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
+				$ext->add($context, $exten, 'did', new ext_set('CDR(did)','${FROM_DID}'));
+				$ext->add($context, $exten, 'callerid', new ext_execif('$[ "${CALLERID(name)}" = "" ] ','Set','CALLERID(name)=${CALLERID(num)}'));
 
 				// if VQA present and configured call it
 				if ($amp_conf['AST_APP_VQA'] && $amp_conf['DITECH_VQA_INBOUND']) {
@@ -2879,7 +2899,7 @@ function core_do_get_config($engine) {
 	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
 	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
 
-	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(AMPUSER/${AMPUSER}/outboundcid)}" = ""]', 'bypass'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(DEVICE/${REALCALLERIDNUM}/user)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));

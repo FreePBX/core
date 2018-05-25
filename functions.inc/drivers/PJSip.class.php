@@ -132,11 +132,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"disallow" => array(
-				"value" => $this->freepbx->Config->get('DEVICE_DISALLOW'),
+				"value" => $this->filterValidCodecs($this->freepbx->Config->get('DEVICE_DISALLOW')),
 				"flag" => $flag++
 			),
 			"allow" => array(
-				"value" => $this->freepbx->Config->get('DEVICE_ALLOW'),
+				"value" => $this->filterValidCodecs($this->freepbx->Config->get('DEVICE_ALLOW')),
 				"flag" => $flag++
 			),
 			"accountcode" => array(
@@ -500,7 +500,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
-				'allow' => str_replace(',', '&', !empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
+				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn
 			);
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
@@ -585,8 +585,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
-					$conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
-				}
+                                        $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
+                                }
 
 				if(!empty($trunk['rewrite_contact']) && $trunk['rewrite_contact'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['rewrite_contact'] = "yes";
@@ -997,9 +997,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 
 		if (!empty($config['disallow'])) {
-			$endpoint[] = "disallow=".str_replace(',', '&', $config['disallow']); // As above.
+			$endpoint[] = "disallow=".$this->filterValidCodecs($config['disallow']); // As above.
 		}
-		$endpoint[] = "allow=".str_replace(',', '&', $config['allow']); // & is invalid in pjsip
+		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
 		$endpoint[] = "callerid=".$config['callerid'];
@@ -1238,7 +1238,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		// Codec allow is now mandatory
 		if (empty($config['allow'])) {
-			$config['allow'] = $this->getDefaultSIPCodecs();
+			$config['allow'] = $this->filterValidCodecs($this->getDefaultSIPCodecs());
 		}
 	}
 

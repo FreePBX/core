@@ -86,4 +86,8 @@ abstract class Driver {
 	public function writeConfig($conf) {
 		return $conf;
 	}
+
+	protected function filterValidCodecs($codecs) {
+		return $this->freepbx->Core->filterValidCodecs($codecs);
+	}
 }
