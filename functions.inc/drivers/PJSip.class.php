@@ -878,6 +878,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		// Grab the default Codecs from the sipsettings module.
 		$codecs 	= $this->freepbx->Sipsettings->getConfig('voicecodecs');
 		$vcodecs 	= $this->freepbx->Sipsettings->getConfig('videocodecs');
+		$cssettings 	= $this->freepbx->Sipsettings->getChanSipSettings();
 
 		if (!$codecs) {
 			// Sipsettings doesn't have any codecs yet.
@@ -889,7 +890,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
-		if (!empty($vcodecs)) {
+		if ($cssettings['videosupport'] === 'yes' && !empty($vcodecs)) {
 			// Sipsettings doesn't have any video codecs yet.
 			$idx = count($codecs) + 1 ;
 			foreach ($vcodecs as $vc => $value) {
