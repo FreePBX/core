@@ -697,30 +697,33 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	* @param {string} $conf The Configuration being passed through
 	*/
 	public function writeConfig($conf) {
-		//we also need to do port checking and if in chan sip mode port on 5060, if in both mode then put if on 5061
-		$nt = \notifications::create();
-
 		$ast_sip_driver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
-		if(version_compare($this->version, '12', 'ge')) {
-			if($ast_sip_driver == 'both') {
-				$this->freepbx->ModulesConf->removenoload("chan_sip.so");
-				foreach ($this->PJSipModules as $mod) {
-					$this->freepbx->ModulesConf->removenoload($mod);
-				}
-			} elseif($ast_sip_driver == 'chan_pjsip') {
-				$this->enablePJSipModules();
-			} elseif($ast_sip_driver == 'chan_sip') {
-				$this->disablePJSipModules();
-			}
-		} else {
-			// We don't support pjsip. If we're trying to use it, don't. Note
-			// that if there are devices or trunks trying to use chan_pjsip, we
-			// complain loudly about it core_devices_configpageload
+		if(version_compare($this->version, '11', 'eq')) {
+			// Asterisk 11 doesn't support pjsip
+			// If we're trying to use pjsip on 11, disable it.  If there are devices or
+			// trunks trying to use chan_pjsip, we complain loudly about it in
+			// core_devices_configpageload
 			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
 				$this->freepbx->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
+				$ast_sip_driver = "chan_sip";
 			}
 		}
 
+		// Asterisk 15.4 and higher REQUIRES pjsip to be enabled. 
+		if(version_compare($this->version, '15.4', 'ge')) {
+			if ($ast_sip_driver !== 'both' && $ast_sip_driver !== 'chan_pjsip') {
+				throw new \Exception("Asterisk 15.4 requires PJSIP to be enabled, but sip driver is $ast_sip_driver - Can not reload");
+			}
+		}
+		if($ast_sip_driver === 'both') {
+			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
+			$this->enablePJSipModules();
+		} elseif($ast_sip_driver === 'chan_pjsip') {
+			$this->enablePJSipModules();
+		} elseif($ast_sip_driver === 'chan_sip') {
+			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
+			$this->disablePJSipModules();
+		}
 		$this->freepbx->WriteConfig($conf);
 	}
 
@@ -1252,8 +1255,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$m = $this->freepbx->ModulesConf;
 
 		$m->noload("chan_sip.so");
-		foreach ($this->PJSipModules as $mod)
+		foreach ($this->PJSipModules as $mod) {
 			$m->removenoload($mod);
+		}
 	}
 
 	/**
