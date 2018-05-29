@@ -717,8 +717,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 		if($ast_sip_driver === 'both') {
 			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
-			$this->enablePJSipModules();
+			foreach ($this->PJSipModules as $mod) {
+				$this->freepbx->ModulesConf->removenoload($mod);
+			}
 		} elseif($ast_sip_driver === 'chan_pjsip') {
+			// Reminder: This disables chan_sip, it doesn't just enable PJSip.
 			$this->enablePJSipModules();
 		} elseif($ast_sip_driver === 'chan_sip') {
 			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
