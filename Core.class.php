@@ -1868,7 +1868,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		// TODO: These should be deferred to their respective driver
 		if('pjsip' == $tech){
-			$sql = "SELECT `data` FROM pjsip WHERE `id` = :trunkid and `key` = 'registration'";
+			$sql = "SELECT `data` FROM pjsip WHERE `id` = :trunkid and `keyword` = 'registration'";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array(':trunkid' => $trunkid));
 			$result = $sth->fetchColumn();
