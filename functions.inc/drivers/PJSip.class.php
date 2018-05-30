@@ -698,7 +698,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	*/
 	public function writeConfig($conf) {
 		$ast_sip_driver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
-		if(version_compare($this->version, '11', 'eq')) {
+
+		// We check for 'is_numeric' in case the Asterisk Version can't be parsed, for whatever
+		// reason - it will return the string 'UNABLE-TO-PARSE'. If that happens, don't change
+		// anything, because it probably was working, and changing things will break them.
+		//
+		// However, if they HAVE switched from somethign that supports pjsip to something
+		// that doesn't support pjsip, we need to disable pjsip, otherwise Asterisk won't
+		// start.
+		if(is_numeric($this->version) && version_compare($this->version, '12', 'lt')) {
 			// Asterisk 11 doesn't support pjsip
 			// If we're trying to use pjsip on 11, disable it.  If there are devices or
 			// trunks trying to use chan_pjsip, we complain loudly about it in
@@ -709,7 +717,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
-		// Asterisk 15.4 and higher REQUIRES pjsip to be enabled. 
+		// Asterisk 15.4 and higher REQUIRES pjsip to be enabled.
 		if(version_compare($this->version, '15.4', 'ge')) {
 			if ($ast_sip_driver !== 'both' && $ast_sip_driver !== 'chan_pjsip') {
 				throw new \Exception("Asterisk 15.4 requires PJSIP to be enabled, but sip driver is $ast_sip_driver - Can not reload");
