@@ -717,12 +717,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
-		// Asterisk 15.4 and higher REQUIRES pjsip to be enabled.
-		if(version_compare($this->version, '15.4', 'ge')) {
-			if ($ast_sip_driver !== 'both' && $ast_sip_driver !== 'chan_pjsip') {
-				throw new \Exception("Asterisk 15.4 requires PJSIP to be enabled, but sip driver is $ast_sip_driver - Can not reload");
-			}
-		}
+		$this->freepbx->ModulesConf->removenoload("res_pjproject.so");
 		if($ast_sip_driver === 'both') {
 			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
 			foreach ($this->PJSipModules as $mod) {
@@ -1267,6 +1262,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$m = $this->freepbx->ModulesConf;
 
 		$m->noload("chan_sip.so");
+		$m->removenoload("res_pjproject.so");
 		foreach ($this->PJSipModules as $mod) {
 			$m->removenoload($mod);
 		}
@@ -1282,8 +1278,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$m = $this->freepbx->ModulesConf;
 
 		$m->removenoload("chan_sip.so");
-		foreach ($this->PJSipModules as $mod)
+		$m->removenoload("res_pjproject.so");
+		foreach ($this->PJSipModules as $mod) {
 			$m->noload($mod);
+		}
 	}
 
 	/**
