@@ -3280,8 +3280,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			array_keys($this->freepbx->Codecs->getImage()),
 			array('all','!all')
 		);
-		$codecs = array_intersect($codecs, $validCodecs);
-		$codecs = implode(",",$codecs);
+		$final = array();
+		foreach($codecs as $codec) {
+			if(preg_match("/([a-z0-9]+):?/i", $codec, $match) && isset($match[1]) && in_array($match[1],$validCodecs)) {
+				$final[] = $codec;
+			}
+		}
+		$codecs = implode(",",$final);
 		return $codecs;
 	}
 }
