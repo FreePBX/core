@@ -661,6 +661,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$nt = \notifications::create();
 
 		$ast_sip_driver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+		$this->freepbx->ModulesConf->removenoload("res_pjproject.so");
 		if(version_compare($this->version, '12', 'ge')) {
 			if($ast_sip_driver == 'both') {
 				$this->freepbx->ModulesConf->removenoload("chan_sip.so");
@@ -1157,6 +1158,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$m = $this->freepbx->ModulesConf;
 
 		$m->noload("chan_sip.so");
+		$m->removenoload("res_pjproject.so");
 		foreach ($this->PJSipModules as $mod)
 			$m->removenoload($mod);
 	}
@@ -1171,6 +1173,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$m = $this->freepbx->ModulesConf;
 
 		$m->removenoload("chan_sip.so");
+		$m->removenoload("res_pjproject.so");
 		foreach ($this->PJSipModules as $mod)
 			$m->noload($mod);
 	}
