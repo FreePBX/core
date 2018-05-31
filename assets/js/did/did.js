@@ -16,4 +16,6 @@ $('.fpbx-submit').submit(function() {
 	if(!isDialpattern($('#cidnum').val()) && !isEmpty($('#cidnum').val().trim()) && keywords.indexOf($('#cidnum').val().toLowerCase()) === -1){
 		return warnInvalid($('#cidnum'), _("CIDNUM can only be numbers, A-D, * and #. DID may also start with a +. Patterns must begin with an _ DID may also start with a +."));
 	}
+
+	return validateDestinations($(".fpbx-submit")[0],1,true);
 });
