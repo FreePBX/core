@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.31</version>
+	<version>13.0.122.32</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.32* Always remove res_pjproject from modules.conf
 		*13.0.122.31* FREEPBX-17588 Fix sql column key 
 		*13.0.122.30* Update registration string check 
 		*13.0.122.29* FREEPBX-15637
