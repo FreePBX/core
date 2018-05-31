@@ -1159,8 +1159,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$m->noload("chan_sip.so");
 		$m->removenoload("res_pjproject.so");
-		foreach ($this->PJSipModules as $mod)
+		foreach ($this->PJSipModules as $mod) {
 			$m->removenoload($mod);
+		}
 	}
 
 	/**
@@ -1174,8 +1175,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$m->removenoload("chan_sip.so");
 		$m->removenoload("res_pjproject.so");
-		foreach ($this->PJSipModules as $mod)
+		foreach ($this->PJSipModules as $mod) {
 			$m->noload($mod);
+		}
 	}
 
 	/**
