@@ -9,6 +9,9 @@ $("[name='privacyman']").change(function(){
 	}
 });
 $('.fpbx-submit').submit(function() {
+	if (!validateDestinations($(this)[0], 1, true)){
+		return false;
+	}
 	if(!($('#extension').val().match(/^\+?[0-9a-dA-D#\*]+$/)) && ($('#extension').val().trim() != '') && ($('#extension').val().indexOf('_') !== 0)){
 		return warnInvalid($('#extension'), _("DID can only be numbers, A-D, * and #. DID may also start with a +. Patterns must begin with an _"));
 	}
