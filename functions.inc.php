@@ -1485,7 +1485,7 @@ function core_do_get_config($engine) {
 			$catchall_context='ext-did-catchall';
 			foreach($didlist as $item) {
 				if (trim($item['destination']) == '') {
-					continue;
+					throw new \Exception("Inbound Route {$item['extension']}/{$item['cidnum']} does not have a valid destination");
 				}
 				$exten = trim($item['extension']);
 				$cidnum = trim($item['cidnum']);

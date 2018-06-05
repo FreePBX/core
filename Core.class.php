@@ -1885,8 +1885,15 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		if (!$this->trunkHasRegistrations($tech)){
 			return '';
 		}
-
-		$sql = "SELECT `data` FROM $tech WHERE `id` = ?";
+		// TODO: These should be deferred to their respective driver
+		if('pjsip' == $tech){
+			$sql = "SELECT `data` FROM pjsip WHERE `id` = :trunkid and `keyword` = 'registration'";
+			$sth = $this->database->prepare($sql);
+			$sth->execute(array(':trunkid' => $trunkid));
+			$result = $sth->fetchColumn();
+			return in_array($result,array('send','receive'))?$result:null;
+		}
+		$sql = "SELECT `data` FROM $tech WHERE `id` = ? ";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array('tr-reg-'.$trunkid));
 		$result = $sth->fetch(\PDO::FETCH_ASSOC);
@@ -3486,8 +3493,13 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			array_keys($this->freepbx->Codecs->getImage()),
 			array('all','!all')
 		);
-		$codecs = array_intersect($codecs, $validCodecs);
-		$codecs = implode(",",$codecs);
+		$final = array();
+		foreach($codecs as $codec) {
+			if(preg_match("/([a-z0-9]+):?/i", $codec, $match) && isset($match[1]) && in_array($match[1],$validCodecs)) {
+				$final[] = $codec;
+			}
+		}
+		$codecs = implode(",",$final);
 		return $codecs;
 	}
 }
