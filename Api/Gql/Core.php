@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\Type;
 use FreePBX\modules\Api\Gql\Base;
 
 class Core extends Base {
+	/*
 	protected $module = 'core';
 	public static function getScopes() {
 		return [
@@ -185,7 +186,6 @@ class Core extends Base {
 			'mohclass' => [
 				'type' => Type::string()
 			],
-			/*
 			'noanswer_dest' => [
 				'type' => $this->typeContainer->get('destination')->getReference()
 			],
@@ -195,7 +195,6 @@ class Core extends Base {
 			'chanunavail_dest' => [
 				'type' => $this->typeContainer->get('destination')->getReference()
 			]
-			*/
 		]);
 	}
 
@@ -270,4 +269,5 @@ class Core extends Base {
 			}
 		}
 	}
+	*/
 }

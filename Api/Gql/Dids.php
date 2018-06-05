@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Type;
 use FreePBX\modules\Api\Gql\Base;
 
 class Dids extends Base {
+	/*
 	protected $module = 'core';
 	public static function getScopes() {
 		return [
@@ -173,4 +174,5 @@ class Dids extends Base {
 			];
 		});
 	}
+	*/
 }
