@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.20</version>
+	<version>14.0.18.21</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.21* FREEPBX-16154  Invalid dialstatus in pjsip channels 
 		*14.0.18.20* FREEPBX-17594 Import of pjsip extensions without match attributes 
 		*14.0.18.19* FREEPBX-17600
 		*14.0.18.18* Always remove res_pjproject from modules.conf
