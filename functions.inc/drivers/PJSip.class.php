@@ -921,8 +921,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 */
 	private function generateEndpoints($retarr) {
 		// More Efficent Function here.
+		$fcc = new \featurecode('core', 'automon');
+		$code = $fcc->getCodeActive();
+		unset($fcc);
+		$enableRecordingFeature = ($code != '');
 		foreach ($this->getAllDevs() as $dev) {
-			$this->generateEndpoint($dev, $retarr);
+			$this->generateEndpoint($dev, $retarr, $enableRecordingFeature);
 		}
 		// Check to see if 'Allow Guest' is enabled in SIP Settings. If it is,
 		// we need to create the magic 'anonymous' endpoint.
@@ -948,7 +952,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {string} $config  configuration
 	 * @param {array} &$retarr Returned Array
 	 */
-	private function generateEndpoint($config, &$retarr) {
+	private function generateEndpoint($config, &$retarr, $enableRecordingFeature=false) {
 
 		// Validate $config array
 		$this->validateEndpoint($config);
@@ -1152,6 +1156,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($l)) {
 				$endpoint[] = "language=" . $l;
 			}
+		}
+
+		if ($enableRecordingFeature) {
+			$endpoint[] = 'one_touch_recording=on';
+			$endpoint[] = 'record_on_feature=apprecord';
+			$endpoint[] = 'record_off_feature=apprecord';
 		}
 
 		// Auth

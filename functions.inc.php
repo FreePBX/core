@@ -430,6 +430,11 @@ class core_conf {
 				die($results2->getMessage());
 			}
 
+			$fcc = new featurecode('core', 'automon');
+			$code = $fcc->getCodeActive();
+			unset($fcc);
+			$enableRecordingFeature = ($code != '');
+
 			// Move all 'disallow=all' and 'deny' to the top to avoid errors
 			//
 			$results2 = array();
@@ -560,6 +565,10 @@ class core_conf {
 				}
 				break;
 				default:
+					if($enableRecordingFeature) {
+						$output .= "recordonfeature=apprecord\n";
+						$output .= "recordofffeature=apprecord\n";
+					}
 					$output .= "callcounter=yes\n";
 					$output .= "faxdetect=no\n";
 					if ($cc_monitor_policy) {
@@ -1114,7 +1123,7 @@ function core_do_get_config($engine) {
 			if ($code != '') {
 				$core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
 			}
-		
+
 			$fcc = new featurecode($modulename, 'disconnect');
 			$code = $fcc->getCodeActive();
 			unset($fcc);
