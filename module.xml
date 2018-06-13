@@ -10,6 +10,7 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.1alpha2* FREEPBX-15833 FREEPBX-17630 In-call feature code *1 defined twice 
 		*15.0.1alpha2* FREEPBX-9493 Route Position dropdown menu missing items 
 		*15.0.1alpha2* FREEPBX-16782 Disable PJSIP write out when disabled. 
 		*15.0.1alpha2* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
