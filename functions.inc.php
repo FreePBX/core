@@ -430,6 +430,11 @@ class core_conf {
 				die($results2->getMessage());
 			}
 
+			$fcc = new featurecode('core', 'automon');
+			$code = $fcc->getCodeActive();
+			unset($fcc);
+			$enableRecordingFeature = ($code != '');
+
 			// Move all 'disallow=all' and 'deny' to the top to avoid errors
 			//
 			$results2 = array();
@@ -560,6 +565,10 @@ class core_conf {
 				}
 				break;
 				default:
+					if($enableRecordingFeature) {
+						$output .= "recordonfeature=apprecord\n";
+						$output .= "recordofffeature=apprecord\n";
+					}
 					$output .= "callcounter=yes\n";
 					$output .= "faxdetect=no\n";
 					if ($cc_monitor_policy) {
@@ -1112,21 +1121,7 @@ function core_do_get_config($engine) {
 			$code = $fcc->getCodeActive();
 			unset($fcc);
 			if ($code != '') {
-				$core_conf->addFeatureMap('automon',$code); //references app record
 				$core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
-
-				/* At this point we are not using hints since we have not found a good way to be always
-				* consistent on both sides of the channel
-				*
-				* $ext->addInclude('from-internal-additional', 'device-hints');
-				* $device_list = core_devices_list("all", 'full', true);
-				* foreach ($device_list as $device) {
-				* 	if ($device['tech'] == 'sip' || $device['tech'] == 'iax2') {
-				*    $ext->add('device-hints', $code.$device['id'], '', new ext_noop("AutoMixMon Hint for: ".$device['id']));
-				*    $ext->addHint('device-hints', $code.$device['id'], "Custom:RECORDING".$device['id']);
-				*   }
-				* }
-				*/
 			}
 
 			$fcc = new featurecode($modulename, 'disconnect');
