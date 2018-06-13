@@ -178,7 +178,8 @@ $ext->add($mcontext,$exten,'', new ext_gotoif('$[ ${REGEX("(/.+/|@)" ${THISDIAL}
 $ext->add($mcontext,$exten,'', new ext_noop('Debug: Updating PJSIP Destination with PJSIP_DIAL_CONTACTS'));
 $ext->add($mcontext,$exten,'', new ext_set('THISDIAL', '${PJSIP_DIAL_CONTACTS(${THISDIAL:6})}'));
 
-// If PJSIP_DIAL_CONTACTS returns nothing, then don't try to add it to the dial string.
+// If PJSIP_DIAL_CONTACTS returns nothing, then We have noting online to dial so setting Dialstatus to Chanunavail.
+$ext->add($mcontext,$exten,'', new ext_execif('$["${THISDIAL}"=""]','Set','DIALSTATUS=CHANUNAVAIL'));
 $ext->add($mcontext,$exten,'docheck', new ext_gotoif('$["${THISDIAL}"=""]','skipset'));
 
 $ext->add($mcontext,$exten,'doset', new ext_set('DSTRING', '${DSTRING}${THISDIAL}&'));
