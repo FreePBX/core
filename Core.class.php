@@ -437,6 +437,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					unset($buttons['delete']);
 				}
 			break;
+			case 'amdsettings':
+				$buttons = array(
+					'reset' => array(
+						'name' => 'reset',
+						'id' => 'reset',
+						'value' => _('Reset')
+					),
+					'submit' => array(
+						'name' => 'submit',
+						'id' => 'submit',
+						'value' => _('Submit')
+					)
+				);
+			break;
 		}
 		return $buttons;
 	}
@@ -1316,6 +1330,36 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			}
 		} // $page == "astmodules"
 
+		if ($page == "amdsettings") {
+			$action = isset($request['action'])?$request['action']:'';
+			$initial_silence = !empty($request['initial_silence'])?$request['initial_silence']:'2500';
+			$greeting = !empty($request['greeting'])?$request['greeting']:'1500';
+			$after_greeting_silence = !empty($request['after_greeting_silence'])?$request['after_greeting_silence']:'800';
+			$total_analysis_time = !empty($request['total_analysis_time'])?$request['total_analysis_time']:'5000';
+			$min_word_length = !empty($request['min_word_length'])?$request['min_word_length']:'100';
+			$max_word_length = !empty($request['max_word_length'])?$request['max_word_length']:'5000';
+			$between_words_silence = !empty($request['between_words_silence'])?$request['between_words_silence']:'50';
+			$maximum_number_of_words = !empty($request['maximum_number_of_words'])?$request['maximum_number_of_words']:'3';
+			$silence_threshold = !empty($request['silence_threshold'])?$request['silence_threshold']:'256';
+			$data = array(	"initial_silence" => $initial_silence,
+					"greeting" => $greeting,
+					"after_greeting_silence" => $after_greeting_silence,
+					"total_analysis_time" => $total_analysis_time,
+					"min_word_length" => $min_word_length,
+					"max_word_length" => $max_word_length,
+					"between_words_silence" => $between_words_silence,
+					"maximum_number_of_words" => $maximum_number_of_words,
+					"silence_threshold" => $silence_threshold
+					);
+			switch($action){
+				case 'save':
+					$this->addAmdSettings($data);
+					needreload();
+					return true;
+				break;
+			}
+			return true;
+		} // $page == "amdsettings"
 	}
 
 	/**
@@ -1740,6 +1784,32 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$ret[] = $stmt->execute($t);
 		}
 		return $ret;
+	}
+
+	public function addAmdSettings($data) {
+		$sql = "truncate table amd_settings";
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		$stmt = $this->database->prepare('INSERT INTO `amd_settings` (`initial_silence`, `greeting`, `after_greeting_silence`, `total_analysis_time`, `min_word_length`, `max_word_length`, `between_words_silence`, `maximum_number_of_words`, `silence_threshold`) VALUES (:initial_silence, :greeting, :after_greeting_silence, :total_analysis_time, :min_word_length, :max_word_length, :between_words_silence, :maximum_number_of_words, :silence_threshold)');
+		$stmt->execute(array(
+				':initial_silence' => $data['initial_silence'],
+				':greeting' => $data['greeting'],
+				':after_greeting_silence' => $data['after_greeting_silence'],
+				':total_analysis_time' => $data['total_analysis_time'],
+				':min_word_length' => $data['min_word_length'],
+				':max_word_length' => $data['max_word_length'],
+				':between_words_silence' => $data['between_words_silence'],
+				':maximum_number_of_words' => $data['maximum_number_of_words'],
+				':silence_threshold' => $data['silence_threshold']
+				));
+	}
+
+	public function getAmdSettings() {
+		$sql = "SELECT * FROM amd_settings";
+		$sth = $this->database->prepare($sql);
+		$sth->execute();
+		$amd_values = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		return $amd_values;
 	}
 
 	public function updateTrunkDialRules($trunknum, &$patterns, $delete = false) {

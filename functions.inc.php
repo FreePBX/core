@@ -88,7 +88,8 @@ class core_conf {
 			'chan_dahdi_additional.conf',
 			'http_additional.conf',
 			'indications_general_additional.conf',
-			'indications_additional.conf'
+			'indications_additional.conf',
+			'amd.conf'
 		);
 		return $files;
 	}
@@ -146,6 +147,9 @@ class core_conf {
 			break;
 			case 'indications_additional.conf':
 			return $this->generate_indications_additional($version);
+			break;
+			case 'amd.conf':
+			return $this->generate_amd($version);
 			break;
 		}
 	}
@@ -247,6 +251,32 @@ class core_conf {
 		$output .= "description = {$zonelist['name']}\n";
 		$output .= $zonelist['conf']."\n\n";
                 return $output;
+	}
+
+	function generate_amd($ast_version) {
+		global $amp_conf;
+		global $astman;
+		if (is_object($astman)) {
+			$param['Module'] = "app_amd.so";
+			$param['LoadType'] = "load";
+			$value = $astman->send_request("ModuleCheck", $param);
+			if($value['Response'] == "Error"){
+				$astman->send_request("ModuleLoad", $param);
+			}
+		}
+		$output = '';
+		$data = FreePBX::Core()->getAmdSettings();
+		$output .= "[general]\n";
+		$output .= "initial_silence = {$data[0]['initial_silence']}\n";
+		$output .= "greeting = {$data[0]['greeting']}\n";
+		$output .= "after_greeting_silence = {$data[0]['after_greeting_silence']}\n";
+		$output .= "total_analysis_time = {$data[0]['total_analysis_time']}\n";
+		$output .= "min_word_length = {$data[0]['min_word_length']}\n";
+		$output .= "maximum_word_length  = {$data[0]['max_word_length']}\n";
+		$output .= "between_words_silence = {$data[0]['between_words_silence']}\n";
+		$output .= "maximum_number_of_words = {$data[0]['maximum_number_of_words']}\n";
+		$output .= "silence_threshold = {$data[0]['silence_threshold']}\n";
+		return $output;
 	}
 
 	function addSipAdditional($section, $key, $value) {

@@ -289,6 +289,17 @@
 			<field name="prepend_digits" type="string" length="50" default="" primarykey="true"/>
 			<field name="seq" type="integer" default="0" primarykey="true"/>
 		</table>
+		<table name="amd_settings">
+			<field name="initial_silence" type="integer" default="2500"/>
+			<field name="greeting" type="integer" default="1500"/>
+			<field name="after_greeting_silence" type="integer" default="800"/>
+			<field name="total_analysis_time" type="integer" default="5000"/>
+			<field name="min_word_length" type="integer" default="100"/>
+			<field name="max_word_length" type="integer" default="5000"/>
+			<field name="between_words_silence" type="integer" default="50"/>
+			<field name="maximum_number_of_words" type="integer" default="3"/>
+			<field name="silence_threshold" type="integer" default="256"/>
+		</table>
 	</database>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
@@ -299,6 +310,7 @@
 		<routing category="Connectivity" needsenginedb="yes">Outbound Routes</routing>
 		<trunks needsenginedb="yes" category="Connectivity">Trunks</trunks>
 		<advancedsettings category="Settings">Advanced Settings</advancedsettings>
+		<amdsettings category="Settings">AMD Settings</amdsettings>
 		<ampusers category="Admin">Administrators</ampusers>
 		<astmodules category="Admin">Asterisk Modules</astmodules>
 		<wiki category="Admin" requires_auth="false" href="http://www.freepbx.org/support-and-professional-services" target="_blank" access="all">FreePBX Support</wiki>
