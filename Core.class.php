@@ -1,13 +1,21 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules;
-class Core extends \FreePBX_Helpers implements \BMO  {
+use FreePBX_Helpers;
+use BMO;
+use PDO;
+use Exception;
+use FreePBX\modules\Core\Components\Dahdichannels;
+
+class Core extends FreePBX_Helpers implements BMO  {
 
 	private $drivers = array();
 	private $deviceCache = array();
 	private $getUserCache = array();
 	private $getDeviceCache = array();
-	private $listUsersCache = array();
+    private $listUsersCache = array();
+    private $dahdiChannels = null;
+    private $routing = null;
 
 	public function __construct($freepbx = null) {
 		parent::__construct($freepbx);
@@ -43,7 +51,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			break;
 			case 'trunks':
 				if(isset($request['tech'])||(isset($request['extdisplay']) && !empty($request['extdisplay']))){
-					$html = load_view(__DIR__.'/views/trunks/bootnav.php', array('trunk_types' => \FreePBX::Core()->listTrunkTypes()));
+					$html = load_view(__DIR__.'/views/trunks/bootnav.php', array('trunk_types' => $this->listTrunkTypes()));
 					return $html;
 				}
 			break;
@@ -310,26 +318,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				);
 			break;
 			case 'dahdichandids':
-				$buttons = array(
-					'delete' => array(
-						'name' => 'delete',
-						'id' => 'delete',
-						'value' => _('Delete')
-					),
-					'reset' => array(
-						'name' => 'reset',
-						'id' => 'reset',
-						'value' => _('Reset')
-					),
-					'submit' => array(
-						'name' => 'submit',
-						'id' => 'submit',
-						'value' => _('Submit')
-					)
-				);
-				if (empty($request['extdisplay'])) {
-					unset($buttons['delete']);
-				}
+                return Dahdichannels::getButtons($request);
 			case 'did':
 				$buttons = array(
 					'delete' => array(
@@ -415,28 +404,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$buttons = $tmpButtons;
 				}
 			break;
-			case 'dahdichandids':
-				$buttons = array(
-					'delete' => array(
-						'name' => 'delete',
-						'id' => 'delete',
-						'value' => _('Delete')
-					),
-					'reset' => array(
-						'name' => 'reset',
-						'id' => 'reset',
-						'value' => _('Reset')
-					),
-					'submit' => array(
-						'name' => 'submit',
-						'id' => 'submit',
-						'value' => _('Submit')
-					)
-				);
-				if ($request['view'] == 'add') {
-					unset($buttons['delete']);
-				}
-			break;
+
 		}
 		return $buttons;
 	}
@@ -447,11 +415,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	public function uninstall() {
 	}
 
-	public function backup() {
-	}
-
-	public function restore($backup) {
-	}
 
 	public function doTests($db) {
 		return true;
@@ -510,23 +473,17 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 			case "delroute":
-				if (!function_exists('core_routing_delbyid')) {
-					if (file_exists(__DIR__."/functions.inc.php")) {
-						include __DIR__."/functions.inc.php";
-					}
-				}
-				$ret = core_routing_delbyid($_POST['id']);
-				// re-order the routes to make sure that there are no skipped numbers.
-				// example if we have 001-test1, 002-test2, and 003-test3 then delete 002-test2
-				// we do not want to have our routes as 001-test1, 003-test3 we need to reorder them
-				// so we are left with 001-test1, 002-test3
-				needreload();
-				return $ret;
-			break;
-			case "updateRoutes":
+                if(empty($this->routing)){
+                    $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+                }
+                return $this->routing->deleteById($_POST['id']);
+            case "updateRoutes":
+                if (empty($this->routing)) {
+                    $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+                }
 				$order = $_REQUEST['data'];
 				array_shift($order);
-				return $this->setRouteOrder($order);
+				return $this->routing->setRouteOrder($order);
 			break;
 			case "getUserGrid":
 				$users = $this->getAllUsers();
@@ -1601,11 +1558,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return array Array of DAHDi Channels
 	 */
 	public function listDahdiChannels(){
-		$sql = "SELECT * FROM dahdichandids ORDER BY channel";
-		$stmt = $this->database->prepare($sql);
-		$stmt->execute();
-		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		return $results;
+        if(!is_object($this->dahdiChannels)){
+            $this->dahdiChannels = new Dahdichannels($this->database);
+        }
+        return $this->dahdiChannels->listChannels();
 	}
 
 	/**
@@ -1614,9 +1570,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return bool           Return from db call
 	 */
 	public function delRouteTrunkByID($trunk_id){
-		$sql ='DELETE FROM outbound_route_trunks WHERE trunk_id = :trunk_id';
-		$stmt = $this->database->prepare($sql);
-		return $stmt->execute(array(':trunk_id' => $trunk_id));
+        if (empty($this->routing)) {
+            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+        }
+        return $this->routing->deleteTrunkRoute($trunk_id);
 	}
 
 	/**
@@ -1674,7 +1631,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute();
-		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$trunk_list = array();
 		foreach ($result as $trunk) {
 			if ($trunk['name'] == '') {
@@ -1714,7 +1671,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = 'SELECT a.seq, b.name FROM outbound_route_trunks a JOIN outbound_routes b ON a.route_id = b.route_id WHERE trunk_id = ?';
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($trunknum));
-		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 		$routes = array();
 		foreach ($results as $entry) {
@@ -1724,22 +1681,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function updateRouteTrunks($route_id, &$trunks, $delete = false) {
-		$insert_trunk = array();
-		$seq = 0;
-		foreach ($trunks as $trunk) {
-			$insert_trunk[] = array( $route_id,$trunk, $seq);
-			$seq++;
-		}
-		if ($delete) {
-			$sth = $this->database->prepare("DELETE FROM `outbound_route_trunks` WHERE `route_id`= ?");
-			$sth->execute(array($route_id));
-		}
-		$stmt = $this->database->prepare('INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
-		$ret = array();
-		foreach($insert_trunk as $t){
-			$ret[] = $stmt->execute($t);
-		}
-		return $ret;
+        if (empty($this->routing)) {
+            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+        }
+        return $this->routing->updateTrunks($route_id, $trunks, $delete);
 	}
 
 	public function updateTrunkDialRules($trunknum, &$patterns, $delete = false) {
@@ -1776,46 +1721,45 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	}
 
 	public function getRouteByID($route_id) {
-		$sql = 'SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id WHERE a.route_id=?';
-		$sth = $this->database->prepare($sql);
-		$sth->execute(array($route_id));
-		return $sth->fetch(\PDO::FETCH_ASSOC);
+        if (empty($this->routing)) {
+            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+        }
+        return $this->routing->get($route_id);
 	}
 
 	public function getAllTrunkDialRules() {
 		$sql = "SELECT * FROM `trunk_dialpatterns` ORDER BY `trunkid`, `seq`";
 		$sth = $this->database->prepare($sql);
 		$sth->execute();
-		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+		return $sth->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public function getRouteTrunksByID($route_id) {
-		$sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = ? ORDER BY `seq`";
-		$sth = $this->database->prepare($sql);
-		$sth->execute(array($route_id));
-		$res = $sth->fetchAll(\PDO::FETCH_COLUMN);
-		return $res;
+        if (empty($this->routing)) {
+            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+        }
+        return $this->routing->getRouteTrunksById($route_id);
 	}
 
 	public function getRoutePatternsByID($route_id) {
-		$sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = ? ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
-		$sth = $this->database->prepare($sql);
-		$sth->execute(array($route_id));
-		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+        if (empty($this->routing)) {
+            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+        }
+        return $this->routing->getRoutePattrnsById($route_id);
 	}
 
 	public function getTrunkDialRulesByID($trunkid) {
 		$sql = "SELECT * FROM `trunk_dialpatterns` WHERE `trunkid` = ?  ORDER BY `seq`";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($trunkid));
-		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+		return $sth->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public function getTrunkTrunkNameByID() {
 		$name = "SELECT `name` FROM `trunks` WHERE `trunkid` = ?";
 		$sth = $this->database->prepare($name);
 		$sth->execute(array($trunknum));
-		$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		$results = $sth->fetch(PDO::FETCH_ASSOC);
 		return isset($results['name']) ? $results['name'] : false;
 	}
 
@@ -1824,7 +1768,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($trunkid));
-		return $sth->fetchAll(\PDO::FETCH_KEY_PAIR);
+		return $sth->fetchAll(PDO::FETCH_KEY_PAIR);
 	}
 
 	public function getTrunkPeerDetailsByID($trunkid) {
@@ -1836,7 +1780,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array('tr-peer-'.$trunkid));
-		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($results as $result) {
 			if ($result['keyword'] != 'account') {
 				if (isset($confdetail)) {
@@ -1853,7 +1797,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT `usercontext` FROM `trunks` WHERE `trunkid` = ?";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($trunkid));
-		$results = $sth->fetch(\PDO::FETCH_ASSOC);
+		$results = $sth->fetch(PDO::FETCH_ASSOC);
 
 		return ((isset($results['usercontext'])) ? $results['usercontext'] : '');
 	}
@@ -1867,7 +1811,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT keyword,data FROM $tech WHERE `id` = ? ORDER BY flags, keyword DESC";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array('tr-user-'.$trunkid));
-		$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($results as $result) {
 			if ($result['keyword'] != 'account') {
 				if (isset($confdetail)) {
@@ -1896,7 +1840,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT `data` FROM $tech WHERE `id` = ? ";
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array('tr-reg-'.$trunkid));
-		$result = $sth->fetch(\PDO::FETCH_ASSOC);
+		$result = $sth->fetch(PDO::FETCH_ASSOC);
 		return isset($result['data'])?$result['data']:null;
 	}
 
@@ -1904,7 +1848,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = 'SELECT * from `trunks` WHERE `trunkid` = ?';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute(array($trunkid));
-		$trunk = $stmt->fetch(\PDO::FETCH_ASSOC);
+		$trunk = $stmt->fetch(PDO::FETCH_ASSOC);
 		if(empty($trunk)) {
 			return false;
 		}
@@ -1927,7 +1871,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = 'SELECT * from `trunks` WHERE `channelid` = ?';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute(array($trunkid));
-		$result = $stmt->fetch(\PDO::FETCH_ASSOC);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
 		return $result;
 	}
 
@@ -1940,7 +1884,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = 'SELECT extension,name,voicemail FROM users ORDER BY extension';
 			$sth = $this->database->prepare($sql);
 			$sth->execute();
-			$results = $sth->fetchAll(\PDO::FETCH_BOTH);
+			$results = $sth->fetchAll(PDO::FETCH_BOTH);
 			$this->listUsersCache = $results;
 		} else {
 			$results = $this->listUsersCache;
@@ -2045,7 +1989,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$sth = $this->database->prepare($sql);
 				try {
 					$sth->execute();
-					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+					$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 				} catch(\Exception $e) {
 					return array();
 				}
@@ -2059,7 +2003,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$sth = $this->database->prepare($sql);
 				try {
 					$sth->execute(array($type));
-					$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+					$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 				} catch(\Exception $e) {
 					return array();
 				}
@@ -2078,10 +2022,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute();
-		$routes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$routes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		return $routes;
 	}
-
+    
 	/**
      * Get a route
      */
@@ -2129,7 +2073,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth = $this->database->prepare($sql);
 			try {
 				$sth->execute();
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 				$final = array();
 				foreach($results as $res) {
 					$ext = $res['extension'];
@@ -2158,7 +2102,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth = $this->database->prepare($sql);
 			try {
 				$sth->execute();
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 			} catch(\Exception $e) {
 				return array();
 			}
@@ -2167,7 +2111,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sth = $this->database->prepare($sql);
 			try {
 				$sth->execute(array($type));
-				$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 			} catch(\Exception $e) {
 				return array();
 			}
@@ -2217,7 +2161,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($sipname, $extension));
 		try {
-			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+			$results = $sth->fetch(PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			die_freepbx($e->getMessage().$sql);
 		}
@@ -2245,7 +2189,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		$sth->execute();
 		try {
-			$results = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$results = $sth->fetchAll(PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			return array();
 		}
@@ -2457,7 +2401,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($cidnum, $extension));
 		try {
-			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+			$results = $sth->fetch(PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			return array();
 		}
@@ -2834,7 +2778,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($extension));
-			$results = $sth->fetch(\PDO::FETCH_ASSOC);
+			$results = $sth->fetch(PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			return array();
 		}
@@ -2902,7 +2846,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		try {
 			$sth->execute(array($account));
-			$device = $sth->fetch(\PDO::FETCH_ASSOC);
+			$device = $sth->fetch(PDO::FETCH_ASSOC);
 		} catch(\Exception $e) {
 			return array();
 		}
@@ -3092,9 +3036,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		switch ($type) {
 		case 'extensions':
-			$defaulttech = \FreePBX::Sipsettings()->getSipPortOwner();
+			$defaulttech = $this->FreePBX->Sipsettings->getSipPortOwner();
 			foreach ($rawData as $data) {
-				array_change_key_case($data, CASE_LOWER);
+				$data = array_change_key_case($data, CASE_LOWER);
 				if(empty($data['tech'])) {
 					if ($defaulttech == "none") {
 						$data['tech'] = 'sip';
@@ -3264,16 +3208,19 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @param  string $datatype The type of data to return
 	 * @return array           Return Array
 	 */
-	public function listAMPUsers($datatype = ''){
-		$sql = "SELECT username FROM ampusers ORDER BY username";
+	public function listAMPUsers($datatype = '', $full = false){
+        $sql = "SELECT username FROM ampusers ORDER BY username";
+        if (false !== $full) {
+            $sql = 'SELECT * FROM ampusers ORDER BY username';
+        }
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute();
 		switch ($datatype) {
 			case 'assoc':
-				return $stmt->fetchall(\PDO::FETCH_ASSOC);
+				return $stmt->fetchall(PDO::FETCH_ASSOC);
 			break;
 			default:
-				return $stmt->fetchall(\PDO::FETCH_BOTH);
+				return $stmt->fetchall(PDO::FETCH_BOTH);
 			break;
 		}
 	}
@@ -3307,12 +3254,20 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					:extension_low,
 					:extension_high,
 					:deptname,
-					:sections)";
+                    :sections) 
+                ON DUPLICATE KEY UPDATE
+                 username = VALUES(username),
+                 password_sha1 = VALUES(password_sha1),
+                 extension_low = VALUES(extension_low),
+                 extension_high = VALUES(extension_high),
+                 deptname = VALUES(deptname),
+                 sections = VALUES(sections),     
+                ";
 		$stmt = $this->database->prepare($sql);
 		try{
 			$stmt->execute($vars);
 			return true;
-		}catch(\PDOException $e){
+		}catch(PDOException $e){
 			//data colission
 			if($e->getCode() == '23000'){
 				return false;
@@ -3328,7 +3283,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return array Array of Trunk Types
 	 */
 	public function listTrunkTypes(){
-		$sipdriver = \FreePBX::create()->Config->get_conf_setting('ASTSIPDRIVER');
+		$sipdriver = $this->FreePBX->Config->get_conf_setting('ASTSIPDRIVER');
 		$default_trunk_types = array(
 			"DAHDI" => 'DAHDi',
 			"IAX2" => 'IAX2',
@@ -3357,7 +3312,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				if(ctype_digit($query)) {
 					$results[] = array("text" => _("Extension")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
@@ -3369,7 +3324,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM devices WHERE id LIKE ? or description LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				if(ctype_digit($query)) {
 					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
@@ -3381,7 +3336,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM users WHERE extension LIKE ? or name LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%","%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				if(ctype_digit($query)) {
 					$results[] = array("text" => _("User")." ".$row['extension'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['extension']);
@@ -3395,7 +3350,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM outbound_routes WHERE name LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				$results[] = array("text" => _("Outbound Route:")." ".$row['name'], "type" => "get", "dest" => "?display=routing&view=form&id=".$row['route_id']);
 			}
@@ -3403,7 +3358,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM trunks WHERE name LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				$results[] = array("text" => _("Trunk:")." ".$row['name'], "type" => "get", "dest" => "?display=trunks&tech=".$row['tech']."&extdisplay=OUT_".$row['trunkid']);
 			}
@@ -3411,7 +3366,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM incoming WHERE description LIKE ?";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				$display = urlencode($row['extension']."/".$row['cidnum']);
 				$results[] = array("text" => _("Inbound Route:")." ".$row['description'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);
@@ -3420,7 +3375,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$sql = "SELECT * FROM incoming WHERE cidnum LIKE :search OR extension LIKE :search";
 			$sth = $this->database->prepare($sql);
 			$sth->execute(array("search" => "%".$query."%"));
-			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				$display = urlencode($row['extension']."/".$row['cidnum']);
 				$results[] = array("text" => _("Inbound Route:")." ".$row['extension']."/".$row['cidnum'], "type" => "get", "dest" => "?display=did&view=form&extdisplay=".$display);

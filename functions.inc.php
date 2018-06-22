@@ -6,7 +6,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //
 use FreePBX\modules\Core\Dialplan as Dialplan;
 include __DIR__.'/functions.inc/functions.deprecated.php';
-include __DIR__.'/functions.inc/functions.migrated.php';
 
 class core_conf {
 	var $_sip_general    = array();
@@ -4274,79 +4273,7 @@ function core_directdid_list(){
 	return array();
 }
 
-function core_dahdichandids_add($description, $channel, $did) {
-	global $db;
 
-
-	if (!ctype_digit(trim($channel)) || trim($channel) == '') {
-		echo "<script>javascript:alert('"._("Invalid Channel Number, must be numeric and not blank")."')</script>";
-		return false;
-	}
-	if (trim($did) == '') {
-		echo "<script>javascript:alert('"._("Invalid DID, must be a non-blank DID")."')</script>";
-		return false;
-	}
-
-	$description = q($description);
-	$channel     = q($channel);
-	$did         = q($did);
-
-	$sql = "INSERT INTO dahdichandids (channel, description, did) VALUES ($channel, $description, $did)";
-	$results = $db->query($sql);
-	if (DB::IsError($results)) {
-		if ($results->getCode() == DB_ERROR_ALREADY_EXISTS) {
-			echo "<script>javascript:alert('"._("Error Duplicate Channel Entry")."')</script>";
-			return false;
-		} else {
-			die_freepbx($results->getMessage()."<br><br>".$sql);
-		}
-	}
-	return true;
-}
-
-function core_dahdichandids_edit($description, $channel, $did) {
-	global $db;
-
-	$description = q($description);
-	$channel     = q($channel);
-	$did         = q($did);
-
-	$sql = "UPDATE dahdichandids SET description = $description, did = $did WHERE channel = $channel";
-	$results = $db->query($sql);
-	if (DB::IsError($results)) {
-		die_freepbx($results->getMessage()."<br><br>".$sql);
-	}
-	return true;
-}
-
-function core_dahdichandids_delete($channel) {
-	global $db;
-
-	$channel     = q($channel);
-
-	$sql = "DELETE FROM dahdichandids WHERE channel = $channel";
-	$results = $db->query($sql);
-	if (DB::IsError($results)) {
-		die_freepbx($results->getMessage()."<br><br>".$sql);
-	}
-	return true;
-}
-
-function core_dahdichandids_list() {
-	global $db;
-
-	$sql = "SELECT * FROM dahdichandids ORDER BY channel";
-	return sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-}
-
-function core_dahdichandids_get($channel) {
-	global $db;
-
-	$channel     = q($channel);
-
-	$sql = "SELECT * FROM dahdichandids WHERE channel = $channel";
-	return sql($sql,"getRow",DB_FETCHMODE_ASSOC);
-}
 
 /* end page.users.php functions */
 
@@ -4558,116 +4485,6 @@ function core_trunks_list_dialrules() {
 	return $rule_hash;
 }
 
-
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
-// The following APIs have all been removed and will result in crashes with traceback to obtain calling tree information
-
-/* end page.trunks.php functions */
-
-
-/* begin page.routing.php functions */
-
-
-function core_routing_setrouteorder($route_id, $seq) {
-	global $db;
-	$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
-	$sequence = $db->getCol($sql);
-	if(DB::IsError($sequence)) {
-		die_freepbx($sequence->getDebugInfo());
-	}
-
-	if ($seq != 'new') {
-		$key = array_search($route_id,$sequence);
-		if ($key === false) {
-			return(false);
-		}
-	}
-	switch ("$seq") {
-		case 'up':
-		if (!isset($sequence[$key-1])) break;
-		$previous = $sequence[$key-1];
-		$sequence[$key-1] = $route_id;
-		$sequence[$key] = $previous;
-		break;
-		case 'down':
-		if (!isset($sequence[$key+1])) break;
-		$previous = $sequence[$key+1];
-		$sequence[$key+1] = $route_id;
-		$sequence[$key] = $previous;
-		break;
-		case 'top':
-		unset($sequence[$key]);
-		array_unshift($sequence,$route_id);
-		break;
-		case 'bottom':
-		unset($sequence[$key]);
-		case 'new':
-		// fallthrough, no break
-		$sequence[]=$route_id;
-		break;
-		case '0':
-		unset($sequence[$key]);
-		array_unshift($sequence,$route_id);
-		break;
-		default:
-		if (!ctype_digit($seq)) {
-			return false;
-		}
-		if ($seq > count($sequence)-1) {
-			unset($sequence[$key]);
-			$sequence[] = $route_id;
-			break;
-		}
-		if ($sequence[$seq] == $route_id) {
-			break;
-		}
-		$sequence[$key] = "bookmark";
-		$remainder = array_slice($sequence,$seq);
-		array_unshift($remainder,$route_id);
-		$sequence = array_merge(array_slice($sequence,0,$seq), $remainder);
-		unset($sequence[array_search("bookmark",$sequence)]);
-		break;
-	}
-	$insert_array = array();
-	$seq = 0;
-	$final_seq = false;
-	foreach($sequence as $rid) {
-		$insert_array[] = array($rid, $seq);
-		if ($rid === $route_id) {
-			$final_seq = $seq;
-		}
-		$seq++;
-	}
-	sql('DELETE FROM `outbound_route_sequence` WHERE 1');
-	$compiled = $db->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
-	$result = $db->executeMultiple($compiled,$insert_array);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error reordering outbound_route_sequence');
-	}
-	return $final_seq;
-}
-
-// function core_routing_del($name)
-function core_routing_delbyid($route_id) {
-	global $db;
-	$ret = array();
-	$sql = 'DELETE FROM outbound_routes WHERE route_id = ?';
-	$sth = $db->prepare($sql);
-	$ret[] = $sth->execute(array($route_id));
-	$sql = 'DELETE FROM outbound_route_patterns WHERE route_id = ?';
-	$sth = $db->prepare($sql);
-	$ret[] = $sth->execute(array($route_id));
-	$sql = 'DELETE FROM outbound_route_trunks WHERE route_id = ?';
-	$sth = $db->prepare($sql);
-	$ret[] = $sth->execute(array($route_id));
-	$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
-	$sth = $db->prepare($sql);
-	$ret[] = $sth->execute(array($route_id));
-	return $ret;
-}
-
-
 // function core_routing_rename($oldname, $newname)
 function core_routing_renamebyid($route_id, $new_name) {
 	global $db;
@@ -4702,7 +4519,6 @@ function core_routing_formatpattern($pattern) {
 
 
 
-// function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
 function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	$sql = "UPDATE `outbound_routes` SET
 	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
@@ -4735,7 +4551,6 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 	}
 }
 
-// function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	global $amp_conf;
 	global $db;
@@ -4769,46 +4584,6 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 	}
 
 	return ($route_id);
-}
-
-/* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
-by hashing without the prepend (since a blank prepend is similar to no prepend) at a minimum and decide if we want to catch
-this and throw an error...
-*/
-function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
-	global $db;
-
-	$route_id =  $db->escapeSimple($route_id);
-	$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
-	$insert_pattern = array();
-	foreach ($patterns as $pattern) {
-		$match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix']))));
-		$match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass']))));
-		$match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_cid']))));
-		$prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits']))));
-
-		if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
-			continue;
-		}
-
-		$hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
-		if (!isset($insert_pattern[$hash_index])) {
-			$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
-		}
-	}
-
-	if ($delete) {
-		sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
-	}
-	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
-	$result = $db->executeMultiple($compiled,$insert_pattern);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');
-	}
-}
-
-function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
-	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
 }
 
 /* callback to Time Groups Module so it can display usage information
