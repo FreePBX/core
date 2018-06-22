@@ -5,7 +5,6 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 //	Copyright 2006-2014 Schmooze Com Inc.
 //
 use FreePBX\modules\Core\Dialplan as Dialplan;
-include __DIR__.'/functions.inc/functions.deprecated.php';
 
 class core_conf {
 	var $_sip_general    = array();
@@ -862,6 +861,7 @@ class core_conf {
 	}
 }
 
+include __DIR__.'/functions.inc/functions.deprecated.php';
 function core_destination_popovers() {
 	global $amp_conf;
 	if ($amp_conf['AMPEXTENSIONS'] == "deviceanduser") {
@@ -2166,7 +2166,6 @@ function core_do_get_config($engine) {
 
 		$patterns = core_routing_getroutepatternsbyid($route['route_id']);
 		$trunks = core_routing_getroutetrunksbyid($route['route_id']);
-
 		foreach ($patterns as $pattern) {
 			// returns:
 			// array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
@@ -4498,7 +4497,7 @@ function core_routing_renamebyid($route_id, $new_name) {
 * dialplan such as pinsets or others.
 */
 function core_routing_formatpattern($pattern) {
-	$exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
+    $exten = $pattern['match_pattern_prefix'].$pattern['match_pattern_pass'];
 	$cid = $pattern['match_cid'];
 	if (!preg_match("/^[0-9*+]+$/",$exten)) {
 		// if # is detected above (as not in the list of acceptable patterns) then _ is appended due to Asterisk
