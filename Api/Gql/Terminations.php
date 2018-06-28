@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\Type;
 use FreePBX\modules\Api\Gql\Base;
 
 class Terminations extends Base {
+	/*
 	public function initTypes() {
 		$ssw = $this->typeContainer->create('coreterminations');
 		$ssw->setDescription('Destination Termination Types');
@@ -28,4 +29,5 @@ class Terminations extends Base {
 			];
 		});
 	}
+	*/
 }
