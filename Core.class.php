@@ -3437,7 +3437,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
 		$ob = $this->database->prepare($sql);
-		return $ob->execute(array($id));
+		$ret = $ob->execute(array($id));
+
+		if ($ret && $tech == 'pjsip') {
+			$sql = "UPDATE pjsip SET data = 'on' WHERE id = ? AND keyword = 'disabletrunk'";
+			$ob = $this->database->prepare($sql);
+			$ret = $ob->execute(array($id));
+		}
+		return $ret;
 	}
 
 	/**
@@ -3447,9 +3454,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return boolean           Result of execute
 	 */
 	public function enableTrunk($id){
+		$tech = $this->getTrunkTech($id);
+
 		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
 		$ob = $this->database->prepare($sql);
-		return $ob->execute(array($id));
+		$ret = $ob->execute(array($id));
+
+		if ($ret && $tech == 'pjsip') {
+			$sql = "UPDATE pjsip SET data = 'off' WHERE id = ? AND keyword = 'disabletrunk'";
+			$ob = $this->database->prepare($sql);
+			$ret = $ob->execute(array($id));
+		}
+		return $ret;
 	}
 
 	/**
