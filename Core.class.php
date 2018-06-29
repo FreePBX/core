@@ -3048,9 +3048,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
 				foreach ($settings as $key => $value) {
+					$data_tech = strtoupper($data['tech']);
 					if (isset($data[$key])) {
 						/* Override default setting with our value. */
 						if($key == "secret" && $data[$key] == "REGEN"){
+							continue;
+						}
+						if(isset($data['user']) && $data_tech == "VIRTUAL" && $data['user'] == ""){
 							continue;
 						}
 						$settings[$key]['value'] = $data[$key];
