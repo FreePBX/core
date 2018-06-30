@@ -702,24 +702,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	public function writeConfig($conf) {
 		$ast_sip_driver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 
-		// We check for 'is_numeric' in case the Asterisk Version can't be parsed, for whatever
-		// reason - it will return the string 'UNABLE-TO-PARSE'. If that happens, don't change
-		// anything, because it probably was working, and changing things will break them.
-		//
-		// However, if they HAVE switched from somethign that supports pjsip to something
-		// that doesn't support pjsip, we need to disable pjsip, otherwise Asterisk won't
-		// start.
-		if(is_numeric($this->version) && version_compare($this->version, '12', 'lt')) {
-			// Asterisk 11 doesn't support pjsip
-			// If we're trying to use pjsip on 11, disable it.  If there are devices or
-			// trunks trying to use chan_pjsip, we complain loudly about it in
-			// core_devices_configpageload
-			if($ast_sip_driver == 'chan_pjsip' || $ast_sip_driver == 'both') {
-				$this->freepbx->Config->set_conf_values(array('ASTSIPDRIVER' => 'chan_sip'), true, true);
-				$ast_sip_driver = "chan_sip";
-			}
-		}
-
 		$this->freepbx->ModulesConf->removenoload("res_pjproject.so");
 		if($ast_sip_driver === 'both') {
 			$this->freepbx->ModulesConf->removenoload("chan_sip.so");
