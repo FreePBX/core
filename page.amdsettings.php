@@ -1,14 +1,14 @@
 <?php
 $data_value = FreePBX::Core()->getAmdSettings();
-$initial_silence = $data_value[0]['initial_silence'];
-$greeting = $data_value[0]['greeting'];
-$after_greeting_silence = $data_value[0]['after_greeting_silence'];
-$total_analysis_time = $data_value[0]['total_analysis_time'];
-$min_word_length = $data_value[0]['min_word_length'];
-$max_word_length = $data_value[0]['max_word_length'];
-$between_words_silence = $data_value[0]['between_words_silence'];
-$maximum_number_of_words = $data_value[0]['maximum_number_of_words'];
-$silence_threshold = $data_value[0]['silence_threshold'];
+$initial_silence = $data_value['initial_silence'];
+$greeting = $data_value['greeting'];
+$after_greeting_silence = $data_value['after_greeting_silence'];
+$total_analysis_time = $data_value['total_analysis_time'];
+$min_word_length = $data_value['min_word_length'];
+$max_word_length = $data_value['max_word_length'];
+$between_words_silence = $data_value['between_words_silence'];
+$maximum_number_of_words = $data_value['maximum_number_of_words'];
+$silence_threshold = $data_value['silence_threshold'];
 ?>
 <div class="container-fluid">
 	<h1><?php echo _('AMD Settings')?></h1>

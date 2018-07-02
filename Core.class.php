@@ -1808,7 +1808,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sql = "SELECT * FROM amd_settings";
 		$sth = $this->database->prepare($sql);
 		$sth->execute();
-		$amd_values = $sth->fetchAll(\PDO::FETCH_ASSOC);
+		$amd_values = $sth->fetch(\PDO::FETCH_ASSOC);
 		return $amd_values;
 	}
 
