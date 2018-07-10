@@ -3372,9 +3372,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				if(ctype_digit($query)) {
-					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=devices&extdisplay=".$row['id']);
 				} else {
-					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=devices&extdisplay=".$row['id']);
 				}
 			}
 
