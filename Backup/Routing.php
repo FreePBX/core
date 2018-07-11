@@ -5,8 +5,8 @@ namespace FreePBX\modules\Core\Backup;
 class Routing extends Corebase{
     public function getConfigs(){
         $final = [];
-        $routing = new FreePBX\modules\Core\Components\Outboundrouting($this->FreePBX->Database);
-        $routes = $routing->listRoutes();
+        $routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->FreePBX->Database);
+        $routes = $routing->listAll();
         foreach($routes as $route){
             $route['patterns'] = $routing->getRoutePatternsByID($route['route_id']);
             $final[] = $route;
@@ -14,7 +14,9 @@ class Routing extends Corebase{
         return $final;
     }
     public function getFiles(){
+	return [];
     }
     public function getDirs(){
+	return [];
     }
 }

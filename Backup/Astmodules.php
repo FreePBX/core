@@ -7,7 +7,9 @@ class Astmodules extends Corebase{
         $this->FreePBX->ConfigFile('modules.conf')->config->ProcessedConfig;
     }
     public function getFiles(){
+	return [];
     }
     public function getDirs(){
+	return [];
     }
 }

@@ -9,7 +9,10 @@ class Ampusers extends Corebase{
         return $this->FreePBX->Core->listAMPUsers('assoc',true);
     }
     public function getFiles(){
+	return [];
     }
     public function getDirs(){
+	return [];
     }
+
 }

@@ -3,11 +3,13 @@
 namespace FreePBX\modules\Core\Backup;
 
 class Devices extends Corebase{
-    public function setConfigs(){
+    public function getConfigs(){
         return $this->FreePBX->Core->getAllDevicesByType();
     }
-    public function setFiles(){
+    public function getFiles(){
+	return [];
     }
-    public function setDirs(){
+    public function getDirs(){
+	return [];
     }
 }

@@ -7,7 +7,9 @@ class Trunks extends Corebase{
         return $this->FreePBX->Core->listTrunks();
     }
     public function getFiles(){
+	return [];
     }
     public function getDirs(){
+	return [];
     }
 }

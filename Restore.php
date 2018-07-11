@@ -1,5 +1,5 @@
 <?php
-namespace FreePBX\modules\__MODULENAME__;
+namespace FreePBX\modules\Core;
 use FreePBX\modules\Backup as Base;
 class Restore Extends Base\RestoreBase{
   public function runRestore($jobid){

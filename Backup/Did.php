@@ -7,7 +7,9 @@ class Did extends Corebase{
         return $this->FreePBX->Core->getAllDIDs();
     }
     public function getFiles(){
+	return[];
     }
     public function getDirs(){
+	return [];
     }
 }
