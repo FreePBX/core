@@ -355,12 +355,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routepass"></i>
 								</div>
 								<div class="col-md-9">
-									<div class="input-group">
-										<input type="password" class="form-control toggle-password clicktoedit" id="routepass" name="routepass" value="<?php echo $routepass;?>">
-										<span class="input-group-btn">
-											<button data-id="routepass" class="btn btn-default toggle-password" type="button"><i class="fa fa-2x fa-eye" style="margin-top: -2px;"></i></button>
-										</span>
-									</div>
+									<input type="text" class="form-control confidential" id="routepass" name="routepass" value="<?php echo htmlspecialchars($routepass);?>"/>
 								</div>
 							</div>
 						</div>
