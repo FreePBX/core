@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.25</version>
+	<version>14.0.18.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.26* FREEPBX-15896
 		*14.0.18.25* [core][search] Device link was wrong when Users/Devices mode is selected
 		*14.0.18.24* FREEPBX-17754 Bulk handler for virtual extension not working 
 		*14.0.18.23* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks 
