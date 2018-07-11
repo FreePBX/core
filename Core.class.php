@@ -3048,9 +3048,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
 				foreach ($settings as $key => $value) {
+					$data_tech = strtoupper($data['tech']);
 					if (isset($data[$key])) {
 						/* Override default setting with our value. */
 						if($key == "secret" && $data[$key] == "REGEN"){
+							continue;
+						}
+						if(isset($data['user']) && $data_tech == "VIRTUAL" && $data['user'] == ""){
 							continue;
 						}
 						$settings[$key]['value'] = $data[$key];
@@ -3327,9 +3331,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 			foreach($rows as $row) {
 				if(ctype_digit($query)) {
-					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+					$results[] = array("text" => _("Device")." ".$row['id'], "type" => "get", "dest" => "?display=devices&extdisplay=".$row['id']);
 				} else {
-					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=extensions&extdisplay=".$row['id']);
+					$results[] = array("text" => $row['description']." (".$row['id'].")", "type" => "get", "dest" => "?display=devices&extdisplay=".$row['id']);
 				}
 			}
 
@@ -3396,7 +3400,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 		$sql = "UPDATE trunks set disabled = 'on' WHERE trunkid = ?";
 		$ob = $this->database->prepare($sql);
-		return $ob->execute(array($id));
+		$ret = $ob->execute(array($id));
+
+		if ($ret && $tech == 'pjsip') {
+			$sql = "UPDATE pjsip SET data = 'on' WHERE id = ? AND keyword = 'disabletrunk'";
+			$ob = $this->database->prepare($sql);
+			$ret = $ob->execute(array($id));
+		}
+		return $ret;
 	}
 
 	/**
@@ -3406,9 +3417,18 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return boolean           Result of execute
 	 */
 	public function enableTrunk($id){
+		$tech = $this->getTrunkTech($id);
+
 		$sql = "UPDATE trunks set disabled = 'off' WHERE trunkid = ?";
 		$ob = $this->database->prepare($sql);
-		return $ob->execute(array($id));
+		$ret = $ob->execute(array($id));
+
+		if ($ret && $tech == 'pjsip') {
+			$sql = "UPDATE pjsip SET data = 'off' WHERE id = ? AND keyword = 'disabletrunk'";
+			$ob = $this->database->prepare($sql);
+			$ret = $ob->execute(array($id));
+		}
+		return $ret;
 	}
 
 	/**
