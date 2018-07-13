@@ -7,9 +7,12 @@ class Devices extends Corebase{
         foreach ($configs as $device) {
             $this->FreePBX->Core->addDevice($device['id'], $device['tech'], $device, true);
         }
+	return $this;
     }
     public function setFiles(){
+	return $this;
     }
     public function setDirs(){
+	return $this;
     }
 }

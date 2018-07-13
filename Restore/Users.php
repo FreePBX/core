@@ -2,7 +2,7 @@
 
 namespace FreePBX\modules\Core\Restore;
 
-class Devices extends Corebase{
+class Users extends Corebase{
   
     public function setConfigs($configs){
         foreach ($configs as $extension => $settings) {

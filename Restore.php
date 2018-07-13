@@ -1,12 +1,18 @@
 <?php
 namespace FreePBX\modules\Core;
 use FreePBX\modules\Backup as Base;
+use SplObjectStorage;
+use DirectoryIterator;
+
 class Restore Extends Base\RestoreBase{
   public function runRestore($jobid){
     $configs = $this->getConfigs();
     $files = $this->getFiles();
     $dirs = $this->getDirs();
     foreach ($this->getClasses($jobid) as $module) {
+	if(empty($class) || !$class->valid()){
+		continue;
+	}
         $class->setDirs($dirs)
             ->setFiles($files)
             ->setConfigs($configs[$class->className]);
@@ -15,14 +21,15 @@ class Restore Extends Base\RestoreBase{
     public function getClasses($transaction){
         $classList = new DirectoryIterator(__DIR__ . '/Restore');
         $classes = new SplObjectStorage();
-        foreach ($classlist as $classItem) {
-            if ($classItem . isDot() || $classItem . getExtension() !== 'php') {
+        foreach ($classList as $classItem) {
+            if ($classItem->isDot() || $classItem->getExtension() !== 'php') {
                 continue;
             }
             $classname = $classItem->getBasename('.php');
             if ($classname === 'Corebase') {
                 continue;
             }
+	    $classname = '\\FreePBX\\modules\\Core\\Restore\\'.$classname;
             $classes->attach(new $classname($this->FreePBX, $transaction));
         }
         return $classes;
