@@ -3253,19 +3253,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 			':deptname' => $deptname,
 			':sections' => $sections,
 		);
-		$sql = "INSERT INTO ampusers (username, password_sha1, extension_low, extension_high, deptname, sections) VALUES (:username,
+		$sql = "REPLACE INTO ampusers (username, password_sha1, extension_low, extension_high, deptname, sections) VALUES (:username,
 					:password_sha1,
 					:extension_low,
 					:extension_high,
 					:deptname,
                     :sections) 
-                ON DUPLICATE KEY UPDATE
-                 username = VALUES(username),
-                 password_sha1 = VALUES(password_sha1),
-                 extension_low = VALUES(extension_low),
-                 extension_high = VALUES(extension_high),
-                 deptname = VALUES(deptname),
-                 sections = VALUES(sections),     
                 ";
 		$stmt = $this->database->prepare($sql);
 		try{

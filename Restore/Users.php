@@ -5,9 +5,8 @@ namespace FreePBX\modules\Core\Restore;
 class Users extends Corebase{
   
     public function setConfigs($configs){
-        foreach ($configs as $extension => $settings) {
-
-            $this->FreePBX->Core->addUser($extension, $settings, true);
+        foreach ($configs as $settings) {
+            $this->FreePBX->Core->addUser($settings['extension'], $settings, true);
         }
         return $this;
     }

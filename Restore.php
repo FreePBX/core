@@ -7,10 +7,11 @@ use DirectoryIterator;
 class Restore Extends Base\RestoreBase{
   public function runRestore($jobid){
     $configs = $this->getConfigs();
+    $configs = reset($configs);
     $files = $this->getFiles();
     $dirs = $this->getDirs();
-    foreach ($this->getClasses($jobid) as $module) {
-	if(empty($class) || !$class->valid()){
+    foreach ($this->getClasses($jobid) as $class) {
+	if(empty($class)){
 		continue;
 	}
         $class->setDirs($dirs)

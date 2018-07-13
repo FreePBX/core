@@ -34,9 +34,8 @@ class Outboundrouting extends ComponentBase{
     }
 
     public function addWithId($id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = ''){
-        $sql = "INSERT INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-    VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)
-    ON DUPLICATE KEY UPDATE name= VALUES(name),  outcid= VALUES(outcid),  outcid_mode= VALUES(outcid_mode),  password= VALUES(password),  emergency_route= VALUES(emergency_route),  intracompany_route= VALUES(intracompany_route),  mohclass= VALUES(mohclass),  time_group_id= VALUES(time_group_id),  patterns= VALUES(patterns),  trunks= VALUES(trunks),  seq= VALUES(seq),  dest= VALUES(dest),  time_mode= VALUES(time_mode),  timezone= VALUES(timezone),  calendar_id= VALUES(calendar_id),  calendar_group_id= VALUES(calendar_group_id)";
+        $sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
+    VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
         $sth = $this->Database->prepare($sql);
         $sth->execute(array(
             ":route_id" => $id,
@@ -81,7 +80,9 @@ class Outboundrouting extends ComponentBase{
     public function setRouteOrder($route_id, $seq){
         $sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
         $sequence = $this->Database->query($sql)->fetchColumn();
-
+        if($sequence === false){
+            $sequence = [];
+        }
         if ($seq != 'new') {
             $key = array_search($route_id, $sequence);
             if ($key === false) {
@@ -193,7 +194,7 @@ class Outboundrouting extends ComponentBase{
          * For now we log this and later we can make it do magic. ¯\_(シ)_/¯
          **/
         if(!$this->allUnique($patterns,'prepend_digits')){
-            dbug(sptintf(_("All the patterns for route id %s were NOT unique which can cause unexpected behavior This may be unallowed in the future.",$route_id)));
+            dbug(sprintf(_("All the patterns for route id %s were NOT unique which can cause unexpected behavior This may be unallowed in the future."),$route_id));
         }
         foreach ($patterns as $pattern) {
             $match_pattern_prefix = preg_replace($filter, '', strtoupper(trim($pattern['match_pattern_prefix'])));
@@ -214,9 +215,9 @@ class Outboundrouting extends ComponentBase{
         if ($delete) {
             $this->deletePatternsById($route_id);
         }
-        $stmt = $this->Database->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES(:route_id, :prefix, :pass, :cid, :digits)');
+        $stmt = $this->Database->prepare('REPLACE INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES(:route_id, :prefix, :pass, :cid, :digits)');
         foreach ($insert_pattern as $pattern) {
-            $pattern[':id'] = $route_id;
+            $pattern[':route_id'] = $route_id;
             $stmt->execute($pattern);
         }
         return $this;

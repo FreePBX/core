@@ -9,6 +9,7 @@ class Routing extends Corebase{
         $routes = $routing->listAll();
         foreach($routes as $route){
             $route['patterns'] = $routing->getRoutePatternsByID($route['route_id']);
+            $route['trunks'] = $routing->getRouteTrunksById($route['route_id']);
             $final[] = $route;
         }
         return $final;
