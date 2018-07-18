@@ -194,7 +194,7 @@ function core_did_del($extension, $cidnum){
 function core_routing_delbyid($route_id){
 	FreePBX::Modules()->deprecatedFunction();
 	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
-	return $routing->setRouteOrder($route_id);
+	return $routing->deleteTrunkRouteById($route_id);
 }
 
 function core_routing_setrouteorder($route_id, $seq){

@@ -1571,9 +1571,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 */
 	public function delRouteTrunkByID($trunk_id){
         if (empty($this->routing)) {
-            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
         }
-        return $this->routing->deleteTrunkRoute($trunk_id);
+        return $this->routing->deleteTrunkRouteById($trunk_id);
 	}
 
 	/**
@@ -1722,7 +1722,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function getRouteByID($route_id) {
         if (empty($this->routing)) {
-            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
         }
         return $this->routing->get($route_id);
 	}
@@ -1736,14 +1736,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function getRouteTrunksByID($route_id) {
         if (empty($this->routing)) {
-            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
         }
         return $this->routing->getRouteTrunksById($route_id);
 	}
 
 	public function getRoutePatternsByID($route_id) {
         if (empty($this->routing)) {
-            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
+            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
         }
         return $this->routing->getRoutePattrnsById($route_id);
 	}
