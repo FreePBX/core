@@ -114,7 +114,7 @@ class Outboundrouting extends ComponentBase{
                 unset($sequence[$key]);
             case 'new':
 		// fallthrough, no break
-                $sequence[] = $route_id;
+                $sequence[$route_id] = $route_id;
                 break;
             case '0':
                 unset($sequence[$key]);
@@ -143,7 +143,8 @@ class Outboundrouting extends ComponentBase{
         $final_seq = false;
         sql('DELETE FROM `outbound_route_sequence` WHERE 1');
         $stmt = $this->Database->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
-        foreach ($sequence as $rid) {
+        $sequence = is_array($sequence)?$sequence:[];
+	foreach ($sequence as $rid) {
             $stmt->execute([$rid,$seq]);
             if ($rid === $route_id) {
                 $final_seq = $seq;

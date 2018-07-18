@@ -275,7 +275,7 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false){
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false){
 	FreePBX::Modules()->deprecatedFunction();
 	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
-	return $this->routing->updateTrunks($route_id, $trunks, $delete);
+	return $routing->updateTrunks($route_id, $trunks, $delete);
 }
 
 function core_routing_get($route_id){
