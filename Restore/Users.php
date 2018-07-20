@@ -6,6 +6,7 @@ class Users extends Corebase{
   
     public function setConfigs($configs){
         foreach ($configs as $settings) {
+            $this->FreePBX->Core->delUser($settings['extension'], true);
             $this->FreePBX->Core->addUser($settings['extension'], $settings, true);
         }
         return $this;

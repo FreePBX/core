@@ -11,6 +11,7 @@ class Devices extends Corebase{
                 $settings[$key]['flag'] = 0;
 
             }
+            $this->FreePBX->Core->delDevice($device['id'], true);
             $this->FreePBX->Core->addDevice($device['id'], $device['tech'], $settings, true);
         }
 	return $this;
