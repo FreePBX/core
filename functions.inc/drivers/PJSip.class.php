@@ -872,7 +872,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			$endpoint[] = "context=$context";
 			$endpoint[] = "allow=all";
-			$endpoint[] = "transport=udp,tcp,ws,wss";
+			//Not specifying a transport will DEFAULT to the first configured transport in pjsip.conf which is valid for the URI we are trying to contact.
+
 			$retarr["pjsip.endpoint.conf"]["anonymous"] = $endpoint;
 		}
 
