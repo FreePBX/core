@@ -748,6 +748,30 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 			</div>
 		</div>
 		<!--END T.38 UDPTL NAT-->
+		<!--T.38 UDPTL MAXDATAGRAM-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="t38_udptl_maxdatagram"><?php echo _("T.38 UDPTL MAXDATAGRAM") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_maxdatagram"></i>
+							</div>
+							<div class="col-md-9">
+								<input type="number" class="form-control" name="t38_udptl_maxdatagram" min=0 id="t38_udptl_maxdatagram" value="<?php echo $t38_udptl_maxdatagram?>"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="t38_udptl_maxdatagram-help" class="help-block fpbx-help-block"><?php echo _("T.38 UDPTL maximum datagram size.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END T.38 UDPTL MAXDATAGRAM-->
 		<!--Fax Detect-->
 		<div class="element-container">
 			<div class="row">
