@@ -551,6 +551,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if(!empty($trunk['t38_udptl_nat'])){
 					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_nat'] = $trunk['t38_udptl_nat'];
 				}
+				if(!empty($trunk['t38_udptl_maxdatagram'])){
+					$conf['pjsip.endpoint.conf'][$tn]['t38_udptl_maxdatagram'] = $trunk['t38_udptl_maxdatagram'];
+				}
 				//yes,pai,both,no
 				if (isset($trunk['sendrpid'])) {
 					if ($trunk['sendrpid'] == "yes" || $trunk['sendrpid'] == "both") {
