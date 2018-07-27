@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.37</version>
+	<version>13.0.122.38</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.38* FREEPBX-17888 Cannot set T.38 MaxDatagram in PJSIP trunk 
 		*13.0.122.37* FREEPBX-17841
 		*13.0.122.36* FREEPBX-15896
 		*13.0.122.35* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks 
