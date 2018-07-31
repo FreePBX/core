@@ -2262,7 +2262,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 		}
 
-		$sql = "INSERT INTO `trunks`
+		$sql = "REPLACE INTO `trunks`
 		(`trunkid`, `name`, `tech`, `outcid`, `keepcid`, `maxchans`, `failscript`, `dialoutprefix`, `channelid`, `usercontext`, `provider`, `disabled`, `continue`)
 		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		$sth = $this->database->prepare($sql);
@@ -2315,7 +2315,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$confitem[$key]=$value;
 			}
 		}
-		$sth = $this->database->prepare("INSERT INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
+		$sth = $this->database->prepare("REPLACE INTO $table (id, keyword, data, flags) values ('$trunknum',?,?,?)");
 		// rember 1=disabled so we start at 2 (1 + the first 1)
 		$seq = 1;
 		foreach($confitem as $k=>$v) {
