@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.29</version>
+	<version>14.0.18.30</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.30* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES 
 		*14.0.18.29* FREEPBX-17888 Cannot set T.38 MaxDatagram in PJSIP trunk 
 		*14.0.18.28* FREEPBX-17841
 		*14.0.18.27* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers 
