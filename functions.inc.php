@@ -336,7 +336,7 @@ class core_conf {
 		// this as for now it makes it for everyone.
 		//
 		if ($add_to_dynamic_features) {
-			$ext->_globals['DYNAMIC_FEATURES'] = empty($ext->_globals['DYNAMIC_FEATURES']) ? $key : $ext->_globals['DYNAMIC_FEATURES'] . ',' . $key;
+			$ext->_globals['DYNAMIC_FEATURES'] = empty($ext->_globals['DYNAMIC_FEATURES']) ? $key : $ext->_globals['DYNAMIC_FEATURES'] . '#' . $key;
 		}
 	}
 
