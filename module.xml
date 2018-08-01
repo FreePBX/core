@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.38</version>
+	<version>13.0.122.39</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.39* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES 
 		*13.0.122.38* FREEPBX-17888 Cannot set T.38 MaxDatagram in PJSIP trunk 
 		*13.0.122.37* FREEPBX-17841
 		*13.0.122.36* FREEPBX-15896
