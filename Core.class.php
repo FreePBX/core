@@ -2025,7 +2025,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$routes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		return $routes;
 	}
-    
+
 	/**
      * Get a route
      */
@@ -2337,6 +2337,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	/* Fill non-mandatory fields with default if not present */
 	public function addDIDDefaults(&$settings) {
+		$settings['cidnum'] = isset($settings['cidnum'])?$settings['cidnum']:'';
+		$settings['description'] = isset($settings['description'])?$settings['description']:'';
 		$settings['fanswer'] = isset($settings['fanswer'])?$settings['fanswer']:'';
 		$settings['delay_answer'] = isset($settings['delay_answer'])&&$settings['delay_answer']?$settings['delay_answer']:'0';
 		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
@@ -3258,7 +3260,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					:extension_low,
 					:extension_high,
 					:deptname,
-                    :sections) 
+                    :sections)
                 ";
 		$stmt = $this->database->prepare($sql);
 		try{
