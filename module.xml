@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.1beta1</version>
+	<version>15.0.1beta2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.1beta2* FREEPBX-18016 Improving tool-tip for maximum channel field. 
 		*15.0.1alpha2* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES 
 		*15.0.1alpha2* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers 
 		*15.0.1alpha2* FREEPBX-17754 Bulk handler for virtual extension not working 
