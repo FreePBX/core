@@ -28,6 +28,16 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$this->loadDrivers();
 	}
 
+	public function setDatabase($pdo){
+	$this->database = $pdo;
+	return $this;
+	}
+	
+	public function resetDatabase(){
+	$this->database = $this->freepbx->Database;
+	return $this;
+	}
+
 	/**
 	 * Get Right Nav
 	 * @param  array $request The request

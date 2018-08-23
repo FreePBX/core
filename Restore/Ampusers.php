@@ -18,4 +18,15 @@ class Ampusers extends Corebase{
     public function setDirs(){
         return $this;
     }
+    
+    public function processLegacy ($pdo, $data, $tables, $tmpfiledir){
+        $core = $this->FreePBX->Core;
+        $core->setDatabase($pdo);
+        $configs = $core->listAMPUsers('assoc', true);
+        $core->resetDatabase();
+        foreach ($configs as $user) {
+            $core->addAMPUser($user['username'], $user['password'], $user['extension_low'], $user['extension_high'], $user['deptname'], explode(';', $user['sections']));
+        }
+        return $this;
+    }
 }
