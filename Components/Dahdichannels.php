@@ -63,7 +63,7 @@ class Dahdichannels extends ComponentBase{
             ]);
             return true;
         }catch(Exception $e){
-            if($e->getCode() === 1062){
+            if($e->getCode() == '23000'){
                 echo "<script>javascript:alert('" . _("Error Duplicate Channel Entry") . "')</script>";
                 return false;
             }
