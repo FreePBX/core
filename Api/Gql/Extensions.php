@@ -13,8 +13,16 @@ class Extensions extends Base {
 		return [
 			'read:extension' => [
 				'description' => _('Read Extensions'),
+			],
+			'write:extension' => [
+				'description' => _('Write Extensions'),
 			]
 		];
+	}
+
+	public function mutationCallback() {
+		if($this->checkAllWriteScope()) {
+		}
 	}
 
 	public function queryCallback() {

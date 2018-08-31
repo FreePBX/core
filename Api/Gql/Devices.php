@@ -9,6 +9,17 @@ use FreePBX\modules\Api\Gql\Base;
 class Devices extends Base {
 	protected $module = 'core';
 
+	public static function getScopes() {
+		return [
+			'read:device' => [
+				'description' => _('Read Devices'),
+			],
+			'write:devices' => [
+				'description' => _('Write Devices'),
+			]
+		];
+	}
+
 	public function mutationCallback() {
 		if($this->checkAllWriteScope()) {
 			return function() {
@@ -133,8 +144,11 @@ class Devices extends Base {
 					}
 				],
 				'tech' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Technology driver type'
+					'type' => $this->typeContainer->get('coretech')->getObject(),
+					'description' => 'Technology driver type',
+					'resolve' => function($row) {
+						return $row;
+					}
 				],
 				'dial' => [
 					'type' => Type::nonNull(Type::string()),
