@@ -158,7 +158,9 @@ $module_list[999] = array(
 $module_list['*'] = array(
 	"name" => _("ALL SECTIONS")
 );
-
+$module_list['setup_wizard'] = array(
+	"name" => _("Restart Setup Wizard")
+);
 uasort($module_list, function($a, $b) {
 	return(strnatcmp($a['name'],$b['name']));
 });
