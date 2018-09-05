@@ -3,6 +3,13 @@ namespace FreePBX\modules\Core\Api\Rest;
 use FreePBX\modules\Api\Rest\Base;
 class Users extends Base {
 	protected $module = 'core';
+	public static function getScopes() {
+		return [
+			'read:users' => [
+				'description' => _('Read Core User information'),
+			]
+		];
+	}
 	public function setupRoutes($app) {
 
 		/**
@@ -13,7 +20,7 @@ class Users extends Base {
 		$app->get('/users', function ($request, $response, $args) {
 			$users = $this->freepbx->Core->getAllUsers();
 			return $response->withJson($users);
-		})->add($this->checkAllReadScopeMiddleware());
+		})->add($this->checkReadScopeMiddleware('users'));
 
 		/**
 		 * @verb GET
@@ -38,6 +45,6 @@ class Users extends Base {
 
 			// No voicemail found.
 			return $response->withJson($base);
-		})->add($this->checkAllReadScopeMiddleware());
+		})->add($this->checkReadScopeMiddleware('users'));
 	}
 }
