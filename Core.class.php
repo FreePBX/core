@@ -809,21 +809,22 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$channel = isset($request['channel']) ? $request['channel'] :  false;
 			$description = isset($request['description']) ? $request['description'] :  '';
 			$did = isset($request['did']) ? $request['did'] :  '';
+			$dahdichannels = new \FreePBX\modules\Core\Components\Dahdichannels($this->database);
 			switch ($action) {
 				case 'add':
-					if (core_dahdichandids_add($description, $channel, $did)) {
+					if ($dahdichannels->add($description, $channel, $did)) {
 						needreload();
 						$_REQUEST['extdisplay'] = $channel;
 						$this->freepbx->View->redirect_standard('extdisplay');
 					}
 				break;
 				case 'edit':
-					if (core_dahdichandids_edit($description, $channel, $did)) {
+					if ($dahdichannels->edit($description, $channel, $did)) {
 						needreload();
 					}
 				break;
 				case 'delete':
-					core_dahdichandids_delete($channel);
+					$dahdichannels->delete($channel);
 					needreload();
 				break;
 			}
