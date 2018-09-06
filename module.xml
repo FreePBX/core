@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.1beta3</version>
+	<version>15.0.1beta2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.1beta2* FREEPBX-18016 Trunk inbound Maximum Channels not honored. 
 		*15.0.1beta3* Rest Api 
 		*15.0.1beta2* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard 
 		*15.0.1beta2* FREEPBX-18114 Fix edit of dahdididchannels 
