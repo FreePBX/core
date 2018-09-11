@@ -32,7 +32,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	$this->database = $pdo;
 	return $this;
 	}
-	
+
 	public function resetDatabase(){
 	$this->database = $this->freepbx->Database;
 	return $this;
@@ -451,10 +451,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function ajaxHandler() {
-		switch($_REQUEST['command']) {
+		$request = freepbxGetSanitizedRequest();
+		switch($request['command']) {
 			case "addastmodule":
-				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
-				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				$section = isset($request['section'])?$request['section']:'';
+				$module = isset($request['astmod'])?$request['astmod']:'';
 				switch($section){
 					case 'amodload':
 						return $this->ModulesConf->load($module);
@@ -468,8 +469,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 			break;
 			case "delastmodule":
-				$section = isset($_REQUEST['section'])?$_REQUEST['section']:'';
-				$module = isset($_REQUEST['astmod'])?$_REQUEST['astmod']:'';
+				$section = isset($request['section'])?$request['section']:'';
+				$module = isset($request['astmod'])?$request['astmod']:'';
 				switch($section){
 					case 'amodload':
 						return $this->ModulesConf->removeload($module);
@@ -491,7 +492,7 @@ class Core extends FreePBX_Helpers implements BMO  {
                 if (empty($this->routing)) {
                     $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
                 }
-				$order = $_REQUEST['data'];
+				$order = $request['data'];
 				array_shift($order);
 				return $this->routing->setRouteOrder($order);
 			break;
@@ -537,7 +538,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$cfusetting = $this->astman->database_show("CFU");
 				// get all DND settings
 				$dndsetting = $this->astman->database_show("DND");
-				if($_REQUEST['type'] == "all") {
+				if($request['type'] == "all") {
 					$devices = $this->getAllUsersByDeviceType();
 					if(empty($devices)) {
 						return array();
@@ -556,7 +557,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					}
 					return $devices;
 				} else {
-					$devices = $this->getAllUsersByDeviceType($_REQUEST['type']);
+					$devices = $this->getAllUsersByDeviceType($request['type']);
 					if(empty($devices)) {
 						return array();
 					}
@@ -575,7 +576,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				break;
 			case "getDeviceGrid":
-				if($_REQUEST['type'] == "all") {
+				if($request['type'] == "all") {
 					$devices = $this->getAllDevicesByType();
 					if(empty($devices)) {
 						return array();
@@ -586,7 +587,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					}
 					return $devices;
 				} else {
-					$devices = $this->getAllDevicesByType($_REQUEST['type']);
+					$devices = $this->getAllDevicesByType($request['type']);
 					if(empty($devices)) {
 						return array();
 					}
@@ -627,7 +628,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				return $status;
 			break;
 			case "getJSON":
-				switch ($_REQUEST['jdata']) {
+				switch ($request['jdata']) {
 					case 'allDID':
 						$dids = $this->getAllDIDs();
 						$dids = is_array($dids)?$dids:array();
@@ -653,8 +654,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 			case 'getnpanxxjson':
 				try {
-					$npa = $_REQUEST['npa'];
-					$nxx = $_REQUEST['nxx'];
+					$npa = $request['npa'];
+					$nxx = $request['nxx'];
 					$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
 					$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
 					$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
@@ -674,7 +675,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			break;
 			case 'populatenpanxx':
 				$dialpattern_array = $dialpattern_insert;
-				if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
+				if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $request["npanxx"], $matches)) {
 					// first thing we do is grab the exch:
 					$ch = curl_init();
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -757,7 +758,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
-		$request = $_REQUEST;
+		$request = freepbxGetSanitizedRequest();
 		global $amp_conf;
 		if ($page == "advancedsettings"){
 			$freepbx_conf = $this->config;
