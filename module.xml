@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.42</version>
+	<version>13.0.122.43</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.43* FREEPBX-18161
 		*13.0.122.42* FREEPBX-18016 Trunk inbound Maximum Channels not honored. 
 		*13.0.122.41* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard 
 		*13.0.122.40* FREEPBX-18016 Improving tool-tip for maximum channel field. 
@@ -334,7 +335,7 @@
 		*13.0.1alpha2* Reskin. Complete visuals change. Added new functionality. Broke apart drivers.
 	</changelog>
 	<depends>
-		<version>13.0.195.2</version>
+		<version>13.0.195.12</version>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
