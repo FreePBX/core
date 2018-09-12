@@ -838,7 +838,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 
 				if(version_compare($this->version,'13.8','ge')) {
-					$transport[$t]['allow_reload'] = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
+					$out = $this->freepbx->Sipsettings->getConfig('pjsip_allow_reload');
+					$transport[$t]['allow_reload'] = (empty($out) || $out === 'yes') ? 'yes' : 'no';
 				}
 
 				// Based on this document : https://wiki.asterisk.org/wiki/display/AST/IP+Quality+of+Service
