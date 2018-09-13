@@ -945,8 +945,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 					$i++;
 				}
-			} else if (isset($request["dialpatterndata"])) {
-				$dp = json_decode($request['dialpatterndata'],true);
+			} else if (isset($_REQUEST["dialpatterndata"])) {
+				$dp = json_decode($_REQUEST['dialpatterndata'],true);
 				$dp = is_array($dp) ? $dp : array();
 				foreach ($dp as $pattern) {
 					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
