@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.44</version>
+	<version>13.0.122.45</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.45* FREEPBX-18205 
 		*13.0.122.44* FREEPBX-18176 
 		*13.0.122.43* FREEPBX-18161
 		*13.0.122.42* FREEPBX-18016 Trunk inbound Maximum Channels not honored. 
