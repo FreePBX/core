@@ -47,7 +47,7 @@ function core_devices_getiax2() {
 	FreePBX::Modules()->deprecatedFunction();
 }
 
-function core_devices_getzap() {	
+function core_devices_getzap() {
 	FreePBX::Modules()->deprecatedFunction();
 }
 
@@ -79,7 +79,7 @@ function core_trunks_getDialRules() {
 	FreePBX::Modules()->deprecatedFunction();
 }
 
-function core_trunks_readDialRulesFile() {	
+function core_trunks_readDialRulesFile() {
 	FreePBX::Modules()->deprecatedFunction();
 }
 
@@ -249,9 +249,9 @@ function core_trunks_del($trunknum, $tech = null, $edit = false){
 
 function core_routing_trunk_delbyid($trunk_id){
 	FreePBX::Modules()->deprecatedFunction();
-	
+
 	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
-	return $routing->deleteTrunkRoute($trunk_id);
+	return $routing->deleteTrunkRouteBuId($trunk_id);
 }
 
 function core_routing_getroutepatternsbyid($route_id){
@@ -299,7 +299,7 @@ function core_routing_setroutepriorityvalue(){
 	FreePBX::Modules()->deprecatedFunction();
 }
 
-function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "", $routecid_mode = "") {	
+function core_routing_add($name, $patterns, $trunks, $method, $pass, $emergency = "", $intracompany = "", $mohsilence = "", $routecid = "", $routecid_mode = "") {
 	FreePBX::Modules()->deprecatedFunction();
 	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
 	return $routing->add($name, $patterns, $trunks, $method, $pass, $emergency, $intracompany, $mohsilence, $routecid, $routecid_mode);
