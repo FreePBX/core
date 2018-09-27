@@ -22,12 +22,13 @@ $ext->add($c,$e,'', new ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
 $ext->add($c,$e,'', new ext_execif('$["${HASH(SIPHEADERS,Alert-Info)}" = "unset"]', 'Set', 'Rheader=1'));
 $ext->add($c,$e,'', new ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));
 $ext->add($c,$e,'', new ext_set('sipheader', '${HASH(SIPHEADERS,${sipkey})}'));
+$ext->add($c,$e,'', new ext_execif('$["${HASH(SIPHEADERS,${sipkey})}" = ""]', 'Set', 'Addheader=1'));
 $driver = \FreePBX::Config()->get("ASTSIPDRIVER");
 if(in_array($driver,array("both","chan_sip"))) {
-	$ext->add($c,$e,'', new ext_sipaddheader('${sipkey}', '${sipheader}'));
+	$ext->add($c,$e,'', new ext_execif('$["${Addheader}" = "1"]', 'SIPAddHeader','${sipkey}:${sipheader}'));
 }
 if(in_array($driver,array("both","chan_pjsip"))) {
-	$ext->add($c,$e,'', new ext_set('PJSIP_HEADER(add,${sipkey})', '${sipheader}'));
+	$ext->add($c,$e,'', new ext_execif('$["${Addheader}" = "1"]','Set', 'PJSIP_HEADER(add,${sipkey})=${sipheader}'));
 }
 $ext->add($c,$e,'', new ext_endwhile(''));
 if (in_array($driver,array("both","chan_sip"))) {
