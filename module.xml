@@ -3,14 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.1beta2</version>
+	<version>15.0.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*15.0.1beta2* Fixing FREEPBX-17953 Alert info headers getting set twice 
+		*15.0.2* Fixing FREEPBX-17953 Alert info headers getting set twice 
 		*15.0.1beta8* fix callback 
 		*15.0.1beta7* FREEPBX-18205 
 		*15.0.1beta6* FREEPBX-18176
