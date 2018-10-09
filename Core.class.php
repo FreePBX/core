@@ -484,14 +484,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 			break;
 			case "delroute":
-                if(empty($this->routing)){
-                    $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
-                }
-                return $this->routing->deleteById($_POST['id']);
-            case "updateRoutes":
-                if (empty($this->routing)) {
-                    $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
-                }
+				if(empty($this->routing)){
+					$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
+				}
+				return $this->routing->deleteById($_POST['id']);
+				case "updateRoutes":
+				if (empty($this->routing)) {
+					$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
+				}
 				$order = $request['data'];
 				array_shift($order);
 				return $this->routing->setRouteOrder($order);
@@ -3208,6 +3208,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Set Outbound Routes Order
 	 */
 	public function setRouteOrder($routes){
+		dbug($routes);
 		$dbh = $this->database();
 		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
 		$stmt->execute();
