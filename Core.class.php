@@ -494,7 +494,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				$order = $request['data'];
 				array_shift($order);
-				return $this->routing->setRouteOrder($order);
+				return $this->setRouteOrder($order);
 			break;
 			case "getUserGrid":
 				$users = $this->getAllUsers();
@@ -3208,7 +3208,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Set Outbound Routes Order
 	 */
 	public function setRouteOrder($routes){
-		dbug($routes);
 		$dbh = $this->database();
 		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
 		$stmt->execute();
