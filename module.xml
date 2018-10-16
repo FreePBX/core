@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.38</version>
+	<version>14.0.18.39</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.39* FREEPBX-17953 FREEPBX-18336 Alert-Info header issue fixes 
 		*14.0.18.38* Fixing FREEPBX-17953 Alert info headers getting set twice 
 		*14.0.18.37* FREEPBX-18205 
 		*14.0.18.36* FREEPBX-18176 
