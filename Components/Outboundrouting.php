@@ -79,8 +79,8 @@ class Outboundrouting extends ComponentBase{
 
 	public function setRouteOrder($route_id, $seq){
 		$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
-		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
-		if($sequence === false){
+		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
+		if($sequence == false){
 			$sequence = [];
 		}
 		if ($seq != 'new') {
@@ -146,7 +146,7 @@ class Outboundrouting extends ComponentBase{
 		$sequence = is_array($sequence)?$sequence:[];
 		foreach ($sequence as $rid) {
 			$stmt->execute([$rid,$seq]);
-			if ($rid === $route_id) {
+			if ($rid == $route_id) {
 				$final_seq = $seq;
 			}
 			$seq++;
