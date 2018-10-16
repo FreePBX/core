@@ -72,8 +72,10 @@ $rgmethod = trim($rgmethod);
 
 // Get all headers
 $headers = array();
+$alertinfo_set_flag = 0;
 $alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
+	$alertinfo_set_flag = 1;
 	debug("Setting Alert-Info:  $alertinfo", 4);
 	$headers['Alert-Info'] = $alertinfo;
 	$AGI->set_alertinfo($alertinfo);
@@ -82,6 +84,9 @@ if ($alertinfo) {
 $sippheader = get_var( $AGI, "SIPADDHEADER" );
 if ($sippheader) {
 	$fields = explode(':',$sippheader,2);
+	if($alertinfo_set_flag == 1 && $h == 'Alert-Info'){
+		continue;
+	}
 	$headers[$fields[0]] = $fields[1];
 }
 
