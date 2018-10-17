@@ -2,6 +2,7 @@
 namespace FreePBX\modules\Core\Components;
 use PDO;
 use Exception;
+use PDOException;
 
 class Dahdichannels extends ComponentBase{
 
@@ -62,8 +63,8 @@ class Dahdichannels extends ComponentBase{
                 ':did' => $did,
             ]);
             return true;
-        }catch(Exception $e){
-            if($e->getCode() == '23000'){
+        }catch(PDOException $e){
+            if($e->getCode() == 23000){
                 echo "<script>javascript:alert('" . _("Error Duplicate Channel Entry") . "')</script>";
                 return false;
             }
