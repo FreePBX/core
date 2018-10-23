@@ -120,7 +120,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '<td class="match">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
-		$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'"  class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" > ';
+		$dpinput[] = '		<input placeholder="'.$mp_tit.'" onchange="check_pattern(this.value)" type="text" id="pattern_pass_'.$idx.'"  class="form-control '.$dpt_class.'" value="'.$pattern['match_pattern_pass'].'" > ';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
@@ -162,7 +162,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
-	$dpinput[] = '		<input placeholder="'.$mp_tit.'" type="text" id="pattern_pass_'.$idx.'" class="form-control '.$dpt_class.'" value=""> ';
+	$dpinput[] = '		<input placeholder="'.$mp_tit.'" onchange="check_pattern(this.value)" type="text" id="pattern_pass_'.$idx.'" class="form-control '.$dpt_class.'" value=""> ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
@@ -479,6 +479,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<!--Dial Patterns -->
 			<div class="tab-pane" id="dialpatterns">
 				<br/>
+				<div id="msg_alert_pattern"></div>
 				<br/>
 				<h3><?php echo $dplabel?></h3>
 				<?php echo $dphelp?>
