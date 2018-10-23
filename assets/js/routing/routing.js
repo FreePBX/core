@@ -282,6 +282,17 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 	}
 });
 
+function check_pattern(pattern){
+	if(pattern.trim().substring(0, 1) == "."){
+		var msg_alert = '<div class="alert alert-dismissable alert-warning">'+
+						'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">'+
+						'<i class="fa fa-times"></i>'+
+						'</button>'+
+						'<strong>'+_('Warning!')+'</strong> '+_('A dial pattern of a single dot is STRONGLY DISCOURAGED. It is recommended that you change it to X.')+
+						'</div>';
+		$("#msg_alert_pattern").html(msg_alert);		
+	}
+}
 
 bindToLast();
 function bindToLast() {
