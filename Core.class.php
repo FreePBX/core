@@ -134,9 +134,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * Quick Extension Create Display
 	 */
 	public function getQuickCreateDisplay() {
-		$devs = $this->getAllUsersByDeviceType();
-		$dev = end($devs);
-		$startExt = $dev['extension'] + 1;
+		$sql = "SELECT extension FROM users ORDER BY extension DESC LIMIT 1";
+		$lastExension = $this->freepbx->Database->query($sql)->fetchColumn();
+		$startExt = !empty($lastExension) ? $lastExension + 1 : 1;
 
 		$pages = array();
 		$pages[0][] = array(
