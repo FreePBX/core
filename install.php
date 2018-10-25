@@ -55,7 +55,7 @@ $fcc->setDefault('*12');
 $fcc->update();
 unset($fcc);
 
-global $version;
+$version = getversion();
 if(version_compare($version, "12.5", "<")) {
 	$fcc = new featurecode('core', 'zapbarge');
 	$fcc->setDescription('ZapBarge');
