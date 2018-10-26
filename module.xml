@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.40</version>
+	<version>14.0.18.41</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.41* FREEPBX-17953 Alert Info headers getting set twice for chan_sip devices 
 		*14.0.18.40* FREEPBX-15536 Throw strong warning if user creates an outbound route with a single dot dial pattern 
 		*14.0.18.39* FREEPBX-17953 FREEPBX-18336 Alert-Info header issue fixes 
 		*14.0.18.38* Fixing FREEPBX-17953 Alert info headers getting set twice 
