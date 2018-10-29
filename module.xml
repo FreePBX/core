@@ -3,38 +3,39 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.4</version>
+	<version>15.0.3.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.5* Add support for FREEPBX-17871
 		*15.0.3.4* FREEPBX-18490 Fix missing functions
 		*15.0.3.3* Adding back missing functions
 		*15.0.3.2* FREEPBX-17953
 		*15.0.3.1* FREEPBX-18289
-		*15.0.2* Fixing FREEPBX-17953 Alert info headers getting set twice 
-		*15.0.1beta8* fix callback 
-		*15.0.1beta7* FREEPBX-18205 
+		*15.0.2* Fixing FREEPBX-17953 Alert info headers getting set twice
+		*15.0.1beta8* fix callback
+		*15.0.1beta7* FREEPBX-18205
 		*15.0.1beta6* FREEPBX-18176
 		*15.0.1beta5* FREEPBX-18165 pjsip allow reload should be defaulted to yes
 		*15.0.1beta4* FREEPBX-18161
-		*15.0.1beta3* FREEPBX-18016 Trunk inbound Maximum Channels not honored. 
-		*15.0.1beta3* Rest Api 
-		*15.0.1beta2* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard 
-		*15.0.1beta2* FREEPBX-18114 Fix edit of dahdididchannels 
-		*15.0.1beta2* FREEPBX-18016 Improving tool-tip for maximum channel field. 
-		*15.0.1alpha2* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES 
-		*15.0.1alpha2* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers 
-		*15.0.1alpha2* FREEPBX-17754 Bulk handler for virtual extension not working 
-		*15.0.1alpha2* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks 
-		*15.0.1alpha2* FREEPBX-15833 FREEPBX-17630 In-call feature code *1 defined twice 
-		*15.0.1alpha2* FREEPBX-9493 Route Position dropdown menu missing items 
-		*15.0.1alpha2* FREEPBX-16782 Disable PJSIP write out when disabled. 
-		*15.0.1alpha2* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls 
-		*15.0.1alpha2* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID 
-		*15.0.1alpha2* FREEPBX-17253 Inbound Route CID needs Withheld added 
+		*15.0.1beta3* FREEPBX-18016 Trunk inbound Maximum Channels not honored.
+		*15.0.1beta3* Rest Api
+		*15.0.1beta2* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard
+		*15.0.1beta2* FREEPBX-18114 Fix edit of dahdididchannels
+		*15.0.1beta2* FREEPBX-18016 Improving tool-tip for maximum channel field.
+		*15.0.1alpha2* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES
+		*15.0.1alpha2* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers
+		*15.0.1alpha2* FREEPBX-17754 Bulk handler for virtual extension not working
+		*15.0.1alpha2* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks
+		*15.0.1alpha2* FREEPBX-15833 FREEPBX-17630 In-call feature code *1 defined twice
+		*15.0.1alpha2* FREEPBX-9493 Route Position dropdown menu missing items
+		*15.0.1alpha2* FREEPBX-16782 Disable PJSIP write out when disabled.
+		*15.0.1alpha2* FREEPBX-13173 CID Num Alias is used instead of Outbound CID in Follow Me outbound calls
+		*15.0.1alpha2* FREEPBX-17067 Outgoing Faxes from UCP not using Extension's Caller ID
+		*15.0.1alpha2* FREEPBX-17253 Inbound Route CID needs Withheld added
 		*15.0.1alpha2* FREEPBX-16978 Add 'Answer' to inbound routes
 		*15.0.1alpha2* FREEPBX-17157 PJSIP trunk, inbound PAI is not trusted - Add GUI option or set as default
 		*15.0.1alpha2* FREEPBX-16782 Fix disabling registered trunks
