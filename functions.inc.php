@@ -2347,7 +2347,7 @@ function core_do_get_config($engine) {
 	Dialplan\macroConfirm::add($ext);
 	Dialplan\macroAutoConfirm::add($ext);
 	Dialplan\macroAutoBlkvm::add($ext);
-	
+
 	/*
 	;------------------------------------------------------------------------
 	; [sub-pincheck]
@@ -3218,7 +3218,7 @@ function core_do_get_config($engine) {
 	// but only if the vmx state is 'enabled'
 	//
 	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','chknomsg'));
-	
+
 	$ext->add('macro-vm','vmx', '', new ext_set('VM_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "1"]?${DB_RESULT}:${VM_OPTS})}'));
 	$ext->add('macro-vm','vmx', 'chknomsg', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
 	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
@@ -3306,7 +3306,7 @@ function core_do_get_config($engine) {
 
 	// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
 	// reasonable values
-	
+
 	$ext->add('macro-vm','vmx', 'getdest', new ext_set('VMX_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
 	$ext->add('macro-vm','vmx', 'vmxpri', new ext_set('VMX_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
 	$ext->add('macro-vm','vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
@@ -4514,75 +4514,6 @@ function core_routing_formatpattern($pattern) {
 	//
 	$pos = strlen(preg_replace('/(\[[^\]]*\])/','X',$pattern['match_pattern_prefix']));
 	return array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $full_exten, 'base_pattern' => $exten, 'offset' => $pos);
-}
-
-
-
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
-	$sql = "UPDATE `outbound_routes` SET
-	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
-	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
-	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
-	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
-
-	$sth = FreePBX::Database()->prepare($sql);
-	$sth->execute(array(
-		":name" => $name,
-		":outcid" => $outcid,
-		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
-		":password" => $password,
-		":emergency_route" => strtoupper($emergency_route),
-		":intracompany_route" => strtoupper($intracompany_route),
-		":mohclass" => $mohclass,
-		":time_group_id" => $time_group_id,
-		":dest" => $dest,
-		":route_id" => $route_id,
-		":time_mode" => $time_mode,
-		":timezone" => $timezone,
-		":calendar_id" => $calendar_id,
-		":calendar_group_id" => $calendar_group_id
-	));
-
-	core_routing_updatepatterns($route_id, $patterns, true);
-	core_routing_updatetrunks($route_id, $trunks, true);
-	if ($seq != '') {
-		core_routing_setrouteorder($route_id, $seq);
-	}
-}
-
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
-	global $amp_conf;
-	global $db;
-
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
-
-	$sth = FreePBX::Database()->prepare($sql);
-	$sth->execute(array(
-		":name" => $name,
-		":outcid" => $outcid,
-		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
-		":password" => $password,
-		":emergency_route" => strtoupper($emergency_route),
-		":intracompany_route" => strtoupper($intracompany_route),
-		":mohclass" => $mohclass,
-		":time_group_id" => $time_group_id,
-		":dest" => $dest,
-		":time_mode" => $time_mode,
-		":timezone" => $timezone
-	));
-
-	$route_id = FreePBX::Database()->lastInsertId();
-
-	core_routing_updatepatterns($route_id, $patterns);
-	core_routing_updatetrunks($route_id, $trunks);
-	core_routing_setrouteorder($route_id, 'new');
-	// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
-	if ($seq != 'new') {
-		core_routing_setrouteorder($route_id, $seq);
-	}
-
-	return ($route_id);
 }
 
 /* callback to Time Groups Module so it can display usage information
