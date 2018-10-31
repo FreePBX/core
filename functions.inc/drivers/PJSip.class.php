@@ -360,11 +360,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		);
 		$debug = $this->freepbx->Sipsettings->getConfig('pjsip_debug');
 		if($debug) {
-			$transport[$t]['debug'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
+			$conf['pjsip.conf']['global']['debug'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
 		}
 		$debug = $this->freepbx->Sipsettings->getConfig('pjsip_keep_alive_interval');
 		if($debug) {
-			$transport[$t]['keep_alive_interval'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
+			$conf['pjsip.conf']['global']['keep_alive_interval'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
 		}
 		if(!empty($this->_global) && is_array($this->_global)) {
 			foreach($this->_global as $el) {
