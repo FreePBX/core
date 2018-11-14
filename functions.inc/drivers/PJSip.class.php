@@ -1398,12 +1398,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		} else {
 			$dispvars = array(
-				"auth_rejection_permanent" => "on",
+				"auth_rejection_permanent" => "off",
 				"expiration" => 3600,
 				"retry_interval" => 60,
-				"forbidden_retry_interval" => 10,
-				"fatal_retry_interval" => 0,
-				"max_retries" => 10,
+				"forbidden_retry_interval" => 30,
+				"fatal_retry_interval" => 30,
+				"max_retries" => 10000,
 				"context" => "from-pstn",
 				"transport" => null,
 				"codecs" => $sipSettingsCodecs,
