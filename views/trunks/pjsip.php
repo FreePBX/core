@@ -68,7 +68,7 @@ $ast_ge_12 = version_compare(\FreePBX::Config()->get("ASTVERSION"), "13.0", "ge"
 						<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
 					</div>
 					<div class="col-md-9">
-						<input type="password" class="form-control" name="secret" id="secret" value="<?php echo $secret?>"/>
+						<input type="password" class="form-control clicktoedit" name="secret" id="secret" value="<?php echo $secret?>"/>
 					</div>
 				</div>
 			</div>
@@ -1020,10 +1020,12 @@ function checkAuthButtons() {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
 		}
+		$("#secret").removeClass("clicktoedit");
 		$("#username,#secret").val("").prop("readonly", true);
 		$("#registrationnone").click();
 	} else if (a === "inbound" || a === "both") {
 		// Username is not settable, as it is the trunk name that is used for auth
+		$("#secret").addClass("clicktoedit");
 		$("#secret").attr('placeholder', '');
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
@@ -1037,6 +1039,7 @@ function checkAuthButtons() {
 		}
 	} else {
 		// Make sure they're not readonly...
+		$("#secret").addClass("clicktoedit");
 		$("#username,#secret").prop("readonly", false).attr('placeholder', '');
 		// If they had anything previously, put them back.
 		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {
