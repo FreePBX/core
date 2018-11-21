@@ -922,7 +922,7 @@ function is_ext_avail( $extnum ) {
 		return $status;
 	}
 
-	$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum)" );
+	$extstate_result  = get_var( $AGI, "EXTENSION_STATE($extnum@ext-local)" );
 	switch ($extstate_result) {
 		case "NOT_INUSE":
 			$status = 0;
