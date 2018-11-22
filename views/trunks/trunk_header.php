@@ -442,7 +442,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 									</div>
 								</div>
 								<!--END DISABLE TRUNK-->
-								<?php echo $mtfhtml ?>
+								<?php  echo $hookHtml;
+								echo $mtfhtml ?>
 							</div>
 							<div role="tabpanel" id="tdialplan" class="tab-pane">
 								<br/>
