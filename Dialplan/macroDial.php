@@ -37,7 +37,14 @@ class macroDial{
 
         $ext->add($c,$s,'', new \ext_execif('$[("${MOHCLASS}"!="default") & ("${MOHCLASS}"!="")]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 
-        $ext->add($c,$s,'dial', new \ext_agi('dialparties.agi'));
+        $dpdialplan = \FreePBX::Config()->get('DIALPARTIESDIALPLAN');
+        if(!$dpdialplan) {
+          $ext->add($c,$s,'dial', new \ext_agi('dialparties.agi'));
+        } else {
+          $ext->add($c,$s,'dial', new \ext_gosub('1','s','dialparties'));
+        }
+
+        $ext->add($c,$s,'', new \ext_gotoif('$["${MACRODIALGOTO_PRI}"!=""]','${MACRODIALGOTO_PRI}'));
         $ext->add($c,$s,'', new \ext_noop('Returned from dialparties with no extensions to call and DIALSTATUS: ${DIALSTATUS}'));
         $ext->add($c,$s,'', new \ext_macroexit());
 
