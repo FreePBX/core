@@ -165,12 +165,14 @@ class dialparties{
 		$ext->add($c, 's', '', new \ext_setvar('Z', '0'));
 		$ext->add($c, 's', '', new \ext_while('$["${SET(dsvalue=${HASH(DSORDEREDARRAY,${Z})})}" != ""]'));
 		$ext->add($c, 's', '', new \ext_setvar('FILTERED_DIAL','${FILTERED_DIAL}${dsvalue}-'));
+		$ext->add($c, 's', '', new \ext_execif('$["${dsvalue}"!="${FMGRP}"]','Set','FMGL_DIAL=${FMGL_DIAL}${HASH(DSORDEREDARRAYNOREPLACE,${Z})}-'));
 		$ext->add($c, 's', '', new \ext_setvar('Z','${MATH(${Z}+1,int)}'));
 		$ext->add($c, 's', '', new \ext_endwhile(''));
 		$ext->add($c, 's', '', new \ext_execif('$["${FILTERED_DIAL}" != "" & ${REGEX("-$" ${FILTERED_DIAL})}]','Set','FILTERED_DIAL=${FILTERED_DIAL:0:-1}')); //remove trailing -
+		$ext->add($c, 's', '', new \ext_execif('$["${FMGL_DIAL}" != "" & ${REGEX("-$" ${FMGL_DIAL})}]','Set','FMGL_DIAL=${FMGL_DIAL:0:-1}')); //remove trailing -
 
 		$ext->add($c, 's', '', new \ext_noop('Filtered ARG3: ${FILTERED_DIAL}'));
-		$ext->add($c, 's', '', new \ext_setvar('FMGL_DIAL','${FILTERED_DIAL}'));
+		$ext->add($c, 's', '', new \ext_noop('RING ALL V2: ${FMGL_DIAL}'));
 
 		$ext->add($c, 's', '', new \ext_setvar('DSHUNT',''));
 		$ext->add($c, 's', '', new \ext_setvar('HUNT_LOOPS','0'));
@@ -539,6 +541,7 @@ class dialparties{
 		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(DSARRAY,${REALEXT})}" != ""]','inhash'));
 		$ext->add($c, 's', '', new \ext_setvar('HASH(DSARRAY,${REALEXT})', '1')); // could be dial string i suppose but currently only using for duplicate check
 		$ext->add($c, 's', '', new \ext_setvar('HASH(DSORDEREDARRAY,${I})', '${REALEXT}'));
+		$ext->add($c, 's', '', new \ext_setvar('HASH(DSORDEREDARRAYNOREPLACE,${I})', '${workingext}'));
 		$ext->add($c, 's', '', new \ext_gosub('1','s','dialparties-getdialstring'));
 		self::getDialString($ext);
 
@@ -584,7 +587,7 @@ class dialparties{
 		// that were set.
 		//
 		$ext->add($c, 's', '', new \ext_setvar('workingext', '${REPLACE(workingext,#,)}'));
-		$ext->add($c, 's', '', new \ext_execif('$["${USE_CONFIRMATION}"="FALSE"]','Set','DIALSTRING=Local/${workingext}@from-internal/n','Set','DIALSTRING=Local/RG-${RINGGROUP_INDEX}*-${workingext}#@from-internal'));
+		$ext->add($c, 's', '', new \ext_execif('$["${USE_CONFIRMATION}"="FALSE"]','Set','DIALSTRING=Local/${workingext}@from-internal/n&','Set','DIALSTRING=Local/RG-${RINGGROUP_INDEX}*-${workingext}#@from-internal&'));
 		$ext->add($c, 's', '', new \ext_noop('Built External dialstring component for ${workingext}: ${DIALSTRING}'));
 		$ext->add($c, 's', '', new \ext_return());
 
