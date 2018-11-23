@@ -634,7 +634,7 @@ class dialparties{
 		$ext->add($c, 'check1', '', new \ext_gotoif('$["${EXTHASCFU}"="1" & "${EXTSTATESTATUS}" != "4"]','check1-1,1'));
 		$ext->add($c, 'check1', '', new \ext_gotoif('$["${EXTHASCW}"="0" & "${EXTHASCFB}"="1"]','check1-2,1'));
 		// -1 means couldn't read status usually due to missing HINT
-		$ext->add($c, 'check1', '', new \ext_gotoif('$["${EXTSTATESTATUS}" > "0"]','check1-3,1'));
+		$ext->add($c, 'check1', '', new \ext_gotoif('$["${EXTSTATESTATUS}" < "0"]','check1-3,1'));
 		$ext->add($c, 'check1', '', new \ext_goto('s,return'));
 
 		// If part of a ring group, then just do what CF does, otherwise needs to
@@ -688,9 +688,12 @@ class dialparties{
 		$ext->add($c, 'check1-2-1-2', '', new \ext_setvar('__DIVERSION_REASON','user-busy'));
 		$ext->add($c, 'check1-2-1-2', '', new \ext_goto('s,return'));
 
-		$ext->add($c, 'check1-2-2','', new \ext_noop('Extension ${workingext} is not available to be called'));
+		$ext->add($c, 'check1-2-2', '', new \ext_noop('Extension ${workingext} is not available to be called'));
 		$ext->add($c, 'check1-2-2', '', new \ext_setvar('workingext',''));
 		$ext->add($c, 'check1-2-2', '', new \ext_goto('s,return'));
+
+		$ext->add($c, 'check1-3', '', new \ext_noop('ExtensionState for ${workingext} could not be read...assuming ok'));
+		$ext->add($c, 'check1-3', '', new \ext_goto('s,return'));
 
 		$ext->add($c, 'check2', '', new \ext_gotoif('$["${EXTSTATESTATUS}">"0" & "${EXTSTATESTATUS}" != "4"]','check2-1,1'));
 		$ext->add($c, 'check2', '', new \ext_goto('s,return'));

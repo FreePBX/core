@@ -756,7 +756,7 @@ if (!strlen($ds)) {
 		$ds .= ',' . $dialopts; // pound to transfer, provide ringing
 		$AGI->set_variable('ds',$ds);
 		$AGI->set_variable("HuntMembers",$loops);
-		$AGI->set_variable("GOTO_PRI","huntdial"); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
+		$AGI->set_variable("MACRODIALGOTO_PRI","huntdial"); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
 	} else {
 		$ds .= ',';
 		if ($timer) {
@@ -778,7 +778,7 @@ if (!strlen($ds)) {
 			}
 		}
 		$AGI->set_variable('ds',$ds);
-		$AGI->set_variable("GOTO_PRI","normdial"); // dial command was at priority 10
+		$AGI->set_variable("MACRODIALGOTO_PRI","normdial"); // dial command was at priority 10
 	}
 }
 
