@@ -1767,7 +1767,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return $sth->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	public function getTrunkTrunkNameByID() {
+	public function getTrunkTrunkNameByID($trunknum) {
 		$name = "SELECT `name` FROM `trunks` WHERE `trunkid` = ?";
 		$sth = $this->database->prepare($name);
 		$sth->execute(array($trunknum));
