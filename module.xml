@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.48</version>
+	<version>13.0.122.49</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.49* FREEPBX-18591 Disabled Option Allows Input 
 		*13.0.122.48* FREEPBX-15536 Throw strong warning if user creates an outbound route with a single dot dial pattern 
 		*13.0.122.47* FREEPBX-17953 FREEPBX-18336 Alert-Info header issue fixes 
 		*13.0.122.46* Fixing FREEPBX-17953 Alert info headers getting set twice 
