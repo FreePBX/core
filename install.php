@@ -117,6 +117,22 @@ $globals_convert['TRUNK_OPTIONS'] = 'T';
 $globals_convert['RINGTIMER'] = '15';
 $globals_convert['TONEZONE'] = 'us';
 
+// DIALPARTIESDIALPLAN
+//
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Use Dialparties Dialplan';
+$set['description'] = "EXPERIMENTAL: If you have choppy/glitchy audio switching this on will make the PBX use Dialparties Dialplan instead of launching an AGI on every call";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('DIALPARTIESDIALPLAN',$set);
+
 // OUTBOUND_CID_UPDATE
 //
 $set['value'] = true;
