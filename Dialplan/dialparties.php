@@ -238,6 +238,7 @@ class dialparties{
 		$ext->add($c, 's', '', new \ext_clearhash('DSARRAY'));
 		$ext->add($c, 's', '', new \ext_clearhash('dialparties_FMFMLIST'));
 		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXTLIST'));
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXT_HUNT'));
 
 		$ext->add($c, 's', '', new \ext_setvar('ds','${HASH(dialparties,FINALDS)}'));
 		$ext->add($c, 's', '', new \ext_setvar('TIMEOUT','${HASH(dialparties,TIMER)}'));
@@ -287,7 +288,7 @@ class dialparties{
 		$ext->add($c, 'hunt', '', new \ext_sethash('dialparties','FINALDS',','));
 		$ext->add($c, 'hunt', '', new \ext_execif('$["${HASH(dialparties,TIMER)}"!=""]','Set','HASH(dialparties,FINALDS)=${HASH(dialparties,FINALDS)}${HASH(dialparties,TIMER)}'));
 		$ext->add($c, 'hunt', '', new \ext_sethash('dialparties','FINALDS','${HASH(dialparties,FINALDS)},${DIALOPTS}'));
-		$ext->add($c, 'hunt', '', new \ext_setvar("HuntMembers",'${LOOPS}'));
+		$ext->add($c, 'hunt', '', new \ext_setvar("HuntMembers",'${HASH(dialparties,HUNT_LOOPS)}'));
 		$ext->add($c, 'hunt', '', new \ext_setvar("MACRODIALGOTO_PRI","huntdial")); // dial command was at priority 20 where dialplan handles calling a ringgroup with strategy of "hunt" or "MemoryHunt"
 		$ext->add($c, 'hunt', '', new \ext_return());
 
@@ -301,7 +302,7 @@ class dialparties{
 		$ext->add($c, 'nohunt', '', new \ext_return());
 
 		$ext->add($c, 'useconfirmation', '', new \ext_setvar('__RG_IDX','${HASH(dialparties,RINGGROUP_INDEX)}'));
-		$ext->add($c, 'useconfirmation', '', new \ext_execif('$["${CIDNUM}"!=""]','Set','__CALLCONFIRMCID=${HASH(dialparties,CIDNUM)}','Set','__CALLCONFIRMCID=999'));
+		$ext->add($c, 'useconfirmation', '', new \ext_execif('$["${HASH(dialparties,CIDNUM)}"!=""]','Set','__CALLCONFIRMCID=${HASH(dialparties,CIDNUM)}','Set','__CALLCONFIRMCID=999'));
 		$ext->add($c, 'useconfirmation', '', new \ext_goto('nohunt,nohuntend'));
 	}
 
@@ -331,7 +332,7 @@ class dialparties{
 		$ext->add($c, 's', '', new \ext_setvar('_FMGRPTIME','${HASH(dialparties,FMGRP_GRPTIME)}'));
 		$ext->add($c, 's', '', new \ext_execif('$["${HASH(dialparties,RECALL_MASTERMODE)}" = "ringallv2"]','Set','_FMPRIME=FALSE','Set','_FMPRIME=TRUE'));
 
-		$ext->add($c, 's', '', new \ext_noop('FMUNIQUE: ${FMUNIQUE}, FMRERING: ${FMPRERING}, FMREALPRERING: ${FMREALPRERING}, FMGRPTIME: ${HFMGRPTIME}'));
+		$ext->add($c, 's', '', new \ext_noop('FMUNIQUE: ${FMUNIQUE}, FMRERING: ${FMPRERING}, FMREALPRERING: ${FMREALPRERING}, FMGRPTIME: ${FMGRPTIME}'));
 
 		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties,USE_CONFIRMATION)}"!="FALSE"]','useconfirmation,1'));
 		$ext->add($c, 's', '', new \ext_return());
@@ -362,70 +363,91 @@ class dialparties{
 		$ext->add($c, 's', 'endblkvm', new \ext_return());
 	}
 
+	static function buildDSHuntShuffle($ext) {
+		$c = 'dialparties-builddshunt-shuffle'; // Context
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		$ext->add($c, 's', '', new \ext_while('$["${SET(HASH(dialparties,workingext)=${HASH(dialparties_EXTLIST,${I})})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_setvar('rand','${RAND(0,5000)}'));
+		$ext->add($c, 's', '', new \ext_while('$["${HASH(dialparties_EXTLISTRAND,${HASH(dialparties,workingext)}:${rand})}"!=""]'));
+		$ext->add($c, 's', '', new \ext_setvar('rand','${RAND(0,5000)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_EXTLISTRAND','${HASH(dialparties,workingext)}:${rand}','${HASH(dialparties,workingext)}'));
+		$ext->add($c, 's', '', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXTLIST'));
+		$ext->add($c, 's', '', new \ext_set('dialparties_EXTLISTRANDKEYS', '${SORT(${HASHKEYS(dialparties_EXTLISTRAND)})}'));
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		$ext->add($c, 's', '', new \ext_while('$["${SET(dialparties_EXTLISTRANDKEY=${SHIFT(dialparties_EXTLISTRANDKEYS)})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_EXTLIST','${I}','${dialparties_EXTLISTRANDKEY}'));
+		$ext->add($c, 's', '', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXTLISTRAND'));
+		$ext->add($c, 's', '', new \ext_return());
+	}
+
 	static function buildDSHunt($ext) {
 		$c = 'dialparties-builddshunt'; // Context
-		$ext->add($c, 's', '', new \ext_return());
-		/*
-		if ($cidnum) {
-				$AGI->set_variable('CALLTRACE_HUNT',$cidnum);
-			}
-			// Treatment of random strategy
-			if ($rgmethod == "random") {
-				shuffle($extarray);	   // shuffle the array
-			}
-			foreach ($extarray as $k ) {
-				// we loop through the original array to get the extensions in order of importance
-				if (isset($ext_hunt[$k]) && $ext_hunt[$k]) {
-					//If the original array is included in the extension hash then set variables
-					$myhuntmember="HuntMember"."$loops";
-					if (($rgmethod == "hunt") || ($rgmethod == "random") || ($rgmethod == "firstavailable") || ($rgmethod == "firstnotonphone")) { //added condition for random strategy
-						$AGI->set_variable($myhuntmember,$ext_hunt[$k]);
-					} elseif ($rgmethod == "memoryhunt") {
-						if ($loops==0) {
-							$dshunt =$ext_hunt[$k];
-						} else {
-							$dshunt .='&'.$ext_hunt[$k];
-						}
-						$AGI->set_variable($myhuntmember,$dshunt);
-					}
-					$loops += 1;
-				}
-			}
-			*/
+		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties,CIDNUM)}"=""]','return'));
+		$ext->add($c, 's', '', new \ext_setvar('DB(CALLTRACE/${HASH(dialparties,workingext)})})','${HASH(dialparties,CIDNUM)}'));
+		// Treatment of random strategy
+		$ext->add($c, 's', '', new \ext_gosubif('$["${HASH(dialparties,RGMETHOD)}"="random"]','dialparties-builddshunt-shuffle,s,1'));
+		self::buildDSHuntShuffle($ext);
+
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		// we loop through the original array to get the extensions in order of importance
+		$ext->add($c, 's', '', new \ext_while('$["${SET(HASH(dialparties,workingext)=${HASH(dialparties_EXTLIST,${I})})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties_EXT_HUNT,${HASH(dialparties,workingext)})}"=""]','next'));
+		//If the original array is included in the extension hash then set variables
+		$ext->add($c, 's', '', new \ext_sethash('dialparties','myhuntmember','HuntMember${HASH(dialparties,HUNT_LOOPS)}'));
+		$ext->add($c, 's', '', new \ext_gotoif('$[$["${HASH(dialparties,RGMETHOD)}"="hunt" | "${HASH(dialparties,RGMETHOD)}"="random" | "${HASH(dialparties,RGMETHOD)}"="firstavailable" | "${HASH(dialparties,RGMETHOD)}"="firstnotonphone"] = 0]','memoryhunt'));
+		$ext->add($c, 's', '', new \ext_setvar('${HASH(dialparties,myhuntmember)}','${HASH(dialparties_EXT_HUNT,${HASH(dialparties,workingext)})}'));
+		$ext->add($c, 's', '', new \ext_goto('increaseloopcount'));
+		$ext->add($c, 's', 'memoryhunt', new \ext_gotoif('$["${HASH(dialparties,RGMETHOD)}"!="memoryhunt"]','increaseloopcount'));
+		$ext->add($c, 's', '', new \ext_execif('$["${HASH(dialparties,HUNT_LOOPS)}"="0"]','Set','HASH(dialparties,DSHUNT)=${HASH(dialparties_EXT_HUNT,${HASH(dialparties,workingext)})}','Set','HASH(dialparties,DSHUNT)=${HASH(dialparties,DSHUNT)}${HASH(dialparties_EXT_HUNT,${HASH(dialparties,workingext)})}'));
+		$ext->add($c, 's', '', new \ext_setvar('${HASH(dialparties,myhuntmember)}','${HASH(dialparties,DSHUNT)}'));
+
+		$ext->add($c, 's', 'increaseloopcount', new \ext_execif('$["${${HASH(dialparties,myhuntmember)}}" != "" & ${REGEX("&$" ${${HASH(dialparties,myhuntmember)}})}]','Set','${HASH(dialparties,myhuntmember)}=${${HASH(dialparties,myhuntmember)}:0:-1}'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties','HUNT_LOOPS','${MATH(${HASH(dialparties,HUNT_LOOPS)}+1,int)}'));
+		$ext->add($c, 's', 'next', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+
+		$ext->add($c, 's', 'return', new \ext_return());
 	}
 
 	static function firstNotOnPhone($ext) {
 		$c = 'dialparties-firstnotonphone'; // Context
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		$ext->add($c, 's', '', new \ext_setvar('Z', '0'));
+		// we loop through the original array to get the extensions in order of importance
+		$ext->add($c, 's', '', new \ext_while('$["${SET(HASH(dialparties,workingext)=${HASH(dialparties_EXTLIST,${I})})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_gosub('1','s','dialparties-isextavail','${HASH(dialparties,workingext)}'));
+		$ext->add($c, 's', '', new \ext_gotoif('$["${GOSUB_RETVAL}"!="0"]','next'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_EXTENAVAIL','${Z}','${HASH(dialparties,workingext)}'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_DSARRAYNEW','${HASH(dialparties,workingext)}','1'));
+		$ext->add($c, 's', '', new \ext_setvar('Z','${MATH(${Z}+1,int)}'));
+		$ext->add($c, 's', 'next', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+		//now we should append other numbers to this array. incase noting is available !!!
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		$ext->add($c, 's', '', new \ext_while('$["${SET(HASH(dialparties,workingext)=${HASH(dialparties_EXTLIST,${I})})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties_DSARRAYNEW,${HASH(dialparties,workingext)})}"=""]','next1'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_EXTENAVAIL','${I}','${HASH(dialparties,workingext)}'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_DSARRAYNEW','${HASH(dialparties,workingext)}','1'));
+		$ext->add($c, 's', '', new \ext_setvar('Z','${MATH(${Z}+1,int)}'));
+		$ext->add($c, 's', 'next1', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+
+		//dialparties_EXTLIST
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXTLIST'));
+		$ext->add($c, 's', '', new \ext_setvar('I', '0'));
+		$ext->add($c, 's', '', new \ext_while('$["${SET(HASH(dialparties,workingext)=${HASH(dialparties_EXTENAVAIL,${I})})}" != ""]'));
+		$ext->add($c, 's', '', new \ext_sethash('dialparties_EXTENAVAIL','${I}','${HASH(dialparties,workingext)}'));
+		$ext->add($c, 's', 'next2', new \ext_setvar('I','${MATH(${I}+1,int)}'));
+		$ext->add($c, 's', '', new \ext_endwhile());
+
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_EXTENAVAIL'));
+		$ext->add($c, 's', '', new \ext_clearhash('dialparties_DSARRAYNEW'));
 		$ext->add($c, 's', '', new \ext_return());
-		/*
-				foreach($ext as $k){
-			$status = is_ext_avail($k);
-			if($status == 0){ // taking only the available extensions first
-				$extenavail[]= $k;
-				$dsarraynew[$k] = 1;
-			}
-		}
-		debug("ONLY available extensions ".print_r($extenavail,true), 3);
-	//now we should append other numbers to this array. incase noting is available !!!
-		foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier
-			if(!in_array($key,$extenavail)){
-				$extenavail[] = $key;
-				$dsarraynew[$key] = $k;
-			}
-		}
-		unset($ext);
-		unset($dsarray);
-		$dsarray = $dsarraynew; // reassigning the filtered array
-		$ext =  $extenavil;
-		foreach($extenavail as $filtred){
-			if(in_array($filtred.'#',$extarray)){
-				$extarraynew[] = $filtred.'#';
-			}else{
-				$extarraynew[] = $filtred;
-			}
-		}
-		$extarray = $extarraynew;
-		*/
 	}
 
 	static function isExtAvail($ext) {
@@ -559,32 +581,24 @@ class dialparties{
 
 		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties,DIALSTRING)}" = ""]','updatecallerid'));
 		$ext->add($c, 's', '', new \ext_sethash('dialparties','FINALDS','${HASH(dialparties,FINALDS)}${HASH(dialparties,DIALSTRING)}'));
-		$ext->add($c, 's', 'updatecallerid', new \ext_noop('TODO: CALL TRACE'));
-		/* TODO: Add Caller ID Call Trace Application
-		// Update Caller ID for calltrace application
-			if ((substr($k,-1)!='#') && (($rgmethod != "hunt") && ($rgmethod != "random") && ($rgmethod != "memoryhunt") && ($rgmethod != "firstavailable") && ($rgmethod != "firstnotonphone")) ) { //added condition for random strategy
-				if ( isset($cidnum) && is_numeric($cidnum) ) {
-					$rc = $AGI->database_put('CALLTRACE', $k, $cidnum);
-					if ($rc['result'] == 1) {
-						debug("dbset CALLTRACE/$k to $cidnum", 3);
-					} else {
-						debug("Failed to DbSet CALLTRACE/$k to $cidnum ({$rc['result']})", 1);
-					}
-				} else {
-					// We don't care about retval, this key may not exist
-					$AGI->database_del('CALLTRACE', $k);
-					debug("DbDel CALLTRACE/$k - Caller ID is not defined", 3);
-				}
-			} else {
-				$ext_hunt[$k]=$extds; // Need to have the extension HASH set with technology for hunt group ring
-			}
-		*/
+		$ext->add($c, 's', 'updatecallerid', new \ext_gosub('1','s','dialparties-call-trace'));
+		self::generateCallTrace($ext);
+
 		$ext->add($c, 's', '', new \ext_goto('next'));
 
 		$ext->add($c, 's', 'inhash', new \ext_noop('${HASH(dialparties,REALEXT)} already in the dialstring, ignoring duplicate'));
 		$ext->add($c, 's', 'next', new \ext_setvar('I','${MATH(${I}+1,int)}'));
 		$ext->add($c, 's', '', new \ext_endwhile(''));
 		$ext->add($c, 's', 'exit', new \ext_return());
+	}
+
+	static function generateCallTrace($ext) {
+		$c = 'dialparties-call-trace';
+		$ext->add($c, 's', '', new \ext_gotoif('$["${REGEX("#$" ${HASH(dialparties,workingext)})}" = "0" && $["${HASH(dialparties,RGMETHOD)}"="hunt" | "${HASH(dialparties,RGMETHOD)}"="random" | "${HASH(dialparties,RGMETHOD)}"="memoryhunt" | "${HASH(dialparties,RGMETHOD)}"="firstavailable" | "${HASH(dialparties,RGMETHOD)}"="firstnotonphone"]]','notrace'));
+		$ext->add($c, 's', '', new \ext_execif('$["${HASH(dialparties,CIDNUM)}"!=""]','Set','DB(CALLTRACE/${HASH(dialparties,workingext)})})=${HASH(dialparties,CIDNUM)}','Noop','DbDel CALLTRACE/${HASH(dialparties,workingext)} - Caller ID is not defined. ${DB_DELETE(CALLTRACE/${HASH(dialparties,workingext)})}'));
+		$ext->add($c, 's', '', new \ext_goto('return'));
+		$ext->add($c, 's', 'notrace', new \ext_sethash('dialparties_EXT_HUNT','${HASH(dialparties,workingext)}','${HASH(dialparties,DIALSTRING)}'));
+		$ext->add($c, 's', 'return', new \ext_return());
 	}
 
 	static function getDialString($ext) {
