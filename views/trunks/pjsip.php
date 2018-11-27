@@ -1171,10 +1171,12 @@ function checkAuthButtons() {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
 		}
+		$("#secret").removeClass("clicktoedit");
 		$("#username,#secret").val("").prop("readonly", true);
 		$("#registrationnone").click();
 	} else if (a === "inbound" || a === "both") {
 		// Username is not settable, as it is the trunk name that is used for auth
+		$("#secret").addClass("clicktoedit");
 		$("#secret").attr('placeholder', '');
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
@@ -1188,6 +1190,7 @@ function checkAuthButtons() {
 		}
 	} else {
 		// Make sure they're not readonly...
+		$("#secret").addClass("clicktoedit");
 		$("#username,#secret").prop("readonly", false).attr('placeholder', '');
 		// If they had anything previously, put them back.
 		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {

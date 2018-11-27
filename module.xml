@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.6</version>
+	<version>15.0.3.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.7* FREEPBX-18591 Disabled Option Allows Input 
 		*15.0.3.6* FREEPBX-18495
 		*15.0.3.5* Add support for FREEPBX-17871
 		*15.0.3.4* FREEPBX-18490 Fix missing functions
