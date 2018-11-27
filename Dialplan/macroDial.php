@@ -63,7 +63,7 @@ class macroDial{
 
         //Hunt Groups
         $ext->add($c,$s,'huntdial', new \ext_noop('Returned from dialparties with ${HuntMembers} hunt members to dial'));
-        $ext->add($c,$s,'', new \ext_set('HuntLoop', (string) '0')); // String zeros, to avoid php getting confused.
+        $ext->add($c,$s,'', new \ext_set('HuntLoop', (string)'0')); // String zeros, to avoid php getting confused.
         $ext->add($c,$s,'', new \ext_execif('$[${LEN(${HuntMembers})}=0]', 'Set', 'HuntMembers=0')); //make sure HuntMembers isnt set to null
         $ext->add($c,$s,'a22', new \ext_gotoif('$[${HuntMembers} >= 1]', 'a30')); // if this is from rg-group, don't strip prefix
         $ext->add($c,$s,'huntnoanswer', new \ext_noop('Returning as there are no members left in the hunt group to ring'));
@@ -91,11 +91,11 @@ class macroDial{
         $ext->add($c,$s,'hsdialapp', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
         $ext->add($c,$s,'', new \ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
         $ext->add($c,$s,'', new \ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
-        $ext->add($c,$s,'', new \ext_gotoif('$[$["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]] & $[$["${DIALSTATUS}" != "CHANUNAVAIL"] & $["${DIALSTATUS}" != "CONGESTION"]]', 'huntreset', 'a46'));
+        $ext->add($c,$s,'', new \ext_gotoif('$[$["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]] & $[$["${DIALSTATUS}" != "CHANUNAVAIL"] & $["${DIALSTATUS}" != "CONGESTION"]]]', 'huntreset', 'a46'));
         $ext->add($c,$s,'huntreset', new \ext_set('HuntMembers', (string) '1')); // String zeros.
         $ext->add($c,$s,'a46', new \ext_set('HuntMembers', '$[${HuntMembers} - 1]'));
         $ext->add($c,$s,'', new \ext_goto('a22', 's'));
-        $ext->add($c,$s,'a50', new \ext_noop('Deleting: CALLTRACE/${CT_EXTEN} ${DB_DELETE(CALLTRACE/${CT_EXTEN})}'));
+        $ext->add($c,$s,'a50', new \ext_execif('$["${CT_EXTEN}"!=""]','Noop','Deleting: CALLTRACE/${CT_EXTEN} ${DB_DELETE(CALLTRACE/${CT_EXTEN})}'));
         $ext->add($c,$s,'', new \ext_goto('huntstart', 's'));
 
         $s = 'NOANSWER';
