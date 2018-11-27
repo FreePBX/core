@@ -17,7 +17,7 @@ $ext->add($c,$e,'', new ext_return());
 
 $c = 'func-apply-sipheaders';
 
-$ext->add($c,$e,'', new ext_noop('Applying SIP Headers to channel'));
+$ext->add($c,$e,'', new ext_noop('Applying SIP Headers to channel ${ARG1}'));
 $ext->add($c,$e,'', new ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
 $ext->add($c,$e,'', new ext_execif('$["${HASH(SIPHEADERS,Alert-Info)}" = "unset"]', 'Set', 'Rheader=1'));
 $ext->add($c,$e,'', new ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));
