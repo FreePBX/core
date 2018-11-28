@@ -3576,6 +3576,26 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 			return false;
 		}
+		// executes after the command finishes
+		if($debug) {
+			$this->writeln(_("Stopping Core FastAGI Server"));
+		}
+
+		$this->pm2->stop("core-fastagi");
+
+		$data = $this->pm2->getStatus("core-fastagi");
+		if (empty($data) || $data['pm2_env']['status'] != 'online') {
+			if($debug) {
+				$this->writeln(_("Stopped FastAGI Server"));
+			}
+		} else {
+			if($debug) {
+				$this->writeln("<error>".sprintf(_("FastAGI Server Failed: %s")."</error>",$process->getErrorOutput()));
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

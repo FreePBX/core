@@ -1,84 +1,50 @@
 const net = require('net');
-const {spawn} = require('child_process');
+const carrier = require('./lib/carrier.js');
+const AGI = require('./lib/AGI.js');
 
-process.env.ASTAGIDIR = '/var/lib/asterisk/agi-bin';
-
-//agi://127.0.0.1/dialparties.agi
+process.env.ASTAGIDIR = process.env.ASTAGIDIR ? process.env.ASTAGIDIR : '/var/lib/asterisk/agi-bin';
 
 process.chdir(process.env.ASTAGIDIR);
 
 const server = net.createServer((sock) => {
-	let child = null;
-	let exited = false;
 	let init = false;
-	let initCount = 0
 	let settings = {};
-	let initBuffer = [];
-	let args = [];
-	let threadid = sock.remotePort;
-	console.log(`[${threadid}] Asterisk connection opened`);
+	let agi = null;
+	let port = sock.remotePort;
+	console.log(`[${port}] Asterisk connection opened`);
 
-	sock.on('data', (data) => {
-		var utf8 = data.toString('utf8');
+	carrier.carry(sock, function(line) {
+		if(!line.length) { //line is blank (technically two newlines)
+			init = true;
+			settings.agi_ASTAGIDIR = process.env.ASTAGIDIR;
+			settings.agi_port = port;
+			agi = new AGI(settings);
+			agi.on('exit',(code, signal) => {
+				sock.end();
+			})
+			agi.on('data',(data) => {
+				sock.write(data.toString('utf8'));
+			})
+			return;
+		}
 		if(!init) {
-			console.log(`[${threadid}] Gathering settings...`);
-			initBuffer.push(utf8);
-
-			utf8.split("\n").forEach(setting => {
-				if(!setting.trim().length) {
-					return;
-				}
-				let s = setting.split(":").map((item) => {
-					return item.trim();
-				});
-				settings[s[0]] = s[1];
+			let s = line.split(":").map((item) => {
+				return item.trim();
 			});
-
-			if(initCount > 2) {
-				console.log(initBuffer);
-			}
-
-			initCount++;
-
-			if(data.toString('utf8').slice(-2) === '\n\n') {
-				console.log(`[${threadid}] Finished gathering settings`);
-				console.log(settings);
-				let i = 1;
-				while(typeof settings['agi_arg_'+i] !== "undefined") {
-					args.push(settings['agi_arg_'+i]);
-					i++;
-				}
-				console.log(`[${threadid}] Launching ${settings.agi_network_script} with args ${args.join(',')}`);
-				child = spawn(`./${settings.agi_network_script}`, args, {cwd: process.env.ASTAGIDIR});
-				child.stdout.on('data', function(data){
-					console.log(`[${threadid}][${settings.agi_uniqueid}] <<< ${data.toString('utf8').trim()}`);
-					sock.write(data.toString('utf8'));
-				});
-
-				child.on('exit',(code, signal) => {
-					console.log(`[${threadid}] Script ended with code ${code}`);
-					sock.end();
-					exited = true;
-				});
-				init = true;
-				initBuffer.forEach((b) => {
-					child.stdin.write(b);
-				});
-			}
-		} else if(!exited) {
-			console.log(`[${threadid}][${settings.agi_uniqueid}] >>> ${data.toString('utf8').trim()}`);
-			child.stdin.write(data.toString('utf8'));
+			settings[s[0]] = s[1];
 		} else {
-			console.log(`[${threadid}][${settings.agi_uniqueid}] >>> ${data.toString('utf8').trim()} !!! Exited`);
+			agi.scriptStdin(line)
 		}
 	});
-
 	sock.on('close', () => {
-		console.log(`[${threadid}] Asterisk connection closed`);
+		agi = null
+		delete(agi)
+		console.log(`[${port}] Asterisk connection closed`);
 	});
 	sock.on('error', (err) => {
-		console.log(`[${threadid}] Asterisk connection error: ${err.message}`);
+		console.log(`[${port}] Asterisk connection error: ${err.message}`);
 	});
 });
 
 server.listen(4573, 'localhost');
+console.log(`FastAGI Server is ready to process calls`);
