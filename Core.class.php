@@ -686,25 +686,21 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 			break;
 			case 'getnpanxxjson':
-				try {
-					$npa = $request['npa'];
-					$nxx = $request['nxx'];
-					$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
-					$request->curl_opts[CURLOPT_FOLLOWLOCATION] = true;
-					$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
-					$xml = new \SimpleXMLElement($data);
-					$pfdata = $xml->xpath('//lca-data/prefix');
-					$retdata = array();
-					foreach($pfdata as $item){
-						$inpa = (string)$item->npa;
-						$inxx = (string)$item->nxx;
-						$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
-					}
-					return $retdata;
-
-				}catch(Pest_NotFound $e){
-					return array('error' => $e);
+				$npa = $request['npa'];
+				$nxx = $request['nxx'];
+				$data = $this->freepbx->Curl->get('http://www.localcallingguide.com/xmllocalprefix.php?npa='.$npa.'&nxx='.$nxx);
+				if(!$data->success || $data->status_code != 200) {
+					return array('error' => 'Error getting data');
 				}
+				$xml = new \SimpleXMLElement($data->body);
+				$pfdata = $xml->xpath('//lca-data/prefix');
+				$retdata = array();
+				foreach($pfdata as $item){
+					$inpa = (string)$item->npa;
+					$inxx = (string)$item->nxx;
+					$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
+				}
+				return $retdata;
 			break;
 			case 'populatenpanxx':
 				$dialpattern_array = $dialpattern_insert;
