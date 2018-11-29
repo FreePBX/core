@@ -10,6 +10,8 @@ if(!empty($mode)) {
 	$display_mode = $mode;
 }
 
+$quickCreateDisplay = \FreePBX::Core()->getQuickCreateDisplay();
+
 if($display_mode == "basic") { ?>
 	<div class="fpbx-container container-fluid">
 		<div class="row">
@@ -167,7 +169,7 @@ if($display_mode == "basic") { ?>
 						</div>
 					</div>
 
-					<div class="modal fade paged" id="quickCreate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-pages="<?php echo count(FreePBX::Core()->getQuickCreateDisplay())?>" data-currentpage="1">
+					<div class="modal fade paged" id="quickCreate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-pages="<?php echo count($quickCreateDisplay)?>" data-currentpage="1">
 						<form>
 							<div class="modal-dialog">
 								<div class="modal-content">
@@ -177,7 +179,7 @@ if($display_mode == "basic") { ?>
 									</div>
 									<div class="modal-body swMain" id="wizard">
 										<ul>
-											<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+											<?php foreach($quickCreateDisplay as $page => $data) {?>
 												<li>
 													<a href="#step-<?php echo $page +1?>">
 														<label class="stepNumber"><?php echo $page +1?></label>
@@ -188,7 +190,7 @@ if($display_mode == "basic") { ?>
 												</li>
 											<?php } ?>
 										</ul>
-											<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+											<?php foreach($quickCreateDisplay as $page => $data) {?>
 												<div id="step-<?php echo $page +1?>">
 														<div class="fpbx-container">
 															<h2 class="StepTitle">Step <?php echo $page +1?></h2>
@@ -219,7 +221,7 @@ if($display_mode == "basic") { ?>
 		$('#wizard').smartWizard({
 			keyNavigation: false,
 			onLeaveStep: function(obj, context) {
-				<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+				<?php foreach($quickCreateDisplay as $page => $data) {?>
 					if(context.fromStep == <?php echo $page + 1?>) {
 						<?php foreach($data as $pageDisplay) { ?>
 							<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
@@ -229,7 +231,7 @@ if($display_mode == "basic") { ?>
 				return true;
 			},
 			onFinish: function(obj, context) {
-				<?php foreach(FreePBX::Core()->getQuickCreateDisplay() as $page => $data) {?>
+				<?php foreach($quickCreateDisplay as $page => $data) {?>
 					<?php foreach($data as $pageDisplay) { ?>
 						<?php echo !empty($pageDisplay['validate']) ? $pageDisplay['validate'] : ''?>
 					<?php } ?>
