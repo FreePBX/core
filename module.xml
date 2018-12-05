@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.8</version>
+	<version>15.0.3.9</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.9* FREEPBX-18637 Ability to remove usage of dialparties.agi in favor of straight dialplan
 		*15.0.3.8* FREEPBX-18507
 		*15.0.3.7* FREEPBX-18591 Disabled Option Allows Input 
 		*15.0.3.6* FREEPBX-18495
@@ -56,7 +57,7 @@
 		*15.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>15.0.1.11</version>
+		<version>15.0.1.28</version>
 	</depends>
 	<database>
 		<table name="trunks">
