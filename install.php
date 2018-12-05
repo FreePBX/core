@@ -31,7 +31,7 @@ $fcc->setDefault('*12');
 $fcc->update();
 unset($fcc);
 
-global $version;
+$version = $amp_conf["ASTVERSION"];
 if(version_compare($version, "12.5", "<")) {
 	$fcc = new featurecode('core', 'zapbarge');
 	$fcc->setDescription('ZapBarge');
@@ -132,6 +132,20 @@ $set['name'] = 'Launch local AGIs through FastAGI Server';
 $set['description'] = "When enabled all AGI() calls that launch local scripts will instead launch through a FastAGI subprocess. In certain environments this can cause performance improvements. Any AGIs that already called upon agi:// will be unaffected";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('LAUNCH_AGI_AS_FASTAGI',$set);
+
+// DIALPARTIESDIALPLAN
+//
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['name'] = 'Use Dialparties Dialplan';
+$set['description'] = "EXPERIMENTAL: If you have choppy/glitchy audio switching this on will make the PBX use Dialparties Dialplan instead of launching an AGI on every call";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('DIALPARTIESDIALPLAN',$set);
 
 // OUTBOUND_CID_UPDATE
 //

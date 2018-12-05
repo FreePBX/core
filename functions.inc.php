@@ -1166,7 +1166,6 @@ function core_do_get_config($engine) {
 		$fc_userlogoff = $fcc->getCodeActive();
 		unset($fcc);
 
-		global $version;
 		if(version_compare($version, "12.5", "<")) {
 			$fcc = new featurecode($modulename, 'zapbarge');
 			$fc_zapbarge = $fcc->getCodeActive();
@@ -1447,7 +1446,6 @@ function core_do_get_config($engine) {
 
 
 		// zap barge
-		global $version;
 		if (version_compare($version, "12.5", "<") && $fc_zapbarge != '') {
 			$ext->addInclude('from-internal-additional', 'app-zapbarge'); // Add the include from from-internal
 
@@ -3756,6 +3754,7 @@ function core_do_get_config($engine) {
 
 	Dialplan\macroDialone::add($ext);
 	Dialplan\funcSipheaders::add($ext);
+	Dialplan\dialparties::add($ext);
 	break;
 	}
 }
