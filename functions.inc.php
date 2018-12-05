@@ -3754,6 +3754,7 @@ function core_do_get_config($engine) {
 
 	Dialplan\macroDialone::add($ext);
 	Dialplan\funcSipheaders::add($ext);
+	Dialplan\dialparties::add($ext);
 	break;
 	}
 }
