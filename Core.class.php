@@ -3585,6 +3585,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		$data = $this->pm2->getStatus("core-fastagi");
 		if (empty($data) || $data['pm2_env']['status'] != 'online') {
+			$this->pm2->delete("core-fastagi");
 			if($debug) {
 				$this->writeln(_("Stopped FastAGI Server"));
 			}
@@ -3603,6 +3604,22 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 */
 	public function chownFreepbx() {
 
+	}
+
+	public function updateFreePBXSetting($keyword, $value) {
+		if($keyword === 'LAUNCH_AGI_AS_FASTAGI') {
+			if(!empty($value)) {
+				$this->startFreepbx(null, false);
+			} else {
+				$this->stopFreepbx(null, false);
+			}
+		}
+	}
+
+	public function removeFreePBXSetting($keyword) {
+		if($keyword === 'LAUNCH_AGI_AS_FASTAGI') {
+			$this->stopFreepbx(null, false);
+		}
 	}
 
 

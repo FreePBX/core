@@ -254,6 +254,10 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
+		<framework class="Config" namespace="FreePBX">
+			<method callingMethod="updateSetting" class="Core" namespace="FreePBX\modules">updateFreePBXSetting</method>
+			<method callingMethod="removeSetting" class="Core" namespace="FreePBX\modules">removeFreePBXSetting</method>
+		</framework>
 		<framework class="Start" namespace="FreePBX\Console\Command">
 			<method callingMethod="postAsteriskHooks" class="Core" namespace="FreePBX\modules">startFreepbx</method>
 		</framework>
