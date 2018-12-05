@@ -57,7 +57,7 @@
 		*15.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>15.0.1.11</version>
+		<version>15.0.1.28</version>
 	</depends>
 	<database>
 		<table name="trunks">
