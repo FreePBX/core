@@ -1,7 +1,8 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
-class Sip extends \FreePBX\modules\Core\Driver {
+use \FreePBX\modules\Core\Driver as techDriver;
+class Sip extends techDriver {
 	public $version;
 
 	public function __construct($freepbx) {
@@ -148,6 +149,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 	public function addDevice($id, $settings) {
 		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
 		$sth = $this->database->prepare($sql);
+		$settings = is_array($settings)?$settings:array();
 		foreach($settings as $key => $setting) {
 			$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
 		}
@@ -472,8 +474,8 @@ class Sip extends \FreePBX\modules\Core\Driver {
 		$tmparr['dial'] = array('prompttext' => _('Dial'), 'value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('prompttext' => _('Account Code'), 'value' => '', 'tt' => $tt, 'level' => 1);
-		$tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
-		$tmparr['mailbox'] = array('prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2);
+		$tt = _("Mailbox for this device. Leaving 'Override dynamic mailbox assignment' unchecked allows the PBX to dynamically change the mailbox when using Device and User mode and user login and logouts on devices. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('type' => 'textcheck','prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2, 'cblabel' => '<small>'._('Override dynamic mailbox assignment').'</small>', 'disabled_value_is_value' => true, 'checked' => (!empty($deviceInfo['mailbox_override']) && $deviceInfo['mailbox_override'] === 'yes' ? true : false));
 		$tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only change this on devices that may have special needs.");
 		$tmparr['vmexten'] = array('prompttext' => _('Voicemail Extension'), 'value' => '', 'tt' => $tt, 'level' => 1);
 		$tt = _("IP Address range to deny access to, in the form of network/netmask.")." "._("You may add multiple subnets, separate them with an &amp;.");

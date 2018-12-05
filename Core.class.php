@@ -13,7 +13,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	private $deviceCache = array();
 	private $getUserCache = array();
 	private $getDeviceCache = array();
-    private $listUsersCache = array();
+	private $listUsersCache = array();
+	private $devicesGetUserMappings = array();
     private $dahdiChannels = null;
     private $routing = null;
 
@@ -1314,11 +1315,19 @@ class Core extends FreePBX_Helpers implements BMO  {
 					} else {
 						$fields[$keyword] = array("value" => $tech.'/'.$account, "flag" => $flag++);
 					}
-				} elseif ($keyword == 'mailbox' && $data == '') {
-					if($_REQUEST['vm'] == 'enabled') {
-						$fields['mailbox'] = array("value" => $account.'@device', "flag" => $flag++);
+				} elseif ($keyword == 'mailbox_hidden') {
+					if(isset($_REQUEST['devinfo_mailbox_cb']) && $_REQUEST['devinfo_mailbox_cb'] === 'checked' ) {
+						$fields['mailbox'] = array("value" => $_REQUEST['devinfo_mailbox'], "flag" => $flag++);
+						$fields['mailbox_override'] = array("value" => 'yes', "flag" => $flag++);
+					} else {
+						if($_REQUEST['vm'] == 'enabled' && empty($data)) {
+							$fields['mailbox'] = array("value" => $account.'@'.$_REQUEST['vmcontext'], "flag" => $flag++);
+						} else {
+							$fields['mailbox'] = array("value" => $data, "flag" => $flag++);
+						}
+						$fields['mailbox_override'] = array("value" => 'no', "flag" => $flag++);
 					}
-				} elseif ($keyword == 'vmexten' && $data == '') {
+				} elseif (($keyword == 'vmexten' && $data == '') || $keyword == 'mailbox_cb' || $keyword === 'mailbox') {
 					// don't add it
 				} else {
 					$fields[$keyword] = array("value" => $data, "flag" => $flag++);
@@ -1418,7 +1427,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 				"flag" => $flag++
 			),
 			"mailbox" => array(
-				"value" => $number."@device",
+				"value" => $number."@default",
+				"flag" => $flag++
+			),
+			"mailbox_override" => array(
+				"value" => "no",
 				"flag" => $flag++
 			),
 			"account" => array(
@@ -1531,12 +1544,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		} else {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
-		}
-
-		// create a voicemail symlink if needed
-		// TODO: This should be hooked from voicemail
-		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','setupMailboxSymlinks') ) {
-			$this->FreePBX->Voicemail->setupMailboxSymlinks($settings['user']['value']);
 		}
 
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
@@ -2590,7 +2597,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		//if voicemail is enabled, set the box@context to use
-		//havn't checked but why is voicemail needed on users anyway?  Doesn't exactly make it modular !
 		//TODO use a hook here
 		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','getMailbox') ) {
 			$vmbox = $this->FreePBX->Voicemail->getMailbox($extension);

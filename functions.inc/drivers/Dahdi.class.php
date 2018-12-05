@@ -1,7 +1,9 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
-class Dahdi extends \FreePBX\modules\Core\Driver {
+use \FreePBX\modules\Core\Driver as techDriver;
+
+class Dahdi extends techDriver {
 	public function getInfo() {
 		return array(
 			"rawName" => "dahdi",
@@ -146,8 +148,8 @@ class Dahdi extends \FreePBX\modules\Core\Driver {
 		$tmparr['namedcallgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_CALLGROUP'), 'tt' => $tt, 'level' => 1);
 		$tt = _("Pickupgroups(s) that this device can pickup calls from, can be one or more alpha/numeric callgroups, e.g. '1,3000-3005,sales,sales2'. Device does not have to be in a group to be able to pickup calls from that group.");
 		$tmparr['namedpickupgroup'] = array('value' => $this->freepbx->Config->get_conf_setting('DEVICE_PICKUPGROUP'), 'tt' => $tt, 'level' => 1);
-		$tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
-		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+		$tt = _("Mailbox for this device. Leaving 'Override dynamic mailbox assignment' unchecked allows the PBX to dynamically change the mailbox when using Device and User mode and user login and logouts on devices. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('type' => 'textcheck','prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2, 'cblabel' => '<small>'._('Override dynamic mailbox assignment').'</small>', 'disabled_value_is_value' => true, 'checked' => (!empty($deviceInfo['mailbox_override']) && $deviceInfo['mailbox_override'] === 'yes' ? true : false));
 		$devopts = $tmparr;
 		return $devopts;
 	}

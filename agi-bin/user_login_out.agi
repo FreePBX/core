@@ -58,12 +58,6 @@ include '/etc/freepbx.conf';
 	}
 	exit;
 
-	/*
-exten => s,n,System(rm -f ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
-exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/voicemail)}/${AMPUSER}/ ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
-*/
-
-
 	// Get the requested action (login or logout)
 	//
 	function get_action() {
@@ -149,7 +143,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 		set_queue_hint($user, $device);
 		$user_event_body = "\"UserDeviceAdded,Data: {$user}\\\\,{$device}\"";
 
-    $agi->exec("UserEvent", $user_event_body);
+		$agi->exec("UserEvent", $user_event_body);
 
 		if ($fm_devstate) {
 			cli_debug("insert_user: Setting FollowMe DEVSTATES for device $device",5);
@@ -170,10 +164,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		$vmcontext = get_voicemail_context($user);
 		if ($vmcontext != 'novm') {
-			exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
-			if ($ret) {
-				cli_debug("Got Return code: $ret trying to: /bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device",5);
-			}
+			update_device_mailbox($device, "{$user}@{$vmcontext}");
 		}
 	}
 
@@ -200,9 +191,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 			$user_event_body = "\"UserDeviceRemoved,Data: {$current_user}\\\\,{$device}\"";
 
-     	$agi->exec("UserEvent", $user_event_body);
+			$agi->exec("UserEvent", $user_event_body);
 
-			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+			update_device_mailbox($device, "");
 
 			cli_debug("Setting device $device states to INVALID before deleting them",5);
 			if ($fm_devstate) {
@@ -226,9 +217,6 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			//
 			//$agi->database_deltree('CustomDevstate','FOLLOWME'.$device);
 			//$agi->database_deltree('CustomDevstate','DEVDND'.$device);
-			if ($ret) {
-				cli_debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
-			}
 			set_device_user($device, 'none');
 		}
 	}
@@ -688,5 +676,62 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			} else {
 				return null;
 			}
+		}
+	}
+
+	function update_device_mailbox($device, $mailbox) {
+		$core = FreePBX::create()->Core;
+		$deviceDetails = $core->getDevice($device);
+
+		$settingType = $deviceDetails['tech'] === 'pjsip' ? 'mailboxes' : 'mailbox';
+		$oldMboxSetting = \FreePBX\modules\Core\Driver::map_dev_user($deviceDetails['account'], $settingType, $deviceDetails['mailbox']);
+
+		try {
+			$tech = ($deviceDetails['tech'] === 'pjsip') ? 'sip' : $deviceDetails['tech'];
+			$sql = "UPDATE `".$tech."` SET `data` = :data WHERE `keyword` = 'mailbox' AND `id` = :id";
+			$sth = \FreePBX::Database()->prepare($sql);
+			$sth->execute(array(":data" => $mailbox, ':id' => $device));
+		} catch(\Exception $e) {
+			cli_debug($e->getMessage(),5);
+			exit();
+		}
+
+		$mboxSetting = \FreePBX\modules\Core\Driver::map_dev_user($deviceDetails['account'], $settingType, $mailbox);
+		dbug($oldMboxSetting);
+		dbug($mboxSetting);
+
+		switch($deviceDetails['tech']) {
+			case "pjsip":
+				$mwisub = !empty($deviceDetails['mwi_subscription']) ? $deviceDetails['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
+				switch($mwisub) {
+					case "solicited":
+						//pjsip.aor.conf
+					break;
+					case "unsolicited":
+						//pjsip.endpoint.conf
+					break;
+					case "auto":
+						//pjsip.aor.conf
+						//pjsip.endpoint.conf
+					break;
+				}
+				exec("asterisk -rx 'module reload res_pjsip.so'");
+			break;
+			case "sip":
+				exec("asterisk -rx 'sip reload'");
+				//sip_additional.conf
+			break;
+			case "dahdi":
+				exec("asterisk -rx 'module reload chan_dahdi.so'");
+				//chan_dahdi.conf
+			break;
+			case "iax":
+			case "iax2":
+				exec("asterisk -rx 'iax2 reload'");
+				//iax_additional.conf
+			break;
+			default:
+				cli_debug("Unable to reload $device because $tech is unknown",5);
+			break;
 		}
 	}

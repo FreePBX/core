@@ -6,6 +6,8 @@ namespace FreePBX\modules\Core;
 abstract class Driver {
 	protected $freepbx;
 	protected $database;
+	protected static $devicesGetUserMappings = [];
+	protected static $removeMailboxSetting = null;
 
 	public function __construct($freepbx) {
 		$this->freepbx = $freepbx;
@@ -89,5 +91,69 @@ abstract class Driver {
 
 	protected function filterValidCodecs($codecs) {
 		return $this->freepbx->Core->filterValidCodecs($codecs);
+	}
+
+
+	// get a mapping of the devices to user description and vmcontext
+	// used for fixed devices when generating tech.conf files to
+	// override some of the mailbox options or remove them if novm
+	//
+	public static function devicesGetUserMappings() {
+		if (!empty(static::$devicesGetUserMappings)) {
+			return static::$devicesGetUserMappings;
+		}
+		$device_list = \FreePBX::Core()->getAllDevicesByType();;
+		foreach ($device_list as $device) {
+			$devices[$device['id']] = $device;
+		}
+		$user_list = \FreePBX::Core()->listUsers(true);
+		foreach ($user_list as $user) {
+			$users[$user[0]]['description'] = $user[1];
+			$users[$user[0]]['vmcontext'] = $user[2];
+		}
+		foreach ($devices as $id => $device) {
+			if ($device['devicetype'] == 'fixed') {
+				$devices[$id]['vmcontext'] = $users[$device['user']]['vmcontext'];
+				$devices[$id]['description'] = $users[$device['user']]['description'];
+			}
+		}
+		static::$devicesGetUserMappings = $devices;
+		return static::$devicesGetUserMappings;
+	}
+
+	// map the actual vmcontext and user devicename if the device is fixed
+	public static function map_dev_user($account, $keyword, $data) {
+		$dev_user_map = static::devicesGetUserMappings();
+		if(is_null(static::$removeMailboxSetting)) {
+			static::$removeMailboxSetting = \FreePBX::Config()->get('DEVICE_REMOVE_MAILBOX');
+		}
+
+		if (!empty($dev_user_map[$account]) && $dev_user_map[$account]['devicetype'] == 'fixed') {
+			switch (strtolower($keyword)) {
+				case 'callerid':
+					$user_option = $dev_user_map[$account]['description'] . ' <' . $account . '>';
+				break;
+				case 'mailboxes':
+				case 'mailbox':
+				if ((empty($dev_user_map[$account]['vmcontext']) || $dev_user_map[$account]['vmcontext'] == 'novm')
+					&& $dev_user_map[$account]['mailbox_override'] === 'no'
+					&& static::$removeMailboxSetting
+				) {
+					// they have no vm so don't put a mailbox=line
+					$user_option = "";
+				} elseif ($dev_user_map[$account]['mailbox_override'] === 'no'
+					&& !empty($dev_user_map[$account]['vmcontext'])
+					&& $dev_user_map[$account]['vmcontext'] != 'novm'
+				) {
+					$user_option = $dev_user_map[$account]['user'] . "@" . $dev_user_map[$account]['vmcontext'];
+				} else {
+					$user_option = $data;
+				}
+			}
+			$output = $keyword . "=" . $user_option . "\n";
+		} else {
+			$output = $keyword . "=" . $data . "\n";
+		}
+		return $output;
 	}
 }

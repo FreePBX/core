@@ -1,7 +1,9 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
-class Iax2 extends \FreePBX\modules\Core\Driver {
+use \FreePBX\modules\Core\Driver as techDriver;
+
+class Iax2 extends techDriver {
 	public function getInfo() {
 		return array(
 			"rawName" => "iax2",
@@ -137,8 +139,8 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 		$tmparr['dial'] = array('value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('value' => '', 'tt' => $tt, 'level' => 1);
-		$tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
-		$tmparr['mailbox'] = array('value' => '', 'tt' => $tt, 'level' => 2);
+		$tt = _("Mailbox for this device. Leaving 'Override dynamic mailbox assignment' unchecked allows the PBX to dynamically change the mailbox when using Device and User mode and user login and logouts on devices. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('type' => 'textcheck','prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2, 'cblabel' => '<small>'._('Override dynamic mailbox assignment').'</small>', 'disabled_value_is_value' => true, 'checked' => (!empty($deviceInfo['mailbox_override']) && $deviceInfo['mailbox_override'] === 'yes' ? true : false));
 		$tt = _("IP Address range to deny access to, in the form of network/netmask.");
 		$tmparr['deny'] = array('value' => '0.0.0.0/0.0.0.0', 'tt' => $tt, 'level' => 1);
 		$tt = _("IP Address range to allow access to, in the form of network/netmask. This can be a very useful security option when dealing with remote extensions that are at a known location (such as a branch office) or within a known ISP range for some home office situations.");
