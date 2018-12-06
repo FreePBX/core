@@ -3,14 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.12</version>
+	<version>15.0.3.13</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*15.0.3.12* Fix xml call
+		*15.0.3.13* Fix xml call
 		*15.0.3.11* Callaccounting changes to core
 		*15.0.3.10* FREEPBX-18703 Launch AGIs through FastAGI NodeJS Process
 		*15.0.3.9* FREEPBX-18637 Ability to remove usage of dialparties.agi in favor of straight dialplan
