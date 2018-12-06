@@ -12,7 +12,7 @@
 	<changelog>
 		*15.0.3.9* FREEPBX-18637 Ability to remove usage of dialparties.agi in favor of straight dialplan
 		*15.0.3.8* FREEPBX-18507
-		*15.0.3.7* FREEPBX-18591 Disabled Option Allows Input 
+		*15.0.3.7* FREEPBX-18591 Disabled Option Allows Input
 		*15.0.3.6* FREEPBX-18495
 		*15.0.3.5* Add support for FREEPBX-17871
 		*15.0.3.4* FREEPBX-18490 Fix missing functions
@@ -254,6 +254,19 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
+		<framework class="Config" namespace="FreePBX">
+			<method callingMethod="updateSetting" class="Core" namespace="FreePBX\modules">updateFreePBXSetting</method>
+			<method callingMethod="removeSetting" class="Core" namespace="FreePBX\modules">removeFreePBXSetting</method>
+		</framework>
+		<framework class="Start" namespace="FreePBX\Console\Command">
+			<method callingMethod="postAsteriskHooks" class="Core" namespace="FreePBX\modules">startFreepbx</method>
+		</framework>
+		<framework class="Stop" namespace="FreePBX\Console\Command">
+			<method callingMethod="preAsteriskHooks" class="Core" namespace="FreePBX\modules">stopFreepbx</method>
+		</framework>
+		<framework class="Chown" namespace="FreePBX\Console\Command">
+			<method callingMethod="fwcChownFiles" class="Core" namespace="FreePBX\modules">chownFreepbx</method>
+		</framework>
 	</hooks>
 	<supported>
 		<version>15.0</version>
