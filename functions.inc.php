@@ -2890,7 +2890,7 @@ function core_do_get_config($engine) {
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
 
 	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
-	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${REALCALLERIDNUM}'));
+	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${CALLERID(name)} <${REALCALLERIDNUM}>'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
 	//FREEPBX-13173 if we are masquerading we need to reset the CID otherwise we will masquerade out as the masquerade
