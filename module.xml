@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.50</version>
+	<version>13.0.122.51</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.51* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name 
 		*13.0.122.50* FREEPBX-18507 Dialed Number Manipulation Rules Wizard fix
 		*13.0.122.49* FREEPBX-18591 Disabled Option Allows Input 
 		*13.0.122.48* FREEPBX-15536 Throw strong warning if user creates an outbound route with a single dot dial pattern 
