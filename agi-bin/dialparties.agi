@@ -831,7 +831,7 @@ function get_dial_string( $agi, $extnum, $use_confirmation, $ringgroup_index ) {
 		if (trim($use_confirmation) == "FALSE") {
 			$dialstring = 'Local/'.$extnum.'@from-internal/n';
 		} else {
-			$dialstring = 'Local/RG-'.$ringgroup_index.'-'.$extnum.'#@from-internal';
+			$dialstring = 'Local/RG-'.$ringgroup_index.'*-'.$extnum.'#@from-internal';
 		}
 		debug("Built External dialstring component for $extnum: $dialstring", 4);
 	} else {
