@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.51</version>
+	<version>13.0.122.52</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.52* FREEPBX-18728 Follow Me with callconfirm doesn't work with external numbers 
 		*13.0.122.51* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name 
 		*13.0.122.50* FREEPBX-18507 Dialed Number Manipulation Rules Wizard fix
 		*13.0.122.49* FREEPBX-18591 Disabled Option Allows Input 
