@@ -1754,7 +1754,7 @@ class Core extends FreePBX_Helpers implements BMO  {
         if (empty($this->routing)) {
             $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
         }
-        return $this->routing->getRoutePattrnsById($route_id);
+        return $this->routing->getRoutePatternsById($route_id);
 	}
 
 	public function getTrunkDialRulesByID($trunkid) {
