@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.14</version>
+	<version>15.0.3.15</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.15* FREEPBX-18745 FREEPBX-18762
 		*15.0.3.14* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name 
 		*15.0.3.13* Fix xml call
 		*15.0.3.11* Callaccounting changes to core
