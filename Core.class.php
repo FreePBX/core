@@ -5,7 +5,6 @@ use FreePBX_Helpers;
 use BMO;
 use PDO;
 use Exception;
-use FreePBX\modules\Core\Components\Dahdichannels;
 //progress bar
 use Symfony\Component\Console\Helper\ProgressBar;
 class Core extends FreePBX_Helpers implements BMO  {
@@ -14,9 +13,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	private $deviceCache = array();
 	private $getUserCache = array();
 	private $getDeviceCache = array();
-    private $listUsersCache = array();
-    private $dahdiChannels = null;
-    private $routing = null;
+	private $listUsersCache = array();
 
 	public function __construct($freepbx = null) {
 		parent::__construct($freepbx);
@@ -27,6 +24,19 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$this->astman = $freepbx->astman;
 		//load drivers
 		$this->loadDrivers();
+	}
+
+	public function __get($var) {
+		switch($var) {
+			case "routing":
+				$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting();
+				return $this->routing;
+			break;
+			case "dahdiChannels":
+				$this->dahdichannels = new \FreePBX\modules\Core\Components\Dahdichannels();
+				return $this->dahdichannels;
+			break;
+		}
 	}
 
 	public function setDatabase($pdo){
@@ -445,6 +455,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			case "delroute":
 			case "getnpanxxjson":
 			case "populatenpanxx":
+			case "updatetrunks":
 				return true;
 			break;
 		}
@@ -452,8 +463,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function ajaxHandler() {
-		$request = freepbxGetSanitizedRequest();
+		$request = $this->getSanitizedRequest();
 		switch($request['command']) {
+			case "updatetrunks":
+				$this->routing->updateTrunks($request['route_id'], $request['trunkpriority'], true);
+				needreload();
+				return ['status' => true];
+			break;
 			case "addastmodule":
 				$section = isset($request['section'])?$request['section']:'';
 				$module = isset($request['astmod'])?$request['astmod']:'';
@@ -485,14 +501,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 			break;
 			case "delroute":
-				if(empty($this->routing)){
-					$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-				}
-				return $this->routing->deleteById($_POST['id']);
-				case "updateRoutes":
-				if (empty($this->routing)) {
-					$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-				}
+				$this->routing->deleteById($_POST['id']);
+				return ["status" => true];
+			case "updateRoutes":
 				$order = $request['data'];
 				array_shift($order);
 				return $this->setRouteOrder($order);
@@ -755,7 +766,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
-		$request = freepbxGetSanitizedRequest();
+		$request = $this->getSanitizedRequest();
 		global $amp_conf;
 		if ($page == "advancedsettings"){
 			$freepbx_conf = $this->config;
@@ -807,7 +818,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$channel = isset($request['channel']) ? $request['channel'] :  false;
 			$description = isset($request['description']) ? $request['description'] :  '';
 			$did = isset($request['did']) ? $request['did'] :  '';
-			$dahdichannels = new \FreePBX\modules\Core\Components\Dahdichannels($this->database);
+			$dahdichannels = new Dahdichannels();
 			switch ($action) {
 				case 'add':
 					if ($dahdichannels->add($description, $channel, $did)) {
@@ -1013,14 +1024,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$dest = $goto ? $request[$goto . '0'] : '';
 			//if submitting form, update database
 			switch ($action) {
-				case 'ajaxroutepos':
-					$ret = core_routing_setrouteorder($repotrunkkey, $repotrunkdirection);
-					needreload();
-
-					header("Content-type: application/json");
-					echo json_encode(array('position' => $ret));
-					exit;
-				break;
 				case "copyroute":
 					$routename .= "_copy_$extdisplay";
 					$extdisplay='';
@@ -1049,121 +1052,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 					// so we are left with 001-test1, 002-test3
 					needreload();
 					return $ret;
-				break;
-				case "updatetrunks":
-					$ret = core_routing_updatetrunks($extdisplay, $trunkpriority, true);
-					header("Content-type: application/json");
-					echo json_encode(array('result' => $ret));
-					needreload();
-					exit;
-				break;
-				case 'prioritizeroute':
-					needreload();
-				break;
-				case 'getnpanxxjson':
-					try {
-						$npa = $request['npa'];
-						$nxx = $request['nxx'];
-						$url = 'http://www.localcallingguide.com/xmllocalprefix.php?npa=602&nxx=930';
-						$request = new \Pest('http://www.localcallingguide.com/xmllocalprefix.php');
-						$data = $request->get('?npa='.$npa.'&nxx='.$nxx);
-						$xml = new \SimpleXMLElement($data);
-						$pfdata = $xml->xpath('//lca-data/prefix');
-						$retdata = array();
-						foreach($pfdata as $item){
-							$inpa = (string)$item->npa;
-							$inxx = (string)$item->nxx;
-							$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
-						}
-						$ret = json_encode($retdata);
-						header("Content-type: application/json");
-						echo $ret;
-						exit;
-					}catch(Pest_NotFound $e){
-						header("Content-type: application/json");
-						echo json_encode(array('error' => $e));
-						exit;
-					}
-				break;
-				case 'populatenpanxx':
-					$dialpattern_array = $dialpattern_insert;
-					if (preg_match("/^([2-9]\d\d)-?([2-9]\d\d)$/", $_REQUEST["npanxx"], $matches)) {
-						// first thing we do is grab the exch:
-						$ch = curl_init();
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-						curl_setopt($ch, CURLOPT_URL, "http://www.localcallingguide.com/xmllocalprefix.php?npa=".$matches[1]."&nxx=".$matches[2]);
-						curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Linux; FreePBX Local Trunks Configuration)");
-						$str = curl_exec($ch);
-						curl_close($ch);
-
-						// quick 'n dirty - nabbed from PEAR
-						global $amp_conf;
-						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Parser.php');
-						require_once($amp_conf['AMPWEBROOT'] . '/admin/modules/core/XML_Unserializer.php');
-
-						$xml = new xml_unserializer;
-						$xml->unserialize($str);
-						$xmldata = $xml->getUnserializedData();
-
-						$hash_filter = array(); //avoid duplicates
-						if (isset($xmldata['lca-data']['prefix'])) {
-							// we do the loops separately so patterns are grouped together
-
-							// match 1+NPA+NXX (dropping 1)
-							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-								if (isset($hash_filter['1'.$prefix['npa'].$prefix['nxx']])) {
-									continue;
-								} else {
-									$hash_filter['1'.$prefix['npa'].$prefix['nxx']] = true;
-								}
-								$dialpattern_array[] = array(
-									'prepend_digits' => '',
-									'match_pattern_prefix' => '1',
-									'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
-									'match_cid' => '',
-									);
-							}
-							// match NPA+NXX
-							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-								if (isset($hash_filter[$prefix['npa'].$prefix['nxx']])) {
-									continue;
-								} else {
-									$hash_filter[$prefix['npa'].$prefix['nxx']] = true;
-								}
-								$dialpattern_array[] = array(
-									'prepend_digits' => '',
-									'match_pattern_prefix' => '',
-									'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
-									'match_cid' => '',
-									);
-							}
-							// match 7-digits
-							foreach ($xmldata['lca-data']['prefix'] as $prefix) {
-								if (isset($hash_filter[$prefix['nxx']])) {
-									continue;
-								} else {
-									$hash_filter[$prefix['nxx']] = true;
-								}
-									$dialpattern_array[] = array(
-										'prepend_digits' => '',
-										'match_pattern_prefix' => '',
-										'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
-										'match_cid' => '',
-										);
-							}
-							unset($hash_filter);
-						} else {
-							$errormsg = _("Error fetching prefix list for: "). $request["npanxx"];
-						}
-					} else {
-						// what a horrible error message... :p
-						$errormsg = _("Invalid format for NPA-NXX code (must be format: NXXNXX)");
-					}
-
-					if (isset($errormsg)) {
-						echo "<script language=\"javascript\">alert('".addslashes($errormsg)."');</script>";
-						unset($errormsg);
-					}
 				break;
 			}
 
@@ -1567,10 +1455,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return array Array of DAHDi Channels
 	 */
 	public function listDahdiChannels(){
-        if(!is_object($this->dahdiChannels)){
-            $this->dahdiChannels = new Dahdichannels($this->database);
-        }
-        return $this->dahdiChannels->listChannels();
+        return $this->dahdichannels->listChannels();
 	}
 
 	/**
@@ -1579,9 +1464,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return bool           Return from db call
 	 */
 	public function delRouteTrunkByID($trunk_id){
-        if (empty($this->routing)) {
-            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-        }
         return $this->routing->deleteTrunkRouteById($trunk_id);
 	}
 
@@ -1690,9 +1572,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function updateRouteTrunks($route_id, &$trunks, $delete = false) {
-        if (empty($this->routing)) {
-            $this->routing = new FreePBX\modules\Core\Components\Outboundrouting($this->database);
-        }
         return $this->routing->updateTrunks($route_id, $trunks, $delete);
 	}
 
@@ -1730,9 +1609,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function getRouteByID($route_id) {
-        if (empty($this->routing)) {
-            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-        }
         return $this->routing->get($route_id);
 	}
 
@@ -1744,16 +1620,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function getRouteTrunksByID($route_id) {
-        if (empty($this->routing)) {
-            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-        }
         return $this->routing->getRouteTrunksById($route_id);
 	}
 
 	public function getRoutePatternsByID($route_id) {
-        if (empty($this->routing)) {
-            $this->routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->database);
-        }
         return $this->routing->getRoutePatternsById($route_id);
 	}
 
@@ -3205,7 +3075,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Set Outbound Routes Order
 	 */
 	public function setRouteOrder($routes){
-		$dbh = $this->database();
+		$dbh = $this->database;
 		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
 		$stmt->execute();
 		$stmt = $dbh->prepare('INSERT INTO outbound_route_sequence (route_id, seq) VALUES (?,?)');

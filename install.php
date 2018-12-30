@@ -1046,3 +1046,23 @@ if(!\FreePBX::Core()->getConfig('migratesendrpid')) {
 	\FreePBX::Database()->query($sql);
 	\FreePBX::Core()->setConfig('migratesendrpid',true);
 }
+
+$sth = \FreePBX::Database()->prepare("SELECT DISTINCT route_id FROM outbound_route_sequence");
+$sth->execute();
+$routeSeqs = $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+$sth = \FreePBX::Database()->prepare("SELECT route_id FROM outbound_routes");
+$sth->execute();
+$outboundRoutes = $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+
+$routeDiff = array_diff($outboundRoutes,$routeSeqs);
+
+if(!empty($routeDiff)) {
+	\FreePBX::Notifications()->add_warning('core', 'MISSING_ROUTES', _('Missing outbound routes have been found'), _('Due to bug FREEPBX-18620 routes were created without valid references which made them invisible. They are now visible and you are advised to edit/delete routes you dont know about'), "?display=routing", true, true);
+	foreach($routeDiff as $route) {
+		$routing = new FreePBX\modules\Core\Components\Outboundrouting();
+		$routing->setOrder($route, 'new');
+	}
+}
+

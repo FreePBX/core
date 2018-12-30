@@ -17,7 +17,6 @@ $tabindex = 0;
 $dialpattern_insert = array();
 $p_idx = 0;
 $n_idx = 0;
-$last_seq = isset($request['routepriority']) ? count($request['routepriority'])-1 : 0;
 if ($action == 'populatenpanxx') {
 	return true;
 }
@@ -73,7 +72,9 @@ switch($request['view']){
 							);
 							$subhead .= ": ". $routename;
 		}else{
-			$route_seq = $last_seq+1;
+			$sql = "SELECT MAX(`seq`) as max FROM outbound_route_sequence";
+			$res = \FreePBX::Database()->query($sql)->fetch(\PDO::FETCH_COLUMN);
+			$route_seq = ctype_digit($res) ? $res + 1 : 0;
 			if (!isset($dialpattern_array)) {
 				$dialpattern_array = array();
 			}

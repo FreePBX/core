@@ -85,31 +85,31 @@ function core_trunks_readDialRulesFile() {
 
 function core_dahdichandids_add($description, $channel, $did){
 	FreePBX::Modules()->deprecatedFunction();
-	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels(FreePBX::Database());
+	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels();
 	return $dahdichannels->add($description, $channel, $did);
 }
 
 function core_dahdichandids_edit($description, $channel, $did){
 	FreePBX::Modules()->deprecatedFunction();
-	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels(FreePBX::Database());
+	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels();
 	return $dahdichannels->add($description, $channel, $did);
 }
 
 function core_dahdichandids_delete($channel){
 	FreePBX::Modules()->deprecatedFunction();
-	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels(FreePBX::Database());
+	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels();
 	return $dahdichannels->delete($channel);
 }
 
 function core_dahdichandids_list(){
 	FreePBX::Modules()->deprecatedFunction();
-	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels(FreePBX::Database());
+	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels();
 	return $dahdichannels->listChannels();
 }
 
 function core_dahdichandids_get($channel){
 	FreePBX::Modules()->deprecatedFunction();
-	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels(FreePBX::Database());
+	$dahdichannels = new FreePBX\modules\Core\Components\Dahdichannels();
 	return $dahdichannels->get($channel);
 }
 
@@ -192,8 +192,8 @@ function core_did_del($extension, $cidnum){
 
 function core_routing_setrouteorder($route_id, $seq){
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
-	return $routing->setRouteOrder($route_id, $seq);
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
+	return $routing->setOrder($route_id, $seq);
 }
 
 
@@ -237,31 +237,31 @@ function core_trunks_del($trunknum, $tech = null, $edit = false){
 function core_routing_trunk_delbyid($trunk_id){
 	FreePBX::Modules()->deprecatedFunction();
 
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->deleteTrunkRouteById($trunk_id);
 }
 
 function core_routing_getroutepatternsbyid($route_id){
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->getRoutePatternsById($route_id);
 }
 
 function core_routing_getroutetrunksbyid($route_id){
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->getRouteTrunksByID($route_id);
 }
 
 function core_routing_updatepatterns($route_id, &$patterns, $delete = false){
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->updatePatterns($route_id, $patterns, $delete);
 }
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false){
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->updateTrunks($route_id, $trunks, $delete);
 }
 
@@ -278,19 +278,19 @@ function core_routing_list(){
 
 function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
-	return $routing->addWithId($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
+	return $routing->editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 }
 
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
 }
 
 function core_routing_delbyid($route_id) {
 	FreePBX::Modules()->deprecatedFunction();
-	$routing = new FreePBX\modules\Core\Components\Outboundrouting(FreePBX::Database());
+	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
 	return $routing->deleteById($route_id);
 }
 

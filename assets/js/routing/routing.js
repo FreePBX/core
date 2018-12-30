@@ -37,15 +37,13 @@ $(function() {
 			});
 			$.ajax({
 				type: 'POST',
-				url: location.href,
+				url: FreePBX.ajaxurl,
 				data: {
-					action:"updatetrunks",
-					quietmode:"1",
-					skip_astman:"1",
-					restrictmods: "core",
+					command:"updatetrunks",
+					module:"core",
 					trunkpriority:seq,
-					extdisplay:$("#extdisplay").val()
-					},
+					route_id:$("#extdisplay").val()
+				},
 				dataType: 'json',
 				success: function(data) {
 					toggle_reload_button('show');
@@ -297,7 +295,7 @@ function check_pattern(pattern){
 						'</button>'+
 						'<strong>'+_('Warning!')+'</strong> '+_('A dial pattern of a single dot is STRONGLY DISCOURAGED. It is recommended that you change it to X.')+
 						'</div>';
-		$("#msg_alert_pattern").html(msg_alert);		
+		$("#msg_alert_pattern").html(msg_alert);
 	}
 }
 
