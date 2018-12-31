@@ -861,6 +861,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$localnets = is_array($localnets)?$localnets:array();
 				if ($localnets) {
 					foreach($localnets as $arr) {
+						if(empty($arr['net']) || empty($arr['mask'])) {
+							continue;
+						}
 						$transport[$t]['local_net'][] = $arr['net']."/".$arr['mask'];
 					}
 				}
