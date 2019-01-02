@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.18</version>
+	<version>15.0.3.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.19* Enable Fast AGI server and dialparties dialplan
 		*15.0.3.18* FREEPBX-18526
 		*15.0.3.17* FREEPBX-18811
 		*15.0.3.16* FREEPBX-18620
