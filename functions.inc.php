@@ -1252,7 +1252,7 @@ function core_do_get_config($engine) {
 		$ext->addInclude('from-internal-additional', $context); // Add the include from from-internal
 		$exten = '_FMPR-.';
 
-		$fm_dnd = $amp_conf['AST_FUNC_SHARED'] ? 'SHARED(FM_DND,${FMUNIQUE})' : 'DB(FM/DND/${FMGRP}/${FMUNIQUE})';
+		$fm_dnd = 'SHARED(FM_DND,${FMUNIQUE})';
 
 		$ext->add($context, $exten, '', new ext_nocdr(''));
 		$ext->add($context, $exten, '', new ext_noop_trace('In FMPR ${FMGRP} with ${EXTEN:5}'));
@@ -1274,20 +1274,12 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_wait('1'));
 		$ext->add($context, $exten, '', new ext_noop_trace('FMGL wait loop: ${EPOCH} / ${ENDLOOP}', 6));
 		$ext->add($context, $exten, '', new ext_gotoif('$[${EPOCH} < ${ENDLOOP}]','start'));
-		if ($amp_conf['AST_FUNC_SHARED']) {
-			$ext->add($context, $exten, '', new ext_set($fm_dnd, ''));
-		} else {
-			$ext->add($context, $exten, '', new ext_dbdel($fm_dnd));
-		}
+		$ext->add($context, $exten, '', new ext_set($fm_dnd, ''));
 		$ext->add($context, $exten, 'dodial', new ext_macro('dial','${FMGRPTIME},${DIAL_OPTIONS},${DIALNUMS}'));
 		$ext->add($context, $exten, '', new ext_noop_trace('Ending FMGL ${FMGRP} with ${EXTEN:5} and dialstatus ${DIALSTATUS}'));
 		$ext->add($context, $exten, '', new ext_hangup(''));
 		// n+10(dodnd):
-		if ($amp_conf['AST_FUNC_SHARED']) {
-			$ext->add($context, $exten, 'dodnd', new ext_set($fm_dnd, ''), 'n', 10);
-		} else {
-			$ext->add($context, $exten, 'dodnd', new ext_dbdel($fm_dnd), 'n', 10);
-		}
+		$ext->add($context, $exten, 'dodnd', new ext_set($fm_dnd, ''), 'n', 10);
 		$ext->add($context, $exten, '', new ext_gotoif('$["${FMPRIME}" = "FALSE"]','dodial'));
 		$ext->add($context, $exten, '', new ext_noop_trace('Got DND in FMGL ${FMGRP} with ${EXTEN:5} in ${RingGroupMethod} mode, aborting'));
 		$ext->add($context, $exten, '', new ext_hangup(''));
@@ -1741,7 +1733,7 @@ function core_do_get_config($engine) {
 				if (!$amp_conf['DYNAMICHINTS']) {
 					$hint = core_hint_get($exten['extension']);
 					$dnd_string = ($amp_conf['USEDEVSTATE'] && function_exists('donotdisturb_get_config')) ? "&Custom:DND".$exten['extension'] : '';
-					$presence_string = $amp_conf['AST_FUNC_PRESENCE_STATE'] ? ",CustomPresence:".$exten['extension'] : '';
+					$presence_string = ",CustomPresence:".$exten['extension'];
 					$hint_string = (!empty($hint) ? $hint : '') . $dnd_string . $presence_string;
 					$astman->database_put("AMPUSER/".$exten['extension'],"hint",$hint_string);
 					if ($hint_string) {
@@ -2304,43 +2296,41 @@ function core_do_get_config($engine) {
 		$ext->add($context, 's', '', new ext_goto('11,1')); //this is dumb. Ask Andrew someday
 	}
 
-	if ($amp_conf['AST_FUNC_PRESENCE_STATE']) {
-		if(function_exists('presencestate_types_get')) {
-			modgettext::push_textdomain("presencestate");
-			$states = presencestate_types_get();
-			modgettext::pop_textdomain();
-		} else {
-			$states = array(
-				'available' => 'Available',
-				'chat' => 'Chatty',
-				'away' => 'Away',
-				'dnd' => 'DND',
-				'xa' => 'Extended Away',
-				'unavailable' => 'Unavailable'
-			);
-		}
+	if(function_exists('presencestate_types_get')) {
+		modgettext::push_textdomain("presencestate");
+		$states = presencestate_types_get();
+		modgettext::pop_textdomain();
+	} else {
+		$states = array(
+			'available' => 'Available',
+			'chat' => 'Chatty',
+			'away' => 'Away',
+			'dnd' => 'DND',
+			'xa' => 'Extended Away',
+			'unavailable' => 'Unavailable'
+		);
+	}
 
-		$context = 'sub-presencestate-display';
+	$context = 'sub-presencestate-display';
 
-		$exten = 's';
-		$ext->add($context, $exten, '', new ext_goto(1, 'state-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
+	$exten = 's';
+	$ext->add($context, $exten, '', new ext_goto(1, 'state-${TOLOWER(${PRESENCE_STATE(CustomPresence:${ARG1},value)})}'));
 
-		foreach ($states as $state => $display) {
-			$exten = 'state-' . $state;
-			$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', '(' . $display . ')'));
-			$ext->add($context, $exten, '', new ext_return(''));
-		}
-
-		// Don't display anything if presencestate is unknown (Coding bug)
-		$exten = '_state-.';
-		$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
-		$ext->add($context, $exten, '', new ext_return(''));
-
-		// Don't display anything if presencestate is empty (not set).
-		$exten = 'state-';
-		$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+	foreach ($states as $state => $display) {
+		$exten = 'state-' . $state;
+		$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', '(' . $display . ')'));
 		$ext->add($context, $exten, '', new ext_return(''));
 	}
+
+	// Don't display anything if presencestate is unknown (Coding bug)
+	$exten = '_state-.';
+	$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+	$ext->add($context, $exten, '', new ext_return(''));
+
+	// Don't display anything if presencestate is empty (not set).
+	$exten = 'state-';
+	$ext->add($context, $exten, '', new ext_setvar('PRESENCESTATE_DISPLAY', ''));
+	$ext->add($context, $exten, '', new ext_return(''));
 
 	Dialplan\macroConfirm::add($ext);
 	Dialplan\macroAutoConfirm::add($ext);
@@ -2435,10 +2425,10 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
 		}
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"!="hidden"]]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
 			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"="hidden"]]', 'Set', 'CONNECTEDLINE(name,i)=CID:(Hidden)${CALLERID(number)}'));
 		}
@@ -2580,10 +2570,10 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
 		}
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
 		}
 
@@ -2750,10 +2740,10 @@ function core_do_get_config($engine) {
 		//  Replacement for asterisk's ENUMLOOKUP function
 		$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
 
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_DIAL_UPDATE']) {
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
 		}
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE'] && $amp_conf['OUTBOUND_CID_UPDATE']) {
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
 			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
 		}
 
@@ -3425,20 +3415,11 @@ function core_do_get_config($engine) {
 	// I think it is adequate that if AMPUSER is blank, it's not internal (don't think FROM_DID has to be checked though I don't think it hurts)
 	$macrodial = 'macrodial';
 	if ($intercom_code != '') {
-		if ($amp_conf['AST_FUNC_EXTENSION_STATE']) {
-			$ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, FROM_QUEUE: $["${CUT(CHANNEL,@,2):5:5}"="queue"], answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, ATTTXF: ${ATTENDEDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}, CC_RECALL: ${CC_RECALL}'));
-			if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
-				$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
-			} else {
-				$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
-			}
+		$ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, FROM_QUEUE: $["${CUT(CHANNEL,@,2):5:5}"="queue"], answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, ATTTXF: ${ATTENDEDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}, CC_RECALL: ${CC_RECALL}'));
+		if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
 		} else {
-			$ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, FROM_QUEUE: $["${CUT(CHANNEL,@,2):5:5}"="queue"], answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, , ATTTXF: ${ATTENDEDTRANSFER}, CC_RECALL: ${CC_RECALL}'));
-			if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
-				$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}]','macrodial'));
-			} else {
-				$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}]','macrodial'));
-			}
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL})}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
 		}
 		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", '${DIAL_OPTIONS}'));
 		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", 'TRUE'));
@@ -3453,11 +3434,7 @@ function core_do_get_config($engine) {
 		$ext->add($mcontext,$exten,$macrodial, new ext_gosubif('$["${INTERCOM_CALL}"="TRUE" & ${LEN(${BLINDTRANSFER})}]','clrheader,1'));
 		$macrodial = '';
 	}
-	if ($amp_conf['AST_FUNC_EXTENSION_STATE']) {
-		$ext->add($mcontext,$exten,$macrodial, new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
-	} else {
-		$ext->add($mcontext,$exten,$macrodial, new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
-	}
+	$ext->add($mcontext,$exten,$macrodial, new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
 	$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
 
 	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$[("${SV_DIALSTATUS}"="NOANSWER"|"${SV_DIALSTATUS}"="CHANUNAVAIL") & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
@@ -3550,11 +3527,7 @@ function core_do_get_config($engine) {
 	$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
 	$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
 	$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
-	if ($amp_conf['AST_FUNC_EXTENSION_STATE']) {
-		$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
-	} else {
-		$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
-	}
+	$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
 	$ext->add($mcontext,$exten,'', new ext_set("__CWIGNORE", '${CWI_TMP}'));
 	$ext->add($mcontext,$exten,'', new ext_set("PR_DIALSTATUS", '${DIALSTATUS}'));
 	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${PR_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!=""]','docfu,1'));
@@ -3641,106 +3614,50 @@ function core_do_get_config($engine) {
 	*/
 
 	$exten = 's';
-	if ($amp_conf['AST_FUNC_SHARED']) {
+	// If it BLKVM_CHANNEL exists, return it's value. If not, then set it and return TRUE
+	//
+	$mcontext = 'macro-blkvm-setifempty';
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_CHANNEL})}]', 'init'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
+	$ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_CHANNEL','${CHANNEL}'));
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
-		// If it BLKVM_CHANNEL exists, return it's value. If not, then set it and return TRUE
-		//
-		$mcontext = 'macro-blkvm-setifempty';
-		$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_CHANNEL})}]', 'init'));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-		$ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_CHANNEL','${CHANNEL}'));
-		$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
+	// If BLKVM_CHANNEL not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
+	//
+	$mcontext = 'macro-blkvm-set';
+	$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_CHANNEL})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_CHANNEL=${CHANNEL}'));
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
-		// If BLKVM_CHANNEL not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
-		//
-		$mcontext = 'macro-blkvm-set';
-		$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_CHANNEL})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_CHANNEL=${CHANNEL}'));
-		$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
+	// if clearing, BLKVM_CHANNEL should already exist (if not, we clear our channel's copy)
+	//
+	$mcontext = 'macro-blkvm-clr';
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})',''));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL',''));
+	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
-		// if clearing, BLKVM_CHANNEL should already exist (if not, we clear our channel's copy)
-		//
-		$mcontext = 'macro-blkvm-clr';
-		$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})',''));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL',''));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-
-		// if checking, BLKVM_CHANNEL should already exist (if not, we check our channel's copy)
-		// CC_RECALL was originally used for CallCompletion but is used elsewhere as well for recall automated
-		// calls that should therefore not go to voicemail, for example a wakeup call
-		//
-		$mcontext = 'macro-blkvm-check';
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
-		$ext->add($mcontext,$exten,'', new ext_execif('$["${GOSUB_RETVAL}"="" & "${CC_RECALL}"="1"]', 'Set','GOSUB_RETVAL=TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-
-	} else { // NO SHARED()
-
-		// If it BLKVM_OVERRIDE exists, return it's value. If not, then set it and return TRUE
-		//
-		$mcontext = 'macro-blkvm-setifempty';
-		$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_OVERRIDE})}]', 'init'));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${DB(${BLKVM_OVERRIDE})}'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-		$ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_OVERRIDE','BLKVM/${MACRO_EXTEN}/${CHANNEL}'));
-		$ext->add($mcontext,$exten,'', new ext_set('__BLKVM_BASE','${MACRO_EXTEN}'));
-		$ext->add($mcontext,$exten,'', new ext_set('DB(${BLKVM_OVERRIDE})','TRUE'));
-
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-
-		// If BLKVM_OVERRIDE not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
-		//
-		$mcontext = 'macro-blkvm-set';
-		$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_OVERRIDE})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_BASE=${MACRO_EXTEN}'));
-		$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_OVERRIDE})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_OVERRIDE=BLKVM/${MACRO_EXTEN}/${CHANNEL}'));
-		$ext->add($mcontext,$exten,'', new ext_set('DB(${BLKVM_OVERRIDE})','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-
-		// if clearing, BLKVM_OVERRIDE should already exist (if not, it's already cleared anyhow)
-		//
-		$mcontext = 'macro-blkvm-clr';
-		$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_OVERRIDE})}]', 'ret'));
-		$ext->add($mcontext,$exten,'', new ext_dbdel('${BLKVM_OVERRIDE}'));
-		$ext->add($mcontext,$exten,'ret', new ext_set('GOSUB_RETVAL',''));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-
-		// if checking, BLKVM_OVERRIDE should already exist (if not, '' will be returned)
-		//
-		$mcontext = 'macro-blkvm-check';
-		$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${DB(${BLKVM_OVERRIDE})}'));
-		$ext->add($mcontext,$exten,'', new ext_macroexit(''));
-	}
+	// if checking, BLKVM_CHANNEL should already exist (if not, we check our channel's copy)
+	// CC_RECALL was originally used for CallCompletion but is used elsewhere as well for recall automated
+	// calls that should therefore not go to voicemail, for example a wakeup call
+	//
+	$mcontext = 'macro-blkvm-check';
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${GOSUB_RETVAL}"="" & "${CC_RECALL}"="1"]', 'Set','GOSUB_RETVAL=TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
 	$mcontext = 'macro-hangupcall';
 	$exten = 's';
 	/*
 	; Cleanup any remaining RG flag
 	*/
-	$skip_label = $amp_conf['AST_FUNC_SHARED'] ? 'theend' : 'skiprg';
+	$skip_label = 'theend';
 	$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]',$skip_label));
 	$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 	$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
-
-	if (!$amp_conf['AST_FUNC_SHARED']) {
-		// only clr it if we were the originating channel
-		//
-		$ext->add($mcontext,$exten,'skiprg', new ext_gotoif('$["${BLKVM_BASE}"="" | "BLKVM/${BLKVM_BASE}/${CHANNEL}"!="${BLKVM_OVERRIDE}"]', 'skipblkvm'));
-		$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Block VM Flag: ${BLKVM_OVERRIDE}'));
-		$ext->add($mcontext,$exten,'', new ext_macro('blkvm-clr'));
-		/*
-		; Cleanup any remaining FollowMe DND flags
-		*/
-		$ext->add($mcontext,$exten,'skipblkvm', new ext_gotoif('$["${FMGRP}"="" | "${FMUNIQUE}"="" | "${CHANNEL}"!="${FMUNIQUE}"]','theend'));
-		$ext->add($mcontext,$exten,'delfmrgp', new ext_dbdel('FM/DND/${FMGRP}/${CHANNEL}'));
-
-		$skip_label = $next_label;
-	}
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
