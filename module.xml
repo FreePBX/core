@@ -14,7 +14,7 @@
 		*15.0.3.17* FREEPBX-18811
 		*15.0.3.16* FREEPBX-18620
 		*15.0.3.15* FREEPBX-18745 FREEPBX-18762
-		*15.0.3.14* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name 
+		*15.0.3.14* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name
 		*15.0.3.13* Fix xml call
 		*15.0.3.11* Callaccounting changes to core
 		*15.0.3.10* FREEPBX-18703 Launch AGIs through FastAGI NodeJS Process
@@ -271,6 +271,10 @@
 		</framework>
 		<framework class="Stop" namespace="FreePBX\Console\Command">
 			<method callingMethod="preAsteriskHooks" class="Core" namespace="FreePBX\modules">stopFreepbx</method>
+		</framework>
+		<framework class="Reload" namespace="FreePBX">
+			<method callingMethod="postReload" class="Core" namespace="FreePBX\Modules">postReloadFreepbx</method>
+			<method callingMethod="preReload" class="Core" namespace="FreePBX\Modules">preReloadFreepbx</method>
 		</framework>
 	</hooks>
 	<supported>

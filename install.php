@@ -119,7 +119,7 @@ $globals_convert['TONEZONE'] = 'us';
 
 // LAUNCH_AGI_AS_FASTAGI
 //
-$set['value'] = false;
+$set['value'] = true;
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['readonly'] = 0;
@@ -135,7 +135,7 @@ $freepbx_conf->define_conf_setting('LAUNCH_AGI_AS_FASTAGI',$set);
 
 // DIALPARTIESDIALPLAN
 //
-$set['value'] = false;
+$set['value'] = true;
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['readonly'] = 0;
@@ -143,7 +143,7 @@ $set['hidden'] = 0;
 $set['level'] = 0;
 $set['module'] = '';
 $set['name'] = 'Use Dialparties Dialplan';
-$set['description'] = "EXPERIMENTAL: If you have choppy/glitchy audio switching this on will make the PBX use Dialparties Dialplan instead of launching an AGI on every call";
+$set['description'] = "Set this to NO if you experience issues with Dialparties usage";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('DIALPARTIESDIALPLAN',$set);
 

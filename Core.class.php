@@ -3358,15 +3358,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 */
 	public function startFreepbx($output=null, $debug=true) {
 		$this->setWriter($output);
-		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
-			$this->writeln("'Launch local AGIs through FastAGI Server' is not enabled in advanced settings so not starting server");
+		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->writeln('PM2 is not installed/enabled. Unable to start Core FastAGI Server');
 			return;
 		}
-		if(!$this->freepbx->Modules->checkStatus("pm2")) {
-			$this->writeln('PM2 is not installed/enabled. Unable to start processes');
-			return;
-		}
-		$status = $this->pm2->getStatus("core-fastagi");
+		$pm2 = $this->freepbx->Pm2;
+		$status = $pm2->getStatus("core-fastagi");
 		switch($status['pm2_env']['status']) {
 			case 'online':
 				if($debug) {
@@ -3396,7 +3393,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				$i = 0;
 				while($i < 100) {
-					$data = $this->pm2->getStatus("core-fastagi");
+					$data = $pm2->getStatus("core-fastagi");
 					if(!empty($data) && $data['pm2_env']['status'] == 'online') {
 						if(is_object($output)) {
 							$progress->finish();
@@ -3415,7 +3412,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					}
 				}
 				if(!empty($data)) {
-					$this->pm2->reset("core-fastagi");
+					$pm2->reset("core-fastagi");
 					if($debug) {
 						$this->writeln(sprintf(_("Started Core FastAGI Server. PID is %s"),$data['pid']));
 					}
@@ -3436,9 +3433,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function stopFreepbx($output=null, $debug=true) {
 		$this->setWriter($output);
 		if(!$this->freepbx->Modules->checkStatus("pm2")) {
-			$this->writeln('PM2 is not installed/enabled. Unable to stop processes');
+			$this->writeln('PM2 is not installed/enabled. Unable to stop Core FastAGI Server');
 			return;
 		}
+		$pm2 = $this->freepbx->Pm2;
 		$data = $this->freepbx->pm2->getStatus("core-fastagi");
 		if(empty($data) || $data['pm2_env']['status'] != 'online') {
 			if($debug) {
@@ -3451,11 +3449,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$this->writeln(_("Stopping Core FastAGI Server"));
 		}
 
-		$this->pm2->stop("core-fastagi");
+		$pm2->stop("core-fastagi");
 
-		$data = $this->pm2->getStatus("core-fastagi");
+		$data = $pm2->getStatus("core-fastagi");
 		if (empty($data) || $data['pm2_env']['status'] != 'online') {
-			$this->pm2->delete("core-fastagi");
+			$pm2->delete("core-fastagi");
 			if($debug) {
 				$this->writeln(_("Stopped FastAGI Server"));
 			}
@@ -3469,6 +3467,24 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return true;
 	}
 
+	public function preReloadFreepbx() {
+		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->freepbx->Config->update('LAUNCH_AGI_AS_FASTAGI',false);
+			$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server, As a result all AGIs will be launched from the CLI"),"",true,true);
+		}
+	}
+
+	public function postReloadFreepbx() {
+		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
+			return;
+		}
+		$pm2 = $this->freepbx->Pm2;
+		$status = $pm2->getStatus("core-fastagi");
+		if($status['pm2_env']['status'] !== 'online') {
+			$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput());
+		}
+	}
+
 	/**
 	 * FreePBX chown hooks
 	 */
@@ -3479,6 +3495,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function updateFreePBXSetting($keyword, $value) {
 		if($keyword === 'LAUNCH_AGI_AS_FASTAGI') {
 			if(!empty($value)) {
+				if(!$this->freepbx->Modules->checkStatus("pm2")) {
+					$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server, As a result all AGIs will be launched from the CLI"),"",true,true);
+				}
 				$this->startFreepbx(null, false);
 			} else {
 				$this->stopFreepbx(null, false);
