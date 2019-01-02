@@ -89,9 +89,6 @@ if ($alertinfo) {
 $sippheader = get_var( $AGI, "SIPADDHEADER" );
 if ($sippheader) {
 	$fields = explode(':',$sippheader,2);
-	if($alertinfo_set_flag == 1 && $h == 'Alert-Info'){
-		continue;
-	}
 	$headers[$fields[0]] = $fields[1];
 }
 
