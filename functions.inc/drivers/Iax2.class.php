@@ -88,6 +88,14 @@ class Iax2 extends \FreePBX\modules\Core\Driver {
 				"value" => "REALCALLERIDNUM=",
 				"flag" => $flag++
 			),
+			"deny" => array(
+				"value" => "0.0.0.0/0.0.0.0",
+				"flag" => $flag++
+			),
+			"permit" => array(
+				"value" => "0.0.0.0/0.0.0.0",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
