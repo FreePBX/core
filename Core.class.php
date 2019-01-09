@@ -1315,17 +1315,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 					} else {
 						$fields[$keyword] = array("value" => $tech.'/'.$account, "flag" => $flag++);
 					}
-				} elseif ($keyword == 'mailbox_hidden') {
-					if(isset($_REQUEST['devinfo_mailbox_cb']) && $_REQUEST['devinfo_mailbox_cb'] === 'checked' ) {
-						$fields['mailbox'] = array("value" => $_REQUEST['devinfo_mailbox'], "flag" => $flag++);
-						$fields['mailbox_override'] = array("value" => 'yes', "flag" => $flag++);
-					} else {
-						if($_REQUEST['vm'] == 'enabled' && empty($data)) {
-							$fields['mailbox'] = array("value" => $account.'@'.$_REQUEST['vmcontext'], "flag" => $flag++);
-						} else {
-							$fields['mailbox'] = array("value" => $data, "flag" => $flag++);
-						}
-						$fields['mailbox_override'] = array("value" => 'no', "flag" => $flag++);
+				} elseif ($keyword == 'mailbox' && $data == '') {
+					if($_REQUEST['vm'] == 'enabled') {
+						$fields['mailbox'] = array("value" => $account.'@device', "flag" => $flag++);
 					}
 				} elseif (($keyword == 'vmexten' && $data == '') || $keyword == 'mailbox_cb' || $keyword === 'mailbox') {
 					// don't add it

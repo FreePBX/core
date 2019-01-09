@@ -1016,22 +1016,3 @@ if(!\FreePBX::Core()->getConfig('migratesendrpid')) {
 	\FreePBX::Database()->query($sql);
 	\FreePBX::Core()->setConfig('migratesendrpid',true);
 }
-
-$types = array('sip','iax','dahdi');
-foreach($types as $type) {
-	$sql = "SELECT t.*, d.user, d.devicetype, u.voicemail FROM `".$type."` as t LEFT OUTER JOIN `devices` as d ON d.id = t.id LEFT OUTER JOIN `users` as u ON u.extension = d.user WHERE t.keyword = 'mailbox' AND t.data LIKE '%@device'";
-	$sth = \FreePBX::Database()->prepare($sql);
-	$sth->execute();
-	$all = $sth->fetchAll(\PDO::FETCH_ASSOC);
-	$sql = "UPDATE `".$type."` SET `data` = :data WHERE `id` = :id AND `keyword` = 'mailbox' AND `data` LIKE '%@device'";
-	$sth = \FreePBX::Database()->prepare($sql);
-	foreach($all as $one) {
-		if($one['voicemail'] !== 'novm') {
-			$parts = explode('@',$one['data']);
-			$execute = array(":id" => $one['id'], ":data" => $parts[0].'@'.$one['voicemail']);
-		} else {
-			$execute = array(":id" => $one['id'], ":data" => '');
-		}
-		$sth->execute($execute);
-	}
-}

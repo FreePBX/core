@@ -474,8 +474,8 @@ class Sip extends techDriver {
 		$tmparr['dial'] = array('prompttext' => _('Dial'), 'value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Accountcode for this device.");
 		$tmparr['accountcode'] = array('prompttext' => _('Account Code'), 'value' => '', 'tt' => $tt, 'level' => 1);
-		$tt = _("Mailbox for this device. Leaving 'Override dynamic mailbox assignment' unchecked allows the PBX to dynamically change the mailbox when using Device and User mode and user login and logouts on devices. This should not be changed unless you know what you are doing.");
-		$tmparr['mailbox'] = array('type' => 'textcheck','prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2, 'cblabel' => '<small>'._('Override dynamic mailbox assignment').'</small>', 'disabled_value_is_value' => true, 'checked' => (!empty($deviceInfo['mailbox_override']) && $deviceInfo['mailbox_override'] === 'yes' ? true : false));
+		$tt = _("Mailbox for this device. This should not be changed unless you know what you are doing.");
+		$tmparr['mailbox'] = array('prompttext' => _('Mailbox'), 'value' => '', 'tt' => $tt, 'level' => 2);
 		$tt = _("Asterisk dialplan extension to reach voicemail for this device. Some devices use this to auto-program the voicemail button on the endpoint. If left blank, the default vmexten setting is automatically configured by the voicemail module. Only change this on devices that may have special needs.");
 		$tmparr['vmexten'] = array('prompttext' => _('Voicemail Extension'), 'value' => '', 'tt' => $tt, 'level' => 1);
 		$tt = _("IP Address range to deny access to, in the form of network/netmask.")." "._("You may add multiple subnets, separate them with an &amp;.");

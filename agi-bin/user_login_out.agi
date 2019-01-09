@@ -700,38 +700,7 @@ include '/etc/freepbx.conf';
 		dbug($oldMboxSetting);
 		dbug($mboxSetting);
 
-		switch($deviceDetails['tech']) {
-			case "pjsip":
-				$mwisub = !empty($deviceDetails['mwi_subscription']) ? $deviceDetails['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
-				switch($mwisub) {
-					case "solicited":
-						//pjsip.aor.conf
-					break;
-					case "unsolicited":
-						//pjsip.endpoint.conf
-					break;
-					case "auto":
-						//pjsip.aor.conf
-						//pjsip.endpoint.conf
-					break;
-				}
-				exec("asterisk -rx 'module reload res_pjsip.so'");
-			break;
-			case "sip":
-				exec("asterisk -rx 'sip reload'");
-				//sip_additional.conf
-			break;
-			case "dahdi":
-				exec("asterisk -rx 'module reload chan_dahdi.so'");
-				//chan_dahdi.conf
-			break;
-			case "iax":
-			case "iax2":
-				exec("asterisk -rx 'iax2 reload'");
-				//iax_additional.conf
-			break;
-			default:
-				cli_debug("Unable to reload $device because $tech is unknown",5);
-			break;
-		}
+		//write out to voicemail.conf
+		//reload asterisk
+		exec("asterisk -rx 'voicemail reload'");
 	}

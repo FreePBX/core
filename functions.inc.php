@@ -5195,10 +5195,6 @@ function core_devices_configpageload() {
 							$currentcomponent->addguielem($sec, new gui_button($devopname, $devoptcurrent, $prompttext, $tooltip, $text, $devoptjs, $devdisable, $class), 4, null, $category);
 						} elseif($type == 'radio') {
 							$currentcomponent->addguielem($sec, new gui_radio($devopname, $devoptarr['select'], $devoptcurrent, $prompttext, $tooltip, false, $devonchange, $devdisable, $class, false), 4, null, $category);
-						} elseif($type == 'textcheck') {
-							$checked = !empty($devoptarr['checked']) ? true : false;
-							$currentcomponent->addguielem($sec, new gui_textbox_check($devopname, $devoptcurrent, $prompttext, $tooltip,$devoptjs, $devoptfailmsg,true,0,!$checked,$devoptarr['cblabel'],(empty($devoptarr['disabled_value_is_value']) ? $devoptarr['disabled_value'] : $devoptcurrent),true), 4, null, $category);
-							$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_hidden", $devoptcurrent), 4, null, $category);
 						}
 					} else { // add so only basic
 						$currentcomponent->addguielem($sec, new gui_hidden($devopname, $devoptcurrent), 4, null, $category);

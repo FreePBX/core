@@ -136,12 +136,12 @@ abstract class Driver {
 				case 'mailboxes':
 				case 'mailbox':
 				if ((empty($dev_user_map[$account]['vmcontext']) || $dev_user_map[$account]['vmcontext'] == 'novm')
-					&& $dev_user_map[$account]['mailbox_override'] === 'no'
+					&& strtolower($data) == "$account" . "@device"
 					&& static::$removeMailboxSetting
 				) {
 					// they have no vm so don't put a mailbox=line
 					$user_option = "";
-				} elseif ($dev_user_map[$account]['mailbox_override'] === 'no'
+				} elseif (strtolower($data) == "$account" . "@device"
 					&& !empty($dev_user_map[$account]['vmcontext'])
 					&& $dev_user_map[$account]['vmcontext'] != 'novm'
 				) {
