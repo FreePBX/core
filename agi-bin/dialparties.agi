@@ -76,13 +76,10 @@ $alertinfo_set_flag = 0;
 $rvol = get_var( $AGI, "RVOL" );
 $alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
-	$alertinfo_set_flag = 1;
-	debug("Setting Alert-Info:  $alertinfo", 4);
-	$headers['Alert-Info'] = $alertinfo;
 	if($rvol !=""){
-		$AGI->set_alertinfo($alertinfo.'\;volume='.$rvol);
+		$headers['Alert-Info'] = $alertinfo.'\;volume='.$rvol;
 	} else {
-		$AGI->set_alertinfo($alertinfo);
+		$headers['Alert-Info'] = $alertinfo;
 	}
 }
 
@@ -94,13 +91,7 @@ if ($sippheader) {
 
 foreach ($headers as $h => $v) {
 	debug("Setting sipheader $h: $v", 4);
-	 if($alertinfo_set_flag == 1 && $h == 'Alert-Info'){
-		 //we already set so unset the channel variables
-		 $AGI->set_variable("RVOL","");
-		 $AGI->set_variable("ALERT_INFO","");
-		 continue;
-	 }
-	$AGI->set_variable("HASH(__SIPHEADERS,$h)", $v);
+	$AGI->set_variable("HASH(_SIPHEADERS,$h)", $v);
 }
 
 // Follow-Me is only one setting PR_DIALSTATUS so don't bother fetching if not a followme
