@@ -117,6 +117,36 @@ $globals_convert['TRUNK_OPTIONS'] = 'T';
 $globals_convert['RINGTIMER'] = '15';
 $globals_convert['TONEZONE'] = 'us';
 
+// LAUNCH_AGI_AS_FASTAGI
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['category'] = 'Dialplan and Operational';
+$set['emptyok'] = 0;
+$set['name'] = 'Launch local AGIs through FastAGI Server';
+$set['description'] = "When enabled all AGI() calls that launch local scripts will instead launch through a FastAGI subprocess. In certain environments this can cause performance improvements. Any AGIs that already called upon agi:// will be unaffected";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('LAUNCH_AGI_AS_FASTAGI',$set);
+
+// DIALPARTIESDIALPLAN
+//
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['name'] = 'Use Dialparties Dialplan';
+$set['description'] = "Set this to NO if you experience issues with Dialparties usage";
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('DIALPARTIESDIALPLAN',$set);
+
 // OUTBOUND_CID_UPDATE
 //
 $set['value'] = true;
@@ -1016,3 +1046,23 @@ if(!\FreePBX::Core()->getConfig('migratesendrpid')) {
 	\FreePBX::Database()->query($sql);
 	\FreePBX::Core()->setConfig('migratesendrpid',true);
 }
+
+$sth = \FreePBX::Database()->prepare("SELECT DISTINCT route_id FROM outbound_route_sequence");
+$sth->execute();
+$routeSeqs = $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+$sth = \FreePBX::Database()->prepare("SELECT route_id FROM outbound_routes");
+$sth->execute();
+$outboundRoutes = $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+
+$routeDiff = array_diff($outboundRoutes,$routeSeqs);
+
+if(!empty($routeDiff)) {
+	\FreePBX::Notifications()->add_warning('core', 'MISSING_ROUTES', _('Missing outbound routes have been found'), _('Due to bug FREEPBX-18620 routes were created without valid references which made them invisible. They are now visible and you are advised to edit/delete routes you dont know about'), "?display=routing", true, true);
+	foreach($routeDiff as $route) {
+		$routing = new FreePBX\modules\Core\Components\Outboundrouting();
+		$routing->setOrder($route, 'new');
+	}
+}
+

@@ -24,30 +24,7 @@ if (function_exists('music_list')){
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
 	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id, 'time_mode' => $time_mode,'timezone' => $timezone,'calendar_id' => $calendar_id,'calendar_group_id' => $calendar_group_id));
 }
-$routepriority = core_routing_list();
-$routeseqopts = '';
-//Routing select box
-if ($route_seq != 0) {
-	$routeseqopts .= '<option value="0"'.($route_seq == 0 ? ' SELECTED' : '').'>'.sprintf(_('First before %s'),$routepriority[0]['name'])."</option>\n";
-}
 
-$last_seq = isset($last_seq)?$last_seq:count($routepriority)-1;
-$route_names = array();
-foreach ($routepriority as $key => $route) {
-	if($request['id'] != $route['route_id']){
-		$route_names[] = $route['name'];
-	}
-	if ($key == 0 && $route_seq != 0) continue;
-	if ($key == ($route_seq+1)) continue;
-	if ($route_seq == $key) {
-		$routeseqopts .= '				<option value="'.$key.'" SELECTED>'._('---No Change---')."</option>\n";
-	} else {
-		$routeseqopts .= '				<option value="'.$key.'">'.sprintf(_('Before %s'),$route['name'])."</option>\n";
-	}
-}
-if ($extdisplay == '' | $route_seq != $last_seq) {
-	$routeseqopts .= '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
-}
 //Hooks....
 //$module_hook = moduleHook::create();
 //if (!empty($module_hook->hookHtml)) {
@@ -254,6 +231,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 ?>
 <form enctype="multipart/form-data" class="fpbx-submit" autocomplete="off" id="routeEdit" name="routeEdit" action="?display=routing" method="POST" data-fpbx-delete="config.php?display=<?php echo urlencode($display) ?>&id=<?php echo urlencode($extdisplay) ?>&action=delroute">
 	<input type="hidden" id="extdisplay" name="extdisplay" value="<?php echo $extdisplay ?>"/>
+	<input type="hidden" id="route_seq" name="route_seq" value="<?php echo $route_seq?>">
 	<input type="hidden" id="id" name="id" value="<?php echo $extdisplay ?>"/>
 	<input type="hidden" id="action" name="action" value="<?php echo $formAction ?>"/>
 	<input type="hidden" id="repotrunkdirection" name="repotrunkdirection" value="">
@@ -401,32 +379,6 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<!--OPTIONAL ELEMENTS-->
 			<?php echo $optionalelems?>
 			<!--END OPTIONAL ELEMENTS-->
-			<!--ROUTE POSITION-->
-			<div class="element-container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
-								<div class="col-md-3">
-									<label class="control-label" for="route_seq"><?php echo _("Route Position")?></label>
-									<i class="fa fa-question-circle fpbx-help-icon" data-for="route_seq"></i>
-								</div>
-								<div class="col-md-9">
-									<select name="route_seq" class="form-control">
-									<?php echo $routeseqopts ?>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<span id="route_seq-help" class="help-block fpbx-help-block"><?php echo _("Where to insert this route or relocate it relative to the other routes.")?></span>
-					</div>
-				</div>
-			</div>
-			<!--END ROUTE POSITION-->
 			<!--TRUNK PRIORITY-->
 			<div class="element-container">
 				<div class="row">

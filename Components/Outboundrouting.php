@@ -27,17 +27,22 @@ class Outboundrouting extends ComponentBase{
 
 		$this->updatePatterns($route_id, $patterns)
 		->updateTrunks($route_id, $trunks)
-		->setRouteOrder($route_id, $seq);
+		->setOrder($route_id, 'new');
+
+		// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
+		if ($seq != 'new') {
+			$this->setOrder($route_id, $seq);
+		}
 
 		return $route_id;
 	}
 
-	public function addWithId($id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = ''){
+	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = ''){
 		$sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 		VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 		$sth = $this->Database->prepare($sql);
 		$sth->execute(array(
-			":route_id" => $id,
+			":route_id" => $route_id,
 			":name" => $name,
 			":outcid" => $outcid,
 			":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
@@ -51,11 +56,9 @@ class Outboundrouting extends ComponentBase{
 			":timezone" => $timezone
 		));
 
-		$route_id = $this->Database->lastInsertId();
-
 		$this->updatePatterns($route_id, $patterns)
 		->updateTrunks($route_id, $trunks)
-		->setRouteOrder($route_id, $seq);
+		->setOrder($route_id, $seq);
 
 		return $route_id;
 	}
@@ -76,79 +79,37 @@ class Outboundrouting extends ComponentBase{
 		return $this;
 	}
 
-	public function setRouteOrder($route_id, $seq){
-		$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
-		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
-		if($sequence == false){
+	public function setOrder($route_id, $order){
+		$sql = "SELECT `seq`,`route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
+		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+		if(!is_array($sequence)){
 			$sequence = [];
 		}
-		if ($seq != 'new') {
-			$key = array_search($route_id, $sequence);
-			if ($key === false) {
-				return (false);
-			}
-		}
-		switch ("$seq") {
-			case 'up':
-			if (!isset($sequence[$key - 1])){
-				break;
-			}
-			$previous = $sequence[$key - 1];
-			$sequence[$key - 1] = $route_id;
-			$sequence[$key] = $previous;
-			break;
-			case 'down':
-			if (!isset($sequence[$key + 1])){
-				break;
-			}
-			$previous = $sequence[$key + 1];
-			$sequence[$key + 1] = $route_id;
-			$sequence[$key] = $previous;
-			break;
-			case 'top':
-			unset($sequence[$key]);
-			array_unshift($sequence, $route_id);
-			break;
-			case 'bottom':
-			unset($sequence[$key]);
-			case 'new':
-			// fallthrough, no break
-			$sequence[$route_id] = $route_id;
-			break;
-			case '0':
-			unset($sequence[$key]);
-			array_unshift($sequence, $route_id);
-			break;
-			default:
-			if (!ctype_digit($seq)) {
-				return false;
-			}
-			if ($seq > count($sequence) - 1) {
+		if ($order === 'new') {
+			array_unshift($sequence,$route_id);
+		} elseif(ctype_digit($order) && $sequence[$order] !== $route_id) {
+			$key = array_search($route_id,$sequence);
+			if($key !== false) {
 				unset($sequence[$key]);
-				$sequence[] = $route_id;
-				break;
+				$sequence = array_values($sequence);
 			}
-			if ($sequence[$seq] == $route_id) {
-				break;
-			}
-			$sequence[$key] = "bookmark";
-			$remainder = array_slice($sequence, $seq);
-			array_unshift($remainder, $route_id);
-			$sequence = array_merge(array_slice($sequence, 0, $seq), $remainder);
-			unset($sequence[array_search("bookmark", $sequence)]);
-			break;
+			array_splice($sequence, $order, 0, $route_id);
+			$sequence = array_values($sequence); //jic
+		} elseif(!ctype_digit($order)) {
+			throw new \Exception("Dont know what to do with $order");
+		} else {
+			//order didnt change
+			return;
 		}
-		$seq = 0;
-		$final_seq = false;
-		sql('DELETE FROM `outbound_route_sequence` WHERE 1');
-		$stmt = $this->Database->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
-		$sequence = is_array($sequence)?$sequence:[];
-		foreach ($sequence as $rid) {
-			$stmt->execute([$rid,$seq]);
-			if ($rid == $route_id) {
-				$final_seq = $seq;
+
+		$this->Database->query('DELETE FROM `outbound_route_sequence` WHERE 1');
+		$stmt = $this->Database->prepare('INSERT INTO `outbound_route_sequence` (`seq`, `route_id`) VALUES (?,?)');
+
+		foreach ($sequence as $k => $v) {
+			$stmt->execute([$k,$v]);
+			if ($v == $route_id) {
+				$final_seq = $k;
 			}
-			$seq++;
 		}
 		return $final_seq;
 	}
@@ -167,11 +128,11 @@ class Outboundrouting extends ComponentBase{
 		return $sth->fetch(PDO::FETCH_ASSOC);
 	}
 
-	public function updateTrunks($route_id, &$trunks, $delete = false){
+	public function updateTrunks($route_id, $trunks, $delete = false){
 		if ($delete) {
 			$this->deleteTrunkRouteById($route_id);
 		}
-		$stmt = $this->Database->prepare('INSERT INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
+		$stmt = $this->Database->prepare('REPLACE INTO `outbound_route_trunks` (`route_id`, `trunk_id`, `seq`) VALUES (?,?,?)');
 		$seq = 0;
 		foreach ($trunks as $trunk) {
 			$stmt->execute([$route_id, $trunk, $seq]);
@@ -180,21 +141,21 @@ class Outboundrouting extends ComponentBase{
 		return $this;
 	}
 
-	public function allUnique(array $array, $column){
+	public function areAllPaternsUnique(array $array, $column){
 		$arraySize = count($array);
 		$uniqueColumnSize = count(array_unique(array_column($array,$column)));
 		return $arraySize === $uniqueColumnSize;
 	}
 
-	public function updatePatterns($route_id, &$patterns, $delete = false){
+	public function updatePatterns($id, $patterns, $delete = false){
 		$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
 		$insert_pattern = [];
 		/**
 		* This was a todo in functions inc. Throwing an exception here may be to big of a functional change
 		* For now we log this and later we can make it do magic. ¯\_(シ)_/¯
 		**/
-		if(!$this->allUnique($patterns,'prepend_digits')){
-			dbug(sprintf(_("All the patterns for route id %s were NOT unique which can cause unexpected behavior This may be unallowed in the future."),$route_id));
+		if(!$this->areAllPaternsUnique($patterns,'prepend_digits')){
+			dbug(sprintf(_("All the patterns for route id %s were NOT unique which can cause unexpected behavior This may be unallowed in the future."),$id));
 		}
 		foreach ($patterns as $pattern) {
 			$match_pattern_prefix = preg_replace($filter, '', strtoupper(trim($pattern['match_pattern_prefix'])));
@@ -213,11 +174,11 @@ class Outboundrouting extends ComponentBase{
 		}
 
 		if ($delete) {
-			$this->deletePatternsById($route_id);
+			$this->deletePatternsById($id);
 		}
 		$stmt = $this->Database->prepare('REPLACE INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES(:route_id, :prefix, :pass, :cid, :digits)');
 		foreach ($insert_pattern as $pattern) {
-			$pattern[':route_id'] = $route_id;
+			$pattern[':route_id'] = $id;
 			$stmt->execute($pattern);
 		}
 		return $this;
@@ -244,10 +205,10 @@ class Outboundrouting extends ComponentBase{
 		return $sth->fetchAll(PDO::FETCH_COLUMN);
 	}
 
-	public function getRoutePatternsByID($route_id){
+	public function getRoutePatternsById($id){
 		$sql = "SELECT * FROM `outbound_route_patterns` WHERE `route_id` = ? ORDER BY `match_pattern_prefix`, `match_pattern_pass`";
 		$sth = $this->Database->prepare($sql);
-		$sth->execute(array($route_id));
+		$sth->execute(array($id));
 		return $sth->fetchAll(PDO::FETCH_ASSOC);
 	}
 
