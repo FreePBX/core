@@ -4104,29 +4104,9 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 // override some of the mailbox options or remove them if novm
 //
 function core_devices_get_user_mappings() {
-	static $devices;
-
-	if (isset($devices)) {
-		return $devices;
-	}
-	$device_list = core_devices_list("all",'full', true);
-	$device_list = is_array($device_list)?$device_list:array();
-	foreach ($device_list as $device) {
-		$devices[$device['id']] = $device;
-	}
-	$user_list = core_users_list(true);
-	$user_list = is_array($user_list)?$user_list:array();
-	foreach ($user_list as $user) {
-		$users[$user[0]]['description'] = $user[1];
-		$users[$user[0]]['vmcontext'] = $user[2];
-	}
-	foreach ($devices as $id => $device) {
-		if ($device['devicetype'] == 'fixed') {
-			$devices[$id]['vmcontext'] = $users[$device['user']]['vmcontext'];
-			$devices[$id]['description'] = $users[$device['user']]['description'];
-		}
-	}
-	return $devices;
+	_core_backtrace();
+	FreePBX::create()->Core;
+	return FreePBX\modules\Core\Driver::devicesGetUserMappings();
 }
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
