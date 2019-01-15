@@ -948,9 +948,7 @@ class dialparties{
 
 	static function setHeader($ext) {
 		$c = 'dialparties-setheader'; // Context
-		$ext->add($c, 's', '', new \ext_execif('$["${SIPADDHEADER}"!="" | "${HASH(dialparties,ALERTINFO_SET_FLAG)}"="1"]','Return'));
 		$ext->add($c, 's', '', new \ext_setvar('HKEY','${CUT(SIPADDHEADER,:,1)}'));
-		$ext->add($c, 's', '', new \ext_execif('$["${HKEY}"="Alert-Info" & "${HASH(dialparties,ALERTINFO_SET_FLAG)}"="1"]','Return'));
 		$ext->add($c, 's', '', new \ext_setvar('HVAL','${CUT(SIPADDHEADER,:,2)}'));
 		$ext->add($c, 's', '', new \ext_setvar('HASH(__SIPHEADERS,${HKEY})','${HVAL}'));
 		$ext->add($c, 's', '', new \ext_return());
@@ -958,9 +956,7 @@ class dialparties{
 
 	static function alertInfo($ext) {
 		$c = 'dialparties-alertinfo'; // Context
-		$ext->add($c, 's', '', new \ext_sethash('dialparties','ALERTINFO_SET_FLAG','1'));
 		$ext->add($c, 's', '', new \ext_noop('Setting Alert-Info:  ${HASH(dialparties,ALERTINFO)}'));
-		//TODO THIS IS WRONG?
 		$ext->add($c, 's', '', new \ext_execif('$["${RVOL}"!=""]','Set','ALERTINFO=${ALERTINFO}\;volume=${RVOL}','Set','ALERTINFO=${ALERTINFO}'));
 		$ext->add($c, 's', '', new \ext_setvar('HASH(__SIPHEADERS,Alert-Info)','${ALERTINFO}'));
 		$ext->add($c, 's', '', new \ext_return());
