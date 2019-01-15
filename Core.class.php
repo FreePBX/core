@@ -1558,8 +1558,6 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
 		}
 
-		// create a voicemail symlink if needed
-		// TODO: This should be hooked from voicemail
 		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','mapMailBox') ) {
 			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
