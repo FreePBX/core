@@ -211,7 +211,7 @@ include '/etc/freepbx.conf';
 
 			$agi->exec("UserEvent", $user_event_body);
 
-			update_device_mailbox($device, "");
+			update_device_mailbox($device, null);
 
 			cli_debug("Setting device $device states to INVALID before deleting them",5);
 			if ($fm_devstate) {
