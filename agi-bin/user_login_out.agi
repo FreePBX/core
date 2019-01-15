@@ -680,27 +680,18 @@ include '/etc/freepbx.conf';
 	}
 
 	function update_device_mailbox($device, $mailbox) {
-		$core = FreePBX::create()->Core;
-		$deviceDetails = $core->getDevice($device);
-
-		$settingType = $deviceDetails['tech'] === 'pjsip' ? 'mailboxes' : 'mailbox';
-		$oldMboxSetting = \FreePBX\modules\Core\Driver::map_dev_user($deviceDetails['account'], $settingType, $deviceDetails['mailbox']);
-
-		try {
-			$tech = ($deviceDetails['tech'] === 'pjsip') ? 'sip' : $deviceDetails['tech'];
-			$sql = "UPDATE `".$tech."` SET `data` = :data WHERE `keyword` = 'mailbox' AND `id` = :id";
-			$sth = \FreePBX::Database()->prepare($sql);
-			$sth->execute(array(":data" => $mailbox, ':id' => $device));
-		} catch(\Exception $e) {
-			cli_debug($e->getMessage(),5);
-			exit();
+		global $astspooldir;
+		if(true) {
+			if(!empty($mailbox)) {
+				exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
+			} else {
+				exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+				if ($ret) {
+					cli_debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
+				}
+			}
+		} else {
+			FreePBX::Voicemail()->updateAliasDeviceMapping($device, $mailbox);
+			exec("asterisk -rx 'voicemail reload'");
 		}
-
-		$mboxSetting = \FreePBX\modules\Core\Driver::map_dev_user($deviceDetails['account'], $settingType, $mailbox);
-		dbug($oldMboxSetting);
-		dbug($mboxSetting);
-
-		//write out to voicemail.conf
-		//reload asterisk
-		exec("asterisk -rx 'voicemail reload'");
 	}

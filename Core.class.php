@@ -1207,7 +1207,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					if($_REQUEST['vm'] == 'enabled') {
 						$fields['mailbox'] = array("value" => $account.'@device', "flag" => $flag++);
 					}
-				} elseif (($keyword == 'vmexten' && $data == '') || $keyword == 'mailbox_cb' || $keyword === 'mailbox') {
+				} elseif ($keyword == 'vmexten' && $data == '') {
 					// don't add it
 				} else {
 					$fields[$keyword] = array("value" => $data, "flag" => $flag++);
@@ -1307,11 +1307,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				"flag" => $flag++
 			),
 			"mailbox" => array(
-				"value" => $number."@default",
-				"flag" => $flag++
-			),
-			"mailbox_override" => array(
-				"value" => "no",
+				"value" => $number."@device",
 				"flag" => $flag++
 			),
 			"account" => array(
@@ -1424,6 +1420,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		} else {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
+		}
+
+		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','mapMailBox') ) {
+			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
 
 		// before calling device specifc funcitions, get rid of any bogus fields in the array

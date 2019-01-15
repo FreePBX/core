@@ -135,20 +135,20 @@ abstract class Driver {
 				break;
 				case 'mailboxes':
 				case 'mailbox':
-				if ((empty($dev_user_map[$account]['vmcontext']) || $dev_user_map[$account]['vmcontext'] == 'novm')
-					&& strtolower($data) == "$account" . "@device"
-					&& static::$removeMailboxSetting
-				) {
-					// they have no vm so don't put a mailbox=line
-					$user_option = "";
-				} elseif (strtolower($data) == "$account" . "@device"
-					&& !empty($dev_user_map[$account]['vmcontext'])
-					&& $dev_user_map[$account]['vmcontext'] != 'novm'
-				) {
-					$user_option = $dev_user_map[$account]['user'] . "@" . $dev_user_map[$account]['vmcontext'];
-				} else {
-					$user_option = $data;
-				}
+					if ((empty($dev_user_map[$account]['vmcontext']) || $dev_user_map[$account]['vmcontext'] == 'novm')
+						&& strtolower($data) == "$account" . "@device"
+						&& static::$removeMailboxSetting
+					) {
+						// they have no vm so don't put a mailbox=line
+						$user_option = "";
+					} elseif (strtolower($data) == "$account" . "@device"
+						&& !empty($dev_user_map[$account]['vmcontext'])
+						&& $dev_user_map[$account]['vmcontext'] != 'novm'
+					) {
+						$user_option = $dev_user_map[$account]['user'] . "@" . $dev_user_map[$account]['vmcontext'];
+					} else {
+						$user_option = $data;
+					}
 			}
 			$output = $keyword . "=" . $user_option . "\n";
 		} else {
