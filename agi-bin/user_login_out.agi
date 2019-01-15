@@ -711,6 +711,9 @@ include '/etc/freepbx.conf';
 		} else {
 			if(!empty($mailbox)) {
 				exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
+				if ($ret) {
+					cli_debug("Got Return code: $ret trying to link: {$astspooldir}/voicemail/device/$device",5);
+				}
 			} else {
 				exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
 				if ($ret) {
