@@ -85,12 +85,14 @@ $rgmethod = trim($rgmethod);
 // Get all headers
 $headers = array();
 $alertinfo_set_flag = 0;
+$rvol = get_var( $AGI, "RVOL" );
 $alertinfo = get_var( $AGI, "ALERT_INFO" );
 if ($alertinfo) {
-	$alertinfo_set_flag = 1;
-	debug("Setting Alert-Info:  $alertinfo", 4);
-	$headers['Alert-Info'] = $alertinfo;
-	$AGI->set_alertinfo($alertinfo);
+	if($rvol !=""){
+		$headers['Alert-Info'] = $alertinfo.'\;volume='.$rvol;
+	} else {
+		$headers['Alert-Info'] = $alertinfo;
+	}
 }
 
 $sippheader = get_var( $AGI, "SIPADDHEADER" );
@@ -101,10 +103,7 @@ if ($sippheader) {
 
 foreach ($headers as $h => $v) {
 	debug("Setting sipheader $h: $v", 4);
-	 if($alertinfo_set_flag == 1 && $h == 'Alert-Info'){
-		 continue;
-	 }
-	$AGI->set_variable("HASH(__SIPHEADERS,$h)", $v);
+	$AGI->set_variable("HASH(_SIPHEADERS,$h)", $v);
 }
 
 // Follow-Me is only one setting PR_DIALSTATUS so don't bother fetching if not a followme
@@ -592,7 +591,7 @@ if($rgmethod == 'firstnotonphone'){
 	}
 	debug("ONLY available extensions ".print_r($extenavail,true), 3);
 //now we should append other numbers to this array. incase noting is available !!!
-	foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier 
+	foreach($dsarray  as $key => $k){ // use dsarray to eliminate the extensions being filtered earlier
 		if(!in_array($key,$extenavail)){
 			$extenavail[] = $key;
 			$dsarraynew[$key] = $k;
