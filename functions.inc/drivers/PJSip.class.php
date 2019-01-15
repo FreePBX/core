@@ -1,6 +1,7 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
+use \FreePBX\modules\Core\Driver as techDriver;
 if(!class_exists("\\FreePBX\\Modules\\Core\\Drivers\\Sip")) {
 	include(__DIR__."/Sip.class.php");
 }
@@ -40,40 +41,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"shortName" => "PJSIP",
 			"description" => _("A new SIP channel driver for Asterisk, chan_pjsip is built on the PJSIP SIP stack. A collection of resource modules provides the bulk of the SIP functionality")
 		);
-	}
-
-	public function addDevice($id, $settings) {
-		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
-		$sth = $this->database->prepare($sql);
-		$settings = is_array($settings)?$settings:array();
-		foreach($settings as $key => $setting) {
-			$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
-		}
-		return true;
-	}
-
-	public function delDevice($id) {
-		$sql = "DELETE FROM sip WHERE id = ?";
-		$sth = $this->database->prepare($sql);
-		$sth->execute(array($id));
-		return true;
-	}
-
-	public function getDevice($id) {
-		$sql = "SELECT keyword,data FROM sip WHERE id = ?";
-		$sth = $this->database->prepare($sql);
-		$tech = array();
-		try {
-			$sth->execute(array($id));
-			$tech = $sth->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
-			//reformulate into what is expected
-			//This is in the try catch just for organization
-			foreach($tech as &$value) {
-				$value = $value[0];
-			}
-		} catch(\Exception $e) {}
-
-		return $tech;
 	}
 
 	public function getDefaultDeviceSettings($id, $displayname, &$flag) {
@@ -920,7 +887,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
-		$endpoint[] = "callerid=".$config['callerid'];
+		$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
 		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
 		$validdtmf = array("rfc4733","inband","info");
 		if(version_compare($this->version,'13','ge')) {
@@ -940,14 +907,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
 			switch($mwisub) {
 				case "solicited":
-					$aor[] = "mailboxes=".$config['mailbox'];
+					$aor[] = techDriver::map_dev_user($config['account'], 'mailboxes', $config['mailbox']);
 				break;
 				case "unsolicited":
-					$endpoint[] = "mailboxes=".$config['mailbox'];
+					$endpoint[] = techDriver::map_dev_user($config['account'], 'mailboxes', $config['mailbox']);
 				break;
 				case "auto":
-					$aor[] = "mailboxes=".$config['mailbox'];
-					$endpoint[] = "mailboxes=".$config['mailbox'];
+					$aor[] = techDriver::map_dev_user($config['account'], 'mailboxes', $config['mailbox']);
+					$endpoint[] = techDriver::map_dev_user($config['account'], 'mailboxes', $config['mailbox']);
 					$endpoint[] = "mwi_subscribe_replaces_unsolicited=yes";
 				break;
 			}

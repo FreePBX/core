@@ -35,39 +35,6 @@ class core_conf {
 		return self::$obj;
 	}
 
-	// map the actual vmcontext and user devicename if the device is fixed
-	private function map_dev_user($account, $keyword, $data) {
-		global $amp_conf;
-
-		if (!isset($this->dev_user_map)) {
-			$this->dev_user_map = core_devices_get_user_mappings();
-		}
-
-		if (!empty($this->dev_user_map[$account]) && $this->dev_user_map[$account]['devicetype'] == 'fixed') {
-			switch (strtolower($keyword)) {
-				case 'callerid':
-				$user_option = $this->dev_user_map[$account]['description'] . ' <' . $account . '>';
-				break;
-				case 'mailbox':
-				if ((empty($this->dev_user_map[$account]['vmcontext']) || $this->dev_user_map[$account]['vmcontext'] == 'novm')
-				&& strtolower($data) == "$account" . "@device" && $amp_conf['DEVICE_REMOVE_MAILBOX']) {
-					// they have no vm so don't put a mailbox=line
-					return "";
-				} elseif (strtolower($data) == "$account" . "@device"
-				&& !empty($this->dev_user_map[$account]['vmcontext']) &&
-				$this->dev_user_map[$account]['vmcontext'] != 'novm') {
-					$user_option = $this->dev_user_map[$account]['user'] . "@" . $this->dev_user_map[$account]['vmcontext'];
-				} else {
-					$user_option = $data;
-				}
-			}
-			$output = $keyword . "=" . $user_option . "\n";
-		} else {
-			$output = $keyword . "=" . $data . "\n";
-		}
-		return $output;
-	}
-
 	// return an array of filenames to write
 	function get_filename() {
 		global $chan_dahdi;
@@ -464,7 +431,7 @@ class core_conf {
 					break;
 					case 'callerid':
 					case 'mailbox':
-					$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+					$output .= FreePBX\modules\Core\Driver::map_dev_user($account, $result2['keyword'], $result2['data']);
 					break;
 					case 'secret_origional':
 					//stupidness coming through
@@ -685,7 +652,7 @@ class core_conf {
 					break;
 					case 'callerid':
 					case 'mailbox':
-						$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+						$output .= FreePBX\modules\Core\Driver::map_dev_user($account, $result2['keyword'], $result2['data']);
 					break;
 					case 'context':
 						$context = $option;
@@ -796,7 +763,7 @@ class core_conf {
 					break;
 					case 'callerid':
 					case 'mailbox':
-					$output .= $this->map_dev_user($account, $result2['keyword'], $result2['data']);
+					$output .= FreePBX\modules\Core\Driver::map_dev_user($account, $result2['keyword'], $result2['data']);
 					break;
 					default:
 					$output .= $result2['keyword']."=".$result2['data']."\n";
@@ -3914,20 +3881,65 @@ function core_do_get_config($engine) {
 
 	$ext->add($mcontext, $exten,'', new ext_hangup()); // TODO: once Asterisk issue fixed label as theend
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
-	/*
-	$ext->add($mcontext, $exten, 'theend', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"]', 'macro-one-touch-record,s,sstate', false, '${FROMEXTEN},NOT_INUSE'));
-	$ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"="${CUT(CALLFILENAME,-,2)}"]', 'macro-one-touch-record,s,sstate', false, '${IF($["${EXTTOCALL}"!=""]?${EXTTOCALL}:${CUT(CALLFILENAME,-,2)})},NOT_INUSE'));
-	$ext->add($mcontext, $exten, '', new ext_gosubif('$["${ONETOUCH_REC}"="RECORDING"&"${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)}"!="${CUT(CALLFILENAME,-,2)}"]','macro-one-touch-record,s,sstate',false,'${MASTER_CHANNEL(CLEAN_DIALEDPEERNUMBER)},NOT_INUSE'));
-	$ext->add($mcontext,$exten,'', new ext_noop_trace('ONETOUCH_REC: ${ONETOUCH_REC}',5));
-	*/
 
-	/* Now generate a clean DIALEDPEERNUMBER if ugly followme/ringgroup extensions dialplans were engaged
-	* doesn't seem like this is need with some of the NoCDRs() but leave for now and keep an eye on it
-	*
-	$ext->add($mcontext, $exten, '', new ext_execif('$["${CLEAN_DIALEDPEERNUMBER}"=""]','Set','CLEAN_DIALEDPEERNUMBER=${IF($[${FIELDQTY(DIALEDPEERNUMBER,-)}=1]?${DIALEDPEERNUMBER}:${CUT(CUT(DIALEDPEERNUMBER,-,2),@,1)})}'));
-	$ext->add($mcontext, $exten, '', new ext_set('CDR(clean_dst)','${CLEAN_DIALEDPEERNUMBER}'));
-	*/
+	// Used to log a user onto an adhoc device. Most of the work is done by
+	// user_login_out.agi AGI script
+	$mcontext = 'macro-user-logon';
+	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
+	$ext->add($mcontext, 's','', new ext_answer());
+	$ext->add($mcontext, 's','', new ext_wait(1));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICETYPE}" = "fixed"]','s-FIXED,1'));
 
+	// get user's extension
+	$ext->add($mcontext, 's','', new ext_set('AMPUSER','${ARG1}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${AMPUSER}" != ""]','gotpass'));
+	$ext->add($mcontext, 's','', new ext_read('AMPUSER', 'please-enter-your-extension-then-press-pound', '', '', 4));
+
+	// get user's password and authenticate
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${AMPUSER}" = ""]','s-MAXATTEMPTS,1'));
+	$ext->add($mcontext, 's','gotpass', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${AMPUSER}/password)}" = "0"]','s-NOUSER,1'));
+	$ext->add($mcontext, 's','', new ext_set('AMPUSERPASS','${DB_RESULT}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$[${LEN(${AMPUSERPASS})} = 0]','s-NOPASSWORD,1'));
+
+	// do not continue if the user has already logged onto this device
+	$ext->add($mcontext, 's','', new ext_set('DEVICEUSER','${DB(DEVICE/${CALLERID(number)}/user)}'));
+	$ext->add($mcontext, 's','gotpass', new ext_gotoif('$["${DEVICEUSER}" = "${AMPUSER}"]','s-ALREADYLOGGEDON,1'));
+	$ext->add($mcontext, 's','', new ext_authenticate('${AMPUSERPASS}'));
+	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,login,${CALLERID(number)},${AMPUSER}'));
+	$ext->add($mcontext, 's','', new ext_playback('agent-loginok'));
+
+	$ext->add($mcontext, 's-FIXED','', new ext_noop('Device is FIXED and cannot be logged into'));
+	$ext->add($mcontext, 's-FIXED','', new ext_saynumber('${CALLERID(number)}'));
+	$ext->add($mcontext, 's-FIXED','', new ext_playback('vm-isunavail&vm-goodbye'));
+	$ext->add($mcontext, 's-FIXED','', new ext_hangup());
+
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_noop('This device has already been logged into by this user'));
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_playback('vm-goodbye'));
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_hangup()); //TODO should play msg indicated device is already logged into
+
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_noop('This extension does not exist or no password is set'));
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_playback('pbx-invalid'));
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_hangup());
+
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_noop('Too many login attempts'));
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_playback('vm-goodbye'));
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_hangup());
+
+	$ext->add($mcontext, 's-NOUSER','', new ext_noop('Invalid extension ${AMPUSER} entered'));
+	$ext->add($mcontext, 's-NOUSER','', new ext_playback('pbx-invalid'));
+	$ext->add($mcontext, 's-NOUSER','', new ext_goto('s,playagain'));
+
+	// Used to log a user off of an adhoc device. Most of the work is done by
+	// user_login_out.agi AGI script
+	$mcontext = 'macro-user-logoff';
+	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICETYPE}" = "fixed"]','s-FIXED,1'));
+	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,logout,${CALLERID(number)}'));
+	$ext->add($mcontext, 's','done', new ext_playback('agent-loggedoff'));
+
+	$ext->add($mcontext, 's-FIXED','', new ext_noop('Device is FIXED and cannot be logged into'));
+	$ext->add($mcontext, 's-FIXED','', new ext_playback('an-error-has-occured&vm-goodbye'));
+	$ext->add($mcontext, 's-FIXED','', new ext_hangup()); //TODO should play msg indicated device cannot be logged into
 
 	/* macro-hangupcall */
 

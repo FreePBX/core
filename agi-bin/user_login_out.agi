@@ -60,12 +60,6 @@ include '/etc/freepbx.conf';
 	}
 	exit;
 
-	/*
-exten => s,n,System(rm -f ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
-exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/voicemail)}/${AMPUSER}/ ${ASTSPOOLDIR}/voicemail/device/${CALLERID(number)})
-*/
-
-
 	// Get the requested action (login or logout)
 	//
 	function get_action() {
@@ -180,10 +174,7 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 
 		$vmcontext = get_voicemail_context($user);
 		if ($vmcontext != 'novm') {
-			exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
-			if ($ret) {
-				cli_debug("Got Return code: $ret trying to: /bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device",5);
-			}
+			update_device_mailbox($device, "{$user}@{$vmcontext}");
 		}
 	}
 
@@ -218,9 +209,9 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
  				$user_event_body = "\"UserDeviceRemoved|Data: {$current_user},{$device}\"";
  			}
 
-     	$agi->exec("UserEvent", $user_event_body);
+			$agi->exec("UserEvent", $user_event_body);
 
-			exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+			update_device_mailbox($device, "");
 
 			cli_debug("Setting device $device states to INVALID before deleting them",5);
 			if ($fm_devstate) {
@@ -244,9 +235,6 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 			//
 			//$agi->database_deltree('CustomDevstate','FOLLOWME'.$device);
 			//$agi->database_deltree('CustomDevstate','DEVDND'.$device);
-			if ($ret) {
-				cli_debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
-			}
 			set_device_user($device, 'none');
 		}
 	}
@@ -709,6 +697,25 @@ exten => s,n,System(/bin/ln -s ${ASTSPOOLDIR}/voicemail/${DB(AMPUSER/${AMPUSER}/
 				return $qcall[$user];
 			} else {
 				return null;
+			}
+		}
+	}
+
+	function update_device_mailbox($device, $mailbox) {
+		$engine_info = engine_getinfo();
+		$version = $engine_info['version'];
+		global $astspooldir;
+		if((version_compare($version, "13.25", ">=") && version_compare($version, "14", "<")) || version_compare($version, "16.2", ">=")) {
+			FreePBX::Voicemail()->updateAliasDeviceMapping($device, $mailbox);
+			exec("asterisk -rx 'voicemail reload'");
+		} else {
+			if(!empty($mailbox)) {
+				exec("/bin/ln -s {$astspooldir}/voicemail/{$vmcontext}/{$user}/ {$astspooldir}/voicemail/device/$device", $output, $ret);
+			} else {
+				exec("/bin/rm -f {$astspooldir}/voicemail/device/$device",$output, $ret);
+				if ($ret) {
+					cli_debug("Got Return code: $ret trying to remove: {$astspooldir}/voicemail/device/$device",5);
+				}
 			}
 		}
 	}
