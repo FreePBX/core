@@ -10,50 +10,50 @@
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.18.48* FREEPBX-18801 
+		*14.0.18.48* FREEPBX-18801
 		*14.0.18.47* Fixing FREEPBX-18880 Adding allow/deny option for IAX2 extensions for
-		*14.0.18.46* FREEPBX-18926 FREEPBX-17953 FREEPBX-18942 remove call to sipaddheader and fix func-apply-sipheaders to address FREEPBX-18926 
-		*14.0.18.45* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name 
-		*14.0.18.44* Callaccounting changes to core 
+		*14.0.18.46* FREEPBX-18926 FREEPBX-17953 FREEPBX-18942 remove call to sipaddheader and fix func-apply-sipheaders to address FREEPBX-18926
+		*14.0.18.45* FREEPBX-18509 PSTN calls forwarded off system to PSTN don't have correct CID Name
+		*14.0.18.44* Callaccounting changes to core
 		*14.0.18.43* FREEPBX-18507
-		*14.0.18.42* FREEPBX-18591 Disabled Option Allows Input 
-		*14.0.18.41* FREEPBX-17953 Alert Info headers getting set twice for chan_sip devices 
-		*14.0.18.40* FREEPBX-15536 Throw strong warning if user creates an outbound route with a single dot dial pattern 
-		*14.0.18.39* FREEPBX-17953 FREEPBX-18336 Alert-Info header issue fixes 
-		*14.0.18.38* Fixing FREEPBX-17953 Alert info headers getting set twice 
-		*14.0.18.37* FREEPBX-18205 
-		*14.0.18.36* FREEPBX-18176 
-		*14.0.18.35* FREEPBX-18165 pjsip allow reload should be defaulted to yes 
+		*14.0.18.42* FREEPBX-18591 Disabled Option Allows Input
+		*14.0.18.41* FREEPBX-17953 Alert Info headers getting set twice for chan_sip devices
+		*14.0.18.40* FREEPBX-15536 Throw strong warning if user creates an outbound route with a single dot dial pattern
+		*14.0.18.39* FREEPBX-17953 FREEPBX-18336 Alert-Info header issue fixes
+		*14.0.18.38* Fixing FREEPBX-17953 Alert info headers getting set twice
+		*14.0.18.37* FREEPBX-18205
+		*14.0.18.36* FREEPBX-18176
+		*14.0.18.35* FREEPBX-18165 pjsip allow reload should be defaulted to yes
 		*14.0.18.34* FREEPBX-18161
-		*14.0.18.33* FREEPBX-18016 Trunk inbound Maximum Channels not honored. 
-		*14.0.18.32* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard 
-		*14.0.18.31* FREEPBX-18016 Improving tool-tip for maximum channel field. 
-		*14.0.18.30* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES 
-		*14.0.18.29* FREEPBX-17888 Cannot set T.38 MaxDatagram in PJSIP trunk 
+		*14.0.18.33* FREEPBX-18016 Trunk inbound Maximum Channels not honored.
+		*14.0.18.32* FREEPBX-18027 PBXact - Basic Mode - Admin Users with only CDR allowed can still restart the setup wizard
+		*14.0.18.31* FREEPBX-18016 Improving tool-tip for maximum channel field.
+		*14.0.18.30* FREEPBX-17948 Fixe separator for global vairable  DYNAMIC_FEATURES
+		*14.0.18.29* FREEPBX-17888 Cannot set T.38 MaxDatagram in PJSIP trunk
 		*14.0.18.28* FREEPBX-17841
-		*14.0.18.27* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers 
+		*14.0.18.27* FREEPBX-17089 Follow Me with callconfirm doesn't work with external numbers
 		*14.0.18.26* FREEPBX-15896
 		*14.0.18.25* [core][search] Device link was wrong when Users/Devices mode is selected
-		*14.0.18.24* FREEPBX-17754 Bulk handler for virtual extension not working 
-		*14.0.18.23* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks 
-		*14.0.18.22* FREEPBX-15833 FREEPBX-17630 In-call feature code *1 defined twice 
-		*14.0.18.21* FREEPBX-16154  Invalid dialstatus in pjsip channels 
-		*14.0.18.20* FREEPBX-17594 Import of pjsip extensions without match attributes 
+		*14.0.18.24* FREEPBX-17754 Bulk handler for virtual extension not working
+		*14.0.18.23* FREEPBX-16782 - make sure we set the disabled trunk flag in the pjsip table as well as the trunks table when enabling and disabling trunks
+		*14.0.18.22* FREEPBX-15833 FREEPBX-17630 In-call feature code *1 defined twice
+		*14.0.18.21* FREEPBX-16154  Invalid dialstatus in pjsip channels
+		*14.0.18.20* FREEPBX-17594 Import of pjsip extensions without match attributes
 		*14.0.18.19* FREEPBX-17600
 		*14.0.18.18* Always remove res_pjproject from modules.conf
-		*14.0.18.17* FREEPBX-17588 Fix sql column key 
-		*14.0.18.16* Bugfix/FREEPBX-17437 
-		*14.0.18.15* Update registration string check 
+		*14.0.18.17* FREEPBX-17588 Fix sql column key
+		*14.0.18.16* Bugfix/FREEPBX-17437
+		*14.0.18.15* Update registration string check
 		*14.0.18.14* FREEPBX-15637
 		*14.0.18.13* FREEPBX-17492
 		*14.0.18.12* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated
-		*14.0.18.11* FREEPBX-17446 PJSip Trunk 'Permanent Auth Rejection' UI wrong 
-		*14.0.18.10* FREEPBX-17449 Alter Info : the inherit option under advanced settings is not working for Attended Transfer. 
+		*14.0.18.11* FREEPBX-17446 PJSip Trunk 'Permanent Auth Rejection' UI wrong
+		*14.0.18.10* FREEPBX-17449 Alter Info : the inherit option under advanced settings is not working for Attended Transfer.
 		*14.0.18.9* Fix incorrect CDR logging
-		*14.0.18.8* Fixing FREEPBX-17499 Adding default values in DID required parameters. 
-		*14.0.18.7* FREEPBX-7158 Device and User Mode - USEROUTCID Incorrect During Blind Transfer 
+		*14.0.18.8* Fixing FREEPBX-17499 Adding default values in DID required parameters.
+		*14.0.18.7* FREEPBX-7158 Device and User Mode - USEROUTCID Incorrect During Blind Transfer
 		*14.0.18.6* Fix trunk method
-		*14.0.18.5* FREEPBX-7158 Device and User Mode - USEROUTCID Incorrect During Blind Transfer 
+		*14.0.18.5* FREEPBX-7158 Device and User Mode - USEROUTCID Incorrect During Blind Transfer
 		*14.0.18.4* FREEPBX-17209 Tonezone / ringback tone by international DID
 		*14.0.18.3* FREEPBX-17381 Trunk does not allow Any CID if Outbound Caller ID is populated
 		*14.0.18.2* FREEPBX-17094 AlertInfo not clearing after answer?
