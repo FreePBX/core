@@ -1066,3 +1066,19 @@ if(!empty($routeDiff)) {
 	}
 }
 
+
+outn(_("Removing encoding on incoming routes alertinfo values..."));
+$sth = \FreePBX::Database()->prepare("SELECT * FROM incoming WHERE `alertinfo` != ''");
+$sth->execute();
+$res = $sth->fetchAll(\PDO::FETCH_ASSOC);
+foreach($res as $row) {
+	$sth1 = \FreePBX::Database()->prepare("UPDATE incoming SET `alertinfo` = :alertinfo WHERE cidnum = :cidnum AND extension = :extension");
+	try {
+		$sth1->execute(array(
+			":alertinfo" => htmlspecialchars_decode($row['alertinfo']),
+			":cidnum" => $row['cidnum'],
+			":extension" => $row['extension'],
+		));
+	} catch(\Exception $e) {}
+}
+out(_("done"));
