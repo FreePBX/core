@@ -788,6 +788,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
 		$request = freepbxGetSanitizedRequest();
+		$unsanitized = array(
+			'CC_AGENT_ALERT_INFO_DEFAULT',
+			'CC_MONITOR_ALERT_INFO_DEFAULT',
+			'ATTTRANSALERTINFO'
+			,'BLINDTRANSALERTINFO',
+			'INTERNALALERTINFO'
+		);
+		foreach($unsanitized as $s) {
+			if(isset($_POST[$s])) {
+				$request[$s] = $_POST[$s];
+			}
+		}
 		global $amp_conf;
 		if ($page == "advancedsettings"){
 			$freepbx_conf = $this->config;
@@ -1205,21 +1217,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$extdisplay= htmlspecialchars(isset($request['extdisplay'])?$request['extdisplay']:'');
 			$old_extdisplay = $extdisplay;
 			$dispnum = 'did'; //used for switch on config.php
-			$account = isset($request['account'])?$request['account']:'';
 			$action = isset($request['action'])?$request['action']:'';
-			$goto = isset($request['goto0'])?$request['goto0']:'';
-			$ringing = isset($request['ringing'])?$request['ringing']:'';
-			$fanswer = isset($request['fanswer'])?$request['fanswer']:'';
-			$reversal = isset($request['reversal'])?$request['reversal']:'';
-			$description = htmlspecialchars(isset($request['description'])?$request['description']:'');
-			$privacyman = isset($request['privacyman'])?$request['privacyman']:'0';
-			$pmmaxretries = isset($request['pmmaxretries'])?$request['pmmaxretries']:'';
-			$pmminlength = isset($request['pmminlength'])?$request['pmminlength']:'';
-			$alertinfo = htmlspecialchars(isset($request['alertinfo'])?$request['alertinfo']:'');
-			$mohclass = isset($request['mohclass'])?$request['mohclass']:'default';
-			$grppre = isset($request['grppre'])?$request['grppre']:'';
-			$delay_answer = isset($request['delay_answer'])&&$request['delay_answer']?$request['delay_answer']:'0';
-			$pricid = isset($request['pricid'])?$request['pricid']:'';
 			$rnavsort = isset($request['rnavsort'])?$request['rnavsort']:'description';
 			$didfilter = isset($request['didfilter'])?$request['didfilter']:'';
 			if (isset($request['submitclear']) && isset($request['goto0'])) {
