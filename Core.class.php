@@ -2395,7 +2395,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$settings['privacyman'] = isset($settings['privacyman'])?$settings['privacyman']:'0';
 		$settings['pmmaxretries'] = isset($settings['pmmaxretries'])?$settings['pmmaxretries']:'';
 		$settings['pmminlength'] = isset($settings['pmminlength'])?$settings['pmminlength']:'';
-		$settings['alertinfo'] = htmlspecialchars(isset($settings['alertinfo'])?$settings['alertinfo']:'');
+		$settings['alertinfo'] = isset($settings['alertinfo'])?$settings['alertinfo']:'';
 		$settings['ringing'] = isset($settings['ringing'])?$settings['ringing']:'';
 		$settings['reversal'] = isset($settings['reversal'])?$settings['reversal']:'';
 		$settings['mohclass'] = isset($settings['mohclass'])?$settings['mohclass']:'default';
