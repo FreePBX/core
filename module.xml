@@ -236,8 +236,8 @@
 			</key>
 		</table>
 		<table name="incoming">
-			<field name="cidnum" type="string" length="50" notnull="false"/>
-			<field name="extension" type="string" length="100"/>
+			<field name="cidnum" type="string" length="50" default="" primarykey="true"/>
+			<field name="extension" type="string" length="100" primarykey="true"/>
 			<field name="destination" type="string" length="50" notnull="false"/>
 			<field name="privacyman" type="boolean" notnull="false"/>
 			<field name="alertinfo" type="string" length="255" notnull="false"/>
