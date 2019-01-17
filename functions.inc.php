@@ -1592,7 +1592,7 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_setcallernumpres('allowed_not_screened'));
 				}
 				if (!empty($item['alertinfo'])) {
-					$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', $item['alertinfo'])));
+					$ext->add($context, $exten, '', new ext_setvar("__ALERT_INFO", str_replace(';', '\;', htmlspecialchars_decode($item['alertinfo']))));
 				}
 				if (!empty($item['rvolume'])) {
 					$ext->add($context, $exten, '', new ext_setvar("__RVOL", $item['rvolume']));
