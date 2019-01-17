@@ -792,6 +792,18 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
 		$request = freepbxGetSanitizedRequest();
+		$unsanitized = array(
+			'CC_AGENT_ALERT_INFO_DEFAULT',
+			'CC_MONITOR_ALERT_INFO_DEFAULT',
+			'ATTTRANSALERTINFO'
+			,'BLINDTRANSALERTINFO',
+			'INTERNALALERTINFO'
+		);
+		foreach($unsanitized as $s) {
+			if(isset($_POST[$s])) {
+				$request[$s] = $_POST[$s];
+			}
+		}
 		global $amp_conf;
 		if ($page == "advancedsettings"){
 			$freepbx_conf = $this->config;
