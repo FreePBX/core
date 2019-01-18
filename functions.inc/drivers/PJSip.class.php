@@ -199,8 +199,16 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "",
 				"flag" => $flag++
 			),
-			"refer_blind_progress" => array(
-				"value" => "yes",
+			"rtp_timeout" => array(
+				"value" => "0",
+				"flag" => $flag++
+			),
+			"rtp_timeout_hold" => array(
+				"value" => "0",
+				"flag" => $flag++
+			),
+			"timers_min_se" => array(
+				"value" => "90",
 				"flag" => $flag++
 			)
 		);
@@ -280,6 +288,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tmparr['timers'] = array('prompttext' => _('Session Timers'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1);
 		unset($select);
 
+		$tt = _("Minimum session timer expiration period. Time in seconds. This does not matter if Session Timers is set to No");
+		$tmparr['timers_min_se'] = array('prompttext' => _('Timer Expiration Period'), 'value' => '90', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is not set to None.").' [media_encryption_optimistic]';
@@ -305,6 +317,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$tt = _("Minimum time to keep an AoR");
 		$tmparr['minimum_expiration'] = array('prompttext' => _('Minimum Expiration'), 'value' => '60', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Maximum number of seconds without receiving RTP (while off hold) before terminating call.");
+		$tmparr['rtp_timeout'] = array('prompttext' => _('RTP Timeout'), 'value' => '0', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Maximum number of seconds without receiving RTP (while on hold) before terminating call.");
+		$tmparr['rtp_timeout_hold'] = array('prompttext' => _('RTP Hold Timeout'), 'value' => '0', 'tt' => $tt, 'level' => 1);
 		unset($select);
 
 		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
@@ -1118,6 +1138,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "timers=".$config['timers'];
 		}
 
+		if (!empty($config['timers_min_se'])) {
+			$endpoint[] = "timers_min_se=".$config['timers_min_se'];
+		}
+
 		if (!empty($config['outbound_proxy'])) {
 			$endpoint[] = "outbound_proxy=".$config['outbound_proxy'];
 		}
@@ -1128,6 +1152,18 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['refer_blind_progress'])) {
 			$endpoint[] = "refer_blind_progress=".$config['refer_blind_progress'];
+		}
+
+		if (!empty($config['refer_blind_progress'])) {
+			$endpoint[] = "refer_blind_progress=".$config['refer_blind_progress'];
+		}
+
+		if (!empty($config['rtp_timeout'])) {
+			$endpoint[] = "rtp_timeout=".$config['rtp_timeout'];
+		}
+
+		if (!empty($config['rtp_timeout_hold'])) {
+			$endpoint[] = "rtp_timeout_hold=".$config['rtp_timeout_hold'];
 		}
 
 		if(!empty($config['device_state_busy_at']) && is_numeric($config['device_state_busy_at']) && $config['device_state_busy_at'] > 0) {
