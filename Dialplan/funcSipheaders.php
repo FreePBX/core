@@ -25,6 +25,7 @@ class funcSipheaders{
 		$ext->add($c,$e,'', new \ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
 		$ext->add($c,$e,'', new \ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));
 		$ext->add($c,$e,'', new \ext_set('sipheader', '${HASH(SIPHEADERS,${sipkey})}'));
+		$driver = \FreePBX::Config()->get("ASTSIPDRIVER");
 		if (in_array($driver,array("both","chan_sip"))) {
 			$ext->add($c,$e,'', new \ext_execif('$["${sipheader}" = "unset" & "${TECH}" = "SIP"]','SIPRemoveHeader','${sipkey}:'));
 		}
@@ -32,7 +33,6 @@ class funcSipheaders{
 			$ext->add($c,$e,'', new \ext_execif('$["${sipheader}" = "unset" & "${TECH}" = "PJSIP"]','Set','PJSIP_HEADER(remove,${sipkey})='));
 		}
 		$ext->add($c,$e,'', new \ext_execif('$["${sipkey}" = "Alert-Info" & ${REGEX("^<[^>]*>" ${sipheader})} != 1]', 'Set', 'sipheader=<http://127.0.0.1>\;info=${sipheader}'));
-		$driver = \FreePBX::Config()->get("ASTSIPDRIVER");
 		if(in_array($driver,array("both","chan_sip"))) {
 			$ext->add($c,$e,'', new \ext_execif('$["${TECH}" = "SIP"]','SIPAddHeader','${sipkey},${sipheader}'));
 		}
