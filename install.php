@@ -1749,3 +1749,21 @@ if(!\FreePBX::Core()->getConfig('migratesendrpid')) {
 	\FreePBX::Database()->query($sql);
 	\FreePBX::Core()->setConfig('migratesendrpid',true);
 }
+
+// 2.5 new field
+//
+outn(_("checking for hint_override field .."));
+$sql = "SELECT `hint_override` FROM `devices`";
+$check = $db->getRow($sql, DB_FETCHMODE_ASSOC);
+if(DB::IsError($check)) {
+	$sql = "ALTER TABLE `devices` ADD `hint_override` VARCHAR(100) DEFAULT NULL";
+	$result = $db->query($sql);
+	if(DB::IsError($result)) {
+		out(_("fatal error"));
+		return false;
+	} else {
+		out(_("added"));
+	}
+} else {
+	out(_("already exists"));
+}
