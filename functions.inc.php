@@ -4117,7 +4117,7 @@ function core_devices_get_user_mappings() {
 	return $devices;
 }
 
-function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$editmode=false){
+function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$hint_override=null,$editmode=false){
 	_core_backtrace();
 	$flag = 2;
 	$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
@@ -4126,7 +4126,8 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		"devicetype" => array("value" => $devicetype),
 		"user" => array("value" => $user),
 		"description" => array("value" => $description),
-		"emergency_cid" => array("value" => $emergency_cid)
+		"emergency_cid" => array("value" => $emergency_cid),
+		"hint_override" => array("value" => $hint_override),
 	);
 	$settings = array_merge($settings,$fields);
 	// Asterisk treats no CallerID from an IAX device as 'hide CallerID', and ignores the CallerID
@@ -4350,19 +4351,20 @@ function core_hint_get($account){
 	if ($astman) {
 		$device=$astman->database_get("AMPUSER",$account."/device");
 		$device_arr = explode('&',$device);
-		$sql = "SELECT dial from devices where id in ('".implode("','",$device_arr)."')";
+		$sql = "SELECT dial, hint_override from devices where id in ('".implode("','",$device_arr)."')";
 	} else {
-		$sql = "SELECT dial from devices where user = '{$account}'";
+		$sql = "SELECT dial, hint_override from devices where user = '{$account}'";
 	}
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
 	//create an array of strings
 	if (is_array($results)){
 		foreach ($results as $result) {
+			$hint = !empty($result['hint_override']) ? $result['hint_override'] : $result['dial'];
 			if ($chan_dahdi) {
-				$dial[] = str_replace('ZAP', 'DAHDI', $result['dial']);
+				$dial[] = str_replace('ZAP', 'DAHDI', $hint);
 			} else {
-				$dial[] = $result['dial'];
+				$dial[] = $hint;
 			}
 		}
 	}
@@ -6018,7 +6020,7 @@ function core_devices_configpageload() {
 		}
 
 		// Ensure they exist before the extract
-		$devinfo_description = $devinfo_emergency_cid = null;
+		$devinfo_hint_override = $devinfo_description = $devinfo_emergency_cid = null;
 		$devinfo_devicetype = $devinfo_user = $devinfo_hardware = null;
 		$devinfo_tech = null;
 		if ( is_array($deviceInfo) ) {
@@ -6049,6 +6051,7 @@ function core_devices_configpageload() {
 			$currentcomponent->addguielem($section, new gui_selectbox('devicetype', $currentcomponent->getoptlist('devicetypelist'), $devinfo_devicetype, _("Device Type"), _("Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), false),"general");
 			$currentcomponent->addguielem($section, new gui_selectbox('deviceuser', $currentcomponent->getoptlist('deviceuserlist'), $devinfo_user, _("Default User"), _("Fixed devices will always mapped to this user.  Adhoc devices will be mapped to this user by default.<br><br>If selecting 'New User', a new User Extension of the same Device ID will be set as the Default User."), false),"general");
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
+			$currentcomponent->addguielem($section, new gui_textbox('hint_override', $devinfo_hint_override, _("Hint Override"), _("Only set this if you wish to override the hint referenced in ext-local. This is useful in situations where the hint doesnt match the dial string. This should not be changed unless you know what you are doing.")),"advanced");
 		} else {
 			$section = _("Extension Options");
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
@@ -6161,7 +6164,7 @@ function core_devices_configprocess() {
 		// really bad hack - but if core_users_add fails, want to stop core_devices_add
 
 		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true || !$_SESSION["AMP_user"]->checkSection('999')) {
-			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid)) {
+			if (core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override)) {
 				needreload();
 				if ($deviceuser == 'new') {
 					//redirect_standard_continue();
@@ -6203,7 +6206,7 @@ function core_devices_configprocess() {
 				$settings = array_merge($fields,$settings);
 				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
 			} else {
-				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,true);
+				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override,true);
 			}
 
 			needreload();
