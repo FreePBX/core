@@ -1364,13 +1364,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['user']['value'] = ($settings['user']['value'] == 'new') ? $id : $settings['user']['value'];
 		$settings['emergency_cid']['value'] = trim($settings['emergency_cid']['value']);
 		$settings['description']['value'] = trim($settings['description']['value']);
+		$settings['hint_override']['value'] = trim($settings['hint_override']['value']);
 
 		//insert into devices table
 		if($tech != 'virtual'){
-			$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid) values (?,?,?,?,?,?,?)";
+			$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid, hint_override) values (?,?,?,?,?,?,?,?)";
 			$sth = $this->database->prepare($sql);
 			try {
-				$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value']));
+				$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value'],$settings['hint_override']['value']));
 			} catch(\Exception $e) {
 				die_freepbx("Could Not Insert Device", $e->getMessage());
 				return false;
@@ -1437,6 +1438,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		unset($settings['description']);
 		unset($settings['emergency_cid']);
 		unset($settings['changecdriver']);
+		unset($settings['hint_override']);
 
 		//take care of sip/iax/zap config
 		$tech = strtolower($tech);
