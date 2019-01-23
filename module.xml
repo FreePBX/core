@@ -208,6 +208,7 @@
 			<field name="user" type="string" length="50" notnull="false"/>
 			<field name="description" type="string" length="50" notnull="false"/>
 			<field name="emergency_cid" type="string" length="100" notnull="false"/>
+			<field name="hint_override" type="string" length="100" notnull="false"/>
 			<key name="id" type="index">
 				<column name="id"/>
 			</key>
