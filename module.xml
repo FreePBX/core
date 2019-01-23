@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.18.48</version>
+	<version>14.0.18.49</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.18.49* FREEPBX-18926
 		*14.0.18.48* FREEPBX-18801
 		*14.0.18.47* Fixing FREEPBX-18880 Adding allow/deny option for IAX2 extensions for
 		*14.0.18.46* FREEPBX-18926 FREEPBX-17953 FREEPBX-18942 remove call to sipaddheader and fix func-apply-sipheaders to address FREEPBX-18926
