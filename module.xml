@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.55</version>
+	<version>13.0.122.56</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.56* FREEPBX-18926 use : to separate headers in chan sip
 		*13.0.122.55* Inherit SIPHEADERs into child channels
 		*13.0.122.54* Fixing FREEPBX-18880 Adding allow/deny option for IAX2 extensions for import/export 
 		*13.0.122.53* FREEPBX-18942 fix bug in 13 
