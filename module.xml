@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.22</version>
+	<version>15.0.3.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.2.23* FREEPBX-18926
 		*15.0.3.22* FREEPBX-18879 Unknown or unavailable item requested: 'recvip' 
 		*15.0.3.21* FREEPBX-18801 
 		*15.0.3.20* FREEPBX-18880 FREEPBX-18926 FREEPBX-17953 FREEPBX-18942 FREEPBX-18880
