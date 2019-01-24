@@ -3,6 +3,9 @@
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	Copyright 2017 Sangoma Technologies Inc
 
+require_once "phpagi.php";
+$AGI = new AGI();
+
 $channel = $argv[1];
 $filename = $argv[2];
 
