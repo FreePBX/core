@@ -3,28 +3,13 @@
 //	License for all code of this FreePBX module can be found in the license file inside the module directory
 //	Copyright 2017 Sangoma Technologies Inc
 
-require_once "phpagi.php";
-$AGI = new AGI();
-
-$channel = $argv[1];
-$filename = $argv[2];
-
-// NO channel !! exit !!
-if($channel == NULL){
-	exit;
-}
-
-// NO filename !!! exit !!
-if($filename == NULL){
-	exit;
-}
-
 //Bootstrap FreePBX
 $bootstrap_settings['freepbx_auth'] = false;
 $restrict_mods = true;
 include '/etc/freepbx.conf';
+require_once "phpagi.php";
+$AGI = new AGI();
 
-//jic these got overwritten inside of freepbx
 $channel = $argv[1];
 $filename = $argv[2];
 
