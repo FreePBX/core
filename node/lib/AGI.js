@@ -27,6 +27,13 @@ class AGI extends EventEmitter {
 		this.agiScript.stdout.on('data', this.scriptStdout.bind(this));
 		this.agiScript.on('exit', this.scriptExit.bind(this));
 
+		this.agiScript.stdout.on('error', (error) => {
+			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] <<< ${JSON.stringify(error)}`);
+		});
+		this.agiScript.stdin.on('error', (error) => {
+			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>> ${JSON.stringify(error)}`);
+		});
+
 		//push settings to script
 		for (var key in this.settings) {
 			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>> ${key}: ${this.settings[key]}`);
