@@ -18,6 +18,10 @@ class AGI extends EventEmitter {
 		this.launch();
 	}
 
+	kill() {
+		this.agiScript.kill();
+	}
+
 	/**
 	 * Launch AGI Script
 	 */
