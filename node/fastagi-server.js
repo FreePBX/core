@@ -34,12 +34,6 @@ const server = net.createServer((sock) => {
 			settings[s[0]] = s[1];
 		} else {
 			agi.scriptStdin(line)
-			//511 Command Not Permitted on a dead channel or intercept routine
-			if(line.trim().match(/^511/) !== null) {
-				console.log(`[${port}] Asterisk has informed us that the AGI is no longer needed. Sending kill signal`);
-				agi.kill();
-				return;
-			}
 		}
 	});
 	sock.on('close', () => {
