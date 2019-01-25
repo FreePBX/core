@@ -54,7 +54,7 @@ class AGI extends EventEmitter {
 	 * @param {string} signal
 	 */
 	scriptExit(code, signal) {
-		console.log(`[${this.settings.agi_port}] Script ended with code ${code}`);
+		console.log(`[${this.settings.agi_port}] Script ended with code ${code} and signal ${signal}`);
 		this.exited = true;
 		this.emit('exit', code, signal);
 	}
@@ -73,11 +73,17 @@ class AGI extends EventEmitter {
 	 * @param {string} data String of data to send to STDIN to script
 	 */
 	scriptStdin(data) {
-		if(!this.exited) {
+		if(!this.exited && data.trim() === 'HANGUP') {
+			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>> SENT HANGUP TO RUNNING AGI, KILLING AGI `);
+			//channel is now dead so hangup
+			this.kill();
+		} else if(!this.exited) {
 			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>> ${data.trim()}`);
 			this.agiScript.stdin.write(data+"\n");
+		} else if(this.exited) {
+			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>TRIED TO SEND TO DEAD AGI>> ${data.trim()} `);
 		} else {
-			console.log(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] >>> ${data.trim()} !!! Exited`);
+			console.error(`[${this.settings.agi_port}][${this.settings.agi_uniqueid}] Strange state?????????`);
 		}
 	}
 }
