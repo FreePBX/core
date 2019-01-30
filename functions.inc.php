@@ -2230,7 +2230,8 @@ function core_do_get_config($engine) {
 	}
 
 	general_generate_indications();
-
+	//adding outisbusy macro context
+	$ext->add('macro-outisbusy', 's', '', new ext_playback('all-circuits-busy-now&please-try-call-later'));
 	// "blackhole" destinations
 	$ext->add('app-blackhole', 'hangup', '', new ext_noop('Blackhole Dest: Hangup'));
 	$ext->add('app-blackhole', 'hangup', '', new ext_hangup());
