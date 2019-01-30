@@ -204,7 +204,10 @@ switch ($action) {
 		// this can rewrite too, so edit is the same
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
 		needreload();
-		redirect_standard('extdisplay');
+		$tech = '';
+		$extdisplay = '';
+		unset($_REQUEST['tech']);
+		unset($_REQUEST['extdisplay']);
 	break;
 	case "deltrunk":
 
