@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.122.58</version>
+	<version>13.0.122.59</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.122.59* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit 
 		*13.0.122.58* FREEPBX-15249 Dialplan missing macro: macro-outisbusy 
 		*13.0.122.57* Add ability to override the hints set in ext-local
 		*13.0.122.56* FREEPBX-18926 use : to separate headers in chan sip
