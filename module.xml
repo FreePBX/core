@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.24</version>
+	<version>15.0.3.25</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.25* FREEPBX-15249 Dialplan missing macro: macro-outisbusy 
 		*15.0.2.24* Add ability to override the hints set in ext-local
 		*15.0.2.23* FREEPBX-18926
 		*15.0.3.22* FREEPBX-18879 Unknown or unavailable item requested: 'recvip'
