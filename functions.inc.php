@@ -2973,8 +2973,10 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
 	$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
-	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
+	//FREEPBX-18066 if CNAM is empty skip setting it...
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CALLERID(name)}" = ""]', 'cnum'));
 	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${CALLERID(name)}'));
+	$ext->add($context, $exten, 'cnum', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
 	$ext->add($context, $exten, 'exit', new ext_macroexit());
 
 
