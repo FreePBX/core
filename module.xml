@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.3.26</version>
+	<version>15.0.3.27</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.3.27* Fixing FREEPBX-19389 
 		*15.0.3.26* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit 
 		*15.0.3.25* FREEPBX-15249 Dialplan missing macro: macro-outisbusy 
 		*15.0.2.24* Add ability to override the hints set in ext-local
