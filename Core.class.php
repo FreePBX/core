@@ -1503,7 +1503,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$settings['user']['value'] = ($settings['user']['value'] == 'new') ? $id : $settings['user']['value'];
 		$settings['emergency_cid']['value'] = trim($settings['emergency_cid']['value']);
 		$settings['description']['value'] = trim($settings['description']['value']);
-		$settings['hint_override']['value'] = trim($settings['hint_override']['value']);
+		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?trim($settings['hint_override']['value']) : null;
 
 		//insert into devices table
 		$sql="INSERT INTO devices (id,tech,dial,devicetype,user,description,emergency_cid,hint_override) values (?,?,?,?,?,?,?,?)";
