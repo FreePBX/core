@@ -13,6 +13,7 @@ class Restore Extends Base\RestoreBase{
 			if(empty($class)){
 				continue;
 			}
+			$this->log(sprintf(_("Processing %s"),$class->className));
 			$class->setDirs($dirs)
 					->setFiles($files)
 					->setConfigs($configs[$class->className]);

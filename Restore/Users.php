@@ -3,33 +3,30 @@
 namespace FreePBX\modules\Core\Restore;
 
 class Users extends Corebase{
-  
-    public function setConfigs($configs){
-        foreach ($configs as $settings) {
-            $this->FreePBX->Core->delUser($settings['extension'], true);
-            $this->FreePBX->Core->addUser($settings['extension'], $settings, true);
-        }
-        return $this;
-    }
-    public function setFiles(){
-        return $this;
-    }
-    public function setDirs(){
-        return $this;
-    }
-    public function processLegacy($pdo, $data, $tables, $tmpfiledir)
-    {
-        if (!in_array('users', $tables)) {
-            return $this;
-        }
-        $core = $this->FreePBX->Core;
-        $core->setDatabase($pdo);
-        $configs = $core->getAllUsersByDeviceType();
-        $core->resetDatabase();
-        foreach ($configs as $settings) {
-            $core->delUser($settings['extension'], true);
-            $core->addUser($settings['extension'], $settings, true);
-        }
-        return $this;
-    }
+
+	public function setConfigs($configs){
+		$this->updateUsers($configs['users']);
+		return $this;
+	}
+	public function setFiles(){
+		return $this;
+	}
+	public function setDirs(){
+		return $this;
+	}
+	public function processLegacy($pdo, $data, $tables, $tmpfiledir) {
+		if (!in_array('users', $tables)) {
+			return $this;
+		}
+		$users = $pdo->query("SELECT * FROM users")->fetchAll(\PDO::FETCH_ASSOC);
+		$this->updateUsers($users);
+		return $this;
+	}
+
+	private function updateUsers($users) {
+		$sth = $this->FreePBX->Database->prepare("INSERT INTO users (`extension`, `password`, `name`, `voicemail`, `ringtimer`, `noanswer`, `recording`, `outboundcid`, `sipname`, `noanswer_cid`, `busy_cid`, `chanunavail_cid`, `noanswer_dest`, `busy_dest`, `chanunavail_dest`, `mohclass`) VALUES (:extension, :password, :name, :voicemail, :ringtimer, :noanswer, :recording, :outboundcid, :sipname, :noanswer_cid, :busy_cid, :chanunavail_cid, :noanswer_dest, :busy_dest, :chanunavail_dest, :mohclass)");
+		foreach($users as $user) {
+			$sth->execute($user);
+		}
+	}
 }

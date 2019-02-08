@@ -3,44 +3,44 @@
 namespace FreePBX\modules\Core\Restore;
 
 class Devices extends Corebase{
-    public function setConfigs($configs){
-        foreach ($configs as $device) {
-            $settings = [];
-            foreach ($device as $key => $value) {
-                $settings[$key]['value'] = $value;
-                $settings[$key]['flag'] = 0;
+	public function setConfigs($configs){
+		$this->updateDevices($configs);
+	return $this;
+	}
+	public function setFiles(){
+	return $this;
+	}
+	public function setDirs(){
+	return $this;
+	}
+	public function processLegacy($pdo, $data, $tables, $tmpfiledir) {
+		if (!in_array('devices', $tables)) {
+			return $this;
+		}
 
-            }
-            $this->FreePBX->Core->delDevice($device['id'], true);
-            $this->FreePBX->Core->addDevice($device['id'], $device['tech'], $settings, true);
-        }
-	return $this;
-    }
-    public function setFiles(){
-	return $this;
-    }
-    public function setDirs(){
-	return $this;
-    }
-    public function processLegacy($pdo, $data, $tables, $tmpfiledir)
-    {
-        if (!in_array('devices', $tables)) {
-            return $this;
-        }
-        $core = $this->FreePBX->Core;
-        $core->setDatabase($pdo);
-        $configs = $core->getAllDevicesByType();
-        $core->resetDatabase();
-        foreach ($configs as $device) {
-            $settings = [];
-            foreach ($device as $key => $value) {
-                $settings[$key]['value'] = $value;
-                $settings[$key]['flag'] = 0;
+		$configs = [
+			"devices" => $pdo->query("SELECT * FROM devices")->fetchAll(\PDO::FETCH_ASSOC),
+			"techTables" => [
+				"sip" => $pdo->query("SELECT s.* FROM sip s, devices d WHERE s.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
+				"dahdi" => $pdo->query("SELECT dh.* FROM dahdi dh, devices d WHERE dh.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
+				"iax" => $pdo->query("SELECT i.* FROM iax i, devices d WHERE i.id = d.id")->fetchAll(\PDO::FETCH_ASSOC)
+			]
+			];
 
-            }
-            $core->delDevice($device['id'], true);
-            $core->addDevice($device['id'], $device['tech'], $settings, true);
-        }
-        return $this;
-    }
+		$this->updateDevices($configs);
+		return $this;
+	}
+
+	private function updateDevices($devices) {
+		$sth = $this->FreePBX->Database->prepare("INSERT INTO devices (`id`, `tech`, `dial`, `devicetype`, `user`, `description`, `emergency_cid`, `hint_override`) VALUES (:id, :tech, :dial, :devicetype, :user, :description, :emergency_cid, :hint_override)");
+		foreach($devices['devices'] as $device) {
+			$sth->execute($device);
+		}
+		foreach($devices['techTables'] as $tech => $rows) {
+			$sth = $this->FreePBX->Database->prepare("INSERT INTO $tech (`id`, `keyword`, `data`, `flags`) VALUES (:id, :keyword, :data, :flags)");
+			foreach($rows as $row) {
+				$sth->execute($row);
+			}
+		}
+	}
 }
