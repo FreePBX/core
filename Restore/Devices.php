@@ -42,5 +42,6 @@ class Devices extends Corebase{
 				$sth->execute($row);
 			}
 		}
+		$this->FreePBX->Core->devices2astdb();
 	}
 }

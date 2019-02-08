@@ -28,5 +28,6 @@ class Users extends Corebase{
 		foreach($users as $user) {
 			$sth->execute($user);
 		}
+		$this->FreePBX->Core->users2astdb();
 	}
 }

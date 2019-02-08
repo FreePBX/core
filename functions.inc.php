@@ -3843,56 +3843,7 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 // this function rebuilds the astdb based on device table contents
 // used on devices.php if action=resetall
 function core_devices2astdb(){
-	global $astman;
-	global $amp_conf;
-
-	$sql = "SELECT * FROM devices";
-	$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
-
-	//add details to astdb
-	if ($astman) {
-		$astman->database_deltree("DEVICE");
-		foreach ($devresults as $dev) {
-			extract($dev);
-			$astman->database_put("DEVICE",$id."/dial",$dial);
-			$astman->database_put("DEVICE",$id."/type",$devicetype);
-			$astman->database_put("DEVICE",$id."/user",$user);
-			$astman->database_put("DEVICE",$id."/default_user",$user);
-			if(trim($emergency_cid) != '') {
-				$astman->database_put("DEVICE",$id."/emergency_cid",$emergency_cid);
-			}
-			// If a user is selected, add this device to the user
-			if ($user != "none") {
-				$existingdevices = $astman->database_get("AMPUSER",$user."/device");
-				if (empty($existingdevices)) {
-					$astman->database_put("AMPUSER",$user."/device",$id);
-				} else {
-					$existingdevices_array = explode('&',$existingdevices);
-					if (!in_array($id, $existingdevices_array)) {
-						$existingdevices_array[]=$id;
-						$existingdevices = implode('&',$existingdevices_array);
-						$astman->database_put("AMPUSER",$user."/device",$existingdevices);
-					}
-				}
-			}
-
-
-			// create a voicemail symlink if needed
-			$thisUser = \FreePBX::Core()->getUser($user);
-			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
-				if(empty($thisUser['voicemail']))
-				$vmcontext = "default";
-				else
-				$vmcontext = $thisUser['voicemail'];
-				//voicemail symlink
-				exec("rm -f /var/spool/asterisk/voicemail/device/".$id);
-				exec("/bin/ln -s /var/spool/asterisk/voicemail/".$vmcontext."/".$user."/ /var/spool/asterisk/voicemail/device/".$id);
-			}
-		}
-		return true;
-	} else {
-		return false;
-	}
+	return \FreePBX::Core()->devices2astdb();
 }
 
 // this function rebuilds the astdb based on users table contents
