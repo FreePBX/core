@@ -1,6 +1,8 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules;
+//progress bar
+use Symfony\Component\Console\Helper\ProgressBar;
 class Core extends \FreePBX_Helpers implements \BMO  {
 
 	private $drivers = array();
@@ -3514,5 +3516,165 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		}
 		$codecs = implode(",",$final);
 		return $codecs;
+	}
+
+	/**
+	 * Start FreePBX for fwconsole hook
+	 * @param object $output The output object.
+	 */
+	public function startFreepbx($output=null, $debug=true) {
+		$this->setWriter($output);
+		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->writeln('PM2 is not installed/enabled. Unable to start Core FastAGI Server');
+			return;
+		}
+		$pm2 = $this->freepbx->Pm2;
+		$status = $pm2->getStatus("core-fastagi");
+		switch($status['pm2_env']['status']) {
+			case 'online':
+				if($debug) {
+					$this->writeln(sprintf(_("Core FastAGI Server has already been running on PID %s for %s"),$status['pid'],$status['pm2_env']['created_at_human_diff']));
+				}
+				return $status['pid'];
+			break;
+			default:
+				if($debug) {
+					$this->writeln(_("Starting Core FastAGI Server..."));
+				}
+				$opts = array(
+					'ASTAGIDIR' => $this->freepbx->Config->get('ASTAGIDIR')
+				);
+				if($this->freepbx->Config->get('DEVEL')) {
+					$opts['NODE_ENV'] = 'development';
+				}
+				$this->freepbx->pm2->start(
+					"core-fastagi",
+					__DIR__."/node/fastagi-server.js",
+					$opts
+				);
+				if(is_object($output)) {
+					$progress = new ProgressBar($output, 0);
+					$progress->setFormat('[%bar%] %elapsed%');
+					$progress->start();
+				}
+				$i = 0;
+				while($i < 100) {
+					$data = $pm2->getStatus("core-fastagi");
+					if(!empty($data) && $data['pm2_env']['status'] == 'online') {
+						if(is_object($output)) {
+							$progress->finish();
+						}
+						break;
+					}
+					if(is_object($output)) {
+						$progress->setProgress($i);
+					}
+					$i++;
+					usleep(100000);
+				}
+				if(is_object($output)) {
+					if($debug) {
+						$this->writeln("");
+					}
+				}
+				if(!empty($data)) {
+					$pm2->reset("core-fastagi");
+					if($debug) {
+						$this->writeln(sprintf(_("Started Core FastAGI Server. PID is %s"),$data['pid']));
+					}
+					return $data['pid'];
+				}
+				if($debug) {
+					$this->writeln("<error>".sprintf(_("Failed to run: '%s'")."</error>",$command));
+				}
+			break;
+		}
+	}
+
+
+	/**
+	 * Stop FreePBX for fwconsole hook
+	 * @param object $output The output object.
+	 */
+	public function stopFreepbx($output=null, $debug=true) {
+		$this->setWriter($output);
+		if(!$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->writeln('PM2 is not installed/enabled. Unable to stop Core FastAGI Server');
+			return;
+		}
+		$pm2 = $this->freepbx->Pm2;
+		$data = $this->freepbx->pm2->getStatus("core-fastagi");
+		if(empty($data) || $data['pm2_env']['status'] != 'online') {
+			if($debug) {
+				$this->writeln("<error>"._("Core FastAGI Server is not running")."</error>");
+			}
+			return false;
+		}
+		// executes after the command finishes
+		if($debug) {
+			$this->writeln(_("Stopping Core FastAGI Server"));
+		}
+
+		$pm2->stop("core-fastagi");
+
+		$data = $pm2->getStatus("core-fastagi");
+		if (empty($data) || $data['pm2_env']['status'] != 'online') {
+			$pm2->delete("core-fastagi");
+			if($debug) {
+				$this->writeln(_("Stopped FastAGI Server"));
+			}
+		} else {
+			if($debug) {
+				$this->writeln("<error>".sprintf(_("FastAGI Server Failed: %s")."</error>",$process->getErrorOutput()));
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	public function preReloadFreepbx() {
+		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->freepbx->Config->update('LAUNCH_AGI_AS_FASTAGI',false);
+			$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server, As a result all AGIs will be launched from the CLI"),"",true,true);
+		}
+	}
+
+	public function postReloadFreepbx() {
+		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
+			return;
+		}
+		$pm2 = $this->freepbx->Pm2;
+		$status = $pm2->getStatus("core-fastagi");
+		if($status['pm2_env']['status'] !== 'online') {
+			$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput());
+		}
+	}
+
+	/**
+	 * FreePBX chown hooks
+	 */
+	public function chownFreepbx() {
+
+	}
+
+	private function setWriter($writer) {
+		$this->writer = $writer;
+	}
+
+	public function writeln($message) {
+		if(is_object($this->writer)) {
+			return $this->writer->writeln($message);
+		} else {
+			out(preg_replace("/<\/?\w*>/", "", $message));
+		}
+	}
+
+	public function write($message) {
+		if(is_object($this->writer)) {
+			return $this->writer->write($message);
+		} else {
+			outn(preg_replace("/<\/?\w*>/", "", $message));
+		}
 	}
 }

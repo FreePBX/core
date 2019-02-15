@@ -364,6 +364,16 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
 		</bulkhandler>
+		<framework class="Start" namespace="FreePBX\Console\Command">
+			<method callingMethod="postAsteriskHooks" class="Core" namespace="FreePBX\modules">startFreepbx</method>
+		</framework>
+		<framework class="Stop" namespace="FreePBX\Console\Command">
+			<method callingMethod="preAsteriskHooks" class="Core" namespace="FreePBX\modules">stopFreepbx</method>
+		</framework>
+		<framework class="Reload" namespace="FreePBX">
+			<method callingMethod="postReload" class="Core" namespace="FreePBX\Modules">postReloadFreepbx</method>
+			<method callingMethod="preReload" class="Core" namespace="FreePBX\Modules">preReloadFreepbx</method>
+		</framework>
 	</hooks>
 	<supported>
 		<version>14.0</version>

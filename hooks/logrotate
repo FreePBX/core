@@ -24,4 +24,17 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	create 0640 asterisk asterisk
 	su asterisk asterisk
 }
+/var/log/asterisk/core-fastagi_*.log {
+	size 50M
+	missingok
+	rotate 5
+	notifempty
+	dateext
+	sharedscripts
+	create 0640 asterisk asterisk
+	su asterisk asterisk
+	postrotate
+		/usr/sbin/fwconsole pm2 --reload-logs -q
+	endscript
+}
 EOF
