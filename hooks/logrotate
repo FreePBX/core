@@ -24,7 +24,6 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	create 0640 asterisk asterisk
 	su asterisk asterisk
 }
-
 /var/log/asterisk/core-fastagi_*.log {
 	size 50M
 	missingok

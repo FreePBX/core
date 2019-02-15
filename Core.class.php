@@ -1421,10 +1421,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
 		}
 
-		// create a voicemail symlink if needed
-		// TODO: This should be hooked from voicemail
-		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','setupMailboxSymlinks') ) {
-			$this->FreePBX->Voicemail->setupMailboxSymlinks($settings['user']['value']);
+		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','mapMailBox') ) {
+			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
 
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
@@ -2461,7 +2459,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		//if voicemail is enabled, set the box@context to use
-		//havn't checked but why is voicemail needed on users anyway?  Doesn't exactly make it modular !
 		//TODO use a hook here
 		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','getMailbox') ) {
 			$vmbox = $this->FreePBX->Voicemail->getMailbox($extension);
