@@ -38,6 +38,13 @@ foreach ($conf as $c){
 	if($c['hidden']){
 		continue;
 	}
+	//lets do the licence check for the commercial module here.
+	if(FreePBX::Modules()->moduleHasMethod($c['module'],'isLicensed')){
+		$mn = FreePBX::Modules()->cleanModuleName($c['module']);
+		if(!FreePBX::$mn()->isLicensed()){
+			continue;
+		}
+	}
 	if(!empty($c['module'])) {
 		\modgettext::push_textdomain(strtolower($c['module']));
 	} else {
