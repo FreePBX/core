@@ -1,7 +1,8 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
-class Iax2 extends \FreePBX\modules\Core\Driver {
+use \FreePBX\modules\Core\Driver as techDriver;
+class Iax2 extends techDriver {
 	public function getInfo() {
 		return array(
 			"rawName" => "iax2",

@@ -1,7 +1,8 @@
 <?php
 // vim: set ai ts=4 sw=4 ft=php:
 namespace FreePBX\modules\Core\Drivers;
-class Sip extends \FreePBX\modules\Core\Driver {
+use \FreePBX\modules\Core\Driver as techDriver;
+class Sip extends techDriver {
 	public $version;
 
 	public function __construct($freepbx) {
@@ -148,6 +149,7 @@ class Sip extends \FreePBX\modules\Core\Driver {
 	public function addDevice($id, $settings) {
 		$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
 		$sth = $this->database->prepare($sql);
+		$settings = is_array($settings)?$settings:array();
 		foreach($settings as $key => $setting) {
 			$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
 		}
