@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.6</version>
+	<version>15.0.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.7* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue 
 		*15.0.6* fixing legacy restore 
 		*15.0.5* Asterisk 13.25.0 and 16.2.0 voicemail changes
 		*15.0.4* Fixing backup and restore
