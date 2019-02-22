@@ -138,6 +138,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited",
 				"flag" => $flag++
 			),
+			"aggregate_mwi" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 			"media_encryption" => array(
 				"value" => "no",
 				"flag" => $flag++
