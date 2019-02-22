@@ -35,15 +35,4 @@ class Restore Extends Base\RestoreBase{
 		}
 		return $classes;
 	}
-
-	public function processLegacy($pdo, $data, $tables, $unknownTables, $tmpfiledir){
-		$tables = array_flip($tables+$unknownTables);
-		foreach ($this->getClasses('legacy') as $class) {
-			if (empty($class)) {
-				continue;
-			}
-			$class->processLegacy($pdo, $data, $tables, $tmpfiledir);
-		}
-		return $this;
-	}
 }
