@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.125</version>
+	<version>13.0.126</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.126* Fixing FREEPBX-18708 
 		*13.0.125* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue 
 		*13.0.124* FREEPBX-19489
 		*13.0.123* Asterisk 13.25.0 and 16.2.0 voicemail changes
