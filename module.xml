@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.20</version>
+	<version>14.0.21</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.21* Fixing FREEPBX-18708 
 		*14.0.20* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue 
 		*14.0.19* Asterisk 13.25.0 and 16.2.0 voicemail changes
 		*14.0.18.54* Fixing FREEPBX-19389 
