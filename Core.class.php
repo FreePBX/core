@@ -836,12 +836,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 					if ($dahdichannels->add($description, $channel, $did)) {
 						needreload();
 						$_REQUEST['extdisplay'] = $channel;
-						$this->freepbx->View->redirect_standard('extdisplay');
+						unset($_REQUEST['view']);
 					}
 				break;
 				case 'edit':
 					if ($dahdichannels->edit($description, $channel, $did)) {
 						needreload();
+						unset($_REQUEST['view']);
 					}
 				break;
 				case 'delete':
