@@ -18,6 +18,9 @@ class Restore Extends Base\RestoreBase{
 					->setFiles($files)
 					->setConfigs($configs[$class->className]);
 		}
+		$this->importKVStore($configs['kvstore']);
+		$this->importFeatureCodes($configs['features']);
+		$this->importAdvancedSettings($configs['settings']);
 	}
 	public function getClasses($transaction){
 		$classList = new DirectoryIterator(__DIR__ . '/Restore');
@@ -34,5 +37,11 @@ class Restore Extends Base\RestoreBase{
 			$classes->attach(new $classname($this->FreePBX, $transaction));
 		}
 		return $classes;
+	}
+
+	public function processLegacy($pdo, $data, $tables, $unknownTables) {
+		$this->restoreLegacyAll($pdo);
+		$this->FreePBX->Core->users2astdb();
+		$this->FreePBX->Core->devices2astdb();
 	}
 }

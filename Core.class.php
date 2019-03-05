@@ -3355,7 +3355,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	function devices2astdb(){
 
 		$devresults = $this->database->query("SELECT * FROM devices")->fetchAll(\PDO::FETCH_ASSOC);
-		$uservoicemails = $this->database->query("SELECT extension, voicemail FROM devices")->fetchAll(\PDO::FETCH_KEY_PAIR);
+		$uservoicemails = $this->database->query("SELECT extension, voicemail FROM users")->fetchAll(\PDO::FETCH_KEY_PAIR);
 
 		//add details to astdb
 		if ($this->astman->connected()) {

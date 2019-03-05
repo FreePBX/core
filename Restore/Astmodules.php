@@ -17,14 +17,4 @@ class Astmodules extends Corebase{
 		}
 		return $this;
 	}
-	public function setFiles(){
-		return $this;
-	}
-	public function setDirs(){
-		return $this;
-	}
-	public function processLegacy($pdo, $data, $tables, $tmpfiledir)
-	{
-		return $this;
-	}
 }

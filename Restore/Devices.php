@@ -5,29 +5,6 @@ namespace FreePBX\modules\Core\Restore;
 class Devices extends Corebase{
 	public function setConfigs($configs){
 		$this->updateDevices($configs);
-	return $this;
-	}
-	public function setFiles(){
-	return $this;
-	}
-	public function setDirs(){
-	return $this;
-	}
-	public function processLegacy($pdo, $data, $tables, $tmpfiledir) {
-		if (!in_array('devices', $tables)) {
-			return $this;
-		}
-
-		$configs = [
-			"devices" => $pdo->query("SELECT * FROM devices")->fetchAll(\PDO::FETCH_ASSOC),
-			"techTables" => [
-				"sip" => $pdo->query("SELECT s.* FROM sip s, devices d WHERE s.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
-				"dahdi" => $pdo->query("SELECT dh.* FROM dahdi dh, devices d WHERE dh.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
-				"iax" => $pdo->query("SELECT i.* FROM iax i, devices d WHERE i.id = d.id")->fetchAll(\PDO::FETCH_ASSOC)
-			]
-			];
-
-		$this->updateDevices($configs);
 		return $this;
 	}
 
