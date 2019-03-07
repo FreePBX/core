@@ -95,6 +95,13 @@ class Outboundrouting extends ComponentBase{
 			}
 			array_splice($sequence, $order, 0, $route_id);
 			$sequence = array_values($sequence); //jic
+		} elseif(!ctype_digit($order) && in_array($order,['top','bottom'])) {
+			if($order === 'bottom') {
+				$sequence[] = $route_id;
+			} else {
+				array_unshift($sequence, $route_id);
+			}
+			$sequence = array_values($sequence); //jic
 		} elseif(!ctype_digit($order)) {
 			throw new \Exception("Dont know what to do with $order");
 		} else {
