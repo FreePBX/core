@@ -3403,13 +3403,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 		//add details to astdb
 		if ($this->astman->connected()) {
 			foreach($userresults as $usr) {
-				$astman->database_put("AMPUSER",$usr['extension']."/password",$usr['password']);
-				$astman->database_put("AMPUSER",$usr['extension']."/ringtimer",$usr['ringtimer']);
-				$astman->database_put("AMPUSER",$usr['extension']."/noanswer",$usr['noanswer']);
-				$astman->database_put("AMPUSER",$usr['extension']."/recording",$usr['recording']);
-				$astman->database_put("AMPUSER",$usr['extension']."/outboundcid",$usr['outboundcid']);
-				$astman->database_put("AMPUSER",$usr['extension']."/cidname",$usr['name']);
-				$astman->database_put("AMPUSER",$usr['extension']."/voicemail",$usr['voicemail']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/password",$usr['password']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/ringtimer",$usr['ringtimer']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/noanswer",$usr['noanswer']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/recording",$usr['recording']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/outboundcid",$usr['outboundcid']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/cidname",$usr['name']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/voicemail",$usr['voicemail']);
 			}
 			return true;
 		} else {

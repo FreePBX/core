@@ -3,23 +3,24 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.1</version>
+	<version>15.0.9.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.2* Fix astdb callback
 		*15.0.9.1* Legacy restore
-		*15.0.9* Fixing FREEPBX-18345 
-		*15.0.8* Fixing FREEPBX-18708 
-		*15.0.7* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue 
-		*15.0.6* fixing legacy restore 
+		*15.0.9* Fixing FREEPBX-18345
+		*15.0.8* Fixing FREEPBX-18708
+		*15.0.7* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue
+		*15.0.6* fixing legacy restore
 		*15.0.5* Asterisk 13.25.0 and 16.2.0 voicemail changes
 		*15.0.4* Fixing backup and restore
-		*15.0.3.27* Fixing FREEPBX-19389 
-		*15.0.3.26* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit 
-		*15.0.3.25* FREEPBX-15249 Dialplan missing macro: macro-outisbusy 
+		*15.0.3.27* Fixing FREEPBX-19389
+		*15.0.3.26* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit
+		*15.0.3.25* FREEPBX-15249 Dialplan missing macro: macro-outisbusy
 		*15.0.2.24* Add ability to override the hints set in ext-local
 		*15.0.2.23* FREEPBX-18926
 		*15.0.3.22* FREEPBX-18879 Unknown or unavailable item requested: 'recvip'
