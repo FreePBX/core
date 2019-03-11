@@ -1526,7 +1526,6 @@ function core_do_get_config($engine) {
 					if ($catchaccount =="_." && ! $catchall) {
 						$catchall = true;
 						$ext->add($catchall_context, $catchaccount, '', new ext_NoOp('Catch-All DID Match - Found ${EXTEN} - You probably want a DID for this.'));
-						$ext->add($catchall_context, $catchaccount, '', new ext_log('WARNING', 'Friendly Scanner from ${CUT(CUT(SIP_HEADER(Via), ,2),:,1)}'));
 						$ext->add($catchall_context, $catchaccount, '', new ext_set('__FROM_DID', '${EXTEN}'));
 						$ext->add($catchall_context, $catchaccount, '', new ext_goto('1','s','ext-did'));
 					}
