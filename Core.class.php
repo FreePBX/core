@@ -39,14 +39,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 	}
 
-	public function setDatabase($pdo){
-	$this->database = $pdo;
-	return $this;
+	public function getBackupSettingsDisplay($id) {
+		$settings = !empty($id) ? $this->getAll('backup_'.$id) : [];
+		return load_view(__DIR__.'/views/backupSettings.php',$settings);
 	}
 
-	public function resetDatabase(){
-	$this->database = $this->freepbx->Database;
-	return $this;
+	public function processBackupSettings($id, $settings) {
+		$this->setMultiConfig($settings,'backup_'.$id);
 	}
 
 	/**
