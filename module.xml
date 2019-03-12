@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.2</version>
+	<version>15.0.9.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.3* FREEI-418 Usage of Any/Any inbound route will get provider ip banned 
 		*15.0.9.2* Fix astdb callback
 		*15.0.9.1* Legacy restore
 		*15.0.9* Fixing FREEPBX-18345
