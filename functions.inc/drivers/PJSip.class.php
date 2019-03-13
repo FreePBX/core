@@ -267,6 +267,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _("Determines whether encryption should be used if possible but does not terminate the session if not achieved. This option only applies if Media Encryption is not set to None.").' [media_encryption_optimistic]';
 		$tmparr['media_encryption_optimistic'] = array('prompttext' => _('Allow Non-Encrypted Media (Opportunistic SRTP)'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
