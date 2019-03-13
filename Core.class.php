@@ -3421,6 +3421,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param object $output The output object.
 	 */
 	public function startFreepbx($output=null, $debug=true) {
+		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
+			return;
+		}
 		$this->setWriter($output);
 		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
 			$this->writeln('PM2 is not installed/enabled. Unable to start Core FastAGI Server');
