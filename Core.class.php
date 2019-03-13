@@ -3563,7 +3563,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if($keyword === 'LAUNCH_AGI_AS_FASTAGI') {
 			if(!empty($value)) {
 				if(!$this->freepbx->Modules->checkStatus("pm2")) {
-					$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server. Please install PM2"),"",true,true);
+					//cant start it as no pm2.
+					//This will be resolved on next reload
 					return;
 				}
 				$this->startFreepbx(null, false);
