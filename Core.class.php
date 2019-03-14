@@ -3506,7 +3506,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$pm2 = $this->freepbx->Pm2;
 		$data = $this->freepbx->pm2->getStatus("core-fastagi");
 		if(empty($data) || $data['pm2_env']['status'] != 'online') {
-			if($debug) {
+			if($debug && $this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
 				$this->writeln("<error>"._("Core FastAGI Server is not running")."</error>");
 			}
 			return false;
