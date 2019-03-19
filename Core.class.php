@@ -998,7 +998,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 						// delete this empty
 						unset($trunkpriority[$key]);
 
-					} else if (($key==($repotrunkkey-1)) && ($repotrunkdirection=="up")) {
+					} else if (is_numeric($repotrunkkey) && ($key==($repotrunkkey-1)) && ($repotrunkdirection=="up")) {
 						// swap this one with the one before (move up)
 						$temptrunk = $trunkpriority[$key];
 						$trunkpriority[ $key ] = $trunkpriority[ $key+1 ];
