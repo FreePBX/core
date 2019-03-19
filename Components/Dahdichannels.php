@@ -26,6 +26,9 @@ class Dahdichannels extends ComponentBase{
             'value' => _('Submit')
         ];
         
+	if (!isset($request['view'])||$request['view'] == '') {
+		$buttons = array();
+	}
         return $buttons;
 
     }

@@ -7,6 +7,7 @@ use PDO;
 use Exception;
 //progress bar
 use Symfony\Component\Console\Helper\ProgressBar;
+use \FreePBX\modules\Core\Components\Dahdichannels as Dahdichannels;
 class Core extends FreePBX_Helpers implements BMO  {
 
 	private $drivers = array();
@@ -32,7 +33,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$this->routing = new \FreePBX\modules\Core\Components\Outboundrouting();
 				return $this->routing;
 			break;
-			case "dahdiChannels":
+			case "dahdichannels":
 				$this->dahdichannels = new \FreePBX\modules\Core\Components\Dahdichannels();
 				return $this->dahdichannels;
 			break;
@@ -338,7 +339,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				);
 			break;
 			case 'dahdichandids':
-                return Dahdichannels::getButtons($request);
+                		return Dahdichannels::getButtons($request);
 			case 'did':
 				$buttons = array(
 					'delete' => array(
