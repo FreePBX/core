@@ -6,7 +6,7 @@ namespace FreePBX\modules\Core;
 abstract class Driver {
 	protected $freepbx;
 	protected $database;
-	protected static $devicesGetUserMappings = [];
+	protected static $devicesGetUserMappings = array();
 	protected static $removeMailboxSetting = null;
 
 	public function __construct($freepbx) {
