@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.7</version>
+	<version>15.0.9.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.8* FREEPBX-19626
 		*15.0.9.7* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value 
 		*15.0.9.6* FREEPBX-19637
 		*15.0.9.5* FREEPBX-19543
