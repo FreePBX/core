@@ -1319,6 +1319,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"outbound_proxy" => array(
 				"value" => '',
 				"flag" => $flag++
+			),
+			"outbound_proxy" => array(
+				"value" => '',
+				"flag" => $flag++
 			)
 		);
 

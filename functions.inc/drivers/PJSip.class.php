@@ -1100,6 +1100,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
 		}
+
 		if (!empty($config['match'])) {
 			$identify[] = "match=".$config['match'];
 		}
@@ -1247,13 +1248,17 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (isset($retarr["pjsip.identify.conf"][$identifyname])) {
 			throw new \Exception("Identify $aorname already exists.");
 		}
-		$retarr["pjsip.identify.conf"][$identifyname] = $identify;
-		if(!empty($this->_identify[$identifyname]) && is_array($this->_identify[$identifyname])) {
-			foreach($this->_identify[$identifyname] as $el) {
-				$retarr["pjsip.identify.conf"][$identifyname][] = "{$el['key']}={$el['value']}";
+
+		if (!empty($config['match_header']) || !empty($config['match']) || !empty($this->_identify[$identifyname])) {
+			$retarr["pjsip.identify.conf"][$identifyname] = $identify;
+			if(!empty($this->_identify[$identifyname]) && is_array($this->_identify[$identifyname])) {
+				foreach($this->_identify[$identifyname] as $el) {
+					$retarr["pjsip.identify.conf"][$identifyname][] = "{$el['key']}={$el['value']}";
+				}
+				unset($this->_identify[$identifyname]);
 			}
-			unset($this->_identify[$identifyname]);
 		}
+
 	}
 
 	/**
