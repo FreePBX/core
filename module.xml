@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.129</version>
+	<version>13.0.130</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.130* FREEPBX-19626
 		*13.0.129* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value 
 		*13.0.128* FREEI-418 Usage of Any/Any inbound route will get provider ip banned 
 		*13.0.127* Fixing FREEPBx-18345 
