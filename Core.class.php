@@ -1461,6 +1461,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			"callerid" => array(
 				"value" => "$displayname <".$number.">",
 				"flag" => $flag++
+			),
+			"outbound_proxy" => array(
+				"value" => '',
+				"flag" => $flag++
 			)
 		);
 
