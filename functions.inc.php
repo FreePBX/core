@@ -4660,16 +4660,6 @@ function core_directdid_list(){
 function core_dahdichandids_add($description, $channel, $did) {
 	global $db;
 
-
-	if (!ctype_digit(trim($channel)) || trim($channel) == '') {
-		echo "<script>javascript:alert('"._("Invalid Channel Number, must be numeric and not blank")."')</script>";
-		return false;
-	}
-	if (trim($did) == '') {
-		echo "<script>javascript:alert('"._("Invalid DID, must be a non-blank DID")."')</script>";
-		return false;
-	}
-
 	$description = q($description);
 	$channel     = q($channel);
 	$did         = q($did);
@@ -4677,12 +4667,7 @@ function core_dahdichandids_add($description, $channel, $did) {
 	$sql = "INSERT INTO dahdichandids (channel, description, did) VALUES ($channel, $description, $did)";
 	$results = $db->query($sql);
 	if (DB::IsError($results)) {
-		if ($results->getCode() == DB_ERROR_ALREADY_EXISTS) {
-			echo "<script>javascript:alert('"._("Error Duplicate Channel Entry")."')</script>";
-			return false;
-		} else {
-			die_freepbx($results->getMessage()."<br><br>".$sql);
-		}
+		die_freepbx($results->getMessage()."<br><br>".$sql);
 	}
 	return true;
 }
