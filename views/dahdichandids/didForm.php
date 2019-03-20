@@ -1,6 +1,28 @@
 <?php
 $editmode = (isset($channel) && !empty($channel))?'readonly':'';
+$channel_list = core_dahdichandids_list();
+$channel_val = null;
+$tmp_channel = '';
+if(isset($channel)) {
+	$tmp_channel = $channel;
+}
+if(!empty($channel_list)) {
+	foreach($channel_list as $tmp_item) {
+		if($tmp_item['channel'] != $tmp_channel) {
+			$channel_val[] = $tmp_item['channel'];
+		}
+	}
+}
 ?>
+<script>
+var channel_num = new Array();
+<?php
+if(!empty($channel_val)) {
+	echo "channel_num = " . json_encode($channel_val) . ";";
+}
+?>
+</script>
+
 <form name="editDAHDIchandid" autocomplete = "off" class="fpbx-submit" action="" method="post" data-fpbx-delete="config.php?display=dahdichandids&action=delete&channel=<?php echo $channel ?>">
 <input type = "hidden" name = "action" value="<?php echo $action?>">
 <!--Channel-->

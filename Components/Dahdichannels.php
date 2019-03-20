@@ -48,15 +48,6 @@ class Dahdichannels extends ComponentBase{
     }
 
     public function add($description, $channel, $did){
-        if (!ctype_digit(trim($channel)) || trim($channel) == '') {
-            echo "<script>javascript:alert('" . _("Invalid Channel Number, must be numeric and not blank") . "')</script>";
-            return false;
-        }
-        if (trim($did) == '') {
-            echo "<script>javascript:alert('" . _("Invalid DID, must be a non-blank DID") . "')</script>";
-            return false;
-        }
-
         try{
             $sql = "INSERT INTO dahdichandids (channel, description, did) VALUES (:channel, :description, :did)";
             $stmt = $this->Database->prepare($sql);

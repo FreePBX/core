@@ -4150,8 +4150,6 @@ function core_directdid_list(){
 	return array();
 }
 
-
-
 /* end page.users.php functions */
 
 
