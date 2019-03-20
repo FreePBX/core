@@ -170,6 +170,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"match_header" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -259,6 +263,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		//https://wiki.asterisk.org/wiki/display/AST/Asterisk+13+Configuration_res_pjsip_endpoint_identifier_ip
 		$tt = _("The value is a comma-delimited list of IP addresses. IP addresses may have a subnet mask appended. The subnet mask may be written in either CIDR or dot-decimal notation. Separate the IP address and subnet mask with a slash ('/')");
 		$tmparr['match'] = array('prompttext' => _('Match (Permit)'), 'value' => '', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("With an \"identify\" section you specify the endpoint to recognize when a request comes in with the exact header and contents in match_header");
+		$tmparr['match_header'] = array('prompttext' => _('Match Header'), 'value' => '', 'tt' => $tt, 'level' => 1);
 		unset($select);
 
 		$tt = _("Maximum time to keep an AoR");
@@ -1080,6 +1088,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['match'])) {
 			$identify[] = "match=".$config['match'];
+		}
+
+		if (!empty($config['match_header'])) {
+			$identify[] = "match_header=".$config['match_header'];
 		}
 
 		if (!empty($config['media_encryption'])) {
