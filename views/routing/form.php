@@ -175,7 +175,9 @@ foreach (core_trunks_listbyid() as $temp) {
 	$trunkstate[$temp['trunkid']] = $temp['disabled'];
 }
 $key = -1;
-$positions=count($trunkpriority);
+if (is_array($trunkpriority)) {
+	$positions=count($trunkpriority);
+}
 $trunkhtml = '<table class = "table">';
 $trunkhtml .= '<tbody id="routetrunks">';
 if(!empty($trunkpriority) && is_array($trunkpriority)) {

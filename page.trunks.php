@@ -441,7 +441,7 @@ if (!$tech && !$extdisplay) {
 				}
 			}
 		}
-		if (count($dialpattern_array) == 0) {
+		if (is_array($dialpattern_array) && (count($dialpattern_array) == 0)) {
 			$dialpattern_array = core_trunks_get_dialrules($trunknum);
 		}
 		$upper_tech = strtoupper($tech);
