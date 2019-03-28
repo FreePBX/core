@@ -883,6 +883,12 @@ function core_getdestinfo($dest) {
 	// Check for Extension Number Destinations
 	//
 	$users = \FreePBX::Core()->getAllUsers();
+  	if (substr(trim($dest),0,11) == 'from-trunk,') {
+		$did = explode(',',$dest);
+		$did = $did[1];
+		return array('description' => sprintf(_('Inbound Routes : %s'),$did),
+		'edit_url' => "config.php?display=did&view=form&extdisplay=$did%2F");
+	}
 	if (substr(trim($dest),0,16) == 'from-did-direct,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
