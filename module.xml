@@ -3,27 +3,28 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.25.4</version>
+	<version>14.0.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.25.4* Fixing FREEPBX-17867 
-		*14.0.25.3* FREEPBX-19613 
-		*14.0.25.2* FREEPBX-19520 Too-Late Announce is not playing under Find Me Follow Me 
+		*14.0.26* Use lazy loading console commands
+		*14.0.25.4* Fixing FREEPBX-17867
+		*14.0.25.3* FREEPBX-19613
+		*14.0.25.2* FREEPBX-19520 Too-Late Announce is not playing under Find Me Follow Me
 		*14.0.25.1* FREEPBX-19626
-		*14.0.25* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value 
+		*14.0.25* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value
 		*14.0.24* FREEPBX-19637
-		*14.0.23* FREEI-418 Usage of Any/Any inbound route will get provider ip banned 
-		*14.0.22* Fixing FREEPBx-18345 
-		*14.0.21* Fixing FREEPBX-18708 
-		*14.0.20* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue 
+		*14.0.23* FREEI-418 Usage of Any/Any inbound route will get provider ip banned
+		*14.0.22* Fixing FREEPBx-18345
+		*14.0.21* Fixing FREEPBX-18708
+		*14.0.20* Fixing FREEPBX-19483 Extension import ignoring aggregate_mwi field issue
 		*14.0.19* Asterisk 13.25.0 and 16.2.0 voicemail changes
-		*14.0.18.54* Fixing FREEPBX-19389 
-		*14.0.18.53* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit 
-		*14.0.18.52* FREEPBX-15249 Dialplan missing macro: macro-outisbusy 
+		*14.0.18.54* Fixing FREEPBX-19389
+		*14.0.18.53* FREEPBX-14525 Uniform Behavior: Have trunks return to grid on submit
+		*14.0.18.52* FREEPBX-15249 Dialplan missing macro: macro-outisbusy
 		*14.0.18.51* dont launch needless agis if variables arent set, also load AGI handler so we dont abruptly hurt Asterisk
 		*14.0.18.50* Add ability to override the hints set in ext-local
 		*14.0.18.49* FREEPBX-18926
@@ -169,7 +170,7 @@
 		*14.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>14.0.3.17</version>
+		<version>14.0.8</version>
 	</depends>
 	<database>
 		<table name="trunks">
@@ -367,6 +368,11 @@
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
+	<console>
+		<command>
+			<name>trunks</name>
+		</command>
+	</console>
 	<hooks>
 		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler" priority="100">
 			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes">bulkhandlerGetTypes</method>
