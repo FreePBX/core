@@ -3,19 +3,20 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.12</version>
+	<version>15.0.9.13</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*15.0.9.12* Fixing FREEPBX-17867 
-		*15.0.9.11* FREEPBX-19613 
-		*15.0.9.10* FREEPBX-19665 Dahdi channels page related issue fixes 
-		*15.0.9.9* FREEPBX-19658 PHP 7x related issue fixes 
+		*15.0.9.13* Use lazy loading console commands
+		*15.0.9.12* Fixing FREEPBX-17867
+		*15.0.9.11* FREEPBX-19613
+		*15.0.9.10* FREEPBX-19665 Dahdi channels page related issue fixes
+		*15.0.9.9* FREEPBX-19658 PHP 7x related issue fixes
 		*15.0.9.8* FREEPBX-19626
-		*15.0.9.7* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value 
+		*15.0.9.7* FREEPBX-18661 Bulk Handler - Extensions :: import not setting outbound_proxy value
 		*15.0.9.6* FREEPBX-19637
 		*15.0.9.5* FREEPBX-19543
 		*15.0.9.2* Fix astdb callback
@@ -90,7 +91,7 @@
 		*15.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>15.0.1.28</version>
+		<version>15.0.6.18</version>
 	</depends>
 	<database>
 		<table name="trunks">
@@ -280,6 +281,11 @@
 	<methods>
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
+	<console>
+		<command>
+			<name>trunks</name>
+		</command>
+	</console>
 	<hooks>
 		<bulkhandler namespace="FreePBX\modules" class="Bulkhandler" priority="100">
 			<method namespace="FreePBX\modules" class="Core" callingMethod="getTypes">bulkhandlerGetTypes</method>
