@@ -3,14 +3,15 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.27</version>
+	<version>14.0.28</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*14.0.27* FREEPBX-19754 Can't unset headers using func-apply-sipheaders 
+		*14.0.28* FREEPBX-19770
+		*14.0.27* FREEPBX-19754 Can't unset headers using func-apply-sipheaders
 		*14.0.26* Use lazy loading console commands
 		*14.0.25.4* Fixing FREEPBX-17867
 		*14.0.25.3* FREEPBX-19613
@@ -171,7 +172,7 @@
 		*14.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>14.0.8</version>
+		<version>14.0.9</version>
 	</depends>
 	<database>
 		<table name="trunks">
