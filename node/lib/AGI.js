@@ -1,5 +1,6 @@
 const {spawn} = require('child_process');
 const EventEmitter = require('events');
+const path = require('path');
 
 class AGI extends EventEmitter {
 	constructor(settings) {
@@ -27,7 +28,11 @@ class AGI extends EventEmitter {
 	 */
 	launch() {
 		console.log(`[${this.settings.agi_port}] Launching ${this.settings.agi_network_script} with args: ${this.args.join(',')}`);
-		this.agiScript = spawn(`./${this.settings.agi_network_script}`, this.args, {cwd: this.settings.agi_ASTAGIDIR});
+		let scriptPath = `./${this.settings.agi_network_script}`;
+		if(!path.isAbsolute(this.settings.agi_network_script)) {
+			scriptPath = this.settings.agi_network_script;
+		}
+		this.agiScript = spawn(scriptPath, this.args, {cwd: this.settings.agi_ASTAGIDIR});
 		this.agiScript.stdout.on('data', this.scriptStdout.bind(this));
 		this.agiScript.on('exit', this.scriptExit.bind(this));
 
