@@ -27,13 +27,13 @@ class macroDial{
         $bt = \FreePBX::Config()->get('BLINDTRANSALERTINFO');
         $bt = trim($bt);
         $bt = ($bt != "none" && $bt != "inherit") ? $bt : '';
-        $ext->add($c,$s,'', new \ext_execif('$[${LEN(${BLINDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$bt));
+        $ext->add($c,$s,'', new \ext_execif('$[${LEN(${BLINDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.str_replace(';','\;',$bt)));
 
         //Advanced settings alert info Attended Transfer
         $at = \FreePBX::Config()->get('ATTTRANSALERTINFO');
         $at = trim($at);
         $at = ($at != "none" && $at != "inherit") ? $at : '';
-        $ext->add($c,$s,'', new \ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
+        $ext->add($c,$s,'', new \ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.str_replace(';','\;',$at)));
 
         $ext->add($c,$s,'', new \ext_execif('$[("${MOHCLASS}"!="default") & ("${MOHCLASS}"!="")]', 'Set', 'CHANNEL(musicclass)=${MOHCLASS}'));
 

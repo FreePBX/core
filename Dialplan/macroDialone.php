@@ -58,13 +58,13 @@ class macroDialone{
 		$bt = \FreePBX::Config()->get('BLINDTRANSALERTINFO');
 		$bt = trim($bt);
 		$bt = ($bt != "none" && $bt != "inherit") ? $bt : '';
-		$ext->add($mcontext,$exten,'', new \ext_execif('$[${LEN(${BLINDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$bt));
+		$ext->add($mcontext,$exten,'', new \ext_execif('$[${LEN(${BLINDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.str_replace(';','\;',$bt)));
 
 		//Advanced settings alert info Attended Transfer
 		$at = \FreePBX::Config()->get('ATTTRANSALERTINFO');
 		$at = trim($at);
 		$at = ($at != "none" && $at != "inherit") ? $at : '';
-		$ext->add($mcontext,$exten,'', new \ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.$at));
+		$ext->add($mcontext,$exten,'', new \ext_execif('$[${LEN(${ATTENDEDTRANSFER})}!=0]', 'Set', 'ALERT_INFO='.str_replace(';','\;',$at)));
 
 		//Now set Alert Info
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${RVOL}"!=""]', 'Set', 'ALERT_INFO=${IF($["${ALERT_INFO}"!=""]?${ALERT_INFO}:Normal)}\;volume=${RVOL}'));
