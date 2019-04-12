@@ -3,6 +3,7 @@ namespace FreePBX\modules\Core\Dialplan;
 
 class macroDialone{
 	static function add($ext){
+		global $chan_dahdi;
 		/*
 		* macro-dial-one
 		*/
@@ -84,17 +85,13 @@ class macroDialone{
 		// Once setting CONNECTEDLINE(), add the I option to Dial() so the device doesn't further update the value with the
 		// "device" <devicenum> data from device CID information, don't send an update if the calling party is not an extension it breaks some providers
 		//
-		if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
-			$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
-			$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
-			if ($amp_conf['AST_FUNC_PRESENCE_STATE'] && $amp_conf['CONNECTEDLINE_PRESENCESTATE']) {
-				$ext->add($mcontext,$exten,'', new \ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
-				$cidnameval.= '${PRESENCESTATE_DISPLAY}';
-			}
-			$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(name,i)', $cidnameval));
-			$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
-			$ext->add($mcontext,$exten,'', new \ext_set('D_OPTIONS', '${D_OPTIONS}I'));
-		}
+		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
+		$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
+		$ext->add($mcontext,$exten,'', new \ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
+		$cidnameval.= '${PRESENCESTATE_DISPLAY}';
+		$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(name,i)', $cidnameval));
+		$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
+		$ext->add($mcontext,$exten,'', new \ext_set('D_OPTIONS', '${D_OPTIONS}I'));
 		//Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
 		//We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
 		$ext->add($mcontext,$exten,'godial', new \ext_macro('dialout-one-predial-hook'));
@@ -138,7 +135,7 @@ class macroDialone{
 		// we have stored in asteriskDB , lets read from that
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(AMPUSER/${DEXTEN}/cfringtimer)}" == "0"]', 'Set', 'ARG1=${IF($["${DB(FREEPBXCONF/CFRINGTIMERDEFAULT)}"="-1"]? : ${DB(FREEPBXCONF/CFRINGTIMERDEFAULT)})}'));
 		$ext->add($mcontext,$exten,'', new \ext_set('DEXTEN', '${IF($["${CFIGNORE}"=""]?"${DB(CF/${DEXTEN})}#": )}'));
-		if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new \ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional": )}'));
+		$ext->add($mcontext,$exten,'', new \ext_set('__DIVERSION_REASON', '${IF($["${DEXTEN}"!=""]?"unconditional": )}'));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DEXTEN}"!=""]', 'Return'));
 		$ext->add($mcontext,$exten,'', new \ext_set('DIALSTATUS', 'NOANSWER'));
 		$ext->add($mcontext,$exten,'', new \ext_return(''));

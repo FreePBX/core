@@ -87,9 +87,7 @@ class macroUserCallerid{
     // CHANNEL(language) does not get inherited (which seems like an Asterisk bug as musicclass does)
     // so if whe have MASTER_CHANNEL() available to us let's rectify that
     //
-    if ($amp_conf['AST_FUNC_MASTER_CHANNEL']) {
-      $ext->add($context, $exten, '', new \ext_set('CHANNEL(language)', '${MASTER_CHANNEL(CHANNEL(language))}'));
-    }
+    $ext->add($context, $exten, '', new \ext_set('CHANNEL(language)', '${MASTER_CHANNEL(CHANNEL(language))}'));
     $ext->add($context, $exten, '', new \ext_noop_trace('Using CallerID ${CALLERID(all)}'));
     $ext->add($context, 'h', '', new \ext_macro('hangupcall'));
 
