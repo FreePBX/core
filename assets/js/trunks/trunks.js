@@ -178,6 +178,15 @@ $('input[name="failtrunk_enable"]').on('change', function(){
 		$('input[name="failtrunk"]').prop('disabled', true);
 	}
 });
+$('input[name="outbound_proxy"]').on('change', function(){
+	if($(this).val().search('sip:') == -1) {
+       		if ($(this).val().search('sips:') == -1) {
+			warnInvalid($(this),"Outbound proxy url format should be <sip>:<url>. Please add missing 'sip(sips)' to the url.");
+			return false;
+		}
+	}
+});
+
 $('input[name="dialoutopts_cb"]').on('change', function(){
 	if($(this).val() == "or"){
 		$('input[name="dialopts"]').prop('disabled', false);
