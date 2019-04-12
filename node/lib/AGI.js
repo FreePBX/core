@@ -27,11 +27,12 @@ class AGI extends EventEmitter {
 	 * Launch AGI Script
 	 */
 	launch() {
-		console.log(`[${this.settings.agi_port}] Launching ${this.settings.agi_network_script} with args: ${this.args.join(',')}`);
 		let scriptPath = `./${this.settings.agi_network_script}`;
-		if(!path.isAbsolute(this.settings.agi_network_script)) {
+		if(path.isAbsolute(this.settings.agi_network_script)) {
 			scriptPath = this.settings.agi_network_script;
 		}
+		console.log(`[${this.settings.agi_port}] Launching ${scriptPath} with args: ${this.args.join(',')}`);
+
 		this.agiScript = spawn(scriptPath, this.args, {cwd: this.settings.agi_ASTAGIDIR});
 		this.agiScript.stdout.on('data', this.scriptStdout.bind(this));
 		this.agiScript.on('exit', this.scriptExit.bind(this));
