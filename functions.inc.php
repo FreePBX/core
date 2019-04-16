@@ -3911,7 +3911,7 @@ function core_do_get_config($engine) {
 
 	// do not continue if the user has already logged onto this device
 	$ext->add($mcontext, 's','', new ext_set('DEVICEUSER','${DB(DEVICE/${CALLERID(number)}/user)}'));
-	$ext->add($mcontext, 's','gotpass', new ext_gotoif('$["${DEVICEUSER}" = "${AMPUSER}"]','s-ALREADYLOGGEDON,1'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICEUSER}" = "${AMPUSER}"]','s-ALREADYLOGGEDON,1'));
 	$ext->add($mcontext, 's','', new ext_authenticate('${AMPUSERPASS}'));
 	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,login,${CALLERID(number)},${AMPUSER}'));
 	$ext->add($mcontext, 's','', new ext_playback('agent-loginok'));
