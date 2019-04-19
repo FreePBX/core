@@ -562,6 +562,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.endpoint.conf'][$tn]['inband_progress'] = "yes";
 				}
 
+				if(!empty($trunk['force_rport']) && $trunk['force_rport'] === "no"){
+					$conf['pjsip.endpoint.conf'][$tn]['force_rport'] = "no";
+				}
+
 				//FREEPBX-14849 PJSIP "direct_media" endpoint option not available and can't set as a custom one
 				if(!empty($trunk['direct_media']) && $trunk['direct_media'] === "no"){
                                         $conf['pjsip.endpoint.conf'][$tn]['direct_media'] = "no";
@@ -1408,7 +1412,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"media_address" => "",
 				"media_encryption" => "no",
 				"message_context" => "",
-				"identify_by" => "default"
+				"identify_by" => "default",
+				"force_rport" => "yes"
 			);
 			if(version_compare($this->version,'13','ge')) {
 				$dispvars['dtmfmode'] = 'auto';
