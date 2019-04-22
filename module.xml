@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.18</version>
+	<version>15.0.9.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.19* FREEPBX-18675 Adding force_rport config option for pjsip trunk in gui 
 		*15.0.9.18* FREEPBX-19643 
 		*15.0.9.17* FREEPBX-19734
 		*15.0.9.16* FREEPBX-18785
