@@ -7,6 +7,7 @@ $request = $_REQUEST;
 $display='trunks';
 $extdisplay=isset($_REQUEST['extdisplay'])?$request['extdisplay']:'';
 $trunknum = ltrim($extdisplay,'OUT_');
+$dialpattern_array = [];
 
 $action = isset($request['action'])?$request['action']:'';
 // Now check if the Copy Trunks submit button was pressed, in which case we duplicate the trunk
@@ -441,7 +442,7 @@ if (!$tech && !$extdisplay) {
 				}
 			}
 		}
-		if (is_array($dialpattern_array) && (count($dialpattern_array) == 0)) {
+		if (!is_array($dialpattern_array) || empty($dialpattern_array)) {
 			$dialpattern_array = core_trunks_get_dialrules($trunknum);
 		}
 		$upper_tech = strtoupper($tech);
