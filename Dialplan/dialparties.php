@@ -661,7 +661,7 @@ class dialparties{
 
 		// Ext has CFU and is Unavailable
 		$ext->add($c, 'check1', '', new \ext_gotoif('$["${HASH(dialparties,EXTHASCFU)}"="1" & "${HASH(dialparties,EXTSTATESTATUS)}" != "4"]','check1-1,1'));
-		$ext->add($c, 'check1', '', new \ext_gotoif('$["${HASH(dialparties,EXTHASCW)}"="0" & "${HASH(dialparties,EXTHASCFB)}"="1"]','check1-2,1'));
+		$ext->add($c, 'check1', '', new \ext_gotoif('$["${HASH(dialparties,EXTHASCW)}"="0" | "${HASH(dialparties,EXTHASCFB)}"="1"]','check1-2,1'));
 		// -1 means couldn't read status usually due to missing HINT
 		$ext->add($c, 'check1', '', new \ext_gotoif('$["${HASH(dialparties,EXTSTATESTATUS)}" < "0"]','check1-3,1'));
 		$ext->add($c, 'check1', '', new \ext_goto('s,return'));
