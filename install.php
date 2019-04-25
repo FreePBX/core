@@ -135,15 +135,15 @@ $freepbx_conf->define_conf_setting('LAUNCH_AGI_AS_FASTAGI',$set);
 
 // DIALPARTIESDIALPLAN
 //
-$set['value'] = true;
+$set['value'] = false;
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['readonly'] = 0;
 $set['hidden'] = 0;
 $set['level'] = 0;
 $set['module'] = '';
-$set['name'] = 'Use Dialparties Dialplan';
-$set['description'] = "Set this to NO if you experience issues with Dialparties usage";
+$set['name'] = 'Use Experimental Dialparties Dialplan';
+$set['description'] = "Use experimental dialparties dialplan. When enabled the system will no longer use dialparties.agi and will instead use strictly dialplan, this may improve performance on heavy systems";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('DIALPARTIESDIALPLAN',$set);
 
@@ -1005,6 +1005,9 @@ if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['
 	} else {
 		out(_("error occured"));
 	}
+}
+if(!empty($info['core']['dbversion']) && version_compare_freepbx($info['core']['dbversion'], "15.0.9.23" , "<=")) {
+	$freepbx_conf->update('DIALPARTIESDIALPLAN', false);
 }
 
 if(FreePBX::Modules()->checkStatus("sysadmin")) {
