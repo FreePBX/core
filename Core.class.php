@@ -170,7 +170,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$pages = array();
 		$pages[0][] = array(
 			'html' => load_view(__DIR__.'/views/quickCreate.php',array('startExt' => $startExt)),
-			'validate' => 'if($("#extension").val().trim() == "") {warnInvalid($("#extension"),"'._("Extension can not be blank!").'");return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {warnInvalid($("#extension"),"'._("Extension already in use!").'");return false}if($("#name").val().trim() == "") {warnInvalid($("#name"),"'._("Display Name can not be blank!").'");return false}'
+			'validate' => 'if($("#extension").val().trim() == "") {warnInvalid($("#extension"),"'._("Extension can not be blank!").'");return false}if(typeof extmap[$("#extension").val().trim()] !== "undefined") {warnInvalid($("#extension"),"'._("Extension already in use!").'");return false}if($("#name").val().trim() == "") {warnInvalid($("#name"),"'._("Display Name can not be blank!").'");return false}if($("#tech").val() == "dahdi" && $("#channel").val().trim() == "") {warnInvalid($("#channel"),"'._("Channel can not be blank!").'");return false}'
 		);
 		$modules = $this->freepbx->Hooks->processHooks();
 		foreach($modules as $module) {
@@ -190,10 +190,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param array $data      Data passed from $_POST on submit
 	 */
 	public function processQuickCreate($tech, $extension, $data) {
+		$channel = false;
 		if(!is_numeric($extension)) {
 			return array("status" => false, "message" => _("Extension was not numeric!"));
 		}
-		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name']);
+		if($tech == "dahdi") {
+			$channel = $data['channel'];
+		}
+		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name'],$channel);
 		if(!$this->addDevice($extension,$tech,$settings)) {
 			return array("status" => false, "message" => _("Device was not added!"));
 		}
@@ -1269,7 +1273,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param {int} The exten or device number
 	 * @param {string} $displayname The displayname
 	 */
-	public function generateDefaultDeviceSettings($tech,$number,$displayname,&$flag = 2) {
+	public function generateDefaultDeviceSettings($tech,$number,$displayname,$channel = false,&$flag = 2) {
 		$flag = !empty($flag) ? $flag : 2;
 		$dial = '';
 		$settings = array();
@@ -1279,6 +1283,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 			if(empty($settings)) {
 				return array();
 			}
+		}
+		if($tech == "dahdi") {
+			if(isset($channel)){
+				$settings['settings']['channel']['value'] = $channel;
+				$dial_value = $settings['dial']."/".$channel;
+			}
+		} else {
+			$dial_value = $settings['dial']."/".$number;
 		}
 		$gsettings  = array(
 			"devicetype" => array(
@@ -1294,7 +1306,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				"value" => '',
 			),
 			"dial" => array(
-				"value" => $settings['dial']."/".$number,
+				"value" => $dial_value,
 				"flag" => $flag++
 			),
 			"secret" => array(
@@ -1326,7 +1338,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 				"flag" => $flag++
 			)
 		);
-
 		return array_merge($settings['settings'],$gsettings);
 	}
 

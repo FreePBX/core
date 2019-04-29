@@ -218,6 +218,7 @@ if($display_mode == "basic") { ?>
 
 <script>
 	$(document).ready(function() {
+		$("#channel-container").addClass("hidden");
 		$('#wizard').smartWizard({
 			keyNavigation: false,
 			onLeaveStep: function(obj, context) {
@@ -251,11 +252,19 @@ if($display_mode == "basic") { ?>
 						$("#quickCreate form")[0].reset();
 						$('#table-all').bootstrapTable('refresh');
 						$('#table-' + data.tech).bootstrapTable('refresh');
+						$("#channel-container").addClass("hidden");
 					} else {
 						$('#wizard').smartWizard('showMessage',d.message);
 						$('#quickCreate .buttonFinish').removeClass("buttonDisabled");
 					}
 				});
+			}
+		});
+		$("#tech").change(function() {
+			if($(this).val() == "dahdi") {
+				$("#channel-container").removeClass("hidden");
+			} else {
+				$("#channel-container").addClass("hidden");
 			}
 		});
 	})
