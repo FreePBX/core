@@ -62,6 +62,22 @@ foreach($drivers as $driver) {
 		</div>
 	</div>
 </div>
+<div class="element-container" id="channel-container">
+	<div class="row">
+		<div class="form-group">
+			<div class="col-md-3">
+				<label class="control-label" for="channel"><?php echo _('Channel')?></label>
+				<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
+			</div>
+			<div class="col-md-9"><input type="number" class="form-control" id="channel" name="channel" placeholder="<?php echo _('Enter Channel')?>" data-for="channel"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<span id="extension-help" class="help-block fpbx-help-block"><?php echo _('The DAHDI channel number for this extension.')?></span>
+		</div>
+	</div>
+</div>
 <div class="element-container">
 	<div class="row">
 		<div class="form-group">
