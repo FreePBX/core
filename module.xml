@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.3</version>
+	<version>13.0.131.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.4* FREEPBX-18708 fatal_retry_interval get a Null value instead of 0 
 		*13.0.131.3* FREEPBX-19762 
 		*13.0.131.2* FREEPBX-19818
 		*13.0.131.1* FREEPBX-18785
