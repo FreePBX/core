@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.4</version>
+	<version>14.0.28.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.5* FREEPBX-18708 fatal_retry_interval get a Null value instead of 0 
 		*14.0.28.4* FREEPBX-18675 Adding force_rport config option for pjsip trunk in gui 
 		*14.0.28.3* FREEPBX-19643 
 		*14.0.28.2* FREEPBX-18785
