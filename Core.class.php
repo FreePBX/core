@@ -965,7 +965,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					$this_prepend = $this_prefix = $this_callerid = '';
 
 					if (preg_match($prepend, $list, $matches)) {
-						$this_prepend = $matches[1];
+						$this_prepend = $matches[0];
 						$list = preg_replace($prepend, '', $list);
 					}
 
