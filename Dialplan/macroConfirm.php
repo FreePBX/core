@@ -34,7 +34,10 @@ class macroConfirm{
 
         $exten = '1';
         if ($config->get('AST_FUNC_SHARED')) {
-            $ext->add($context, $exten, '', new \ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" & "${SHARED(ANSWER_STATUS,${FORCE_CONFIRM})}"=""]', 'toolate,1'));
+		$ext->add($context, $exten, '', new \ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0"  & "${SHARED(ANSWER_STATUS,${FORCE_CONFIRM})}"=""]', 'toolate,1'));
+		$ext->add($context, $exten, '', new \ext_gotoif('$["${BLKVM_CHANNEL}" !="" & "${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0" & "${SHARED(ANSWER_STATUS,${BLKVM_CHANNEL})}"=""]', 'toolate,1'));
+		$ext->add($context, $exten, '', new \ext_setvar("cfchannel", '${IF($[${REGEX("/from-queue/" ${UNIQCHAN})}]?${UNIQCHAN}:${BLKVM_CHANNEL})}'));
+		$ext->add($context, $exten, '', new \ext_gotoif('$["${SHARED(BLKVM,${cfchannel})}"=""]', 'toolate,1'));
         } else {
             $ext->add($context, $exten, '', new \ext_gotoif('$["${FORCE_CONFIRM}" != ""]', 'skip'));
             $ext->add($context, $exten, '', new \ext_gotoif('$["${DB_EXISTS(RG/${ARG3}/${UNIQCHAN})}"="0"]', 'toolate,1'));
