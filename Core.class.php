@@ -1402,6 +1402,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					$astman->database_put("DEVICE",$id."/user",$settings['user']['value']);
 				}
 			}
+			$astman->database_put("DEVICE",$id."/tech",$tech);
 			$astman->database_put("DEVICE",$id."/dial",$settings['dial']['value']);
 			$astman->database_put("DEVICE",$id."/type",$settings['devicetype']['value']);
 			$astman->database_put("DEVICE",$id."/default_user",$settings['user']['value']);
