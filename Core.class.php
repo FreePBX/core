@@ -15,6 +15,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	private $getUserCache = array();
 	private $getDeviceCache = array();
 	private $listUsersCache = array();
+	private $fastAGIState = false;
 
 	public function __construct($freepbx = null) {
 		parent::__construct($freepbx);
@@ -3555,22 +3556,59 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return true;
 	}
 
+	/**
+	 * This is called in extensions.class.php to tell if FastAGI Dialplan should be written out
+	 *
+	 * @return boolean
+	 */
+	public function fastAGIStatus() {
+		return $this->fastAGIState;
+	}
+
 	public function preReloadFreepbx() {
-		if($this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI') && !$this->freepbx->Modules->checkStatus("pm2")) {
-			$this->freepbx->Config->update('LAUNCH_AGI_AS_FASTAGI',false);
-			$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server, As a result all AGIs will be launched from the CLI"),"",true,true);
+		//dont do anything if FASTAGI is disabled
+		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
+			//should we do a notification here? probably not.
+			$this->freepbx->Notifications->delete('core','FASTAGI');
+			return;
 		}
+
+		//make sure pm2 is installed
+		if(!$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->freepbx->Notifications->add_warning('core','FASTAGI',_("PM2 Not installed"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but PM2 is not installed so we were unable to start the FastAGI server, As a result all AGIs will be forked inside of Asterisk until this is resolved"),"",true,true);
+		}
+
+		//lets see if core-fastagi is running
+		$pm2 = $this->freepbx->Pm2;
+		$status = $pm2->getStatus("core-fastagi");
+		//its not started so lets attempt to start it
+		if($status['pm2_env']['status'] !== 'online') {
+			//its not so lets try to start it!
+			try {
+				//attempting
+				$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput());
+			} catch(\Exception $e) {
+				//it failed. log out the reason why and return
+				$this->freepbx->Notifications->add_warning('core','FASTAGI',_("Fast AGI Server not running"),sprintf(_("Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but we were unable to start FastAGI server because: %s, As a result all AGIs will be forked inside of Asterisk until this is resolved"),$e->getMessage()),"",true,true);
+				return;
+			}
+
+			//did it actually start?
+			$status = $pm2->getStatus("core-fastagi");
+			if($status['pm2_env']['status'] !== 'online') {
+				$this->freepbx->Notifications->add_warning('core','FASTAGI',_("Fast AGI Server not running"),_("'Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but the FastAGI server was unable to start, As a result all AGIs will be forked inside of Asterisk until this is resolved"),"",true,true);
+				return;
+			}
+		}
+
+		//delete any warnings because we are successfull
+		$this->freepbx->Notifications->delete('core','FASTAGI');
+		//set state to true
+		$this->fastAGIState = true;
 	}
 
 	public function postReloadFreepbx() {
-		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
-			return;
-		}
-		$pm2 = $this->freepbx->Pm2;
-		$status = $pm2->getStatus("core-fastagi");
-		if($status['pm2_env']['status'] !== 'online') {
-			$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput());
-		}
+
 	}
 
 	/**
