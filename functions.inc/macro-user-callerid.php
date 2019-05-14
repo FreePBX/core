@@ -41,7 +41,7 @@ $ext->add($context, $exten, '', new ext_set('AMPUSERCID', '${IF($["${ARG2}" != "
 $ext->add($context, $exten, '', new ext_set('__DIAL_OPTIONS', '${IF($["${DB_EXISTS(AMPUSER/${AMPUSER}/dialopts)}" = "1"]?${DB_RESULT}:${DIAL_OPTIONS})}'));
 
 $ext->add($context, $exten, '', new ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
-$ext->add($context, $exten, '', new ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CALLERID(all)=${IF($["${DB(AMPUSER/${ARG2}/outboundcid)}" !=""]?${DB(AMPUSER/${ARG2}/outboundcid)}:${ARG2})}'));
+$ext->add($context, $exten, '', new ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CALLERID(all)=${IF($[${LEN(${DB(AMPUSER/${ARG2}/outboundcid)})}]?${DB(AMPUSER/${ARG2}/outboundcid)}:${ARG2})}'));
 $ext->add($context, $exten, '', new ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})} & ${DB_EXISTS(AMPUSER/${AMPUSER}/concurrency_limit)} & ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}>0 & ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}>=${DB(AMPUSER/${AMPUSER}/concurrency_limit)}]', 'limit'));
 $ext->add($context, $exten, '', new ext_execif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})}]', 'Set', 'GROUP(concurrency_limit)=${AMPUSER}'));
