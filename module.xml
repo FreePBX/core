@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.27</version>
+	<version>15.0.9.28</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.28* FREEPBX-19943 Wrong CallerID Sent on Calls from Custom Extensions 
 		*15.0.9.27* Better checks for FastAGI server
 		*15.0.9.26* FREEPBX-19520
 		*15.0.9.25* FREEPBX-18708 fatal_retry_interval get a Null value instead of 0 
