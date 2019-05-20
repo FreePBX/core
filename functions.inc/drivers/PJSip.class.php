@@ -181,7 +181,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"timers_min_se" => array(
 				"value" => "90",
 				"flag" => $flag++
-			)
+			),
+			"direct_media" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
@@ -261,6 +265,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$tt = _("Minimum session timer expiration period. Time in seconds. This does not matter if Session Timers is set to No");
 		$tmparr['timers_min_se'] = array('prompttext' => _('Timer Expiration Period'), 'value' => '90', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$tt = _("Determines whether media may flow directly between endpoints.");
+		$tmparr['direct_media'] = array('prompttext' => _('Direct Media'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
@@ -1039,6 +1049,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
 
+		if (!empty($config['direct_media'])) {
+			$endpoint[] = "direct_media=".$config['direct_media'];
+		}
 		//http://issues.freepbx.org/browse/FREEPBX-12151
 		if(isset($config['mailbox'])) {
 			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
