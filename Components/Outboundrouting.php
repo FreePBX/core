@@ -25,9 +25,9 @@ class Outboundrouting extends ComponentBase{
 
 		$route_id = $this->Database->lastInsertId();
 
-		$this->updatePatterns($route_id, $patterns)
-		->updateTrunks($route_id, $trunks)
-		->setOrder($route_id, 'new');
+		$this->updatePatterns($route_id, $patterns);
+		$this->updateTrunks($route_id, $trunks);
+		$this->setOrder($route_id, 'new');
 
 		// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
 		if ($seq != 'new') {
@@ -55,10 +55,9 @@ class Outboundrouting extends ComponentBase{
 			":time_mode" => $time_mode,
 			":timezone" => $timezone
 		));
-
-		$this->updatePatterns($route_id, $patterns)
-		->updateTrunks($route_id, $trunks)
-		->setOrder($route_id, $seq);
+		$this->updatePatterns($route_id, $patterns,true);
+		$this->updateTrunks($route_id, $trunks,true);
+		$this->setOrder($route_id, $seq);
 
 		return $route_id;
 	}
