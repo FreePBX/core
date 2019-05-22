@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.30</version>
+	<version>15.0.9.31</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.31* FREEPBX-19991 Cannot delete or change settings 
 		*15.0.9.30* FREEPBX-19927 Direct Media for pjsip endpoints 
 		*15.0.9.29* FREEPBX-19976 Internal auto answer option under extensions advanced tab is not working 
 		*15.0.9.28* FREEPBX-19943 Wrong CallerID Sent on Calls from Custom Extensions 
