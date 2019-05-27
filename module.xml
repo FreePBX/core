@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.11</version>
+	<version>14.0.28.12</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.12* FREEPBX-18676 Configuration File Link removed(http://freepbx.org/configuration_files) 
 		*14.0.28.11* FREEPBX-19927 Direct Media for pjsip endpoints 
 		*14.0.28.10* FREEPBX-19943 Wrong CallerID Sent on Calls from Custom Extensions 
 		*14.0.29* Better FastAGI and PM2 notifications when in weird states
