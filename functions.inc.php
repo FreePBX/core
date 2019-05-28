@@ -26,6 +26,7 @@ class core_conf {
 	public function __construct() {
 		// Ensure the local object is available
 		self::$obj = $this;
+		$this->FreePBX = FreePBX::Create();
 	}
 
 	public static function create() {
@@ -197,7 +198,7 @@ class core_conf {
 		global $amp_conf;
 		$output = '';
 		$country = $amp_conf['TONEZONE'];
-		$didlist = \FreePBX::Core()->getAllDIDs();
+		$didlist = $this->FreePBX->Core->getAllDIDs();
 		if(is_array($didlist)){
 			foreach($didlist as $item) {
 				if($item['indication_zone'] == "default" || $item['indication_zone'] == $country){
@@ -320,7 +321,6 @@ class core_conf {
 
 	function generate_sip_additional($ast_version) {
 		global $db;
-
 		$table_name = "sip";
 		$additional = "";
 		$finaloutput = "";
@@ -358,9 +358,9 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
-					$opt = FreePBX::Core()->filterValidCodecs($option);
+					$opt = $this->FreePBX->Core->filterValidCodecs($option);
 					if(!empty($opt)) {
-						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+						$additional .= $result['keyword']."=".$this->FreePBX->Core()->filterValidCodecs($opt)."\n";
 					}
 				break;
 				case 'accountcode':
@@ -377,8 +377,8 @@ class core_conf {
 			die($results->getMessage());
 		}
 
-		if(FreePBX::Modules()->moduleHasMethod("sipsettings","getChanSipSettings")) {
-			$sipsettings = FreePBX::Sipsettings()->getChanSipSettings();
+		if($this->FreePBX->Modules->moduleHasMethod("sipsettings","getChanSipSettings")) {
+			$sipsettings = $this->FreePBX->Sipsettings->getChanSipSettings();
 		} else {
 			$sipsettings = array();
 		}
@@ -464,7 +464,7 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
-						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						$opt = $this->FreePBX->Core->filterValidCodecs($result2['data']);
 						if(!empty($opt)) {
 							$output .= $result2['keyword']."=".$opt."\n";
 						}
@@ -614,9 +614,9 @@ class core_conf {
 				break;
 				case 'allow':
 				case 'disallow':
-					$opt = FreePBX::Core()->filterValidCodecs($option);
+					$opt = $this->FreePBX->Core->filterValidCodecs($option);
 					if(!empty($opt)) {
-						$additional .= $result['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+						$additional .= $result['keyword']."=".$this->FreePBX->Core->filterValidCodecs($opt)."\n";
 					}
 				break;
 				case 'accountcode':
@@ -684,9 +684,9 @@ class core_conf {
 					break;
 					case 'allow':
 					case 'disallow':
-						$opt = FreePBX::Core()->filterValidCodecs($result2['data']);
+						$opt = $this->FreePBX->Core->filterValidCodecs($result2['data']);
 						if(!empty($opt)) {
-							$output .= $result2['keyword']."=".FreePBX::Core()->filterValidCodecs($opt)."\n";
+							$output .= $result2['keyword']."=".$this->FreePBX->Core->filterValidCodecs($opt)."\n";
 						}
 					break;
 					case 'accountcode':
@@ -827,6 +827,9 @@ class core_conf {
 	}
 }
 
+$core_FreePBX = FreePBX::Create();
+global $core_FreePBX;
+
 function core_destination_popovers() {
 	global $amp_conf;
 	if ($amp_conf['AMPEXTENSIONS'] == "deviceanduser") {
@@ -934,10 +937,10 @@ function core_getdest($exten) {
 function core_getdestinfo($dest) {
 	global $amp_conf;
 	global $active_modules;
-
+	global $core_FreePBX;
 	// Check for Extension Number Destinations
 	//
-	$users = \FreePBX::Core()->getAllUsers();
+	$users = $core_FreePBX->Core->getAllUsers();
   	if (substr(trim($dest),0,11) == 'from-trunk,') {
 		$did = explode(',',$dest);
 		$did = $did[1];
@@ -1042,7 +1045,7 @@ function core_do_get_config($engine) {
 	global $chan_dahdi;
 	global $chan_dahdi_loaded;
 	global $astman;
-
+	global $core_FreePBX;
 	$modulename = "core";
 
 	$callrecording = 'callrecording';
@@ -1435,7 +1438,7 @@ function core_do_get_config($engine) {
 		$ext->add('ext-did', 'foo','', new ext_noop('bar'));
 
 		/* inbound routing extensions */
-		$didlist = \FreePBX::Core()->getAllDIDs();
+		$didlist = $core_FreePBX->Core->getAllDIDs();
 		if(is_array($didlist)){
 			$catchall = false;
 			$catchall_context='ext-did-catchall';
@@ -1641,7 +1644,7 @@ function core_do_get_config($engine) {
 		$userlist = core_users_list();
 		if (is_array($userlist)) {
 			foreach($userlist as $item) {
-				$exten = \FreePBX::Core()->getUser($item[0]);
+				$exten = $core_FreePBX->Core->getUser($item[0]);
 				$vm = ((($exten['voicemail'] == "novm") || ($exten['voicemail'] == "disabled") || ($exten['voicemail'] == "")) ? "novm" : $exten['extension']);
 
 				$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($["${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}" > "0"]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
@@ -2084,7 +2087,7 @@ function core_do_get_config($engine) {
 	$ext->addInclude('from-internal-additional','outbound-allroutes');
 	//$ext->add('outbound-allroutes', '_!', '', new ext_macro('user-callerid,SKIPTTL'));
 	$ext->add('outbound-allroutes', 'foo', '', new ext_noop('bar'));
-	$routes = \FreePBX::Core()->getAllRoutes();
+	$routes = $core_FreePBX->Core->getAllRoutes();
 	$trunk_table = core_trunks_listbyid();
 	$trunk_type_needed = array(); // track which macros need to be generated
 	$delim = ',';
@@ -4004,8 +4007,9 @@ function core_do_get_config($engine) {
 /* begin page.ampusers.php functions */
 
 function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections) {
+	global $core_FreePBX;
 	_core_backtrace();
-	return \FreePBX::Core()->addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections);
+	return $core_FreePBX->Core->addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections);
 }
 
 function core_ampusers_del($username) {
@@ -4033,29 +4037,32 @@ function core_ampusers_list() {
 /* begin page.did.php functions */
 
 function core_did_list($order='extension'){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->getAllDIDs($order);
+	return $core_FreePBX->Core->getAllDIDs($order);
 }
 
 function core_did_get($extension="",$cidnum=""){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->getDID($extension,$cidnum);
+	return $core_FreePBX->Core->getDID($extension,$cidnum);
 }
 
 function core_did_del($extension,$cidnum){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->delDID($extension,$cidnum);
+	return $core_FreePBX->Core->delDID($extension,$cidnum);
 }
 
 function core_did_edit($oldExtension,$oldCidnum, $incoming){
 	$incoming['destination'] = isset($incoming[$incoming['goto0'].'0']) ? $incoming[$incoming['goto0'].'0'] : "";
-	$res = FreePBX::Core()->editDID($oldExtension,$oldCidnum, $incoming);
+	$res = $core_FreePBX->Core->editDID($oldExtension,$oldCidnum, $incoming);
 	if ($res) {
 		return true;
 	} else {
 		$extension = $incoming['extension'];
 		$cidnum = $incoming['cidnum'];
-		$existing = FreePBX::Core()->getDID($extension,$cidnum);
+		$existing = $core_FreePBX->Core->getDID($extension,$cidnum);
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 	}
 	return false;
@@ -4064,27 +4071,31 @@ function core_did_edit($oldExtension,$oldCidnum, $incoming){
 /* Create a new did with values passed into $did_vars and defaults used otherwise
 */
 function core_did_create_update($did_vars) {
-	return FreePBX::Core()->createUpdateDID($did_vars);
+	global $core_FreePBX;
+
+	return $core_FreePBX->Core->createUpdateDID($did_vars);
 }
 
 
 /* Edits the poperties of a did, but not the did or cid nums since those could of course be in conflict
 */
 function core_did_edit_properties($did_vars) {
-	return FreePBX::Core()->editDIDProperties($did_vars);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->editDIDProperties($did_vars);
 }
 
 function core_did_add($incoming,$target=false){
+	global $core_FreePBX;
 
 	$incoming['destination'] = ($target) ? $target : (isset($incoming[$incoming['goto0'].'0']) ? $incoming[$incoming['goto0'].'0'] : "");
 
 	// Check to make sure the did is not being used elsewhere
 	//
-	$res = \FreePBX::Core()->addDID($incoming);
+	$res = $core_FreePBX->Core->addDID($incoming);
 	if ($res) {
 		return true;
 	} else {
-		$existing = \FreePBX::Core()->getDID($incoming['extension'],$incoming['cidnum']);
+		$existing = $core_FreePBX->Core->getDID($incoming['extension'],$incoming['cidnum']);
 		echo "<script>javascript:alert('"._("A route for this DID/CID already exists!")." => ".$existing['extension']."/".$existing['cidnum']."')</script>";
 		return false;
 	}
@@ -4161,9 +4172,10 @@ function core_devices_get_user_mappings() {
 }
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$hint_override=null,$editmode=false){
+	global $core_FreePBX;
 	_core_backtrace();
 	$flag = 2;
-	$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
+	$fields = $core_FreePBX->Core->convertRequest2Array($id,$tech,$flag);
 	$settings = array(
 		"dial" => array("value" => $dial),
 		"devicetype" => array("value" => $devicetype),
@@ -4181,20 +4193,22 @@ function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emerge
 		$settings['setvar'] = array("value" => "REALCALLERIDNUM=$account", "flag" => $flag++);
 	}
 	try {
-		return FreePBX::Core()->addDevice($id,$tech,$settings,$editmode);
+		return $core_FreePBX->Core->addDevice($id,$tech,$settings,$editmode);
 	} catch(Exception $e) {
 		echo "<script>javascript:alert('".$e->getMessage()."');</script>";
 	}
 }
 
 function core_devices_del($account,$editmode=false){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->delDevice($account,$editmode);
+	return $core_FreePBX->Core->delDevice($account,$editmode);
 }
 
 function core_devices_get($account){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->getDevice($account);
+	return $core_FreePBX->Core->getDevice($account);
 }
 
 //I dont wanna talk about it.
@@ -4296,11 +4310,12 @@ function core_devices_getsip($account) {
 function core_devices2astdb(){
 	global $astman;
 	global $amp_conf;
-
+	global $core_FreePBX;
 	$sql = "SELECT * FROM devices";
 	$devresults = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
 	//add details to astdb
+
 	if ($astman) {
 		$astman->database_deltree("DEVICE");
 		foreach ($devresults as $dev) {
@@ -4329,7 +4344,7 @@ function core_devices2astdb(){
 
 
 			// create a voicemail symlink if needed
-			$thisUser = \FreePBX::Core()->getUser($user);
+			$thisUser = $core_FreePBX->Core->getUser($user);
 			if(isset($thisUser['voicemail']) && ($thisUser['voicemail'] != "novm")) {
 				if(empty($thisUser['voicemail']))
 				$vmcontext = "default";
@@ -4434,8 +4449,9 @@ function core_hint_get($account){
 // get the existing extensions
 // the returned arrays contain [0]:extension [1]:name
 function core_users_list($get_all=false){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->listUsers($get_all);
+	return $core_FreePBX->Core->listUsers($get_all);
 }
 
 function core_check_extensions($exten=true) {
@@ -4559,29 +4575,33 @@ function core_change_destination($old_dest, $new_dest) {
 
 
 function core_sipname_check($sipname, $extension) {
-	return FreePBX::Core()->checkSipnameInUse($sipname,$extension);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->checkSipnameInUse($sipname,$extension);
 }
 
 function core_users_add($vars, $editmode=false) {
+	global $core_FreePBX;
 	_core_backtrace();
 	try {
 		$vars['noanswer_dest'] = !empty($vars['noanswer_dest']) && !empty($vars[$vars[$vars['noanswer_dest']].'0']) && $vars[$vars[$vars['noanswer_dest']].'0'] != '' ? $vars[$vars[$vars['noanswer_dest']].'0'] : "";
 		$vars['busy_dest'] = !empty($vars['busy_dest']) && !empty($vars[$vars[$vars['busy_dest']].'1']) && $vars[$vars[$vars['busy_dest']].'1'] != '' ? $vars[$vars[$vars['busy_dest']].'1'] : "";
 		$vars['chanunavail_dest'] = !empty($vars['chanunavail_dest']) && !empty($vars[$vars[$vars['chanunavail_dest']].'2']) && $vars[$vars[$vars['chanunavail_dest']].'2'] != '' ? $vars[$vars[$vars['chanunavail_dest']].'2'] : "";
-		return FreePBX::Core()->addUser($vars['extension'], $vars, $editmode);
+		return $core_FreePBX->Core->addUser($vars['extension'], $vars, $editmode);
 	} catch(Exception $e) {
 		echo "<script>javascript:alert('".$e->getMessage()."');</script>";
 	}
 }
 
 function core_users_get($extension){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->getUser($extension);
+	return $core_FreePBX->Core->getUser($extension);
 }
 
 function core_users_del($extension, $editmode=false){
+	global $core_FreePBX;
 	_core_backtrace();
-	return FreePBX::Core()->delUser($extension,$editmode);
+	return $core_FreePBX->Core->delUser($extension,$editmode);
 }
 
 function core_users_directdid_get($directdid=""){
@@ -4610,6 +4630,7 @@ function core_users_edit($extension, $vars){
 	global $db;
 	global $amp_conf;
 	global $astman;
+	global $core_FreePBX;
 
 	//I we are editing, we need to remember existing user<->device mapping, so we can delete and re-add
 	if ($astman) {
@@ -4634,7 +4655,7 @@ function core_users_edit($extension, $vars){
 
 	// Well more ugliness since the javascripts are already in here
 	if ($newdid != '' || $newdidcid != '') {
-		$existing = \FreePBX::Core()->getDID($newdid, $newdidcid);
+		$existing = $core_FreePBX->Core->getDID($newdid, $newdidcid);
 		if (! empty($existing)) {
 			echo "<script>javascript:alert('".sprintf(_("A route with this DID/CID: %s/%s already exists"),$existing['extension'],$existing['cidnum'])."')</script>";
 			return false;
@@ -4643,7 +4664,7 @@ function core_users_edit($extension, $vars){
 
 	//delete and re-add
 	if (core_sipname_check($vars['sipname'],$extension)) {
-		\FreePBX::Core()->delUser($extension, true);
+		$core_FreePBX->Core->delUser($extension, true);
 		core_users_add($vars, true);
 
 		// If the vmcontext has changed, we need to change all the links. In extension mode, the link
@@ -4736,6 +4757,7 @@ function core_dahdichandids_get($channel) {
 * @pram boolean; true disables trunk, false is enables trunk
 */
 function core_trunks_disable($trunk, $switch) {
+	global $core_FreePBX;
 	if(empty($trunk)){
 		return false;
 	}
@@ -4761,10 +4783,10 @@ function core_trunks_disable($trunk, $switch) {
 	if (empty($trunks)) {
 		return false;
 	}
-	$freepbx = FreePBX::Create();
+	$freepbx = $core_FreePBX;
 	foreach ($trunks as $t) {
 		if($switch){
-				$freepbx->Core->disableTrunk($t['trunkid']);
+				$core_FreePBX->Core->disableTrunk($t['trunkid']);
 				continue;
 		}
 		$freepbx->Core->enableTrunk($t['trunkid']);
@@ -4773,6 +4795,8 @@ function core_trunks_disable($trunk, $switch) {
 
 // we're adding ,don't require a $trunknum
 function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue="off", $dialopts=false) {
+	global $core_FreePBX;
+
 	$settings = array(
 		"channelid" => $channelid,
 		"dialoutprefix" => $dialoutprefix,
@@ -4789,16 +4813,18 @@ function core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, 
 		"continue" => $continue,
 		"dialopts" => $dialopts
 	);
-	return FreePBX::Core()->addTrunk($name, $tech, $settings);
+	return $core_FreePBX->Core->addTrunk($name, $tech, $settings);
 }
 
 function core_trunks_del($trunknum, $tech = null , $edit = false) {
+	global $core_FreePBX;
 	_core_backtrace();
-	return \FreePBX::Core()->deleteTrunk($trunknum, $tech, $edit);
+	return $core_FreePBX->Core->deleteTrunk($trunknum, $tech, $edit);
 }
 
 function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name="", $provider="", $continue='off', $dialopts = false) {
-	$tech = FreePBX::Core()->getTrunkTech($trunknum);
+	global $core_FreePBX;
+	$tech = $core_FreePBX->Core->getTrunkTech($trunknum);
 	if ($tech == "") {
 		return false;
 	}
@@ -4819,17 +4845,18 @@ function core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $out
 		"continue" => $continue,
 		"dialopts" => $dialopts
 	);
-	\FreePBX::Core()->deleteTrunk($trunknum, $tech, true);
+	$core_FreePBX->Core->deleteTrunk($trunknum, $tech, true);
 	if($tech == 'pjsip') {
 		$settings = array_merge($_REQUEST,$settings);
 	}
-	return FreePBX::Core()->addTrunk($name, $tech, $settings, true);
+	return $core_FreePBX->Core->addTrunk($name, $tech, $settings, true);
 }
 
 // just used internally by addTrunk() and editTrunk()
 //obsolete
 // This is not obsolete 8-( 2013-12-31.
 function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, $failtrunk, $disabletrunk, $name, $provider, $continue, $dialopts=false) {
+	global $core_FreePBX;
 	$settings = array(
 		"trunknum" => $trunknum,
 		"channelid" => $channelid,
@@ -4851,35 +4878,40 @@ function core_trunks_backendAdd($trunknum, $tech, $channelid, $dialoutprefix, $m
 	if($tech == 'pjsip') {
 		$settings = array_merge($_REQUEST,$settings);
 	}
-	return FreePBX::Core()->addTrunk($tech, $settings, true);
+	return $core_FreePBX->Core->addTrunk($tech, $settings, true);
 }
 
 //TODO: replace with NEW table
 //
 function core_trunks_getTrunkTech($trunknum) {
-	return FreePBX::Core()->getTrunkTech($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkTech($trunknum);
 }
 
 //add trunk info to sip or iax table
 function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
-	return FreePBX::Core()->addSipOrIaxTrunk($config,$table,$channelid,$trunknum,$disable_flag,$type);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->addSipOrIaxTrunk($config,$table,$channelid,$trunknum,$disable_flag,$type);
 }
 
 //get unique trunks
 function core_trunks_getDetails($trunkid='') {
+	global $core_FreePBX;
 	if ($trunkid != '') {
-		return \FreePBX::Core()->getTrunkByID($trunkid);
+		return $core_FreePBX->Core->getTrunkByID($trunkid);
 	}
-	return \FreePBX::Core()->listTrunks();
+	return $core_FreePBX->Core->listTrunks();
 }
 
 function core_trunks_listbyid() {
-	return \FreePBX::Core()->listTrunks();
+	global $core_FreePBX;
+	return $core_FreePBX->Core->listTrunks();
 }
 
 function core_trunks_list($assoc = false) {
+	global $core_FreePBX;
 	// TODO: $assoc default to true, eventually..
-	$trunks = \FreePBX::Core()->listTrunks();
+	$trunks = $core_FreePBX->Core->listTrunks();
 
 	$unique_trunks = array();
 	foreach ($trunks as $trunk) {
@@ -4920,18 +4952,21 @@ function core_trunks_list($assoc = false) {
 }
 
 function core_trunks_addRegister($trunknum,$tech,$reg,$disable_flag=0) {
-	return \FreePBX::Core()->addTrunkRegister($trunknum,$tech,$reg,$disable_flag);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->addTrunkRegister($trunknum,$tech,$reg,$disable_flag);
 }
 
 
 function core_trunks_update_dialrules($trunknum, &$patterns, $delete = false) {
-	return \FreePBX::Core()->updateTrunkDialRules($trunknum, $patterns, $delete);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->updateTrunkDialRules($trunknum, $patterns, $delete);
 }
 
 function core_trunks_list_dialrules() {
+	global $core_FreePBX;
 	$rule_hash = array();
 
-	$patterns = \FreePBX::Core()->getAllTrunkDialRules();
+	$patterns = $core_FreePBX->Core->getAllTrunkDialRules();
 	foreach ($patterns as $pattern) {
 		//$rule_hash[$pattern['trunkid']][] = $pattern['prepend_digits'].'^'.$pattern['match_pattern_prefix'].'|'.$pattern['match_pattern_pass'];
 		$rule_hash[$pattern['trunkid']][] = $pattern;
@@ -4940,41 +4975,49 @@ function core_trunks_list_dialrules() {
 }
 
 function core_trunks_getTrunkTrunkName($trunknum) {
-	return \FreePBX::Core()->getTrunkTrunkNameByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkTrunkNameByID($trunknum);
 }
 
 function core_trunks_getTrunkPeerDetails($trunknum) {
-	return \FreePBX::Core()->getTrunkPeerDetailsByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkPeerDetailsByID($trunknum);
 }
 
 function core_trunks_getTrunkUserContext($trunknum) {
-	return \FreePBX::Core()->getTrunkUserContext($trunknum);
+		global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkUserContext($trunknum);
 }
 
 function core_trunks_getTrunkUserConfig($trunknum) {
-	return \FreePBX::Core()->getTrunkUserConfigByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkUserConfigByID($trunknum);
 }
 
 //get trunk account register string
 function core_trunks_getTrunkRegister($trunknum) {
-	return \FreePBX::Core()->getTrunkRegisterStringByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkRegisterStringByID($trunknum);
 }
 
 function core_trunks_get_dialrules($trunknum = false) {
+	global $core_FreePBX;
 	if ($trunknum === false) {
-		return \FreePBX::Core()->getAllTrunkDialRules();
+		return $core_FreePBX->Core->getAllTrunkDialRules();
 	} else {
-		return \FreePBX::Core()->getTrunkDialRulesByID($trunknum);
+		return $core_FreePBX->Core->getTrunkDialRulesByID($trunknum);
 	}
 }
 
 //get outbound routes for a given trunk
 function core_trunks_gettrunkroutes($trunknum) {
-	return \FreePBX::Core()->getTrunkRoutesByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getTrunkRoutesByID($trunknum);
 }
 
 function core_trunks_delete_dialrules($trunknum) {
-	return \FreePBX::Core()->deleteTrunkDialRulesByID($trunknum);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->deleteTrunkDialRulesByID($trunknum);
 }
 
 
@@ -4988,7 +5031,8 @@ function core_trunks_addDialRules($trunknum, $dialrules) {
 }
 
 function core_trunk_has_registrations($type = ''){
-	return \FreePBX::Core()->trunkHasRegistrations($type);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->trunkHasRegistrations($type);
 }
 
 function core_trunks_deleteDialRules($trunknum) {
@@ -5023,13 +5067,15 @@ function core_trunks_readDialRulesFile() {
 // function core_routing_getroutemohsilence($route)
 // function core_routing_getroutecid($route)
 function core_routing_get($route_id) {
-	return \FreePBX::Core()->getRouteByID($route_id);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getRouteByID($route_id);
 }
 
 // function core_routing_getroutenames()
 function core_routing_list() {
+	global $core_FreePBX;
 	_core_backtrace();
-	return \FreePBX::Core()->getAllRoutes();
+	return $core_FreePBX->Core->getAllRoutes();
 }
 
 // function core_routing_setroutepriority($routepriority, $reporoutedirection, $reporoutekey)
@@ -5133,8 +5179,9 @@ function core_routing_delbyid($route_id) {
 
 // function core_routing_trunk_del($trunknum)
 function core_routing_trunk_delbyid($trunk_id) {
+	global $core_FreePBX;
 	_core_backtrace();
-	return \FreePBX::Core()->delRouteTrunkByID($trunk_id);
+	return $core_FreePBX->Core->delRouteTrunkByID($trunk_id);
 }
 
 // function core_routing_rename($oldname, $newname)
@@ -5142,12 +5189,13 @@ function core_routing_renamebyid($route_id, $new_name) {
 	global $db;
 	$route_id = q($db->escapeSimple($route_id));
 	$new_name = $db->escapeSimple($new_name);
-	sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
+	sql("UPDATE `outbound_routes` SET `name` = '$new_name'  WHERE `route_id` = $route_id");
 }
 
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
-	return \FreePBX::Core()->getRoutePatternsByID($route_id);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getRoutePatternsByID($route_id);
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5176,18 +5224,20 @@ function core_routing_formatpattern($pattern) {
 
 // function core_routing_getroutetrunks($route)
 function core_routing_getroutetrunksbyid($route_id) {
-	return FreePBX::Core()->getRouteTrunksByID($route_id);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->getRouteTrunksByID($route_id);
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
 function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
+	global $core_FreePBX;
 	$sql = "UPDATE `outbound_routes` SET
 	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
 	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
 	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
 	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
 
-	$sth = FreePBX::Database()->prepare($sql);
+	$sth = $core_FreePBX->Database->prepare($sql);
 	$sth->execute(array(
 		":name" => $name,
 		":outcid" => $outcid,
@@ -5216,11 +5266,11 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
 	global $amp_conf;
 	global $db;
-
+	global $core_FreePBX;
 	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 
-	$sth = FreePBX::Database()->prepare($sql);
+	$sth = $core_FreePBX->Database->prepare($sql);
 	$sth->execute(array(
 		":name" => $name,
 		":outcid" => $outcid,
@@ -5235,7 +5285,7 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 		":timezone" => $timezone
 	));
 
-	$route_id = FreePBX::Database()->lastInsertId();
+	$route_id = $core_FreePBX->Database->lastInsertId();
 
 	core_routing_updatepatterns($route_id, $patterns);
 	core_routing_updatetrunks($route_id, $trunks);
@@ -5285,7 +5335,8 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 }
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
-	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
+	global $core_FreePBX;
+	return $core_FreePBX->Core->updateRouteTrunks($route_id, $trunks, $delete);
 }
 
 /* callback to Time Groups Module so it can display usage information
@@ -5548,6 +5599,7 @@ function dev_grp($a, $b) {
 function core_users_configpageload() {
 	global $currentcomponent;
 	global $amp_conf;
+	global $core_FreePBX;
 
 	// Ensure variables possibly extracted later exist
 	$name = $outboundcid = $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
@@ -5575,7 +5627,7 @@ function core_users_configpageload() {
 		if ( is_string($extdisplay) ) {
 
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-				$extenInfo=\FreePBX::Core()->getUser($extdisplay);
+				$extenInfo=$core_FreePBX->Core->getUser($extdisplay);
 				extract($extenInfo);
 			}
 			if (isset($deviceInfo) && is_array($deviceInfo)) {
@@ -5584,31 +5636,11 @@ function core_users_configpageload() {
 
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
-				/*
-				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-				$tlabel = sprintf(_("Delete Extension %s"),$extdisplay);
-				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
-				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
-				$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
-				if (!empty($usage_list)) {
-				$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
-			}
-		}
-		*/
 			} else {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("User").": $extdisplay", false), 0);
 				if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-					/*
-					$tlabel = sprintf(_("Delete User %s"),$extdisplay);
-					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_delete.png"/>&nbsp;'.$tlabel.'</span>';
-					$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
-
-					$usage_list = framework_display_destination_usage(core_getdest($extdisplay));
-					if (!empty($usage_list)) {
-						$currentcomponent->addguielem('_top', new gui_link_label('dests', $usage_list['text'], $usage_list['tooltip'], true), 0);
-					}
-					*/
+	
 				}
 			}
 		} elseif ( $display != 'extensions' ) {
@@ -5751,7 +5783,7 @@ function core_users_configpageload() {
 		$currentcomponent->addguielem($section, new gui_textbox('newdid', $newdid, _("Add Inbound DID"), _("A direct DID that is associated with this extension. The DID should be in the same format as provided by the provider (e.g. full number, 4 digits for 10x4, etc).<br><br>Format should be: <b>XXXXXXXXXX</b><br><br>.An optional CID can also be associated with this DID by setting the next box"),'!isDialpattern()',$msgInvalidDIDNum,true), 4, null, $category);
 		$currentcomponent->addguielem($section, new gui_textbox('newdidcid', $newdidcid, _("Add Inbound CID"), _("Add a CID for more specific DID + CID routing. A DID must be specified in the above Add DID box. In addition to standard dial sequences, you can also put Private, Blocked, Unknown, Restricted, Anonymous, Unavailable and Withheld in order to catch these special cases if the Telco transmits them."),"!frm_${display}_isValidCID()",$msgInvalidCIDNum,true), 4, null, $category);
 
-		$dids = \FreePBX::Core()->getAllDIDs('extension');
+		$dids = $core_FreePBX->Core->getAllDIDs('extension');
 		$did_count = 0;
 		foreach ($dids as $did) {
 			$did_dest = preg_split('/,/',$did['destination']);
@@ -5828,6 +5860,8 @@ function core_users_configpageload() {
 
 function core_users_configprocess() {
 	global $astman;
+	global $core_FreePBX;
+
 	//create vars from the request
 	extract($_REQUEST);
 
@@ -5862,7 +5896,7 @@ function core_users_configprocess() {
 			}
 			break;
 			case "del":
-			\FreePBX::Core()->delUser($extdisplay);
+			$core_FreePBX->Core->delUser($extdisplay);
 			core_users_cleanastdb($extdisplay);
 			if (function_exists('findmefollow_del')) {
 				findmefollow_del($extdisplay);
@@ -5909,6 +5943,7 @@ function core_devices_configpageinit($dispnum) {
 }
 
 function core_devices_configpageload() {
+	global $core_FreePBX;
 	global $currentcomponent;
 	global $amp_conf;
 
@@ -6025,7 +6060,7 @@ function core_devices_configpageload() {
 				$section = ($extdisplay ? _("Edit User") : _("Add User"));
 			}
 
-			$drivers = FreePBX::Core()->getAllDrivers();
+			$drivers = $core_FreePBX->Core->getAllDrivers();
 			if(isset($drivers[$devinfo_tech])) {
 				$devopts = $drivers[$devinfo_tech]->getDeviceDisplay($display, $deviceInfo, $currentcomponent, $section);
 			} else {
@@ -6053,7 +6088,7 @@ function core_devices_configpageload() {
 					if ($devopt == "secret") {
 						$currentcomponent->addguielem($sec, new gui_hidden($devopname . "_origional", $devoptcurrent), 4, null, $category);
 						if ($devoptcurrent == '' && empty($extdisplay)) {
-							$devoptcurrent = \FreePBX::Core()->generateSecret();
+							$devoptcurrent = $core_FreePBX->Core->generateSecret();
 						}
 					}
 
@@ -6080,6 +6115,7 @@ function core_devices_configpageload() {
 
 function core_devices_configprocess() {
 	global $astman;
+	global $core_FreePBX;
 	if ( !class_exists('agi_asteriskmanager') )
 	include 'common/php-asmanager.php';
 
@@ -6144,7 +6180,7 @@ function core_devices_configprocess() {
 				$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
 				$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
 				$flag = 2;
-				$fields = FreePBX::Core()->convertRequest2Array($deviceid,$tech,$flag);
+				$fields = $core_FreePBX->Core->convertRequest2Array($deviceid,$tech,$flag);
 				$settings = array(
 					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
 					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
@@ -6153,7 +6189,7 @@ function core_devices_configprocess() {
 					"emergency_cid" => array("value" => $emergency_cid, "flag" => isset($fields['emergency_cid']['flag']) ? $fields['emergency_cid']['flag'] : $flag++)
 				);
 				$settings = array_merge($fields,$settings);
-				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
+				return $core_FreePBX->Core->addDevice($deviceid,$tech,$settings,true);
 			} else {
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override,true);
 			}
@@ -6179,9 +6215,11 @@ function _core_backtrace() {
 }
 
 function core_module_repo_parameters_callback($opts) {
+	global $core_FreePBX;
+
 	$final = array();
-	if(\FreePBX::Config()->get('BROWSER_STATS')) {
-		$final['udmode'] = \FreePBX::Config()->get('AMPEXTENSIONS');
+	if($core_FreePBX->Config->get('BROWSER_STATS')) {
+		$final['udmode'] = $core_FreePBX->Config->get('AMPEXTENSIONS');
 	}
 	return $final;
 }
