@@ -3138,8 +3138,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param string $deptname       The department name
 	 * @param array $sections       Sections to allow
 	 */
-	public function addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections){
-		if (strlen($password) == 40 && ctype_xdigit($password)) {
+	public function addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections, $skipSHA1 = false){
+		if ($skipSHA1 || strlen($password) == 40 && ctype_xdigit($password)) {
 			$password_sha1 = $password;
 		}else {
 			$password_sha1 = sha1($password);
