@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.34</version>
+	<version>15.0.9.35</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.35* FREEPBX-20059 Restoring the backup is changing the admin password 
 		*15.0.9.34* FREEPBX-20059 add option to skip sha1 test adding ampuser 
 		*15.0.9.33* FREEPBX-20024 Wrong CallerID Sent on Calls from Custom Extensions 
 		*15.0.9.32* FREEPBX-18676 Configuration File Link removed(http://freepbx.org/configuration_files) 
