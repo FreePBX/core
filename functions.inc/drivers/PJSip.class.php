@@ -559,14 +559,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				unset($this->_endpoint[$tn]);
 			}
 
-			// Identify types aren't used when we're receiving registrations
-			if ($trunk['registration'] != "receive") {
-				$conf['pjsip.identify.conf'][$tn] = array(
-					'type' => 'identify',
-					'endpoint' => $tn,
-					'match' => !empty($trunk['match']) ? $trunk['match'] : $trunk['sip_server']
-				);
-			}
+			// Identify types
+			$conf['pjsip.identify.conf'][$tn] = array(
+				'type' => 'identify',
+				'endpoint' => $tn,
+				'match' => !empty($trunk['match']) ? $trunk['match'] : $trunk['sip_server']
+			);
 
 			if(!empty($this->_identify[$tn]) && is_array($this->_identify[$tn])) {
 				foreach($this->_identify[$tn] as $el) {
