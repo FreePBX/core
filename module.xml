@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.36</version>
+	<version>15.0.9.37</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.37* FREEPBX-20153 Call Waiting tone not working in FreePBX 15 
 		*15.0.9.36* FREEPBX-20190
 		*15.0.9.35* FREEPBX-20059 Restoring the backup is changing the admin password 
 		*15.0.9.34* FREEPBX-20059 add option to skip sha1 test adding ampuser 
