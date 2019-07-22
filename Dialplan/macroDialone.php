@@ -25,12 +25,12 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'', new \ext_set('EXTHASCW', '${IF($["${CWIGNORE}"!=""]? :${DB(CW/${DEXTEN})})}'));
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!="" | "${DB(CFU/${DEXTEN})}"!=""]','next1','cwinusebusy'));
 
-		$ext->add($mcontext,$exten,'next1', new \ext_gotoif('$["${DB(CFU/${DEXTEN})}"!="" & ("${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN")]','docfu','skip3'));
+		$ext->add($mcontext,$exten,'next1', new \ext_gotoif('$["${DB(CFU/${DEXTEN})}"!="" & ("${EXTENSION_STATE(${DEXTEN}@ext-local)}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN}@ext-local)}"="UNKNOWN")]','docfu','skip3'));
 		$ext->add($mcontext,$exten,'docfu', new \ext_set('DEXTEN', ''));
 		$ext->add($mcontext,$exten,'', new \ext_set('DIALSTATUS', 'NOANSWER'));
 		$ext->add($mcontext,$exten,'',new \ext_goto('nodial'));
 		$ext->add($mcontext,$exten,'skip3', new \ext_gotoif('$["${EXTHASCW}"="" | "${DB(CFB/${DEXTEN})}"!=""]','next2','continue'));
-		$ext->add($mcontext,$exten,'next2', new \ext_gotoif('$["${EXTENSION_STATE(${DEXTEN})}"="NOT_INUSE" | "${EXTENSION_STATE(${DEXTEN})}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN})}"="UNKNOWN"]','continue'));
+		$ext->add($mcontext,$exten,'next2', new \ext_gotoif('$["${EXTENSION_STATE(${DEXTEN}@ext-local)}"="NOT_INUSE" | "${EXTENSION_STATE(${DEXTEN}@ext-local)}"="UNAVAILABLE" | "${EXTENSION_STATE(${DEXTEN}@ext-local)}"="UNKNOWN"]','continue'));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(CFB/${DEXTEN})}"!="" & "${CFIGNORE}"=""]', 'Set', 'DIALSTATUS=BUSY'));
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${EXTHASCW}"!="" | "${DEXTEN:-1}"="#"]','cwinusebusy'));
 		$ext->add($mcontext,$exten,'', new \ext_set('DEXTEN', ''));
@@ -38,7 +38,7 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'', new \ext_goto('nodial'));
 		//TODO: we know about CWINUSEBUSY at generation time, so change this and above corresponding targets to streamline at generation
 		$ext->add($mcontext,$exten,'cwinusebusy', new \ext_gotoif('$["${EXTHASCW}"!="" & "${CWINUSEBUSY}"="true"]','next3','continue'));
-		$ext->add($mcontext,$exten,'next3', new \ext_execif('$["${EXTENSION_STATE(${DEXTEN})}"!="UNAVAILABLE" & "${EXTENSION_STATE(${DEXTEN})}"!="NOT_INUSE" & "${EXTENSION_STATE(${DEXTEN})}"!="UNKNOWN"]', 'Set', 'DIALSTATUS_CW=BUSY'));
+		$ext->add($mcontext,$exten,'next3', new \ext_execif('$["${EXTENSION_STATE(${DEXTEN}@ext-local)}"!="UNAVAILABLE" & "${EXTENSION_STATE(${DEXTEN}@ext-local)}"!="NOT_INUSE" & "${EXTENSION_STATE(${DEXTEN}@ext-local)}"!="UNKNOWN"]', 'Set', 'DIALSTATUS_CW=BUSY'));
 		$ext->add($mcontext,$exten,'continue', new \ext_gotoif('$["${DEXTEN}"=""]','nodial'));
 		$ext->add($mcontext,$exten,'', new \ext_gosubif('$["${DEXTEN:-1}"!="#"]','dstring,1','dlocal,1'));
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$[${LEN(${DSTRING})}=0]','nodial'));
