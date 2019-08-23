@@ -275,7 +275,7 @@ class Sip extends techDriver {
 		$msgInvalidSecret = _("Please enter a Secret for this device");
 		$secret_validation = '(isEmpty() && !confirm("'.$msgConfirmSecret.'"))';
 		$tt = _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure.").' [secret]';
-		$tmparr['secret'] = array('prompttext' => _('Secret'), 'class' => 'password-meter', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
+		$tmparr['secret'] = array('prompttext' => _('Secret'), 'class' => 'password-meter confidential', 'value' => '', 'tt' => $tt, 'level' => 0, 'jsvalidation' => $secret_validation, 'failvalidationmsg' => $msgInvalidSecret, 'category' => $category, 'section' => $primarySection);
 
 		$section = _("Device Options");
 		$category = "advanced";
