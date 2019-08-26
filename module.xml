@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.38</version>
+	<version>15.0.9.39</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.39* Fixes FREEPBX-20337: added CSS class "confidential" to secret input 
 		*15.0.9.38* FREEPBX-20260 CFB not working 
 		*15.0.9.37* FREEPBX-20153 Call Waiting tone not working in FreePBX 15 
 		*15.0.9.36* FREEPBX-20190
