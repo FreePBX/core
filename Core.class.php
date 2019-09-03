@@ -3192,6 +3192,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				} elseif($replaceExisting && !empty($exists)) {
 					$this->delDID($data['extension'], $data['cidnum']);
 				}
+				if (isset($data['sf_enable']) && !empty($data['sf_enable'])) {
+				   //Superfect module presence
+				  if ($this->freepbx->Modules->checkStatus("superfecta")) {
+					\FreePBX::Superfecta()->bulkhandler_superfecta_cfg($data);
+				     }
+				}
 				$this->addDID($data);
 			}
 
