@@ -311,6 +311,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
 
+		$tt = _("Context where SIP MESSAGEs from this endpoint will be processed");
+		$tmparr['message_context'] = array('prompttext' => _('Messages Context'), 'value' => '', 'tt' => $tt, 'level' => 1);
+
 		//Use the transport engine, don't cross migrate anymore, it just doesn't work
 		$transports = $this->getActiveTransports();
 		$transports = is_array($transports)?$transports:array();
@@ -1200,6 +1203,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = 'record_on_feature=apprecord';
 			$endpoint[] = 'record_off_feature=apprecord';
 		}
+
+		if (!empty($config['message_context'])) {
+                        $endpoint[] = "message_context=".$config['message_context'];
+                }
 
 		// Auth
 		$auth[] = "auth_type=userpass";
