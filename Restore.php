@@ -5,11 +5,11 @@ use SplObjectStorage;
 use DirectoryIterator;
 
 class Restore Extends Base\RestoreBase{
-	public function runRestore($jobid){
+	public function runRestore(){
 		$configs = $this->getConfigs();
 		$files = $this->getFiles();
 		$dirs = $this->getDirs();
-		foreach ($this->getClasses($jobid) as $class) {
+		foreach ($this->getClasses($this->transactionId) as $class) {
 			if(empty($class)){
 				continue;
 			}
