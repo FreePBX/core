@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.44</version>
+	<version>15.0.9.45</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.45* FREEI-733: Change allow_reload for pjsip to be No by default. 
 		*15.0.9.44* Related to FREEPBX-20414: removed $jobid from runRestore() 
 		*15.0.9.43* FREEPBX-20520 expose message_context parameter 
 		*15.0.9.42* FREEI-730 Qcallback CID not passing for Outbound calls 
