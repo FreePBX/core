@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.17</version>
+	<version>14.0.28.18</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.18* FREEI-733: Change allow_reload for pjsip to be No by default. 
 		*14.0.28.17* FREEI-730 Qcallback CID not passing for Outbound calls
 		*14.0.28.16* freepbx-17661 
 		*14.0.28.15* Fixes FREEPBX-20337: added CSS class "confidential" to secret input (FreePBX 14 backport) 
