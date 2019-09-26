@@ -480,13 +480,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$module = isset($request['astmod'])?$request['astmod']:'';
 				switch($section){
 					case 'amodload':
-						return $this->ModulesConf->load($module);
+						return $this->freepbx->ModulesConf->load($module);
 					break;
 					case 'amodnoload':
-						return $this->ModulesConf->noload($module);
+						return $this->freepbx->ModulesConf->noload($module);
 					break;
 					case 'amodpreload':
-						return $this->ModulesConf->preload($module);
+						return $this->freepbx->ModulesConf->preload($module);
 					break;
 				}
 			break;
@@ -495,13 +495,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$module = isset($request['astmod'])?$request['astmod']:'';
 				switch($section){
 					case 'amodload':
-						return $this->ModulesConf->removeload($module);
+						return $this->freepbx->ModulesConf->removeload($module);
 					break;
 					case 'amodnoload':
-						return $this->ModulesConf->removenoload($module);
+						return $this->freepbx->ModulesConf->removenoload($module);
 					break;
 					case 'amodpreload':
-						return $this->ModulesConf->removepreload($module);
+						return $this->freepbx->ModulesConf->removepreload($module);
 					break;
 				}
 			break;
@@ -1137,15 +1137,15 @@ class Core extends FreePBX_Helpers implements BMO  {
 				case 'add':
 					switch($section){
 						case 'amodload':
-							$this->ModulesConf->load($module);
+							$this->freepbx->ModulesConf->load($module);
 							return true;
 						break;
 						case 'amodnoload':
-							$this->ModulesConf->noload($module);
+							$this->freepbx->ModulesConf->noload($module);
 							return true;
 						break;
 						case 'amodpreload':
-							$this->ModulesConf->preload($module);
+							$this->freepbx->ModulesConf->preload($module);
 							return true;
 						break;
 						default:
@@ -1156,11 +1156,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 				case 'del':
 					switch($section){
 						case 'amodnoload':
-							$this->ModulesConf->removenoload($module);
+							$this->freepbx->ModulesConf->removenoload($module);
 							return true;
 						break;
 						case 'amodpreload':
-							$this->ModulesConf->removepreload($module);
+							$this->freepbx->ModulesConf->removepreload($module);
 							return true;
 						break;
 						default:
