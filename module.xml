@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.19</version>
+	<version>14.0.28.20</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.20* FREEI-683 Attended Transfers Using PJSIP not updating Original Caller ID 
 		*14.0.28.19* FREEPBX-20564 Security issue with call tranfer (## or *2) being allowed for inbound caller 
 		*14.0.28.18* FREEI-733: Change allow_reload for pjsip to be No by default. 
 		*14.0.28.17* FREEI-730 Qcallback CID not passing for Outbound calls
