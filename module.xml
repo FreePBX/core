@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.5</version>
+	<version>13.0.131.6</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.6* FREEI-683 Attended Transfers Using PJSIP not updating Original Caller ID 
 		*13.0.131.5* FREEPBX-18676 Webpage mentioned on the banner on top of the asterisk.conf files is no longer there (404) 
 		*13.0.131.4* FREEPBX-18708 fatal_retry_interval get a Null value instead of 0 
 		*13.0.131.3* FREEPBX-19762 
