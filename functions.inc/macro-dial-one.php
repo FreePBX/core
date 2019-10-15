@@ -90,7 +90,7 @@ if ($amp_conf['AST_FUNC_CONNECTEDLINE']) {
 	}
 	$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(name,i)', $cidnameval));
 	$ext->add($mcontext,$exten,'', new ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
-	$ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}'));
+	$ext->add($mcontext,$exten,'', new ext_set('D_OPTIONS', '${D_OPTIONS}I'));
 }
 //Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
 //We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
