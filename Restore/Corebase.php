@@ -17,4 +17,7 @@ class Corebase {
 	public function setDirs(){
 		return $this;
 	}
+	public function setbackupinfo($backupinfo){
+		return $this;
+	}
 }
