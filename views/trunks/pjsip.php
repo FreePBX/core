@@ -257,6 +257,33 @@
 				</div>
 			</div>
 		</div><!--END TRANSPORT-->
+		<!--SEND CONNECTED LINE-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="send_connected_linew"><?php echo _("Send Connected Line") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="send_connected_linew"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php echo ($send_connected_line == "true"?"CHECKED":"") ?>>
+								<label for="send_connected_lineyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="false" <?php echo ($send_connected_line == "false" || empty($send_connected_line) ?"CHECKED":"") ?>>
+								<label for="send_connected_lineno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="send_connected_linew-help" class="help-block fpbx-help-block"><?php echo _("Send Connected Line updates to this endpoint. It can be bad for some providers. False by default.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END SEND CONNECTED LINE-->
 		<!--PERMINENT AUTH REJECTION-->
 		<div class="element-container">
 			<div class="row">
