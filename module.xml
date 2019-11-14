@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.22</version>
+	<version>14.0.28.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.23* FREEPBX-20441 FreePBX 13 to SNG7 update breaks calling 
 		*14.0.28.22* FREEPBX-20656 fix dialplan expressions related to QCALLBACK 
 		*14.0.28.21* FREEI-683 Setting up send_connected_line in endpoint part for trunks 
 		*14.0.28.20* FREEI-683 Attended Transfers Using PJSIP not updating Original Caller ID 
