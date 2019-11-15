@@ -3777,7 +3777,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				}
 
 				// create a voicemail symlink if needed
-				if(isset($uservoicemails[$dev['user']]['voicemail']) && ($uservoicemails[$dev['user']]['voicemail'] != "novm") && $this->freepbx->Modules-checkStatus('voicemail')) {
+				if(isset($uservoicemails[$dev['user']]['voicemail']) && ($uservoicemails[$dev['user']]['voicemail'] != "novm") && $this->freepbx->Modules->checkStatus('voicemail')) {
 					$this->freepbx->Voicemail->mapMailBox($dev['user']);
 				}
 			}
