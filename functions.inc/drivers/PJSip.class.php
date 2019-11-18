@@ -186,6 +186,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "yes",
 				"flag" => $flag++
 			),
+			"force_callerid" => array(
+				"value" => "no",
+				"flag" => $flag++
+			)
 		);
 		return array(
 			"dial" => $dial,
@@ -1038,7 +1042,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
-		$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
+		// If the config is sure it has the correct callerid, use that. Otherwise, try to map it from the dev
+		if (isset($config['force_callerid']) && $config['force_callerid'] === 'yes') {
+			$endpoint[] = "callerid=".$config['callerid'];
+		} else {
+			$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
+		}
 		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
 		$validdtmf = array("rfc4733","inband","info");
 		if(version_compare($this->version,'13','ge')) {
