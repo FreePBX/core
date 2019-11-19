@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.50</version>
+	<version>15.0.9.51</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.51* FREEI-765 Warm Spare backup 
 		*15.0.9.50*  bump 
 		*15.0.9.49*  FREEPBX-20441 getStatus(module_name) doesn't exist anymore, checkStatus(module_name) is the good one.
 		*15.0.9.48* FREEPBX-20656 fix dialplan expressions related to QCALLBACK 
