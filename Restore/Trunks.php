@@ -3,8 +3,18 @@
 namespace FreePBX\modules\Core\Restore;
 
 class Trunks extends Corebase{
+	protected $backupinfo = [];
+
+	public function setbackupinfo($backupinfo){
+		$this->backupinfo = $backupinfo;
+		return $this;
+	}
 	public function setConfigs($configs){
 		$this->updateTrunks($configs);
+		$backupinfo = $this->backupinfo;
+		if ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_remotetrunks'] == 'yes') {
+			core_trunks_disable('reg', true);
+		}
 		return $this;
 	}
 

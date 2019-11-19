@@ -8,6 +8,7 @@ class Restore Extends Base\RestoreBase{
 	public function runRestore(){
 		$configs = $this->getConfigs();
 		$files = $this->getFiles();
+		$backupinfo = $this->getBackupInfo();
 		$dirs = $this->getDirs();
 		foreach ($this->getClasses($this->transactionId) as $class) {
 			if(empty($class)){
@@ -15,6 +16,7 @@ class Restore Extends Base\RestoreBase{
 			}
 			$this->log(sprintf(_("Processing %s"),$class->className));
 			$class->setDirs($dirs)
+					->setbackupinfo($backupinfo)
 					->setFiles($files)
 					->setConfigs($configs[$class->className]);
 		}
