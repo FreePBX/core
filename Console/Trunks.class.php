@@ -33,13 +33,13 @@ class Trunks extends Command {
 		if($input->getOption('disable')){
 			$ARGUSED = True;
 			$id = $input->getOption('disable');
-			$output->writeln(sprintf(_('Disabling Trunk %s'),$id));
+			$output->writeln(sprintf(_('Disabling Trunk %s Run fwconsole reload'),$id));
 			$this->disableTrunk($id);
 		}
 		if($input->getOption('enable')){
 			$ARGUSED = True;
 			$id = $input->getOption('enable');
-			$output->writeln(sprintf(_('Enabling Trunk %s'),$id));
+			$output->writeln(sprintf(_('Enabling Trunk %s Run fwconsole reload'),$id));
 			$this->enableTrunk($id);
 		}
 		if($input->getOption('list')){
@@ -68,7 +68,7 @@ class Trunks extends Command {
 			if($trunks[($id -1 )]['disabled'] == 'off'){
 				$output->writeln(sprintf(_('Disabling Trunk %s'),$id));
 				if($this->disableTrunk($id)){
-					$output->writeln(sprintf(_('Enabled Trunk %s Run fwconsole reload'),$id));
+					$output->writeln(sprintf(_('Disabled Trunk %s Run fwconsole reload'),$id));
 				}else{
 					$output->writeln(sprintf(_('Unable to enable Trunk %s. This trunk type may not support this')));
 				}
