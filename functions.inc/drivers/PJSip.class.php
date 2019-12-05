@@ -179,6 +179,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			)
 		);
+
+		// dtls_auto_generate_cert introduced in Asterisk 15
+		if (version_compare($this->version, "15.0",">=")) {
+			$settings["dtls_auto_generate_cert"] = array(
+				"value" => "no",
+				"flag" => $flag++
+			);
+		}
 		return array(
 			"dial" => $dial,
 			"settings" => $settings
