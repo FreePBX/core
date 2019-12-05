@@ -602,6 +602,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$conf['pjsip.endpoint.conf'][$tn]['media_encryption'] = $trunk['media_encryption'];
 				}
 
+				if(!empty($trunk['dtls_auto_generate_cert']) && $trunk['dtls_auto_generate_cert'] !== "no"){
+					$conf['pjsip.endpoint.conf'][$tn]['dtls_auto_generate_cert'] = $trunk['dtls_auto_generate_cert'];
+				}
+
 				if(!empty($trunk['rtp_symmetric']) && $trunk['rtp_symmetric'] === "yes"){
 					$conf['pjsip.endpoint.conf'][$tn]['rtp_symmetric'] = $trunk['rtp_symmetric'];
 				}
