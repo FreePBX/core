@@ -38,8 +38,9 @@ class Devices extends Base {
 						],
 						'mutateAndGetPayload' => function ($input) {
 							$output = $this->getMutationExecuteArray($input);
-							$this->freepbx->Core->addDevice($input['id'],$input['tech'],$output);
-							$item = $this->freepbx->Core->getDevice($input['extension']);
+							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'],$output['description']);
+							$this->freepbx->Core->addDevice($input['id'],$input['tech'],$defaults);
+							$item = $this->freepbx->Core->getDevice($input['id']);
 							return !empty($item) ? $item : [];
 						}
 					]),
