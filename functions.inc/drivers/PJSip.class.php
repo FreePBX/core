@@ -186,10 +186,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "yes",
 				"flag" => $flag++
 			),
-			"force_callerid" => array(
-				"value" => "no",
-				"flag" => $flag++
-			)
 		);
 		return array(
 			"dial" => $dial,
@@ -525,7 +521,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				}
 				unset($this->_aor[$tn]);
 			}
-
+		
 			$conf['pjsip.endpoint.conf'][$tn] = array(
 				'type' => 'endpoint',
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
@@ -535,6 +531,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
 			);
+			
+			if(version_compare($this->freepbx->Config->get('ASTVERSION'),"13.24","lt")){
+				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
+			}
+
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
 				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
@@ -1042,12 +1043,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
 		$endpoint[] = "context=".$config['context'];
-		// If the config is sure it has the correct callerid, use that. Otherwise, try to map it from the dev
-		if (isset($config['force_callerid']) && $config['force_callerid'] === 'yes') {
-			$endpoint[] = "callerid=".$config['callerid'];
-		} else {
-			$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
-		}
+		$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
 		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
 		$validdtmf = array("rfc4733","inband","info");
 		if(version_compare($this->version,'13','ge')) {
