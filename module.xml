@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.27</version>
+	<version>14.0.28.28</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.28* FREEPBX-20810 Whoops\Exception\ErrorException Allowed memory size 
 		*14.0.28.27* FREEI-1022 force_callerid code got removed by mistake. 
 		*14.0.28.26* FREEPBX-20843 Latest Core module from Edge breaks PJSip trunks 
 		*14.0.28.25* Allow PJSIP config to force callerid setting 
