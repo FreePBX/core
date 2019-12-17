@@ -474,7 +474,7 @@ foreach ($curnotif as $notif) {
 	}
 }
 outn(_("Checking for possibly invalid emergency caller id fields.."));
-$sql = "select a.id, a.description from devices as a, devices as b where a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid";
+$sql = "select a.id, a.description from devices as a, devices as b where a.description = b.emergency_cid AND concat('',b.emergency_cid * 1) != b.emergency_cid and a.emergency_cid != '' ";
 $devices = $db->getAll($sql,DB_FETCHMODE_ASSOC);
 if (DB::IsError($devices)) {
 	return false;
