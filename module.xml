@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.54</version>
+	<version>15.0.9.55</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.55*  FREEPBX-20810 
 		*15.0.9.54* FREEI-1022 force_callerid code got removed by mistake. 
 		*15.0.9.53* FREEPBX-20843 Latest Core module from Edge breaks PJSip trunks 
 		*15.0.9.52* FREEPBX-20754  GrpahQL issue 
