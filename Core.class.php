@@ -838,10 +838,18 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$dahdichannels = new Dahdichannels();
 			switch ($action) {
 				case 'add':
-					if ($dahdichannels->add($description, $channel, $did)) {
-						needreload();
-						$_REQUEST['extdisplay'] = $channel;
-						unset($_REQUEST['view']);
+					try {
+						if($dahdichannels->add($description, $channel, $did)) {
+							needreload();
+							$_REQUEST['extdisplay'] = $channel;
+							unset($_REQUEST['view']);
+						}
+					} catch(\PDOException $e) {
+						if($e->getCode() == 23000){
+							echo "<script>javascript:alert('" . _("Error Duplicate Channel Entry") . "')</script>";
+						} else {
+							throw $e;
+						}
 					}
 				break;
 				case 'edit':

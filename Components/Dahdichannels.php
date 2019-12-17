@@ -47,23 +47,20 @@ class Dahdichannels extends ComponentBase{
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function add($description, $channel, $did){
-        try{
-            $sql = "INSERT INTO dahdichandids (channel, description, did) VALUES (:channel, :description, :did)";
-            $stmt = $this->Database->prepare($sql);
-            $stmt->execute([
-                ':channel' => $channel,
-                ':description' => $description,
-                ':did' => $did,
-            ]);
-            return true;
-        }catch(PDOException $e){
-            if($e->getCode() == 23000){
-                echo "<script>javascript:alert('" . _("Error Duplicate Channel Entry") . "')</script>";
-                return false;
-            }
-            throw $e;
+    public function add($description, $channel, $did) {
+        // A channel can only be a number
+        if (!is_numeric($channel)) {
+            return false;
         }
+
+        $sql = "INSERT INTO dahdichandids (channel, description, did) VALUES (:channel, :description, :did)";
+        $stmt = $this->Database->prepare($sql);
+        $stmt->execute([
+            ':channel' => $channel,
+            ':description' => $description,
+            ':did' => $did,
+        ]);
+        return true;
     }
     public function edit($description, $channel, $did){
         $sql = "UPDATE dahdichandids SET description = :description, did = :did WHERE channel = :channel";
