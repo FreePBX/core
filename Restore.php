@@ -6,6 +6,11 @@ use DirectoryIterator;
 
 class Restore Extends Base\RestoreBase{
 	public function runRestore(){
+		global $astman;
+		$astman->database_deltree("AMPUSER");
+		$astman->database_deltree("AMPDEV");
+		$astman->database_deltree("CW");
+		
 		$configs = $this->getConfigs();
 		$files = $this->getFiles();
 		$backupinfo = $this->getBackupInfo();
