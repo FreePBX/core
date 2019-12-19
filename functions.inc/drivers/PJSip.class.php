@@ -131,7 +131,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"rewrite_contact" => array(
-				"value" => "yes",
+				"value" => "no",
 				"flag" => $flag++
 			),
 			"mwi_subscription" => array(
@@ -207,7 +207,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
 		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
-		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Force use of return port.");
 		$tmparr['force_rport'] = array('prompttext' => _('Force rport'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
@@ -1147,7 +1147,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		//rtp_symmetric needs to be yes for NAT --mjordan, Digium
 		$endpoint[] = !empty($config['rtp_symmetric']) ? "rtp_symmetric=".$config['rtp_symmetric'] : "rtp_symmetric=yes";
 		//rewrite_contact needs to be yes for NAT --mjordan, Digium
-		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['rewrite_contact'] : "rewrite_contact=yes";
+		//Asterisk default value is no,so changing it to no
+		$endpoint[] = !empty($config['rewrite_contact']) ? "rewrite_contact=".$config['rewrite_contact'] : "rewrite_contact=no";
 
 		$endpoint[] = !empty($config['force_rport']) ? "force_rport=".$config['force_rport'] : "force_rport=yes";
 
@@ -1436,7 +1437,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"direct_media" => "no",
 				// Always yes. --mjordan
 				"rtp_symmetric" => "yes",
-				"rewrite_contact" => "yes",
+				"rewrite_contact" => "no",
 				"support_path" => "no",
 				"media_address" => "",
 				"media_encryption" => "no",
