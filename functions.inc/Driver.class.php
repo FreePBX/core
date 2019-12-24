@@ -111,7 +111,7 @@ abstract class Driver {
 			$users[$user[0]]['vmcontext'] = $user[2];
 		}
 		foreach ($devices as $id => $device) {
-			if ($device['devicetype'] == 'fixed') {
+			if ($device['devicetype'] == 'fixed' && !empty($users[$device['user']])) {
 				$devices[$id]['vmcontext'] = $users[$device['user']]['vmcontext'];
 				$devices[$id]['description'] = $users[$device['user']]['description'];
 			}
