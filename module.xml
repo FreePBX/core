@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.10</version>
+	<version>13.0.131.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.11* Connected line is not in the good place. 
 		*13.0.131.10* FREEPBX-20935 PJSIP trunks missing after modules updates 
 		*13.0.131.9* FREEI-1043 Backport setting to disable transport reload to 13 
 		*13.0.131.8* FREEPBX-20441 FreePBX 13 to SNG7 update breaks calling 
