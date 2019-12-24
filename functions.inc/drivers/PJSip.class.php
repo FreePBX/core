@@ -462,7 +462,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'aors' => $tn,
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
 			);
-
+			
+			if(version_compare($this->freepbx->Config->get('ASTVERSION'),"13.24","lt")){
+				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
+			}
+			
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
 				$conf['pjsip.endpoint.conf'][$tn]['language'] = $lang;
