@@ -68,7 +68,7 @@
 						<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
 					</div>
 					<div class="col-md-9">
-						<input type="password" class="form-control clicktoedit" name="secret" id="secret" value="<?php echo $secret?>"/>
+						<input type="text" class="form-control password-meter confidential" name="secret" id="secret" value="<?php echo $secret?>"/>
 					</div>
 				</div>
 			</div>
