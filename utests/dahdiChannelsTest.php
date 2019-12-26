@@ -13,7 +13,7 @@ use Exception;
  
  */
 
-class dahdiChannelsTest extends PHPUnit_Framework_TestCase{
+class dahdiChannelsTest extends PHPUnit_Framework_TestCase {
     static $testData = [
         'description' => "Foobar one",
         'did' => '1234567',
@@ -24,52 +24,38 @@ class dahdiChannelsTest extends PHPUnit_Framework_TestCase{
         include __DIR__.'/../Components/Dahdichannels.php';
     }
 
-    public function testAdd(){
-        $database = $this->getMockBuilder(PDO::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['prepare'])
-            ->getMock();
-        $stmt = $this->getMockBuilder(PDOStatement::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['execute', 'fetchAll'])
-            ->getMock();
-        $stmt->method('execute')
-            ->willReturn(true);
-        $database->expects($this->once())
-            ->method('prepare')
-            ->willReturn($stmt);
+    public function testDahdichannels_add_whenAllIsWell_shouldAddChannelSuccessfully(){
+        $dc = new Dahdichannels();
 
-        $dc = new Dahdichannels($database);
+        // delete channels in case it's lingering from an old test
+		$dc->delete(1);
+
         $ret = $dc->add('Foobar one', 1, '1234567');
         $this->assertTrue($ret);
+    }
+
+    public function testDahichannels_add_whenStringPassedForChannel_shouldReturnFalse(){
+        $dc = new Dahdichannels();
+
         $ret = $dc->add('Foobar one', "FAIL", '1234567');
         $this->assertFalse($ret);
     }
-    public function testAddException(){
-        $database = $this->getMockBuilder(PDO::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['prepare'])
-            ->getMock();
-        $stmt = $this->getMockBuilder(PDOStatement::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['execute', 'fetchAll'])
-            ->getMock();
-        $stmt->method('execute')
-            ->will($this->throwException(new Exception('Stuff',1062)));
-        $database->method('prepare')
-            ->willReturn($stmt);
 
-        $dc = new Dahdichannels($database);
+
+    public function testDahdichannels_add_whenDuplicateRecordCreated_shouldThrowException(){
+        $dc = new Dahdichannels();
+
+        // delete channels in case it's lingering from an old test
+		$dc->delete(1);
+
+        // create test record
         $ret = $dc->add('Foobar one', 1, '1234567');
-        $this->assertFalse($ret);
-        $stmt->method('execute')
-            ->will($this->throwException(new Exception('Stuff', 9001)));
-        $dc = new Dahdichannels($database);
+
         try{
             $ret = $dc->add('Foobar one', 1, '1234567');   
             $this->fail("Should have thrown an exception");
         } catch (Exception $e){
-            $this->assertTrue(true);
+            $this->assertEquals(23000, $e->getCode());
         }
 
     }
