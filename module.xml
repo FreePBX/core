@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.58</version>
+	<version>15.0.9.59</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.59* Fixing FREEPBX-20811 
 		*15.0.9.58* FREEI-1028 fixed dahdi unit tests
 		*15.0.9.57* FREEI-911 core - restore: asterisk database entries are not cleared before restore from backup 
 		*15.0.9.56* FREEPBX-18699 Default FPBX setting for rewrite_contact differs from Asterisk 
