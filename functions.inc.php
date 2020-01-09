@@ -1646,6 +1646,7 @@ function core_do_get_config($engine) {
 
 				$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($["${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}" > "0"]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
 
+				$ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${REGEX("from-queue" ${CHANNEL})}"="1" && "${CONTEXT}"="from-internal-xfer"]', 'Set', '__CWIGNORE='));
 				$dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
 				$ext->add('ext-local', $exten['extension'], 'dest', new ext_set('__PICKUPMARK',''));
