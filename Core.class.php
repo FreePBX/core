@@ -3108,6 +3108,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Set Outbound Routes Order
 	 */
 	public function setRouteOrder($routes){
+		$routes = array_unique($routes);
+		$routes = array_values($routes);
 		$dbh = $this->database;
 		$stmt = $dbh->prepare('DELETE FROM `outbound_route_sequence` WHERE 1');
 		$stmt->execute();

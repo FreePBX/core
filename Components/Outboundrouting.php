@@ -110,7 +110,8 @@ class Outboundrouting extends ComponentBase{
 
 		$this->Database->query('DELETE FROM `outbound_route_sequence` WHERE 1');
 		$stmt = $this->Database->prepare('INSERT INTO `outbound_route_sequence` (`seq`, `route_id`) VALUES (?,?)');
-
+		$sequence = array_unique($sequence);
+		$sequence = array_values($sequence);
 		foreach ($sequence as $k => $v) {
 			$stmt->execute([$k,$v]);
 			if ($v == $route_id) {
