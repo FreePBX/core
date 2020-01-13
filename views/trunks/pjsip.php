@@ -257,7 +257,9 @@
 				</div>
 			</div>
 		</div><!--END TRANSPORT-->
-		<?php if( version_compare(\FreePBX::Config()->get('ASTVERSION'),"13.24","ge")){ ?>
+		<?php 
+		$ver_list = array("13.0.24", "16.1.0");
+		if(version_min(\FreePBX::Config()->get('ASTVERSION'),$ver_list) == true) { ?>
 		<!--SEND CONNECTED LINE-->
 		<div class="element-container">
 			<div class="row">

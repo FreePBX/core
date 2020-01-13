@@ -494,8 +494,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
 			);
-			
-			if(version_compare($this->freepbx->Config->get('ASTVERSION'),"13.24","lt")){
+
+			$ver_list = array("13.0.24", "16.1.0"); // include all versions to test.
+			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
 			}
 
