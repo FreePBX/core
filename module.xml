@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.31</version>
+	<version>14.0.28.32</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.32* FREEPBX-20683: mention the RFC7462 setting 
 		*14.0.28.31* FREEPBX-20955 Dialplan warning ast_expr2.fl:470 ast_yyerror: syntax error 
 		*14.0.28.30* Fixing FREEPBX-20811 
 		*14.0.28.29* FREEPBX-18699 Default FPBX setting for rewrite_contact differs from Asterisk 
