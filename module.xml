@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.63</version>
+	<version>15.0.9.64</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.64* FREEI-1073 
 		*15.0.9.63* FREEPBX-20683: mention the RFC7462 setting 
 		*15.0.9.62* FREEI-1076 extensionroutes whoops error 
 		*15.0.9.61* FREEI-1044-user-is-optional: User is optional for extension when generating config
