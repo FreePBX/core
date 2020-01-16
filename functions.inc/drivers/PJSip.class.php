@@ -131,7 +131,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"rewrite_contact" => array(
-				"value" => "no",
+				"value" => "yes",
 				"flag" => $flag++
 			),
 			"mwi_subscription" => array(
@@ -219,7 +219,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("Enforce that RTP must be symmetric. If this device is natting in it is usually a good idea to enable this. Disable only if you are having issues.");
 		$tmparr['rtp_symmetric'] = array('prompttext' => _('RTP Symmetric'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Allow Contact header to be rewritten with the source IP address-port");
-		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		$tmparr['rewrite_contact'] = array('prompttext' => _('Rewrite Contact'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		$tt = _("Force use of return port.");
 		$tmparr['force_rport'] = array('prompttext' => _('Force rport'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
