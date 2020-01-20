@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.66</version>
+	<version>15.0.9.67</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.67* bump 
 		*15.0.9.66* FREEI-1138 Latest core module dependency issue with framework 
 		*15.0.9.65* FREEPBX-21031 Default FPBX setting for rewrite_contact differs from Asterisk 
 		*15.0.9.64* FREEI-1073 
@@ -145,6 +146,7 @@
 	</changelog>
 	<depends>
 		<version>15.0.8.1</version>
+		<module>framework ge 15.0.16.40</module>
 	</depends>
 	<database>
 		<table name="trunks">
