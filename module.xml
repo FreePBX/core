@@ -207,6 +207,7 @@
 	</changelog>
 	<depends>
 		<version>14.0.9</version>
+		<module>framework ge 14.0.13.24</module>
 	</depends>
 	<database>
 		<table name="trunks">
