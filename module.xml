@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.12</version>
+	<version>13.0.131.13</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.13* bump 
 		*13.0.131.12* FREEI-1073 FREEPBX-21000 sipstatation generated pjsip trunks broken in asterisk 15 
 		*13.0.131.11* Connected line is not in the good place. 
 		*13.0.131.10* FREEPBX-20935 PJSIP trunks missing after modules updates 
@@ -374,6 +375,7 @@
 	</changelog>
 	<depends>
 		<version>13.0.197.3</version>
+		<module>framework ge 13.0.197.22</module>
 	</depends>
 	<menuitems>
 		<extensions needsenginedb="yes">Extensions</extensions>
