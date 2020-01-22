@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.37</version>
+	<version>14.0.28.38</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.38* FREEI-995 User should be optional when generating config
 		*14.0.28.37* FREEPBX-21062 
 		*14.0.28.36* Additional PJSIP settings for video 
 		*14.0.28.35* FREEI-1138 Latest core module dependency issue with framework 
