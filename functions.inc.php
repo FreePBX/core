@@ -1773,6 +1773,16 @@ function core_do_get_config($engine) {
 					$trunkprops['tech'] = 'iax2';
 					// fall-through
 					case 'pjsip':
+						$_trunks 	= FreePBX::PJSip()->getAllTrunks();
+						$tio_hide 	= "no";
+						if(!empty($trunkprops["trunkid"]) && !empty($_trunks[$trunkprops["trunkid"]])){
+							$tio 	= $_trunks[$trunkprops["trunkid"]]["trust_id_outbound"];
+							$cu 	= $_trunks[$trunkprops["trunkid"]]["contact_user"];
+							if($cu == "Anonymous" && $tio == "yes"){
+								$tio_hide = "yes";
+							}							
+						}
+						
 					case 'iax2':
 					case 'sip':
 					$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
@@ -3016,10 +3026,20 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 	//check queue callback callerid ,if  No force trunkcid is set the send queue callback cid
 	$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1" & ${LEN(${FORCEDOUTCID_${ARG1}})} = 0]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
+	if(!empty($tio_hide) && $tio_hide == "yes"){
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'yes'));
+	}
+	else{
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'no'));
+	}
+	
 	$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
 	//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
 	$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
 	// $has_keepcid_cnum is checked and set when the globals are being generated above
+	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	
 	//
 	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
 		if ($amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
