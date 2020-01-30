@@ -1318,6 +1318,22 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$devlist[$id][$setting['keyword']] = $setting['data'];
 			}
 		}
+		// need to get from emergencydevices
+		$allemergencydevices = $this->db->query("SELECT * FROM emergencydevices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
+		foreach($allemergencydevices as $device) {
+			$id = $device['id'];
+			// Have we already prepared our query?
+			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
+
+			$q->execute(array(":id" => $id));
+			$data = $q->fetchAll(\PDO::FETCH_ASSOC);
+
+			$devlist[$id] = $device;
+
+			foreach($data as $setting) {
+				$devlist[$id][$setting['keyword']] = $setting['data'];
+			}
+		}
 		return $devlist;
 	}
 
