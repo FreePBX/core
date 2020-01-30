@@ -542,6 +542,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(!empty($trunk['from_user'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
 			}
+			if(!empty($trunk['contact_user'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['contact_user'] = $trunk['contact_user'];
+			}
 
 			if(!empty($trunk['dtmfmode'])) {
 				// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
@@ -590,6 +593,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
 					}
 				}
+
+				if(!empty($trunk['trust_id_outbound']) && $trunk['trust_id_outbound'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['trust_id_outbound'] = "yes";
+				}
+
 				if(!empty($trunk['identify_by']) && $trunk['identify_by'] != "default"){
 					$conf['pjsip.endpoint.conf'][$tn]['identify_by'] = $trunk['identify_by'];
 				}
