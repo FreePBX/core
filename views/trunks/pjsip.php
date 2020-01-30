@@ -938,6 +938,33 @@
 			</div>
 		</div>
 		<!--END Send RPID/PAI-->
+		<!--Trust outbound CID-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="trust_id_outbound"><?php echo _("Send Private CallerID Information") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_id_outbound"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundyes" value="yes" <?php echo ($trust_id_outbound == "yes"?"CHECKED":"") ?>>
+								<label for="trust_id_outboundyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundno" value = "no" <?php echo ($trust_id_outbound == "yes"?"":"CHECKED") ?>>
+								<label for="trust_id_outboundno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="trust_id_outbound-help" class="help-block fpbx-help-block"><?php echo _("Send private CallerID to outbound trust even when using hidden CallerID.  PJSIP trust_id_outbound")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Trust outbound CID-->
 		<!--Match Inbound Authentication-->
 		<div class="element-container">
 			<div class="row">
