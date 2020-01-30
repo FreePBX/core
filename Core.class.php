@@ -201,6 +201,27 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return array("status" => true, "ext" => $extension, "name" => $data['name']);
 	}
 
+	/* this is useful only for emergencydevice creation*/
+	public function emergencyProcessQuickCreate($tech, $extension, $data) {
+		if(!is_numeric($extension)) {
+			return array("status" => false, "message" => _("Extension was not numeric!"));
+		}
+		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name']);
+		$settings['emergency_cid']['value'] = $data['emergency_cid'];
+		$settings['context']['value'] = $data['context'];
+		$settings['callerid']['value'] = $data['emergency_cid'];
+		$settings['calleridname']['value'] = $data['name'];
+		if(strtolower($tech) == 'pjsip') {
+			$settings['max_contacts']['value'] = $data['max_contacts'];
+		}
+		if(!$this->emergencyAddDevice($extension,$tech,$settings)) {
+			return array("status" => false, "message" => _("Device was not added!"));
+		}
+		// we dont want to do the userthings for emergency
+		needreload();
+		return array("status" => true, "ext" => $extension, "name" => $data['name']);
+	}
+
 	/**
 	 * Propagator for genConfig() from BMO that is passed on
 	 * to child drivers
@@ -1615,6 +1636,100 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/* create emergency Device
+	* Allowed only sip and Pjsip
+	*/
+	public function emergencyAddDevice($id,$tech,$settings=array(),$editmode=false) {
+		if ($tech == '' || trim($tech) == 'virtual') {
+			return true;
+		}
+
+		if (trim($id) == '' || empty($settings)) {
+			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
+			return false;
+		}
+
+		//ensure this id is not already in use
+		$dev = $this->getEmergencyDevice($id);
+		if(!empty($dev)) {
+			throw new \Exception(_("This device id is already in use"));
+		}
+
+		//unless defined, $dial is TECH/id
+		if ($settings['dial']['value'] == '') {
+			$settings['dial']['value'] = strtoupper($tech)."/".$id;
+		}
+
+		$settings['user']['value'] = 'DummyUser';
+		$settings['emergency_cid']['value'] = trim($settings['emergency_cid']['value']);
+		$settings['description']['value'] = trim($settings['calleridname']['value']);
+		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?trim($settings['hint_override']['value']) : null;
+
+		//insert into devices table
+		$sql="INSERT INTO emergencydevices (id,tech,dial,devicetype,user,description,emergency_cid,hint_override) values (?,?,?,?,?,?,?,?)";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($id,$tech,$settings['dial']['value'],$settings['devicetype']['value'],$settings['user']['value'],$settings['description']['value'],$settings['emergency_cid']['value'],$settings['hint_override']['value']));
+		} catch(\Exception $e) {
+			die_freepbx("Could Not Insert Device", $e->getMessage());
+			return false;
+		}
+
+		$astman = $this->FreePBX->astman;
+		//add details to astdb
+		if ($astman->connected()) {
+			// if adding or editting a fixed device, user property should always be set
+			if ($settings['devicetype']['value'] == 'fixed' || !$editmode) {
+				$astman->database_put("EDEVICE",$id."/user",$settings['user']['value']);
+			}
+			// If changing from a fixed to an adhoc, the user property should be intialized
+			// to the new default, not remain as the previous fixed user
+			if ($editmode) {
+				$previous_type = $astman->database_get("EDEVICE",$id."/type");
+				if ($previous_type == 'fixed' && $settings['devicetype']['value'] == 'adhoc') {
+					$astman->database_put("EDEVICE",$id."/user",$settings['user']['value']);
+				}
+			}
+			$astman->database_put("EDEVICE",$id."/dial",$settings['dial']['value']);
+			$astman->database_put("EDEVICE",$id."/type",$settings['devicetype']['value']);
+			$astman->database_put("EDEVICE",$id."/default_user",$settings['user']['value']);
+			$astman->database_put("EDEVICE",$id."/location",$settings['description']['value']);
+			if($settings['emergency_cid']['value'] != '') {
+				$astman->database_put("EDEVICE",$id."/emergency_cid",$settings['emergency_cid']['value']);
+			} else {
+				$astman->database_del("EDEVICE",$id."/emergency_cid");
+			}
+
+
+		} else {
+			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get('AMPMGRUSER')."/".$this->config->get('AMPMGRPASS'));
+		}
+		unset($settings['devinfo_secret_origional']);
+		unset($settings['devicetype']);
+		unset($settings['user']);
+		unset($settings['description']);
+		unset($settings['emergency_cid']);
+		unset($settings['changecdriver']);
+		unset($settings['hint_override']);
+
+		//take care of sip/iax/zap config
+		$tech = strtolower($tech);
+		if($tech == 'sip' || $tech == 'pjsip') {
+			$sql = 'INSERT INTO sip (id, keyword, data, flags) values (?,?,?,?)';
+			$sth = $this->database->prepare($sql);
+			$settings = is_array($settings)?$settings:array();
+			foreach($settings as $key => $setting) {
+				if($key == 'calleridname') {
+					continue; // addtional param we dont want this in sip table But need it in astDB
+				}
+				$sth->execute(array($id,$key,$setting['value'],$setting['flag']));
+			}
+		}
+
+		$this->deviceCache = array();
+		return true;
+	}
+
 	/**
 	 * List All DAHDi Channels
 	 * @return array Array of DAHDi Channels
@@ -2052,6 +2167,48 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$this->getDeviceCache = array();
 		return true;
 	}
+	/**
+	 * Delete a emergencyDevice
+	 * @param {int} The Device ID
+	 * @param {bool} $editmode=false If in edit mode (this is so it doesnt destroy the AsteriskDB)
+	 */
+	public function delEmergencyDevice($account,$editmode=false) {
+		$astman = $this->FreePBX->astman;
+		//get all info about device
+		$devinfo = $this->getEmergencyDevice($account);
+		if(!isset($devinfo['id'])) {
+			return;
+		}
+		//delete details to astdb
+		if ($astman->connected()) {
+		if (!$editmode) {
+				$astman->database_del("EDEVICE",$account."/dial");
+				$astman->database_del("EDEVICE",$account."/type");
+				$astman->database_del("EDEVICE",$account."/user");
+				$astman->database_del("EDEVICE",$account."/default_user");
+				$astman->database_del("EDEVICE",$account."/location");
+				$astman->database_del("EDEVICE",$account."/emergency_cid");
+			}
+
+			//delete from devices table
+			$sql = "DELETE FROM emergencydevices WHERE id = ?";
+			$sth = $this->database->prepare($sql);
+			try {
+				$sth->execute(array($account));
+			} catch(\Exception $e) {
+			}
+		} else {
+			die_freepbx("Cannot connect to Asterisk Manager with ".$this->config->get("AMPMGRUSER")."/".$this->config->get("AMPMGRPASS"));
+		}
+
+		$tech = $devinfo['tech'];
+		if(isset($this->drivers[$tech])&& isset($devinfo['id'])) {
+			$this->drivers[$tech]->delDevice($account);
+		}
+		needreload();
+		return true;
+	}
+
 
 	/**
 	 * Get all devices by type
@@ -2935,6 +3092,34 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		$this->getDeviceCache[$account] = $results;
 		return $this->getDeviceCache[$account];
+	}
+
+	/*
+	* Get emergencyDevice
+	*/
+	public function getEmergencyDevice($account) {
+		$sql = "SELECT * FROM emergencydevices WHERE id = ?";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array($account));
+			$device = $sth->fetch(\PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+
+		if (empty($device)) {
+			return array();
+		}
+
+		$t = $device['tech'];
+		$tech = array();
+		if(isset($this->drivers[$t])) {
+			$tech = $this->drivers[$t]->getDevice($account);
+		}
+
+		$results = array_merge($device,$tech);
+
+		return $results;
 	}
 
 	/**
