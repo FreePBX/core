@@ -2982,6 +2982,11 @@ function core_do_get_config($engine) {
 	//
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	//lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
+	$ext->add($context, $exten, '', new ext_set('HOTDESKCALL',0));
+	$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${CALLERID(number)}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${CALLERID(number)}/location)}'));
+
 	// We dont want to allow HOTDESK Emergency extension to dial Normal calls. Only emergency calls allowed
 	$ext->add($context, $exten, '', new ext_set('ALLOWTHISROUTE', 'NO'));
 	$ext->add($context,$exten,'',new ext_execif('$["${EMERGENCYROUTE}" = "YES"]', 'Set', 'ALLOWTHISROUTE=YES'));
