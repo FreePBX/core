@@ -21,7 +21,7 @@ $ext->add($context, $exten, '', new ext_set('TOUCH_MONITOR','${UNIQUEID}'));
 $ext->add($context, $exten, '', new ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
 //lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
 $ext->add($context, $exten, '', new ext_set('HOTDESKCALL',0));
-$ext->add($context, $exten, '', new ext_execif('$[${DB(EDEVICE/${CALLERID(number)}/user)}=DummyUser]', 'Set', 'HOTDESKCALL=1'));
+$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${CALLERID(number)}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
 $ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${CALLERID(number)}/location)}'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue" | ${LEN(${AMPUSERCIDNAME})}]', 'report'));
 $ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
