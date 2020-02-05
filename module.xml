@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.40</version>
+	<version>14.0.28.41</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.41* bump
 		*14.0.28.40* FREEI-1074: moved Emergency CID field from Advanced tab to general/main tab, under Outbound CID, when adding/modifying an extension 
 		*14.0.28.39* FREEI-1180 Fixes issue with contact_user not being added to PJSIP trunk endpoints. 
 		*14.0.28.38* FREEI-995 User should be optional when generating config
