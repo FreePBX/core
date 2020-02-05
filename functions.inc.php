@@ -2918,6 +2918,10 @@ function core_do_get_config($engine) {
 	//
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	// We dont want to allow HOTDESK Emergency extension to dial Normal calls. Only emergency calls allowed
+	$ext->add($context, $exten, '', new ext_set('ALLOWTHISROUTE', 'NO'));
+	$ext->add($context,$exten,'',new ext_execif('$["${EMERGENCYROUTE}" = "YES"]', 'Set', 'ALLOWTHISROUTE=YES'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1 & ${ALLOWTHISROUTE} = NO ]', 'Hangup'));
 
 	// Keep the original CallerID number, for failover to the next trunk.
 
@@ -2942,6 +2946,8 @@ function core_do_get_config($engine) {
 
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${CALLERID(number)}/emergency_cid)}'));
+
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
 	$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
