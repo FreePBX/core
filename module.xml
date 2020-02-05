@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.15</version>
+	<version>13.0.131.16</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.16* bump 
 		*13.0.131.15* FREEI-1086 Emergecy device creation 
 		*13.0.131.14* FREEPBX-21062 send connected line present in 13.22 
 		*13.0.131.13* bump 
