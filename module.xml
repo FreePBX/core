@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.73</version>
+	<version>15.0.9.74</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.74* FREEI-1086 14 
 		*15.0.9.73* bump 
 		*15.0.9.72* FREEPBX-21106 Restoring from backup won't select trunk in outbound routes 
 		*15.0.9.71* FREEI-1074: moved Emergency CID field from Advanced tab to general/main tab, under Outbound CID, when adding/modifying an extension 
