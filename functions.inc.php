@@ -6024,8 +6024,8 @@ function core_devices_configpageload() {
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
 			$currentcomponent->addguielem($section, new gui_textbox('hint_override', $devinfo_hint_override, _("Hint Override"), _("Only set this if you wish to override the hint referenced in ext-local. This is useful in situations where the hint doesnt match the dial string. This should not be changed unless you know what you are doing.")),"advanced");
 		} else {
-			$section = _("Extension Options");
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
+			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID, true),4, null, "general");
 		}
 		$currentcomponent->addguielem('_top', new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem('_top', new gui_hidden('hardware', $devinfo_hardware));
