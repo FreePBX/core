@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.43</version>
+	<version>14.0.28.44</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.44* FREEI-683 fixe attended transfer for pjsip extension 
 		*14.0.28.43* FREEI-1086 14 
 		*14.0.28.42* bump
 		*14.0.28.41* bump
