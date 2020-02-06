@@ -90,6 +90,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"send_connected_line" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
 			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
@@ -1168,6 +1172,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
+		}
+		
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0");
+		if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
+			if (!empty($config['send_connected_line'])) {
+				$endpoint[] = "send_connected_line=".$config['send_connected_line'];
+			}else{
+				$endpoint[] = "send_connected_line=yes";
+			}
 		}
 
 		if (!empty($config['match'])) {
