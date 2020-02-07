@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.17</version>
+	<version>13.0.131.18</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.18* FREEI-1226 
 		*13.0.131.17* FREEI-683 fixe attended transfer for pjsip extension 
 		*13.0.131.16* bump 
 		*13.0.131.15* FREEI-1086 Emergecy device creation 
