@@ -498,6 +498,33 @@
 			</div>
 		</div>
 		<!--END OUTBOUND PROXY-->
+		<!--USER EQ PHONE-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="user_eq_phone"><?php echo _("User = Phone") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="user_eq_phone"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php echo ($user_eq_phone == "yes") ? "CHECKED" : "" ?>>
+								<label for="user_eq_phoneyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneno" value="no" <?php echo ($user_eq_phone == "no" || empty($user_eq_phone)) ? "CHECKED" : "" ?>>
+								<label for="user_eq_phoneno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="user_eq_phone-help" class="help-block fpbx-help-block"><?php echo _("Determines whether a user=phone parameter is placed into the request URI if the user is determined to be a phone number.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END USER EQ PHONE-->
 		<!--CONTACT USER-->
 		<div class="element-container">
 			<div class="row">
