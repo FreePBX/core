@@ -2946,7 +2946,7 @@ function core_do_get_config($engine) {
 
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${CALLERID(number)}/emergency_cid)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
 
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
