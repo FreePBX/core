@@ -2855,9 +2855,11 @@ function core_do_get_config($engine) {
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
 	//lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
+	$ext->add($context, $exten, '', new ext_set('HOTDESCKCHAN','${CUT(CHANNEL,/,2)}'));
+	$ext->add($context, $exten, '', new ext_set('HOTDESKEXTEN','${CUT(HOTDESCKCHAN,-,1)}'));
 	$ext->add($context, $exten, '', new ext_set('HOTDESKCALL',0));
-	$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${CALLERID(number)}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
-	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${CALLERID(number)}/location)}'));
+	$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${HOTDESKEXTEN}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${HOTDESKEXTEN}/location)}'));
 
 	// We dont want to allow HOTDESK Emergency extension to dial Normal calls. Only emergency calls allowed
 	$ext->add($context, $exten, '', new ext_set('ALLOWTHISROUTE', 'NO'));
@@ -2889,7 +2891,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(DEVICE/${REALCALLERIDNUM}/user)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${CALLERID(number)}/emergency_cid)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
 
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
