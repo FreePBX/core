@@ -353,6 +353,13 @@ class Sip extends techDriver {
 		}
 
 		unset($select);
+		$select[] 	= array('value' => 'no', 'text' => _('No'));
+		$select[] 	= array('value' => 'yes', 'text' => _('Yes'));
+		$tt 		= _("Determines whether a user=phone parameter is placed into the request URI if the user is determined to be a phone number.").'[user_eq_phone]';
+		$uep_val 	= $this->freepbx->Config->get_conf_setting('user_eq_phone');
+		$tmparr['user_eq_phone'] = array('prompttext' => _('user = Phone'), 'value' => empty($uep_val) ? 'no': $uep_val, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+
+		unset($select);
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Send Remote-Party-ID header'));
 
