@@ -94,6 +94,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "yes",
 				"flag" => $flag++
 			),
+			"user_eq_phone" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
@@ -498,6 +502,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($trunk['from_user'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
+			}
+
+			if(!empty($trunk['user_eq_phone'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['user_eq_phone'] = $trunk['user_eq_phone'];
 			}
 
 			if(!empty($trunk['dtmfmode'])) {
@@ -979,6 +987,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
+		}
+
+		// Any Asterisk version
+		if (!empty($config['user_eq_phone'])) {
+			$endpoint[] = "user_eq_phone=".$config['user_eq_phone']; // any Asterisk version
+		}
+		else{
+			$endpoint[] = "user_eq_phone=no";
 		}
 		
 		$ver_list = array("13.24.0", "16.1.0", "17.0.0");
