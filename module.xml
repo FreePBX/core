@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.78</version>
+	<version>15.0.9.79</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.79* bump 
 		*15.0.9.78* FREEI-1235 Location Name added in Hotdesking CallerID mapping is not passing 
 		*15.0.9.77* FREEI-1232 callerid issue  14+ 
 		*15.0.9.76* FREEI-1226 Conflicts 13-&amp;gt; 14 
