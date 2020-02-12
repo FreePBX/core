@@ -1787,7 +1787,8 @@ function core_do_get_config($engine) {
 					$trunkprops['tech'] = 'iax2';
 					// fall-through
 					case 'pjsip':
-						$_trunks 	= FreePBX::PJSip()->getAllTrunks();
+						$pjsip 		= \FreePBX::Core()->getDriver('pjsip');
+						$_trunks 	= $pjsip->getAllTrunks();
 						$tio_hide 	= "no";
 						if(!empty($trunkprops["trunkid"]) && !empty($_trunks[$trunkprops["trunkid"]])){
 							$tio 	= $_trunks[$trunkprops["trunkid"]]["trust_id_outbound"];
