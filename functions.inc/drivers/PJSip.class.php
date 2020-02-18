@@ -189,6 +189,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"max_video_streams" => array(
 				"value" => "1",
 				"flag" => $flag++
+			),
+			"webrtc" => array(
+				"value" => "no",
+				"flag" => $flag++
 			)
 		);
 		return array(
@@ -249,13 +253,18 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$tt = _("With this option enabled, Asterisk will attempt to negotiate the use of bundle. If negotiated this will result in multiple RTP streams being carried over the same underlying transport. Note that enabling bundle will also enable the rtcp_mux option");
 			$tmparr['bundle'] = array('prompttext' => _('Enable RTP bundling'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			unset($select);
-		}
 
-		if (version_compare($this->version, '15.0', 'ge')) {
 			$tt = _("Maximum number of allowed audio streams for the endpoint");
 			$tmparr['max_audio_streams'] = array('prompttext' => _('Max audio streams'), 'value' => '1', 'tt' => $tt, 'level' => 1);
+
 			$tt = _("Maximum number of allowed video streams for the endpoint");
 			$tmparr['max_video_streams'] = array('prompttext' => _('Max video streams'), 'value' => '1', 'tt' => $tt, 'level' => 1);
+
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("Defaults and enables some options that are relevant to WebRTC");
+			$tmparr['bundle'] = array('prompttext' => _('Enable WebRTC defaults'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			unset($select);
 		}
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
@@ -1129,6 +1138,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if (!empty($config['max_video_streams'])) {
 				$endpoint[] = "max_video_streams=".$config['max_video_streams'];
+			}
+			if (!empty($config['webrtc'])) {
+				$endpoint[] = "webrtc=".$config['webrtc'];
 			}
 		}
 
