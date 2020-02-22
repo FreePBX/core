@@ -27,12 +27,7 @@ class Outboundrouting extends ComponentBase{
 
 		$this->updatePatterns($route_id, $patterns);
 		$this->updateTrunks($route_id, $trunks);
-		$this->setOrder($route_id, 'new');
-
-		// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
-		if ($seq != 'new') {
-			$this->setOrder($route_id, $seq);
-		}
+		$this->setOrder($route_id, $seq);
 
 		return $route_id;
 	}
@@ -86,7 +81,7 @@ class Outboundrouting extends ComponentBase{
 		}
 		if ($order === 'new') {
 			array_unshift($sequence,$route_id);
-		} elseif(ctype_digit($order) && $sequence[$order] !== $route_id) {
+		} elseif(ctype_digit($order) && (empty($sequence[$order]) || $sequence[$order] !== $route_id)) {
 			$key = array_search($route_id,$sequence);
 			if($key !== false) {
 				unset($sequence[$key]);
