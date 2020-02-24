@@ -403,7 +403,24 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
-
+      
+   		$ver_list = array("13.24.0", "16.1.0", "17.0.0"); 
+        if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
+  			$use_callerid_contact = \FreePBX::create()->Sipsettings->getConfig('pjsip_use_callerid_contact');
+			$use_callerid_contact = (empty($use_callerid_contact))? "no": $use_callerid_contact;
+        	$conf['pjsip.conf']['global'] = array(
+              'type=global',
+              'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")",
+              'use_callerid_contact='.$use_callerid_contact,
+          	);
+        }
+        else{
+        	$conf['pjsip.conf']['global'] = array(
+			'type=global',
+			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")",
+			);
+        }
+      
 		$conf['pjsip.conf']['global'] = array(
 			'type=global',
 			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
