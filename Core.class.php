@@ -3809,7 +3809,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$this->astman->database_put("DEVICE",$dev['id']."/type",$dev['devicetype']);
 				$this->astman->database_put("DEVICE",$dev['id']."/user",$dev['user']);
 				$this->astman->database_put("DEVICE",$dev['id']."/default_user",$dev['user']);
-				if(trim($emergency_cid) != '') {
+				if(trim($dev['emergency_cid']) != '') {
 					$this->astman->database_put("DEVICE",$dev['id']."/emergency_cid",$dev['emergency_cid']);
 				}
 				// If a user is selected, add this device to the user
