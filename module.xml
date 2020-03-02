@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.85</version>
+	<version>15.0.9.86</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.86* FREEI-948 Fix outbound route sequence
 		*15.0.9.85*  FREEI-1183 Contact User in PJSIP isn't setting the User part of the Contact Header
 		*15.0.9.84* fix check if "emergency_cid" is empty. 
 		*15.0.9.83* FREEPBX-20225 Queue with Skip Busy set to Yes transferred calls not working properly 
