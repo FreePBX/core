@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.53</version>
+	<version>14.0.28.54</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.54* FREEI-1316 Getting syntax error in asterisk CLI while the appointment reminder call is getting dialled. 
 		*14.0.28.53* FREEI-1192
 		*14.0.28.52* FREEI-1181 Setting the Contact Header part dynamically with the Caller ID value 
 		*14.0.28.51* FREEI-1183 Contact User in PJSIP isn't setting the User part of the Contact Header 
