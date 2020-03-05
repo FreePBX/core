@@ -2127,7 +2127,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 	public function setOutboundRouteOrder($route_id, $seq) {
 		$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
-		$sequence = $this->Database->query($sql)->fetchColumn();
+		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
 
 		if ($seq != 'new') {
 			$key = array_search($route_id,$sequence);
