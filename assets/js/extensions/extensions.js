@@ -22,6 +22,7 @@ $(".btn-remove").click(function() {
 					delete(extmap[v]);
 				})
 				toggle_reload_button("show");
+				$("#button_reload").trigger('click');
 			} else {
 				btn.find("span").text(_("Delete"));
 				btn.prop("disabled", true);
@@ -42,6 +43,7 @@ $("table").on("post-body.bs.table", function () {
 						values: [id.toString()]
 					});
 					toggle_reload_button("show");
+					$("#button_reload").trigger('click');
 				} else {
 					alert(data.message);
 				}
@@ -61,8 +63,8 @@ $("table").on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs
   });
 });
 $('#extension').on('change', function(){
-			$('#title-badge').remove();
-			if($('#extension').val() != '' || $('#action').val() == 'add'){
-				$('#title').append('<span id="title-badge" class="label label-success">'+$('#extension').val()+'</span>');
-			}
+	$('#title-badge').remove();
+	if($('#extension').val() != '' || $('#action').val() == 'add'){
+		$('#title').append('<span id="title-badge" class="label label-success">'+$('#extension').val()+'</span>');
+	}
 });
