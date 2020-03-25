@@ -1636,6 +1636,60 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/**
+	 * Take an output from a getDevice() and convert it to a format that addDevice() expects
+	 * @param {array} Array of device values
+	 * 
+	 * @return array Array of add device values
+	 */
+	private function kvArrayifyDeviceValues($values) {
+		$response = array();
+		$flag = 2;
+		$ignoreTheseKeys = array('id', 'tech');
+		foreach($values as $key => $value) {
+			if (in_array($key, $ignoreTheseKeys)) {
+				continue;
+			}
+
+			$response[$key] = array(
+				'value' => $value,
+				'flag' => $flag++
+			);
+		}
+		return $response;
+	}
+
+	/**
+	 * Change a Device Tech from SIP -> PJSIP and visa versa
+	 * @param {int} The Device Number
+	 * @param {string} Convert to the specified TECH type
+	 * 
+	 * @return boolean If the method was successful
+	 */
+	public function changeDeviceTech($deviceid, $tech) {
+		$device = $this->getDevice($deviceid);
+
+		if (empty($device)) {
+			$errorMsg = _("Unable to change device driver. Unable to fetch the device");
+			throw new \Exception($errorMsg);
+			return false;			
+		}
+
+		if ($device['tech'] === $tech) {
+			$errorMsg = _("Unable to change device driver. The device is already set to the specified driver");
+			throw new \Exception($errorMsg);
+			return false;
+		}
+
+		$device['dial'] = strtoupper($tech).'/'.$deviceid;
+		$device['sipdriver'] = ($tech == 'pjsip') ? 'chan_pjsip' : 'chan_sip'; 
+		$settings = $this->kvArrayifyDeviceValues($device);
+
+		// delete then re add, insanity.
+		$this->delDevice($deviceid, true);
+		return $this->addDevice($deviceid, $tech, $settings, true);
+	}
+
 	/* create emergency Device
 	* Allowed only sip and Pjsip
 	*/
