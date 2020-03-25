@@ -358,6 +358,9 @@
 	</methods>
 	<console>
 		<command>
+			<name>convert2pjsip</name>
+		</command>
+		<command>
 			<name>trunks</name>
 		</command>
 	</console>
