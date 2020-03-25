@@ -5167,25 +5167,13 @@ function core_devices_configprocess() {
 		case "edit":  //just delete and re-add
 		// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-			//delete then re add, insanity.
-			core_devices_del($extdisplay,true);
 			//PJSIP <--> CHAN_SIP Switcher, not the best but better than it was before and lets us continue forward into PHP 5.5
 			if(isset($_REQUEST['changesipdriver']) && !empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
-				$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
-				$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
-				$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
-				$flag = 2;
-				$fields = FreePBX::Core()->convertRequest2Array($deviceid,$tech,$flag);
-				$settings = array(
-					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
-					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
-					"user" => array("value" => $deviceuser, "flag" => isset($fields['deviceuser']['flag']) ? $fields['deviceuser']['flag'] : $flag++),
-					"description" => array("value" => $description, "flag" => isset($fields['description']['flag']) ? $fields['description']['flag'] : $flag++),
-					"emergency_cid" => array("value" => $emergency_cid, "flag" => isset($fields['emergency_cid']['flag']) ? $fields['emergency_cid']['flag'] : $flag++)
-				);
-				$settings = array_merge($fields,$settings);
-				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
+				$tech = ($_REQUEST['devinfo_sipdriver'] === 'chan_pjsip') ? 'pjsip' : 'sip';
+				return FreePBX::Core()->changeDeviceTech($deviceid, $tech);
 			} else {
+				//delete then re add, insanity.
+				core_devices_del($extdisplay,true);
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override,true);
 			}
 
