@@ -4404,14 +4404,6 @@ function core_trunks_list_dialrules() {
 	return $rule_hash;
 }
 
-// function core_routing_rename($oldname, $newname)
-function core_routing_renamebyid($route_id, $new_name) {
-	global $db;
-	$route_id = q($db->escapeSimple($route_id));
-	$new_name = $db->escapeSimple($new_name);
-	sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
-}
-
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
 * Used when generating the dialplan and can be used by other modules that may be splicing into the
 * dialplan such as pinsets or others.
