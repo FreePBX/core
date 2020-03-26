@@ -6,6 +6,7 @@ function coreSideTable(value, row, index) {
 $("#table-all-side").on("click-row.bs.table", function(row, $element) {
 	window.location = "?display=extensions&extdisplay="+$element.extension;
 });
+
 $(".btn-remove").click(function() {
 	var btn = $(this);
 	if(confirm(_("Are you sure you wish to delete these extensions?"))) {
