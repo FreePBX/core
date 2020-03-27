@@ -42,12 +42,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function getBackupSettingsDisplay($id) {
-		$settings = !empty($id) ? $this->getAll('backup_'.$id) : [];
+		$settings = !empty($id) ? $this->freepbx->Backup->getAll($id) : [];
 		return load_view(__DIR__.'/views/backupSettings.php',$settings);
 	}
 
 	public function processBackupSettings($id, $settings) {
-		$this->setMultiConfig($settings,'backup_'.$id);
+		$this->freepbx->Backup->setMultiConfig($settings,$id);
 	}
 
 	/**
