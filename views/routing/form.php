@@ -48,6 +48,41 @@ foreach ($routepriority as $key => $route) {
 if ($extdisplay == '' | $route_seq != $last_seq) {
 	$routeseqopts .= '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
 }
+
+//Notification Settings
+/** vars
+{{CALLERNAME}}
+{{CALLERNUMBER}} //make sure this works for external callers, if possible if fpbx
+{{DIALEDNUMBER}}
+{{CALLTIME}}
+{{OUTBOUNDCALLERID}}
+{{OUTBOUNDROUTENAME}}
+{{TRUNK}} //if possible
+{{CALLUUID}}
+**/
+$emailfrom = !empty($emailInfo['emailfrom']) ? $emailInfo['emailfrom'] : '';
+$emailsubject = !empty($emailInfo['emailsubject']) ? $emailInfo['emailsubject'] : _('{{STATUS}} voicemail notification from {{MAILBOX}} --- [{{ID}}]');
+$emailbody = !empty($emailInfo['emailbody']) ? $emailInfo['emailbody'] : _('A new voicemail notification was sent from
+	mailbox {{MAILBOX}} on {{TIME}}.
+
+	-----------------------------------------
+		Notification Details:
+	-----------------------------------------
+
+	Status:          {{STATUS}}
+	Message CID:     {{CALLERID}}
+	Length:          {{LENGTH}} seconds
+	Accepted By:     {{ACCEPTEDBY}}
+	Notification ID: {{ID}}
+	Number Retries:  {{RETRY}}
+	Final Priority:  {{PRIORITY}}
+
+	-----------------------------------------
+		 Notification Log:
+	-----------------------------------------
+	{{LOG}}
+');
+
 //Hooks....
 //$module_hook = moduleHook::create();
 //if (!empty($module_hook->hookHtml)) {
@@ -264,6 +299,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
   <li role="presentation" data-name="routesettings" class="change-tab active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
   <li role="presentation" data-name="dialpatterns" class="change-tab"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
   <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
+  <li role="presentation" data-name="notifications" class="change-tab"><a href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
     <?php echo $hooks['hookTabs'] ?>
   <?php echo $hooktab ?>
 </ul>
@@ -543,6 +579,92 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</div>
 			</div>
 			<!--END IMPORT/EXPORT-->
+			<!--NOTIFICATIONS-->
+			<div class="tab-pane" id="notifications">
+				<!--Email From-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailfrom"><?php echo _("Email From") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailfrom"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailfrom" name="emailfrom" value="<?php echo isset($emailfrom)?$emailfrom:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailfrom-help" class="help-block fpbx-help-block"><?php echo _("The email address you want the notification emails to appear  to come from.  Keep in mind this may need to be a real email box, and  the address of this server may need to be added to your SPF records to  ensure delivery of the emails.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email From-->
+				<!--Email Subject-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailsubject"><?php echo _("Email Subject") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailsubject"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailsubject" name="emailsubject" value="<?php echo isset($emailsubject)?$emailsubject:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailsubject-help" class="help-block fpbx-help-block"><?php echo _("Available Variables:<br />
+				<br />
+				{{STATUS}} - Either FAILED or SUCCESSFUL depending on if the notification was accepted or timed out.<br />
+				{{CALLERID}} - The caller ID of the person who left the message.<br />
+				{{MAILBOX}}  - The mailbox number the voicemail was left in.<br />
+				{{TIME}}  - The date and time the message was left.<br />
+				{{LENGTH}} - The length of the message in seconds.<br />
+				{{ACCEPTEDBY}} - The phone number that accepted the call.<br />
+				{{ID}} - The unique notification ID.  This can be used to prevent email clients from grouping unrelated messages by subject.<br />
+				{{RETRY}} - The retry number the call reached before being accepted or  timing out.  This will be 0 if it was accepted on the first attempt.<br />
+				{{PRIORITY}} - The last priority level the call reached before it was accepted or timed out.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email Subject-->
+				<!--Email Body-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailbody"><?php echo _("Email Body") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailbody"></i>
+						  </div>
+						  <div class="col-md-9">
+							<textarea class="form-control" rows="20" id="emailbody" name="emailbody"><?php echo isset($emailbody)?$emailbody:''?></textarea>
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailbody-help" class="help-block fpbx-help-block"><?php echo _("The email body can contain any of the variables from the Email Subject. See Help text for Email Subject.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email Body-->
+			</div>
+			<!--END NOTIFICATIONS-->
 			<!--Hooks in the "Additional Settings tab -->
 			<div class="tab-pane" id="additionalsettings">
 				<?php //echo $module_hook->hookHtml; ?>

@@ -5165,6 +5165,9 @@ function core_routing_delbyid($route_id) {
 	$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
 	$sth = $db->prepare($sql);
 	$ret[] = $sth->execute(array($route_id));
+	$sql = 'DELETE FROM outbound_route_email WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
 	return $ret;
 }
 
@@ -5185,6 +5188,10 @@ function core_routing_renamebyid($route_id, $new_name) {
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
 	return \FreePBX::Core()->getRoutePatternsByID($route_id);
+}
+
+function core_routing_getrouteemailbyid($route_id) {
+	return \FreePBX::Core()->getRouteEmailByID($route_id);
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5217,7 +5224,7 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailsubject, $emailbody) {
 	$sql = "UPDATE `outbound_routes` SET
 	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
 	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
@@ -5244,13 +5251,14 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 
 	core_routing_updatepatterns($route_id, $patterns, true);
 	core_routing_updatetrunks($route_id, $trunks, true);
+	core_routing_updateemail($route_id, $emailfrom, $emailsubject, $emailbody, true);
 	if ($seq != '') {
 		core_routing_setrouteorder($route_id, $seq);
 	}
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailsubject, $emailbody) {
 	global $amp_conf;
 	global $db;
 
@@ -5277,6 +5285,7 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 	core_routing_updatepatterns($route_id, $patterns);
 	core_routing_updatetrunks($route_id, $trunks);
 	core_routing_setrouteorder($route_id, 'new');
+	core_routing_updateemail($route_id, $emailfrom, $emailsubject, $emailbody);
 	// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
 	if ($seq != 'new') {
 		core_routing_setrouteorder($route_id, $seq);
@@ -5323,6 +5332,21 @@ function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
 	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
+}
+
+function core_routing_updateemail($route_id, $emailfrom, $emailsubject, $emailbody, $delete = false) {
+	global $db;
+	$route_id =  $db->escapeSimple($route_id);
+
+	if ($delete) {
+		sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
+	}
+	$sql = "INSERT INTO outbound_route_email (route_id, emailfrom, emailsubject, emailbody) VALUES ($route_id, '$emailfrom', '$emailsubject', '$emailbody')";
+	$results = $db->query($sql);
+	if (DB::IsError($results)) {
+		die_freepbx($results->getDebugInfo()."<br><br>".$sql);
+	}
+	return true;
 }
 
 /* callback to Time Groups Module so it can display usage information
