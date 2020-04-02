@@ -5268,39 +5268,7 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
-	global $amp_conf;
-	global $db;
-
-	$name = $db->escapeSimple($name);
-	$outcid = $db->escapeSimple($outcid);
-	$outcid_mode = $db->escapeSimple($outcid_mode);
-	$password = $db->escapeSimple($password);
-	$emergency_route = strtoupper($db->escapeSimple($emergency_route));
-	$intracompany_route = strtoupper($db->escapeSimple($intracompany_route));
-	$mohclass = $db->escapeSimple($mohclass);
-	$time_group_id = $time_group_id == ''? 'NULL':$db->escapeSimple($time_group_id);
-	$dest = $db->escapeSimple($dest);
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`)
-	VALUES ('$name', '$outcid', '$outcid_mode', '$password', '$emergency_route', '$intracompany_route', '$mohclass', $time_group_id, '$dest')";
-	sql($sql);
-
-	// TODO: sqlite_last_insert_rowid() un-tested and php5 ???
-	//
-	if(method_exists($db,'insert_id')) {
-		$route_id = $db->insert_id();
-	} else {
-		$route_id = $amp_conf["AMPDBENGINE"] == "sqlite3" ? sqlite_last_insert_rowid($db->connection) : mysql_insert_id($db->connection);
-	}
-
-	core_routing_updatepatterns($route_id, $patterns);
-	core_routing_updatetrunks($route_id, $trunks);
-	core_routing_setrouteorder($route_id, 'new');
-	// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
-	if ($seq != 'new') {
-		core_routing_setrouteorder($route_id, $seq);
-	}
-
-	return ($route_id);
+	return \FreePBX::Core()->addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest);
 }
 
 /* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
@@ -5308,35 +5276,7 @@ by hashing without the prepend (since a blank prepend is similar to no prepend) 
 this and throw an error...
 */
 function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
-	global $db;
-
-	$route_id =  $db->escapeSimple($route_id);
-	$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
-	$insert_pattern = array();
-	foreach ($patterns as $pattern) {
-		$match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix']))));
-		$match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass']))));
-		$match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_cid']))));
-		$prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits']))));
-
-		if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
-			continue;
-		}
-
-		$hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
-		if (!isset($insert_pattern[$hash_index])) {
-			$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
-		}
-	}
-
-	if ($delete) {
-		sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
-	}
-	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
-	$result = $db->executeMultiple($compiled,$insert_pattern);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');
-	}
+	return \FreePBX::Core()->updatePatterns($route_id, $patterns, $delete);
 }
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
