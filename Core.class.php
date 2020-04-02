@@ -43,10 +43,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function getBackupSettingsDisplay($id) {
 		$settings = !empty($id) ? $this->freepbx->Backup->getAll($id) : [];
+		$settings["core_disabletrunks"] = $this->getConfig("core_disabletrunks", $id);
 		return load_view(__DIR__.'/views/backupSettings.php',$settings);
 	}
 
-	public function processBackupSettings($id, $settings) {
+	public function processBackupSettings($id, $settings) {		
+		if(!empty($settings["core_disabletrunks"]) && ($settings["core_disabletrunks"] != "yes" || $settings["core_disabletrunks"] != "no")){
+			$this->setConfig("core_disabletrunks",$settings["core_disabletrunks"], $id);
+		}
 		$this->freepbx->Backup->setMultiConfig($settings,$id);
 	}
 
