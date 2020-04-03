@@ -10,9 +10,22 @@ class Trunks extends Corebase{
 		return $this;
 	}
 	public function setConfigs($configs){
-		$this->updateTrunks($configs);
+		$this->updateTrunks($configs);		
 		$backupinfo = $this->backupinfo;
-		if (($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_remotetrunks'] == 'yes') || (isset($backupinfo['core_disabletrunks']) && $backupinfo['core_disabletrunks'] == 'yes')) {
+		$items = json_decode($backupinfo["backup_items"]);
+		$disable_trunk = "no";				
+		foreach($items as $index => $data){
+			foreach($data as $item => $val){
+				if($item == "settings"){
+					foreach((array) $val as $result){
+						if($result->name == "core_disabletrunks" && ($result->value == "yes" || $result->value == "no")){
+							$disable_trunk = $result->value;
+						}
+					}
+				}
+			}
+		}			
+		if (($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_remotetrunks'] == 'yes') || (!empty($disable_trunk) && $disable_trunk == 'yes')) {
 			core_trunks_disable('reg', true);
 		}
 		return $this;
