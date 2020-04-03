@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.58</version>
+	<version>14.0.28.59</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.59* FREEI-1325 FastAGI setting not using FastAGI in dialplan 
 		*14.0.28.58* FREEI-687 Add cli tool to convert SIP to PJSIP
 		*14.0.28.57* FREEI-1090 Error message when exceeding license count 
 		*14.0.28.56* FREEI-1192 Return a list of route strings, rather each as array of itself. 
