@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.88</version>
+	<version>15.0.9.89</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.89* FREEI-1077 Disable Trunk on Restore option in FreePBX 15 Backup items is not working. 
 		*15.0.9.88* FREEI-687 Add cli tool to convert SIP to PJSIP
 		*15.0.9.87* FREEI-1316
 		*15.0.9.86* FREEI-948 Fix outbound route sequence
