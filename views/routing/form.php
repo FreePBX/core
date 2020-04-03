@@ -49,39 +49,11 @@ if ($extdisplay == '' | $route_seq != $last_seq) {
 	$routeseqopts .= '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
 }
 
-//Notification Settings
-/** vars
-{{CALLERNAME}}
-{{CALLERNUMBER}} //make sure this works for external callers, if possible if fpbx
-{{DIALEDNUMBER}}
-{{CALLTIME}}
-{{OUTBOUNDCALLERID}}
-{{OUTBOUNDROUTENAME}}
-{{TRUNK}} //if possible
-{{CALLUUID}}
-**/
-$emailfrom = !empty($emailInfo['emailfrom']) ? $emailInfo['emailfrom'] : '';
-$emailsubject = !empty($emailInfo['emailsubject']) ? $emailInfo['emailsubject'] : _('{{STATUS}} voicemail notification from {{MAILBOX}} --- [{{ID}}]');
-$emailbody = !empty($emailInfo['emailbody']) ? $emailInfo['emailbody'] : _('A new voicemail notification was sent from
-	mailbox {{MAILBOX}} on {{TIME}}.
-
-	-----------------------------------------
-		Notification Details:
-	-----------------------------------------
-
-	Status:          {{STATUS}}
-	Message CID:     {{CALLERID}}
-	Length:          {{LENGTH}} seconds
-	Accepted By:     {{ACCEPTEDBY}}
-	Notification ID: {{ID}}
-	Number Retries:  {{RETRY}}
-	Final Priority:  {{PRIORITY}}
-
-	-----------------------------------------
-		 Notification Log:
-	-----------------------------------------
-	{{LOG}}
-');
+//Notification tab email settings
+$emailfrom = $emailInfo['emailfrom'];
+$emailto = $emailInfo['emailto'];
+$emailsubject = $emailInfo['emailsubject'];
+$emailbody = $emailInfo['emailbody'];
 
 //Hooks....
 //$module_hook = moduleHook::create();
@@ -605,6 +577,30 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				  </div>
 				</div>
 				<!--END Email From-->
+				<!--Email To-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailto"><?php echo _("Email To") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailto"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailto" name="emailto" value="<?php echo isset($emailto)?$emailto:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailto-help" class="help-block fpbx-help-block"><?php echo _("The email address you want the notifications sent to.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email To-->
 				<!--Email Subject-->
 				<div class="element-container">
 				  <div class="row">
@@ -650,7 +646,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailbody"></i>
 						  </div>
 						  <div class="col-md-9">
-							<textarea class="form-control" rows="20" id="emailbody" name="emailbody"><?php echo isset($emailbody)?$emailbody:''?></textarea>
+							<textarea class="form-control" rows="20" id="emailbody" name="emailbody">
+								<?php echo isset($emailbody)?htmlspecialchars($emailbody):''?>
+							</textarea>
 						  </div>
 						</div>
 					  </div>

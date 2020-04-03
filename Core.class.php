@@ -1081,6 +1081,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 			$emailfrom = isset($request['emailfrom']) ? $request['emailfrom'] : '';
+			$emailto = isset($request['emailto']) ? $request['emailto'] : '';
 			$emailsubject = isset($request['emailsubject']) ? $request['emailsubject'] : '';
 			$emailbody = isset($request['emailbody']) ? $request['emailbody'] : '';
 
@@ -1103,12 +1104,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailsubject, $emailbody);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailsubject, $emailbody);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "delroute":
