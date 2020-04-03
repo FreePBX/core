@@ -3754,6 +3754,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return boolean
 	 */
 	public function fastAGIStatus() {
+        $this->preReloadFreepbx();
 		return $this->fastAGIState;
 	}
 
