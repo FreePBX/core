@@ -42,10 +42,8 @@ $nowEpoch = !empty($argv[8]) ? $argv[8]:'';
 $outgoingCallerIdName = !empty($argv[9]) ? $argv[9]:'';
 $outgoingCallerIdNumber = !empty($argv[10]) ? $argv[10]:'';
 $cuid = !empty($argv[11]) ? $argv[11]:'';
-//$outgoingCallerIdName = agi_get_var('CONNECTEDLINE(name)');
-//$cuid = agi_get_var("CHANNEL(LINKEDID)");
-dbug('dadfadfs');
-//If we don't get a routeId, something's wrong. get out of here.
+
+//If we don't get a routeId, something's wrong.
 if (empty($routeId)) { exit(); }
 
 //Get the email values from the outbound route
@@ -59,6 +57,9 @@ $emailTo = $results[0]['emailto'];
 $emailSubject = $results[0]['emailsubject'];
 $emailBody = $results[0]['emailbody'];
 
+//Exit if outbound route doesn't have an emailto set
+if (empty($emailTo)) { exit(); }
+
 //Get the trunk name
 $sql = "SELECT name FROM trunks WHERE trunkid = $trunkId";
 $results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
@@ -66,19 +67,13 @@ if(DB::IsError($results) || !is_array($results)) {
 	$results = array();
 }
 $trunkName = !empty($results[0]['name']) ? $results[0]['name']:'';
-dbug($trunkName);
 
-/**
-dbug($sql);
-dbug($emailFrom . '  '.$emailTo);
-dbug($emailSubject);
-dbug($emailBody);
-**/
+//Fill in the email vars
 $emailSubject = parse_email_vars($emailSubject);
 $emailBody = parse_email_vars($emailBody);
 dbug($emailSubject);
 dbug($emailBody);
-
+/*****
 $agi->verbose("ARG1: $argv[1]", 0);
 $agi->verbose("CUID: $cuid", 0);
 $agi->verbose("ROUTENAME: $routeName", 0);
@@ -89,9 +84,8 @@ $agi->verbose("OUTGOINGCALLERIDNAME: $outgoingCallerIdName", 0);
 $agi->verbose("OUTGOINGCALLERIDNUMBER: $outgoingCallerIdNumber", 0);
 $agi->verbose("CALLERID(all): $outgoingCallerIdAll", 0);
 $agi->verbose("NowEpoch: $nowEpoch", 0);
+****/
 exit();
-//Exit if outbound route doesn't have an emailto set
-if (empty($emailTo)) { exit(); }
 
 dbug($emailTo . '    ' . $emailFrom);
 	$email = new \CI_Email();
@@ -105,12 +99,29 @@ dbug('sending email........');
 exit();
 
 function parse_email_vars($emailText) {
-	global $cuid, $dialedNumber, $dialedNumberRaw, $routeName, $callerName, $callerNumber
-		, $trunkName, $outgoingCallerIdNumber, $outgoingCallerIdName;
-dbug($trunkName);
-	$callerAll = $callerName . ' <' . $callerNumber . '>';
-	$outgoingCallerIdAll = $outgoingCallerIdName . ' <' . $outgoingCallerIdNumber . '>';
+	global $cuid, $dialedNumber, $dialedNumberRaw, $routeName, $callerName, $callerNumber,
+		$trunkName, $outgoingCallerIdNumber, $outgoingCallerIdName, $nowEpoch;
 
+	$callerAll = '"' . $callerName . '"' . ' <' . $callerNumber . '>';
+	$outgoingCallerIdAll = '"' . $outgoingCallerIdName . '"' . ' <' . $outgoingCallerIdNumber . '>';
+
+	//set the dateTime vars
+	$iniTz = ini_get('date.timezone');
+	if (empty($iniTz)) {
+		//the tz set in php.ini comes from sysadmin. if they never set that, use UTC for these emails
+		date_default_timezone_set('UTC');
+	}
+	$dt = new DateTime("@$nowEpoch");
+	$dt->setTimezone(new DateTimeZone(date_default_timezone_get()));
+	$month = $dt->format('m');
+	$day = $dt->format('d');
+	$year = $dt->format('Y');
+	$timeampm = $dt->format('g:i:sA');
+	$time = $dt->format('G:i:s');
+	$timezoneFull = $dt->format('e'); // America/New_York
+	$timezoneShort = $dt->format('T'); // UTC, PST, +12 
+
+	//Replace the vars in email subject and body
 	$emailText = str_replace('{{CALLUID}}', $cuid, $emailText);
 	$emailText = str_replace('{{ROUTENAME}}', $routeName, $emailText);
 	$emailText = str_replace('{{DIALEDNUMBER}}', $dialedNumber, $emailText);
@@ -122,6 +133,14 @@ dbug($trunkName);
 	$emailText = str_replace('{{OUTGOINGCALLERIDNUMBER}}', $outgoingCallerIdNumber, $emailText);
 	$emailText = str_replace('{{OUTGOINGCALLERIDALL}}', $outgoingCallerIdAll, $emailText);
 	$emailText = str_replace('{{TRUNKNAME}}', $trunkName, $emailText);
+	$emailText = str_replace('{{MONTH}}', $month, $emailText);
+	$emailText = str_replace('{{DAY}}', $day, $emailText);
+	$emailText = str_replace('{{YEAR}}', $year, $emailText);
+	$emailText = str_replace('{{TIME}}', $time, $emailText);
+	$emailText = str_replace('{{TIMEAMPM}}', $timeampm, $emailText);
+	$emailText = str_replace('{{TZFULL}}', $timezoneFull, $emailText);
+	$emailText = str_replace('{{TZSHORT}}', $timezoneShort, $emailText);
+
 	return $emailText;
 }
 

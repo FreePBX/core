@@ -5383,23 +5383,19 @@ function core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject
 	if (empty($emailsubject)) {
 		$emailsubject = _('PBX: A call has been placed via outbound route: {{ROUTENAME}}');
 	}
+
 	if (empty($emailbody)) {
 		$emailbody = _('-----------------------------------------
 Call Details:
 -----------------------------------------
-Call Time:       {{CALLTIME}}
-CallerName:          {{CALLERNAME}}
-CallerNumber:          {{CALLERNUMBER}}
-CallerALL:          {{CALLERALL}}
-Dialed Number:   {{DIALEDNUMBER}}
-Dialed Number Raw:   {{DIALEDNUMBERRAW}}
-CallerIDAll Sent:   {{OUTGOINGCALLERIDALL}}
-CallerID Name Sent:   {{OUTGOINGCALLERIDNAME}}
-CallerID Number Sent:   {{OUTGOINGCALLERIDNUMBER}}
+Call Time:  {{MONTH}}-{{DAY}}-{{YEAR}} {{TIMEAMPM}} {{TZSHORT}}
+Caller:  {{CALLERALL}}
+Call to:  {{DIALEDNUMBER}}
+CallerID Sent:  {{OUTGOINGCALLERIDALL}}
 Outbound Route:  {{ROUTENAME}}
-Trunk Name:  {{TRUNKNAME}}
-CallUID:  {{CALLUID}}');
-	};
+CallUID:  {{CALLUID}}
+');
+		};
 
 	$sql = "INSERT INTO outbound_route_email (route_id, emailfrom, emailto, emailsubject, emailbody)";
 	$sql.= " VALUES ($route_id, '$emailfrom', '$emailto', '$emailsubject', '$emailbody')";
