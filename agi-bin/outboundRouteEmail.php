@@ -25,11 +25,6 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 }
 
 global $db;
-$freepbx = \FreePBX::Create();
-$agidir = $freepbx->Config->get('ASTAGIDIR');
-require_once $agidir."/phpagi.php";
-
-$agi = new AGI();
 
 $dialedNumber = !empty($argv[1]) ? $argv[1]:'';
 $dialedNumberRaw = !empty($argv[2]) ? $argv[2]:'';
@@ -71,30 +66,15 @@ $trunkName = !empty($results[0]['name']) ? $results[0]['name']:'';
 //Fill in the email vars
 $emailSubject = parse_email_vars($emailSubject);
 $emailBody = parse_email_vars($emailBody);
-dbug($emailSubject);
-dbug($emailBody);
-/*****
-$agi->verbose("ARG1: $argv[1]", 0);
-$agi->verbose("CUID: $cuid", 0);
-$agi->verbose("ROUTENAME: $routeName", 0);
-$agi->verbose("DIALEDNUMBER: $dialedNumber", 0);
-$agi->verbose("CALLERNAME: $callerName", 0);
-$agi->verbose("CALLERNUMBER: $callerNumber", 0);
-$agi->verbose("OUTGOINGCALLERIDNAME: $outgoingCallerIdName", 0);
-$agi->verbose("OUTGOINGCALLERIDNUMBER: $outgoingCallerIdNumber", 0);
-$agi->verbose("CALLERID(all): $outgoingCallerIdAll", 0);
-$agi->verbose("NowEpoch: $nowEpoch", 0);
-****/
-exit();
 
-dbug($emailTo . '    ' . $emailFrom);
-	$email = new \CI_Email();
-	$email->from($emailFrom);
-	$email->to($emailTo);
-	$email->subject($emailSubject);
-	$email->message($emailBody);
-	$email->send();
-dbug('sending email........');
+//just gonna send it
+$email = new \CI_Email();
+$email->from($emailFrom);
+$email->to($emailTo);
+$email->subject($emailSubject);
+$email->message($emailBody);
+$email->send();
+dbug("Outbound Route email notification has been sent to: $emailTo");
 
 exit();
 
@@ -143,17 +123,4 @@ function parse_email_vars($emailText) {
 
 	return $emailText;
 }
-
-function agi_get_var($value) {
-    global $agi;
-    $r = $agi->get_variable($value);
-
-    if ($r['result'] == 1) {
-        $result = $r['data'];
-        return $result;
-    }
-    return '';
-}
-
-
 ?>

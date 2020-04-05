@@ -2497,7 +2497,6 @@ function core_do_get_config($engine) {
 	*/
 	$context = 'macro-send-obroute-email';
 	$exten = 's';
-	$ext->add($context, $exten, '', new ext_dumpchan());
 	$ext->add($context, $exten, '', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ARG7},${ARG8},${ARG9},${ARG10},${CHANNEL(LINKEDID)}'));
 
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate

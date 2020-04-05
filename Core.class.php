@@ -1080,11 +1080,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$timezone = isset($request['timezone']) ? $request['timezone'] : '';
 			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
-			$emailfrom = isset($request['emailfrom']) ? $request['emailfrom'] : '';
-			$emailto = isset($request['emailto']) ? $request['emailto'] : '';
-			$emailsubject = isset($request['emailsubject']) ? $request['emailsubject'] : '';
-			$emailbody = isset($request['emailbody']) ? $request['emailbody'] : '';
-
+			//email values will be taken from _POST because we don't want the sanitized
+			//values, where stuff between angle brackets were removed. 
+			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
+			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
+			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';
+			$emailbody = isset($_POST['emailbody']) ? $_POST['emailbody'] : '';
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
 			//if submitting form, update database
