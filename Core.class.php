@@ -2269,25 +2269,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
 		}
 
-		//These defaults will be set if the page is saved with blank values
-		$emailfrom = !empty(trim($emailfrom)) ? trim($emailfrom) : 'PBX@localhost.localdomain';
+		$emailfrom = trim($emailfrom);
 		$emailto = trim($emailto);
-		if (empty($emailsubject)) {
-			$emailsubject = _('PBX: A call has been placed via outbound route: {{ROUTENAME}}');
-		}
-
-		if (empty($emailbody)) {
-			$emailbody = _('-----------------------------------------
-Call Details:
------------------------------------------
-Call Time:  {{MONTH}}-{{DAY}}-{{YEAR}} {{TIMEAMPM}} {{TZSHORT}}
-Caller:  {{CALLERALL}}
-Call to:  {{DIALEDNUMBER}}
-CallerID Sent:  {{OUTGOINGCALLERIDALL}}
-Outbound Route:  {{ROUTENAME}}
-CallUID:  {{CALLUID}}'
-			);
-		};
 
 		$sql = "INSERT INTO `outbound_route_email`
 		(`route_id`, `emailfrom`, `emailto`, `emailsubject`, `emailbody`)

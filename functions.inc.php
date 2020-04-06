@@ -2477,6 +2477,29 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
 
+	/*
+	;------------------------------------------------------------------------
+	; [macro-send-obroute-email]
+	;------------------------------------------------------------------------
+	; Send the info to a script that sends an email with the 
+	; call info, if the route has this feature enabled
+	;
+	; ${ARG1} - the number sent to the trunk, after prepend/stripping
+	; ${ARG2} - the raw number dialed, before any prepend/stripping
+	; ${ARG3} - the Outbound Route ID 
+	; ${ARG4} - the Outbound Route Name 
+	; ${ARG5} - the calling party's Name
+	; ${ARG6} - the calling party's Number
+	; ${ARG7} - the trunk id number 
+	; ${ARG8} - the epoch time of the call 
+	; ${ARG9} - the outgoing callerId name 
+	; ${ARG10}- the outgoing callerId number 
+	;------------------------------------------------------------------------
+	*/
+	$context = 'macro-send-obroute-email';
+	$exten = 's';
+	$ext->add($context, $exten, '', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ARG7},${ARG8},${ARG9},${ARG10},${CHANNEL(LINKEDID)}'));
+
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
 	//
