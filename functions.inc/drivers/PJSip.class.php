@@ -420,11 +420,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")",
 			);
         }
-      
-		$conf['pjsip.conf']['global'] = array(
-			'type=global',
-			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
-		);
+
 		$debug = $this->freepbx->Sipsettings->getConfig('pjsip_debug');
 		if($debug) {
 			$conf['pjsip.conf']['global']['debug'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
