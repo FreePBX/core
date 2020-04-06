@@ -1641,6 +1641,60 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return true;
 	}
 
+	/**
+	 * Take an output from a getDevice() and convert it to a format that addDevice() expects
+	 * @param {array} Array of device values
+	 * 
+	 * @return array Array of add device values
+	 */
+	private function kvArrayifyDeviceValues($values) {
+		$response = array();
+		$flag = 2;
+		$ignoreTheseKeys = array('id', 'tech');
+		foreach($values as $key => $value) {
+			if (in_array($key, $ignoreTheseKeys)) {
+				continue;
+			}
+
+			$response[$key] = array(
+				'value' => $value,
+				'flag' => $flag++
+			);
+		}
+		return $response;
+	}
+
+	/**
+	 * Change a Device Tech from SIP -> PJSIP and visa versa
+	 * @param {int} The Device Number
+	 * @param {string} Convert to the specified TECH type
+	 * 
+	 * @return boolean If the method was successful
+	 */
+	public function changeDeviceTech($deviceid, $tech) {
+		$device = $this->getDevice($deviceid);
+
+		if (empty($device)) {
+			$errorMsg = _("Unable to change device driver. Unable to fetch the device");
+			throw new \Exception($errorMsg);
+			return false;			
+		}
+
+		if ($device['tech'] === $tech) {
+			$errorMsg = _("Unable to change device driver. The device is already set to the specified driver");
+			throw new \Exception($errorMsg);
+			return false;
+		}
+
+		$device['dial'] = strtoupper($tech).'/'.$deviceid;
+		$device['sipdriver'] = ($tech == 'pjsip') ? 'chan_pjsip' : 'chan_sip'; 
+		$settings = $this->kvArrayifyDeviceValues($device);
+
+		// delete then re add, insanity.
+		$this->delDevice($deviceid, true);
+		return $this->addDevice($deviceid, $tech, $settings, true);
+	}
+
 	/* create emergency Device
 	* Allowed only sip and Pjsip
 	*/
@@ -2076,6 +2130,178 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$ret  = $stmt->execute(array($trunkid));
 		$result = $stmt->fetch(\PDO::FETCH_ASSOC);
 		return $result;
+	}
+
+	public function addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody) {
+		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
+		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
+
+		$sth = \FreePBX::Database()->prepare($sql);
+		$sth->execute(array(
+			":name" => $name,
+			":outcid" => $outcid,
+			":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+			":password" => $password,
+			":emergency_route" => strtoupper($emergency_route),
+			":intracompany_route" => strtoupper($intracompany_route),
+			":mohclass" => $mohclass,
+			":time_group_id" => $time_group_id,
+			":dest" => $dest,
+			":time_mode" => $time_mode,
+			":timezone" => $timezone
+		));
+
+		$route_id = \FreePBX::Database()->lastInsertId();
+
+		$this->updatePatterns($route_id, $patterns);
+		$this->updateRouteTrunks($route_id, $trunks);
+		$this->setOutboundRouteOrder($route_id, 'new');
+		// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
+		if ($seq != 'new') {
+			$this->setOutboundRouteOrder($route_id, $seq);
+		}
+		$this->setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+		return ($route_id);
+	}
+
+	public function updatePatterns($route_id, &$patterns, $delete = false) {
+		$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
+		$insert_pattern = array();
+		foreach ($patterns as $pattern) {
+			$match_pattern_prefix = preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix'])));
+			$match_pattern_pass = preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass'])));
+			$match_cid = preg_replace($filter,'',strtoupper(trim($pattern['match_cid'])));
+			$prepend_digits = preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits'])));
+
+			if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
+				continue;
+			}
+
+			$hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
+			if (!isset($insert_pattern[$hash_index])) {
+				$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
+			}
+		}
+
+		if ($delete) {
+			sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
+		}
+		$stmt = \FreePBX::Database()->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
+		foreach ($insert_pattern as $pattern) {
+		   $stmt->execute($pattern);
+		}
+	}
+
+	public function setOutboundRouteOrder($route_id, $seq) {
+		$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
+		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+		if ($seq != 'new') {
+			$key = array_search($route_id,$sequence);
+			if ($key === false) {
+				return(false);
+			}
+		}
+		switch ("$seq") {
+			case 'up':
+			if (!isset($sequence[$key-1])) break;
+			$previous = $sequence[$key-1];
+			$sequence[$key-1] = $route_id;
+			$sequence[$key] = $previous;
+			break;
+			case 'down':
+			if (!isset($sequence[$key+1])) break;
+			$previous = $sequence[$key+1];
+			$sequence[$key+1] = $route_id;
+			$sequence[$key] = $previous;
+			break;
+			case 'top':
+			unset($sequence[$key]);
+			array_unshift($sequence,$route_id);
+			break;
+			case 'bottom':
+			unset($sequence[$key]);
+			case 'new':
+			// fallthrough, no break
+			$sequence[]=$route_id;
+			break;
+			case '0':
+			unset($sequence[$key]);
+			array_unshift($sequence,$route_id);
+			break;
+			default:
+			if (!ctype_digit($seq)) {
+				return false;
+			}
+			if ($seq > count($sequence)-1) {
+				unset($sequence[$key]);
+				$sequence[] = $route_id;
+				break;
+			}
+			if ($sequence[$seq] == $route_id) {
+				break;
+			}
+			$sequence[$key] = "bookmark";
+			$remainder = array_slice($sequence,$seq);
+			array_unshift($remainder,$route_id);
+			$sequence = array_merge(array_slice($sequence,0,$seq), $remainder);
+			unset($sequence[array_search("bookmark",$sequence)]);
+			break;
+		}
+		$seq = 0;
+		$final_seq = false;
+		sql('DELETE FROM `outbound_route_sequence` WHERE 1');
+		$stmt = \FreePBX::Database()->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
+		foreach($sequence as $rid) {
+			$stmt->execute(array($rid, $seq));
+			if ($rid === $route_id) {
+				$final_seq = $seq;
+			}
+			$seq++;
+		}
+		return $final_seq;
+	}
+
+// core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+	/* Set the email notification values on Outbound Routes */
+	public function setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete = false) {
+		if ($delete) {
+			sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
+		}
+
+		//These defaults will be set if the page is saved with blank values
+		$emailfrom = !empty(trim($emailfrom)) ? trim($emailfrom) : 'PBX@localhost.localdomain';
+		$emailto = trim($emailto);
+		if (empty($emailsubject)) {
+			$emailsubject = _('PBX: A call has been placed via outbound route: {{ROUTENAME}}');
+		}
+
+		if (empty($emailbody)) {
+			$emailbody = _('-----------------------------------------
+Call Details:
+-----------------------------------------
+Call Time:  {{MONTH}}-{{DAY}}-{{YEAR}} {{TIMEAMPM}} {{TZSHORT}}
+Caller:  {{CALLERALL}}
+Call to:  {{DIALEDNUMBER}}
+CallerID Sent:  {{OUTGOINGCALLERIDALL}}
+Outbound Route:  {{ROUTENAME}}
+CallUID:  {{CALLUID}}'
+			);
+		};
+
+		$sql = "INSERT INTO `outbound_route_email`
+		(`route_id`, `emailfrom`, `emailto`, `emailsubject`, `emailbody`)
+		VALUES (?,?,?,?,?)";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array(
+			$route_id,
+			$emailfrom,
+			$emailto,
+			$emailsubject,
+			$emailbody
+		));
+
+		return true;
 	}
 
 	/**
@@ -3865,6 +4091,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return boolean
 	 */
 	public function fastAGIStatus() {
+        $this->preReloadFreepbx();
 		return $this->fastAGIState;
 	}
 
@@ -3956,7 +4183,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 				$this->astman->database_put("DEVICE",$dev['id']."/type",$dev['devicetype']);
 				$this->astman->database_put("DEVICE",$dev['id']."/user",$dev['user']);
 				$this->astman->database_put("DEVICE",$dev['id']."/default_user",$dev['user']);
-				if(trim($emergency_cid) != '') {
+				if(trim($dev['emergency_cid']) != '') {
 					$this->astman->database_put("DEVICE",$dev['id']."/emergency_cid",$dev['emergency_cid']);
 				}
 				// If a user is selected, add this device to the user

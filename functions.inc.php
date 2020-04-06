@@ -1646,6 +1646,7 @@ function core_do_get_config($engine) {
 
 				$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($["${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}" > "0"]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
 
+				$ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${REGEX("from-queue" ${CHANNEL})}"="1" && "${CONTEXT}"="from-internal-xfer"]', 'Set', '__CWIGNORE='));
 				$dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
 				$ext->add('ext-local', $exten['extension'], 'dest', new ext_set('__PICKUPMARK',''));
@@ -2159,13 +2160,13 @@ function core_do_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND']));
 			}
 
-			if ($route['route_id'] != '') {
-				$ext->add($context, $exten, '', new ext_set("ROUTEID",$route['route_id']));
-			}
+            if ($route['route_id'] != '') {
+                $ext->add($context, $exten, '', new ext_set("ROUTEID",$route['route_id']));
+            }
 
-			if ($route['name'] != '') {
-				$ext->add($context, $exten, '', new ext_set("ROUTENAME",$route['name']));
-			}
+            if ($route['name'] != '') {
+                $ext->add($context, $exten, '', new ext_set("ROUTENAME",$route['name']));
+            }
 
 			if ($route['emergency_route'] != '') {
 				$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
@@ -2183,8 +2184,8 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)})}=0 & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
 				}
 			}
-			$ext->add($context, $exten, '', new ext_set("CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
-			$ext->add($context, $exten, '', new ext_set("CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
+	        $ext->add($context, $exten, '', new ext_set("CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
+            $ext->add($context, $exten, '', new ext_set("CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			$password = $route['password'];
@@ -2475,29 +2476,6 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_authenticate('${ARG3}'));
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
-
-	/*
-	;------------------------------------------------------------------------
-	; [macro-send-obroute-email]
-	;------------------------------------------------------------------------
-	; Send the info to a script that sends an email with the 
-	; call info, if the route has this feature enabled
-	;
-	; ${ARG1} - the number sent to the trunk, after prepend/stripping
-	; ${ARG2} - the raw number dialed, before any prepend/stripping
-	; ${ARG3} - the Outbound Route ID 
-	; ${ARG4} - the Outbound Route Name 
-	; ${ARG5} - the calling party's Name
-	; ${ARG6} - the calling party's Number
-	; ${ARG7} - the trunk id number 
-	; ${ARG8} - the epoch time of the call 
-	; ${ARG9} - the outgoing callerId name 
-	; ${ARG10}- the outgoing callerId number 
-	;------------------------------------------------------------------------
-	*/
-	$context = 'macro-send-obroute-email';
-	$exten = 's';
-	$ext->add($context, $exten, '', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ARG7},${ARG8},${ARG9},${ARG10},${CHANNEL(LINKEDID)}'));
 
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
@@ -3036,7 +3014,7 @@ function core_do_get_config($engine) {
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
 
-	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
+	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $[${LEN(${REALCALLERIDNUM})} = 0] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${CALLERID(name)} <${REALCALLERIDNUM}>'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
@@ -5198,9 +5176,9 @@ function core_routing_delbyid($route_id) {
 	$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
 	$sth = $db->prepare($sql);
 	$ret[] = $sth->execute(array($route_id));
-	$sql = 'DELETE FROM outbound_route_email WHERE route_id = ?';
-	$sth = $db->prepare($sql);
-	$ret[] = $sth->execute(array($route_id));
+ 	$sql = 'DELETE FROM outbound_route_email WHERE route_id = ?';
+    $sth = $db->prepare($sql);
+    $ret[] = $sth->execute(array($route_id));
 	return $ret;
 }
 
@@ -5224,7 +5202,7 @@ function core_routing_getroutepatternsbyid($route_id) {
 }
 
 function core_routing_getrouteemailbyid($route_id) {
-	return \FreePBX::Core()->getRouteEmailByID($route_id);
+    return \FreePBX::Core()->getRouteEmailByID($route_id);
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5292,39 +5270,7 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
 function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody) {
-	global $amp_conf;
-	global $db;
-
-	$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-	VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
-
-	$sth = FreePBX::Database()->prepare($sql);
-	$sth->execute(array(
-		":name" => $name,
-		":outcid" => $outcid,
-		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
-		":password" => $password,
-		":emergency_route" => strtoupper($emergency_route),
-		":intracompany_route" => strtoupper($intracompany_route),
-		":mohclass" => $mohclass,
-		":time_group_id" => $time_group_id,
-		":dest" => $dest,
-		":time_mode" => $time_mode,
-		":timezone" => $timezone
-	));
-
-	$route_id = FreePBX::Database()->lastInsertId();
-
-	core_routing_updatepatterns($route_id, $patterns);
-	core_routing_updatetrunks($route_id, $trunks);
-	core_routing_setrouteorder($route_id, 'new');
-	core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody);
-	// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
-	if ($seq != 'new') {
-		core_routing_setrouteorder($route_id, $seq);
-	}
-
-	return ($route_id);
+	return \FreePBX::Core()->addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 }
 
 /* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
@@ -5332,77 +5278,16 @@ by hashing without the prepend (since a blank prepend is similar to no prepend) 
 this and throw an error...
 */
 function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
-	global $db;
-
-	$route_id =  $db->escapeSimple($route_id);
-	$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
-	$insert_pattern = array();
-	foreach ($patterns as $pattern) {
-		$match_pattern_prefix = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix']))));
-		$match_pattern_pass = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass']))));
-		$match_cid = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['match_cid']))));
-		$prepend_digits = $db->escapeSimple(preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits']))));
-
-		if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
-			continue;
-		}
-
-		$hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
-		if (!isset($insert_pattern[$hash_index])) {
-			$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
-		}
-	}
-
-	if ($delete) {
-		sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
-	}
-	$compiled = $db->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
-	$result = $db->executeMultiple($compiled,$insert_pattern);
-	if(DB::IsError($result)) {
-		die_freepbx($result->getDebugInfo()."<br><br>".'error updating outbound_route_patterns');
-	}
+	return \FreePBX::Core()->updatePatterns($route_id, $patterns, $delete);
 }
 
 function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
 	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
 }
 
-/* Set the email notification values on Outbound Routes */ 
+/* Set the email notification values on Outbound Routes */
 function core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete = false) {
-	global $db;
-	$route_id =  $db->escapeSimple($route_id);
-
-	if ($delete) {
-		sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
-	}
-
-	//These defaults will be set if the page is saved with blank values
-	$emailfrom = !empty(trim($emailfrom)) ? trim($emailfrom) : 'PBX@localhost.localdomain';
-	$emailto = trim($emailto);
-	if (empty($emailsubject)) {
-		$emailsubject = _('PBX: A call has been placed via outbound route: {{ROUTENAME}}');
-	}
-
-	if (empty($emailbody)) {
-		$emailbody = _('-----------------------------------------
-Call Details:
------------------------------------------
-Call Time:  {{MONTH}}-{{DAY}}-{{YEAR}} {{TIMEAMPM}} {{TZSHORT}}
-Caller:  {{CALLERALL}}
-Call to:  {{DIALEDNUMBER}}
-CallerID Sent:  {{OUTGOINGCALLERIDALL}}
-Outbound Route:  {{ROUTENAME}}
-CallUID:  {{CALLUID}}
-');
-		};
-
-	$sql = "INSERT INTO outbound_route_email (route_id, emailfrom, emailto, emailsubject, emailbody)";
-	$sql.= " VALUES ($route_id, '$emailfrom', '$emailto', '$emailsubject', '$emailbody')";
-	$results = $db->query($sql);
-	if (DB::IsError($results)) {
-		die_freepbx($results->getDebugInfo()."<br><br>".$sql);
-	}
-	return true;
+	return \FreePBX::Core()->setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete);
 }
 
 /* callback to Time Groups Module so it can display usage information
@@ -5670,7 +5555,7 @@ function core_users_configpageload() {
 	$name = $outboundcid = $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
 
 	// Init vars from $_REQUEST[]
-	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 	$tech_hardware = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
@@ -6037,7 +5922,7 @@ function core_devices_configpageload() {
 	}
 
 	// Init vars from $_REQUEST[]
-	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
+	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
 	$action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
 	$extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
 
@@ -6253,25 +6138,13 @@ function core_devices_configprocess() {
 		case "edit":  //just delete and re-add
 		// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-			//delete then re add, insanity.
-			core_devices_del($extdisplay,true);
 			//PJSIP <--> CHAN_SIP Switcher, not the best but better than it was before and lets us continue forward into PHP 5.5
 			if(isset($_REQUEST['changesipdriver']) && !empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
-				$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
-				$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
-				$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
-				$flag = 2;
-				$fields = FreePBX::Core()->convertRequest2Array($deviceid,$tech,$flag);
-				$settings = array(
-					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
-					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
-					"user" => array("value" => $deviceuser, "flag" => isset($fields['deviceuser']['flag']) ? $fields['deviceuser']['flag'] : $flag++),
-					"description" => array("value" => $description, "flag" => isset($fields['description']['flag']) ? $fields['description']['flag'] : $flag++),
-					"emergency_cid" => array("value" => $emergency_cid, "flag" => isset($fields['emergency_cid']['flag']) ? $fields['emergency_cid']['flag'] : $flag++)
-				);
-				$settings = array_merge($fields,$settings);
-				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
+				$tech = ($_REQUEST['devinfo_sipdriver'] === 'chan_pjsip') ? 'pjsip' : 'sip';
+				return FreePBX::Core()->changeDeviceTech($deviceid, $tech);
 			} else {
+				//delete then re add, insanity.
+				core_devices_del($extdisplay,true);
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override,true);
 			}
 
