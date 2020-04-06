@@ -1081,7 +1081,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 			//email values will be taken from _POST because we don't want the sanitized
-			//values, where stuff between angle brackets were removed. 
+			//values(from freepbxGetSanitizedRequest), where stuff between angle brackets were removed. 
 			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
 			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
 			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';

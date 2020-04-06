@@ -2,10 +2,11 @@
 <?php 
 /*
 ;------------------------------------------------------------------------
-; [macro-send-obroute-email]
+; called by [macro-send-obroute-email]
 ;------------------------------------------------------------------------
-; Send the info to a script that sends an email with the
-; call info, if the route has this feature enabled
+; This script recieves some call variables from the dialplan, and
+; sends and email based on the route's db settings, if a valid 'Email To' is set
+; on the Outbound Route.  
 ;
 ; ${ARG1} - the number sent to the trunk, after prepend/stripping
 ; ${ARG2} - the raw number dialed, before any prepend/stripping
@@ -67,7 +68,7 @@ $trunkName = !empty($results[0]['name']) ? $results[0]['name']:'';
 $emailSubject = parse_email_vars($emailSubject);
 $emailBody = parse_email_vars($emailBody);
 
-//just gonna send it
+//Send it
 $email = new \CI_Email();
 $email->from($emailFrom);
 $email->to($emailTo);
@@ -76,8 +77,10 @@ $email->message($emailBody);
 $email->send();
 dbug("Outbound Route email notification has been sent to: $emailTo");
 
+//Job's Done
 exit();
 
+//Replace the {{VAR}}'s in the email subject and body templates with current values
 function parse_email_vars($emailText) {
 	global $cuid, $dialedNumber, $dialedNumberRaw, $routeName, $callerName, $callerNumber,
 		$trunkName, $outgoingCallerIdNumber, $outgoingCallerIdName, $nowEpoch;
