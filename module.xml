@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.90</version>
+	<version>15.0.9.91</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.91* FREEI-1181 removing part of code which overiddes the good one. 
 		*15.0.9.90* FREEI-1325 FastAGI setting not using FastAGI in dialplan 
 		*15.0.9.89* FREEI-1077 Disable Trunk on Restore option in FreePBX 15 Backup items is not working. 
 		*15.0.9.88* FREEI-687 Add cli tool to convert SIP to PJSIP
