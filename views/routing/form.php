@@ -48,6 +48,13 @@ foreach ($routepriority as $key => $route) {
 if ($extdisplay == '' | $route_seq != $last_seq) {
 	$routeseqopts .= '<option value="bottom"'.($route_seq == count($routepriority) ? ' SELECTED' : '').'>'.sprintf(_('Last after %s'),$routepriority[$last_seq]['name'])."</option>\n";
 }
+
+//Notification tab email settings
+$emailfrom = $emailInfo['emailfrom'];
+$emailto = $emailInfo['emailto'];
+$emailsubject = $emailInfo['emailsubject'];
+$emailbody = $emailInfo['emailbody'];
+
 //Hooks....
 //$module_hook = moduleHook::create();
 //if (!empty($module_hook->hookHtml)) {
@@ -264,6 +271,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
   <li role="presentation" data-name="routesettings" class="change-tab active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
   <li role="presentation" data-name="dialpatterns" class="change-tab"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
   <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
+  <li role="presentation" data-name="notifications" class="change-tab"><a href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
     <?php echo $hooks['hookTabs'] ?>
   <?php echo $hooktab ?>
 </ul>
@@ -543,6 +551,131 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				</div>
 			</div>
 			<!--END IMPORT/EXPORT-->
+			<!--NOTIFICATIONS-->
+			<div class="tab-pane" id="notifications">
+				<div class="well well-info">
+					<?php echo _("Use caution when enabling Notifications for routes with high traffic to avoid excessive calls, and emails.")?>
+				</div>
+				<!--Email To-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailto"><?php echo _("Email To") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailto"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailto" name="emailto" value="<?php echo isset($emailto)?$emailto:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailto-help" class="help-block fpbx-help-block"><?php echo _("The email address you want the notifications sent to.  Leave this blank to disable email notifications.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email To-->
+				<!--Email From-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailfrom"><?php echo _("Email From") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailfrom"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailfrom" name="emailfrom" value="<?php echo isset($emailfrom)?$emailfrom:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailfrom-help" class="help-block fpbx-help-block"><?php echo _("The email address you want the notification emails to appear  to come from.  Keep in mind this may need to be a real email box, and  the address of this server may need to be added to your SPF records to  ensure delivery of the emails.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email From-->
+				<!--Email Subject-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailsubject"><?php echo _("Email Subject") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailsubject"></i>
+						  </div>
+						  <div class="col-md-9">
+							<input type="text" class="form-control" id="emailsubject" name="emailsubject" value="<?php echo isset($emailsubject)?$emailsubject:''?>">
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailsubject-help" class="help-block fpbx-help-block"><?php echo _("Saving with a blank value will restore the default.
+						<br />Available Variables for Email Subject and Body:
+						<br />
+						<b>{{CALLUID}}</b> - Call's Unique ID<br />
+						<b>{{ROUTENAME}}</b> - Outbound Route's name<br />
+						<b>{{DIALEDNUMBER}}</b> - Destination number as it will be sent to the trunk<br />
+						<b>{{DIALEDNUMBERRAW}}</b> - Destination number as it was dialed<br /> 
+						<b>{{CALLERNAME}}</b> - Caller's name<br />
+						<b>{{CALLERNUMBER}}</b> - Caller's number<br />
+						<b>{{CALLERALL}}</b> - example:  \"CALLERNAME\" &lt;CALLERNUMBER&gt;<br />
+						<b>{{OUTGOINGCALLERIDNAME}}</b> - Outgoing CallerID name<br />
+						<b>{{OUTGOINGCALLERIDNUMBER}}</b> - Outgoing CallerID number<br />
+						<b>{{OUTGOINGCALLERIDALL}}</b> - example: \"OUTGOINGCALLERIDNAME\" &lt;OUTGOINGCALLERIDNUMBER&gt;<br />
+						<b>{{TRUNKNAME}}</b> - Trunk name<br />
+						<b>{{MONTH}}</b> - 2 digit month<br />
+						<b>{{DAY}}</b> - 2 digit day<br />
+						<b>{{YEAR}}</b> - 4 digit year<br />
+						<b>{{TIME}}</b> - example: 17:30:00<br />
+						<b>{{TIMEAMPM}}</b> - example: 5:30 PM<br />
+						<b>{{TZFULL}}</b> - Full Timezone.  ex. America/New_York<br />
+						<b>{{TZSHORT}}</b> - Short Timezone.  ex. UTC, PST, +12
+						")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email Subject-->
+				<!--Email Body-->
+				<div class="element-container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="row">
+						<div class="form-group">
+						  <div class="col-md-3">
+							<label class="control-label" for="emailbody"><?php echo _("Email Body") ?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailbody"></i>
+						  </div>
+						  <div class="col-md-9">
+							<textarea class="form-control" rows="20" id="emailbody" name="emailbody"><?php echo isset($emailbody)?htmlentities($emailbody):''?></textarea>
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					<div class="col-md-12">
+					  <span id="emailbody-help" class="help-block fpbx-help-block"><?php echo _("Saving with a blank value will restore the default.
+							<br>See Email Subject Help message for available variables.")?></span>
+					</div>
+				  </div>
+				</div>
+				<!--END Email Body-->
+			</div>
+			<!--END NOTIFICATIONS-->
 			<!--Hooks in the "Additional Settings tab -->
 			<div class="tab-pane" id="additionalsettings">
 				<?php //echo $module_hook->hookHtml; ?>

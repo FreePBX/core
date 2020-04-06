@@ -390,6 +390,13 @@
 			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
 			<field name="timezone" type="string" length="255" notnull="false"/>
 		</table>
+		<table name="outbound_route_email">
+            <field name="route_id" type="integer" primarykey="true"/>
+            <field name="emailfrom" type="string" length="320" default = "" notnull="false"/>
+            <field name="emailto" type="string" length="320" default = "" notnull="false"/>
+            <field name="emailsubject" type="text" default = "" notnull="false"/>
+            <field name="emailbody" type="text" default = "" notnull="false"/>
+        </table>
 		<table name="trunk_dialpatterns">
 			<field name="trunkid" type="integer" default="0" primarykey="true"/>
 			<field name="match_pattern_prefix" type="string" length="50" default="" primarykey="true"/>
