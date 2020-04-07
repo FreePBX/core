@@ -44,11 +44,19 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function getBackupSettingsDisplay($id) {
 		$settings = !empty($id) ? $this->freepbx->Backup->getAll($id) : [];
 		$settings["core_disabletrunks"] = $this->getConfig("core_disabletrunks", $id);
+		$settings["core_disabletrunks"] = (preg_match('/(yes|no)/', $settings["core_disabletrunks"]))? $settings["core_disabletrunks"] : 'no';
+		$backup_items = json_decode($settings["backup_items"], true);
+		foreach($backup_items as $idx => $items){
+			if($items["modulename"] == "core"){
+				$backup_items[$idx]["settings"] = [array("name" => "core_disabletrunks", "value" => $settings["core_disabletrunks"])];
+			}
+		}
+		$settings["backup_items"] = json_encode($backup_items);
 		return load_view(__DIR__.'/views/backupSettings.php',$settings);
 	}
 
 	public function processBackupSettings($id, $settings) {		
-		if(!empty($settings["core_disabletrunks"]) && ($settings["core_disabletrunks"] != "yes" || $settings["core_disabletrunks"] != "no")){
+		if(!empty($settings["core_disabletrunks"]) && (preg_match('/(yes|no)/', $settings["core_disabletrunks"]))){
 			$this->setConfig("core_disabletrunks",$settings["core_disabletrunks"], $id);
 		}
 		$this->freepbx->Backup->setMultiConfig($settings,$id);
