@@ -641,7 +641,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 						<b>{{DAY}}</b> - 2 digit day<br />
 						<b>{{YEAR}}</b> - 4 digit year<br />
 						<b>{{TIME}}</b> - example: 17:30:00<br />
-						<b>{{TIMEAMPM}}</b> - example: 5:30 PM<br />
+						<b>{{TIMEAMPM}}</b> - example: 5:30:00 PM<br />
 						<b>{{TZFULL}}</b> - Full Timezone.  ex. America/New_York<br />
 						<b>{{TZSHORT}}</b> - Short Timezone.  ex. UTC, PST, +12
 						")?></span>
