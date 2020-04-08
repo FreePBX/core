@@ -2102,6 +2102,14 @@ function core_do_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND']));
 			}
 
+			if ($route['route_id'] != '') {
+				$ext->add($context, $exten, '', new ext_set("ROUTEID",$route['route_id']));
+			}
+
+			if ($route['name'] != '') {
+				$ext->add($context, $exten, '', new ext_set("ROUTENAME",$route['name']));
+			}
+
 			if ($route['emergency_route'] != '') {
 				$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
 			}
@@ -2118,6 +2126,8 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)})}=0 & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
 				}
 			}
+			$ext->add($context, $exten, '', new ext_set("CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
+			$ext->add($context, $exten, '', new ext_set("CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			$password = $route['password'];
@@ -2407,6 +2417,29 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
 
+	/*
+	;------------------------------------------------------------------------
+	; [macro-send-obroute-email]
+	;------------------------------------------------------------------------
+	; Send the info to a script that sends an email with the 
+	; call info, if the route has this feature enabled
+	;
+	; ${ARG1} - the number sent to the trunk, after prepend/stripping
+	; ${ARG2} - the raw number dialed, before any prepend/stripping
+	; ${ARG3} - the Outbound Route ID 
+	; ${ARG4} - the Outbound Route Name 
+	; ${ARG5} - the calling party's Name
+	; ${ARG6} - the calling party's Number
+	; ${ARG7} - the trunk id number 
+	; ${ARG8} - the epoch time of the call 
+	; ${ARG9} - the outgoing callerId name 
+	; ${ARG10}- the outgoing callerId number 
+	;------------------------------------------------------------------------
+	*/
+	$context = 'macro-send-obroute-email';
+	$exten = 's';
+	$ext->add($context, $exten, '', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ARG7},${ARG8},${ARG9},${ARG10},${CHANNEL(LINKEDID)}'));
+
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
 	//
@@ -2485,7 +2518,7 @@ function core_do_get_config($engine) {
 		}
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}M(send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${ROUTEID}^${ROUTENAME}^${CALLERIDNAMEINTERNAL}^${CALLERIDNUMINTERNAL}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
@@ -5171,6 +5204,31 @@ function core_routing_setrouteorder($route_id, $seq) {
 	return $final_seq;
 }
 
+/* Set the email notification values on Outbound Routes */
+function core_routing_setrouteemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete = false) {
+	global $db;
+	if ($delete) {
+		sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
+	}
+	$emailfrom = trim($emailfrom);
+	$emailto = trim($emailto);
+	$sql = "INSERT INTO `outbound_route_email`
+	(`route_id`, `emailfrom`, `emailto`, `emailsubject`, `emailbody`)
+	VALUES (?,?,?,?,?)";
+	$sth = $db->prepare($sql);
+	$res = $sth->execute(array(
+		$route_id,
+		$emailfrom,
+		$emailto,
+		$emailsubject,
+		$emailbody
+	));
+	if(DB::IsError($res)) {
+		die_freepbx($res->getDebugInfo()."<br><br>".'error setting outbound_route_email');
+	}
+	return true;
+}
+
 // function core_routing_del($name)
 function core_routing_delbyid($route_id) {
 	global $db;
@@ -5185,6 +5243,9 @@ function core_routing_delbyid($route_id) {
 	$sth = $db->prepare($sql);
 	$ret[] = $sth->execute(array($route_id));
 	$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
+	$sth = $db->prepare($sql);
+	$ret[] = $sth->execute(array($route_id));
+	$sql = 'DELETE FROM outbound_route_email WHERE route_id = ?';
 	$sth = $db->prepare($sql);
 	$ret[] = $sth->execute(array($route_id));
 	return $ret;
@@ -5207,6 +5268,10 @@ function core_routing_renamebyid($route_id, $new_name) {
 // function core_routing_getroutepatterns($route)
 function core_routing_getroutepatternsbyid($route_id) {
 	return \FreePBX::Core()->getRoutePatternsByID($route_id);
+}
+
+function core_routing_getrouteemailbyid($route_id) {
+    return \FreePBX::Core()->getRouteEmailByID($route_id);
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5239,7 +5304,7 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '') {
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $emailfrom, $emailto, $emailsubject, $emailbody) {
 	global $db;
 
 	$route_id = $db->escapeSimple($route_id);
@@ -5261,13 +5326,14 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 
 	core_routing_updatepatterns($route_id, $patterns, true);
 	core_routing_updatetrunks($route_id, $trunks, true);
+	core_routing_setrouteemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, true);
 	if ($seq != '') {
 		core_routing_setrouteorder($route_id, $seq);
 	}
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $emailfrom, $emailto, $emailsubject, $emailbody) {
 	global $amp_conf;
 	global $db;
 
@@ -5294,6 +5360,7 @@ function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergenc
 
 	core_routing_updatepatterns($route_id, $patterns);
 	core_routing_updatetrunks($route_id, $trunks);
+	core_routing_setrouteemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 	core_routing_setrouteorder($route_id, 'new');
 	// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
 	if ($seq != 'new') {

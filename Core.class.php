@@ -1073,7 +1073,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$outcid_mode = isset($request['outcid_mode']) ? $request['outcid_mode'] : '';
 			$time_group_id = isset($request['time_group_id']) ? $request['time_group_id'] : '';
 			$route_seq = isset($request['route_seq']) ? $request['route_seq'] : '';
-
+			//email values will be taken from _POST because we don't want the sanitized
+			//values(from freepbxGetSanitizedRequest), where stuff between angle brackets were removed. 
+			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
+			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
+			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';
+			$emailbody = isset($_POST['emailbody']) ? $_POST['emailbody'] : '';
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
 			//if submitting form, update database
@@ -1093,12 +1098,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "delroute":
@@ -1911,6 +1916,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$sth = $this->database->prepare($sql);
 		$sth->execute(array($route_id));
 		return $sth->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function getRouteEmailByID($route_id) {
+		$sql = "SELECT * FROM `outbound_route_email` WHERE `route_id` = ?";
+		$sth = $this->database->prepare($sql);
+		$sth->execute(array($route_id));
+		$res = $sth->fetch(\PDO::FETCH_ASSOC);
+		return $res;
 	}
 
 	public function getTrunkDialRulesByID($trunkid) {

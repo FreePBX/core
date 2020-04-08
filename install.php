@@ -150,7 +150,7 @@ $set['description'] = "When set to true and when CONNECTEDLINE() capabilities ar
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('OUTBOUND_DIAL_UPDATE',$set);
 //Added Emergencydevice table
-outn(_("Adding EmergencyDevicetable.."));
+outn(_("Adding emergencydevices table.."));
 $sql = "CREATE TABLE IF NOT EXISTS `emergencydevices` (
   `id` VARCHAR(20)  NOT NULL,
   `tech` VARCHAR(10) NOT NULL ,
@@ -163,7 +163,23 @@ $sql = "CREATE TABLE IF NOT EXISTS `emergencydevices` (
 )";
 $check = $db->query($sql);
 if(DB::IsError($check)) {
-	out(_("Failed to create emergencydevices Table"));
+	out(_("Failed to create emergencydevices table"));
+}
+out(_("Done"));
+
+//Add outbound_route_email table
+outn(_("Adding outbound_route_email table.."));
+$sql = "CREATE TABLE IF NOT EXISTS `outbound_route_email` (
+	`route_id` INTEGER(11)  NOT NULL,
+	`emailfrom` VARCHAR(320) DEFAULT '',
+	`emailto` VARCHAR(320) DEFAULT '',
+	`emailsubject` LONGTEXT DEFAULT '',
+	`emailbody` LONGTEXT DEFAULT '',
+	PRIMARY KEY  (`route_id`)
+)";
+$check = $db->query($sql);
+if(DB::IsError($check)) {
+	out(_("Failed to create outbound_route_email table"));
 }
 out(_("Done"));
 
