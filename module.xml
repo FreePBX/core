@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.93</version>
+	<version>15.0.9.94</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.94* FREEPBX-21364 Backup/restore doesn't restore Dial Number Manipulation Rules in Trunks 
 		*15.0.9.93* Bugfix/FREEI-1077 empty list 
 		*15.0.9.92* FREEI-1077 Disable Trunk on Restore option in FreePBX 15 Backup items is not working. 
 		*15.0.9.91* FREEI-1181 removing part of code which overiddes the good one. 
