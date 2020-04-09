@@ -42,5 +42,9 @@ class Trunks extends Corebase{
 				$sth->execute($row);
 			}
 		}
+		$sth = $this->FreePBX->Database->prepare("INSERT INTO trunk_dialpatterns (`trunkid`, `match_pattern_prefix`, `match_pattern_pass`, `prepend_digits`, `seq`) VALUES (:trunkid, :match_pattern_prefix, :match_pattern_pass, :prepend_digits, :seq)");
+		foreach($trunks['dialpatterns'] as $pattern) {
+			$sth->execute($pattern);
+		}
 	}
 }
