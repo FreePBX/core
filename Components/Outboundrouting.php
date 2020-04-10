@@ -4,7 +4,7 @@ use PDO;
 use Exception;
 
 class Outboundrouting extends ComponentBase{
-	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = ''){
+	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody){
 		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 
@@ -28,11 +28,12 @@ class Outboundrouting extends ComponentBase{
 		$this->updatePatterns($route_id, $patterns);
 		$this->updateTrunks($route_id, $trunks);
 		$this->setOrder($route_id, $seq);
+		$this->setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 
 		return $route_id;
 	}
 
-	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = ''){
+	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody){
 		$sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 		VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 		$sth = $this->Database->prepare($sql);
@@ -53,6 +54,7 @@ class Outboundrouting extends ComponentBase{
 		$this->updatePatterns($route_id, $patterns,true);
 		$this->updateTrunks($route_id, $trunks,true);
 		$this->setOrder($route_id, $seq);
+		$this->setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, true);
 
 		return $route_id;
 	}
@@ -68,6 +70,9 @@ class Outboundrouting extends ComponentBase{
 		$this->Database->prepare($sql);
 		$sth->execute(array($route_id));
 		$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
+		$sth = $this->Database->prepare($sql);
+		$sth->execute(array($route_id));
+		$sql = 'DELETE FROM outbound_route_email WHERE route_id = ?';
 		$sth = $this->Database->prepare($sql);
 		$sth->execute(array($route_id));
 		return $this;
@@ -219,5 +224,35 @@ class Outboundrouting extends ComponentBase{
 		$sth = $this->Database->prepare($sql);
 		$sth->execute();
 		return $sth->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+    public function getRouteEmailByID($route_id) {
+        $sql = "SELECT * FROM `outbound_route_email` WHERE `route_id` = ?";
+        $sth = $this->Database->prepare($sql);
+        $sth->execute(array($route_id));
+        return $sth->fetch(\PDO::FETCH_ASSOC);
+    }
+
+	public function setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete = false) {
+		if ($delete) {
+			sql('DELETE FROM `outbound_route_email` WHERE `route_id`='.q($route_id));
+		}
+
+		$emailfrom = trim($emailfrom);
+		$emailto = trim($emailto);
+
+		$sql = "INSERT INTO `outbound_route_email`
+		(`route_id`, `emailfrom`, `emailto`, `emailsubject`, `emailbody`)
+		VALUES (?,?,?,?,?)";
+		$sth = $this->Database->prepare($sql);
+		$sth->execute(array(
+			$route_id,
+			$emailfrom,
+			$emailto,
+			$emailsubject,
+			$emailbody
+		));
+
+		return true;
 	}
 }

@@ -287,6 +287,23 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 	}
 });
 
+//Notification email settings
+var emailFromDefault = 'PBX@localhost.localdomain';
+var emailSubjectDefault = _('PBX: A call has been placed via outbound route:') + ' {{ROUTENAME}}';
+var emailBodyDefault = '-----------------------------------------'
+	+ '\n' + _('Call Details:')
+	+ '\n-----------------------------------------'
+	+ '\n' + _('Call Time:') + ' {{MONTH}}-{{DAY}}-{{YEAR}} {{TIMEAMPM}} {{TZSHORT}}'
+	+ '\n' + _('Caller:') + ' {{CALLERALL}}'
+	+ '\n' + _('Call to:') + ' {{DIALEDNUMBER}}'
+	+ '\n' + _('CallerID Sent:') + ' {{OUTGOINGCALLERIDALL}}'
+	+ '\n' + _('Outbound Route:') + ' {{ROUTENAME}}'
+	+ '\n' + _('CallUID:') + ' {{CALLUID}}';
+//fill in the form with these defaults when adding a new route
+if ($('#emailfrom').val() === '') { $('#emailfrom').val(emailFromDefault); }
+if ($('#emailsubject').val() === '') { $('#emailsubject').val(emailSubjectDefault); }
+if ($('#emailbody').val() === '') { $('#emailbody').val(emailBodyDefault); }
+
 function check_pattern(pattern){
 	if(pattern.trim().substring(0, 1) == "."){
 		var msg_alert = '<div class="alert alert-dismissable alert-warning">'+
@@ -374,5 +391,11 @@ $("#routeEdit").submit(function(){
 	});
 	var data = JSON.stringify(curpatterns);
 	$("#dialpatterndata").val(data);
+
+    //Notifications - fill in the defaults if they try to save these with blank values
+	if ($('#emailfrom').val() === '') { $('#emailfrom').val(emailFromDefault); }
+	if ($('#emailsubject').val() === '') { $('#emailsubject').val(emailSubjectDefault); }
+	if ($('#emailbody').val() === '') { $('#emailbody').val(emailBodyDefault); }
+
 	return true;
 });

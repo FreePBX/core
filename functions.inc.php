@@ -2173,6 +2173,14 @@ function core_do_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND']));
 			}
 
+            if ($route['route_id'] != '') {
+                $ext->add($context, $exten, '', new ext_set("ROUTEID",$route['route_id']));
+            }
+
+            if ($route['name'] != '') {
+                $ext->add($context, $exten, '', new ext_set("ROUTENAME",$route['name']));
+            }
+
 			if ($route['emergency_route'] != '') {
 				$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
 			}
@@ -2189,6 +2197,8 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)})}=0 & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
 				}
 			}
+	        $ext->add($context, $exten, '', new ext_set("CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
+            $ext->add($context, $exten, '', new ext_set("CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			$password = $route['password'];
@@ -2340,6 +2350,41 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
 
+	/*
+	;------------------------------------------------------------------------
+	; [macro-send-obroute-email]
+	;------------------------------------------------------------------------
+	; Send the info to a script that sends an email with the 
+	; call info, if the route has this feature enabled
+	;
+	; ${ARG1} - the number sent to the trunk, after prepend/stripping
+	; ${ARG2} - the raw number dialed, before any prepend/stripping
+	; ${ARG3} - the Outbound Route ID 
+	; ${ARG4} - the Outbound Route Name 
+	; ${ARG5} - the calling party's Name
+	; ${ARG6} - the calling party's Number
+	; ${ARG7} - the trunk id number 
+	; ${ARG8} - the epoch time of the call 
+	; ${ARG9} - the outgoing callerId name 
+	; ${ARG10}- the outgoing callerId number 
+	;------------------------------------------------------------------------
+	*/
+	$context = 'macro-send-obroute-email';
+	$exten = 's';
+	$ext->add($context, $exten, '', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ARG7},${ARG8},${ARG9},${ARG10},${CHANNEL(LINKEDID)}'));
+
+	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
+	// the reason for the diversion (e.g. CFB could set it to busy)
+	//
+	if ($amp_conf['DIVERSIONHEADER']) {
+		$context = 'sub-diversion-header';
+		$exten = 's';
+		$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
+		$ext->add($context, $exten, '', new ext_gosub('1','s','func-set-sipheader','Diversion,<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
+		$ext->add($context, $exten, '', new ext_return(''));
+	}
+
+
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
 	//
@@ -2420,7 +2465,7 @@ function core_do_get_config($engine) {
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))M(send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${ROUTEID}^${ROUTENAME}^${CALLERIDNAMEINTERNAL}^${CALLERIDNUMINTERNAL}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
