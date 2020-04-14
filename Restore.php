@@ -22,7 +22,7 @@ class Restore Extends Base\RestoreBase{
 			$modulefunction = \module_functions::create();
 			$uninstall = $modulefunction->uninstall('core', 'true');
 			if(is_array($uninstall)) {
-				throw new \Exception(sprintf(_('Error uninstalling core reason(s): %s'),implode(",",$uninstall)))
+				throw new \Exception(sprintf(_('Error uninstalling core reason(s): %s'),implode(",",$uninstall)));
 			}
 			$install = $modulefunction->install('core', 'true');
 			if(is_array($install)) {
