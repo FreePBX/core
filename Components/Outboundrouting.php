@@ -4,7 +4,7 @@ use PDO;
 use Exception;
 
 class Outboundrouting extends ComponentBase{
-	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody){
+	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
 		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 
@@ -33,7 +33,7 @@ class Outboundrouting extends ComponentBase{
 		return $route_id;
 	}
 
-	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom, $emailto, $emailsubject, $emailbody){
+	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
 		$sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
 		VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
 		$sth = $this->Database->prepare($sql);
