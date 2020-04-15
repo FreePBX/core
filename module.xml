@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.60</version>
+	<version>14.0.28.61</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.61* FREEI-1284: added feature to send out an email when an Outbound Route is dialed 
 		*14.0.28.60* FREEI-1351 Emergency CID lost from ASTDB when upgrading 
 		*14.0.28.59* FREEI-1325 FastAGI setting not using FastAGI in dialplan 
 		*14.0.28.58* FREEI-687 Add cli tool to convert SIP to PJSIP
@@ -392,10 +393,10 @@
 		</table>
 		<table name="outbound_route_email">
             <field name="route_id" type="integer" primarykey="true"/>
-            <field name="emailfrom" type="string" length="320" default = "" notnull="false"/>
-            <field name="emailto" type="string" length="320" default = "" notnull="false"/>
-            <field name="emailsubject" type="text" default = "" notnull="false"/>
-            <field name="emailbody" type="text" default = "" notnull="false"/>
+            <field name="emailfrom" type="string" length="320" default="" notnull="false"/>
+            <field name="emailto" type="string" length="320" default="" notnull="false"/>
+            <field name="emailsubject" type="text" default="" notnull="false"/>
+            <field name="emailbody" type="text" default="" notnull="false"/>
         </table>
 		<table name="trunk_dialpatterns">
 			<field name="trunkid" type="integer" default="0" primarykey="true"/>
