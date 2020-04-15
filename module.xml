@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.9.96</version>
+	<version>15.0.9.97</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.9.97* FREEI-687 Add convert2pjsip script success message
 		*15.0.9.96* FREEI-1284: added email notifications to Outbound Routes 
 		*15.0.9.95* FREEPBX-21385 Adding an option for remove Trunks from copying to a warm spare 
 		*15.0.9.94* FREEPBX-21364 Backup/restore doesn't restore Dial Number Manipulation Rules in Trunks 
