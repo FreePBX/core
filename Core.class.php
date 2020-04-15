@@ -1080,7 +1080,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$timezone = isset($request['timezone']) ? $request['timezone'] : '';
 			$calendar_id = isset($request['calendar_id']) ? $request['calendar_id'] : '';
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
-
+			//email values will be taken from _POST because we don't want the sanitized
+			//values(from freepbxGetSanitizedRequest), where stuff between angle brackets were removed. 
+			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
+			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
+			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';
+			$emailbody = isset($_POST['emailbody']) ? $_POST['emailbody'] : '';
 			$goto = isset($request['goto0'])?$request['goto0']:'';
 			$dest = $goto ? $request[$goto . '0'] : '';
 			//if submitting form, update database
@@ -1092,12 +1097,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "delroute":
@@ -1837,6 +1842,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function getRoutePatternsByID($route_id) {
         return $this->routing->getRoutePatternsById($route_id);
 	}
+
+    public function getRouteEmailByID($route_id) {
+        return $this->routing->getRouteEmailById($route_id);
+    }
 
 	public function getTrunkDialRulesByID($trunkid) {
 		$sql = "SELECT * FROM `trunk_dialpatterns` WHERE `trunkid` = ?  ORDER BY `seq`";

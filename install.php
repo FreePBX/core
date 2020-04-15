@@ -178,8 +178,8 @@ $set['name'] = 'Display Dialed Number on Calling Phone';
 $set['description'] = "When set to true and when CONNECTEDLINE() capabilities are configured and supported by your handset, the number actually dialled will be updated on your handset in the CNUM field. This allows you to see the final manipulation of your number after outbound route and trunk dial manipulation rules have been applied. For example, if you have configured 7 digit dialing on a North America dialplan, the ultimate 10 or 11 digit transmission will be displayed back. Any 'Outbound Dial Prefixes' configured at the trunk level will NOT be shown as these are foten analog line pauses (w) or other characters that distort the CNUM field on updates.";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('OUTBOUND_DIAL_UPDATE',$set);
-//Added Emergencydevice table
-outn(_("Adding EmergencyDevicetable.."));
+//Added emergencydevices table
+outn(_("Adding emergencydevices table.."));
 $sql = "CREATE TABLE IF NOT EXISTS `emergencydevices` (
   `id` VARCHAR(20)  NOT NULL,
   `tech` VARCHAR(10) NOT NULL ,
@@ -192,7 +192,7 @@ $sql = "CREATE TABLE IF NOT EXISTS `emergencydevices` (
 )";
 $check = $db->query($sql);
 if(DB::IsError($check)) {
-	out(_("Failed to create emergencydevices Table"));
+	out(_("Failed to create emergencydevices table"));
 }
 out(_("Done"));
 

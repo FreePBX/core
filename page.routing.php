@@ -31,6 +31,7 @@ switch($request['view']){
 			$route_info = core_routing_get($extdisplay);
 			$dialpattern_array = core_routing_getroutepatternsbyid($extdisplay);
 			$trunkpriority = core_routing_getroutetrunksbyid($extdisplay);
+			$emailInfo = core_routing_getrouteemailbyid($extdisplay);
 			$routepass = $route_info['password'];
 			$emergency = $route_info['emergency_route'];
 			$intracompany = $route_info['intracompany_route'];
@@ -68,6 +69,7 @@ switch($request['view']){
 							'route_seq' => $route_seq,
 							'routename' => $routename,
 							'dest' => $dest,
+							'emailInfo' => $emailInfo,
 							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 							);
 							$subhead .= ": ". $routename;
