@@ -46,6 +46,9 @@ class Convert2pjsip extends Command {
 			}
 		}
 
+		needreload();
+		$output->writeln(_("Extensions converted successfully!"));
+		$output->writeln(_("Run 'fwconsole reload' to reload config"));
 		return 0;
 	}
 
