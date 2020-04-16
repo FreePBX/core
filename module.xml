@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.62</version>
+	<version>14.0.28.63</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.63* bump 
 		*14.0.28.62* FREEI-687 Add convert2pjsip script success message
 		*14.0.28.61* FREEI-1284: added feature to send out an email when an Outbound Route is dialed 
 		*14.0.28.60* FREEI-1351 Emergency CID lost from ASTDB when upgrading 
