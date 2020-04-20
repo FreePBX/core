@@ -2045,6 +2045,134 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $result;
 	}
 
+	public function addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '') {
+		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`)
+		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest)";
+
+		$sth = \FreePBX::Database()->prepare($sql);
+		$sth->execute(array(
+			":name" => $name,
+			":outcid" => $outcid,
+			":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+			":password" => $password,
+			":emergency_route" => strtoupper($emergency_route),
+			":intracompany_route" => strtoupper($intracompany_route),
+			":mohclass" => $mohclass,
+			":time_group_id" => $time_group_id == ''? 'NULL':$time_group_id,
+			":dest" => $dest
+		));
+
+		$route_id = \FreePBX::Database()->lastInsertId();
+
+		$this->updatePatterns($route_id, $patterns);
+		$this->updateRouteTrunks($route_id, $trunks);
+		$this->setOutboundRouteOrder($route_id, 'new');
+		// this is lame, should change to do as a single call but for now this expects route_id to be in array for anything but new
+		if ($seq != 'new') {
+			$this->setOutboundRouteOrder($route_id, $seq);
+		}
+
+		return ($route_id);
+	}
+
+	public function updatePatterns($route_id, &$patterns, $delete = false) {
+		$filter = '/[^0-9\*\#\+\-\.\[\]xXnNzZ]/';
+		$insert_pattern = array();
+		foreach ($patterns as $pattern) {
+			$match_pattern_prefix = preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_prefix'])));
+			$match_pattern_pass = preg_replace($filter,'',strtoupper(trim($pattern['match_pattern_pass'])));
+			$match_cid = preg_replace($filter,'',strtoupper(trim($pattern['match_cid'])));
+			$prepend_digits = preg_replace($filter,'',strtoupper(trim($pattern['prepend_digits'])));
+
+			if ($match_pattern_prefix.$match_pattern_pass.$match_cid == '') {
+				continue;
+			}
+
+			$hash_index = md5($match_pattern_prefix.$match_pattern_pass.$match_cid);
+			if (!isset($insert_pattern[$hash_index])) {
+				$insert_pattern[$hash_index] = array($match_pattern_prefix, $match_pattern_pass, $match_cid, $prepend_digits);
+			}
+		}
+
+		if ($delete) {
+			sql('DELETE FROM `outbound_route_patterns` WHERE `route_id`='.q($route_id));
+		}
+		$stmt = \FreePBX::Database()->prepare('INSERT INTO `outbound_route_patterns` (`route_id`, `match_pattern_prefix`, `match_pattern_pass`, `match_cid`, `prepend_digits`) VALUES ('.$route_id.',?,?,?,?)');
+		foreach ($insert_pattern as $pattern) {
+		   $stmt->execute($pattern);
+		}
+	}
+
+	public function setOutboundRouteOrder($route_id, $seq) {
+		$sql = "SELECT `route_id` FROM `outbound_route_sequence` ORDER BY `seq`";
+		$sequence = $this->Database->query($sql)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+		if ($seq != 'new') {
+			$key = array_search($route_id,$sequence);
+			if ($key === false) {
+				return(false);
+			}
+		}
+		switch ("$seq") {
+			case 'up':
+			if (!isset($sequence[$key-1])) break;
+			$previous = $sequence[$key-1];
+			$sequence[$key-1] = $route_id;
+			$sequence[$key] = $previous;
+			break;
+			case 'down':
+			if (!isset($sequence[$key+1])) break;
+			$previous = $sequence[$key+1];
+			$sequence[$key+1] = $route_id;
+			$sequence[$key] = $previous;
+			break;
+			case 'top':
+			unset($sequence[$key]);
+			array_unshift($sequence,$route_id);
+			break;
+			case 'bottom':
+			unset($sequence[$key]);
+			case 'new':
+			// fallthrough, no break
+			$sequence[]=$route_id;
+			break;
+			case '0':
+			unset($sequence[$key]);
+			array_unshift($sequence,$route_id);
+			break;
+			default:
+			if (!ctype_digit($seq)) {
+				return false;
+			}
+			if ($seq > count($sequence)-1) {
+				unset($sequence[$key]);
+				$sequence[] = $route_id;
+				break;
+			}
+			if ($sequence[$seq] == $route_id) {
+				break;
+			}
+			$sequence[$key] = "bookmark";
+			$remainder = array_slice($sequence,$seq);
+			array_unshift($remainder,$route_id);
+			$sequence = array_merge(array_slice($sequence,0,$seq), $remainder);
+			unset($sequence[array_search("bookmark",$sequence)]);
+			break;
+		}
+		$seq = 0;
+		$final_seq = false;
+		sql('DELETE FROM `outbound_route_sequence` WHERE 1');
+		$stmt = \FreePBX::Database()->prepare('INSERT INTO `outbound_route_sequence` (`route_id`, `seq`) VALUES (?,?)');
+		foreach($sequence as $rid) {
+			$stmt->execute(array($rid, $seq));
+			if ($rid === $route_id) {
+				$final_seq = $seq;
+			}
+			$seq++;
+		}
+		return $final_seq;
+	}
+
 	/**
 	* Get all the users
 	* @param {bool} $get_all=false Whether to get all of check in the range
