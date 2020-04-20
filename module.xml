@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.21</version>
+	<version>13.0.131.22</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.22* FREEI-1466 Activating sipstation trial account gives "Call to undefined function" whoops error and the screen freezes in FreePBX 13. 
 		*13.0.131.21* bump 
 		*13.0.131.20* FREEI-1284: added email notifications to Outbound Routes, FPBX13 changes 
 		*13.0.131.19* FREEI-1183 Contact User in PJSIP isn't setting the User part of the Contact Header 
