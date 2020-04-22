@@ -4473,6 +4473,67 @@ function core_routing_formatpattern($pattern) {
 	return array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $full_exten, 'base_pattern' => $exten, 'offset' => $pos);
 }
 
+// function core_routing_getroutetrunks($route)
+function core_routing_getroutetrunksbyid($route_id) {
+	return FreePBX::Core()->getRouteTrunksByID($route_id);
+}
+
+// function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
+	$sql = "UPDATE `outbound_routes` SET
+	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
+	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
+	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
+	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
+
+	$sth = FreePBX::Database()->prepare($sql);
+	$sth->execute(array(
+		":name" => $name,
+		":outcid" => $outcid,
+		":outcid_mode" => trim($outcid) == '' ? '' : $outcid_mode,
+		":password" => $password,
+		":emergency_route" => strtoupper($emergency_route),
+		":intracompany_route" => strtoupper($intracompany_route),
+		":mohclass" => $mohclass,
+		":time_group_id" => $time_group_id,
+		":dest" => $dest,
+		":route_id" => $route_id,
+		":time_mode" => $time_mode,
+		":timezone" => $timezone,
+		":calendar_id" => $calendar_id,
+		":calendar_group_id" => $calendar_group_id
+	));
+
+	core_routing_updatepatterns($route_id, $patterns, true);
+	core_routing_updatetrunks($route_id, $trunks, true);
+	core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, true);
+	if ($seq != '') {
+		core_routing_setrouteorder($route_id, $seq);
+	}
+}
+
+// function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
+	return \FreePBX::Core()->addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+}
+
+/* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
+by hashing without the prepend (since a blank prepend is similar to no prepend) at a minimum and decide if we want to catch
+this and throw an error...
+*/
+function core_routing_updatepatterns($route_id, &$patterns, $delete = false) {
+	return \FreePBX::Core()->updatePatterns($route_id, $patterns, $delete);
+}
+
+function core_routing_updatetrunks($route_id, &$trunks, $delete = false) {
+	return \Freepbx::Core()->updateRouteTrunks($route_id, $trunks, $delete);
+}
+
+/* Set the email notification values on Outbound Routes */
+function core_routing_updateemail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete = false) {
+	return \FreePBX::Core()->setOutboundRouteEmail($route_id, $emailfrom, $emailto, $emailsubject, $emailbody, $delete);
+}
+
 /* callback to Time Groups Module so it can display usage information
 of specific groups
 */
