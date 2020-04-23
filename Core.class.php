@@ -2160,7 +2160,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 	* Get All Routes
 	*/
 	public function getAllRoutes(){
-		$sql = "SELECT a.*, b.seq FROM `outbound_routes` a JOIN `outbound_route_sequence` b ON a.route_id = b.route_id ORDER BY `seq`";
+		$sql = "SELECT a.*
+					, b.seq
+					, c.emailto
+				FROM `outbound_routes` a
+				JOIN `outbound_route_sequence` b ON a.route_id = b.route_id
+				JOIN `outbound_route_email` c ON a.route_id = c.route_id
+				ORDER BY `seq`";
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute();
 		$routes = $stmt->fetchAll(PDO::FETCH_ASSOC);
