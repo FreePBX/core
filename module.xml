@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.10</version>
+	<version>15.0.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.11* FREEI-1498 disable trunk option was broken in advanced Recovery module 
 		*15.0.10*   FREEPBX-21437: optimized outbound route notification email script usage. 
 		*15.0.9.98* bump 
 		*15.0.9.97* FREEI-687 Add convert2pjsip script success message
@@ -336,10 +337,10 @@
 		</table>
 		<table name="outbound_route_email">
             <field name="route_id" type="integer" primarykey="true"/>
-            <field name="emailfrom" type="string" length="320" default = "" notnull="false"/>
-            <field name="emailto" type="string" length="320" default = "" notnull="false"/>
-            <field name="emailsubject" type="text" default = "" notnull="false"/>
-            <field name="emailbody" type="text" default = "" notnull="false"/>
+            <field name="emailfrom" type="string" length="320" default="" notnull="false"/>
+            <field name="emailto" type="string" length="320" default="" notnull="false"/>
+            <field name="emailsubject" type="text" default="" notnull="false"/>
+            <field name="emailbody" type="text" default="" notnull="false"/>
         </table>
 		<table name="trunk_dialpatterns">
 			<field name="trunkid" type="integer" default="0" primarykey="true"/>
