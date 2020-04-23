@@ -6,46 +6,48 @@
 ;------------------------------------------------------------------------
 ; This script recieves some call variables from the dialplan, and
 ; sends and email based on the route's db settings, if a valid 'Email To' is set
-; on the Outbound Route.  
+; on the Outbound Route.
 ;
 ; ${ARG1} - the number sent to the trunk, after prepend/stripping
 ; ${ARG2} - the raw number dialed, before any prepend/stripping
-; ${ARG3} - the Outbound Route ID
-; ${ARG4} - the Outbound Route Name
-; ${ARG5} - the calling party's Name
-; ${ARG6} - the calling party's Number
-; ${ARG7} - the trunk id number
-; ${ARG8} - the epoch time of the call
-; ${ARG9} - the outgoing callerId name
-; ${ARG10}- the outgoing callerId number
-; ${ARG11}- the call's LINKEDID 
+; ${ARG3} - the trunk id number
+; ${ARG4} - the epoch time of the call
+; ${ARG5} - the outgoing callerId name
+; ${ARG6} - the outgoing callerId number
+; ${ARG7} - the Outbound Route ID
+; ${ARG8} - the Outbound Route Name
+; ${ARG9} - the calling party's Name
+; ${ARG10}- the calling party's Number
+; ${ARG11}- the call's LINKEDID
 ;------------------------------------------------------------------------
 */
 if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
-    include_once('/etc/asterisk/freepbx.conf');
+	include_once('/etc/asterisk/freepbx.conf');
 }
 
 global $db;
 
 $dialedNumber = !empty($argv[1]) ? $argv[1]:'';
 $dialedNumberRaw = !empty($argv[2]) ? $argv[2]:'';
-$routeId = !empty($argv[3]) ? $argv[3]:'';
-$routeName = !empty($argv[4]) ? $argv[4]:'';
-$callerName = !empty($argv[5]) ? $argv[5]:'';
-$callerNumber = !empty($argv[6]) ? $argv[6]:'';
-$trunkId = !empty($argv[7]) ? $argv[7]:'';
-$nowEpoch = !empty($argv[8]) ? $argv[8]:'';
-$outgoingCallerIdName = !empty($argv[9]) ? $argv[9]:'';
-$outgoingCallerIdNumber = !empty($argv[10]) ? $argv[10]:'';
+$trunkId = !empty($argv[3]) ? $argv[3]:'';
+$nowEpoch = !empty($argv[4]) ? $argv[4]:'';
+$outgoingCallerIdName = !empty($argv[5]) ? $argv[5]:'';
+$outgoingCallerIdNumber = !empty($argv[6]) ? $argv[6]:'';
+$routeId = !empty($argv[7]) ? $argv[7]:'';
+$routeName = !empty($argv[8]) ? $argv[8]:'';
+$callerName = !empty($argv[9]) ? $argv[9]:'';
+$callerNumber = !empty($argv[10]) ? $argv[10]:'';
 $cuid = !empty($argv[11]) ? $argv[11]:'';
 
 //If we don't get a routeId, something's wrong.
-if (empty($routeId)) { exit(); }
+if (empty($routeId)) {
+    exit();
+}
 
 //Get the email values from the outbound route
 $sql = "SELECT * FROM outbound_route_email WHERE route_id = $routeId";
 $results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-if(DB::IsError($results) || !is_array($results)) {
+if (DB::IsError($results) || !is_array($results)) {
 	$results = array();
 }
 $emailFrom = $results[0]['emailfrom'];
@@ -54,12 +56,14 @@ $emailSubject = $results[0]['emailsubject'];
 $emailBody = $results[0]['emailbody'];
 
 //Exit if outbound route doesn't have an emailto set
-if (empty($emailTo)) { exit(); }
+if (empty($emailTo)) {
+	exit(); 
+}
 
 //Get the trunk name
 $sql = "SELECT name FROM trunks WHERE trunkid = $trunkId";
 $results = $db->getAll($sql, DB_FETCHMODE_ASSOC);
-if(DB::IsError($results) || !is_array($results)) {
+if (DB::IsError($results) || !is_array($results)) {
 	$results = array();
 }
 $trunkName = !empty($results[0]['name']) ? $results[0]['name']:'';
@@ -99,10 +103,10 @@ function parse_email_vars($emailText) {
 	$month = $dt->format('m');
 	$day = $dt->format('d');
 	$year = $dt->format('Y');
-	$timeampm = $dt->format('g:i:sA');
+	$timeampm = $dt->format('g:i:s A');
 	$time = $dt->format('G:i:s');
 	$timezoneFull = $dt->format('e'); // America/New_York
-	$timezoneShort = $dt->format('T'); // UTC, PST, +12 
+	$timezoneShort = $dt->format('T'); // UTC, PST, +12
 
 	//Replace the vars in email subject and body
 	$emailText = str_replace('{{CALLUID}}', $cuid, $emailText);
