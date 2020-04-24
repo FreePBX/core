@@ -2126,6 +2126,7 @@ function core_do_get_config($engine) {
 
 		$patterns = core_routing_getroutepatternsbyid($route['route_id']);
 		$trunks = core_routing_getroutetrunksbyid($route['route_id']);
+		$emailInfo = \FreePBX::Core()->getRouteEmailByID($route['route_id']);
 
 		foreach ($patterns as $pattern) {
 			// returns:
@@ -2186,7 +2187,7 @@ function core_do_get_config($engine) {
 			}
 	        $ext->add($context, $exten, '', new ext_set("_CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
 	        $ext->add($context, $exten, '', new ext_set("_CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
-            $ext->add($context, $exten, '', new ext_set("_EMAILNOTIFICATION", (empty($route['emailto']) ? 'FALSE' : 'TRUE')));
+            $ext->add($context, $exten, '', new ext_set("_EMAILNOTIFICATION", (empty($emailInfo['emailto']) ? 'FALSE' : 'TRUE')));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			$password = $route['password'];
