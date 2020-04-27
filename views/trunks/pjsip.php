@@ -260,6 +260,33 @@
 		<?php 
 		$ver_list = array("13.24.0", "16.1.0");
 		if(version_min(\FreePBX::Config()->get('ASTVERSION'),$ver_list) == true) { ?>
+		<!--PJSIP TRUNK LINE ENABLE / DISABLE-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="pjsip line"><?php echo _("Enable/Disable Line") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php echo ($pjsip_line == "true" || empty($pjsip_line)?"CHECKED":"") ?>>
+								<label for="pjsip_lineyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="pjsip_line" id="pjsip_lineno" value="false" <?php echo ($pjsip_line == "false" ?"CHECKED":"") ?>>
+								<label for="pjsip_lineno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="pjsip_linew-help" class="help-block fpbx-help-block"><?php echo _("The line option to outbound registrations in res_pjsip helps to eliminate this in some cases. If “line” is enabled on an outbound registration, a “line” parameter is added to the outgoing “Contact” header which should be returned by the registrar in the request URI or the “To” header URI of incoming requests.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--PJSIP TRUNK LINE ENABLE / DISABLE-->
 		<!--SEND CONNECTED LINE-->
 		<div class="element-container">
 			<div class="row">

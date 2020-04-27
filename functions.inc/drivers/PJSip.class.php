@@ -62,6 +62,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => $dtmf,
 				"flag" => $flag++
 			),
+			"pjsip_line" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
 			"trustrpid" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
@@ -578,9 +582,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
-				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
+				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
-
+			if($trunk['pjsip_line'] != 'false'){
+				$conf['pjsip.endpoint.conf'][$tn]['line'] = 'yes';
+			}
+			
 			$ver_list = array("13.24.0", "16.1.0"); // include all versions to test.
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
