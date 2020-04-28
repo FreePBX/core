@@ -62,10 +62,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => $dtmf,
 				"flag" => $flag++
 			),
-			"pjsip_line" => array(
-				"value" => "yes",
-				"flag" => $flag++
-			),
 			"trustrpid" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_SIP_TRUSTRPID'),
 				"flag" => $flag++
@@ -479,7 +475,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'forbidden_retry_interval' => (empty($trunk['forbidden_retry_interval']))? "0" : $trunk['forbidden_retry_interval'],
 					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
-					'line' => 'yes',
+					'line' => ($trunk['pjsip_line'] == 'true') ? 'yes' : 'no',
 					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
@@ -584,9 +580,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
-			if($trunk['pjsip_line'] != 'false'){
-				$conf['pjsip.endpoint.conf'][$tn]['line'] = 'yes';
-			}
 			
 			$ver_list = array("13.24.0", "16.1.0"); // include all versions to test.
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
