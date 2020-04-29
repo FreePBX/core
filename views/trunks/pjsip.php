@@ -267,7 +267,7 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-md-3">
-								<label class="control-label" for="pjsip line"><?php echo _("Enable/Disable Line") ?></label>
+								<label class="control-label" for="pjsip line"><?php echo _("Send Line in Registration") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
@@ -282,7 +282,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<span id="pjsip_linew-help" class="help-block fpbx-help-block"><?php echo _("The line option to outbound registrations in res_pjsip helps to eliminate this in some cases. If “line” is enabled on an outbound registration, a “line” parameter is added to the outgoing “Contact” header which should be returned by the registrar in the request URI or the “To” header URI of incoming requests.")?></span>
+					<span id="pjsip_linew-help" class="help-block fpbx-help-block"><?php echo _("If this option is enabled, a “line” parameter is added to the outgoing “Contact” header during registration.")?></span>
 				</div>
 			</div>
 		</div>
