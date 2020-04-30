@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.3</version>
+	<version>15.0.12.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.4* FREEI-1468: to update default_user value from extension advance setting form 
 		*15.0.12.3* To add voicemail_extension value in pjsip.endpoint.conf 
 		*15.0.12.2* Bugfix/FREEI-21449 
 		*15.0.12.1* FREEI-1349 Add indication tones for Indonesia 
