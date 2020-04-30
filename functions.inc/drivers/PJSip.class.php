@@ -475,7 +475,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'forbidden_retry_interval' => (empty($trunk['forbidden_retry_interval']))? "0" : $trunk['forbidden_retry_interval'],
 					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
-					'line' => 'yes',
+					'line' => ($trunk['pjsip_line'] == 'true') ? 'yes' : 'no',
 					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
@@ -578,9 +578,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
-				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
+				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
-
+			
 			$ver_list = array("13.24.0", "16.1.0"); // include all versions to test.
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
