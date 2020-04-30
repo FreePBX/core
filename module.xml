@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12</version>
+	<version>15.0.12.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.1* FREEI-1349 Add indication tones for Indonesia 
 		*15.0.12* FREEPBX-21450: Fix broken Outbound Routes after update 
 		*15.0.11* FREEI-1498 disable trunk option was broken in advanced Recovery module 
 		*15.0.10*   FREEPBX-21437: optimized outbound route notification email script usage. 
