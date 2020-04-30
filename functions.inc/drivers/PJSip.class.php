@@ -1103,6 +1103,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['direct_media'])) {
 			$endpoint[] = "direct_media=".$config['direct_media'];
 		}
+
+		if (!empty($config['vmexten'])) {
+			$endpoint[] = "voicemail_extension=".$config['vmexten'];
+		}
+
 		//http://issues.freepbx.org/browse/FREEPBX-12151
 		if(isset($config['mailbox'])) {
 			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
