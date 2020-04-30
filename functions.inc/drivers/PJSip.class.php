@@ -197,6 +197,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"webrtc" => array(
 				"value" => "no",
 				"flag" => $flag++
+			),
+			"defaultuser" => array(
+					"value" => "",
+					"flag" => $flag++
 			)
 		);
 		return array(
