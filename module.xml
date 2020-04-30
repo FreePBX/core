@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.65</version>
+	<version>14.0.28.66</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.66* FREEI-1349 Add indication tones for Indonesia
 		*14.0.28.65* FREEPBX-21450: Fix broken Outbound Routes after update, for fpbx14 
 		*14.0.28.64* FREEPBX-21437: optimized outbound route notification email script usage 
 		*14.0.28.63* bump 
