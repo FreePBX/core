@@ -90,6 +90,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"send_connected_line" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"user_eq_phone" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 			"namedcallgroup" => array(
 				"value" => $this->freepbx->Config->get('DEVICE_CALLGROUP'),
 				"flag" => $flag++
@@ -197,6 +205,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"max_video_streams" => array(
 				"value" => "1",
 				"flag" => $flag++
+			),
+			"webrtc" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
+			"defaultuser" => array(
+					"value" => "",
+					"flag" => $flag++
 			)
 		);
 		return array(
@@ -257,13 +273,18 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$tt = _("With this option enabled, Asterisk will attempt to negotiate the use of bundle. If negotiated this will result in multiple RTP streams being carried over the same underlying transport. Note that enabling bundle will also enable the rtcp_mux option");
 			$tmparr['bundle'] = array('prompttext' => _('Enable RTP bundling'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 			unset($select);
-		}
 
-		if (version_compare($this->version, '15.0', 'ge')) {
 			$tt = _("Maximum number of allowed audio streams for the endpoint");
 			$tmparr['max_audio_streams'] = array('prompttext' => _('Max audio streams'), 'value' => '1', 'tt' => $tt, 'level' => 1);
+
 			$tt = _("Maximum number of allowed video streams for the endpoint");
 			$tmparr['max_video_streams'] = array('prompttext' => _('Max video streams'), 'value' => '1', 'tt' => $tt, 'level' => 1);
+
+			$select[] = array('value' => 'no', 'text' => _('No'));
+			$select[] = array('value' => 'yes', 'text' => _('Yes'));
+			$tt = _("Defaults and enables some options that are relevant to WebRTC");
+			$tmparr['bundle'] = array('prompttext' => _('Enable WebRTC defaults'), 'value' => 'no', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			unset($select);
 		}
 
 		$select[] = array('value' => 'no', 'text' => _('None'));
@@ -387,10 +408,23 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
 
-		$conf['pjsip.conf']['global'] = array(
+   		$ver_list = array("13.24.0", "16.1.0", "17.0.0"); 
+        if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
+  			$use_callerid_contact = \FreePBX::create()->Sipsettings->getConfig('pjsip_use_callerid_contact');
+			$use_callerid_contact = (empty($use_callerid_contact))? "no": $use_callerid_contact;
+        	$conf['pjsip.conf']['global'] = array(
+              'type=global',
+              'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")",
+              'use_callerid_contact='.$use_callerid_contact,
+          	);
+        }
+        else{
+        	$conf['pjsip.conf']['global'] = array(
 			'type=global',
-			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")"
-		);
+			'user_agent='.$this->freepbx->Config->get('SIPUSERAGENT') . '-' . getversion() . "(" . $this->version . ")",
+			);
+        }
+
 		$debug = $this->freepbx->Sipsettings->getConfig('pjsip_debug');
 		if($debug) {
 			$conf['pjsip.conf']['global']['debug'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
@@ -445,7 +479,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'forbidden_retry_interval' => (empty($trunk['forbidden_retry_interval']))? "0" : $trunk['forbidden_retry_interval'],
 					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
-					'line' => 'yes',
+					'line' => ($trunk['pjsip_line'] == 'true') ? 'yes' : 'no',
 					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
@@ -548,9 +582,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
-				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes',
+				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
-
+			
 			$ver_list = array("13.24.0", "16.1.0"); // include all versions to test.
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
@@ -582,6 +616,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 			if(!empty($trunk['from_user'])) {
 				$conf['pjsip.endpoint.conf'][$tn]['from_user'] = $trunk['from_user'];
+			}
+			if(!empty($trunk['contact_user'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['contact_user'] = $trunk['contact_user'];
+			}
+
+			if(!empty($trunk['user_eq_phone'])) {
+				$conf['pjsip.endpoint.conf'][$tn]['user_eq_phone'] = $trunk['user_eq_phone'];
 			}
 
 			if(!empty($trunk['dtmfmode'])) {
@@ -631,6 +672,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 						$conf['pjsip.endpoint.conf'][$tn]['send_pai'] = "yes";
 					}
 				}
+
+				if(!empty($trunk['trust_id_outbound']) && $trunk['trust_id_outbound'] === "yes"){
+					$conf['pjsip.endpoint.conf'][$tn]['trust_id_outbound'] = "yes";
+				}
+
 				if(!empty($trunk['identify_by']) && $trunk['identify_by'] != "default"){
 					$conf['pjsip.endpoint.conf'][$tn]['identify_by'] = $trunk['identify_by'];
 				}
@@ -1087,6 +1133,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['direct_media'])) {
 			$endpoint[] = "direct_media=".$config['direct_media'];
 		}
+
+		if (!empty($config['vmexten'])) {
+			$endpoint[] = "voicemail_extension=".$config['vmexten'];
+		}
+
 		//http://issues.freepbx.org/browse/FREEPBX-12151
 		if(isset($config['mailbox'])) {
 			$mwisub = !empty($config['mwi_subscription']) ? $config['mwi_subscription'] : (version_compare($this->version,'13.9.1','ge') ? "auto" : "unsolicited");
@@ -1144,6 +1195,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if (!empty($config['max_video_streams'])) {
 				$endpoint[] = "max_video_streams=".$config['max_video_streams'];
 			}
+			if (!empty($config['webrtc'])) {
+				$endpoint[] = "webrtc=".$config['webrtc'];
+			}
 		}
 
 		if (!empty($config['bundle']) && version_compare($this->version,'15.0','ge')) {
@@ -1160,6 +1214,23 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['trustrpid'])) {
 			$endpoint[] = "trust_id_inbound=".$config['trustrpid'];
+		}
+
+		// Any Asterisk version
+		if (!empty($config['user_eq_phone'])) {
+			$endpoint[] = "user_eq_phone=".$config['user_eq_phone']; // any Asterisk version
+		}
+		else{
+			$endpoint[] = "user_eq_phone=no";
+		}
+		
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0");
+		if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
+			if (!empty($config['send_connected_line'])) {
+				$endpoint[] = "send_connected_line=".$config['send_connected_line'];
+			}else{
+				$endpoint[] = "send_connected_line=yes";
+			}
 		}
 
 		if (!empty($config['match'])) {
@@ -1544,6 +1615,22 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$alldevices = $this->db->query("SELECT * FROM devices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
 		$devlist = array();
 		foreach($alldevices as $device) {
+			$id = $device['id'];
+			// Have we already prepared our query?
+			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");
+
+			$q->execute(array(":id" => $id));
+			$data = $q->fetchAll(\PDO::FETCH_ASSOC);
+
+			$devlist[$id] = $device;
+
+			foreach($data as $setting) {
+				$devlist[$id][$setting['keyword']] = $setting['data'];
+			}
+		}
+		// need to get from emergencydevices
+		$allemergencydevices = $this->db->query("SELECT * FROM emergencydevices WHERE tech = 'pjsip'",\PDO::FETCH_ASSOC);
+		foreach($allemergencydevices as $device) {
 			$id = $device['id'];
 			// Have we already prepared our query?
 			$q = $this->db->prepare("SELECT * FROM `sip` WHERE `id` = :id");

@@ -10,6 +10,11 @@ if(!empty($mode)) {
 	$display_mode = $mode;
 }
 
+$remaining = 1;
+if(function_exists('sysadmin_extensions_limit')) {
+	$remaining = sysadmin_extensions_limit('remaining');
+}
+
 $quickCreateDisplay = \FreePBX::Core()->getQuickCreateDisplay();
 
 if($display_mode == "basic") { ?>
@@ -20,8 +25,8 @@ if($display_mode == "basic") { ?>
 					<div class="display no-border">
 						<h1><?php echo _("Extensions")?></h1>
 						<div id="toolbar-sip">
-						<?php  if(empty($sections) || in_array("999",$sections) || in_array("*",$sections)){ ?>
-							<a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=sip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a>
+						<?php if(empty($sections) || in_array("999",$sections) || in_array("*",$sections) && $remaining >= 1){ ?>
+							<span id="bt-add-ex"><a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=sip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a></span>
 						<?php } ?>
 							<button id="remove-sip" class="btn btn-danger btn-remove" data-type="extensions" data-section="sip" disabled>
 								<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
@@ -103,8 +108,8 @@ if($display_mode == "basic") { ?>
 						<div class="tab-content display">
 							<div role="tabpanel" id="alldids" class="tab-pane active">
 								<div id="toolbar-all">
-									<?php  if(empty($sections) || in_array("999",$sections) || in_array("*",$sections)){ ?>
-									<div class="dropdown" style="display:inline-block;">
+								<?php  if(empty($sections) || in_array("999",$sections) || in_array("*",$sections) && $remaining >= 1){ ?>
+									<div id="bt-add-ex" class="dropdown" style="display:inline-block;">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 											<i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?> <span class="caret"></span>
 										</button>
@@ -141,8 +146,8 @@ if($display_mode == "basic") { ?>
 							<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 								<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
 									<div id="toolbar-<?php echo $driver['rawName']?>">
-										 <?php if(in_array("999",$sections) || in_array("*",$sections)){ ?>
-										<a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></a>
+										<?php if(in_array("999",$sections) || in_array("*",$sections) && ($remaining >= 1 || $driver['shortName'] == "Virtual")){ ?>
+											<span id="bt-add-dev"><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></a></span>
 										<?php } ?>
 										<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
 											<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
@@ -217,8 +222,24 @@ if($display_mode == "basic") { ?>
 </div>
 
 <script>
+	(function ($) {
+	  $.each(['show', 'hide'], function (i, ev) {
+	    var el = $.fn[ev];
+	    $.fn[ev] = function () {
+	      this.trigger(ev);
+	      return el.apply(this, arguments);
+	    };
+	  });
+	})(jQuery);	
+
 	$(document).ready(function() {
-		$("#channel-container").addClass("hidden");
+		$("#channel-container").addClass("hidden")
+
+		$("#button_reload").on("hide", function() {
+			/* Need reload page after apply */
+			window.location = window.location.href;
+		});
+
 		$('#wizard').smartWizard({
 			keyNavigation: false,
 			onLeaveStep: function(obj, context) {
@@ -243,11 +264,11 @@ if($display_mode == "basic") { ?>
 				});
 				$('#quickCreate .buttonFinish').addClass("buttonDisabled");
 				$.post("ajax.php?module=core&command=quickcreate", data, function(d,status){
-					console.log(d);
 					if(d.status) {
 						extmap[d.ext] = d.name;
 						$('#quickCreate').modal('hide');
-						toggle_reload_button("show");
+						toggle_reload_button("show");						
+						$("#button_reload").trigger('click');
 						$('#wizard').smartWizard('goToStep',1);
 						$("#quickCreate form")[0].reset();
 						$('#table-all').bootstrapTable('refresh');

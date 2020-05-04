@@ -260,6 +260,33 @@
 		<?php 
 		$ver_list = array("13.24.0", "16.1.0");
 		if(version_min(\FreePBX::Config()->get('ASTVERSION'),$ver_list) == true) { ?>
+		<!--PJSIP TRUNK LINE ENABLE / DISABLE-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="pjsip line"><?php echo _("Send Line in Registration") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php echo ($pjsip_line == "true" || empty($pjsip_line)?"CHECKED":"") ?>>
+								<label for="pjsip_lineyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="pjsip_line" id="pjsip_lineno" value="false" <?php echo ($pjsip_line == "false" ?"CHECKED":"") ?>>
+								<label for="pjsip_lineno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="pjsip_linew-help" class="help-block fpbx-help-block"><?php echo _("If this option is enabled, a “line” parameter is added to the outgoing “Contact” header during registration.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--PJSIP TRUNK LINE ENABLE / DISABLE-->
 		<!--SEND CONNECTED LINE-->
 		<div class="element-container">
 			<div class="row">
@@ -498,6 +525,33 @@
 			</div>
 		</div>
 		<!--END OUTBOUND PROXY-->
+		<!--USER EQ PHONE-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="user_eq_phone"><?php echo _("User = Phone") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="user_eq_phone"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php echo ($user_eq_phone == "yes") ? "CHECKED" : "" ?>>
+								<label for="user_eq_phoneyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneno" value="no" <?php echo ($user_eq_phone == "no" || empty($user_eq_phone)) ? "CHECKED" : "" ?>>
+								<label for="user_eq_phoneno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="user_eq_phone-help" class="help-block fpbx-help-block"><?php echo _("Determines whether a user=phone parameter is placed into the request URI if the user is determined to be a phone number.")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END USER EQ PHONE-->
 		<!--CONTACT USER-->
 		<div class="element-container">
 			<div class="row">
@@ -938,6 +992,33 @@
 			</div>
 		</div>
 		<!--END Send RPID/PAI-->
+		<!--Trust outbound CID-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="trust_id_outbound"><?php echo _("Send Private CallerID Information") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_id_outbound"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundyes" value="yes" <?php echo ($trust_id_outbound == "yes"?"CHECKED":"") ?>>
+								<label for="trust_id_outboundyes"><?php echo _("Yes");?></label>
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundno" value = "no" <?php echo ($trust_id_outbound == "yes"?"":"CHECKED") ?>>
+								<label for="trust_id_outboundno"><?php echo _("No");?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="trust_id_outbound-help" class="help-block fpbx-help-block"><?php echo _("Send private CallerID to outbound trust even when using hidden CallerID.  PJSIP trust_id_outbound")?></span>
+				</div>
+			</div>
+		</div>
+		<!--END Trust outbound CID-->
 		<!--Match Inbound Authentication-->
 		<div class="element-container">
 			<div class="row">

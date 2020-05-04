@@ -1660,6 +1660,7 @@ function core_do_get_config($engine) {
 
 				$ext->add('ext-local', $exten['extension'], '', new ext_set('__RINGTIMER', '${IF($["${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}" > "0"]?${DB(AMPUSER/'.$exten['extension'].'/ringtimer)}:${RINGTIMER_DEFAULT})}'));
 
+				$ext->add('ext-local', $exten['extension'], '', new ext_execif('$["${REGEX("from-queue" ${CHANNEL})}"="1" && "${CONTEXT}"="from-internal-xfer"]', 'Set', '__CWIGNORE='));
 				$dest_args = ','.($exten['noanswer_dest']==''?'0':'1').','.($exten['busy_dest']==''?'0':'1').','.($exten['chanunavail_dest']==''?'0':'1');
 				$ext->add('ext-local', $exten['extension'], '', new ext_macro('exten-vm',$vm.",".$exten['extension'].$dest_args));
 				$ext->add('ext-local', $exten['extension'], 'dest', new ext_set('__PICKUPMARK',''));
@@ -1787,6 +1788,17 @@ function core_do_get_config($engine) {
 					$trunkprops['tech'] = 'iax2';
 					// fall-through
 					case 'pjsip':
+						$pjsip 		= \FreePBX::Core()->getDriver('pjsip');
+						$_trunks 	= $pjsip->getAllTrunks();
+						$tio_hide 	= "no";
+						if(!empty($trunkprops["trunkid"]) && !empty($_trunks[$trunkprops["trunkid"]])){
+							$tio 	= $_trunks[$trunkprops["trunkid"]]["trust_id_outbound"];
+							$cu 	= $_trunks[$trunkprops["trunkid"]]["contact_user"];
+							if($cu == "Anonymous" && $tio == "yes"){
+								$tio_hide = "yes";
+							}							
+						}
+						
 					case 'iax2':
 					case 'sip':
 					$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
@@ -2128,6 +2140,7 @@ function core_do_get_config($engine) {
 
 		$patterns = core_routing_getroutepatternsbyid($route['route_id']);
 		$trunks = core_routing_getroutetrunksbyid($route['route_id']);
+		$emailInfo = \FreePBX::Core()->getRouteEmailByID($route['route_id']);
 		foreach ($patterns as $pattern) {
 			// returns:
 			// array('prepend_digits' => $pattern['prepend_digits'], 'dial_pattern' => $exten, 'offset' => $pos);
@@ -2161,6 +2174,14 @@ function core_do_get_config($engine) {
 				$ext->add($context, $exten, '', new ext_vqa($amp_conf['DITECH_VQA_OUTBOUND']));
 			}
 
+            if ($route['route_id'] != '') {
+                $ext->add($context, $exten, '', new ext_set("_ROUTEID",$route['route_id']));
+            }
+
+            if ($route['name'] != '') {
+                $ext->add($context, $exten, '', new ext_set("_ROUTENAME",$route['name']));
+            }
+
 			if ($route['emergency_route'] != '') {
 				$ext->add($context, $exten, '', new ext_set("EMERGENCYROUTE",$route['emergency_route']));
 			}
@@ -2177,6 +2198,9 @@ function core_do_get_config($engine) {
 					$ext->add($context, $exten, '', new ext_execif('$["${KEEPCID}"!="TRUE" & ${LEN(${DB(AMPUSER/${AMPUSER}/outboundcid)})}=0 & ${LEN(${TRUNKCIDOVERRIDE})}=0]','Set','TRUNKCIDOVERRIDE='.$route['outcid']));
 				}
 			}
+	        $ext->add($context, $exten, '', new ext_set("_CALLERIDNAMEINTERNAL",'${CALLERID(name)}'));
+            $ext->add($context, $exten, '', new ext_set("_CALLERIDNUMINTERNAL",'${CALLERID(num)}'));
+			$ext->add($context, $exten, '', new ext_set("_EMAILNOTIFICATION", (empty($emailInfo['emailto']) ? 'FALSE' : 'TRUE')));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			$password = $route['password'];
@@ -2328,6 +2352,40 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
 
+	/*
+	;------------------------------------------------------------------------
+	; [macro-send-obroute-email]
+	;------------------------------------------------------------------------
+	; Send the info to a script that sends an email with the 
+	; call info, if the route has this feature enabled
+	;
+	; ${ARG1} - the number sent to the trunk, after prepend/stripping
+	; ${ARG2} - the raw number dialed, before any prepend/stripping
+	; ${ARG3} - the trunk id number
+	; ${ARG4} - the epoch time of the call
+	; ${ARG5} - the outgoing callerId name
+	; ${ARG6} - the outgoing callerId number
+	;------------------------------------------------------------------------
+	*/
+    $context = 'macro-send-obroute-email';
+    $exten = 's';
+    $ext->add($context, $exten, '', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
+    $ext->add($context, $exten, '', new ext_noop('email notifications disabled..exiting.'));
+    $ext->add($context, $exten, '', new ext_macroexit());
+    $ext->add($context, $exten, 'sendEmail', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ROUTEID},${ROUTENAME},${CALLERIDNAMEINTERNAL},${CALLERIDNUMINTERNAL},${CHANNEL(LINKEDID)}'));
+
+	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
+	// the reason for the diversion (e.g. CFB could set it to busy)
+	//
+	if ($amp_conf['DIVERSIONHEADER']) {
+		$context = 'sub-diversion-header';
+		$exten = 's';
+		$ext->add($context, $exten, '', new ext_set('DIVERSION_REASON', '${IF($[${LEN(${DIVERSION_REASON})}=0]?no-answer:${DIVERSION_REASON})}'));
+		$ext->add($context, $exten, '', new ext_gosub('1','s','func-set-sipheader','Diversion,<tel:${FROM_DID}>\;reason=${DIVERSION_REASON}\;screen=no\;privacy=off'));
+		$ext->add($context, $exten, '', new ext_return(''));
+	}
+
+
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
 	//
@@ -2408,7 +2466,7 @@ function core_do_get_config($engine) {
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))M(send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
@@ -2844,6 +2902,17 @@ function core_do_get_config($engine) {
 	//
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
 	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	//lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
+	$ext->add($context, $exten, '', new ext_set('HOTDESCKCHAN','${CUT(CHANNEL,/,2)}'));
+	$ext->add($context, $exten, '', new ext_set('HOTDESKEXTEN','${CUT(HOTDESCKCHAN,-,1)}'));
+	$ext->add($context, $exten, '', new ext_set('HOTDESKCALL',0));
+	$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${HOTDESKEXTEN}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${HOTDESKEXTEN}/location)}'));
+
+	// We dont want to allow HOTDESK Emergency extension to dial Normal calls. Only emergency calls allowed
+	$ext->add($context, $exten, '', new ext_set('ALLOWTHISROUTE', 'NO'));
+	$ext->add($context,$exten,'',new ext_execif('$["${EMERGENCYROUTE}" = "YES"]', 'Set', 'ALLOWTHISROUTE=YES'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1 & ${ALLOWTHISROUTE} = NO ]', 'Hangup'));
 
 	// Keep the original CallerID number, for failover to the next trunk.
 
@@ -2853,7 +2922,7 @@ function core_do_get_config($engine) {
 	// OUTKEEPCID_${trunknum} is set.
 	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
 
-	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $["${REALCALLERIDNUM}" = ""] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
+	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $[${LEN(${REALCALLERIDNUM})} = 0] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
 	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${CALLERID(name)} <${REALCALLERIDNUM}>'));
 	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
 
@@ -2870,6 +2939,8 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(DEVICE/${REALCALLERIDNUM}/user)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
+
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
 	$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
@@ -2888,10 +2959,20 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 	//check queue callback callerid ,if  No force trunkcid is set the send queue callback cid
 	$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1" & ${LEN(${FORCEDOUTCID_${ARG1}})} = 0]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
+	if(!empty($tio_hide) && $tio_hide == "yes"){
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'yes'));
+	}
+	else{
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'no'));
+	}
+	
 	$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
 	//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
 	$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
 	// $has_keepcid_cnum is checked and set when the globals are being generated above
+	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	
 	//
 	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
 		if ($amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
@@ -4181,7 +4262,7 @@ function core_trunks_disable($trunk, $switch) {
 		case 'reg':
 		case 'registered':
 			foreach (core_trunks_getDetails() as $t) {
-				if($reg = core_trunks_getTrunkRegister($t['trunkid'])) {
+				if($reg = FreePBX::Core()->getTrunkRegisterStringByID($t['trunkid'])) {
 					$trunks[] = $t;
 				}
 			}
@@ -4367,14 +4448,6 @@ function core_trunks_list_dialrules() {
 		$rule_hash[$pattern['trunkid']][] = $pattern;
 	}
 	return $rule_hash;
-}
-
-// function core_routing_rename($oldname, $newname)
-function core_routing_renamebyid($route_id, $new_name) {
-	global $db;
-	$route_id = q($db->escapeSimple($route_id));
-	$new_name = $db->escapeSimple($new_name);
-	sql("UPDATE `outbound_routes` SET `name = '$new_name'  WHERE `route_id` = $route_id");
 }
 
 /* Utility function to determine required dialpattern and offsets for a specific dialpattern record.
@@ -5010,8 +5083,8 @@ function core_devices_configpageload() {
 			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
 			$currentcomponent->addguielem($section, new gui_textbox('hint_override', $devinfo_hint_override, _("Hint Override"), _("Only set this if you wish to override the hint referenced in ext-local. This is useful in situations where the hint doesnt match the dial string. This should not be changed unless you know what you are doing.")),"advanced");
 		} else {
-			$section = _("Extension Options");
-			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID),"advanced");
+			$section = ($extdisplay ? _("Edit Extension") : _("Add Extension"));
+			$currentcomponent->addguielem($section, new gui_textbox('emergency_cid', $devinfo_emergency_cid, _("Emergency CID"), _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency.  The Emergency CID overrides all other CallerID settings."), '!isCallerID()', $msgInvalidEmergCID, true),4, null, "general");
 		}
 		$currentcomponent->addguielem('_top', new gui_hidden('tech', $devinfo_tech));
 		$currentcomponent->addguielem('_top', new gui_hidden('hardware', $devinfo_hardware));
@@ -5140,25 +5213,13 @@ function core_devices_configprocess() {
 		case "edit":  //just delete and re-add
 		// really bad hack - but if core_users_edit fails, want to stop core_devices_edit
 		if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
-			//delete then re add, insanity.
-			core_devices_del($extdisplay,true);
 			//PJSIP <--> CHAN_SIP Switcher, not the best but better than it was before and lets us continue forward into PHP 5.5
 			if(isset($_REQUEST['changesipdriver']) && !empty($_REQUEST['devinfo_sipdriver']) && ($tech == 'pjsip' || $tech == 'sip')) {
-				$tech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'sip' : 'pjsip';
-				$rtech = ($_REQUEST['devinfo_sipdriver'] == 'chan_sip') ? 'pjsip' : 'sip';
-				$devinfo_dial = preg_replace('/^'.$rtech.'\/'.$deviceid.'$/i',strtoupper($tech).'/'.$deviceid,$devinfo_dial);
-				$flag = 2;
-				$fields = FreePBX::Core()->convertRequest2Array($deviceid,$tech,$flag);
-				$settings = array(
-					"dial" => array("value" => $devinfo_dial, "flag" => isset($fields['dial']['flag']) ? $fields['dial']['flag'] : $flag++),
-					"devicetype" => array("value" => $devicetype, "flag" => isset($fields['devicetype']['flag']) ? $fields['devicetype']['flag'] : $flag++),
-					"user" => array("value" => $deviceuser, "flag" => isset($fields['deviceuser']['flag']) ? $fields['deviceuser']['flag'] : $flag++),
-					"description" => array("value" => $description, "flag" => isset($fields['description']['flag']) ? $fields['description']['flag'] : $flag++),
-					"emergency_cid" => array("value" => $emergency_cid, "flag" => isset($fields['emergency_cid']['flag']) ? $fields['emergency_cid']['flag'] : $flag++)
-				);
-				$settings = array_merge($fields,$settings);
-				return FreePBX::Core()->addDevice($deviceid,$tech,$settings,true);
+				$tech = ($_REQUEST['devinfo_sipdriver'] === 'chan_pjsip') ? 'pjsip' : 'sip';
+				return FreePBX::Core()->changeDeviceTech($deviceid, $tech);
 			} else {
+				//delete then re add, insanity.
+				core_devices_del($extdisplay,true);
 				core_devices_add($deviceid,$tech,$devinfo_dial,$devicetype,$deviceuser,$description,$emergency_cid,$hint_override,true);
 			}
 

@@ -178,6 +178,23 @@ $set['name'] = 'Display Dialed Number on Calling Phone';
 $set['description'] = "When set to true and when CONNECTEDLINE() capabilities are configured and supported by your handset, the number actually dialled will be updated on your handset in the CNUM field. This allows you to see the final manipulation of your number after outbound route and trunk dial manipulation rules have been applied. For example, if you have configured 7 digit dialing on a North America dialplan, the ultimate 10 or 11 digit transmission will be displayed back. Any 'Outbound Dial Prefixes' configured at the trunk level will NOT be shown as these are foten analog line pauses (w) or other characters that distort the CNUM field on updates.";
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('OUTBOUND_DIAL_UPDATE',$set);
+//Added emergencydevices table
+outn(_("Adding emergencydevices table.."));
+$sql = "CREATE TABLE IF NOT EXISTS `emergencydevices` (
+  `id` VARCHAR(20)  NOT NULL,
+  `tech` VARCHAR(10) NOT NULL ,
+  `dial` VARCHAR(255) NOT NULL ,
+  `devicetype` VARCHAR(10),
+  `user` VARCHAR(50) ,
+  `description` VARCHAR(100),
+  `emergency_cid` VARCHAR(100) ,
+  `hint_override` VARCHAR(100)
+)";
+$check = $db->query($sql);
+if(DB::IsError($check)) {
+	out(_("Failed to create emergencydevices table"));
+}
+out(_("Done"));
 
 // VMX_CONTEXT
 //
@@ -564,6 +581,7 @@ function _initialize_zonelist() {
  array ( "name" => "Hong Kong", "iso" => "hk", "conf" => "ringcadence = 400,200,400,3000\ndial = 350+440\nbusy = 480+620/500,0/500\nring = 440+480/400,0/200,440+480/400,0/3000\ncongestion = 480+620/250,0/250\ncallwaiting = 440/300,0/10000\ndialrecall = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\nrecord = 1400/500,0/15000\ninfo = !950/330,!1400/330,!1800/330,0\nstutter = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\n"),
  array ( "name" => "Hungary",  "iso" => "hu", "conf" => "ringcadence = 1250,3750\ndial = 425\nbusy = 425/300,0/300\nring = 425/1250,0/3750\ncongestion = 425/300,0/300\ncallwaiting = 425/40,0/1960\ndialrecall = 425+450\nrecord = 1400/400,0/15000\ninfo = !950/330,!1400/330,!1800/330,!0/1000,!950/330,!1400/330,!1800/330,!0/1000,!950/330,!1400/330,!1800/330,!0/1000,0\nstutter = 350+375+400\n"),
  array ( "name" => "India",  "iso" => "in", "conf" => "ringcadence = 400,200,400,2000\ndial = 400*25\nbusy = 400/750,0/750\nring = 400*25/400,0/200,400*25/400,0/2000\ncongestion = 400/250,0/250\ncallwaiting = 400/200,0/100,400/200,0/7500\ndialrecall = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\nrecord = 1400/500,0/15000\ninfo = !950/330,!1400/330,!1800/330,0/1000\nstutter = !350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440\n"),
+ array ( "name" => "Indonesia",  "iso" => "id", "conf" => "ringcadence = 1000,4000\ndial = 425\nbusy = 425/500,0/500\nring = 425/1000,0/4000\ncongestion = 425/250,0/250\ncallwaiting = 425/150,0/150,425/150,0/10000\ninfo = !950/330,!1400/330,!1800/330,!0/1000\n"),
  array ( "name" => "Iran",  "iso" => "ir", "conf" => "ringcadence = 1000,4000\ndial = 425\nbusy = 425/500,0/500\nring = 425/1000,0/4000\ncongestion = 425/240,0/240\ncallwaiting = 425/200,0/200,425/200,0/10000\ndialrecall = 425 record = 1400/80,0/15000\ninfo = 950/330,1400/330,1800/330,0/1000\nstutter = 400+425\n"),
  array ( "name" => "Ireland", "iso" => "ie", "conf" => "ringcadance = 400,200,400,2000\ndial = 425\nbusy = 425/450,0/450\nring = 400+450/400,0/200,400+450/400,0/2000\ncongestion = 425/375,0/375\ncallwaiting = 425/200,0/200,425/200,0/4000\ndialrecall = 440\nrecord = 1400/500,0/10000\ninfo = 950/330,1400/330,1800/330\n"),
  array ( "name" => "Israel",  "iso" => "il", "conf" => "ringcadence = 1000,3000\ndial = 414\nbusy = 414/500,0/500\nring = 414/1000,0/3000\ncongestion = 414/250,0/250\ncallwaiting = 414/100,0/100,414/100,0/100,414/600,0/3000 \ndialrecall = !414/100,!0/100,!414/100,!0/100,!414/100,!0/100,414\nrecord = 1400/500,0/15000\ninfo = 1000/330,1400/330,1800/330,0/1000\nstutter = !414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,!414/160,!0/160,414 \n"),
