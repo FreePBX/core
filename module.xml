@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.68</version>
+	<version>14.0.28.69</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.69* FREEPBX-21382 Alert-Info header unconfigurably passed through to trunk when forwarding 
 		*14.0.28.68* FREEI-1468: to update default_user value from extension advance setting form 
 		*14.0.28.67* To add voicemail_extension value in pjsip.endpoint.conf 
 		*14.0.28.66* FREEI-1349 Add indication tones for Indonesia
