@@ -476,9 +476,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
 					'line' => ($trunk['pjsip_line'] == 'true') ? 'yes' : 'no',
-					'endpoint' => str_replace(' ', '', $tn),
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
+				if($trunk['pjsip_line'] == 'true') {
+					$conf['pjsip.registration.conf'][$tn]['endpoint'] = str_replace(' ', '', $tn);
+				}
 				if(!empty($trunk['contact_user'])) {
 					$conf['pjsip.registration.conf'][$tn]['contact_user'] = $trunk['contact_user'];
 				}
