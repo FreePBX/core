@@ -2466,6 +2466,7 @@ function core_do_get_config($engine) {
 
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
+		$ext->add($context, $exten, '', new ext_set("HASH(__SIPHEADERS,Alert-Info)", "unset"));
 		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))M(send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
