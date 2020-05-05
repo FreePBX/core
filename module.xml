@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.6</version>
+	<version>15.0.12.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.7* Fixe back slash 
 		*15.0.12.6* FREEI-21449 : taking line parameter with endpoint field. 
 		*15.0.12.5* FREEPBX-21382 Alert-Info header unconfigurably passed through to trunk when forwarding 
 		*15.0.12.4* FREEI-1468: to update default_user value from extension advance setting form 
