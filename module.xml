@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.4</version>
+	<version>16.0.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.5* FREEI-1468 if default_user is coming blank, it should be equal to user 
 		*16.0.4* Fixe back slash 
 		*16.0.3* FREEI-21449 : taking line parameter with endpoint field. 
 		*16.0.2* FREEI-1180 Fixes issue with contact_user not being added to PJSIP trunk endpoints. 
