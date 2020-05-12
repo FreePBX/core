@@ -36,10 +36,10 @@ if(\FreePBX::Config()->get('RFC7462')) {
 }
 
 if(in_array($driver,array("both","chan_sip"))) {
-	$ext->add($c,$e,'', new ext_execif('$["${TECH}" = "SIP"]','SIPAddHeader','${sipkey}:${sipheader}'));
+	$ext->add($c,$e,'', new ext_execif('$["${TECH}" = "SIP" & "${sipheader}" != "unset"]','SIPAddHeader','${sipkey}:${sipheader}'));
 }
 if(in_array($driver,array("both","chan_pjsip"))) {
-	$ext->add($c,$e,'', new ext_execif('$["${TECH}" = "PJSIP"]','Set','PJSIP_HEADER(add,${sipkey})=${sipheader}'));
+	$ext->add($c,$e,'', new ext_execif('$["${TECH}" = "PJSIP" & "${sipheader}" != "unset"]','Set','PJSIP_HEADER(add,${sipkey})=${sipheader}'));
 }
 $ext->add($c,$e,'', new ext_endwhile(''));
 $ext->add($c,$e,'', new ext_return());
