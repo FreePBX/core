@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.25</version>
+	<version>13.0.131.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.131.26* FREEPBX-21382 Alert-Info header unconfigurably passed through to trunk when forwarding 
 		*13.0.131.25* FREEPBX-21382 Alert-Info header unconfigurably passed through to trunk when forwarding 
 		*13.0.131.24* FREEI-1349 Add indication tones for Indonesia 
 		*13.0.131.23* FREEPBX-21437: optimized outbound route notification email script usage, FPBX13 changes 
