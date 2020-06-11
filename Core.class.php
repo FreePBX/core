@@ -239,7 +239,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 			throw $e;
 		}
 		needreload();
-		return array("status" => true, "ext" => $extension, "name" => $data['name']);
+		if ($this->freepbx->Modules->checkStatus("sysadmin") && (!\FreePBX::Modules()->moduleHasMethod('sysadmin', 'isCommercialDeployment'))) { 
+			$isCommercialDep = \FreePBX::Sysadmin()->isCommercialDeployment();
+		} else {
+			$isCommercialDep = false;
+		}
+		return array("status" => true, "ext" => $extension, "name" => $data['name'], "isCommercialDep" => $isCommercialDep);
 	}
 
 	/* this is useful only for emergencydevice creation*/
@@ -654,11 +659,17 @@ class Core extends FreePBX_Helpers implements BMO  {
 				if(!empty($_POST['extensions'])) {
 					switch($_POST['type']) {
 						case "extensions":
+							if ($this->freepbx->Modules->checkStatus("sysadmin") && (!\FreePBX::Modules()->moduleHasMethod('sysadmin', 'isCommercialDeployment'))) { 
+								$isCommercialDep = \FreePBX::Sysadmin()->isCommercialDeployment();
+							} else {
+								$isCommercialDep = false;
+							}
+
 							foreach($_POST['extensions'] as $ext) {
 								$this->delUser($ext);
 								$this->delDevice($ext);
 							}
-							return array("status" => true);
+							return array("status" => true, "isCommercialDep" => $isCommercialDep);
 						break;
 						case "users":
 							foreach($_POST['extensions'] as $ext) {
@@ -676,6 +687,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 			break;
 			case "quickcreate":
+
 				$status = $this->processQuickCreate($_POST['tech'], $_POST['extension'], $_POST);
 				return $status;
 			break;

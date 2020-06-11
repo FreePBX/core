@@ -268,7 +268,9 @@ if($display_mode == "basic") { ?>
 						extmap[d.ext] = d.name;
 						$('#quickCreate').modal('hide');
 						toggle_reload_button("show");						
-						$("#button_reload").trigger('click');
+						if (d.isCommercialDep) {
+							$("#button_reload").trigger('click');
+						}
 						$('#wizard').smartWizard('goToStep',1);
 						$("#quickCreate form")[0].reset();
 						$('#table-all').bootstrapTable('refresh');
