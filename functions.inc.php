@@ -2481,7 +2481,7 @@ function core_do_get_config($engine) {
 
 	/*
 	;------------------------------------------------------------------------
-	; [macro-send-obroute-email]
+	; [sub-send-obroute-email]
 	;------------------------------------------------------------------------
 	; Send the info to a script that sends an email with the 
 	; call info, if the route has this feature enabled
@@ -2494,12 +2494,13 @@ function core_do_get_config($engine) {
 	; ${ARG6} - the outgoing callerId number 
 	;------------------------------------------------------------------------
 	*/
-	$context = 'macro-send-obroute-email';
+	$context = 'sub-send-obroute-email';
 	$exten = 's';
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
 	$ext->add($context, $exten, '', new ext_noop('email notifications disabled..exiting.'));
-	$ext->add($context, $exten, '', new ext_macroexit());
+	$ext->add($context, $exten, '', new ext_return(''));
 	$ext->add($context, $exten, 'sendEmail', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ROUTEID},${ROUTENAME},${CALLERIDNAMEINTERNAL},${CALLERIDNUMINTERNAL},${CHANNEL(LINKEDID)}'));
+	$ext->add($context, $exten, '', new ext_return(''));
 
 	// Subroutine to add diversion header with reason code "no-answer" unless provided differently elsewhere in the dialplan to indicate
 	// the reason for the diversion (e.g. CFB could set it to busy)
@@ -2582,7 +2583,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_set("HASH(__SIPHEADERS,Alert-Info)", "unset"));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))M(send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))U(sub-send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})'));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
