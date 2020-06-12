@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.71</version>
+	<version>14.0.28.72</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.72* FREEPBX-21565 Call confirm does not work since updates 
 		*14.0.28.71* FREEI-1443 fixe syntax error in Asterisk dial plan anyway. 
 		*14.0.28.70* FREEI-1468 if default_user is coming blank, it should be equal to user value 
 		*14.0.28.69* FREEPBX-21382 Alert-Info header unconfigurably passed through to trunk when forwarding 
