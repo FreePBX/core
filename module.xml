@@ -3,13 +3,15 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.8</version>
+	<version>15.0.12.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.10* Packaging of ver 15.0.12.10
+		*15.0.12.9* FREEPBX-21565 Call confirm does not work since updates 
 		*15.0.12.8* FREEI-1468 if default_user is coming blank, it should be equal to user 
 		*15.0.12.7* Fixe back slash 
 		*15.0.12.6* FREEI-21449 : taking line parameter with endpoint field. 
