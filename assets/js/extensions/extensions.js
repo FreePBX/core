@@ -23,7 +23,9 @@ $(".btn-remove").click(function() {
 					delete(extmap[v]);
 				})
 				toggle_reload_button("show");
-				$("#button_reload").trigger('click');
+				if (data.isCommercialDep) {
+					$("#button_reload").trigger('click');
+				}
 			} else {
 				btn.find("span").text(_("Delete"));
 				btn.prop("disabled", true);
@@ -44,7 +46,9 @@ $("table").on("post-body.bs.table", function () {
 						values: [id.toString()]
 					});
 					toggle_reload_button("show");
-					$("#button_reload").trigger('click');
+					if (data.isCommercialDep) {
+						$("#button_reload").trigger('click');
+					}
 				} else {
 					alert(data.message);
 				}
