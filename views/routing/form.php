@@ -761,4 +761,10 @@ if(!empty($route_names)){
 	echo "routing_names = " . json_encode($route_names) . ";";
 }
 ?>
+$(document).ready(function(){
+	// https://stackoverflow.com/questions/1279957/how-to-move-an-element-into-another-element
+	if($("#paging").length){
+		$("#paging").detach().appendTo("#notifications");
+	}
+})
 </script>
