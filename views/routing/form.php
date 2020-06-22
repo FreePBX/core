@@ -763,4 +763,9 @@ if(!empty($route_names)){
 	echo "routing_names = " . json_encode($route_names) . ";";
 }
 ?>
+$(document).ready(function(){
+	if($("#paging").length){
+		$("#paging").detach().appendTo("#notifications");
+	}
+})
 </script>
