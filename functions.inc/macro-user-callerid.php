@@ -54,7 +54,9 @@ $ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${HOTDESKEXTEN}/
 $ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${HOTDESKEXTEN}/location)}'));
 $ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(all)="${DB(EDEVICE/${HOTDESKEXTEN}/location)}" < ${DB(EDEVICE/${HOTDESKEXTEN}/cid)} >'));
 
-$ext->add($context, $exten, '', new ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CALLERID(all)=${IF($[${LEN(${DB(AMPUSER/${ARG2}/outboundcid)})}]?${DB(AMPUSER/${ARG2}/outboundcid)}:${ARG2})}'));
+$ext->add($context, $exten, '', new ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CUSDIAL=${CUT(DB(DEVICE/${ARG2}/dial),/,2)}'));
+$ext->add($context, $exten, '', new ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom" & "${DB(DEVICE/${CUSDIAL}/type)}" =""]', 'Set', 'CALLERID(all)=${IF($[${LEN(${DB(AMPUSER/${ARG2}/outboundcid)})}]?${DB(AMPUSER/${ARG2}/outboundcid)}:${ARG2})}'));
+
 $ext->add($context, $exten, '', new ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
 $ext->add($context, $exten, '', new ext_gotoif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})} & ${DB_EXISTS(AMPUSER/${AMPUSER}/concurrency_limit)} & ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}>0 & ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}>=${DB(AMPUSER/${AMPUSER}/concurrency_limit)}]', 'limit'));
 $ext->add($context, $exten, '', new ext_execif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})}]', 'Set', 'GROUP(concurrency_limit)=${AMPUSER}'));
