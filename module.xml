@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.8</version>
+	<version>16.0.9</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.9* FREEPBX-21582 Custom device caller ID broken 
 		*16.0.8* FREEPBX-21582 Custom device caller ID broken 
 		*16.0.7* FREEI-1481 Outbound Routes - move paging Notifications setting to the new tab 
 		*16.0.6* Fixing FREEI-1617 Keeping auto reload only for commercial deployments 
