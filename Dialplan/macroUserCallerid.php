@@ -50,8 +50,8 @@ class macroUserCallerid{
 
     $ext->add($context, $exten, '', new \ext_set('CALLERID(all)', '"${AMPUSERCIDNAME}" <${AMPUSERCID}>'));
 
-	$ext->add($context, $exten, '', new \ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CUSDIAL=${CUT(DB(DEVICE/${ARG2}/dial),/,2)}'));
-	$ext->add($context, $exten, '', new \ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom" & "${DB(DEVICE/${CUSDIAL}/type)}" =""]', 'Set', 'CALLERID(all)=${IF($[${LEN(${DB(AMPUSER/${ARG2}/outboundcid)})}]?${DB(AMPUSER/${ARG2}/outboundcid)}:${ARG2})}'));
+	$ext->add($context, $exten, '', new \ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom"]', 'Set', 'CUSDIAL=${CUT(CUT(DB(DEVICE/${ARG2}/dial),/,2),@,1)}'));
+	$ext->add($context, $exten, '', new \ext_execif('$["${DB(DEVICE/${ARG2}/tech)}"="custom" & "${DB(DEVICE/${CUSDIAL}/type)}" =""]', 'Set', 'CALLERID(all)=${IF($[${LEN(${DB(AMPUSER/${ARG2}/outboundcid)})}]?${DB(AMPUSER/${ARG2}/outboundcid)}:${CALLERID(all)})}'));
 
     $ext->add($context, $exten, '', new \ext_noop_trace('Current Concurrency Count for ${AMPUSER}: ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}, User Limit: ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}'));
     $ext->add($context, $exten, '', new \ext_gotoif('$["${ARG1}"="LIMIT" & ${LEN(${AMPUSER})} & ${DB_EXISTS(AMPUSER/${AMPUSER}/concurrency_limit)} & ${DB(AMPUSER/${AMPUSER}/concurrency_limit)}>0 & ${GROUP_COUNT(${AMPUSER}@concurrency_limit)}>=${DB(AMPUSER/${AMPUSER}/concurrency_limit)}]', 'limit'));
