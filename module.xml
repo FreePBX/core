@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.15</version>
+	<version>15.0.12.16</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.16* FREEPBX-21652 bulk handler, adding message_context to default setting 
 		*15.0.12.15* Resolve FREEPBX-21582 conflict 
 		*15.0.12.14* FREEPBX-21582 Custom device caller ID broken 
 		*15.0.12.13* FREEPBX-21582 Custom device caller ID broken 
