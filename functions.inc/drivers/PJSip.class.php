@@ -213,6 +213,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"defaultuser" => array(
 					"value" => "",
 					"flag" => $flag++
+			),
+			"message_context" => array(
+					"value" => "",
+					"flag" => $flag++
 			)
 		);
 		return array(
