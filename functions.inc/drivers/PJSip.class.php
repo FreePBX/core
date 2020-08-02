@@ -178,6 +178,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"rtp_timeout" => array(
+				"value" => "0",
+				"flag" => $flag++
+			),
+			"rtp_timeout_hold" => array(
+				"value" => "0",
+				"flag" => $flag++
+			),
 			"direct_media" => array(
 				"value" => "yes",
 				"flag" => $flag++
@@ -317,6 +325,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$tt = _("Minimum time to keep an AoR");
 		$tmparr['minimum_expiration'] = array('prompttext' => _('Minimum Expiration'), 'value' => '60', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Maximum number of seconds without receiving RTP (while off hold) before terminating call");
+		$tmparr['rtp_timeout'] = array('prompttext' => _('RTP Timeout'), 'value' => '0', 'tt' => $tt, 'level' => 1);
+		unset($select);
+
+		$tt = _("Maximum number of seconds without receiving RTP (while on hold) before terminating call");
+		$tmparr['rtp_timeout_hold'] = array('prompttext' => _('RTP Hold Timeout'), 'value' => '0', 'tt' => $tt, 'level' => 1);
 		unset($select);
 
 		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
@@ -1226,6 +1242,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['media_encryption_optimistic'])) {
 			$endpoint[] = "media_encryption_optimistic=".$config['media_encryption_optimistic'];
 		}
+
+		$endpoint[] = "rtp_timeout=".(!empty($config['rtp_timeout']) ? $config['rtp_timeout'] : $chan_sip_settings['rtptimeout']);
+		$endpoint[] = "rtp_timeout_hold=".(!empty($config['rtp_timeout_hold']) ? $config['rtp_timeout_hold'] : $chan_sip_settings['rtpholdtimeout']);
 
 		if(!empty($config['device_state_busy_at']) && is_numeric($config['device_state_busy_at']) && $config['device_state_busy_at'] > 0) {
 			$endpoint[] = "device_state_busy_at=".$config['device_state_busy_at'];
