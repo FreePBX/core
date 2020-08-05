@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.18</version>
+	<version>15.0.12.19</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.19* FREEPBX-21732 Execute notification email before dial on pattern match 
 		*15.0.12.18* FREEI-1379 
 		*15.0.12.17* FREEPBX-21603 Unable to dial LOCAL/XX from TAPI since FreePBX 15 
 		*15.0.12.16* FREEPBX-21652 bulk handler, adding message_context to default setting 
