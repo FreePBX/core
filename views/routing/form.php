@@ -556,6 +556,35 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="well well-info">
 					<?php echo _("Use caution when enabling Notifications for routes with high traffic to avoid excessive calls, and emails.")?>
 				</div>
+				<!--NOTIFICATION WHEN-->
+				<div class="element-container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-3">
+										<label class="control-label" for="notification_on"><?php echo _("Notification when") ?></label>
+										<i class="fa fa-question-circle fpbx-help-icon" data-for="notification_on"></i>
+									</div>
+									<div class="col-md-9 radioset">
+										<span class="radioset">
+										<input type="radio" name="notification_on" id="call" value="call" <?php echo (empty($notification_on) || $notification_on == "call"?"CHECKED":"") ?>>
+										<label for="call"><?php echo _("Call successful");?></label>
+										<input type="radio" name="notification_on" id="pattern" value="pattern" <?php echo ($notification_on == "pattern"?"CHECKED":"") ?>>
+										<label for="pattern"><?php echo _("Dial pattern matched");?></label>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<span id="notification_on-help" class="help-block fpbx-help-block"><?php echo _("If the option 'Call successful' is selected, an email notification will be sent on post answer. Selecting 'Dial pattern matched' will send notification email as soon as the dialled pattern is getting matched, so in this case, the notification may not have correct information about trunk & sent outbound caller id.")?></span>
+						</div>
+					</div>
+				</div>
+				<!--NOTIFICATION WHEN-->
 				<!--Email To-->
 				<div class="element-container">
 				  <div class="row">

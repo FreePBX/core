@@ -47,6 +47,7 @@ switch($request['view']){
 			$route_seq = $route_info['seq'];
 			$routename = $route_info['name'];
 			$dest = $route_info['dest'];
+			$notification_on = $route_info['notification_on'];
 			$routelist = core_routing_list();
 			$subhead = sprintf('%s: %s',$subhead,$routename);
 			$viewinfo = array(
@@ -70,6 +71,7 @@ switch($request['view']){
 							'route_seq' => $route_seq,
 							'routename' => $routename,
 							'dest' => $dest,
+							'notification_on' => $notification_on,
 							'emailInfo' => $emailInfo,
 							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 							);

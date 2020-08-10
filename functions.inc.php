@@ -2190,6 +2190,10 @@ function core_do_get_config($engine) {
             $ext->add($context, $exten, '', new ext_set("_EMAILNOTIFICATION", (empty($emailInfo['emailto']) ? 'FALSE' : 'TRUE')));
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
+			if($route['notification_on'] == 'pattern'){
+				$ext->add($context, $exten, '', new ext_gosub('1','s','sub-send-obroute-email',$pattern['prepend_digits'] . '${EXTEN' . $offset . '},${EXTEN},,${NOW},${CALLERID(name)},${CALLERID(number)}'));
+			}
+			
 			$password = $route['password'];
 			foreach ($trunks as $trunk_id) {
 				if (isset($trunk_table[$trunk_id])) switch(strtolower($trunk_table[$trunk_id]['tech'])) {
@@ -2557,7 +2561,6 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
 		$ext->add($context, $exten, '', new ext_macro('outbound-callerid', '${DIAL_TRUNK}'));
 		$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
-		$ext->add($context, $exten, '', new ext_gosub('1','s','sub-send-obroute-email','${DIAL_NUMBER},${MACRO_EXTEN},${DIAL_TRUNK},${NOW},${CALLERID(name)},${CALLERID(number)}'));
 		$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
 		$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
 
@@ -2584,7 +2587,10 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_set("HASH(__SIPHEADERS,Alert-Info)", "unset"));
-		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'));  // Regular Trunk Dial
+
+		$obroute_email = ($route['notification_on'] == 'call') ? 'U(sub-send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})' : '';
+
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
 
@@ -5262,12 +5268,12 @@ function core_routing_getroutetrunksbyid($route_id) {
 }
 
 // function core_routing_edit($name,$patterns,$trunks,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode)
-function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
+function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = '', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
 	$sql = "UPDATE `outbound_routes` SET
 	`name`= :name , `outcid`= :outcid, `outcid_mode`= :outcid_mode, `password`= :password,
 	`emergency_route`= :emergency_route, `intracompany_route`= :intracompany_route, `mohclass`= :mohclass,
 	`time_group_id`= :time_group_id, `dest`= :dest, `time_mode` = :time_mode, `timezone` = :timezone,
-	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id WHERE `route_id` = :route_id";
+	`calendar_id` = :calendar_id, `calendar_group_id` = :calendar_group_id, `notification_on` = :notification_on WHERE `route_id` = :route_id";
 
 	$sth = FreePBX::Database()->prepare($sql);
 	$sth->execute(array(
@@ -5284,7 +5290,8 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 		":time_mode" => $time_mode,
 		":timezone" => $timezone,
 		":calendar_id" => $calendar_id,
-		":calendar_group_id" => $calendar_group_id
+		":calendar_group_id" => $calendar_group_id,
+		":notification_on" => $notification_on
 	));
 
 	core_routing_updatepatterns($route_id, $patterns, true);
@@ -5296,8 +5303,8 @@ function core_routing_editbyid($route_id, $name, $outcid, $outcid_mode, $passwor
 }
 
 // function core_routing_add($name,$patterns,$trunks,$method,$pass,$emergency="",$intracompany="",$mohsilence="",$routecid="",$routecid_mode="")
-function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
-	return \FreePBX::Core()->addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+function core_routing_addbyid($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
+	return \FreePBX::Core()->addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
 }
 
 /* TODO: duplicate prepend_patterns is a problem as only one will win. We need to catch this and filter it out. We can silently trap it
