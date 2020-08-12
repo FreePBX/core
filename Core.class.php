@@ -1688,7 +1688,14 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 
 		$device['dial'] = strtoupper($tech).'/'.$deviceid;
 		$device['sipdriver'] = ($tech == 'pjsip') ? 'chan_pjsip' : 'chan_sip'; 
-		$settings = $this->kvArrayifyDeviceValues($device);
+
+		$default_setting = $this->generateDefaultDeviceSettings($tech, $deviceid, $device['description']);
+		foreach($default_setting as $key => $data){
+			$default[$key] = $data['value'];
+		}
+
+		$updated_dev_setting = array_intersect_key(array_merge($default,$device), $default);
+		$settings = $this->kvArrayifyDeviceValues($updated_dev_setting);
 
 		// delete then re add, insanity.
 		$this->delDevice($deviceid, true);
