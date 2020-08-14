@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.77</version>
+	<version>14.0.28.78</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.78* FREEI-1964 making PJSIP extension's rewrite_contact 'yes' 
 		*14.0.28.77* FREEPBX-21732 Execute notification email before dial on pattern match 
 		*14.0.28.76* FREEI-1379 adding RTP timeout configuration for pjsip extensions 
 		*14.0.28.75* FREEPBX-21582 Custom device caller ID broken 
