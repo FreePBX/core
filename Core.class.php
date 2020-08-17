@@ -1094,6 +1094,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 			//email values will be taken from _POST because we don't want the sanitized
 			//values(from freepbxGetSanitizedRequest), where stuff between angle brackets were removed. 
+			$notification_on = isset($_POST['notification_on']) ? $_POST['notification_on'] : '';
 			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
 			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
 			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';
@@ -1109,12 +1110,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "delroute":

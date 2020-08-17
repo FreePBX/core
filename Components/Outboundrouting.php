@@ -4,9 +4,9 @@ use PDO;
 use Exception;
 
 class Outboundrouting extends ComponentBase{
-	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
-		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
+	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
+		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `notification_on`)
+		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone, :notification_on)";
 
 		$sth = $this->Database->prepare($sql);
 		$sth->execute(array(
@@ -20,7 +20,9 @@ class Outboundrouting extends ComponentBase{
 			":time_group_id" => $time_group_id,
 			":dest" => $dest,
 			":time_mode" => $time_mode,
-			":timezone" => $timezone
+			":timezone" => $timezone,
+			":notification_on" => $notification_on
+
 		));
 
 		$route_id = $this->Database->lastInsertId();
@@ -33,9 +35,9 @@ class Outboundrouting extends ComponentBase{
 		return $route_id;
 	}
 
-	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
-		$sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-		VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
+	public function editById($route_id, $name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
+		$sql = "REPLACE INTO `outbound_routes` (`route_id`,`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `notification_on`)
+		VALUES (:route_id, :name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone, :notification_on)";
 		$sth = $this->Database->prepare($sql);
 		$sth->execute(array(
 			":route_id" => $route_id,
@@ -49,7 +51,9 @@ class Outboundrouting extends ComponentBase{
 			":time_group_id" => $time_group_id,
 			":dest" => $dest,
 			":time_mode" => $time_mode,
-			":timezone" => $timezone
+			":timezone" => $timezone,
+			":notification_on" => $notification_on
+
 		));
 		$this->updatePatterns($route_id, $patterns,true);
 		$this->updateTrunks($route_id, $trunks,true);
