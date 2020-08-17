@@ -355,22 +355,6 @@
 			<field name="mohclass" type="string" length="80" default="" notnull="false"/>
 			<field name="indication_zone" type="string" length="20" default="default" notnull="false"/>
 		</table>
-		<table name="outbound_routes">
-			<field name="route_id" type="integer" primaryKey="true" autoincrement="true"/>
-			<field name="name" type="string" length="40" notnull="false"/>
-			<field name="outcid" type="string" length="40" notnull="false"/>
-			<field name="outcid_mode" type="string" length="20" notnull="false"/>
-			<field name="password" type="string" length="30" notnull="false"/>
-			<field name="emergency_route" type="string" length="4" notnull="false"/>
-			<field name="intracompany_route" type="string" length="4" notnull="false"/>
-			<field name="mohclass" type="string" length="80" notnull="false"/>
-			<field name="time_mode" type="string" length="20" default="" notnull="false"/>
-			<field name="timezone" type="string" length="255" notnull="false"/>
-			<field name="time_group_id" type="integer" notnull="false"/>
-			<field name="calendar_id" type="string" length="255" notnull="false"/>
-			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
-			<field name="dest" type="string" length="255" notnull="false"/>
-		</table>
 		<table name="dahdichandids">
 			<field name="channel" type="integer" default="0" primaryKey="true"/>
 			<field name="description" type="string" length="40" default=""/>
@@ -407,6 +391,7 @@
 			<field name="calendar_id" type="string" length="255" notnull="false"/>
 			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
 			<field name="timezone" type="string" length="255" notnull="false"/>
+			<field name="notification_on" type="string" length="255" default="call" notnull="false"/>
 		</table>
 		<table name="outbound_route_email">
             <field name="route_id" type="integer" primarykey="true"/>

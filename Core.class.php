@@ -1082,6 +1082,7 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			$calendar_group_id = isset($request['calendar_group_id']) ? $request['calendar_group_id'] : '';
 			//email values will be taken from _POST because we don't want the sanitized
 			//values(from freepbxGetSanitizedRequest), where stuff between angle brackets were removed. 
+			$notification_on = isset($_POST['notification_on']) ? $_POST['notification_on'] : '';
 			$emailfrom = isset($_POST['emailfrom']) ? $_POST['emailfrom'] : '';
 			$emailto = isset($_POST['emailto']) ? $_POST['emailto'] : '';
 			$emailsubject = isset($_POST['emailsubject']) ? $_POST['emailsubject'] : '';
@@ -1105,12 +1106,12 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 					// Fallthrough to addtrunk now...
 					//
 				case "addroute":
-					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "editroute":
 					$extdisplay = $_REQUEST['id'];
-					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $emailfrom, $emailto, $emailsubject, $emailbody);
+					core_routing_editbyid($extdisplay, $routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
 					needreload();
 				break;
 				case "delroute":
@@ -2139,9 +2140,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		return $result;
 	}
 
-	public function addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
-		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`)
-		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone)";
+	public function addRoute($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = '') {
+		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `notification_on`)
+		VALUES (:name, :outcid, :outcid_mode, :password, :emergency_route,  :intracompany_route,  :mohclass, :time_group_id, :dest, :time_mode, :timezone, :notification_on)";
 
 		$sth = \FreePBX::Database()->prepare($sql);
 		$sth->execute(array(
@@ -2155,7 +2156,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			":time_group_id" => $time_group_id,
 			":dest" => $dest,
 			":time_mode" => $time_mode,
-			":timezone" => $timezone
+			":timezone" => $timezone,
+			":notification_on" => $notification_on
 		));
 
 		$route_id = \FreePBX::Database()->lastInsertId();
