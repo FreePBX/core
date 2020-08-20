@@ -3942,6 +3942,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$this->astman->database_put("AMPUSER",$usr['extension']."/recording",$usr['recording']);
 				$this->astman->database_put("AMPUSER",$usr['extension']."/outboundcid",$usr['outboundcid']);
 				$this->astman->database_put("AMPUSER",$usr['extension']."/cidname",$usr['name']);
+				$this->astman->database_put("AMPUSER",$usr['extension']."/cidnum",$usr['extension']);
 				$this->astman->database_put("AMPUSER",$usr['extension']."/voicemail",$usr['voicemail']);
 			}
 			return true;
