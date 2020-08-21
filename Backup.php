@@ -24,6 +24,7 @@ class Backup Extends BackupBase{
 		$configs['features'] = $this->dumpFeatureCodes();
 		$configs['settings'] = $this->dumpAdvancedSettings();
 		$configs['kvstore'] = $this->dumpKVStore();
+		$configs['astdb'] = $this->dumpAstDB('AMPUSER');
 		$configs['backup'] = $this->FreePBX->Core->getAll('backup_'.$id);
 		$this->addDirectories($dirs);
 		$this->addConfigs($configs);
