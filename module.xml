@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.22</version>
+	<version>15.0.12.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.23* FREEPBX-21736 Fixing - Backup&amp;amp;Restore : all astdb variables are not getting restored 
 		*15.0.12.22* FREEI-2058 COS not working after restoring the legacy backup on Freepbx 15 
 		*15.0.12.21* Packaging of ver 15.0.12.21
 		*15.0.12.20* FREEI-1964 making PJSIP extension's rewrite_contact 'yes' 
