@@ -1587,9 +1587,37 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$updated_dev_setting = array_intersect_key(array_merge($default,$device), $default);
 		$settings = $this->kvArrayifyDeviceValues($updated_dev_setting);
 
+		//reboot the associated endpoint to pull the new configuration
+		$this->processEPM($deviceid, $tech, true);
+
 		// delete then re add, insanity.
 		$this->delDevice($deviceid, true);
-		return $this->addDevice($deviceid, $tech, $settings, true);
+
+		$ret = $this->addDevice($deviceid, $tech, $settings, true);
+
+		//update the associated endpoint configuration
+		$this->processEPM($deviceid, $tech);
+
+                return $ret;
+
+	}
+	public function processEPM($ext, $tech, $reboot = false) {
+		if ($tech != 'pjsip')  {
+			return ;
+		}
+		if (!$this->freepbx->Modules->checkStatus("endpoint")) {
+			return ;
+		}
+
+		$this->freepbx->Modules->loadFunctionsInc('endpoint');
+
+		if ($reboot && function_exists('endpoint_forcereboot')) {
+			endpoint_forcereboot($ext);
+		} else {
+			if (function_exists('endpoint_convertExt')) {
+				endpoint_convertExt($ext, $tech);
+			}
+		}
 	}
 
 	/* create emergency Device
