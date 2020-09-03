@@ -133,7 +133,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '</td>';
 		$dpinput[] = '<td>';
 		$dpinput[] = '		<a href="#"  id="rowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-		$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+		$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash-o"></i></a>';
 		$dpinput[] = '</td>';
 		$dpinput[] = '</tr>';
 	}
@@ -169,7 +169,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '</td>';
 	$dpinput[] = '<td>';
 	$dpinput[] = '		<a href="#"  id="rowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-	$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+	$dpinput[] = '		<a href="#"  id="rowdel'.$idx.'"><i class="fa fa-trash-o"></i></a>';
 	$dpinput[] = '</td>';
 	$dpinput[] = '</tr>';
 	$dprows = implode(PHP_EOL, $dpinput);

@@ -44,7 +44,7 @@
 				<td><?php echo $trunk['tresult']['disabled'] == 'on'?_("Disabled"):_("Enabled")?></td>
 				<td>
 					<a href="config.php?display=trunks&amp;tech=<?php echo $trunk['tresult']['tech']?>&amp;extdisplay=OUT_<?php echo $trunk['tresult']['trunkid']?>"><i class="fa fa-edit"></i></a>
-					<a class="delAction" href="config.php?display=trunks&amp;extdisplay=OUT_<?php echo $trunk['tresult']['trunkid']?>&amp;action=deltrunk"><i class="fa fa-trash"></i></a>
+					<a class="delAction" href="config.php?display=trunks&amp;extdisplay=OUT_<?php echo $trunk['tresult']['trunkid']?>&amp;action=deltrunk"><i class="fa fa-trash-o"></i></a>
 				</td>
 			</tr>
 		<?php } ?>
