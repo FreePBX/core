@@ -69,9 +69,18 @@ class Restore Extends Base\RestoreBase{
 	}
 
 	public function processLegacy($pdo, $data, $tables, $unknownTables) {
+		global $astman;
 		$this->restoreLegacyAll($pdo);
-		$this->FreePBX->Core->users2astdb();
 		$this->FreePBX->Core->devices2astdb();
+		if(isset($data['astdb']['AMPUSER'])) {
+			$ampuser = array();
+            foreach($data['astdb']['AMPUSER'] as $key => $value) {
+                $ampuser[] = ['AMPUSER' => [ $key => $value ]];
+            }
+        }
+        $astman->database_deltree("AMPUSER");
+        $this->importAstDB($ampuser);
+
 	}
 
 	private function getTrunksconfig(){
