@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.16</version>
+	<version>16.0.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.17* FREEI-2013 Not all extension data imported and applied on a 15 restore 
 		*16.0.16* Fixing FREEI-2095 Adding API call to Commercial Endpoint Manager(if 
 		*16.0.15* FREEPBX-21736 Fixing - Backup&amp;amp;Restore : all astdb variables are not getting restored 
 		*16.0.14* FREEI-2058 COS not working after restoring the legacy backup on Freepbx 15 
