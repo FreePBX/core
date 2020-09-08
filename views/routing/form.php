@@ -115,7 +115,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '	</div>';
 		$dpinput[] = '<td>';
 		$dpinput[] = '		<a href="#"  id="routerowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-		$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+		$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash-o"></i></a>';
 		$dpinput[] = '</td>';
 		$dpinput[] = '</tr>';
 	}
@@ -157,7 +157,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '	</div>';
 	$dpinput[] = '<td>';
 	$dpinput[] = '		<a href="#"  id="routerowadd'.$idx.'"><i class="fa fa-plus"></i></a>';
-	$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash"></i></a>';
+	$dpinput[] = '		<a href="#"  id="routerowdel'.$idx.'"><i class="fa fa-trash-o"></i></a>';
 	$dpinput[] = '</td>';
 	$dpinput[] = '</tr>';
 	$dprows = implode(PHP_EOL, $dpinput);
@@ -203,7 +203,7 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 				}
 
 				$trunkhtml .= '</select>';
-				$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash"></i></button></span>';
+				$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></span>';
 				$trunkhtml .= '</div>';
 				$trunkhtml .= '</td>';
 				$trunkhtml .= '</tr>';
@@ -228,7 +228,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		}
 	}
 	$trunkhtml .= '</select>';
-	$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash"></i></button></span>';
+	$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></span>';
 	$trunkhtml .= '</div>';
 	$trunkhtml .= '</td>';
 	$trunkhtml .= '</tr>';
