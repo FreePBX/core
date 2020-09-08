@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.25</version>
+	<version>15.0.12.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.26* FREEI-2013 Not all extension data imported and applied on a 15 restore 
 		*15.0.12.25* Packaging of ver 15.0.12.25
 		*15.0.12.24* Fixing FREEI-2095 Adding API call to Commercial Endpoint Manager(if 
 		*15.0.12.23* FREEPBX-21736 Fixing - Backup&amp;amp;Restore : all astdb variables are not getting restored 
