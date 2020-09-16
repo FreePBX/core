@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.26</version>
+	<version>15.0.12.27</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.27* FREEI-1977 Importing Extensions causes calls to no longer ring on Zulu 
 		*15.0.12.26* FREEI-2013 Not all extension data imported and applied on a 15 restore 
 		*15.0.12.25* Packaging of ver 15.0.12.25
 		*15.0.12.24* Fixing FREEI-2095 Adding API call to Commercial Endpoint Manager(if 
