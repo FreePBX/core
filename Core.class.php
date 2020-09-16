@@ -3322,6 +3322,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 					$this->delDevice($data['extension'], $replaceExisting);
 					return array("status" => false, "message" => $e->getMessage());
 				}
+				if(isset($data['devicedata']) && $data['devicedata'] !=''){
+					$this->astman->database_put("AMPUSER",$data['extension']."/device",$data['devicedata']);
+				}
 			}
 
 			needreload();
@@ -3395,8 +3398,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 					$user['cid_masquerade'] = $tmp_user_data['cid_masquerade'];
 				}
 				if(isset($tmp_user_data['concurrency_limit'])) {
-                    $user['concurrency_limit'] = $tmp_user_data['concurrency_limit'];;
-                }
+					$user['concurrency_limit'] = $tmp_user_data['concurrency_limit'];;
+				}
+				$existingdevices = $this->astman->database_get("AMPUSER",$user['extension']."/device");
+				$user['devicedata'] = $existingdevices;
 				$data[$user['extension']] = array_merge($user, $device);
 			}
 
