@@ -19,6 +19,7 @@ class Restore Extends Base\RestoreBase{
 		if($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes') {
 			$excludetrunks = true;
 			$trunkConfig = $this->getTrunksconfig();
+			$outbound_routes = $this->getRouteConfigs();
 			$modulefunction = \module_functions::create();
 			$uninstall = $modulefunction->uninstall('core', 'true');
 			if(is_array($uninstall)) {
@@ -39,7 +40,13 @@ class Restore Extends Base\RestoreBase{
                                         ->setbackupinfo($backupinfo)
                                         ->setFiles($files)
                                         ->setConfigs($trunkConfig);
-			}else {
+			}elseif( $class->className == 'Routing' && $excludetrunks){
+				$class->setDirs($dirs)
+                                        ->setbackupinfo($backupinfo)
+                                        ->setFiles($files)
+                                        ->setConfigs($outbound_routes);
+			}
+			else {
 			$class->setDirs($dirs)
 					->setbackupinfo($backupinfo)
 					->setFiles($files)
@@ -94,5 +101,15 @@ class Restore Extends Base\RestoreBase{
 			"dialpatterns" => $this->FreePBX->Database->query("SELECT * FROM trunk_dialpatterns")->fetchAll(\PDO::FETCH_ASSOC)
                 ];
         }
-
+	public function getRouteConfigs(){
+        $final = [];
+        $routing = new \FreePBX\modules\Core\Components\Outboundrouting($this->FreePBX->Database);
+        $routes = $routing->listAll();
+        foreach($routes as $route){
+            $route['patterns'] = $routing->getRoutePatternsByID($route['route_id']);
+            $route['trunks'] = $routing->getRouteTrunksById($route['route_id']);
+            $final[] = $route;
+        }
+        return $final;
+    }
 }
