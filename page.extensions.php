@@ -26,13 +26,13 @@ if($display_mode == "basic") { ?>
 						<h1><?php echo _("Extensions")?></h1>
 						<div id="toolbar-sip">
 						<?php if(empty($sections) || in_array("999",$sections) || in_array("*",$sections) && $remaining >= 1){ ?>
-							<span id="bt-add-ex"><a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=sip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a></span>
+							<span id="bt-add-ex"><a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=pjsip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a></span>
 						<?php } ?>
 							<button id="remove-sip" class="btn btn-danger btn-remove" data-type="extensions" data-section="sip" disabled>
 								<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 							</button>
 						</div>
-						<table data-cookie="true" data-cookie-id-table="extensions-sip" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=sip" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-sip" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-sip">
+						<table data-cookie="true" data-cookie-id-table="extensions-sip" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=pjsip" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-sip" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-sip">
 							<thead>
 								<tr>
 									<th data-checkbox="true"></th>
