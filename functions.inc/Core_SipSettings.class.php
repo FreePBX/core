@@ -17,7 +17,7 @@ class Core_SipSettings {
 
 	private function doSipsettingsPage(&$text) {
 		// Split the entire page at EOL
-		$foo = split("\n", $text);
+		$foo = preg_split("/\n/", $text);
 
 		// Grab the first line, we'll need this later.
 		$header = array_shift($foo);
