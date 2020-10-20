@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.30</version>
+	<version>15.0.12.31</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.31* FREEI-2276  extension APIs 
 		*15.0.12.30* Packaging of ver 15.0.12.30
 		*15.0.12.29* Fixing FREEI-2137 displaying only  pjsip extensions during basic mode 
 		*15.0.12.28* FREEI-2157 warm spare backup exclude trunks should exclude outbound route 
