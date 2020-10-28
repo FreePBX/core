@@ -298,6 +298,10 @@ class Users extends Base {
 				'type' => Type::string(),
 				'description' => ''
 			],
+			'callwaiting' => [
+				'type' => Type::string(),
+				'description' => "Call Waiting option. default is 'enabled'"
+			],
 
 		];
 	}
@@ -320,6 +324,8 @@ class Users extends Base {
 			"busy_dest" => isset($input['busy_dest']) ? $input['busy_dest'] : '',
 			"chanunavail_dest" => isset($input['chanunavail_dest']) ? $input['chanunavail_dest'] : '',
 			"mohclass" => isset($input['mohclass']) ? $input['mohclass'] : null,
+			"callwaiting" => isset($input['callwaiting']) ? $input['callwaiting'] : 'enabled',
+			"pinless" => isset($input['pinless']) ? $input['pinless'] : 'disabled',
 		];
 	}
 }
