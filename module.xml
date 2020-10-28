@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.22</version>
+	<version>16.0.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.23* FREEPBX-21978 Undefined index "callwaiting" 
 		*16.0.22* typo error 
 		*16.0.21* FREEI-2276  extension APIs 
 		*16.0.20* Fixing FREEI-2137 displaying only  pjsip extensions during basic mode 
