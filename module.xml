@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.32</version>
+	<version>15.0.12.33</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.33* FREEPBX-21978 Undefined index "callwaiting" 
 		*15.0.12.32* typo error 
 		*15.0.12.31* FREEI-2276  extension APIs 
 		*15.0.12.30* Packaging of ver 15.0.12.30
