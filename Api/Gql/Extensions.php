@@ -37,7 +37,7 @@ class Extensions extends Base {
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$input['um-groups'] = implode(',',$input['umgroups']);
+							$input['um-groups'] = explode(',',$input['umgroups']);
 							$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							return !empty($status) ? $status : [];
 						}
