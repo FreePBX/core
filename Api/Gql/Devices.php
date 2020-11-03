@@ -106,13 +106,13 @@ class Devices extends Base {
 						'type' => $this->typeContainer->get('coredevice')->getObject(),
 						'description' => '',
 						'args' => [
-							'id' => [
+							'device_id' => [
 								'type' => Type::id(),
-								'description' => 'The ID',
+								'description' => 'The Device ID',
 							]
 						],
 						'resolve' => function($root, $args) {
-							return $this->freepbx->Core->getDevice($args['id']);
+							return $this->freepbx->Core->getDevice($args['device_id']);
 						}
 					]
 				];
@@ -134,9 +134,6 @@ class Devices extends Base {
 
 		$user->addFieldCallback(function() {
 			return [
-				'id' => Relay::globalIdField('coredevice', function($row) {
-					return isset($row['id']) ? $row['id'] : null;
-				}),
 				'device_id' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => 'Give your device a unique integer ID. The device will use this ID to authenticate to the system',
