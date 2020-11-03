@@ -46,7 +46,7 @@ class Users extends Base {
 						],
 						'mutateAndGetPayload' => function ($input) {
 							$output = $this->getMutationExecuteArray($input);
-							$this->freepbx->Core->delUser($extension, true);
+							$this->freepbx->Core->delUser($input['extension'], true);
 							$this->freepbx->Core->addUser($input['extension'], $output, true);
 							$item = $this->freepbx->Core->getUser($input['extension']);
 							return !empty($item) ? $item : [];
