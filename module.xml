@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.36</version>
+	<version>15.0.12.37</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.37* FREEPBX-21970 taskprocessor_overload_trigger=pjsip_only in pjsip.conf 
 		*15.0.12.36* FREEPBX-21996 Undefined variable: extension 
 		*15.0.12.35* Api device query return an unwanted ID , And it suppose to take the input var Device_Id 
 		*15.0.12.34* FREEPBX-21952 Update comment note for from-pstn-custom 
