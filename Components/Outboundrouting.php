@@ -71,7 +71,7 @@ class Outboundrouting extends ComponentBase{
 		$sth = $this->Database->prepare($sql);
 		$sth->execute(array($route_id));
 		$sql = 'DELETE FROM outbound_route_trunks WHERE route_id = ?';
-		$this->Database->prepare($sql);
+		$sth = $this->Database->prepare($sql);
 		$sth->execute(array($route_id));
 		$sql = 'DELETE FROM outbound_route_sequence WHERE route_id = ?';
 		$sth = $this->Database->prepare($sql);
