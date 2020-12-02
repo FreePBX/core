@@ -41,8 +41,7 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 		self::$core->addDevice($testExtension, 'pjsip', $settings);
 
 		$response = $this->request("query { 
-			coreDevice(id: \"{$testExtension}\") { 
-				id,
+			coreDevice(device_id: \"{$testExtension}\") { 
 				device_id,
 				description,
 				devicetype,
@@ -52,11 +51,9 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 		}");
 
 		$json = json_decode((string)$response->getBody(), true);
-		$mutationId = base64_encode("coredevice:{$testExtension}");
-		$this->assertEquals($json, array(
+		$this->assertEquals(array(
 			'data' => array(
 				'coreDevice' => array(
-					'id' => $mutationId,
 					'device_id' => $testExtension,
 					'description' => 'pjsip test',
 					'devicetype' => 'fixed',
@@ -64,6 +61,6 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 					'emergency_cid' => ''
 				)
 			)
-		));
+		), $json);
 	}
 }
