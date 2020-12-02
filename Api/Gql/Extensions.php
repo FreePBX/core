@@ -5,6 +5,7 @@ namespace FreePBX\modules\Core\Api\Gql;
 use GraphQLRelay\Relay;
 use GraphQL\Type\Definition\Type;
 use FreePBX\modules\Api\Gql\Base;
+use \GraphQL\Error\FormattedError;
 
 class Extensions extends Base {
 	protected $module = 'core';
@@ -24,8 +25,8 @@ class Extensions extends Base {
 			if($this->checkAllWriteScope()) {
 			return function() {
 				return [
-					'addCoreExten' => Relay::mutationWithClientMutationId([
-						'name' => 'addCoreExten',
+					'addExtension' => Relay::mutationWithClientMutationId([
+						'name' => 'addExtension',
 						'description' => _('Add a new Extension to Core'),
 						'inputFields' => $this->getMutationFields(),
 						'outputFields' => [
@@ -34,16 +35,31 @@ class Extensions extends Base {
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
+							],
+							'message' => [
+								'type' => Type::nonNull(Type::string()),
+								'resolve' => function ($payload) {
+									return $payload['message'];
+								}
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$input['um-groups'] = explode(',',$input['umgroups']);
-							$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
+							$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
+							$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
+							$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+							try{
+								$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
+								$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
+							}catch(\Exception $ex){
+								//extracting exception message and updating with response message
+								FormattedError::setInternalErrorMessage($ex->getMessage());
+							}
 							return !empty($status) ? $status : [];
 						}
 					]),
-					'updateCoreExten' => Relay::mutationWithClientMutationId([
-						'name' => 'updateCoreExten',
+					'updateExtension' => Relay::mutationWithClientMutationId([
+						'name' => 'updateExtension',
 						'description' => _('Update an Extension in Core'),
 						'inputFields' => $this->getMutationFields(),
 						'outputFields' => [
@@ -52,18 +68,41 @@ class Extensions extends Base {
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
+							],
+							'message' => [
+								'type' => Type::string(),
+								'resolve' => function ($payload) {
+									return $payload['message'];
+								}
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$this->freepbx->Core->delDevice($input['extension'], true);
-							$this->freepbx->Core->delUser($input['extension']);
-							$input['um-groups'] = explode(',',$input['umgroups']);
-							$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
+						    try {
+								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
+								if (empty($extensionExists)) {
+									return array("status" => false, "message" => _("Extension does not exists."));
+								}
+								$this->freepbx->Core->delDevice($input['extension'], true);
+								$this->freepbx->Core->delUser($input['extension']);
+								$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
+								$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
+								$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+								$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
+								$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+								$status = $this->freepbx->Core->processQuickCreate($input['tech'] ,$input['extension'],$input);
+								if($status['status'] == True){
+									return array("status" => true ,"message"=> "Extension has been updated");
+								}else{
+									return array("status" => false ,"message"=> "Sorry could not update the extension");
+								}
+							}catch(\Exception $ex ){
+								FormattedError::setInternalErrorMessage($ex->getMessage());
+							}
 							return !empty($status) ? $status: [];
 						}
 					]),
-					'deleteCoreExten' => Relay::mutationWithClientMutationId([
-						'name' => 'deleteCoreExten',
+					'deleteExtension' => Relay::mutationWithClientMutationId([
+						'name' => 'deleteExtension',
 						'description' => _('Delete an Extension in Core'),
 						'inputFields' => ['extension' => ['type' => Type::nonNull(Type::id()),'description' => 'Extension Number to be deleted']],
 						'outputFields' => [
@@ -72,17 +111,32 @@ class Extensions extends Base {
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
+							],
+							'message' => [
+								'type' => Type::string(),
+								'resolve' => function ($payload) {
+									return $payload['message'];
+								}
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$this->freepbx->Core->delDevice($input['extension'], true);
-							$this->freepbx->Core->delUser($input['extension']);
-							$item = array("status" => true);;
+							try {
+								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
+								if (empty($extensionExists)) {
+									return array("status" => false, "message" => _("Extension does not exists."));
+								}
+								$this->freepbx->Core->delDevice($input['extension'], true);
+								$this->freepbx->Core->delUser($input['extension']);
+								$item = array("status" => true ,"message"=> "Extension has been deleted");
+							}catch(Exception $ex){
+								FormattedError::setInternalErrorMessage($ex->getMessage());
+							}
+						
 							return !empty($item) ? $item : [];
 						}
 					]),
-					'CreateRangeofExten' => Relay::mutationWithClientMutationId([
-						'name' => 'CreateRangeofExten',
+					'createRangeofExtension' => Relay::mutationWithClientMutationId([
+						'name' => 'CreateRangeofExtension',
 						'description' => _('Create a Range of Extensions'),
 						'inputFields' => $this->getMutationFieldsRange(),
 						'outputFields' => [
@@ -91,17 +145,28 @@ class Extensions extends Base {
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
+							],
+							'message' => [
+								'type' => Type::string(),
+								'resolve' => function ($payload) {
+									return $payload['message'];
+								}
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$name = $input['name'];
 							$count= 0;
-							$max =$input['start'] + $input['nuberofexten'];
-							for($i =$input['start'];$i< $max; $i++){
-								$input['name'] = $i.'  '.$name;
+							$max =$input['startExtension'] + $input['numberOfExtensions'];
+							for($i =$input['startExtension'];$i< $max; $i++){
+								$input['name'] = $i.'  '.$input['name'];
 								$input['extension'] = $i;
-								$input['um-groups'] = explode(',',$input['umgroups']);
-								$re = $this->freepbx->Core->processQuickCreate($input['tech'],$i,$input);
+								$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
+								$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
+								$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+								try{
+									$re = $this->freepbx->Core->processQuickCreate($input['tech'],$i,$input);
+								}catch(\Exception $ex){
+									FormattedError::setInternalErrorMessage($ex->getMessage());
+								}
 								if($re['status'] == true){
 									$count ++;
 								}
@@ -137,7 +202,11 @@ class Extensions extends Base {
 							]
 						],
 						'resolve' => function($root, $args) {
-							return $this->freepbx->Core->getDevice($args['id']);
+							try{
+								return $this->freepbx->Core->getDevice($args['id']);
+							}catch(Exception $ex){
+								FormattedError::setInternalErrorMessage($ex->getMessage());
+							}		
 						}
 					]
 				];
@@ -216,7 +285,7 @@ class Extensions extends Base {
 	}
 	private function getMutationFieldsRange() {
 		return [
-			'start' => [
+			'startExtension' => [
 				'type' => Type::nonNull(Type::id()),
 				'description' => _("Give your Extension Starting Number")
 			],
@@ -225,27 +294,27 @@ class Extensions extends Base {
 				'description' => _("The CallerID name , a name which you want to append along with the extension number.")
 			],
 			'tech' => [
-				'type' => Type::nonNull(Type::string()),
+				'type' => Type::string(),
 				'description' => _("Technology driver type")
 			],
-			'nuberofexten' => [
+			'numberOfExtensions' => [
 				'type' => Type::nonNull(Type::id()),
 				'description' => _("Number of extensions you want to create.")
 			],
-			'um' => [
+			'umEnable' => [
 				'type' => Type::string(),
 				'description' => _("Usermanagment enable yes/no.")
 			],
-			'outboundcid' => [
+			'outboundCid' => [
 				'type' => Type::string(),
 				'description' => _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.
 									Format: \"caller name\" <#######>")
 			],
-			'umgroups' => [
+			'umGroups' => [
 				'type' => Type::string(),
 				'description' => _("Usermanagment groupid. (comma seperated)")
 			],
-			'emergency_cid' => [
+			'emergencyCid' => [
 				'type' => Type::string(),
 				'description' => _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.")
 			],
@@ -253,13 +322,21 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
-			'vm' => [
+			'vmEnable' => [
 				'type' => Type::string(),
 				'description' => _("Voicemail enable yes/no.")
 			],
-			'vmpwd' => [
+			'vmPassword' => [
 				'type' => Type::string(),
 				'description' => _("Voicemail password")
+			],
+			'callerID' => [
+				'type' => Type::string(),
+				'description' => _("User caller ID")
+			],
+			'channelName' => [
+				'type' => Type::string(),
+				'description' => _("Channel Name incase if you are using tech DAHDi.")
 			],
 		];
 	}
@@ -271,10 +348,10 @@ class Extensions extends Base {
 				'description' => _("Give your Extension a unique integer ID. The Extension will use this ID to create Extension in the system")
 			],
 			'tech' => [
-				'type' => Type::nonNull(Type::string()),
+				'type' => Type::string(),
 				'description' =>_("Technology driver type")
 			],
-			'channel' => [
+			'channelName' => [
 				'type' => Type::string(),
 				'description' => _("Channel Name incase if you are using tech DAHDi.")
 				],
@@ -282,12 +359,12 @@ class Extensions extends Base {
 				'type' => Type::nonNull(Type::string()),
 				'description' => _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number.")
 			],
-			'outboundcid' => [
+			'outboundCid' => [
 				'type' => Type::string(),
 				'description' => _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.
 									Format: \"caller name\" <#######>")
 			],
-			'emergency_cid' => [
+			'emergencyCid' => [
 				'type' => Type::string(),
 				'description' => _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.")
 			],
@@ -295,21 +372,25 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
-			'um' => [
+			'umEnable' => [
 				'type' => Type::string(),
 				'description' => _("Usermanagment enable yes/no.")
 			],
-			'umgroups' => [
+			'umGroups' => [
 				'type' => Type::string(),
 				'description' => _("Usermanagment groupid. (comma seperated)")
 			],
-			'vm' => [
+			'vmEnable' => [
 				'type' => Type::string(),
 				'description' => _("Voicemail enable yes/no.")
 			],
-			'vmpwd' => [
+			'vmPassword' => [
 				'type' => Type::string(),
 				'description' => _("Voicemail password")
+			],
+			'callerID' => [
+				'type' => Type::string(),
+				'description' => _("User caller ID")
 			],
 		];
 	}
