@@ -3018,7 +3018,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$results['rvolume'] = strtolower($astman->database_get("AMPUSER",$extension."/rvolume"));
 
 		} else {
-			throw new \Exception("Cannot connect to Asterisk Manager with ".$this->FreePBX->Config->get("AMPMGRUSER")."/".$this->FreePBX->Config->get("AMPMGRPASS"));
+			throw new \Exception("Cannot connect to Asterisk Manager with using user[".$this->FreePBX->Config->get("AMPMGRUSER")."]");
 		}
 		$this->getUserCache[$extension] = $results;
 		return $results;
