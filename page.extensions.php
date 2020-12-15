@@ -1,6 +1,6 @@
 <?php /* $Id$ */
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-$ret = core_getAmpUser($_SESSION['AMP_user']->username);
+$ret = $_SESSION['AMP_user']->getAmpUser($_SESSION['AMP_user']->username);
 $sections = !empty($ret['sections']) ? $ret['sections'] : array();
 $popover = isset($_REQUEST['fw_popover']) ? "&amp;fw_popover=".$_REQUEST['fw_popover'] : '';
 
