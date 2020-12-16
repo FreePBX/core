@@ -48,14 +48,14 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			extension(id: \"{$testExtension}\") { extension,user{name,outboundcid}}
+			fetchExtension(id: \"{$testExtension}\") { extension,user{name,outboundcid}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals($json,'{"data":{"extension":{"extension":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}');
+		$this->assertEquals($json,'{"data":{"fetchExtension":{"extension":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}');
 	}
 	
 	public function testAddExtension(){
@@ -332,4 +332,184 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		));
 	}
 
+	public function testAddExtensionWhenBooleanOptionsAreSetToTrue(){
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extension: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:true
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals($json,json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => "true"
+					)
+				)
+			)
+		));
+	}
+
+	public function testAddExtensionWhenBooleanOptionsAreSetToFalse(){
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extension: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:false
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:false
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals($json,json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => "true"
+					)
+				)
+			)
+		));
+	}
+
+	public function testAddExtensionWhenBooleanOptionsAreSetToFalseAndTrue(){
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extension: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:false
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals($json,json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => "true"
+					)
+				)
+			)
+		));
+	}
+
+	public function testAddExtensionWhenSendingSameFiledsTwoTimes(){
+		//sending channel name fied 2 time should give an error
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extension: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:true
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals('{"errors":[{"message":"There can be only one input field named \"channelName\".","status":false}]}',$json);
+	}
 }
