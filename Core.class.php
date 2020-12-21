@@ -1111,6 +1111,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					//
 				case "addroute":
 					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
+					$_REQUEST['id'] = $extdisplay;
 					needreload();
 				break;
 				case "editroute":
