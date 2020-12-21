@@ -658,6 +658,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<!--END Email Body-->
 			</div>
 			<!--END NOTIFICATIONS-->
+			<?php echo $hooks['hookContent']?>
 			<!--Hooks in the "Additional Settings tab -->
 			<div class="tab-pane" id="additionalsettings">
 				<?php //echo $module_hook->hookHtml; ?>
