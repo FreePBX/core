@@ -44,9 +44,7 @@ class Extensions extends Base {
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
-							$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
-							$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+							$input = $this->resolveNames($input);
 							try{
 								$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
 								$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
@@ -84,11 +82,7 @@ class Extensions extends Base {
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);
 								$this->freepbx->Core->delUser($input['extension']);
-								$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
-								$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
-								$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
-								$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
-								$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+								$input = $this->resolveNames($input);
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'] ,$input['extension'],$input);
 								if($status['status'] == True){
 									return array("status" => true ,"message"=> "Extension has been updated");
@@ -159,9 +153,7 @@ class Extensions extends Base {
 							for($i =$input['startExtension'];$i< $max; $i++){
 								$input['name'] = $i.'  '.$input['name'];
 								$input['extension'] = $i;
-								$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
-								$input['vm'] = isset($input['vmEnable']) ? $input['vmEnable'] : 'yes';
-								$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+								$input = $this->resolveNames($input);
 								try{
 									$re = $this->freepbx->Core->processQuickCreate($input['tech'],$i,$input);
 								}catch(\Exception $ex){
@@ -184,7 +176,7 @@ class Extensions extends Base {
 		if($this->checkAllReadScope()) {
 			return function() {
 				return [
-					'allExtensions' => [
+					'fetchAllExtensions' => [
 						'type' => $this->typeContainer->get('extension')->getConnectionType(),
 						'description' => '',
 						'args' => Relay::connectionArgs(),
@@ -192,7 +184,7 @@ class Extensions extends Base {
 							return Relay::connectionFromArray($this->freepbx->Core->getAllDevicesByType(), $args);
 						},
 					],
-					'extension' => [
+					'fetchExtension' => [
 						'type' => $this->typeContainer->get('extension')->getObject(),
 						'description' => '',
 						'args' => [
@@ -302,7 +294,7 @@ class Extensions extends Base {
 				'description' => _("Number of extensions you want to create.")
 			],
 			'umEnable' => [
-				'type' => Type::string(),
+				'type' => Type::boolean(),
 				'description' => _("Usermanagment enable yes/no.")
 			],
 			'outboundCid' => [
@@ -323,7 +315,7 @@ class Extensions extends Base {
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
 			'vmEnable' => [
-				'type' => Type::string(),
+				'type' => Type::boolean(),
 				'description' => _("Voicemail enable yes/no.")
 			],
 			'vmPassword' => [
@@ -373,7 +365,7 @@ class Extensions extends Base {
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
 			'umEnable' => [
-				'type' => Type::string(),
+				'type' => Type::boolean(),
 				'description' => _("Usermanagment enable yes/no.")
 			],
 			'umGroups' => [
@@ -381,7 +373,7 @@ class Extensions extends Base {
 				'description' => _("Usermanagment groupid. (comma seperated)")
 			],
 			'vmEnable' => [
-				'type' => Type::string(),
+				'type' => Type::boolean(),
 				'description' => _("Voicemail enable yes/no.")
 			],
 			'vmPassword' => [
@@ -395,4 +387,23 @@ class Extensions extends Base {
 		];
 	}
 
+	private function resolveNames($input){
+		$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
+		if(isset($input['vmEnable']) && $input['vmEnable'] == true){
+			$input['vm']  = 'yes';
+		}elseif(isset($input['vmEnable']) && $input['vmEnable'] == false){
+			$input['vm']  = 'no';
+		}else{
+			$input['vm'] = 'yes';
+		}
+		if(isset($input['umEnable']) && $input['umEnable'] == true){
+			$input['umEnable']  = 'yes';
+		}elseif(isset($input['umEnable']) && $input['umEnable'] == false){
+			$input['umEnable']  = 'no';
+		}
+		$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
+		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
+		$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+		return $input;
+	}
 }
