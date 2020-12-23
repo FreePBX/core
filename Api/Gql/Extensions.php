@@ -31,7 +31,7 @@ class Extensions extends Base {
 						'inputFields' => $this->getMutationFields(),
 						'outputFields' => [
 							'status' => [
-								'type' => Type::nonNull(Type::string()),
+								'type' => Type::nonNull(Type::boolean()),
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
@@ -46,14 +46,16 @@ class Extensions extends Base {
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->resolveNames($input);
 							try{
-								$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
-								$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							}catch(\Exception $ex){
 								//extracting exception message and updating with response message
 								FormattedError::setInternalErrorMessage($ex->getMessage());
 							}
-							return !empty($status) ? $status : [];
+							if(!empty($status)){
+								return ['message' => _("Extension has been created Successfully"),'status' => true];
+							}else{
+								return ['message' => _("This device id is already in use"),'status' => false];
+							}
 						}
 					]),
 					'updateExtension' => Relay::mutationWithClientMutationId([
@@ -62,7 +64,7 @@ class Extensions extends Base {
 						'inputFields' => $this->getMutationFields(),
 						'outputFields' => [
 							'status' => [
-								'type' => Type::nonNull(Type::string()),
+								'type' => Type::nonNull(Type::boolean()),
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
@@ -76,32 +78,31 @@ class Extensions extends Base {
 						],
 						'mutateAndGetPayload' => function ($input) {
 						    try {
+								$input = $this->resolveNames($input);
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);
 								$this->freepbx->Core->delUser($input['extension']);
-								$input = $this->resolveNames($input);
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'] ,$input['extension'],$input);
 								if($status['status'] == True){
-									return array("status" => true ,"message"=> "Extension has been updated");
+									return array("status" => true ,"message"=> _("Extension has been updated"));
 								}else{
-									return array("status" => false ,"message"=> "Sorry could not update the extension");
+									return array("status" => false ,"message"=> _("Sorry could not update the extension"));
 								}
 							}catch(\Exception $ex ){
 								FormattedError::setInternalErrorMessage($ex->getMessage());
 							}
-							return !empty($status) ? $status: [];
 						}
 					]),
 					'deleteExtension' => Relay::mutationWithClientMutationId([
 						'name' => 'deleteExtension',
 						'description' => _('Delete an Extension in Core'),
-						'inputFields' => ['extension' => ['type' => Type::nonNull(Type::id()),'description' => 'Extension Number to be deleted']],
+						'inputFields' => ['extensionId' => ['type' => Type::nonNull(Type::id()),'description' => 'Extension Number to be deleted']],
 						'outputFields' => [
 							'status' => [
-								'type' => Type::nonNull(Type::string()),
+								'type' => Type::nonNull(Type::boolean()),
 								'resolve' => function ($payload) {
 									return $payload['status'];
 								}
@@ -115,18 +116,17 @@ class Extensions extends Base {
 						],
 						'mutateAndGetPayload' => function ($input) {
 							try {
+								$input['extension'] = $input['extensionId'];
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);
 								$this->freepbx->Core->delUser($input['extension']);
-								$item = array("status" => true ,"message"=> "Extension has been deleted");
+								return array("status" => true ,"message"=> _("Extension has been deleted"));
 							}catch(Exception $ex){
 								FormattedError::setInternalErrorMessage($ex->getMessage());
 							}
-						
-							return !empty($item) ? $item : [];
 						}
 					]),
 					'createRangeofExtension' => Relay::mutationWithClientMutationId([
@@ -164,7 +164,11 @@ class Extensions extends Base {
 								}
 							}
 							$item['status'] = $count;
-							return !empty($item) ? $item : [];
+							if(!empty($item)){
+								return ['message' => _("Extension's has been created Successfully"),'status' => true];
+							}else{
+								return ['message' => _("This device id is already in use"),'status' => false];
+							}
 						}
 					]),
 				];
@@ -181,21 +185,31 @@ class Extensions extends Base {
 						'description' => '',
 						'args' => Relay::connectionArgs(),
 						'resolve' => function($root, $args) {
-							return Relay::connectionFromArray($this->freepbx->Core->getAllDevicesByType(), $args);
+							$list = Relay::connectionFromArray($this->freepbx->Core->getAllDevicesByType(), $args);
+							if(isset($list) && $list != null){
+								return ['response'=> $list,'status'=>true, 'message'=> _("Extension's found successfully")];
+							}else{
+								return ['message'=> _("Sorry, unable to find any extensions"),'status' => false];
+							}
 						},
 					],
 					'fetchExtension' => [
 						'type' => $this->typeContainer->get('extension')->getObject(),
 						'description' => '',
 						'args' => [
-							'id' => [
+							'extensionId' => [
 								'type' => Type::id(),
-								'description' => 'The ID',
+								'description' => _('The ExtensionId to fetch'),
 							]
 						],
 						'resolve' => function($root, $args) {
+							$res = $this->freepbx->Core->getDevice($args['extensionId']);
 							try{
-								return $this->freepbx->Core->getDevice($args['id']);
+								if(!empty($res)){
+									return ['response' => $res, 'status' => true, 'message' => _('Extension found successfully')];
+								}else{
+									return ['status' => false, 'message' => _('Extension does not exists')];
+								}
 							}catch(Exception $ex){
 								FormattedError::setInternalErrorMessage($ex->getMessage());
 							}		
@@ -221,31 +235,71 @@ class Extensions extends Base {
 		$user->addFieldCallback(function() {
 			return [
 				'id' => Relay::globalIdField('extension', function($row) {
-					return isset($row['id']) ? $row['id'] : null;
+					return isset($row['response']) ? $row['response']['id'] : null;
 				}),
-				'extension' => [
-					'type' => Type::nonNull(Type::string()),
+				'extensionId' => [
+					'type' => Type::string(),
 					'description' => _('Give your device a unique integer ID. The device will use this ID to authenticate to the system'),
 					'resolve' => function($row) {
-						return isset($row['id']) ? $row['id'] : null;
+						if(isset($row['id'])){
+							return $row['id'];
+						}elseif(isset($row['response'])){
+							return  $row['response']['id'];
+						}
+						return null;
+					}
+				],
+				'tech' => [
+					'type' => Type::string(),
+					'description' => _('Device tech default is pjsip'),
+					'resolve' => function($row) {
+						if(isset($row['tech'])){
+							return $row['tech'];
+						}elseif(isset($row['response'])){
+							return  $row['response']['tech'];
+						}
+						return null;
 					}
 				],
 				'user' => [
 					'type' => $this->typeContainer->get('coreuser')->getObject(),
 					'description' => _('Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.'),
 					'resolve' => function($row) {
-						if($row['devicetype'] !== 'fixed') {
+						if(isset($row['response']) && $row['response']['devicetype'] !== 'fixed') {
+							return null;
+						}else if(isset($row['devicetype']) && $row['devicetype'] !== 'fixed'){
 							return null;
 						}
-						$item = $this->freepbx->Core->getUser($row['user']);
-						return isset($item) ? $item : null;
+						if(isset($row['response'])){
+							return $this->freepbx->Core->getUser($row['response']['user']);
+						}elseif(isset($row)){
+							return $this->freepbx->Core->getUser($row['user']);
+						}
+						return null;	
 					}
 				],
-				'device' => [
+				'coreDevice' => [
 					'type' => $this->typeContainer->get('coredevice')->getObject(),
 					'description' => _('Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.'),
 					'resolve' => function($row) {
-						return $row;
+						if(isset($row['response'])){
+							return $row['response'];
+						}elseif(isset($row)){
+							return  $row;
+						}
+						return null;
+					}
+				],
+				'status' => [
+					'type' => Type::nonNull(Type::boolean()),
+					'resolve' => function ($payload) {
+						return $payload['status'];
+					}
+				],
+				'message' => [
+					'type' => Type::nonNull(Type::string()),
+					'resolve' => function ($payload) {
+						return $payload['message'];
 					}
 				],
 			];
@@ -260,7 +314,7 @@ class Extensions extends Base {
 				'totalCount' => [
 					'type' => Type::int(),
 					'resolve' => function($value) {
-						return $this->getTotal();
+						return count($this->freepbx->Core->getAllDevicesByType());
 					}
 				],
 				'extension' => [
@@ -268,10 +322,22 @@ class Extensions extends Base {
 					'resolve' => function($root, $args) {
 						$data = array_map(function($row){
 							return $row['node'];
-						},$root['edges']);
+						},$root['response']['edges']);
 						return $data;
 					}
-				]
+				],
+				'status' => [
+					'type' => Type::nonNull(Type::boolean()),
+					'resolve' => function ($payload) {
+						return $payload['status'];
+					}
+				],
+				'message' => [
+					'type' => Type::nonNull(Type::string()),
+					'resolve' => function ($payload) {
+						return $payload['message'];
+					}
+				],
 			];
 		});
 	}
@@ -335,7 +401,7 @@ class Extensions extends Base {
 		
 	private function getMutationFields() {
 		return [
-			'extension' => [
+			'extensionId' => [
 				'type' => Type::nonNull(Type::id()),
 				'description' => _("Give your Extension a unique integer ID. The Extension will use this ID to create Extension in the system")
 			],
@@ -404,6 +470,14 @@ class Extensions extends Base {
 		$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
 		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
 		$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+
+		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
+		$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+		
+		if(isset($input['extensionId'])){
+			$input['extension'] = $input['extensionId'];
+		}
+		
 		return $input;
 	}
 }

@@ -48,14 +48,17 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			fetchExtension(id: \"{$testExtension}\") { extension,user{name,outboundcid}}
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundcid}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals($json,'{"data":{"fetchExtension":{"extension":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}');
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}',$json);
+		  
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 	
 	public function testAddExtension(){
@@ -74,7 +77,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
@@ -85,15 +88,18 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAddExtensionFailureExtensionAlreadyExists(){
@@ -105,7 +111,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
@@ -116,14 +122,15 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(
 					array('message' => "This device id is already in use" ,
 					'status' => false)
-					)
-				)
-			)
-		);
+					))
+				),$json);
+		
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWithoutRequiredField(){
@@ -139,7 +146,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
@@ -149,15 +156,17 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
 					'message' => "Field addExtensionInput.name of required type String! was not provided." ,
 					'status' => false
 					)
-				)
-			  )
-			)
+				))
+			),$json
 		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testAddExtensionwithoutAnyField(){
@@ -177,20 +186,21 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
-					'message' => "Field addExtensionInput.extension of required type ID! was not provided." ,
+					'message' => "Field addExtensionInput.extensionId of required type ID! was not provided." ,
 					'status' => false
 					)
-				)
-			  )
-			)
+				))),$json
 		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testUpdateExtension()
 	{
-		$testExtension = 909000899;
+		$testExtension = 907070;
 		$name = 'api test';
 		$tech = 'pjsip';
 		$outboundId = '12345678901';
@@ -208,7 +218,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//updated the new extension created 
 		$response = $this->request("mutation {
 		 updateExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
@@ -219,13 +229,15 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 				'updateExtension' => array('message' => "Extension has been updated",
-					'status' => "true")
-				)
-			)
-		));
+					'status' => true)
+				))
+			),$json);
+		
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 	
 	public function testUpdateExtensionWhichDoesNotExists()
@@ -242,7 +254,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//updated the new extension created 
 		$response = $this->request("mutation {
 		 updateExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
@@ -253,19 +265,20 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
 						'message' => "Extension does not exists.",
-						"status" => "false"
+						"status" => false
 				)
-			  )
-			)
-		));
+			  ))
+		),$json);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 	
+	public function testDeleteExtension(){
 
-	public function testDeleteExtension()
-	{
 		$testExtension = 909000140;
 		$name = 'api test';
 		$tech = 'pjsip';
@@ -284,7 +297,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//delete the new extension created 
 		$response = $this->request("mutation {
 		 deleteExtension ( input: {
-				extension: $testExtension
+				extensionId: $testExtension
 				 clientMutationId: \"{$clientMutationId}\"
 			  })
 			  { clientMutationId status }
@@ -293,26 +306,29 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'deleteExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());	
 	}
 
-	public function testDeleteExtensionWhichDoesNotExists()
-	{
+	public function testDeleteExtensionWhichDoesNotExists(){
+
 		$testExtension = 909000140;
 		$clientMutationId = "test1231";
 
 		//delete the new extension created 
 		$response = $this->request("mutation {
 		 deleteExtension ( input: {
-				extension: $testExtension
+				extensionId: $testExtension
 				 clientMutationId: \"{$clientMutationId}\"
 			  })
 			  { message status }
@@ -321,15 +337,18 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(
 					array(
 						'message' => "Extension does not exists.",
-						'status' => "false"
+						'status' => false
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWhenBooleanOptionsAreSetToTrue(){
@@ -348,7 +367,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				tech:\"pjsip\"
@@ -368,15 +387,18 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWhenBooleanOptionsAreSetToFalse(){
@@ -395,7 +417,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				tech:\"pjsip\"
@@ -415,15 +437,18 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWhenBooleanOptionsAreSetToFalseAndTrue(){
@@ -442,7 +467,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				tech:\"pjsip\"
@@ -462,15 +487,18 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWhenSendingSameFiledsTwoTimes(){
@@ -489,7 +517,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				channelName : \"{$channelName}\"
@@ -511,5 +539,8 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		$json = (string)$response->getBody();
 
 		$this->assertEquals('{"errors":[{"message":"There can be only one input field named \"channelName\".","status":false}]}',$json);
+		
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 }
