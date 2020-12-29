@@ -134,6 +134,9 @@ class Devices extends Base {
 
 		$user->addFieldCallback(function() {
 			return [
+				'id' => Relay::globalIdField('extension', function($row) {
+					return isset($row['id']) ? $row['id'] : null;
+				}),
 				'device_id' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => 'Give your device a unique integer ID. The device will use this ID to authenticate to the system',
