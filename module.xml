@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.41</version>
+	<version>15.0.12.42</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.42* Fixing FREEPBX-22118 and FREEPBX-19671 
 		*15.0.12.41* Packaging of ver 15.0.12.41
 		*15.0.12.40* FREEPBX-22068 UCP Allowing access to extensions edit allow create new extensions 
 		*15.0.12.39* Packaging of ver 15.0.12.39
