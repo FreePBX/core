@@ -551,4 +551,40 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//status 400 failure check
       $this->assertEquals(400, $response->getStatusCode());
 	}
+
+	public function testAddExtensionForAlphanumericValuesShouldReturnFalse(){
+
+		$testExtension = "90test96999";
+		$name = 'api test';
+		$name = "name";
+		$email = "xyz@xyz.com";
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name : \"{$name}\"
+				email : \"{$email}\"
+			  })
+			  {  message status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'errors' => array(array(
+					'message' => "Please enter only numeric values" ,
+					'status' => false
+					)
+				))
+			),$json
+		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
+	}
 }
