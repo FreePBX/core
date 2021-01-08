@@ -29,22 +29,16 @@ class Extensions extends Base {
 						'name' => 'addExtension',
 						'description' => _('Add a new Extension to Core'),
 						'inputFields' => $this->getMutationFields(),
-						'outputFields' => [
-							'status' => [
-								'type' => Type::nonNull(Type::boolean()),
-								'resolve' => function ($payload) {
-									return $payload['status'];
-								}
-							],
-							'message' => [
-								'type' => Type::nonNull(Type::string()),
-								'resolve' => function ($payload) {
-									return $payload['message'];
-								}
-							]
-						],
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->resolveNames($input);
+							if(!is_numeric($input['extension'])){
+								return ['message' => _("Please enter only numeric values"),'status' => false];
+							}
+							$res = $this->freepbx->Core->getDevice($input['extension']);
+							if(!empty($res)){
+								return ['message' => _("This device id is already in use"),'status' => false];
+							}
 							try{
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							}catch(\Exception $ex){
@@ -54,37 +48,33 @@ class Extensions extends Base {
 							if(!empty($status)){
 								return ['message' => _("Extension has been created Successfully"),'status' => true];
 							}else{
-								return ['message' => _("This device id is already in use"),'status' => false];
+								return ['message' => _("Failed to create extension"),'status' => false];
 							}
 						}
 					]),
 					'updateExtension' => Relay::mutationWithClientMutationId([
 						'name' => 'updateExtension',
 						'description' => _('Update an Extension in Core'),
-						'inputFields' => $this->getMutationFields(),
-						'outputFields' => [
-							'status' => [
-								'type' => Type::nonNull(Type::boolean()),
-								'resolve' => function ($payload) {
-									return $payload['status'];
-								}
-							],
-							'message' => [
-								'type' => Type::string(),
-								'resolve' => function ($payload) {
-									return $payload['message'];
-								}
-							]
-						],
+						'inputFields' => $this->getMutationFieldsUpdate(),
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 						    try {
 								$input = $this->resolveNames($input);
+								if(!is_numeric($input['extension'])){
+									return ['message' => _("Please enter only numeric values"),'status' => false];
+								}
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
+								$users = $this->freepbx->Core->getUser($input['extension']);
+								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
+
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);
-								$this->freepbx->Core->delUser($input['extension']);
+								$this->freepbx->Core->delUser($input['extension']);	
+								if(!empty($userman))
+							   	$this->freepbx->userman->deleteUserByID($userman['id']);
+								$input = $this->getUpdatedValues($extensionExists,$users,$userman,$input);
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'] ,$input['extension'],$input);
 								if($status['status'] == True){
 									return array("status" => true ,"message"=> _("Extension has been updated"));
@@ -99,24 +89,14 @@ class Extensions extends Base {
 					'deleteExtension' => Relay::mutationWithClientMutationId([
 						'name' => 'deleteExtension',
 						'description' => _('Delete an Extension in Core'),
-						'inputFields' => ['extensionId' => ['type' => Type::nonNull(Type::id()),'description' => 'Extension Number to be deleted']],
-						'outputFields' => [
-							'status' => [
-								'type' => Type::nonNull(Type::boolean()),
-								'resolve' => function ($payload) {
-									return $payload['status'];
-								}
-							],
-							'message' => [
-								'type' => Type::string(),
-								'resolve' => function ($payload) {
-									return $payload['message'];
-								}
-							]
-						],
+						'inputFields' => ['extensionId' => ['type' => Type::nonNull(Type::id()),'description' => _('Extension Number to be deleted')]],
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							try {
 								$input['extension'] = $input['extensionId'];
+								if(!is_numeric($input['extension'])){
+									return ['message' => _("Please enter only numeric values"),'status' => false];
+								}
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
@@ -133,25 +113,13 @@ class Extensions extends Base {
 						'name' => 'CreateRangeofExtension',
 						'description' => _('Create a Range of Extensions'),
 						'inputFields' => $this->getMutationFieldsRange(),
-						'outputFields' => [
-							'status' => [
-								'type' => Type::nonNull(Type::string()),
-								'resolve' => function ($payload) {
-									return $payload['status'];
-								}
-							],
-							'message' => [
-								'type' => Type::string(),
-								'resolve' => function ($payload) {
-									return $payload['message'];
-								}
-							]
-						],
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
+							$name = $input['name'];
 							for($i =$input['startExtension'];$i< $max; $i++){
-								$input['name'] = $i.'  '.$input['name'];
+								$input['name'] = $i.'  '.$name;
 								$input['extension'] = $i;
 								$input = $this->resolveNames($input);
 								try{
@@ -238,7 +206,7 @@ class Extensions extends Base {
 					return isset($row['response']) ? $row['response']['id'] : null;
 				}),
 				'extensionId' => [
-					'type' => Type::string(),
+					'type' => Type::id(),
 					'description' => _('Give your device a unique integer ID. The device will use this ID to authenticate to the system'),
 					'resolve' => function($row) {
 						if(isset($row['id'])){
@@ -291,13 +259,13 @@ class Extensions extends Base {
 					}
 				],
 				'status' => [
-					'type' => Type::nonNull(Type::boolean()),
+					'type' => Type::boolean(),
 					'resolve' => function ($payload) {
 						return $payload['status'];
 					}
 				],
 				'message' => [
-					'type' => Type::nonNull(Type::string()),
+					'type' => Type::string(),
 					'resolve' => function ($payload) {
 						return $payload['message'];
 					}
@@ -327,13 +295,13 @@ class Extensions extends Base {
 					}
 				],
 				'status' => [
-					'type' => Type::nonNull(Type::boolean()),
+					'type' => Type::boolean(),
 					'resolve' => function ($payload) {
 						return $payload['status'];
 					}
 				],
 				'message' => [
-					'type' => Type::nonNull(Type::string()),
+					'type' => Type::string(),
 					'resolve' => function ($payload) {
 						return $payload['message'];
 					}
@@ -377,7 +345,7 @@ class Extensions extends Base {
 				'description' => _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.")
 			],
 			'email' => [
-				'type' => Type::string(),
+				'type' => Type::nonNull(Type::string()),
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
 			'vmEnable' => [
@@ -427,6 +395,60 @@ class Extensions extends Base {
 				'description' => _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.")
 			],
 			'email' => [
+				'type' => Type::nonNull(Type::string()),
+				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
+			],
+			'umEnable' => [
+				'type' => Type::boolean(),
+				'description' => _("Usermanagment enable yes/no.")
+			],
+			'umGroups' => [
+				'type' => Type::string(),
+				'description' => _("Usermanagment groupid. (comma seperated)")
+			],
+			'vmEnable' => [
+				'type' => Type::boolean(),
+				'description' => _("Voicemail enable yes/no.")
+			],
+			'vmPassword' => [
+				'type' => Type::string(),
+				'description' => _("Voicemail password")
+			],
+			'callerID' => [
+				'type' => Type::string(),
+				'description' => _("User caller ID")
+			],
+		];
+	}
+	
+		private function getMutationFieldsupdate() {
+		return [
+			'extensionId' => [
+				'type' => Type::nonNull(Type::id()),
+				'description' => _("Give your Extension a unique integer ID. The Extension will use this ID to create Extension in the system")
+			],
+			'tech' => [
+				'type' => Type::string(),
+				'description' =>_("Technology driver type")
+			],
+			'channelName' => [
+				'type' => Type::string(),
+				'description' => _("Channel Name incase if you are using tech DAHDi.")
+				],
+			'name' => [
+				'type' => Type::string(),
+				'description' => _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number.")
+			],
+			'outboundCid' => [
+				'type' => Type::string(),
+				'description' => _("Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.
+									Format: \"caller name\" <#######>")
+			],
+			'emergencyCid' => [
+				'type' => Type::string(),
+				'description' => _("This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.")
+			],
+			'email' => [
 				'type' => Type::string(),
 				'description' => _("Email address to use for services such as Voicemail, User Management and Fax.")
 			],
@@ -452,32 +474,76 @@ class Extensions extends Base {
 			],
 		];
 	}
-
+	/**
+	 * resolveNames
+	 *
+	 * @param  mixed $input
+	 * @return void
+	 */
 	private function resolveNames($input){
-		$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : 1;
-		if(isset($input['vmEnable']) && $input['vmEnable'] == true){
-			$input['vm']  = 'yes';
-		}elseif(isset($input['vmEnable']) && $input['vmEnable'] == false){
+		$input['um-groups'] = isset($input['umGroups']) ? explode(',',$input['umGroups']) : array('1');
+		if(isset($input['vmEnable']) && $input['vmEnable'] == false){
 			$input['vm']  = 'no';
 		}else{
 			$input['vm'] = 'yes';
 		}
-		if(isset($input['umEnable']) && $input['umEnable'] == true){
-			$input['umEnable']  = 'yes';
-		}elseif(isset($input['umEnable']) && $input['umEnable'] == false){
-			$input['umEnable']  = 'no';
+		if(isset($input['umEnable']) && $input['umEnable'] == false){
+			$input['um']  = 'no';
+		}else{
+			$input['um']  = 'yes';
 		}
 		$input['vmpwd'] = isset($input['vmPassword']) ? $input['vmPassword'] : '';
 		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
 		$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
 
 		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
-		$input['outboundcid'] = isset($input['outboundCid']) ? $input['outboundCid'] : '';
+		$input['emergency_cid'] = isset($input['emergencyCid']) ? $input['emergencyCid'] : '';
+		$input['callerid'] = isset($input['callerID']) ? $input['callerID'] : '';
+		$input['channel'] = isset($input['channelName']) ? $input['channelName'] : '';
 		
 		if(isset($input['extensionId'])){
 			$input['extension'] = $input['extensionId'];
 		}
 		
 		return $input;
+	}
+	
+	/**
+	 * getUpdatedValues
+	 *
+	 * @param  mixed $extensionExists
+	 * @param  mixed $users
+	 * @param  mixed $userman
+	 * @param  mixed $input
+	 * @return void
+	 */
+	private function getUpdatedValues($extensionExists,$users,$userman,$input){
+
+		$input['tech']= !empty($input['tech']) ? $input['tech'] : $extensionExists['tech'];
+		$input['channel']= !empty($input['channel']) ? $input['channel'] : $extensionExists['description'];
+		$input['emergency_cid']= !empty($input['emergency_cid']) ? $input['emergency_cid'] : $extensionExists['emergency_cid'];
+		$input['callerid']= !empty($input['callerid']) ? $input['callerid'] : isset($extensionExists['callerid']) ? $extensionExists['callerid'] : '';
+		$input['name']= !empty($input['name']) ? $input['name'] : isset($users['name']) ? $users['name'] : '';
+		$input['outboundcid']= !empty($input['outboundcid']) ? $input['outboundcid'] : isset($users['outboundcid']) ? $users['outboundcid'] : '';
+		$input['vmpwd']= !empty($input['vmpwd']) ? $input['vmpwd'] : $users['password'];
+		$input['email']= !empty($input['email']) ? $input['email'] : $userman['email'];
+
+		return $input;
+	}
+	
+	/**
+	 * getoutputFields
+	 *
+	 * @return void
+	 */
+	public function getoutputFields(){
+		return [
+			'status' => [
+			'type' => Type::boolean(),
+		],
+		   'message' => [
+			'type' => Type::string(),
+			]
+		];
 	}
 }
