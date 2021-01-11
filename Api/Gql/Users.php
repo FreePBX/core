@@ -158,45 +158,59 @@ class Users extends Base {
 					'description' => '',
 
 				],
-				'outboundcid' => [
+				'outboundCid' => [
 					'type' => Type::string(),
-					'description' => 'Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.',
-
+					'description' => _('Overrides the CallerID when dialing out a trunk. Any setting here will override the common outbound CallerID set in the Trunks admin.'),
+					'resolve' => function($row) {
+						return isset($row['outboundcid']) ? $row['outboundcid'] : null;
+					}
 				],
 				'sipname' => [
 					'type' => Type::string(),
 					'description' => '',
 
 				],
-				'noanswer_cid' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional CID Prefix to add before sending to this no answer destination',
-
+				'noanswerCid' => [
+					'type' => Type::string(),
+					'description' => _('Optional CID Prefix to add before sending to this no answer destination'),
+					'resolve' => function($row) {
+						return isset($row['noanswer_cid']) ? $row['noanswer_cid'] : null;
+					}
 				],
-				'busy_cid' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional CID Prefix to add before sending to this busy destination.',
-
+				'busyCid' => [
+					'type' =>Type::string(),
+					'description' => _('Optional CID Prefix to add before sending to this busy destination.'),
+					'resolve' => function($row) {
+						return isset($row['busy_cid']) ? $row['busy_cid'] : null;
+					}
 				],
-				'chanunavail_cid' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional CID Prefix to add before sending to this not reachable destination.',
-
+				'chanunavailCid' => [
+					'type' => Type::string(),
+					'description' => _('Optional CID Prefix to add before sending to this not reachable destination.'),
+					'resolve' => function($row) {
+						return isset($row['chanunavail_cid']) ? $row['chanunavail_cid'] : null;
+					}
 				],
-				'noanswer_dest' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional destination call is routed to when the call is not answered on an otherwise idle phone. If the phone is in use and the call is simply ignored, then the busy destination will be used',
-
+				'noanswerDestination' => [
+					'type' => Type::string(),
+					'description' => _('Optional destination call is routed to when the call is not answered on an otherwise idle phone. If the phone is in use and the call is simply ignored, then the busy destination will be used'),
+					'resolve' => function($row) {
+						return isset($row['noanswer_dest']) ? $row['noanswer_dest'] : null;
+					}
 				],
-				'busy_dest' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional destination the call is routed to when the phone is busy or the call is rejected by the user. This destination is also used on an unanswered call if the phone is in use and the user chooses not to pickup the second call.',
-
+				'busyDestination' => [
+					'type' => Type::string(),
+					'description' => _('Optional destination the call is routed to when the phone is busy or the call is rejected by the user. This destination is also used on an unanswered call if the phone is in use and the user chooses not to pickup the second call.'),
+					'resolve' => function($row) {
+						return isset($row['busy_dest']) ? $row['busy_dest'] : null;
+					}
 				],
-				'chanunavail_dest' => [
-					'type' => Type::nonNull(Type::string()),
-					'description' => 'Optional destination the call is routed to when the phone is offline, such as a softphone currently off or a phone unplugged.',
-
+				'chanunavailDestination' => [
+					'type' => Type::string(),
+					'description' => _('Optional destination the call is routed to when the phone is offline, such as a softphone currently off or a phone unplugged.'),
+					'resolve' => function($row) {
+						return isset($row['chanunavail_dest']) ? $row['chanunavail_dest'] : null;
+					}
 				],
 				'mohclass' => [
 					'type' => Type::string(),

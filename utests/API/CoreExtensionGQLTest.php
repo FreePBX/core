@@ -28,7 +28,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testExtentions(){
 
-		$testExtension = 909000140;
+		$testExtension = "909000140";
 		$name = 'api test';
 		$tech = 'pjsip';
 		$outboundId = '12345678901';
@@ -48,14 +48,14 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundcid}}
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}',$json);
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"'.$testExtension.'","user":{"name":"api test","outboundCid":"'.$outboundId.'"}}}}',$json);
 		  
 		//status 200 success check
       $this->assertEquals(200, $response->getStatusCode());
@@ -63,26 +63,26 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 	
 	public function testAddExtension(){
 
-		$testExtension = 9090096111;
+		$testExtension = "1112222";
 		$name = 'api test';
+		$email = "xyz@xyz.com";
 
         // clear old test extension
 		self::$core->delDevice($testExtension);
 		self::$core->delUser($testExtension);
 
-		$testExtension = 9090096111;
-		$name = 'api test';
-		$channelName = "channelName";
+		$tech = "pjsip";
 		$clientMutationId = "test1231";
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
 				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
-				channelName : \"{$channelName}\"
+				tech : \"{$tech}\"
+				email : \"{$email}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
-			  { clientMutationId status }
+			  { clientMutationId status message }
 			}
 		");
 
@@ -92,7 +92,8 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => true
+						'status' => true,
+						'message'=>'Extension has been created Successfully'
 					)
 				)
 			)
@@ -104,16 +105,22 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testAddExtensionFailureExtensionAlreadyExists(){
 
-		$testExtension = 9090096111;
+		$testExtension = "9090096111";
 		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
+		$email = "xyz@xyz.com";
+		$tech = 'pjsip';
+
+		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
+		self::$core->addDevice($testExtension, $tech, $deviceSettings);
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
 				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
+				email : \"{$email}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
 			  { clientMutationId message status }
@@ -135,7 +142,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testAddExtensionWithoutRequiredField(){
 
-		$testExtension = 9090096999;
+		$testExtension = "9090096999";
 		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
@@ -200,7 +207,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testUpdateExtension()
 	{
-		$testExtension = 907070;
+		$testExtension = "907070";
 		$name = 'api test';
 		$tech = 'pjsip';
 		$outboundId = '12345678901';
@@ -214,6 +221,10 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//adding new extension
 		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
 		self::$core->addDevice($testExtension, $tech, $deviceSettings);
+
+		$userSettings = self::$core->generateDefaultUserSettings($testExtension,$name);
+		$userSettings['outboundcid'] = $outboundId;
+		self::$core->addUser($testExtension,$userSettings);
 
 		//updated the new extension created 
 		$response = $this->request("mutation {
@@ -258,6 +269,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
+				
 			  })
 			  { message status }
 			}
@@ -353,15 +365,13 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testAddExtensionWhenBooleanOptionsAreSetToTrue(){
 
-		$testExtension = 9090096111;
+		$testExtension = "9090096111";
 		$name = 'api test';
 
         // clear old test extension
 		self::$core->delDevice($testExtension);
 		self::$core->delUser($testExtension);
 
-		$testExtension = 9090096111;
-		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
 
@@ -503,15 +513,13 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testAddExtensionWhenSendingSameFiledsTwoTimes(){
 		//sending channel name fied 2 time should give an error
-		$testExtension = 9090096111;
+		$testExtension = "9090096111";
 		$name = 'api test';
 
         // clear old test extension
 		self::$core->delDevice($testExtension);
 		self::$core->delUser($testExtension);
 
-		$testExtension = 9090096111;
-		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
 
@@ -540,6 +548,42 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$this->assertEquals('{"errors":[{"message":"There can be only one input field named \"channelName\".","status":false}]}',$json);
 		
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
+	}
+
+	public function testAddExtensionForAlphanumericValuesShouldReturnFalse(){
+
+		$testExtension = "90test96999";
+		$name = 'api test';
+		$name = "name";
+		$email = "xyz@xyz.com";
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name : \"{$name}\"
+				email : \"{$email}\"
+			  })
+			  {  message status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'errors' => array(array(
+					'message' => "Please enter only numeric values" ,
+					'status' => false
+					)
+				))
+			),$json
+		);
+
 		//status 400 failure check
       $this->assertEquals(400, $response->getStatusCode());
 	}

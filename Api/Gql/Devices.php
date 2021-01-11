@@ -137,7 +137,7 @@ class Devices extends Base {
 				'id' => Relay::globalIdField('extension', function($row) {
 					return isset($row['id']) ? $row['id'] : null;
 				}),
-				'device_id' => [
+				'deviceId' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => 'Give your device a unique integer ID. The device will use this ID to authenticate to the system',
 					'resolve' => function($row) {
@@ -172,10 +172,12 @@ class Devices extends Base {
 					'type' => Type::string(),
 					'description' => 'The CallerID name for this device will be set to this description until it is logged into.'
 				],
-				'emergency_cid' => [
+				'emergencyCid' => [
 					'type' => Type::string(),
 					'description' => 'This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.',
-
+					'resolve' => function($row) {
+						return isset($row['emergency_cid']) ? $row['emergency_cid'] : null;
+					}
 				],
 
 			];
