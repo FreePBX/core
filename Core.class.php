@@ -213,6 +213,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$channel = $data['channel'];
 		}
 		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name'],$channel);
+		$settings['emergency_cid']['value'] = isset($data['emergency_cid']) ? $data['emergency_cid'] : '';
+		$input['callerid']['value'] = isset($data['callerid']) ? $data['callerid'] : '' ;
 		if(!$this->addDevice($extension,$tech,$settings)) {
 			return array("status" => false, "message" => _("Device was not added!"));
 		}
@@ -1111,6 +1113,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					//
 				case "addroute":
 					$extdisplay = core_routing_addbyid($routename, $outcid, $outcid_mode, $routepass, $emergency, $intracompany, $mohsilence, $time_group_id, $dialpattern_insert, $trunkpriority, $route_seq, $dest, $time_mode, $timezone, $calendar_id, $calendar_group_id, $notification_on, $emailfrom, $emailto, $emailsubject, $emailbody);
+					$_REQUEST['id'] = $extdisplay;
 					needreload();
 				break;
 				case "editroute":

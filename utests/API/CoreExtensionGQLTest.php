@@ -28,7 +28,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 	public function testExtentions(){
 
-		$testExtension = 909000140;
+		$testExtension = "909000140";
 		$name = 'api test';
 		$tech = 'pjsip';
 		$outboundId = '12345678901';
@@ -48,66 +48,79 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			extension(id: \"{$testExtension}\") { extension,user{name,outboundcid}}
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals($json,'{"data":{"extension":{"extension":"'.$testExtension.'","user":{"name":"api test","outboundcid":"'.$outboundId.'"}}}}');
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"'.$testExtension.'","user":{"name":"api test","outboundCid":"'.$outboundId.'"}}}}',$json);
+		  
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 	
 	public function testAddExtension(){
 
-		$testExtension = 9090096111;
+		$testExtension = "1112222";
 		$name = 'api test';
+		$email = "xyz@xyz.com";
 
         // clear old test extension
 		self::$core->delDevice($testExtension);
 		self::$core->delUser($testExtension);
 
-		$testExtension = 9090096111;
-		$name = 'api test';
-		$channelName = "channelName";
+		$tech = "pjsip";
 		$clientMutationId = "test1231";
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
-				channelName : \"{$channelName}\"
+				tech : \"{$tech}\"
+				email : \"{$email}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
-			  { clientMutationId status }
+			  { clientMutationId status message }
 			}
 		");
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'addExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true,
+						'message'=>'Extension has been created Successfully'
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAddExtensionFailureExtensionAlreadyExists(){
 
-		$testExtension = 9090096111;
+		$testExtension = "9090096111";
 		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
+		$email = "xyz@xyz.com";
+		$tech = 'pjsip';
+
+		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
+		self::$core->addDevice($testExtension, $tech, $deviceSettings);
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
+				email : \"{$email}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
 			  { clientMutationId message status }
@@ -116,19 +129,20 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(
 					array('message' => "This device id is already in use" ,
 					'status' => false)
-					)
-				)
-			)
-		);
+					))
+				),$json);
+		
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testAddExtensionWithoutRequiredField(){
 
-		$testExtension = 9090096999;
+		$testExtension = "9090096999";
 		$name = 'api test';
 		$channelName = "channelName";
 		$clientMutationId = "test1231";
@@ -139,7 +153,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("mutation {
 		 addExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
@@ -149,15 +163,17 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
 					'message' => "Field addExtensionInput.name of required type String! was not provided." ,
 					'status' => false
 					)
-				)
-			  )
-			)
+				))
+			),$json
 		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testAddExtensionwithoutAnyField(){
@@ -177,20 +193,21 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
-					'message' => "Field addExtensionInput.extension of required type ID! was not provided." ,
+					'message' => "Field addExtensionInput.extensionId of required type ID! was not provided." ,
 					'status' => false
 					)
-				)
-			  )
-			)
+				))),$json
 		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
 	public function testUpdateExtension()
 	{
-		$testExtension = 909000899;
+		$testExtension = "907070";
 		$name = 'api test';
 		$tech = 'pjsip';
 		$outboundId = '12345678901';
@@ -205,10 +222,14 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
 		self::$core->addDevice($testExtension, $tech, $deviceSettings);
 
+		$userSettings = self::$core->generateDefaultUserSettings($testExtension,$name);
+		$userSettings['outboundcid'] = $outboundId;
+		self::$core->addUser($testExtension,$userSettings);
+
 		//updated the new extension created 
 		$response = $this->request("mutation {
 		 updateExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
@@ -219,13 +240,15 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 				'updateExtension' => array('message' => "Extension has been updated",
-					'status' => "true")
-				)
-			)
-		));
+					'status' => true)
+				))
+			),$json);
+		
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
 	}
 	
 	public function testUpdateExtensionWhichDoesNotExists()
@@ -242,10 +265,11 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//updated the new extension created 
 		$response = $this->request("mutation {
 		 updateExtension ( input: {
-				extension: \"{$testExtension}\",
+				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
 				clientMutationId : \"{$clientMutationId}\"
+				
 			  })
 			  { message status }
 			}
@@ -253,19 +277,20 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(array(
 						'message' => "Extension does not exists.",
-						"status" => "false"
+						"status" => false
 				)
-			  )
-			)
-		));
+			  ))
+		),$json);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 	
+	public function testDeleteExtension(){
 
-	public function testDeleteExtension()
-	{
 		$testExtension = 909000140;
 		$name = 'api test';
 		$tech = 'pjsip';
@@ -284,7 +309,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//delete the new extension created 
 		$response = $this->request("mutation {
 		 deleteExtension ( input: {
-				extension: $testExtension
+				extensionId: $testExtension
 				 clientMutationId: \"{$clientMutationId}\"
 			  })
 			  { clientMutationId status }
@@ -293,26 +318,29 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'data' => array(
 					'deleteExtension' => array(
 						'clientMutationId' => $clientMutationId,
-						'status' => "true"
+						'status' => true
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());	
 	}
 
-	public function testDeleteExtensionWhichDoesNotExists()
-	{
+	public function testDeleteExtensionWhichDoesNotExists(){
+
 		$testExtension = 909000140;
 		$clientMutationId = "test1231";
 
 		//delete the new extension created 
 		$response = $this->request("mutation {
 		 deleteExtension ( input: {
-				extension: $testExtension
+				extensionId: $testExtension
 				 clientMutationId: \"{$clientMutationId}\"
 			  })
 			  { message status }
@@ -321,15 +349,242 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 
 		$json = (string)$response->getBody();
 
-		$this->assertEquals($json,json_encode(array(
+		$this->assertEquals(json_encode(array(
 				'errors' => array(
 					array(
 						'message' => "Extension does not exists.",
-						'status' => "false"
+						'status' => false
 					)
 				)
 			)
-		));
+		),$json);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
 	}
 
+	public function testAddExtensionWhenBooleanOptionsAreSetToTrue(){
+
+		$testExtension = "9090096111";
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:true
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => true
+					)
+				)
+			)
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function testAddExtensionWhenBooleanOptionsAreSetToFalse(){
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:false
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:false
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => true
+					)
+				)
+			)
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function testAddExtensionWhenBooleanOptionsAreSetToFalseAndTrue(){
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$testExtension = 9090096111;
+		$name = 'api test';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:false
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'data' => array(
+					'addExtension' => array(
+						'clientMutationId' => $clientMutationId,
+						'status' => true
+					)
+				)
+			)
+		),$json);
+
+		//status 200 success check
+      $this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function testAddExtensionWhenSendingSameFiledsTwoTimes(){
+		//sending channel name fied 2 time should give an error
+		$testExtension = "9090096111";
+		$name = 'api test';
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				channelName : \"{$channelName}\"
+				tech:\"pjsip\"
+			   outboundCid:\"123456\"
+			   email:\"test@gamil.com\"
+			   umGroups:\"1\"
+			   umEnable:true
+			   vmPassword: \"abcdefgh\"
+			   vmEnable:true
+			   callerID: \"1234567\"
+			   emergencyCid:\"112233445566\"
+				clientMutationId : \"{$clientMutationId}\"
+			  })
+			  { clientMutationId status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals('{"errors":[{"message":"There can be only one input field named \"channelName\".","status":false}]}',$json);
+		
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
+	}
+
+	public function testAddExtensionForAlphanumericValuesShouldReturnFalse(){
+
+		$testExtension = "90test96999";
+		$name = 'api test';
+		$name = "name";
+		$email = "xyz@xyz.com";
+
+        // clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name : \"{$name}\"
+				email : \"{$email}\"
+			  })
+			  {  message status }
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals(json_encode(array(
+				'errors' => array(array(
+					'message' => "Please enter only numeric values" ,
+					'status' => false
+					)
+				))
+			),$json
+		);
+
+		//status 400 failure check
+      $this->assertEquals(400, $response->getStatusCode());
+	}
 }
