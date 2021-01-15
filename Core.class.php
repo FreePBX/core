@@ -213,6 +213,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$channel = $data['channel'];
 		}
 		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name'],$channel);
+		$settings['emergency_cid']['value'] = isset($data['emergency_cid']) ? $data['emergency_cid'] : '';
+		$input['callerid']['value'] = isset($data['callerid']) ? $data['callerid'] : '' ;
 		if(!$this->addDevice($extension,$tech,$settings)) {
 			return array("status" => false, "message" => _("Device was not added!"));
 		}

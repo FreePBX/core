@@ -45,7 +45,7 @@ class Extensions extends Base {
 								//extracting exception message and updating with response message
 								FormattedError::setInternalErrorMessage($ex->getMessage());
 							}
-							if(!empty($status)){
+							if($status == True){
 								return ['message' => _("Extension has been created Successfully"),'status' => true];
 							}else{
 								return ['message' => _("Failed to create extension"),'status' => false];
@@ -64,19 +64,19 @@ class Extensions extends Base {
 									return ['message' => _("Please enter only numeric values"),'status' => false];
 								}
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
-								$users = $this->freepbx->Core->getUser($input['extension']);
-								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
-
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
+								$users = $this->freepbx->Core->getUser($input['extension']);
+								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
+								$input = $this->getUpdatedValues($extensionExists,$users,$userman,$input);
+
 								$this->freepbx->Core->delDevice($input['extension'], true);
 								$this->freepbx->Core->delUser($input['extension']);	
 								if(!empty($userman))
 							   	$this->freepbx->userman->deleteUserByID($userman['id']);
-								$input = $this->getUpdatedValues($extensionExists,$users,$userman,$input);
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'] ,$input['extension'],$input);
-								if($status['status'] == True){
+								if($status == True){
 									return array("status" => true ,"message"=> _("Extension has been updated"));
 								}else{
 									return array("status" => false ,"message"=> _("Sorry could not update the extension"));
@@ -238,9 +238,9 @@ class Extensions extends Base {
 						}else if(isset($row['devicetype']) && $row['devicetype'] !== 'fixed'){
 							return null;
 						}
-						if(isset($row['response'])){
+						if(isset($row['response']['user'])){
 							return $this->freepbx->Core->getUser($row['response']['user']);
-						}elseif(isset($row)){
+						}elseif(isset($row['user'])){
 							return $this->freepbx->Core->getUser($row['user']);
 						}
 						return null;	
@@ -498,9 +498,10 @@ class Extensions extends Base {
 
 		$input['tech']= isset($input['tech']) ? $input['tech'] : "pjsip";
 		$input['emergency_cid'] = isset($input['emergencyCid']) ? $input['emergencyCid'] : '';
-		$input['callerid'] = isset($input['callerID']) ? $input['callerID'] : '';
+		$input['callerid'] = isset($input['callerID']) ? $input['callerID'] : $input['emergency_cid'] ;
 		$input['channel'] = isset($input['channelName']) ? $input['channelName'] : '';
-		
+		$input['calleridname']['value'] = $input['name'];	
+
 		if(isset($input['extensionId'])){
 			$input['extension'] = $input['extensionId'];
 		}
@@ -518,16 +519,26 @@ class Extensions extends Base {
 	 * @return void
 	 */
 	private function getUpdatedValues($extensionExists,$users,$userman,$input){
+		$voicemail = $this->freepbx->LoadConfig->getConfig("voicemail.conf");
 
 		$input['tech']= !empty($input['tech']) ? $input['tech'] : $extensionExists['tech'];
 		$input['channel']= !empty($input['channel']) ? $input['channel'] : $extensionExists['description'];
 		$input['emergency_cid']= !empty($input['emergency_cid']) ? $input['emergency_cid'] : $extensionExists['emergency_cid'];
-		$input['callerid']= !empty($input['callerid']) ? $input['callerid'] : isset($extensionExists['callerid']) ? $extensionExists['callerid'] : '';
-		$input['name']= !empty($input['name']) ? $input['name'] : isset($users['name']) ? $users['name'] : '';
-		$input['outboundcid']= !empty($input['outboundcid']) ? $input['outboundcid'] : isset($users['outboundcid']) ? $users['outboundcid'] : '';
-		$input['vmpwd']= !empty($input['vmpwd']) ? $input['vmpwd'] : $users['password'];
+		$input['callerid']= !empty($input['callerid']) ? $input['callerid'] : (isset($extensionExists['callerid']) ? $extensionExists['callerid'] : '');
+		$input['name']= !empty($input['name']) ? $input['name'] : (isset($users['name']) ? $users['name'] : '');
+		$input['outboundcid']= !empty($input['outboundcid']) ? $input['outboundcid'] : (isset($users['outboundcid']) ? $users['outboundcid'] : '');
 		$input['email']= !empty($input['email']) ? $input['email'] : $userman['email'];
 
+		$vm = isset($voicemail['default'][$input['extension']]) ? ($voicemail['default'][$input['extension']]) : '';
+
+		if(!empty($vm)){
+			$options = explode(",",$vm);
+			$input['vmpwd'] = !empty($input['vmpwd']) ? $input['vmpwd'] : (!empty($options[0]) ? $options[0] : '');
+			$input['vm'] = !empty($input['vm']) ? $input['vm'] : 'yes';
+		}else{
+			$input['vmpwd'] = !empty($input['vmpwd']) ? $input['vmpwd'] :  '';
+		}
+					
 		return $input;
 	}
 	
