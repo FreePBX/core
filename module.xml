@@ -146,22 +146,6 @@
 			<field name="rvolume" type="string" length="2" default="" notnull="false"/>
 			<field name="indication_zone" type="string" length="20" default="default" notnull="false"/>
 		</table>
-		<table name="outbound_routes">
-			<field name="route_id" type="integer" primaryKey="true" autoincrement="true"/>
-			<field name="name" type="string" length="40" notnull="false"/>
-			<field name="outcid" type="string" length="40" notnull="false"/>
-			<field name="outcid_mode" type="string" length="20" notnull="false"/>
-			<field name="password" type="string" length="30" notnull="false"/>
-			<field name="emergency_route" type="string" length="4" notnull="false"/>
-			<field name="intracompany_route" type="string" length="4" notnull="false"/>
-			<field name="mohclass" type="string" length="80" notnull="false"/>
-			<field name="time_mode" type="string" length="20" default="" notnull="false"/>
-			<field name="timezone" type="string" length="255" notnull="false"/>
-			<field name="time_group_id" type="integer" notnull="false"/>
-			<field name="calendar_id" type="string" length="255" notnull="false"/>
-			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
-			<field name="dest" type="string" length="255" notnull="false"/>
-		</table>
 		<table name="dahdichandids">
 			<field name="channel" type="integer" default="0" primaryKey="true"/>
 			<field name="description" type="string" length="40" default=""/>
@@ -198,7 +182,15 @@
 			<field name="calendar_id" type="string" length="255" notnull="false"/>
 			<field name="calendar_group_id" type="string" length="255" notnull="false"/>
 			<field name="timezone" type="string" length="255" notnull="false"/>
+			<field name="notification_on" type="string" length="255" default="call" notnull="false"/>
 		</table>
+		<table name="outbound_route_email">
+            <field name="route_id" type="integer" primarykey="true"/>
+            <field name="emailfrom" type="string" length="320" default="" notnull="false"/>
+            <field name="emailto" type="string" length="320" default="" notnull="false"/>
+            <field name="emailsubject" type="text" default="" notnull="false"/>
+            <field name="emailbody" type="text" default="" notnull="false"/>
+        </table>
 		<table name="trunk_dialpatterns">
 			<field name="trunkid" type="integer" default="0" primarykey="true"/>
 			<field name="match_pattern_prefix" type="string" length="50" default="" primarykey="true"/>
@@ -234,6 +226,9 @@
 		<get_config pri="480">core_do_get_config</get_config>
 	</methods>
 	<console>
+		<command>
+			<name>convert2pjsip</name>
+		</command>
 		<command>
 			<name>trunks</name>
 		</command>
