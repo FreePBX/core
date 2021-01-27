@@ -4016,7 +4016,7 @@ function core_hint_get($account){
 
 	//create a string with & delimiter
 	if (isset($dial) && is_array($dial)){
-		$hint = implode($dial,"&");
+		$hint = implode("&",$dial);
 	} else {
 		if (isset($results[0]['dial'])) {
 			$hint = $results[0]['dial'];
