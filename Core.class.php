@@ -1587,6 +1587,22 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$default[$key] = $data['value'];
 		}
 
+		$getencryptionval = $this->getencryptionval($deviceid, $tech);
+		if (!empty($getencryptionval)) {
+			if ($tech == 'pjsip') {
+				if (isset($getencryptionval[0]['data']) && $getencryptionval[0]['data'] == 'yes') {
+					$default['media_encryption'] = 'sdes';
+				} else {
+					$default['media_encryption'] = 'no';
+				}
+			} else {
+				if (isset($getencryptionval[0]['data']) && $getencryptionval[0]['data'] != 'no') {
+					$default['encryption'] = 'yes';
+				} else {
+					$default['encryption'] = 'no';
+				}
+			}
+		}
 		$updated_dev_setting = array_intersect_key(array_merge($default,$device), $default);
 		$settings = $this->kvArrayifyDeviceValues($updated_dev_setting);
 
@@ -3994,5 +4010,17 @@ class Core extends FreePBX_Helpers implements BMO  {
 		} else {
 			return false;
 		}
+	}
+
+	public function getencryptionval($ext, $tech) {
+		if ($tech == 'pjsip' ) {
+			$sql = "SELECT * FROM sip WHERE id ='$ext' AND keyword='encryption'";
+		} else {
+			$sql = "SELECT * FROM sip WHERE id ='$ext' AND keyword='media_encryption'";
+		}
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute();
+		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		return $result;
 	}
 }
