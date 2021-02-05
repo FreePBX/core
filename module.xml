@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.45</version>
+	<version>15.0.12.46</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.46* FREEI-2765 array_product() expects parameter 1 to be array, object given 
 		*15.0.12.45* FREEPBX-22130 SIP to PJSIP conversion tool needs a couple of bugs fixed 
 		*15.0.12.44* FREEI-2629 updated issue fixed 
 		*15.0.12.43* Packaging of ver 15.0.12.43
