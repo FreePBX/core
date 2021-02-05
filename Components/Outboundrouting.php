@@ -149,7 +149,7 @@ class Outboundrouting extends ComponentBase{
 			$stmt->execute([$route_id, $trunk, $seq]);
 			++$seq;
 		}
-		return $this;
+		return [];
 	}
 
 	public function areAllPaternsUnique(array $array, $column){
