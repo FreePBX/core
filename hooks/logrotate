@@ -8,7 +8,7 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	dateext
 	notifempty
 	sharedscripts
-	create 0640 asterisk asterisk
+	create 0664 asterisk asterisk
 	su asterisk asterisk
 }
 
@@ -21,7 +21,7 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	dateext
 	notifempty
 	sharedscripts
-	create 0640 asterisk asterisk
+	create 0664 asterisk asterisk
 	su asterisk asterisk
 }
 /var/log/asterisk/core-fastagi_*.log {
@@ -31,7 +31,7 @@ cat <<- EOF > /etc/logrotate.d/freepbx-core
 	notifempty
 	dateext
 	sharedscripts
-	create 0640 asterisk asterisk
+	create 0664 asterisk asterisk
 	su asterisk asterisk
 	postrotate
 		/usr/sbin/fwconsole pm2 --reload-logs -q
