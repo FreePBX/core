@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.83</version>
+	<version>14.0.28.84</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.84* FREEI-2738  PBX does not forward the original callerID to a misc destination 
 		*14.0.28.83* Packaging of ver 14.0.28.83
 		*14.0.28.82* FREEPBX-21952 Update comment note for from-pstn-custom 
 		*14.0.28.81* Packaging of ver 14.0.28.81
