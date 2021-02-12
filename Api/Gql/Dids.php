@@ -284,8 +284,7 @@ class Dids extends Base {
 		$destinations->addResolveValueCallback(function($value) {
 			if (substr(trim($value),0,10) == 'from-trunk') {
 				$exten = explode(',',$value);
-				$exten = substr($exten[0],10);
-				$out = $this->freepbx->Core->getDID($settings['extension'], $settings['cidnum']);
+				$out = $this->freepbx->Core->getDID($exten[1], '');
 				if(!empty($out)) {
 					return array_merge($out,['graphqlType' => 'did']);
 				}
