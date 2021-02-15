@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.48</version>
+	<version>15.0.12.49</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.49* FREEI-2828 GraphQL server error on query allInboundRoutes 
 		*15.0.12.48* FREEI-2738  PBX does not forward the original callerID to a misc destination 
 		*15.0.12.47* Fixes FREEPBX-20269 
 		*15.0.12.46* FREEI-2765 array_product() expects parameter 1 to be array, object given 
