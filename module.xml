@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.85</version>
+	<version>14.0.28.86</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.86* Add ability to hide trunks in routes ui 
 		*14.0.28.85* FREEI-2848 core with outbound CID 
 		*14.0.28.84* FREEI-2738  PBX does not forward the original callerID to a misc destination 
 		*14.0.28.83* Packaging of ver 14.0.28.83
