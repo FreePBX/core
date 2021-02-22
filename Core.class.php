@@ -3674,6 +3674,34 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return $ret;
 	}
 
+
+
+	/**
+	 * Hide Trunk in routes ui
+	 * @method hideTrunk
+	 * @param  string       $id The trunk ID
+	 * @return boolean           Result of execute
+	 */
+	public function hideTrunk($id){
+		$sql = "UPDATE trunks set routedisplay = 'off' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ret = $ob->execute(array($id));
+		return $ret;
+	}
+
+	/**
+	 * Show Trunk in routes ui
+	 * @method showTrunk
+	 * @param  string       $id The trunk ID
+	 * @return boolean           Result of execute
+	 */
+	public function showTrunk($id){
+		$sql = "UPDATE trunks set routedisplay = 'on' WHERE trunkid = ?";
+		$ob = $this->database->prepare($sql);
+		$ret = $ob->execute(array($id));
+		return $ret;
+	}
+	
 	/**
 	 * Get Trunk Tech
 	 * @method getTrunkTech
