@@ -275,6 +275,7 @@
 			<field name="provider" type="string" length="40" notnull="false"/>
 			<field name="disabled" type="string" length="4" default="off" notnull="false"/>
 			<field name="continue" type="string" length="4" default="off" notnull="false"/>
+			<field name="routedisplay" type="string" length="4" default="on" notnull="false"/>
 		</table>
 		<table name="pjsip">
 			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
