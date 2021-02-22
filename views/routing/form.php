@@ -179,6 +179,7 @@ $trunks = array();
 foreach (core_trunks_listbyid() as $temp) {
 	$trunks[$temp['trunkid']] = $temp['name'];
 	$trunkstate[$temp['trunkid']] = $temp['disabled'];
+	$trunkdisplay[$temp['trunkid']] = isset($temp['routedisplay']) ? $temp['routedisplay'] : 'on';
 }
 $key = -1;
 if (is_array($trunkpriority)) {
@@ -192,12 +193,12 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 				$trunkhtml .= '<td>';
 				$trunkhtml .= '<div class="input-group">';
 				$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
-			 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off'?"":'text-danger').'">';
+			 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off' &&  $trunkdisplay[$trunk] == 'on'?"":'text-danger').'">';
 				$trunkhtml .= '<option value=""></option>';
 				foreach ($trunks as $name=>$display_description) {
-					if ($trunkstate[$name] == 'off') {
+					if ($trunkstate[$name] == 'off' && $trunkdisplay[$trunk] == 'on') {
 						$trunkhtml .= '<option id="trunk'.$key.'" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
-					} else {
+					} else if ($trunkdisplay[$trunk] == 'on') {
 						$trunkhtml .= '<option id="trunk'.$key.'" class="text-danger" name="trunk'.$key.'" value="'.$name.'" '.($name == $trunk ? "selected" : "").'>'.str_replace('AMP:', '', $display_description).'</option>';
 					}
 				}
