@@ -60,6 +60,22 @@
 			</div>
 		</div>
 		<!--END USERNAME-->
+		<div class="element-container">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="secret"><?php echo _("Auth username") ?></label>
+						 <i class="fa fa-question-circle fpbx-help-icon" data-for="auth_username"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="auth_username" id="auth_username" value="<?php echo $auth_username ?>">
+					</div>
+				</div>
+				<div class="col-md-12">
+					<span id="auth_username-help" class="help-block fpbx-help-block"><?php echo _("This need to be set only  when auth username not same as the username. ")?> </span>
+				</div>
+			</div>
+		</div>
 		<!--SECRET-->
 		<div class="element-container">
 			<div class="row">

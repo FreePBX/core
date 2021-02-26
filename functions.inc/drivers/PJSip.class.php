@@ -544,7 +544,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				if ($trunk['authentication'] == "inbound" || $trunk['authentication'] == "both" || empty($trunk['username'])) {
 					$conf['pjsip.auth.conf'][$tn]['username'] = $tn;
 				} else {
-					$conf['pjsip.auth.conf'][$tn]['username'] = $trunk['username'];
+					$conf['pjsip.auth.conf'][$tn]['username'] = isset($trunk['auth_username']) && !empty($trunk['auth_username']) ? $trunk['auth_username'] : $trunk['username'];
 				}
 			}
 
