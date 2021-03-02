@@ -1290,17 +1290,21 @@ function checkAuthButtons() {
 	// username/secret is disabled.
 	var a = $("input[name=authentication]:checked").val();
 	if (a === "off") {
-		$("#username,#secret").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
+		$("#username,#secret,#auth_username").attr('placeholder', '<?php echo _("Authentication Disabled"); ?>');
 		if ($("#username").val().length) {
 			// It's set to something. Remove it.
 			$("#username").data("origval", $("#username").val());
+		}
+		if ($("#auth_username").val().length) {
+			// It's set to something. Remove it.
+			$("#auth_username").data("origval", $("#auth_username").val());
 		}
 		if ($("#secret").val().length) {
 			// It's set to something. Remove it.
 			$("#secret").data("origval", $("#secret").val());
 		}
 		$("#secret").removeClass("clicktoedit");
-		$("#username,#secret").val("").prop("readonly", true);
+		$("#username,#secret,#auth_username").val("").prop("readonly", true);
 		$("#registrationnone").click();
 	} else if (a === "inbound" || a === "both") {
 		// Username is not settable, as it is the trunk name that is used for auth
@@ -1310,7 +1314,12 @@ function checkAuthButtons() {
 			// It's set to something. Remove it.
 			$("#username").data("origval", $("#username").val());
 		}
-		$("#username").attr('placeholder', '<?php echo _("Username is trunk name"); ?>').prop("readonly", true).val("");
+		if ($("#auth_username").val().length) {
+			// It's set to something. Remove it.
+			$("#auth_username").data("origval", $("#auth_username").val());
+		}
+		$("#username,#auth_username").attr('placeholder', '<?php echo _("username is trunk name"); ?>').prop("readonly", true).val("");
+		$("#auth_username").attr('placeholder', '<?php echo _("Auth Username is trunk name"); ?>').prop("readonly", true).val("");
 		$("#secret").prop("readonly", false).attr('placeholder', '');
 		if (typeof $("#secret").data("origval") !== "undefined" && $("#secret").data("origval") !== false) {
 			$("#secret").val($("#secret").data("origval"));
@@ -1319,7 +1328,7 @@ function checkAuthButtons() {
 	} else {
 		// Make sure they're not readonly...
 		$("#secret").addClass("clicktoedit");
-		$("#username,#secret").prop("readonly", false).attr('placeholder', '');
+		$("#username,#secret,#auth_username").prop("readonly", false).attr('placeholder', '');
 		// If they had anything previously, put them back.
 		if (typeof $("#username").data("origval") !== "undefined" && $("#username").data("origval") !== false) {
 			$("#username").val($("#username").data("origval"));
@@ -1328,6 +1337,10 @@ function checkAuthButtons() {
 		if (typeof $("#secret").data("origval") !== "undefined" && $("#secret").data("origval") !== false) {
 			$("#secret").val($("#secret").data("origval"));
 			$("#secret").data("origval", false);
+		}
+		if (typeof $("#auth_username").data("origval") !== "undefined" && $("#auth_username").data("origval") !== false) {
+			$("#auth_username").val($("#auth_username").data("origval"));
+			$("#auth_username").data("origval", false);
 		}
 	}
 }
