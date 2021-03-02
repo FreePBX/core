@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.87</version>
+	<version>14.0.28.88</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.88* FREEI-2762 974250 - PJSIP - Set Auth User Name 
 		*14.0.28.87* FREEI-2762 Ticket#974250 - PJSIP - Set Auth User Name 
 		*14.0.28.86* Add ability to hide trunks in routes ui 
 		*14.0.28.85* FREEI-2848 core with outbound CID 
