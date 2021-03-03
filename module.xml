@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.40</version>
+	<version>16.0.41</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.41* FREEPBX-22337 Restore fails on trunks 
 		*16.0.40* FREEI-2762 974250 - PJSIP - Set Auth User Name 
 		*16.0.39* FREEPBX-22331 Backup and Restore Module does not restore trunks and outbound routes 
 		*16.0.38* FREEI-2762 Ticket#974250 - PJSIP - Set Auth User Name 
