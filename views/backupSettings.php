@@ -1,3 +1,20 @@
+<script type="text/javascript">
+    $(document).ready(function () {
+    	$("input[name='core_disabletrunks']").click(function(){
+    	    let obj = {};
+    	    obj = {
+    	            'core': $("#modulesetting_core").serializeArray()
+    	    }
+            $('#backup_items').val(JSON.stringify(processItems(undefined, obj)));
+        });
+	    var dbValue = <?php echo json_encode($core_disabletrunks) ?>;
+	    var items =  $("input[name='backup_items']").val();
+        var mod = JSON.parse(items).find(item => item.modulename === "core")
+        var toggle = mod && mod.settings.length > 0 ? mod.settings[0].value : dbValue;
+        (toggle && toggle === "yes") ? $('#core_disabletrunksyes').attr('checked', true) : $('#core_disabletrunksno').attr('checked', true);
+	});
+</script>
+
 <!--Restore Advanced Settings-->
 <div class="element-container">
 	<div class="row">
