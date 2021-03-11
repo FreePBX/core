@@ -176,7 +176,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 }
 //trunk html
 $trunks = array();
-foreach (core_trunks_listbyid() as $temp) {
+foreach (core_trunks_listbyid(true) as $temp) {
 	$trunks[$temp['trunkid']] = $temp['name'];
 	$trunkstate[$temp['trunkid']] = $temp['disabled'];
 	$trunkdisplay[$temp['trunkid']] = isset($temp['routedisplay']) ? $temp['routedisplay'] : 'on';

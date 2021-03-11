@@ -341,7 +341,7 @@ switch ($action) {
 }
 
 //get existing trunk info
-$tresults = core_trunks_getDetails();
+$tresults = core_trunks_getDetails('', true);
 
 $trunks = array();
 foreach ($tresults as $tresult) {

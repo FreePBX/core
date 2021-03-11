@@ -1,5 +1,5 @@
 <?php
-$trunk_list = \FreePBX::Core()->listTrunks();
+$trunk_list = \FreePBX::Core()->listTrunks(true);
 if($trunk_list){
 	$trunk_names = array();
 	$trunk_channelids = array();

@@ -705,7 +705,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 						return array_values($dids);
 					break;
 					case 'allTrunks':
-						return array_values($this->listTrunks());
+						$displayOnly = (isset($request['jdisplay']) && $request['jdisplay']=='onlyVisible') ? true : false;
+						return array_values($this->listTrunks($displayOnly));
 					break;
 					case 'routingrnav':
 						return array_values($this->getAllRoutes());
@@ -1799,9 +1800,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	/**
 	 * List All Trunks
+	 * if$displayOnly is true, will get only the trunks with routedisplay field set to on
 	 * @return array Array of Trunks
 	 */
-	public function listTrunks() {
+	public function listTrunks($displayOnly = false) {
 		$sql = 'SELECT * from `trunks` ORDER BY `trunkid`';
 		$stmt = $this->database->prepare($sql);
 		$ret  = $stmt->execute();
@@ -1819,8 +1821,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 					break;
 				}
 			}
-			$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
-			$trunk_list[$trunk['trunkid']] = $trunk;
+			if (!$displayOnly || ($displayOnly && (!isset($trunk['routedisplay']) || $trunk['routedisplay'] == 'on'))) {
+				// if displayOnly is set let's return only the trunks with routedisplay set to 'off'
+				$trunk['dialopts'] = $this->freepbx->astman->database_get("TRUNK",$trunk['trunkid'] . "/dialopts");
+				$trunk_list[$trunk['trunkid']] = $trunk;
+			} 
+			
 		}
 		return $trunk_list;
 	}
