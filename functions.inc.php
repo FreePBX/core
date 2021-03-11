@@ -893,7 +893,7 @@ function core_destinations() {
 		}
 	}
 
-	$trunklist = core_trunks_listbyid();
+	$trunklist = core_trunks_listbyid(true);
 	if (is_array($trunklist)) foreach ($trunklist as $trunk) {
 		switch($trunk['tech']) {
 			case 'enum':
@@ -4947,15 +4947,17 @@ function core_trunks_addSipOrIax($config,$table,$channelid,$trunknum,$disable_fl
 }
 
 //get unique trunks
-function core_trunks_getDetails($trunkid='') {
+function core_trunks_getDetails($trunkid='', $displayOnly = false) {
 	if ($trunkid != '') {
 		return \FreePBX::Core()->getTrunkByID($trunkid);
 	}
-	return \FreePBX::Core()->listTrunks();
+	return \FreePBX::Core()->listTrunks($displayOnly);
 }
 
-function core_trunks_listbyid() {
-	return \FreePBX::Core()->listTrunks();
+// get list of trunks, if $displayOnly is true, will get only the trunks 
+// with routedisplay field set to on
+function core_trunks_listbyid($displayOnly = false) {
+	return \FreePBX::Core()->listTrunks($displayOnly);
 }
 
 function core_trunks_list($assoc = false) {
