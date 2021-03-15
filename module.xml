@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.43</version>
+	<version>16.0.44</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.44* Added hidding of trunks on core destinations when routedisplay is off 
 		*16.0.43* FREEI-3039 
 		*16.0.42* Packaging of ver 16.0.42
 		*16.0.41* FREEPBX-22337 Restore fails on trunks 
