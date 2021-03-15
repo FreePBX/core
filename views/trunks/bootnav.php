@@ -14,7 +14,7 @@
 	<a href="?display=trunks" class="btn btn-default"><i class="fa fa-list"></i>&nbsp;<?php echo _("List Trunks")?></a>
 
 </div>
-<table data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allTrunks" data-cache="false" data-toggle="table" data-search="true" data-toolbar="#bnavtrunk" class="table" id="table-all-side">
+<table data-url="ajax.php?module=core&amp;command=getJSON&amp;jdata=allTrunks&amp;jdisplay=onlyVisible" data-cache="false" data-toggle="table" data-search="true" data-toolbar="#bnavtrunk" class="table" id="table-all-side">
 	<thead>
 			<tr>
 					<th data-formatter="rtrunk" data-sortable="true" data-field="name"><?php echo _('Trunks')?></th>
