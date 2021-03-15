@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.56</version>
+	<version>15.0.12.57</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.57* Added hidding of trunks on core destinations when routedisplay is off 
 		*15.0.12.56* FREEI-3039 
 		*15.0.12.55* FREEPBX-22337 Restore fails on trunks 
 		*15.0.12.54* FREEI-2762 974250 - PJSIP - Set Auth User Name 
