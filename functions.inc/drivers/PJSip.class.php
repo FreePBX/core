@@ -1511,7 +1511,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {array} $dispvars Display Variables
 	 */
 	public function getDisplayVars($trunkid, $dispvars) {
-		$sipSettingsCodecs = $this->freepbx->Sipsettings->getCodecs('audio',true);
+		$audio_codecs 		= $this->freepbx->Sipsettings->getCodecs('audio',true);
+		$video_codecs 		= $this->freepbx->Sipsettings->getCodecs('video',true);	
+		$sipSettingsCodecs 	= array_merge($audio_codecs, $video_codecs);
+
 		if(!empty($trunkid)) {
 			$get = $this->db->prepare("SELECT keyword, data FROM pjsip WHERE id = :id");
 			$get->bindParam(':id', str_replace('OUT_','',$trunkid));
