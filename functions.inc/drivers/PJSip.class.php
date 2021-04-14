@@ -433,9 +433,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if($debug) {
 			$conf['pjsip.conf']['global']['debug'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
 		}
-		$debug = $this->freepbx->Sipsettings->getConfig('pjsip_keep_alive_interval');
-		if($debug) {
-			$conf['pjsip.conf']['global']['keep_alive_interval'] = (empty($debug) || $debug === 'yes') ? 'yes' : 'no';
+		$pjsip_keepAliveinterval = $this->freepbx->Sipsettings->getConfig('pjsip_keep_alive_interval');
+		if(isset($pjsip_keepAliveinterval)) {
+			$conf['pjsip.conf']['global']['keep_alive_interval'] = !empty($pjsip_keepAliveinterval) ? $pjsip_keepAliveinterval : '90';
 		}
 		if(!empty($this->_global) && is_array($this->_global)) {
 			foreach($this->_global as $el) {
