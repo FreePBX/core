@@ -273,8 +273,8 @@
 				</div>
 			</div>
 		</div><!--END TRANSPORT-->
-		<?php 
-		$ver_list = array("13.24.0", "16.1.0");
+		<?php
+		$ver_list = array("13.24.0", "16.1.0", "18.0.0");
 		if(version_min(\FreePBX::Config()->get('ASTVERSION'),$ver_list) == true) { ?>
 		<!--PJSIP TRUNK LINE ENABLE / DISABLE-->
 		<div class="element-container">
