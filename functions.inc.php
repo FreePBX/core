@@ -2967,7 +2967,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
 	//check queue callback callerid ,if  No force trunkcid is set the send queue callback cid
 	$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1" & ${LEN(${FORCEDOUTCID_${ARG1}})} = 0]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
-	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${AMPUSER})} = 0 &  ${LEN(${USEROUTCID})} = 0 & "${OUTKEEPCID_${ARG1}}" ="off" & ${LEN(${REALCALLERIDNUM})} != 0 ]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${CALLERIDNUMINTERNAL})} = 0 & ${LEN(${AMPUSER})} = 0 &  ${LEN(${USEROUTCID})} = 0 & "${OUTKEEPCID_${ARG1}}" ="off" & ${LEN(${REALCALLERIDNUM})} != 0 ]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
 	if(!empty($tio_hide) && $tio_hide == "yes"){
 		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'yes'));
 	}
