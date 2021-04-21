@@ -412,7 +412,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
 
-   		$ver_list = array("13.24.0", "16.1.0", "17.0.0"); 
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0");
         if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
   			$use_callerid_contact = \FreePBX::create()->Sipsettings->getConfig('pjsip_use_callerid_contact');
 			$use_callerid_contact = (empty($use_callerid_contact))? "no": $use_callerid_contact;
@@ -597,7 +597,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
 			
-			$ver_list = array("13.24.0", "16.1.0"); // include all versions to test.
+			$ver_list = array("13.24.0", "16.1.0", "18.0.0"); // include all versions to test.
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
 			}
@@ -1236,7 +1236,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "user_eq_phone=no";
 		}
 		
-		$ver_list = array("13.24.0", "16.1.0", "17.0.0");
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0");
 		if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
 			if (!empty($config['send_connected_line'])) {
 				$endpoint[] = "send_connected_line=".$config['send_connected_line'];
