@@ -593,6 +593,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'context' => !empty($trunk['context']) ? $trunk['context'] : 'from-pstn',
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
+				//Add QoS/DSCP markings for PJSIP trunks
+				'tos_audio' => 'ef',
+				'tos_video' => 'af41',
+				'cos_audio' => '5',
+				'cos_video' => '4',
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
 				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
 			);
