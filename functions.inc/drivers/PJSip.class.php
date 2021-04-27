@@ -1477,7 +1477,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			'tech',
 			'outcid',
 			'keepcid',
-			'maxhans',
+			'maxchans',
 			'failtrunk',
 			'dialoutprefix',
 			'channelid',
