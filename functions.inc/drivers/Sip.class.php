@@ -194,30 +194,12 @@ class Sip extends techDriver {
 						if ($protocol == "ws" || $protocol == "wss") {
 							continue;
 						}
-						// Is this the default port for this protocol?
-						$defaultport = false;
-						if ($protocol == "udp" && $port == 5060) {
-							$defaultport = true;
-						} elseif ($protocol == "tcp" && $port == 5060) {
-							$defaultport = true;
-						} elseif ($protocol == "tls" && $port == 5061) {
-							$defaultport = true;
-						}
-
 						// If the bind address is 0.0.0.0 (or :: or [::]), we don't need to say
 						// that it's listening on a specific address.
-						if ($ip == "0.0.0.0" || $ip == "::" || $ip = "[::]") {
-							if ($defaultport) {
-								$pports[] = sprintf(_("Port %s (%s)"), $port, strtoupper($protocol));
-							} else {
-								$pports[] = sprintf(_("Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $port, strtoupper($protocol));
-							}
+						if ($ip == "0.0.0.0" || $ip == "::" || $ip == "[::]") {
+							$pports[] = sprintf(_("Port %s (%s)"), $port, strtoupper($protocol));
 						} else {
-							if ($defaultport) {
-								$pports[] = sprintf(_("Interface %s, Port %s (%s)"), $ip, $port, strtoupper($protocol));
-							} else {
-								$pports[] = sprintf(_("Interface %s, Port %s (%s - this is a <strong>NON STANDARD</strong> port)"), $ip, $port, strtoupper($protocol));
-							}
+							$pports[] = sprintf(_("Interface %s with Port %s (%s)"), $ip, $port, strtoupper($protocol));
 						}
 					}
 				}
