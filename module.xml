@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.61</version>
+	<version>15.0.12.62</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.62* FREEI-3110 Remove 'this is a non standard port' text in gui 
 		*15.0.12.61* FREEPBX-22406 Outbound CID name is stripped following core upgrade 
 		*15.0.12.60* FREEPBX-22361 Asterisk 18 integration still incomplete 
 		*15.0.12.59* FREEI-3073 Error - Pjsip Keep alive Interval button not working (Sipsetting) 
