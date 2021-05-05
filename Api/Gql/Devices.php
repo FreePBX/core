@@ -139,30 +139,38 @@ class Devices extends Base {
 				}),
 				'deviceId' => [
 					'type' => Type::nonNull(Type::string()),
-					'description' => 'Give your device a unique integer ID. The device will use this ID to authenticate to the system',
+					'description' => _('Give your device a unique integer ID. The device will use this ID to authenticate to the system'),
 					'resolve' => function($row) {
 						return isset($row['id']) ? $row['id'] : null;
 					}
 				],
 				'tech' => [
-					'type' => $this->typeContainer->get('coretech')->getObject(),
-					'description' => 'Technology driver type',
+					'type' => Type::nonNull(Type::string()),
+					'description' => _('Technology driver type'),
+				],
+				'callerId' => [
+					'type' => Type::string(),
+					'description' => _('Caller ID for the device'),
 					'resolve' => function($row) {
-						return $row;
+						return isset($row['callerid']) ? $row['callerid'] : null;
 					}
+				],
+				'sipdriver' => [
+					'type' => Type::string(),
+					'description' => _('Caller ID for the device')
 				],
 				'dial' => [
 					'type' => Type::nonNull(Type::string()),
-					'description' => 'How to dial this device, this should not be changed unless you know what you are doing.',
+					'description' => _('How to dial this device, this should not be changed unless you know what you are doing.'),
 				],
 				'devicetype' => [
 					'type' => Type::nonNull(Type::string()),
-					'description' => 'Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.',
+					'description' => _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.'),
 
 				],
 				'user' => [
 					'type' => $this->typeContainer->get('coreuser')->getObject(),
-					'description' => 'Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.',
+					'description' => _('Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.'),
 					'resolve' => function($row) {
 						$item = $this->freepbx->Core->getUser($row['user']);
 						return isset($item) ? $item : null;
@@ -170,11 +178,11 @@ class Devices extends Base {
 				],
 				'description' => [
 					'type' => Type::string(),
-					'description' => 'The CallerID name for this device will be set to this description until it is logged into.'
+					'description' => _('The CallerID name for this device will be set to this description until it is logged into.')
 				],
 				'emergencyCid' => [
 					'type' => Type::string(),
-					'description' => 'This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.',
+					'description' => _('This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.'),
 					'resolve' => function($row) {
 						return isset($row['emergency_cid']) ? $row['emergency_cid'] : null;
 					}
