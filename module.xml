@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.90</version>
+	<version>14.0.28.91</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.28.91* FREEPBX-22483 confirm-call-bug-ringroup-with-confirm-call-to-extension-with-follow-me-call-is-no-longer-available 
 		*14.0.28.90* FREEI-1065 When Video Support is Enabled, PJSIP trunks should be able to select them 
 		*14.0.28.89* FREEI-3010 
 		*14.0.28.88* FREEI-2762 974250 - PJSIP - Set Auth User Name 
