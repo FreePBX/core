@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.62</version>
+	<version>15.0.12.63</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.63* FREEI-2625 bugfix for callerId not updating and not able to fetch 
 		*15.0.12.62* FREEI-3110 Remove 'this is a non standard port' text in gui 
 		*15.0.12.61* FREEPBX-22406 Outbound CID name is stripped following core upgrade 
 		*15.0.12.60* FREEPBX-22361 Asterisk 18 integration still incomplete 
