@@ -69,7 +69,8 @@ $timer		= get_var( $AGI, "ARG1" );
 $dialopts	= get_var( $AGI, "ARG2" );
 $rgmethod	= get_var( $AGI, "RingGroupMethod" );
 $rgmethod = trim($rgmethod);
-
+$rgconfirm = get_var( $AGI, "RG_CONFIRM" );
+debug("Ringgroup confirm is  : $rgconfirm",1);
 // Get all headers
 $headers = array();
 $alertinfo_set_flag = 0;
@@ -653,8 +654,10 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 	    strpos($dialopts,"M(confirm") > 0      || strpos($dialopts,"M(confirm") === 0) {
 		debug("NODEST: $nodest blkvm enabled macro already in dialopts: $dialopts",4);
 	} else {
-		$dialopts .= "M(auto-blkvm)";
-		debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+		if($rgconfirm != 1){
+			$dialopts .= "M(auto-blkvm)";
+			debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+		}
 	}
 }
 
@@ -725,8 +728,10 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 	    strpos($dialopts,"M(confirm") > 0      || strpos($dialopts,"M(confirm") === 0) {
 		debug("NODEST: $nodest blkvm enabled macro already in dialopts: $dialopts",4);
 	} else {
-		$dialopts .= "M(auto-blkvm)";
-		debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+		if($rgconfirm != 1){
+			$dialopts .= "M(auto-blkvm)";
+			debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+		}
 	}
 }
 
