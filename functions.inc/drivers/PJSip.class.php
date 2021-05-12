@@ -442,8 +442,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$conf['pjsip.conf']['global'][] = "{$el['key']}={$el['value']}";
 			}
 		}
-		if(isset($this->freepbx->Sipsettings->getConfig('taskprocessor_overload_trigger'))){
-			$taskprocessor_overload_trigger = $this->freepbx->Sipsettings->getConfig('taskprocessor_overload_trigger');
+		$taskprocessor_overload_trigger = $this->freepbx->Sipsettings->getConfig('taskprocessor_overload_trigger');
+		if(isset($taskprocessor_overload_trigger)){
 			$conf['pjsip.conf']['global']['taskprocessor_overload_trigger'] =  (empty($taskprocessor_overload_trigger)) ? 'pjsip_only' : $taskprocessor_overload_trigger;
 		}
 		$conf['pjsip.conf']['global'][] = "#include pjsip_custom_post.conf";
