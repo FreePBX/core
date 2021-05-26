@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.66</version>
+	<version>15.0.12.67</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.67* FREEI-2691 adding password and secret in gql core 
 		*15.0.12.66* FREEI-3303 unset taskprocessor if its already set on asterisk version switch to old version 
 		*15.0.12.65* FREEI-3303 bugfix for isset use on function call 
 		*15.0.12.64* FREEPBX-22483 confirm-call-bug-ringroup-with-confirm-call-to-extension-with-follow-me-call-is-no-longer-available 
