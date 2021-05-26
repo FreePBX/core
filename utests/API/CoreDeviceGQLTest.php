@@ -42,11 +42,11 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 
 		$response = $this->request("query { 
 			coreDevice(device_id: \"{$testExtension}\") { 
-				device_id,
+				deviceId,
 				description,
 				devicetype,
 				dial,
-				emergency_cid
+				emergencyCid
 			}
 		}");
 
@@ -54,11 +54,11 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 		$this->assertEquals(array(
 			'data' => array(
 				'coreDevice' => array(
-					'device_id' => $testExtension,
+					'deviceId' => $testExtension,
 					'description' => 'pjsip test',
 					'devicetype' => 'fixed',
 					'dial' => "PJSIP/{$testExtension}",
-					'emergency_cid' => ''
+					'emergencyCid' => ''
 				)
 			)
 		), $json);

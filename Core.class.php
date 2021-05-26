@@ -213,6 +213,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$channel = $data['channel'];
 		}
 		$settings = $this->generateDefaultDeviceSettings($tech,$extension,$data['name'],$channel);
+
 		$settings['emergency_cid']['value'] = isset($data['emergency_cid']) ? $data['emergency_cid'] : '';
 		$settings['callerid']['value'] = isset($data['callerid']) ? $data['callerid'] : '' ;
 		if(!$this->addDevice($extension,$tech,$settings)) {
@@ -220,6 +221,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 		$settings = $this->generateDefaultUserSettings($extension,$data['name']);
 		$settings['outboundcid'] = $data['outboundcid'];
+		if(isset($data['password']) && !empty($data['password'])){
+			$settings['password']  = $data['password'];
+		}
 		try {
 			if(!$this->addUser($extension, $settings)) {
 				//cleanup
