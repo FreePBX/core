@@ -32,6 +32,9 @@ class Extensions extends Base {
 						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->resolveNames($input);
+							if((isset($input['umEnable']) && $input['umEnable'] == true) && !isset($input['umPassword'])  ){
+								return ['message' => _('User management is enabled please provide password'), 'status' => false];
+							}
 							if(!is_numeric($input['extension'])){
 								return ['message' => _("Please enter only numeric values"),'status' => false];
 							}
@@ -60,6 +63,9 @@ class Extensions extends Base {
 						'mutateAndGetPayload' => function ($input) {
 						    try {
 								$input = $this->resolveNames($input);
+								if((isset($input['umEnable']) && $input['umEnable'] == true) && !isset($input['umPassword'])  ){
+									return ['message' => _('User management is enabled please provide password'), 'status' => false];
+								}
 								if(!is_numeric($input['extension'])){
 									return ['message' => _("Please enter only numeric values"),'status' => false];
 								}
@@ -115,6 +121,9 @@ class Extensions extends Base {
 						'inputFields' => $this->getMutationFieldsRange(),
 						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
+							if((isset($input['umEnable']) && $input['umEnable'] == true) && !isset($input['umpassword'])  ){
+								return ['message' => _('User management is enabled please provide password'), 'status' => false];
+							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
 							$name = $input['name'];
@@ -364,6 +373,10 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("Channel Name incase if you are using tech DAHDi.")
 			],
+			'umPassword' => [
+				'type' => Type::string(),
+				'description' => _("The user's password")
+			],
 		];
 	}
 		
@@ -417,6 +430,10 @@ class Extensions extends Base {
 			'callerID' => [
 				'type' => Type::string(),
 				'description' => _("User caller ID")
+			],
+			'umPassword' => [
+				'type' => Type::string(),
+				'description' => _("The user's password")
 			],
 		];
 	}
@@ -472,6 +489,14 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("User caller ID")
 			],
+			'secret' => [
+				'type' => Type::string(),
+				'description' => _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure. [secret]")
+			],
+			'umPassword' => [
+				'type' => Type::string(),
+				'description' => _("The user's password")
+			],
 		];
 	}
 	/**
@@ -501,6 +526,7 @@ class Extensions extends Base {
 		$input['callerid'] = isset($input['callerID']) ? $input['callerID'] : $input['emergency_cid'] ;
 		$input['channel'] = isset($input['channelName']) ? $input['channelName'] : '';
 		$input['calleridname']['value'] = $input['name'];	
+		$input['password'] = isset($input['umPassword']) ? $input['umPassword'] : '';
 
 		if(isset($input['extensionId'])){
 			$input['extension'] = $input['extensionId'];
