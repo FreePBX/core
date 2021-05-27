@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.67</version>
+	<version>15.0.12.68</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.68* FREE-2691 removing umpassword for range creation and renaming secret to extPassword 
 		*15.0.12.67* FREEI-2691 adding password and secret in gql core 
 		*15.0.12.66* FREEI-3303 unset taskprocessor if its already set on asterisk version switch to old version 
 		*15.0.12.65* FREEI-3303 bugfix for isset use on function call 
