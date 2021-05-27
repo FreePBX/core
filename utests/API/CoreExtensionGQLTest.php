@@ -703,7 +703,7 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 				extensionId: \"{$testExtension}\",
 				name: \"{$name}\"
 				channelName : \"{$channelName}\"
-				secret: \"testing\"
+				extPassword: \"testing\"
 				clientMutationId : \"{$clientMutationId}\"
 			  })
 			  { message status}
