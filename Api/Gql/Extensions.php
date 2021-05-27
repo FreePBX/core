@@ -121,9 +121,6 @@ class Extensions extends Base {
 						'inputFields' => $this->getMutationFieldsRange(),
 						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
-							if((isset($input['umEnable']) && $input['umEnable'] == true) && !isset($input['umpassword'])  ){
-								return ['message' => _('User management is enabled please provide password'), 'status' => false];
-							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
 							$name = $input['name'];
@@ -373,10 +370,6 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("Channel Name incase if you are using tech DAHDi.")
 			],
-			'umPassword' => [
-				'type' => Type::string(),
-				'description' => _("The user's password")
-			],
 		];
 	}
 		
@@ -489,7 +482,7 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("User caller ID")
 			],
-			'secret' => [
+			'extPassword' => [
 				'type' => Type::string(),
 				'description' => _("Password (secret) configured for the device. Should be alphanumeric with at least 2 letters and numbers to keep secure. [secret]")
 			],
@@ -527,6 +520,7 @@ class Extensions extends Base {
 		$input['channel'] = isset($input['channelName']) ? $input['channelName'] : '';
 		$input['calleridname']['value'] = $input['name'];	
 		$input['password'] = isset($input['umPassword']) ? $input['umPassword'] : '';
+		$input['secret'] = isset($input['extPassword']) ? $input['extPassword'] : ''; 
 
 		if(isset($input['extensionId'])){
 			$input['extension'] = $input['extensionId'];
