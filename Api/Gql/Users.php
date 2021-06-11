@@ -168,7 +168,10 @@ class Users extends Base {
 				'sipname' => [
 					'type' => Type::string(),
 					'description' => '',
-
+				],
+				'sipsecret' =>  [
+					'type' => Type::string(),
+					'description' => _(''),
 				],
 				'noanswerCid' => [
 					'type' => Type::string(),

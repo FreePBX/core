@@ -757,4 +757,148 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//status 200 success check
       $this->assertEquals(200, $response->getStatusCode());
 	}
+
+	public function testfetchExtension_along_with_sip_secret()
+	{
+		$testExtension = "909000140";
+		$name = 'api test';
+		$tech = 'pjsip';
+		$outboundId = '12345678901';
+
+		// clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		//adding new extension
+		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
+		self::$core->addDevice($testExtension, $tech, $deviceSettings);
+
+		$userSettings = self::$core->generateDefaultUserSettings($testExtension, $name);
+
+		$userSettings['outboundcid'] = $outboundId;
+		self::$core->addUser($testExtension, $userSettings);
+
+		//fetch extension for the created record 
+		$response = $this->request("
+		  { 
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,sipsecret}}
+		  }
+		");
+
+		$json = (string)$response->getBody();
+
+		//validate the resoponse
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","sipsecret":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
+
+		//status 200 success check
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function testfetchExtension_should_return_empty_password_if_umPassword_is_empty()
+	{
+		$testExtension = "909000140";
+		$name = 'api test';
+		$tech = 'pjsip';
+		$outboundId = '12345678901';
+
+		// clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		//adding new extension
+		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
+		self::$core->addDevice($testExtension, $tech, $deviceSettings);
+
+		$userSettings = self::$core->generateDefaultUserSettings($testExtension, $name);
+
+		$userSettings['outboundcid'] = $outboundId;
+		self::$core->addUser($testExtension, $userSettings);
+
+		//fetch extension for the created record 
+		$response = $this->request("
+		  { 
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,sipsecret}}
+		  }
+		");
+
+		$json = (string)$response->getBody();
+
+		//validate the resoponse
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","sipsecret":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
+
+		//status 200 success check
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function test_fetchExtension_should_return_updated_password()
+	{
+
+		$testExtension = "907070";
+		$name = 'api test';
+		$tech = 'pjsip';
+		$email = "xyz@gmail.com";
+		$umPassword = "newPassword";
+		$outboundId = '12345678901';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		// clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				tech : \"{$tech}\"
+				email : \"{$email}\"
+				clientMutationId : \"{$clientMutationId}\"
+				umPassword: \"{$umPassword}\"
+			  })
+			  { clientMutationId status message }
+			}
+		");
+
+		// clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		//adding new extension
+		$deviceSettings = self::$core->generateDefaultDeviceSettings($tech, $testExtension, $name);
+		self::$core->addDevice($testExtension, $tech, $deviceSettings);
+
+		$userSettings = self::$core->generateDefaultUserSettings($testExtension, $name);
+		$userSettings['outboundcid'] = $outboundId;
+		self::$core->addUser($testExtension, $userSettings);
+
+		//updated the extension created 
+		$response = $this->request("mutation {
+		 updateExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				clientMutationId : \"{$clientMutationId}\"
+				umPassword : \"updatedPassword\"
+			  })
+			  { message status}
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		//fetch extension for the updated record 
+		$response = $this->request("
+		  { 
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password}}
+		  }
+		");
+
+		$json = (string)$response->getBody();
+
+		//validate the resoponse
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"907070","user":{"name":"api test","outboundCid":"12345678901","password":"updatedPassword"}}}}', $json);
+
+		//status 200 success check
+		$this->assertEquals(200, $response->getStatusCode());
+	}
 }
