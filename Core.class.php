@@ -46,7 +46,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings["core_disabletrunks"] = $this->getConfig("core_disabletrunks", $id);
 		$settings["core_disabletrunks"] = (preg_match('/(yes|no)/', $settings["core_disabletrunks"]))? $settings["core_disabletrunks"] : 'no';
 		if(!empty($settings["backup_items"])){
-			$backup_items = json_decode($settings["backup_items"], true);
+			if (gettype($settings["backup_items"]) == 'string') {
+				$backup_items = json_decode($settings["backup_items"], true);
+			} else {
+				$backup_items = $settings["backup_items"];
+			}
 			foreach($backup_items as $idx => $items){
 				if($items["modulename"] == "core"){
 					$backup_items[$idx]["settings"] = [array("name" => "core_disabletrunks", "value" => $settings["core_disabletrunks"])];
