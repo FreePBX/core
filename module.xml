@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.54</version>
+	<version>16.0.55</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.55* FREEI-2691 Updated fetchExtension and fetchAllExtensions by including sip secret and user manager password 
 		*16.0.54* FREE-2691 removing umpassword for range creation and renaming secret to extPassword 
 		*16.0.53* FREEI-2691 adding password and secret in gql core 
 		*16.0.52* Packaging of ver 16.0.52
