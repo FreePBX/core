@@ -244,10 +244,22 @@ class Extensions extends Base {
 						}else if(isset($row['devicetype']) && $row['devicetype'] !== 'fixed'){
 							return null;
 						}
+						$data = array();
 						if(isset($row['response']['user'])){
-							return $this->freepbx->Core->getUser($row['response']['user']);
+							$data = $this->freepbx->Core->getUser($row['response']['user']);
 						}elseif(isset($row['user'])){
-							return $this->freepbx->Core->getUser($row['user']);
+							$data = $this->freepbx->Core->getUser($row['user']);
+						}
+						if (isset($data['extension'])) {
+							$sipDetails = $this->freepbx->Core->getSipSecret($data['extension']);
+							if (isset($sipDetails)) {
+								foreach ($sipDetails as $sipData) {
+									$data['sipsecret'] = $sipData['data'];
+								}
+								return $data;
+							}
+						} else {
+							return $data;
 						}
 						return null;	
 					}
