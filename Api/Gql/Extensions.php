@@ -254,7 +254,7 @@ class Extensions extends Base {
 							$sipDetails = $this->freepbx->Core->getSipSecret($data['extension']);
 							if (isset($sipDetails)) {
 								foreach ($sipDetails as $sipData) {
-									$data['sipsecret'] = $sipData['data'];
+									$data['extPassword'] = $sipData['data'];
 								}
 								return $data;
 							}

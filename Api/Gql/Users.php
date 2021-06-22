@@ -169,9 +169,9 @@ class Users extends Base {
 					'type' => Type::string(),
 					'description' => '',
 				],
-				'sipsecret' =>  [
+				'extPassword' =>  [
 					'type' => Type::string(),
-					'description' => _(''),
+					'description' => _('Extension password'),
 				],
 				'noanswerCid' => [
 					'type' => Type::string(),
