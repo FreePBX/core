@@ -13,14 +13,18 @@ class Trunks extends Corebase{
 		$this->updateTrunks($configs);		
 		$backupinfo = $this->backupinfo;
 		$items = json_decode($backupinfo["backup_items"]);
-		$disable_trunk = "no";	
-		if(isset($items) && is_array($items)) {
-			foreach($items as $index => $data){
-				foreach($data as $item => $val){
-					if($item == "settings"){
-						foreach((array) $val as $result){
-							if($result->name == "core_disabletrunks" && ($result->value == "yes" || $result->value == "no")){
-								$disable_trunk = $result->value;
+		if(isset($backupinfo['core_disabletrunks'])){
+			$disable_trunk = $backupinfo['core_disabletrunks']=='yes'?'yes':'no';
+		}else {
+			$disable_trunk = "no";
+			if(isset($items) && is_array($items)) {
+				foreach($items as $index => $data){
+					foreach($data as $item => $val){
+						if($item == "settings"){
+							foreach((array) $val as $result){
+								if($result->name == "core_disabletrunks" && ($result->value == "yes" || $result->value == "no")){
+									$disable_trunk = $result->value;
+								}
 							}
 						}
 					}
