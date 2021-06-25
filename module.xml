@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.1</version>
+	<version>16.0.56.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.2* FREEI-3477 backup restore 
 		*16.0.56.1* bump 
 		*16.0.56* Fixing FREEI-2691 GQL API for createExtention and updateExtension issue 
 		*16.0.55* FREEI-2691 Updated fetchExtension and fetchAllExtensions by including sip secret and user manager password 
