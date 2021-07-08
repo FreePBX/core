@@ -1325,6 +1325,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"cid_masquerade" => "",
 			"noanswer_dest" => "",
 			"busy_dest" => "",
+			"cwtone" =>"disabled",
 			"concurrency_limit" => "",
 			"chanunavail_dest" => ""
 		);
@@ -2859,7 +2860,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			//TODO need to be in paging soon
 			$astman->database_put("AMPUSER",$extension."/answermode",isset($settings['answermode']) ? $settings['answermode']: 'disabled');
 			$astman->database_put("AMPUSER",$extension."/intercom",isset($settings['intercom']) ? $settings['intercom']: 'enabled');
-
+			$astman->database_put("AMPUSER",$extension."/cwtone",isset($settings['cwtone']) ? $settings['cwtone']: 'disabled');
 			$astman->database_put("AMPUSER",$extension."/recording/in/external",$settings['recording_in_external']);
 			$astman->database_put("AMPUSER",$extension."/recording/out/external",$settings['recording_out_external']);
 			$astman->database_put("AMPUSER",$extension."/recording/in/internal",$settings['recording_in_internal']);
