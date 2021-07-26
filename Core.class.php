@@ -1325,6 +1325,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"cid_masquerade" => "",
 			"noanswer_dest" => "",
 			"busy_dest" => "",
+			"noanswer_cid" => "",
+			"busy_cid" => "",
+			"chanunavail_cid" => "",
 			"cwtone" =>"disabled",
 			"concurrency_limit" => "",
 			"chanunavail_dest" => ""
