@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.72</version>
+	<version>15.0.12.73</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.73* FREEPBX-22628 bulk handler noanswer/busy/chanunvail_cid is being ignored 
 		*15.0.12.72* FREEPBX-22625 bulk extension cwtone is ignored 
 		*15.0.12.71* FREEI-3477 backup restore 
 		*15.0.12.70* Fixing FREEI-2691 GQL API for createExtention and updateExtension issue 
