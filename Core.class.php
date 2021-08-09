@@ -217,7 +217,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if (isset($data['secret']) && !empty($data['secret'])) {
 			$settings['secret']['value']  = $data['secret'];
 		}
-		
+
+      	if($tech == "pjsip") {
+			if (isset($data['max_contacts']) && !empty($data['max_contacts'])) {
+				$settings['max_contacts']['value']  = $data['max_contacts'];
+			}
+        }
+
 		$settings['emergency_cid']['value'] = isset($data['emergency_cid']) ? $data['emergency_cid'] : '';
 		$settings['callerid']['value'] = isset($data['callerid']) ? $data['callerid'] : '' ;
 		if(!$this->addDevice($extension,$tech,$settings)) {
