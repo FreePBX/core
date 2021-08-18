@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.74</version>
+	<version>15.0.12.75</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.75* Packaging of ver 15.0.12.75
 		*15.0.12.74* FREEI-3532 Web callback caller ID number 
 		*15.0.12.73* FREEPBX-22628 bulk handler noanswer/busy/chanunvail_cid is being ignored 
 		*15.0.12.72* FREEPBX-22625 bulk extension cwtone is ignored 
