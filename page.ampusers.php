@@ -242,6 +242,14 @@ foreach ($module_list as $key => $val) {
 								</div>
 							</div>
 						</div>
+						<?php
+							$freePBX = FreePBX::Create();
+							$displayAccessRestriction = 1;
+							if ($freePBX->Modules->checkStatus('oembranding') && $freePBX->Oembranding->isLicensed() && method_exists($freePBX->Oembranding->licenseClass(),'displayAccessRestrictionAreaInAdmistratorModule') &&!$freePBX->Oembranding->licenseClass()->displayAccessRestrictionAreaInAdmistratorModule()) {
+								$displayAccessRestriction = 0;
+							}
+							if($displayAccessRestriction) {
+						?>
 						<div class="section-title" data-for="access">
 							<h3><i class="fa fa-minus"></i> <?php echo _("Access Restrictions")?></h3>
 						</div>
@@ -296,6 +304,7 @@ foreach ($module_list as $key => $val) {
 								</div>
 							</div>
 						</div>
+						<?php } ?>
 					</div>
 				</form>
 			</div>
