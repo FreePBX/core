@@ -781,14 +781,14 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,sipsecret}}
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,extPassword}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","sipsecret":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","extPassword":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
 
 		//status 200 success check
 		$this->assertEquals(200, $response->getStatusCode());
@@ -817,14 +817,14 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//fetch extension for the created record 
 		$response = $this->request("
 		  { 
-			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,sipsecret}}
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password,extPassword}}
 		  }
 		");
 
 		$json = (string)$response->getBody();
 
 		//validate the resoponse
-		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","sipsecret":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"909000140","user":{"name":"api test","outboundCid":"12345678901","password":"","extPassword":"' . $deviceSettings['secret']['value'] . '"}}}}', $json);
 
 		//status 200 success check
 		$this->assertEquals(200, $response->getStatusCode());
