@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.7</version>
+	<version>16.0.56.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.8* FREEPBX-22723/setMaxContactsOnQuickCreate 
 		*16.0.56.7* FREEPBX-22785/UnitTestFixes 
 		*16.0.56.6* FREEI-3869 
 		*16.0.56.5* FREEI-3532 Web callback caller ID number 
