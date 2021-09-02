@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.77</version>
+	<version>15.0.12.78</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.78* FREEPBX-22723/setMaxContactsOnQuickCreate 
 		*15.0.12.77* FREEPBX-22785/UnitTestFixes 
 		*15.0.12.76* FREEI-3869 
 		*15.0.12.75* Packaging of ver 15.0.12.75
