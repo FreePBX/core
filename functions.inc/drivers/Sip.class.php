@@ -139,6 +139,10 @@ class Sip extends techDriver {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"webrtc" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
