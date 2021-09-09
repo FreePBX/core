@@ -440,6 +440,10 @@ class Extensions extends Base {
 				'type' => Type::string(),
 				'description' => _("The user's password")
 			],
+			 'maxContacts' => [
+                'type' => Type::string(),
+                 'description' => _("Max Contacts will set the maximum concurrent contacts for a PJSIP extension")
+            ],
 		];
 	}
 	
