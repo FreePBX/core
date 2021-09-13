@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.9</version>
+	<version>16.0.56.10</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.10* FREEPBX-22796 changed query field type of 'id' from type int to type id 
 		*16.0.56.9* FREEPBX-22794 and FREEPBX-22800 
 		*16.0.56.8* FREEPBX-22723/setMaxContactsOnQuickCreate 
 		*16.0.56.7* FREEPBX-22785/UnitTestFixes 
