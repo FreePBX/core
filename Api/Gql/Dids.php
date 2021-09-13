@@ -210,7 +210,7 @@ class Dids extends Base {
 						'description' => 'Remove an inbound route from the system',
 						'inputFields' => [
 							'id' => [
-								'type' => Type::nonNull(Type::int())
+								'type' => Type::nonNull(Type::id())
 							]
 						],
 						'outputFields' => [
@@ -219,14 +219,27 @@ class Dids extends Base {
 								'resolve' => function ($payload) {
 									return $payload['id'];
 								}
-							]
+							],
+							'status' =>[
+								'type' => Type::boolean(),
+								'description' => _('Status of the request'),
+							],
+							'message' =>[
+								'type' => Type::String(),
+								'description' => _('Message for the request')
+							],
 						],
 						'mutateAndGetPayload' => function ($input) {
-							$parts = explode("/",$args['id']);
+							$parts = explode("/",$input['id']);
 							$extension = $parts[0];
 							$cidnum = isset($parts[1]) ? $parts[1] : '';
-							$this->freepbx->Core->delDID($extension,$cidnum);
-							return ['id' => $input['id']];
+							$didInfo = $this->freepbx->Core->getDID($extension, $cidnum);
+							if($didInfo){
+								$this->freepbx->Core->delDID($extension,$cidnum);
+								return ['id' => $input['id'],'message' => _("Inbound Route deleted successfully"), 'status' => true];
+							}else{
+								return ['id' => $input['id'],'message' => _("Inbound Route not found"), 'status' => false];
+							}
 						}
 					])
 				];
@@ -251,7 +264,7 @@ class Dids extends Base {
 						'description' => $this->description,
 						'args' => [
 							'id' => [
-								'type' => Type::id(),
+								'type' => Type::nonNull(Type::id()),
 								'description' => 'Inbound Route ID',
 							]
 						],
@@ -310,9 +323,13 @@ class Dids extends Base {
 
 		$user->addFieldCallback(function() {
 			return [
-				'id' => Relay::globalIdField('did', function($row) {
-					return $row['extension']."/".$row['cidnum'];
-				}),
+				'id' => [
+					'type' => Type::nonNull(Type::id()),
+					'description' => 'Define ID of inbound route',
+					'resolve' => function($row) {
+						return $row['extension']."/".$row['cidnum'];
+					}
+				],
 				'extension' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => 'Define the expected DID Number if your trunk passes DID on incoming calls.'
