@@ -545,6 +545,11 @@ class Extensions extends Base {
 		if(isset($input['extensionId'])){
 			$input['extension'] = $input['extensionId'];
 		}
+      
+        if($input['tech'] == "pjsip"){
+			$input['max_contacts'] = isset($input['maxContacts']) ? $input['maxContacts'] : '1';
+        }
+      
 		
 		return $input;
 	}
@@ -578,6 +583,10 @@ class Extensions extends Base {
 		}else{
 			$input['vmpwd'] = !empty($input['vmpwd']) ? $input['vmpwd'] :  '';
 		}
+      
+        if($input['tech'] == "pjsip"){
+        	$input['max_contacts']= !empty($input['maxContacts']) ? $input['maxContacts'] : $extensionExists['max_contacts'];
+        }
 					
 		return $input;
 	}
