@@ -3176,16 +3176,22 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 		$ret = NULL;
 
 		switch ($type) {
+		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
 		case 'extensions':
-			if (true) {
-				$ret = array(
-					'status' => true,
-				);
-			} else {
-				$ret = array(
-					'status' => false,
-					'message' => sprintf(_('%s records failed validation'), count($rawData))
-				);
+			foreach ($rawData as $data) {
+
+				if (empty($data['extension'])) {
+					return array("status" => false, "message" => _("Extension is missing."));
+				}
+				if (!is_numeric($data['extension'])) {
+					return array("status" => false, "message" => _("Extension is not numeric."));
+				}
+				if(empty($data['name'])){
+					return array("status" => false, "message" => _("Extension name is blank."));
+				}
+				if(!empty($data['tech']) && !in_array($data['tech'], $techType)) {
+					return array("status" => false, "message" => _("Please provide valid device technology"));
+				}
 			}
 			break;
 		}
