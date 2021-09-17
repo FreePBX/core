@@ -3174,9 +3174,9 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 */
 	public function bulkhandlerValidate($type, $rawData) {
 		$ret = NULL;
+		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
 
 		switch ($type) {
-		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
 		case 'extensions':
 			foreach ($rawData as $data) {
 
