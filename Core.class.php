@@ -3522,8 +3522,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 	 * @return array                  Message containing status
 	 */
 	public function bulkhandlerValidate($type, $rawData) {
-		switch ($type) {
 		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
+		switch ($type) {
 		case 'extensions':
 			foreach ($rawData as $data) {
 
