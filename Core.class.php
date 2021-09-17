@@ -3264,8 +3264,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return array                  Message containing status
 	 */
 	public function bulkhandlerValidate($type, $rawData) {
-		switch ($type) {
 		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
+		switch ($type) {
 		case 'extensions':
 			foreach ($rawData as $data) {
 
@@ -3279,7 +3279,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					return array("status" => false, "message" => _("Extension name is blank."));
 				}
 				if(!empty($data['tech']) && !in_array($data['tech'], $techType)) {
-					return array("status" => false, "message" => _("Please provide valid Device Technology"));
+					return array("status" => false, "message" => _("Please provide valid device technology"));
 				}
 			}
 			return array("status" => true);
