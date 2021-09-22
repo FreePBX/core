@@ -2974,13 +2974,14 @@ function core_do_get_config($engine) {
 	else{
 		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'no'));
 	}
-	
-	$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
-	//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
-	$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
-	// $has_keepcid_cnum is checked and set when the globals are being generated above
-	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
-	$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	if (version_compare($version, "18.5", "le")) {
+		$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+		//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
+		$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+		// $has_keepcid_cnum is checked and set when the globals are being generated above
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	}
 	
 	//
 	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
