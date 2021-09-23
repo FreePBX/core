@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.12</version>
+	<version>16.0.56.13</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.13* FREEPBX-22676 Function CALLERPRES not registered 
 		*16.0.56.12* Fixing the bulkhandler validation issue 
 		*16.0.56.11* process MaxContacts if provided, and keep existing value if not set. 
 		*16.0.56.10* FREEPBX-22796 changed query field type of 'id' from type int to type id 
