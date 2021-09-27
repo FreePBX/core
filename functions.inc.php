@@ -1774,8 +1774,13 @@ function core_do_get_config($engine) {
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', $trunkgroup));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_'.$trunkprops['trunkid'].'}" = ""]', 'nomax'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$[${GROUP_COUNT('.$trunkgroup.')} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-					$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
-					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+					if (version_compare($version, "18.5", "le")) {
+						$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+						$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+					}else {
+						$ext->add($tcontext,$trunkprops['trunkid'],'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERID(name-pres)=${CALLINGNAMEPRES_SV}'));
+						$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERID(num-pres)=${CALLINGNUMPRES_SV}'));
+					}
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gosubif('$["${PREFIX_TRUNK_'.$trunkprops['trunkid'].'}" != ""]','sub-flp-'.$trunkprops['trunkid'].',s,1'));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -1841,8 +1846,13 @@ function core_do_get_config($engine) {
 				$ext->add($tcontext,$tcustom,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
 				$ext->add($tcontext,$tcustom,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 				$ext->add($tcontext,$tcustom,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-				$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
-				$ext->add($tcontext,$tcustom,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+				if (version_compare($version, "18.5", "le")) {
+					$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+					$ext->add($tcontext,$tcustom,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+				}else {
+					$ext->add($tcontext,$tcustom,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERID(name-pres)=${CALLINGNAMEPRES_SV}'));
+					$ext->add($tcontext,$tcustom,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERID(num-pres)=${CALLINGNUMPRES_SV}'));
+				}
 				$ext->add($tcontext,$tcustom,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 				$ext->add($tcontext,$tcustom,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
 				$ext->add($tcontext,$tcustom,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -1862,8 +1872,13 @@ function core_do_get_config($engine) {
 				$ext->add($tcontext,$texten,'',new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
 				$ext->add($tcontext,$texten,'',new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 				$ext->add($tcontext,$texten,'',new ext_gotoif('$[${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}}]', 'hangit'));
-				$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
-				$ext->add($tcontext,$texten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+				if (version_compare($version, "18.5", "le")) {
+					$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+					$ext->add($tcontext,$texten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+				}else {
+					$ext->add($tcontext,$texten,'nomax',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERID(name-pres)=${CALLINGNAMEPRES_SV}'));
+					$ext->add($tcontext,$texten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERID(num-pres)=${CALLINGNUMPRES_SV}'));
+				}
 				$ext->add($tcontext,$texten,'',new ext_set('DIAL_NUMBER','${FROM_DID}'));
 				$ext->add($tcontext,$texten,'',new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));
 				$ext->add($tcontext,$texten,'',new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
@@ -2909,8 +2924,13 @@ function core_do_get_config($engine) {
 	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
 	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
 	//
-	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
-	$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	if (version_compare($version, "18.5", "le")) {
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	}else {
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERID(name-pres)=${CALLINGNAMEPRES_SV}'));
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERID(num-pres)=${CALLINGNUMPRES_SV}'));
+	}
 	//lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
 	$ext->add($context, $exten, '', new ext_set('HOTDESCKCHAN','${CUT(CHANNEL,/,2)}'));
 	$ext->add($context, $exten, '', new ext_set('HOTDESKEXTEN','${CUT(HOTDESCKCHAN,-,1)}'));
@@ -2981,6 +3001,13 @@ function core_do_get_config($engine) {
 		// $has_keepcid_cnum is checked and set when the globals are being generated above
 		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
 		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	}else {
+		$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERID(name-pres)=prohib_passed_screen'));
+		//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
+		$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERID(num-pres)=prohib_passed_screen'));
+		// $has_keepcid_cnum is checked and set when the globals are being generated above
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERID(name-pres)=prohib_passed_screen'));
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERID(num-pres)=prohib_passed_screen'));
 	}
 	
 	//
