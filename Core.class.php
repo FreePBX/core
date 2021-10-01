@@ -4089,4 +4089,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		return $result;
 	}
+
+	public function checkExtensionLicenseCount(){
+		if ($this->freepbx->Modules->checkStatus("sysadmin")) { 
+			$sysLimitRemaining = \FreePBX::Sysadmin()->get_sysadmin_extensions_limit('remaining');
+			if($sysLimitRemaining <= 0 ){					
+				return false;
+			}
+		}
+		return true;
+	}
 }
