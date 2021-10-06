@@ -3279,7 +3279,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					return array("status" => false, "message" => _("Extension name is blank."));
 				}
 				if(!empty($data['tech']) && !in_array($data['tech'], $techType)) {
-					return array("status" => false, "message" => _("Please provide valid Device Technology"));
+					return array("status" => false, "message" => _("Please provide valid device technology"));
 				}
 			}
 			return array("status" => true);
@@ -4088,5 +4088,15 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$stmt->execute();
 		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		return $result;
+	}
+
+	public function checkExtensionLicenseCount(){
+		if ($this->freepbx->Modules->checkStatus("sysadmin")) { 
+			$sysLimitRemaining = \FreePBX::Sysadmin()->get_sysadmin_extensions_limit('remaining');
+			if($sysLimitRemaining <= 0 ){					
+				return false;
+			}
+		}
+		return true;
 	}
 }

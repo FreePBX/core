@@ -32,6 +32,11 @@ class Extensions extends Base {
 						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->resolveNames($input);
+							//check license count 
+							$res = $this->freepbx->core->checkExtensionLicenseCount();
+							if(!$res){
+								return ['message' => _('Can not add extension beyond the extensions license limit'), 'status' => false];
+							}
 							if((isset($input['umEnable']) && $input['umEnable'] == true) && !isset($input['umPassword'])  ){
 								return ['message' => _('User management is enabled please provide password'), 'status' => false];
 							}
@@ -121,6 +126,11 @@ class Extensions extends Base {
 						'inputFields' => $this->getMutationFieldsRange(),
 						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
+							//check license count 
+							$res = $this->freepbx->core->checkExtensionLicenseCount();
+							if(!$res){
+								return ['message' => _('Can not add extension beyond the extensions license limit'), 'status' => false];
+							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
 							$name = $input['name'];
