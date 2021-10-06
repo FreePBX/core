@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.84</version>
+	<version>15.0.12.85</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.85* FREEI-4018 added condition to throw error whern trying to add extensions beyond the system extension license limit 
 		*15.0.12.84* FREEPBX-22676 Function CALLERPRES not registered 
 		*15.0.12.83* FREEPBX-22676 Function CALLERPRES not registered 
 		*15.0.12.82* Fixing the bulkhandler validation issue 
