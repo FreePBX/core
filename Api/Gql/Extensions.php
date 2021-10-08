@@ -556,9 +556,17 @@ class Extensions extends Base {
 			$input['extension'] = $input['extensionId'];
 		}
       
-        if($input['tech'] == "pjsip"){
-			$input['max_contacts'] = isset($input['maxContacts']) ? $input['maxContacts'] : '1';
-        }
+		if($input['tech'] == "pjsip"){
+			if(isset($input['maxContacts']) && !empty($input['maxContacts'])){
+				if($input['maxContacts'] > 100){
+					$input['max_contacts'] = 100;
+				}else{
+					$input['max_contacts'] = $input['maxContacts'];
+				}
+			}else{
+				$input['max_contacts'] = 1 ;
+			}
+		}
       
 		
 		return $input;
@@ -594,8 +602,16 @@ class Extensions extends Base {
 			$input['vmpwd'] = !empty($input['vmpwd']) ? $input['vmpwd'] :  '';
 		}
       
-        if($input['tech'] == "pjsip"){
-        	$input['max_contacts']= !empty($input['maxContacts']) ? $input['maxContacts'] : $extensionExists['max_contacts'];
+		if($input['tech'] == "pjsip"){
+			if(isset($input['maxContacts']) && !empty($input['maxContacts'])){
+				if($input['maxContacts'] > 100){
+					$input['max_contacts'] = 100;
+				}else{
+					$input['max_contacts'] = $input['maxContacts'];
+				}
+			}else{
+				$input['max_contacts'] = $extensionExists['max_contacts'] ;
+			}
         }
 					
 		return $input;
