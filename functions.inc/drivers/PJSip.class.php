@@ -1344,6 +1344,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[]="max_contacts=1";
 			$aor[]="remove_existing=yes";
 		} else {
+			if($config['max_contacts'] > 100){
+				$config['max_contacts'] = 100;
+			}
 			$aor[]="max_contacts=".$config['max_contacts'];
 			$aor[]="remove_existing=no";
 		}

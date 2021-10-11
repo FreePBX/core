@@ -220,7 +220,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 
       	if($tech == "pjsip") {
 			if (isset($data['max_contacts']) && !empty($data['max_contacts'])) {
-				$settings['max_contacts']['value']  = $data['max_contacts'];
+				if ($data['max_contacts'] > 100) {
+					$settings['max_contacts']['value']  = 100;
+				}else{
+					$settings['max_contacts']['value']  = $data['max_contacts'];
+				}
 			}
         }
 
@@ -274,7 +278,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['callerid']['value'] = $data['emergency_cid'];
 		$settings['calleridname']['value'] = $data['name'];
 		if(strtolower($tech) == 'pjsip') {
-			$settings['max_contacts']['value'] = $data['max_contacts'];
+			if ($data['max_contacts'] > 100) {
+				$settings['max_contacts']['value']  = 100;
+			}else{
+				$settings['max_contacts']['value'] = $data['max_contacts'];
+			}
 		}
 		if(!$this->emergencyAddDevice($extension,$tech,$settings)) {
 			return array("status" => false, "message" => _("Device was not added!"));
