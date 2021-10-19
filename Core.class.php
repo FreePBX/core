@@ -1445,6 +1445,16 @@ class Core extends FreePBX_Helpers implements BMO  {
 			return true;
 		}
 
+		if ($tech == "pjsip") {
+			if (isset($settings['max_contacts']) && !empty($settings['max_contacts']['value'])) {
+				if ($settings['max_contacts']['value'] > 100) {
+					$settings['max_contacts']['value']  = 100;
+				} else {
+					$settings['max_contacts']['value']  = $settings['max_contacts']['value'];
+				}
+			}
+		}
+
 		if (trim($id) == '' || empty($settings)) {
 			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
