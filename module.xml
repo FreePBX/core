@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.87</version>
+	<version>15.0.12.88</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.88* FREEI-4058 Added condition to limit max contacts value to 100 while adding new device 
 		*15.0.12.87* FREEI-4101 Added default values for pmmaxretries and pmminlength fields 
 		*15.0.12.86* FREEI-4058 Added condition to limit max contacts value to 100 
 		*15.0.12.85* FREEI-4018 added condition to throw error whern trying to add extensions beyond the system extension license limit 
