@@ -2583,8 +2583,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['delay_answer'] = isset($settings['delay_answer'])&&$settings['delay_answer']?$settings['delay_answer']:'0';
 		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
 		$settings['privacyman'] = isset($settings['privacyman'])?$settings['privacyman']:'0';
-		$settings['pmmaxretries'] = isset($settings['pmmaxretries'])?$settings['pmmaxretries']:'';
-		$settings['pmminlength'] = isset($settings['pmminlength'])?$settings['pmminlength']:'';
+		$settings['pmmaxretries'] = isset($settings['pmmaxretries']) && $settings['pmmaxretries'] != '' ?$settings['pmmaxretries']:3;
+		$settings['pmminlength'] = isset($settings['pmminlength']) && $settings['pmminlength'] != '' ?$settings['pmminlength']:10;
 		$settings['alertinfo'] = isset($settings['alertinfo'])?$settings['alertinfo']:'';
 		$settings['ringing'] = isset($settings['ringing'])?$settings['ringing']:'';
 		$settings['reversal'] = isset($settings['reversal'])?$settings['reversal']:'';
