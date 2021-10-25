@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.16</version>
+	<version>16.0.56.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.17* FREEI-4101 Added default values for pmmaxretries and pmminlength fields 
 		*16.0.56.16* FREEI-4058 Added condition to limit max contacts value to 100 
 		*16.0.56.15* FREEI-4018 added condition to throw error whern trying to add extensions beyond the system extension license limit 
 		*16.0.56.14* FREEPBX-22676 Function CALLERPRES not registered 
