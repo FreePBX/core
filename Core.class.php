@@ -220,11 +220,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 
       	if($tech == "pjsip") {
 			if (isset($data['max_contacts']) && !empty($data['max_contacts'])) {
-				if ($data['max_contacts'] > 100) {
-					$settings['max_contacts']['value']  = 100;
-				}else{
-					$settings['max_contacts']['value']  = $data['max_contacts'];
-				}
+				$settings['max_contacts']['value'] = ($data['max_contacts'] > 100 ? 100 : $data['max_contacts']);
+			}else{
+				$settings['max_contacts']['value'] = 1;
 			}
         }
 
@@ -278,10 +276,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['callerid']['value'] = $data['emergency_cid'];
 		$settings['calleridname']['value'] = $data['name'];
 		if(strtolower($tech) == 'pjsip') {
-			if ($data['max_contacts'] > 100) {
-				$settings['max_contacts']['value']  = 100;
+			if (isset($data['max_contacts']) && !empty($data['max_contacts'])) {
+				$settings['max_contacts']['value'] = ($data['max_contacts'] > 100 ? 100 : $data['max_contacts']);
 			}else{
-				$settings['max_contacts']['value'] = $data['max_contacts'];
+				$settings['max_contacts']['value'] = 1;
 			}
 		}
 		if(!$this->emergencyAddDevice($extension,$tech,$settings)) {
@@ -1443,6 +1441,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function addDevice($id,$tech,$settings=array(),$editmode=false) {
 		if ($tech == '') {
 			return true;
+		}
+
+		if ($tech == "pjsip") {
+			if (isset($settings['max_contacts']['value']) && !empty($settings['max_contacts']['value'])) {
+				$settings['max_contacts']['value'] = ($settings['max_contacts']['value'] > 100 ? 100 : $settings['max_contacts']['value']);
+			}else{
+				$settings['max_contacts']['value'] = 1;
+			}
 		}
 
 		if (trim($id) == '' || empty($settings)) {
