@@ -2587,10 +2587,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['description'] = isset($settings['description'])?$settings['description']:'';
 		$settings['fanswer'] = isset($settings['fanswer'])?$settings['fanswer']:'';
 		$settings['delay_answer'] = isset($settings['delay_answer'])&&$settings['delay_answer']?$settings['delay_answer']:'0';
-		$settings['rvolume'] = isset($settings['rvolume']) ? $settings['rvolume'] : "";
+		$settings['rvolume'] = isset($settings['rvolume']) && $settings['rvolume'] != '' ? $settings['rvolume'] : '0';
 		$settings['privacyman'] = isset($settings['privacyman'])?$settings['privacyman']:'0';
-		$settings['pmmaxretries'] = isset($settings['pmmaxretries']) && $settings['pmmaxretries'] != '' ?$settings['pmmaxretries']:3;
-		$settings['pmminlength'] = isset($settings['pmminlength']) && $settings['pmminlength'] != '' ?$settings['pmminlength']:10;
+		$settings['pmmaxretries'] = isset($settings['pmmaxretries']) && $settings['pmmaxretries'] != '' ?$settings['pmmaxretries']:'3';
+		$settings['pmminlength'] = isset($settings['pmminlength']) && $settings['pmminlength'] != '' ?$settings['pmminlength']:'10';
 		$settings['alertinfo'] = isset($settings['alertinfo'])?$settings['alertinfo']:'';
 		$settings['ringing'] = isset($settings['ringing'])?$settings['ringing']:'';
 		$settings['reversal'] = isset($settings['reversal'])?$settings['reversal']:'';
@@ -2693,8 +2693,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			return $this->editDIDProperties($did_vars); //already exists so just edit properties
 		} else {
 			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
-			$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries'])  ? $did_vars['pmmaxretries']  : '';
-			$did_create['pmminlength']  = isset($did_vars['pmminlength'])  ? $did_vars['pmminlength']  : '';
+			$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries']) && $did_vars['pmmaxretries'] != '' ? $did_vars['pmmaxretries']  : '3';
+			$did_create['pmminlength']  = isset($did_vars['pmminlength']) && $did_vars['pmminlength'] != ''  ? $did_vars['pmminlength']  : '10';
 			$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
 			$did_create['ringing']     = isset($did_vars['ringing'])     ? $did_vars['ringing']     : '';
 			$did_create['fanswer']     = isset($did_vars['fanswer'])     ? $did_vars['fanswer']     : '';
