@@ -98,9 +98,17 @@ class Dids extends Base {
 							'inboundRoute' => [
 								'type' => $this->typeContainer->get('did')->getObject(),
 								'resolve' => function ($payload) {
-									return $payload;
+									return $payload['response'];
 								}
-							]
+							],
+							'status' =>[
+								'type' => Type::boolean(),
+								'description' => _('Status of the request'),
+							],
+							'message' =>[
+								'type' => Type::String(),
+								'description' => _('Message for the request')
+							],
 						],
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->getMutationExecuteArray($input);
@@ -112,8 +120,13 @@ class Dids extends Base {
 								}
 							}
 							$output = array_merge($defaults, $input);
-							$id = $this->freepbx->Core->addDID($output);
-							return $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
+							$res = $this->freepbx->Core->addDID($output);
+							$didInfo = $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
+							if($res){
+								return ['response' => $didInfo,'message' => _("Inbound Route created successfully"), 'status' => true];
+							}else{
+								return ['response' => $didInfo,'message' => _("Inbound Route already exists"), 'status' => false];
+							}
 						}
 					]),
 					'updateInboundRoute' => Relay::mutationWithClientMutationId([
@@ -127,6 +140,14 @@ class Dids extends Base {
 							'cidnum' => [
 								'type' => Type::string(),
 								'description' => _('Define the CallerID Number to be matched on incoming calls.')
+							],
+							'oldExtension' => [
+								'type' => Type::string(),
+								'description' => _('Old Extension. Used to change the extension ')
+							],
+							'oldCidnum' => [
+								'type' => Type::string(),
+								'description' => _('Old CID Num. Used to change the cid number ')
 							],
 							'description' => [
 								'type' => Type::string(),
@@ -189,9 +210,17 @@ class Dids extends Base {
 							'inboundRoute' => [
 								'type' => $this->typeContainer->get('did')->getObject(),
 								'resolve' => function ($payload) {
-									return $payload;
+									return $payload['response'];
 								}
-							]
+							],
+							'status' =>[
+								'type' => Type::boolean(),
+								'description' => _('Status of the request'),
+							],
+							'message' =>[
+								'type' => Type::String(),
+								'description' => _('Message for the request')
+							],
 						],
 						'mutateAndGetPayload' => function ($input) {
 							$input = $this->getMutationExecuteArray($input);
@@ -202,9 +231,15 @@ class Dids extends Base {
 									$input[$key] = $value;
 								}
 							}
-
-							$this->freepbx->Core->editDID($input['extension'], $input['cidnum'], $input);
-							return $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
+							$oldExtension = isset($input['oldExtension']) ? $input['oldExtension'] : $input['extension'];
+							$oldCidNum = isset($input['oldCidnum']) ? $input['oldCidnum'] : $input['cidnum'];
+							$res = $this->freepbx->Core->editDID($oldExtension, $oldCidNum, $input);
+							$didInfo = $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
+							if($res){
+								return ['response' => $didInfo,'message' => _("Inbound Route updated successfully"), 'status' => true];
+							}else{
+								return ['response' => $didInfo,'message' => _("Inbound Route does not exists"), 'status' => false];
+							}
 						}
 					]),
 					'removeInboundRoute' => Relay::mutationWithClientMutationId([
