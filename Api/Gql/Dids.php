@@ -27,71 +27,71 @@ class Dids extends Base {
 				return [
 					'addInboundRoute' => Relay::mutationWithClientMutationId([
 						'name' => 'addInboundRoute',
-						'description' => 'Add a new inbound route to the system',
+						'description' => _('Add a new inbound route to the system'),
 						'inputFields' => [
 							'extension' => [
 								'type' => Type::nonNull(Type::string()),
-								'description' => 'Define the expected DID Number if your trunk passes DID on incoming calls.'
+								'description' => _('Define the expected DID Number if your trunk passes DID on incoming calls.')
 							],
 							'cidnum' => [
 								'type' => Type::string(),
-								'description' => 'Define the CallerID Number to be matched on incoming calls.'
+								'description' => _('Define the CallerID Number to be matched on incoming calls.')
 							],
 							'description' => [
 								'type' => Type::string(),
-								'description' => 'Provide a meaningful description of what this incoming route is'
+								'description' => _('Provide a meaningful description of what this incoming route is')
 							],
 							'privacyman' => [
 								'type' => Type::boolean(),
-								'description' => 'If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.'
+								'description' => _('If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.')
 							],
 							'alertinfo' => [
 								'type' => Type::string(),
-								'description' => 'ALERT_INFO can be used for distinctive ring with SIP devices.'
+								'description' => _('ALERT_INFO can be used for distinctive ring with SIP devices.')
 							],
 							'ringing' => [
 								'type' => Type::boolean(),
-								'description' => "Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call."
+								'description' => _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")
 							],
 							'mohclass' => [
 								'type' => Type::string(),
-								'description' => 'Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.'
+								'description' => _('Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.')
 							],
 							'grppre' => [
 								'type' => Type::string(),
-								'description' => 'CID name prefix'
+								'description' => _('CID name prefix')
 							],
 							'delay_answer' => [
 								'type' => Type::int(),
-								'description' => 'An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.'
+								'description' => _('An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.')
 							],
 							'pricid' => [
 								'type' => Type::boolean(),
-								'description' => 'This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.'
+								'description' => _('This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.')
 							],
 							'pmmaxretries' => [
-								'type' => Type::int(),
-								'description' => 'Number of attempts the caller has to enter a valid CallerID'
+								'type' => Type::string(),
+								'description' => _('Number of attempts the caller has to enter a valid CallerID. Default value is 3')
 							],
 							'pmminlength' => [
-								'type' => Type::int(),
-								'description' => 'Minimum amount of digits CallerID needs to contain in order to be considered valid'
+								'type' => Type::string(),
+								'description' => _('Minimum amount of digits CallerID needs to contain in order to be considered valid. Default value is 10')
 							],
 							'reversal' => [
 								'type' => Type::boolean(),
-								'description' => 'On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported'
+								'description' => _('On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported')
 							],
 							'rvolume' => [
-								'type' => Type::int(),
-								'description' => 'Override the ringer volume. Note: This is only valid for Sangoma phones at this time'
+								'type' => Type::string(),
+								'description' => _('Override the ringer volume. Note: This is only valid for Sangoma phones at this time. Default value is 0')
 							],
 							'fanswer' => [
 								'type' => Type::boolean(),
-								'description' => 'Set to Yes to force the call to be answered at this time'
+								'description' => _('Set to Yes to force the call to be answered at this time')
 							],
 							'destination' => [
 								'type' => Type::nonNull(Type::string()),
-								'description' => 'Destination for route'
+								'description' => _('Destination for route')
 							]
 						],
 						'outputFields' => [
@@ -117,71 +117,71 @@ class Dids extends Base {
 					]),
 					'updateInboundRoute' => Relay::mutationWithClientMutationId([
 						'name' => 'updateInboundRoute',
-						'description' => 'Update an inbound route on the system',
+						'description' => _('Update an inbound route on the system'),
 						'inputFields' => [
 							'extension' => [
 								'type' => Type::nonNull(Type::string()),
-								'description' => 'Define the expected DID Number if your trunk passes DID on incoming calls.'
+								'description' => _('Define the expected DID Number if your trunk passes DID on incoming calls.')
 							],
 							'cidnum' => [
 								'type' => Type::string(),
-								'description' => 'Define the CallerID Number to be matched on incoming calls.'
+								'description' => _('Define the CallerID Number to be matched on incoming calls.')
 							],
 							'description' => [
 								'type' => Type::string(),
-								'description' => 'Provide a meaningful description of what this incoming route is'
+								'description' => _('Provide a meaningful description of what this incoming route is')
 							],
 							'privacyman' => [
 								'type' => Type::boolean(),
-								'description' => 'If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.'
+								'description' => _('If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.')
 							],
 							'alertinfo' => [
 								'type' => Type::string(),
-								'description' => 'ALERT_INFO can be used for distinctive ring with SIP devices.'
+								'description' => _('ALERT_INFO can be used for distinctive ring with SIP devices.')
 							],
 							'ringing' => [
 								'type' => Type::boolean(),
-								'description' => "Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call."
+								'description' => _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")
 							],
 							'mohclass' => [
 								'type' => Type::string(),
-								'description' => 'Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.'
+								'description' => _('Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.')
 							],
 							'grppre' => [
 								'type' => Type::string(),
-								'description' => 'CID name prefix'
+								'description' => _('CID name prefix')
 							],
 							'delay_answer' => [
 								'type' => Type::int(),
-								'description' => 'An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.'
+								'description' => _('An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.')
 							],
 							'pricid' => [
 								'type' => Type::boolean(),
-								'description' => 'This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.'
+								'description' => _('This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.')
 							],
 							'pmmaxretries' => [
-								'type' => Type::int(),
-								'description' => 'Number of attempts the caller has to enter a valid CallerID'
+								'type' => Type::string(),
+								'description' => _('Number of attempts the caller has to enter a valid CallerID. Default value is 3')
 							],
 							'pmminlength' => [
-								'type' => Type::int(),
-								'description' => 'Minimum amount of digits CallerID needs to contain in order to be considered valid'
+								'type' => Type::string(),
+								'description' => _('Minimum amount of digits CallerID needs to contain in order to be considered valid. Default value is 10')
 							],
 							'reversal' => [
 								'type' => Type::boolean(),
-								'description' => 'On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported'
+								'description' => _('On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported')
 							],
 							'rvolume' => [
-								'type' => Type::int(),
-								'description' => 'Override the ringer volume. Note: This is only valid for Sangoma phones at this time'
+								'type' => Type::string(),
+								'description' => _('Override the ringer volume. Note: This is only valid for Sangoma phones at this time. Default value is 0')
 							],
 							'fanswer' => [
 								'type' => Type::boolean(),
-								'description' => 'Set to Yes to force the call to be answered at this time'
+								'description' => _('Set to Yes to force the call to be answered at this time')
 							],
 							'destination' => [
 								'type' => Type::nonNull(Type::string()),
-								'description' => 'Destination for route'
+								'description' => _('Destination for route')
 							]
 						],
 						'outputFields' => [
@@ -207,7 +207,7 @@ class Dids extends Base {
 					]),
 					'removeInboundRoute' => Relay::mutationWithClientMutationId([
 						'name' => 'removeInboundRoute',
-						'description' => 'Remove an inbound route from the system',
+						'description' => _('Remove an inbound route from the system'),
 						'inputFields' => [
 							'id' => [
 								'type' => Type::nonNull(Type::id())
@@ -265,7 +265,7 @@ class Dids extends Base {
 						'args' => [
 							'id' => [
 								'type' => Type::nonNull(Type::id()),
-								'description' => 'Inbound Route ID',
+								'description' => _('Inbound Route ID'),
 							]
 						],
 						'resolve' => function($root, $args) {
@@ -325,83 +325,83 @@ class Dids extends Base {
 			return [
 				'id' => [
 					'type' => Type::nonNull(Type::id()),
-					'description' => 'Define ID of inbound route',
+					'description' => _('Define ID of inbound route'),
 					'resolve' => function($row) {
 						return $row['extension']."/".$row['cidnum'];
 					}
 				],
 				'extension' => [
 					'type' => Type::nonNull(Type::string()),
-					'description' => 'Define the expected DID Number if your trunk passes DID on incoming calls.'
+					'description' => _('Define the expected DID Number if your trunk passes DID on incoming calls.')
 				],
 				'cidnum' => [
 					'type' => Type::string(),
-					'description' => 'Define the CallerID Number to be matched on incoming calls.'
+					'description' => _('Define the CallerID Number to be matched on incoming calls.')
 				],
 				'description' => [
 					'type' => Type::string(),
-					'description' => 'Provide a meaningful description of what this incoming route is'
+					'description' => _('Provide a meaningful description of what this incoming route is')
 				],
 				'privacyman' => [
 					'type' => Type::boolean(),
-					'description' => 'If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.'
+					'description' => _('If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.')
 				],
 				'alertinfo' => [
 					'type' => Type::string(),
-					'description' => 'ALERT_INFO can be used for distinctive ring with SIP devices.'
+					'description' => _('ALERT_INFO can be used for distinctive ring with SIP devices.')
 				],
 				'ringing' => [
 					'type' => Type::boolean(),
-					'description' => "Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call."
+					'description' => _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")
 				],
 				'mohclass' => [
 					'type' => Type::string(),
-					'description' => 'Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.'
+					'description' => _('Set the MoH class that will be used for calls that come in on this route. For example, choose a type appropriate for routes coming in from a country which may have announcements in their language.')
 				],
 				'grppre' => [
 					'type' => Type::string(),
-					'description' => 'CID name prefix'
+					'description' => _('CID name prefix')
 				],
 				'delay_answer' => [
 					'type' => Type::int(),
-					'description' => 'An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.'
+					'description' => _('An optional delay to wait before processing this route. Setting this value will delay the channel from answering the call. This may be handy if external fax equipment or security systems are installed in parallel and you would like them to be able to seize the line.')
 				],
 				'pricid' => [
 					'type' => Type::boolean(),
-					'description' => 'This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.',
+					'description' => _('This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.'),
 					'resolve' => function($row) {
 						return ($row['pricid'] === 'CHECKED');
 					}
 				],
 				'pmmaxretries' => [
-					'type' => Type::int(),
-					'description' => 'Number of attempts the caller has to enter a valid CallerID'
+					'type' => Type::string(),
+					'description' => _('Number of attempts the caller has to enter a valid CallerID. Default value is 3')
 				],
 				'pmminlength' => [
-					'type' => Type::int(),
-					'description' => 'Minimum amount of digits CallerID needs to contain in order to be considered valid'
+					'type' => Type::string(),
+					'description' => _('Minimum amount of digits CallerID needs to contain in order to be considered valid. Default value is 10')
 				],
 				'reversal' => [
 					'type' => Type::boolean(),
-					'description' => 'On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported',
+					'description' => _('On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported'),
 					'resolve' => function($row) {
 						return ($row['reversal'] === 'CHECKED');
 					}
 				],
 				'rvolume' => [
-					'type' => Type::int(),
-					'description' => 'Override the ringer volume. Note: This is only valid for Sangoma phones at this time'
+					'type' => Type::string(),
+					'description' => _('Override the ringer volume. Note: This is only valid for Sangoma phones at this time. Default value is 0')
 				],
 				'fanswer' => [
 					'type' => Type::boolean(),
-					'description' => 'Set to Yes to force the call to be answered at this time',
+					'description' => _('Set to Yes to force the call to be answered at this time'),
 					'resolve' => function($row) {
 						return ($row['fanswer'] === 'CHECKED');
 					}
 				],
 				'destinationConnection' => [
 					'type' => $this->typeContainer->get('destination')->getObject(),
-					'description' => 'Destination for route',
+					'description' => _('Destination for route'),
 					'resolve' => function($row) {
 						return $this->typeContainer->get('destination')->resolveValue($row['destination']);
 					}
