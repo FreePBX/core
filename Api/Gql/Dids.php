@@ -103,6 +103,7 @@ class Dids extends Base {
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
+							$input = $this->getMutationExecuteArray($input);
 							$defaults = [];
 							$this->freepbx->Core->addDIDDefaults($defaults);
 							foreach($defaults as $key => $value) {
@@ -193,6 +194,7 @@ class Dids extends Base {
 							]
 						],
 						'mutateAndGetPayload' => function ($input) {
+							$input = $this->getMutationExecuteArray($input);
 							$defaults = [];
 							$this->freepbx->Core->addDIDDefaults($defaults);
 							foreach($defaults as $key => $value) {
@@ -344,7 +346,10 @@ class Dids extends Base {
 				],
 				'privacyman' => [
 					'type' => Type::boolean(),
-					'description' => _('If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.')
+					'description' => _('If no CallerID has been received, Privacy Manager will ask the caller to enter their phone number. If an user/extension has Call Screening enabled, the incoming caller will be prompted to say their name when the call reaches the user/extension.'),
+					'resolve' => function($row) {
+						return $row['privacyman'] == 1 ? true : false;
+					}
 				],
 				'alertinfo' => [
 					'type' => Type::string(),
@@ -352,7 +357,10 @@ class Dids extends Base {
 				],
 				'ringing' => [
 					'type' => Type::boolean(),
-					'description' => _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call.")
+					'description' => _("Some devices or providers require RINGING to be sent before ANSWER. You'll notice this happening if you can send calls directly to a phone, but if you send it to an IVR, it won't connect the call."),
+					'resolve' => function($row) {
+						return $row['ringing'] == "CHECKED" ? true : false;
+					}
 				],
 				'mohclass' => [
 					'type' => Type::string(),
@@ -370,7 +378,7 @@ class Dids extends Base {
 					'type' => Type::boolean(),
 					'description' => _('This effects CID ONLY routes where no DID is specified. If checked, calls with this CID will be routed to this route, even if there is a route to the DID that was called. Normal behavior is for the DID route to take the calls. If there is a specific DID/CID route for this CID, that route will still take the call when that DID is called.'),
 					'resolve' => function($row) {
-						return ($row['pricid'] === 'CHECKED');
+						return $row['pricid'] == "CHECKED" ? true : false;
 					}
 				],
 				'pmmaxretries' => [
@@ -385,7 +393,7 @@ class Dids extends Base {
 					'type' => Type::boolean(),
 					'description' => _('On PRI channels the carrier will send a signal if the caller indicates a billing reversal. When checked this route will reject calls that indicate a billing reversal if supported'),
 					'resolve' => function($row) {
-						return ($row['reversal'] === 'CHECKED');
+						return $row['reversal'] == "CHECKED" ? true : false;
 					}
 				],
 				'rvolume' => [
@@ -396,7 +404,7 @@ class Dids extends Base {
 					'type' => Type::boolean(),
 					'description' => _('Set to Yes to force the call to be answered at this time'),
 					'resolve' => function($row) {
-						return ($row['fanswer'] === 'CHECKED');
+						return $row['fanswer'] == "CHECKED" ? true : false;
 					}
 				],
 				'destinationConnection' => [
@@ -433,5 +441,14 @@ class Dids extends Base {
 				]
 			];
 		});
+	}
+
+	private function getMutationExecuteArray($input) {
+		$input['privacyman'] = $input['privacyman'] == true ? 1 : 0;
+		$input['pricid'] = $input['pricid'] == true ? "CHECKED" : "";
+		$input['reversal'] = $input['reversal'] == true ? "CHECKED" : "";
+		$input['fanswer'] = $input['fanswer'] == true ? "CHECKED" : "";
+		$input['ringing'] = $input['ringing'] == true ? "CHECKED" : "";
+		return $input;
 	}
 }
