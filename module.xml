@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.89</version>
+	<version>15.0.12.90</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.90* FREEI-4126 and FREEI-4127 GQL API fixes 
 		*15.0.12.89* FREEI-4101 Changed 'rvolume', 'pmmaxretries' and 'pmminlength' field type to string because it is causing internal error for already existing data which has empty string and added default value for 'rvolume' field 
 		*15.0.12.88* FREEI-4058 Added condition to limit max contacts value to 100 while adding new device 
 		*15.0.12.87* FREEI-4101 Added default values for pmmaxretries and pmminlength fields 
