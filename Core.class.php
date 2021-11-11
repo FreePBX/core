@@ -2668,7 +2668,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		// if did or cid changed, then check to make sure that this pair is not already being used.
 		//
-		$existing = $this->getDID($extension,$cidnum);
+		if (($extension != $oldExtension) || ($cidnum != $oldCidnum)) {
+			$existing = $this->getDID($extension,$cidnum);
+		}
 
 		if (empty($existing)) {
 			$this->delDID($oldExtension,$oldCidnum);
