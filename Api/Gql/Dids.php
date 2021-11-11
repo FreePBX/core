@@ -233,7 +233,7 @@ class Dids extends Base {
 							}
 							$oldExtension = isset($input['oldExtension']) ? $input['oldExtension'] : $input['extension'];
 							$oldCidNum = isset($input['oldCidnum']) ? $input['oldCidnum'] : $input['cidnum'];
-							$res = $this->freepbx->Core->editDID($oldExtension, $oldCidNum, $input);
+							$res = $this->freepbx->Core->editGqlDID($oldExtension, $oldCidNum, $input);
 							$didInfo = $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
 							if($res){
 								return ['response' => $didInfo,'message' => _("Inbound Route updated successfully"), 'status' => true];
