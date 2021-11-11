@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.20</version>
+	<version>16.0.56.21</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.21* FREEPBX-23025 Revert DID change check 
 		*16.0.56.20* FREEI-4126 and FREEI-4127 GQL API fixes 
 		*16.0.56.19* FREEI-4101 Changed 'rvolume', 'pmmaxretries' and 'pmminlength' field type to string because it is causing internal error for already existing data which has empty string and added default value for 'rvolume' field 
 		*16.0.56.18* FREEI-4058 Added condition to limit max contacts value to 100 while adding new device 
