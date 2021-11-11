@@ -364,7 +364,11 @@ class Dids extends Base {
 					'type' => Type::nonNull(Type::id()),
 					'description' => _('Define ID of inbound route'),
 					'resolve' => function($row) {
-						return $row['extension']."/".$row['cidnum'];
+						if(isset($row['extension']) && isset($row['cidnum'])){
+							return $row['extension']."/".$row['cidnum'];
+						}else{
+							return null;
+						}
 					}
 				],
 				'extension' => [
