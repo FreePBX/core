@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.92</version>
+	<version>15.0.12.93</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.93* FREEI-4126 Added condition to delete the old did and create new did when did and cidnum value is changed while updating inboundRoute 
 		*15.0.12.92* FREEPBX-22892 D&amp;amp;U ringgroup callerid issue 
 		*15.0.12.91* FREEPBX-23025 Revert DID change check 
 		*15.0.12.90* FREEI-4126 and FREEI-4127 GQL API fixes 
