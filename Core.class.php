@@ -4094,8 +4094,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return $result;
 	}
 
-	public function getSipSecret($ext)
-	{
+	public function getSipSecret($ext){
 		$sql = "SELECT * FROM sip WHERE id = :id AND keyword='secret' LIMIT 1";
 		$stmt = $this->database->prepare($sql);
         $stmt->bindParam(':id', $ext);

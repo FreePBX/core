@@ -26,63 +26,59 @@ class Devices extends Base {
 				return [
 					'addCoreDevice' => Relay::mutationWithClientMutationId([
 						'name' => 'addCoreDevice',
-						'description' => 'Add a new entry to Core',
+						'description' => _('Add a new entry to Core'),
 						'inputFields' => $this->getMutationFields(),
-						'outputFields' => [
-							'coredevice' => [
-								'type' => $this->typeContainer->get('coredevice')->getObject(),
-								'resolve' => function ($payload) {
-									return count($payload) > 1 ? $payload : null;
-								}
-							]
-						],
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
+							$item = $this->freepbx->Core->getDevice($input['id']);
+							if (!empty($item)) {
+								return ['message' => _("This device id is already in use"), 'status' => false];
+							} 
 							$output = $this->getMutationExecuteArray($input);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'],$output['description']);
 							$this->freepbx->Core->addDevice($input['id'],$input['tech'],$defaults);
 							$item = $this->freepbx->Core->getDevice($input['id']);
-							return !empty($item) ? $item : [];
+							if (!empty($item)) {
+								return ['message' => _("Core device has been created successfully"), 'status' => true, 'response' => $item];
+							} else {
+								return ['message' => _("Failed to create core device"), 'status' => false, 'response' => []];
+							}
 						}
 					]),
 					'updateCoreDevice' => Relay::mutationWithClientMutationId([
 						'name' => 'updateCoreDevice',
-						'description' => 'Update an entry in Core',
+						'description' => _('Update an entry in Core'),
 						'inputFields' => $this->getMutationFields(),
-						'outputFields' => [
-							'coredevice' => [
-								'type' => $this->typeContainer->get('coredevice')->getObject(),
-								'resolve' => function ($payload) {
-									return count($payload) > 1 ? $payload : null;
-								}
-							]
-						],
+						'outputFields' => $this->getOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
+							$item = $this->freepbx->Core->getDevice($input['id']);
+							if (empty($item)) {
+								return ['message' => _("Core device does not exists"), 'status' => false];
+							} 
 							$output = $this->getMutationExecuteArray($input);
-							$this->freepbx->Core->delDevice($extension, true);
-							$this->freepbx->Core->addDevice($input['id'],$input['tech'],$output);
-							$item = $this->freepbx->Core->getDevice($input['extension']);
-							return !empty($item) ? $item : [];
+							$this->freepbx->Core->delDevice($input['id'], true);
+							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'], $output['description']);
+							$this->freepbx->Core->addDevice($input['id'], $input['tech'], $defaults);
+							$item = $this->freepbx->Core->getDevice($input['id']);
+							if (!empty($item)) {
+								return ['message' => _("Core device has been updated successfully"), 'status' => true, 'response' => $item];
+							} else {
+								return ['message' => _("Failed to updated core device"), 'status' => false, 'response' => []];
+							}
 						}
 					]),
-					'removeCoreDevice' => Relay::mutationWithClientMutationId([
-						'name' => 'removeCoreDevice',
-						'description' => 'Remove an entry from Core',
+					'deleteCoreDevice' => Relay::mutationWithClientMutationId([
+						'name' => 'deleteCoreDevice',
+						'description' => _('Remove an entry from Core'),
 						'inputFields' => [
 							'id' => [
 								'type' => Type::nonNull(Type::id())
 							]
 						],
-						'outputFields' => [
-							'deletedId' => [
-								'type' => Type::nonNull(Type::id()),
-								'resolve' => function ($payload) {
-									return $payload['id'];
-								}
-							]
-						],
+						'outputFields' => $this->deleteCoreDeviceOutputFields(),
 						'mutateAndGetPayload' => function ($input) {
 							$this->freepbx->Core->delDevice($input['id']);
-							return ['id' => $input['id']];
+							return ['message' => _("Core device has been deleted successfully"), 'status' => true, 'id' => $input['id']];
 						}
 					])
 				];
@@ -94,24 +90,29 @@ class Devices extends Base {
 		if($this->checkAllReadScope()) {
 			return function() {
 				return [
-					'allCoreDevices' => [
+					'fetchAllCoreDevices' => [
 						'type' => $this->typeContainer->get('coredevice')->getConnectionType(),
-						'description' => '',
+						'description' => _('Fetchs all core devices'),
 						'args' => Relay::connectionArgs(),
 						'resolve' => function($root, $args) {
-							return Relay::connectionFromArray($this->freepbx->Core->getAllDevicesByType(), $args);
+							$list = Relay::connectionFromArray($this->freepbx->Core->getAllDevicesByType(), $args);
+							if (isset($list) && $list != null) {
+								return ['response' => $list, 'status' => true, 'message' => _("Core Device's found successfully")];
+							} else {
+								return ['message' => _("Sorry, unable to find any core devices"), 'status' => false];
+							}
 						},
 					],
-					'coreDevice' => [
+					'fetchCoreDevice' => [
 						'type' => $this->typeContainer->get('coredevice')->getObject(),
-						'description' => '',
+						'description' => _('Fetchs particular core device'),
 						'args' => [
 							'device_id' => [
 								'type' => Type::id(),
-								'description' => 'The Device ID',
+								'description' => _('The Device ID'),
 							]
 						],
-						'resolve' => function($root, $args) {
+						'resolve' => function ($root, $args) {
 							return $this->freepbx->Core->getDevice($args['device_id']);
 						}
 					]
@@ -135,59 +136,114 @@ class Devices extends Base {
 		$user->addFieldCallback(function() {
 			return [
 				'id' => Relay::globalIdField('extension', function($row) {
-					return isset($row['id']) ? $row['id'] : null;
+					if (isset($row['id'])) {
+						return $row['id'];
+					} elseif (isset($row['response'])) {
+						return  $row['response']['id'];
+					}
+					return null;
 				}),
 				'deviceId' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => _('Give your device a unique integer ID. The device will use this ID to authenticate to the system'),
 					'resolve' => function($row) {
-						return isset($row['id']) ? $row['id'] : null;
+						if (isset($row['id'])) {
+							return $row['id'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['id'];
+						}
+						return null;
 					}
 				],
 				'tech' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => _('Technology driver type'),
-				],
-				'callerId' => [
-					'type' => Type::string(),
-					'description' => _('Caller ID for the device'),
-					'resolve' => function($row) {
-						return isset($row['callerid']) ? $row['callerid'] : null;
+					'resolve' => function ($row) {
+						if (isset($row['tech'])) {
+							return $row['tech'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['tech'];
+						}
+						return null;
 					}
-				],
-				'sipdriver' => [
-					'type' => Type::string(),
-					'description' => _('Caller ID for the device')
 				],
 				'dial' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => _('How to dial this device, this should not be changed unless you know what you are doing.'),
+					'resolve' => function ($row) {
+						if (isset($row['dial'])) {
+							return $row['dial'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['dial'];
+						}
+						return null;
+					}
 				],
 				'devicetype' => [
 					'type' => Type::nonNull(Type::string()),
 					'description' => _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.'),
-
+					'resolve' => function ($row) {
+						if (isset($row['devicetype'])) {
+							return $row['devicetype'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['devicetype'];
+						}
+						return null;
+					}
 				],
 				'user' => [
 					'type' => $this->typeContainer->get('coreuser')->getObject(),
 					'description' => _('Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.'),
-					'resolve' => function($row) {
+					'resolve' => function ($row) {
 						$item = $this->freepbx->Core->getUser($row['user']);
 						return isset($item) ? $item : null;
 					}
 				],
 				'description' => [
 					'type' => Type::string(),
-					'description' => _('The CallerID name for this device will be set to this description until it is logged into.')
+					'description' => _('The CallerID name for this device will be set to this description until it is logged into.'),
+					'resolve' => function ($row) {
+						if (isset($row['description'])) {
+							return $row['description'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['description'];
+						}
+						return null;
+					}
 				],
 				'emergencyCid' => [
 					'type' => Type::string(),
 					'description' => _('This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.'),
-					'resolve' => function($row) {
-						return isset($row['emergency_cid']) ? $row['emergency_cid'] : null;
+					'resolve' => function ($row) {
+						if (isset($row['emergency_cid'])) {
+							return $row['emergency_cid'];
+						} elseif (isset($row['response'])) {
+							return  $row['response']['emergency_cid'];
+						}
+						return null;
 					}
 				],
-
+				'coreDevice' => [
+					'type' => Type::listOf($this->typeContainer->get('coredevice')->getObject()),
+					'resolve' => function ($root, $args) {
+						$data = array_map(function ($row) {
+							return $row['node'];
+						}, $root['response']['edges']);
+						return $data;
+					}
+				],
+				'status' => [
+					'type' => Type::boolean(),
+					'resolve' => function ($payload) {
+						return $payload['status'];
+					}
+				],
+				'message' => [
+					'type' => Type::string(),
+					'resolve' => function ($payload) {
+						return $payload['message'];
+					}
+				],
 			];
 		});
 
@@ -200,18 +256,32 @@ class Devices extends Base {
 				'totalCount' => [
 					'type' => Type::int(),
 					'resolve' => function($value) {
-						return $this->getTotal();
+						return count($this->freepbx->Core->getAllDevicesByType());
 					}
 				],
 				'coreDevice' => [
 					'type' => Type::listOf($this->typeContainer->get('coredevice')->getObject()),
-					'resolve' => function($root, $args) {
-						$data = array_map(function($row){
+					'resolve' => function ($root, $args) {
+						$data = array_map(function ($row) {
 							return $row['node'];
-						},$root['edges']);
+						}, $root['response']['edges']);
 						return $data;
 					}
-				]
+				],
+				'status' => [
+					'type' => Type::boolean(),
+					'description' => _('Status of the request'),
+					'resolve' => function ($payload) {
+						return $payload['status'];
+					}
+				],
+				'message' => [
+					'type' => Type::string(),
+					'description' => _('Message of the request'),
+					'resolve' => function ($payload) {
+						return $payload['message'];
+					}
+				],
 			];
 		});
 	}
@@ -220,31 +290,31 @@ class Devices extends Base {
 		return [
 			'id' => [
 				'type' => Type::nonNull(Type::id()),
-				'description' => 'Give your device a unique integer ID. The device will use this ID to authenticate to the system'
+				'description' => _('Give your device a unique integer ID. The device will use this ID to authenticate to the system')
 			],
 			'tech' => [
 				'type' => Type::nonNull(Type::string()),
-				'description' => 'Technology driver type'
+				'description' => _('Technology driver type')
 			],
 			'dial' => [
 				'type' => Type::nonNull(Type::string()),
-				'description' => 'How to dial this device, this should not be changed unless you know what you are doing.'
+				'description' => _('How to dial this device, this should not be changed unless you know what you are doing.')
 			],
 			'devicetype' => [
 				'type' => Type::nonNull(Type::string()),
-				'description' => 'Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.'
+				'description' => _('Devices can be fixed or adhoc. Fixed devices are always associated to the same extension/user. Adhoc devices can be logged into and logged out of by users.')
 			],
 			'user' => [
 				'type' => Type::string(),
-				'description' => 'Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.'
+				'description' => _('Fixed devices will always mapped to this user. Adhoc devices will be mapped to this user by default.')
 			],
 			'description' => [
 				'type' => Type::string(),
-				'description' => 'The CallerID name for this device will be set to this description until it is logged into.'
+				'description' => _('The CallerID name for this device will be set to this description until it is logged into.')
 			],
 			'emergency_cid' => [
 				'type' => Type::string(),
-				'description' => 'This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.'
+				'description' => _('This CallerID will always be set when dialing out an Outbound Route flagged as Emergency. The Emergency CID overrides all other CallerID settings.')
 			],
 
 		];
@@ -259,6 +329,54 @@ class Devices extends Base {
 			"user" => isset($input['user']) ? $input['user'] : null,
 			"description" => isset($input['description']) ? $input['description'] : null,
 			"emergency_cid" => isset($input['emergency_cid']) ? $input['emergency_cid'] : null,
+		];
+	}
+	
+	/**
+	 * getOutputFields
+	 *
+	 * @return void
+	 */
+	public function getOutputFields(){
+		return [
+			'status' => [
+				'type' => Type::boolean(),
+				'description' => _('Status of the request'),
+			],
+			'message' => [
+				'type' => Type::string(),
+				'description' => _('Message of the request'),
+			],
+			'coreDevice' => [
+				'type' => $this->typeContainer->get('coredevice')->getObject(),
+				'resolve' => function ($row) {
+					if (isset($row['response'])) {
+						return $row['response'];
+					} elseif (isset($row)) {
+						return  $row;
+					}
+					return null;
+				}
+			]
+		];
+	}
+
+	public function deleteCoreDeviceOutputFields(){
+		return [
+			'deletedId' => [
+				'type' => Type::nonNull(Type::id()),
+				'resolve' => function ($payload) {
+					return $payload['id'];
+				}
+			],
+			'status' => [
+				'type' => Type::boolean(),
+				'description' => _('Status of the request'),
+			],
+			'message' => [
+				'type' => Type::string(),
+				'description' => _('Message of the request'),
+			],
 		];
 	}
 }
