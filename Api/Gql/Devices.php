@@ -36,6 +36,9 @@ class Devices extends Base {
 							} 
 							$output = $this->getMutationExecuteArray($input);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'],$output['description']);
+							$defaults['emergency_cid']['value'] = isset($input['emergency_cid']) ? $input['emergency_cid'] : "";
+							$defaults['devicetype']['value'] = isset($input['devicetype']) ? $input['devicetype'] : "";
+							$defaults['user']['value'] = isset($input['user']) ? $input['user'] : "";
 							$this->freepbx->Core->addDevice($input['id'],$input['tech'],$defaults);
 							$item = $this->freepbx->Core->getDevice($input['id']);
 							if (!empty($item)) {
@@ -58,6 +61,9 @@ class Devices extends Base {
 							$output = $this->getMutationExecuteArray($input);
 							$this->freepbx->Core->delDevice($input['id'], true);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'], $output['description']);
+							$defaults['emergency_cid']['value'] = isset($input['emergency_cid']) ? $input['emergency_cid'] : "";
+							$defaults['devicetype']['value'] = isset($input['devicetype']) ? $input['devicetype'] : "";
+							$defaults['user']['value'] = isset($input['user']) ? $input['user'] : "";
 							$this->freepbx->Core->addDevice($input['id'], $input['tech'], $defaults);
 							$item = $this->freepbx->Core->getDevice($input['id']);
 							if (!empty($item)) {
