@@ -1780,7 +1780,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @return bool           Return from db call
 	 */
 	public function delRouteTrunkByID($trunk_id){
-        return $this->routing->deleteTrunkRouteById($trunk_id);
+        return $this->routing->deleteOutboundRouteTrunksByTrunkId($trunk_id);
 	}
 
 	/**

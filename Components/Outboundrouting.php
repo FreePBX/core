@@ -209,6 +209,13 @@ class Outboundrouting extends ComponentBase{
 		return $this;
 	}
 
+	public function deleteOutboundRouteTrunksByTrunkId($id) {
+		$sql = "DELETE FROM `outbound_route_trunks` WHERE `trunk_id`= :id";
+		$stmt = $this->Database->prepare($sql);
+		$stmt->execute([':id' => $id]);
+		return $this;
+	}
+
 	public function getRouteTrunksById($id){
 		$sql = "SELECT `trunk_id` FROM `outbound_route_trunks` WHERE `route_id` = ? ORDER BY `seq`";
 		$sth = $this->Database->prepare($sql);
