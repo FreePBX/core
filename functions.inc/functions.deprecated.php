@@ -238,7 +238,7 @@ function core_routing_trunk_delbyid($trunk_id){
 	FreePBX::Modules()->deprecatedFunction();
 
 	$routing = new FreePBX\modules\Core\Components\Outboundrouting();
-	return $routing->deleteTrunkRouteById($trunk_id);
+	return $routing->deleteOutboundRouteTrunksByTrunkId($trunk_id);
 }
 
 function core_routing_getroutepatternsbyid($route_id){
