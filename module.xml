@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.25</version>
+	<version>16.0.56.26</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.26* FREEI-4100 Updated default settings with actual input values 
 		*16.0.56.25* FREEI-4153 fixed the issue in outbound routes when a non-used trunk is deleted 
 		*16.0.56.24* FREEI-4100 Refactored all core device gql api's with new unit tests and replaced unexistent field with correct value 
 		*16.0.56.23* FREEI-4126 
