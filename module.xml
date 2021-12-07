@@ -475,6 +475,7 @@
 			<method namespace="FreePBX\modules" class="Core" callingMethod="validate">bulkhandlerValidate</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="import">bulkhandlerImport</method>
 			<method namespace="FreePBX\modules" class="Core" callingMethod="export">bulkhandlerExport</method>
+			<method namespace="FreePBX\modules" class="Core" callingMethod="importFinished">regenerateAllContactFiles</method>
 		</bulkhandler>
 		<backup class="Backup" namespace="FreePBX\modules">
 			<method callingMethod="getBackupSettingsDisplay" class="Core" namespace="FreePBX\modules">getBackupSettingsDisplay</method>

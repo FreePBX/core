@@ -4134,4 +4134,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 	}
+
+	public function regenerateAllContactFiles($type) {
+		switch ($type) {
+			case 'extensions':
+				if($this->freepbx->Modules->checkStatus("sysadmin")) {
+					$this->freepbx->Sysadmin->ApiHooks()->runModuleSystemHook('contactmanager', 'update-contacts', [-1]);
+				}
+			break;
+		}
+	}
 }
