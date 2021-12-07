@@ -586,10 +586,10 @@ class Extensions extends Base {
 
 		$input['tech']= !empty($input['tech']) ? $input['tech'] : $extensionExists['tech'];
 		$input['channel']= !empty($input['channel']) ? $input['channel'] : $extensionExists['description'];
-		$input['emergency_cid']= !empty($input['emergency_cid']) ? $input['emergency_cid'] : $extensionExists['emergency_cid'];
+		$input['emergency_cid'] = isset($input['emergency_cid']) ? $input['emergency_cid'] : $extensionExists['emergency_cid'];
 		$input['callerid']= !empty($input['callerid']) ? $input['callerid'] : (isset($extensionExists['callerid']) ? $extensionExists['callerid'] : '');
 		$input['name']= !empty($input['name']) ? $input['name'] : (isset($users['name']) ? $users['name'] : '');
-		$input['outboundcid']= !empty($input['outboundcid']) ? $input['outboundcid'] : (isset($users['outboundcid']) ? $users['outboundcid'] : '');
+		$input['outboundcid'] = isset($input['outboundcid']) ? $input['outboundcid'] : (isset($users['outboundcid']) ? $users['outboundcid'] : '');
 		$input['email']= !empty($input['email']) ? $input['email'] : $userman['email'];
 
 		$vm = isset($voicemail['default'][$input['extension']]) ? ($voicemail['default'][$input['extension']]) : '';
