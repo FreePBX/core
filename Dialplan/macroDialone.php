@@ -87,8 +87,11 @@ class macroDialone{
 		// the I option to Dial() option removed since Asterisk >= 13.24 
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cidname)}" = "" || "${DB(AMPUSER/${AMPUSER}/cidname)}" = ""]','godial'));
 		$cidnameval = '${DB(AMPUSER/${EXTTOCALL}/cidname)}';
-		$ext->add($mcontext,$exten,'', new \ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
-		$cidnameval.= '${PRESENCESTATE_DISPLAY}';
+		$cl_ps = \FreePBX::Config()->get('CONNECTEDLINE_PRESENCESTATE');
+		if (boolval($cl_ps)) {
+			$ext->add($mcontext,$exten,'', new \ext_gosub('1','s','sub-presencestate-display','${EXTTOCALL}'));
+			$cidnameval.= ' ${PRESENCESTATE_DISPLAY}';
+		}
 		$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(name,i)', $cidnameval));
 		$ext->add($mcontext,$exten,'', new \ext_set('CONNECTEDLINE(num)', '${EXTTOCALL}'));
 		$ext->add($mcontext,$exten,'', new \ext_set('D_OPTIONS', '${D_OPTIONS}'));
