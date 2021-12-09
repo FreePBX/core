@@ -901,4 +901,66 @@ class CoreExtensionGQLTest extends ApiBaseTestCase {
 		//status 200 success check
 		$this->assertEquals(200, $response->getStatusCode());
 	}
+
+	public function test_updateExtension_with_empty_outbound_cid_value()
+	{
+
+		$testExtension = "907070";
+		$name = 'api test';
+		$tech = 'pjsip';
+		$email = "xyz@gmail.com";
+		$umPassword = "newPassword";
+		$outboundId = '12345678901';
+		$channelName = "channelName";
+		$clientMutationId = "test1231";
+
+		// clear old test extension
+		self::$core->delDevice($testExtension);
+		self::$core->delUser($testExtension);
+
+		$response = $this->request("mutation {
+		 addExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				tech : \"{$tech}\"
+				email : \"{$email}\"
+				clientMutationId : \"{$clientMutationId}\"
+				outboundCid:\"{$outboundId}\"
+				umPassword: \"{$umPassword}\"
+			  })
+			  { clientMutationId status message }
+			}
+		");
+
+		//updated the extension which is created 
+		$response = $this->request("mutation {
+		 updateExtension ( input: {
+				extensionId: \"{$testExtension}\",
+				name: \"{$name}\"
+				channelName : \"{$channelName}\"
+				clientMutationId : \"{$clientMutationId}\"
+				outboundCid : \"\"
+				umPassword : \"updatedPassword\"
+			  })
+			  { message status}
+			}
+		");
+
+		$json = (string)$response->getBody();
+
+		//fetch extension for the updated record 
+		$response = $this->request("
+		  { 
+			fetchExtension(extensionId: \"{$testExtension}\") { extensionId,user{name,outboundCid,password}}
+		  }
+		");
+
+		$json = (string)$response->getBody();
+
+		//validate the resoponse
+		$this->assertEquals('{"data":{"fetchExtension":{"extensionId":"907070","user":{"name":"api test","outboundCid":"","password":"updatedPassword"}}}}', $json);
+
+		//status 200 success check
+		$this->assertEquals(200, $response->getStatusCode());
+	}
 }
