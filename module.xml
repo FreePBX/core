@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.28</version>
+	<version>16.0.56.29</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.29* update macroDialone.php to fix FREEPBX-22038 
 		*16.0.56.28* FREEI-4269 Modified condition for the fields 'emergency_cid' and 'outboundcid' to accept the empty value same as GUI 
 		*16.0.56.27* FREEI-4033 Created new GQL Api to update, fetch advance settings with unit tests 
 		*16.0.56.26* FREEI-4100 Updated default settings with actual input values 
