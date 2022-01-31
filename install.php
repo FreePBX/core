@@ -754,6 +754,42 @@ $set['level'] = 4;
 $set['readonly'] = 0;
 $freepbx_conf->define_conf_setting('HTTPTLSPRIVATEKEY',$set);
 
+// TLSDISABLEV1
+$set['value'] = true;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS Disable TLS1';
+$set['description'] = 'To DISABLE this TLS version for Asterisk builtin mini-http server, set parameter to YES';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('TLSDISABLEV1',$set);
+
+// TLSDISABLEV11
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS Disable TLS1.1';
+$set['description'] = 'To DISABLE this TLS version for Asterisk builtin mini-http server, set parameter to YES';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('TLSDISABLEV11',$set);
+
+// TLSDISABLEV12
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['options'] = '';
+$set['name'] = 'HTTPS Disable TLS1.2';
+$set['description'] = 'To DISABLE this TLS version for Asterisk builtin mini-http server, set parameter to YES';
+$set['emptyok'] = 0;
+$set['type'] = CONF_TYPE_BOOL;
+$set['level'] = 4;
+$set['readonly'] = 0;
+$freepbx_conf->define_conf_setting('TLSDISABLEV12',$set);
+
 if($httpupdate) {
 	if(file_exists($amp_conf['ASTETCDIR'].'/http.conf')) {
 		$settings = array();

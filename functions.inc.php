@@ -180,9 +180,13 @@ class core_conf {
 			if (filter_var($bindaddr, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
 				$bindaddr = "[$bindaddr]";
 			}
+			$output .= "tlsdisablev1=".($freepbx_conf->get_conf_setting('TLSDISABLEV1') ? 'yes' : 'no')."\n";
+			$output .= "tlsdisablev11=".($freepbx_conf->get_conf_setting('TLSDISABLEV11') ? 'yes' : 'no')."\n";
+			$output .= "tlsdisablev12=".($freepbx_conf->get_conf_setting('TLSDISABLEV12') ? 'yes' : 'no')."\n";
 			$output .= "tlsbindaddr=$bindaddr:".$freepbx_conf->get_conf_setting('HTTPTLSBINDPORT')."\n";
 			$output .= "tlscertfile=".$freepbx_conf->get_conf_setting('HTTPTLSCERTFILE')."\n";
 			$output .= "tlsprivatekey=".$freepbx_conf->get_conf_setting('HTTPTLSPRIVATEKEY')."\n";
+
 		}
 		return $output;
 	}
