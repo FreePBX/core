@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.100</version>
+	<version>15.0.12.101</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.101* FREEI-4491 added condition to accept boolean value of string type 
 		*15.0.12.100* FREEI-4490 Added condition to check whether the setting is already updated 
 		*15.0.12.99* update macroDialone.php to fix FREEPBX-22038 
 		*15.0.12.98* FREEI-4269 Modified condition for the fields 'emergency_cid' and 'outboundcid' to accept the empty value same as GUI 
