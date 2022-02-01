@@ -37,8 +37,9 @@ class Advancesettings extends Base {
 							if($validationResult['status']){
 								$value = $validationResult['value'];
 								$keyword = $input['keyword'];
+								$alreadyExistingInfo = $this->freepbx->config->conf_setting($keyword);
 								$res = $this->freepbx->config->set_conf_values(array($keyword => $value),true);
-								if($res){
+								if($res || ($alreadyExistingInfo['keyword'] == $keyword && $alreadyExistingInfo['value'] == $value )){
 									return ['status' => true, 'message'=> _("Setting's updated successfully")];
 								}else{
 									return ['message'=> _("Sorry, unable to update settings"),'status' => false];
