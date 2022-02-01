@@ -290,10 +290,16 @@ class Advancesettings extends Base {
 								return ['status' => true,'value' => $value];
 							}
 						case 'bool':
-							if(($input['value'] != "1") && ($input['value'] != "0")){
-								return ['message' => _("Value of $keyword should be boolean. Possible values can be 1 or 0"),'status' => false];
+							if(($input['value'] != "1") && ($input['value'] != "0") && (strtolower($input['value']) != "true") && (strtolower($input['value']) != "false")){
+								return ['message' => _("Value of $keyword should be boolean. Possible values can be 1 or 0 or true or false"),'status' => false];
 							}else{
-								$value = (int)$input['value'];
+								if(strtolower($input['value']) == "true"){
+									$value = 1;
+								}else if(strtolower($input['value']) == "false"){
+									$value = 0;
+								}else{
+									$value = (int)$input['value'];
+								}
 								return ['status' => true,'value' => $value];
 							}
 		
