@@ -2474,10 +2474,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 		$nonull = array('failtrunk','outcid','dialoutprefix');
 		foreach($nonull as $item) {
-			$settings[$item] = !is_null($settings[$item]) ? $settings[$item] : ""; // can't be NULL
+			$settings[$item] = isset($settings[$item]) && !is_null($settings[$item]) ? $settings[$item] : ""; // can't be NULL
 		}
 
-		$disable_flag = ($settings['disabletrunk'] == "on")?1:0;
+		$disable_flag = (isset($settings['disabletrunk']) && $settings['disabletrunk'] == "on")?1:0;
 
 		switch (strtolower($tech)) {
 			case "iax":
