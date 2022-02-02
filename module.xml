@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.56.32</version>
+	<version>16.0.56.33</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.56.33* FREEI-4499 Added condition to check settings fields are exists or not 
 		*16.0.56.32* FREEPBX-23267 Add controls for asterisk http server TLS version 
 		*16.0.56.31* FREEI-4491 added condition to accept boolean value of string type 
 		*16.0.56.30* FREEI-4490 Added condition to check whether the setting is already updated 
