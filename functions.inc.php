@@ -3765,11 +3765,7 @@ function core_do_get_config($engine) {
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
-	//FREEPBX-13830 and FREEPBX-13025 Call recording stopped after a atxfer (attendend transfer)
-	$ext->add($mcontext, $exten,'', new ext_noop('${CDR(dstchannel)} montior file= ${MIXMONITOR_FILENAME}'));
-	$ext->add($mcontext, $exten,'', new ext_gotoif('$["${CDR(dstchannel)}" = "" | "${MIXMONITOR_FILENAME}" = ""]', 'skipagi'));
-	$ext->add($mcontext, $exten,'', new ext_AGI('attendedtransfer-rec-restart.php,${CDR(dstchannel)},${MIXMONITOR_FILENAME}'));
-	$ext->add($mcontext, $exten,'skipagi', new ext_hangup());
+	$ext->add($mcontext, $exten,'', new ext_hangup());
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
 
 	// Used to log a user onto an adhoc device. Most of the work is done by
