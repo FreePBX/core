@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.12.102</version>
+	<version>15.0.12.103</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.12.103* Bugfix/FREEPBX-23256 graphql api did does not include destination information 
 		*15.0.12.102* FREEPBX-23267 Add controls for asterisk http server TLS version 
 		*15.0.12.101* FREEI-4491 added condition to accept boolean value of string type 
 		*15.0.12.100* FREEI-4490 Added condition to check whether the setting is already updated 
