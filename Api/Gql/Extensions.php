@@ -337,6 +337,7 @@ class Extensions extends Base {
 			];
 		});
 	}
+	
 	private function getMutationFieldsRange() {
 		return [
 			'startExtension' => [

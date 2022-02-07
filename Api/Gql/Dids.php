@@ -447,12 +447,17 @@ class Dids extends Base {
 					}
 				],
 				'destinationConnection' => [
-					'type' => $this->typeContainer->get('destination')->getObject(),
+					'type' => Type::string(),
 					'description' => _('Destination for route'),
 					'resolve' => function($row) {
-						return $this->typeContainer->get('destination')->resolveValue($row['destination']);
+						$getDestinations = \FreePBX::Modules()->getDestinations();
+						$destination = isset($row['destination'])? $row['destination'] : null;
+						$destination_description = isset($getDestinations[$destination])? $getDestinations[$destination] : null;
+						$name = isset($destination_description['name'])? $destination_description['name'] :'';
+						$category = isset($destination_description['category'])? $destination_description['category'] : $name;
+						return isset($destination_description['description'])? $category.':'.$destination_description['description']:null;
 					}
-				]
+				],
 			];
 		});
 
