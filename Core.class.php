@@ -691,6 +691,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 								$this->delUser($ext);
 								$this->delDevice($ext);
 							}
+							needreload();
 							return array("status" => true, "isCommercialDep" => $isCommercialDep);
 						break;
 						case "users":
