@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.13</version>
+	<version>15.0.14</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.14* FREEI-4267 
 		*15.0.13* bump 
 		*15.0.12.103* Bugfix/FREEPBX-23256 graphql api did does not include destination information 
 		*15.0.12.102* FREEPBX-23267 Add controls for asterisk http server TLS version 
