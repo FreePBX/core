@@ -499,10 +499,123 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function install() {
 	}
-
-	public function uninstall() {
+	private function startdaemon($output=null) {
+		$this->writeln('Starting Call Transfer Monitoring Service');
+		$this->setWriter($output);
+		if(!$this->freepbx->Modules->checkStatus("pm2")) {
+			$this->writeln('PM2 is not installed/enabled. Unable to start Call transfer monitoring');
+			return;
+		}
+		$pm2 = $this->freepbx->Pm2;
+		$data = $pm2->getStatus("core-calltransfer-monitor");
+		if (empty($data) || $data['pm2_env']['status'] == 'online') {
+			$this->stopdaemon();
+			$this->writeln('Restarting Call Transfer Monitoring Service');
+		}
+		$pm2->start("core-calltransfer-monitor",__DIR__."/call-transfer-events.php");
+		$pm2->reset("core-calltransfer-monitor");
+		if(is_object($output)) {
+			$progress = new ProgressBar($output, 0);
+			$progress->setFormat('[%bar%] %elapsed%');
+			$progress->start();
+		}
+		$i = 0;
+		while($i < 100) {
+			$data = $pm2->getStatus("core-calltransfer-monitor");
+			if(!empty($data) && $data['pm2_env']['status'] == 'online') {
+				if(is_object($output)) {
+					$progress->finish();
+				}
+				break;
+			}
+			if(is_object($output)) {
+				$progress->setProgress($i);
+			}
+			$i++;
+			usleep(100000);
+		}
+		if(is_object($output)) {
+			$output->writeln("");
+		}
+		if(!empty($data) && $data['pm2_env']['status'] == 'online') {
+			if(is_object($output)) {
+				$output->writeln(sprintf(_("Started call trasnfer monitoring Service. PID is %s"),$data['pid']));
+			}
+		} else {
+			if(is_object($output)) {
+				$output->writeln("<error>"._("Failed to start call trasnfer monitoring service")."</error>");
+			}
+			return false;
+		}
 	}
 
+	private function stopdaemon($output=null){
+		$this->writeln('Stopping Call Transfer Monitoring Service');
+		// Kill the monitoring script
+		$launcher = trim(`pidof -x call-transfer-events.php`);
+		if ($launcher) {
+			$pids = explode(" ", $launcher);
+			foreach ($pids as $pid) {
+				posix_kill($pid, 9);
+			}
+
+			if(is_object($output)) {
+				$output->writeln(_("Stopped call trasnfer monitoring service"));
+			}
+			$this->freepbx->Pm2->stop("core-calltransfer-monitor");
+			$data = $this->freepbx->Pm2->getStatus("core-calltransfer-monitor");
+			if (empty($data) || $data['pm2_env']['status'] != 'online') {
+				if (is_object($output)){
+					$output->writeln(_("call trasnfer monitoring service stopped"));
+				}
+				return true;
+			}
+				//fallback
+			$adv = trim(`pidof -x call-transfer-events.php.php`);
+			if ($adv) {
+				$pids = explode(" ", $adv);
+				foreach ($pids as $p) {
+					posix_kill($p, 9);
+				}
+				if (is_object($output)) {
+					$output->writeln(_("Call trasnfer monitoring service stopped"));
+				}
+			} else {
+				if(is_object($output)) {
+					$output->writeln(_("Call trasnfer monitoring service was not running"));
+				}
+			}
+		}
+		$data = $this->freepbx->Pm2->getStatus("core-calltransfer-monitor");
+		if(empty($data) || $data['pm2_env']['status'] != 'online') {
+			if(is_object($output)) {
+				$output->writeln("<error>"._("Call trasnfer monitoring service is not running")."</error>");
+			}
+		} else {
+			// executes after the command finishes
+			if(is_object($output)) {
+				$output->writeln(_("Stopping Call trasnfer monitoring service "));
+			}
+
+			$this->freepbx->Pm2->stop("core-calltransfer-monitor");
+
+			$data = $this->freepbx->Pm2->getStatus("core-calltransfer-monitor");
+			if (empty($data) || $data['pm2_env']['status'] != 'online') {
+				if(is_object($output)){
+					$output->writeln(_("Stopped Call trasnfer monitoring service "));
+				}
+			} else {
+				if(is_object($output)) {
+					$output->writeln("<error>".sprintf(_("Call trasnfer monitoring service  Failed: %s")."</error>",$process->getErrorOutput()));
+				}
+			}
+		}
+		return true;
+	}
+
+	public function uninstall() {
+		$this->stopdaemon();
+	}
 
 	public function doTests($db) {
 		return true;
@@ -3796,6 +3909,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param object $output The output object.
 	 */
 	public function startFreepbx($output=null, $debug=true) {
+		$this->startdaemon();
 		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
 			return;
 		}
@@ -3873,6 +3987,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param object $output The output object.
 	 */
 	public function stopFreepbx($output=null, $debug=true) {
+		$this->stopdaemon();
 		$this->setWriter($output);
 		if(!$this->freepbx->Modules->checkStatus("pm2")) {
 			$this->writeln('PM2 is not installed/enabled. Unable to stop Core FastAGI Server');
