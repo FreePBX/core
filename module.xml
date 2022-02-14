@@ -308,13 +308,13 @@
 		<table name="pjsip">
 			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
 			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
-			<field name="data" type="string" length="255"/>
+			<field name="data" type="string" length="8100"/>
 			<field name="flags" type="integer" default="0"/>
 		</table>
 		<table name="sip">
 			<field name="id" type="string" length="20" default="-1" primaryKey="true"/>
 			<field name="keyword" type="string" length="30" default="" primaryKey="true"/>
-			<field name="data" type="string" length="255"/>
+			<field name="data" type="string" length="8100"/>
 			<field name="flags" type="integer" default="0"/>
 		</table>
 		<table name="dahdi">
