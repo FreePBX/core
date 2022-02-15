@@ -40,7 +40,7 @@ class macroUserCallerid{
     // Device & User: If they're not signed in, then they can't do anything.
     $ext->add($context, $exten, '', new \ext_gotoif('$["${AMPUSER}" = "none"]', 'limit'));
 
-    $ext->add($context, $exten, '', new \ext_set('AMPUSERCIDNAME', '${DB(AMPUSER/${AMPUSER}/cidname)}'));
+    $ext->add($context, $exten, '', new \ext_set('AMPUSERCIDNAME', '${IF($["${CALLERID(name)}" != ""]?${CALLERID(name)}:${DB(AMPUSER/${AMPUSER}/cidname)})}'));
     $ext->add($context, $exten, '', new \ext_execif('$["${ARG2}" != "EXTERNAL" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', '__CIDMASQUERADING=TRUE'));
     $ext->add($context, $exten, '', new \ext_gotoif('$["${AMPUSERCIDNAME:1:2}" = ""]', 'report'));
 
