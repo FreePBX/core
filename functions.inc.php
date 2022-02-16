@@ -2239,10 +2239,9 @@ function core_do_get_config($engine) {
 					$trunk_macro = 'dialout-trunk';
 					break;
 				}
-				$ext->add($context, $exten, '', new ext_macro(
-				$trunk_macro, $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue']));
+				$ext->add($context, $exten, '', new ext_gosub('1','s','sub-'.$trunk_macro, $trunk_id.','.$pattern['prepend_digits'].'${EXTEN'.$offset.'},'.$password.','.$trunk_table[$trunk_id]['continue']));
 				$password = '';
-				$trunk_type_needed['macro-' . $trunk_macro] = true;
+				$trunk_type_needed['sub-' . $trunk_macro] = true;
 			}
 			if ($route['dest']) {
 				// Put back the saved CID since each trunk attempt screws with it and set KEEPCID since this is
@@ -2451,6 +2450,7 @@ function core_do_get_config($engine) {
 	$context = 'macro-dialout-trunk';
 	if (!empty($trunk_type_needed[$context])) {
 		$exten = 's';
+		$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
@@ -2477,7 +2477,7 @@ function core_do_get_config($engine) {
 		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 		// such as adding SIP header information or other requirements. All the channel variables from above are present
 
-		$ext->add($context, $exten, 'gocall', new ext_macro('dialout-trunk-predial-hook'));
+		$ext->add($context, $exten, 'gocall', new ext_gosub('1','s','sub-dialout-trunk-predial-hook'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
 		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
@@ -2597,6 +2597,154 @@ function core_do_get_config($engine) {
 		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 	} // if trunk_type_needed
 
+	$context = 'sub-dialout-trunk';
+	if (!empty($trunk_type_needed[$context])) {
+		$exten = 's';
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_execif('$["${INTRACOMPANYROUTE}" = "YES" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', 'CALLERID(num)=${DB(AMPUSER/${AMPUSER}/cidnum)}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+		$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
+		$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
+		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+		$ext->add($context, $exten, '', new ext_gosub('1','s','sub-outbound-callerid','${DIAL_TRUNK}'));
+		$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // this sets DIAL_NUMBER to the proper dial string for this trunk
+		$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+		$ext->add($context, $exten, '', new ext_set('custom', '${CUT(OUT_${DIAL_TRUNK},:,1)}'));  // Custom trunks are prefixed with "AMP:"
+
+		// Back to normal processing, whether intracompany or not.
+		// But add the macro-setmusic if we don't want music on this outbound call
+		// if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
+		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
+
+		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
+		// such as adding SIP header information or other requirements. All the channel variables from above are present
+
+		$ext->add($context, $exten, 'gocall', new ext_gosub('1','s','sub-dialout-trunk-predial-hook'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
+		}
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"!="hidden"]]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
+			$ext->add($context, $exten, '', new ext_execif('$[$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""] & $["${CALLERID(name)}"="hidden"]]', 'Set', 'CONNECTEDLINE(name,i)=CID:(Hidden)${CALLERID(number)}'));
+		}
+
+		$ext->add($context, $exten, '', new ext_gotoif('$["${custom}" = "AMP"]', 'customtrunk'));
+		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
+		$ext->add($context, $exten, '', new ext_set("HASH(__SIPHEADERS,Alert-Info)", "unset"));
+
+		$obroute_email = ($route['notification_on'] == 'call') ? 'U(sub-send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})' : '';
+
+		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));  // Regular Trunk Dial
+		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
+
+		$ext->add($context, $exten, 'customtrunk', new ext_set('pre_num', '${CUT(OUT_${DIAL_TRUNK},$,1)}'));
+		$ext->add($context, $exten, '', new ext_set('the_num', '${CUT(OUT_${DIAL_TRUNK},$,2)}'));  // this is where we expect to find string OUTNUM
+		$ext->add($context, $exten, '', new ext_set('post_num', '${CUT(OUT_${DIAL_TRUNK},$,3)}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${the_num}" = "OUTNUM"]', 'outnum', 'skipoutnum'));  // if we didn't find "OUTNUM", then skip to Dial
+		$ext->add($context, $exten, 'outnum', new ext_set('the_num', '${OUTNUM}'));  // replace "OUTNUM" with the actual number to dial
+		$ext->add($context, $exten, 'skipoutnum', new ext_dial('${pre_num:4}${the_num}${post_num}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
+		$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
+
+		$exten = 's-BUSY';
+		/*
+		* HANGUPCAUSE 17 = Busy, or SIP 486 Busy everywhere
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting BUSY - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		/*
+		* There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
+		* execution with a status of ANSWER. So we hangup at this point
+		*/
+		$exten = 's-ANSWER';
+		$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
+		$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+
+		$exten = 's-NOANSWER';
+		/*
+		* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
+		* HANGUPCAUSE 19 = No Answer From The User, or SIP 480 Temporarily unavailable, SIP 483 To many hops
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['no_answer_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('number-not-answering,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['no_answer_msg_id']);
+			$message = ($message != "") ? $message : "number-not-answering";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_congestion(20));
+
+		$exten = 's-INVALIDNMBR';
+		/*
+		* HANGUPCAUSE 28 = Address Incomplete, or SIP 484 Address Incomplete
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Address Incomplete - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['invalidnmbr_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['invalidnmbr_msg_id']);
+			$message = ($message != "") ? $message : "ss-noservice";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = "s-CHANGED";
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = '_s-.';
+		$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
+		$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
+
+		$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
+		$ext->add($context, '18', '', new ext_goto('1','s-NOANSWER'));
+		$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '1', '', new ext_goto('1','s-INVALIDNMBR'));
+		$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+		$ext->add($context, '_X', '', new ext_goto('1','continue'));
+		$ext->add($context, '_X.', '', new ext_goto('1','continue'));
+
+		$exten = 'continue';
+		if ($generate_trunk_monitor_failure) {
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+		}
+		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
+
+		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+
+		$ext->add($context, 'h', '', new ext_gosub('1','s','sub-hangupcall'));
+	} // if trunk_type_needed
 
 	$context = 'macro-dialout-dundi';
 	if (!empty($trunk_type_needed[$context])) {
@@ -2605,6 +2753,7 @@ function core_do_get_config($engine) {
 		/*
 		* Dialout Dundi Trunk
 		*/
+		$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
@@ -2627,7 +2776,7 @@ function core_do_get_config($engine) {
 		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 		// such as adding SIP header information or other requirements. All the channel variables from above are present
 
-		$ext->add($context, $exten, 'gocall', new ext_macro('dialout-dundi-predial-hook'));
+		$ext->add($context, $exten, 'gocall', new ext_gosub('1','s','sub-dialout-dundi-predial-hook'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
 
 		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
@@ -2731,6 +2880,138 @@ function core_do_get_config($engine) {
 		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 	} // if trunk_type_needed
 
+	$context = 'sub-dialout-dundi';
+	if (!empty($trunk_type_needed[$context])) {
+		$exten = 's';
+
+		/*
+		* Dialout Dundi Trunk
+		*/
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+		$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}foo" = "foo"]', 'nomax'));
+		$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
+		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+		$ext->add($context, $exten, '', new ext_gosub('1','s','sub-outbound-callerid'),'${DIAL_TRUNK}');
+		$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manipulate DIAL_NUMBER
+		$ext->add($context, $exten, '', new ext_set('OUTNUM', '${OUTPREFIX_${DIAL_TRUNK}}${DIAL_NUMBER}'));  // OUTNUM is the final dial number
+
+		// Back to normal processing, whether intracompany or not.
+		// But add the macro-setmusic if we don't want music on this outbound call
+		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
+
+		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
+		// such as adding SIP header information or other requirements. All the channel variables from above are present
+
+		$ext->add($context, $exten, 'gocall', new ext_gosub('1','s','sub-dialout-dundi-predial-hook'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${PREDIAL_HOOK_RET}" = "BYPASS"]', 'bypass,1'));
+
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
+		}
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
+		}
+
+		$ext->add($context, $exten, '', new ext_macro('dundi-${DIAL_TRUNK}','${OUTNUM}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
+		$ext->add($context, $exten, 'chanfull', new ext_noop('max channels used up'));
+
+		$exten = 's-BUSY';
+		/*
+		* HANGUPCAUSE 17 = Busy, or SIP 486 Busy everywhere
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting BUSY - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		/*
+		* There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
+		* execution with a status of ANSWER. So we hangup at this point
+		*/
+		$exten = 's-ANSWER';
+		$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
+		$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+
+		$exten = 's-NOANSWER';
+		/*
+		* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
+		* HANGUPCAUSE 19 = No Answer From The User, or SIP 480 Temporarily unavailable, SIP 483 To many hops
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['no_answer_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('number-not-answering,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['no_answer_msg_id']);
+			$message = ($message != "") ? $message : "number-not-answering";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_congestion(20));
+
+		$exten = 's-INVALIDNMBR';
+		/*
+		* HANGUPCAUSE 28 = Address Incomplete, or SIP 484 Address Incomplete
+		* HANGUPCAUSE 1 = Unallocated (unassigned) number
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Address Incomplete - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['invalidnmbr_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['invalidnmbr_msg_id']);
+			$message = ($message != "") ? $message : "ss-noservice";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = "s-CHANGED";
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = '_s-.';
+		$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
+		$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
+
+		$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
+		$ext->add($context, '18', '', new ext_goto('1','s-NOANSWER'));
+		$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+		$ext->add($context, '_X', '', new ext_goto('1','continue'));
+		$ext->add($context, '_X.', '', new ext_goto('1','continue'));
+
+		$exten = 'continue';
+		if ($generate_trunk_monitor_failure) {
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+		}
+		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
+
+
+		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-dundi-predial-hook'));
+
+		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+	} // if trunk_type_needed
 
 	/*
 	;-------------------------------------------------------------------------------
@@ -2749,6 +3030,25 @@ function core_do_get_config($engine) {
 	;-------------------------------------------------------------------------------
 	*/
 	$context = 'macro-privacy-mgr';
+	$exten = 's';
+
+	$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($context, $exten, '', new ext_set('KEEPCID', '${CALLERID(num)}'));
+	$ext->add($context, $exten, '', new ext_set('TESTCID', '${IF($["${CALLERID(num):0:1}"="+"]?${MATH(1+${CALLERID(num):1})}:${MATH(1+${CALLERID(num)})})}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TESTCID})}=0]', 'Set', 'CALLERID(num)='));
+	$ext->add($context, $exten, '', new ext_privacymanager('${ARG1},${ARG2}'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${PRIVACYMGRSTATUS}"="FAILED"]', 'fail'));
+	$ext->add($context, $exten, '', new ext_gosubif('$["${CALLED_BLACKLIST}"="1"]','app-blacklist-check,s,1'));
+	$ext->add($context, $exten, '', new ext_set('CALLERID(num-pres)', 'allowed_passed_screen'));
+	$ext->add($context, $exten, '', new ext_macroexit());
+
+	$ext->add($context, $exten, 'fail', new ext_noop('STATUS: ${PRIVACYMGRSTATUS} CID: ${CALLERID(num)} ${CALLERID(name)} CALLPRES: ${CALLLINGPRES}'));
+	$ext->add($context, $exten, '', new ext_playback('sorry-youre-having-problems&goodbye'));
+	$ext->add($context, $exten, '', new ext_playtones('congestion'));
+	$ext->add($context, $exten, '', new ext_congestion(20));
+	$ext->add($context, 'h', '', new ext_hangup());
+
+	$context = 'sub-privacy-mgr';
 	$exten = 's';
 
 	$ext->add($context, $exten, '', new ext_set('KEEPCID', '${CALLERID(num)}'));
@@ -2785,6 +3085,7 @@ function core_do_get_config($engine) {
 	if (!empty($trunk_type_needed[$context])) {
 		$exten = 's';
 
+		$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
@@ -2911,6 +3212,135 @@ function core_do_get_config($engine) {
 		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 	} // if trunk_type_needed
 
+	$context = 'sub-dialout-enum';
+	if (!empty($trunk_type_needed[$context])) {
+		$exten = 's';
+
+		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+		$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${ARG1}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${ARG1}}foo" = "foo"]', 'nomax'));
+		$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${ARG1})} >= ${OUTMAXCHANS_${ARG1}} ]', 'nochans'));
+		$ext->add($context, $exten, 'nomax', new ext_set('DIAL_NUMBER', '${ARG2}'));
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
+		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
+		$ext->add($context, $exten, '', new ext_macro('1(${DIAL_TRUNK})','s','sub-outbound-callerid'));
+		$ext->add($context, $exten, 'skipoutcid', new ext_gosubif('$["${PREFIX_TRUNK_${DIAL_TRUNK}}" != ""]','sub-flp-${DIAL_TRUNK},s,1'));  // manimpulate DIAL_NUMBER
+		//  Replacement for asterisk's ENUMLOOKUP function
+		$ext->add($context, $exten, '', new ext_agi('enumlookup.agi'));
+
+		if ($amp_conf['OUTBOUND_DIAL_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(num,i)=${DIAL_NUMBER}'));
+		}
+		if ($amp_conf['OUTBOUND_CID_UPDATE']) {
+			$ext->add($context, $exten, '', new ext_execif('$["${DB(AMPUSER/${AMPUSER}/cidname)}" != ""]','Set','CONNECTEDLINE(name,i)=CID:${CALLERID(number)}'));
+		}
+
+		// Now we have the variable DIALARR set to a list of URI's that can be called, in order of priority
+		// Loop through them trying them in order.
+		$ext->add($context, $exten, 'dialloop', new ext_gotoif('$["foo${DIALARR}"="foo"]', 's-${DIALSTATUS},1'));
+		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(confirm)${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_set('TRYDIAL', '${CUT(DIALARR,%,1)}'));
+		$ext->add($context, $exten, '', new ext_set('DIALARR', '${CUT(DIALARR,%,2-)}'));
+		$ext->add($context, $exten, '', new ext_dial('${TRYDIAL}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}'));
+		// Now, if we're still here, that means the Dial failed for some reason.
+		// If it's CONGESTION or CHANUNAVAIL we want to try again on a different
+		// different channel. If there's no more left, the dialloop tag will exit.
+		$ext->add($context, $exten, '', new ext_gotoif('$[ $[ "${DIALSTATUS}" = "CHANUNAVAIL" ] | $[ "${DIALSTATUS}" = "CONGESTION" ] ]', 'dialloop'));
+		$ext->add($context, $exten, '', new ext_gotoif('$["${ARG4}" = "on"]','continue,1', 's-${DIALSTATUS},1'));
+		// Here are the exit points for the macro.
+		$ext->add($context, $exten, 'nochans', new ext_noop('max channels used up'));
+
+		$exten = 's-BUSY';
+		/*
+		* HANGUPCAUSE 17 = Busy, or SIP 486 Busy everywhere
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting BUSY - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		/*
+		* There are reported bugs in Asterisk Blind Trasfers that result in Dial() returning and continuing
+		* execution with a status of ANSWER. So we hangup at this point
+		*/
+		$exten = 's-ANSWER';
+		$ext->add($context, $exten, '', new ext_noop('Call successfully answered - Hanging up now'));
+		$ext->add($context, $exten, '', new ext_macro('hangupcall'));
+
+		$exten = 's-NOANSWER';
+		/*
+		* HANGUPCAUSE 18 = No User Responding, or SIP 408 Request Timeout
+		* HANGUPCAUSE 19 = No Answer From The User, or SIP 480 Temporarily unavailable, SIP 483 To many hops
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting NOANSWER - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['no_answer_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('number-not-answering,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['no_answer_msg_id']);
+			$message = ($message != "") ? $message : "number-not-answering";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_congestion(20));
+
+		$exten = 's-INVALIDNMBR';
+		/*
+		* HANGUPCAUSE 28 = Address Incomplete, or SIP 484 Address Incomplete
+		*/
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Address Incomplete - giving up'));
+		$ext->add($context, $exten, '', new ext_progress());
+		switch ($trunkreportmsg_ids['invalidnmbr_msg_id']) {
+			case DEFAULT_MSG:
+			$ext->add($context, $exten, '', new ext_playback('ss-noservice,noanswer'));
+			break;
+			case CONGESTION_TONE:
+			$ext->add($context, $exten, '', new ext_playtones('congestion'));
+			break;
+			default:
+			$message = recordings_get_file($trunkreportmsg_ids['invalidnmbr_msg_id']);
+			$message = ($message != "") ? $message : "ss-noservice";
+			$ext->add($context, $exten, '', new ext_playback("$message, noanswer"));
+		}
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = "s-CHANGED";
+		$ext->add($context, $exten, '', new ext_noop('Dial failed due to trunk reporting Number Changed - giving up'));
+		$ext->add($context, $exten, '', new ext_playtones('busy'));
+		$ext->add($context, $exten, '', new ext_busy(20));
+
+		$exten = '_s-.';
+		$ext->add($context, $exten, '', new ext_set('RC', '${IF($[${ISNULL(${HANGUPCAUSE})}]?0:${HANGUPCAUSE})}'));
+		$ext->add($context, $exten, '', new ext_goto('1','${RC}'));
+
+		$ext->add($context, '17', '', new ext_goto('1','s-BUSY'));
+		$ext->add($context, '18', '', new ext_goto('1','s-NOANSWER'));
+		$ext->add($context, '22', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '23', '', new ext_goto('1','s-CHANGED'));
+		$ext->add($context, '28', '', new ext_goto('1','s-INVALIDNMBR'));
+		$ext->add($context, '_X', '', new ext_goto('1','continue'));
+		$ext->add($context, '_X.', '', new ext_goto('1','continue'));
+
+		$exten = 'continue';
+		if ($generate_trunk_monitor_failure) {
+			$ext->add($context, $exten, '', new ext_gotoif('$["${OUTFAIL_${ARG1}}" = ""]', 'noreport'));
+			$ext->add($context, $exten, '', new ext_agi('${OUTFAIL_${ARG1}}'));
+		}
+		$ext->add($context, $exten, 'noreport', new ext_noop('TRUNK Dial failed due to ${DIALSTATUS} HANGUPCAUSE: ${HANGUPCAUSE} - failing through to other trunks'));
+		$ext->add($context, $exten, '', new ext_execif('$["${AMPUSER}"!="" ]', 'Set', 'CALLERID(number)=${AMPUSER}'));
+
+		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+
+		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
+	} // if trunk_type_needed
 
 	/*
 	* overrides CallerID out trunks
@@ -2921,6 +3351,7 @@ function core_do_get_config($engine) {
 	$context = 'macro-outbound-callerid';
 	$exten = 's';
 
+	$ext->add($context,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
 	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
 	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
@@ -3018,7 +3449,6 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERID(num-pres)=prohib_passed_screen'));
 	}
 	
-	//
 	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
 		if ($amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
 			$ext->add($context, $exten, '', new ext_set('CALLERID(name)', ''));
@@ -3029,11 +3459,125 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
 	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${CALLERID(name)}'));
 
-
 	// Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
-	//
 	$ext->addInclude('from-zaptel', 'from-dahdi');
 	$ext->add('from-zaptel', 'foo','', new ext_noop('bar'));
+
+	$context = 'sub-outbound-callerid';
+	$exten = 's';
+
+	$ext->add($context,$exten,'',new ext_noop('${REALCALLERIDNUM}'));
+	$ext->add($context,$exten,'',new ext_noop('${KEEPCID}'));
+	$ext->add($context,$exten,'',new ext_noop('${OUTKEEPCID_${ARG1}}'));
+
+	// If we modified the caller presence, set it back. This allows anonymous calls to be internally prepended but keep
+	// their status if forwarded back out. Not doing this can result in the trunk CID being displayed vs. 'blocked call'
+	//
+	if (version_compare($version, "18.5", "le")) {
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERPRES(name-pres)=${CALLINGNAMEPRES_SV}'));
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERPRES(num-pres)=${CALLINGNUMPRES_SV}'));
+	}else {
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNAMEPRES_SV}" != ""]', 'Set', 'CALLERID(name-pres)=${CALLINGNAMEPRES_SV}'));
+		$ext->add($context,$exten,'',new ext_execif('$["${CALLINGNUMPRES_SV}" != ""]', 'Set', 'CALLERID(num-pres)=${CALLINGNUMPRES_SV}'));
+	}
+	//lets add the HOT desk emergency extensions check here set EMERGENCYCID and location to calleridname
+	$ext->add($context, $exten, '', new ext_set('HOTDESCKCHAN','${CUT(CHANNEL,/,2)}'));
+	$ext->add($context, $exten, '', new ext_set('HOTDESKEXTEN','${CUT(HOTDESCKCHAN,-,1)}'));
+	$ext->add($context, $exten, '', new ext_set('HOTDESKCALL',0));
+	$ext->add($context, $exten, '', new ext_execif('$["${DB(EDEVICE/${HOTDESKEXTEN}/user)}"="DummyUser"]', 'Set', 'HOTDESKCALL=1'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}=1]', 'Set', 'CALLERID(name)=${DB(EDEVICE/${HOTDESKEXTEN}/location)}'));
+
+	// We dont want to allow HOTDESK Emergency extension to dial Normal calls. Only emergency calls allowed
+	$ext->add($context, $exten, '', new ext_set('ALLOWTHISROUTE', 'NO'));
+	$ext->add($context,$exten,'',new ext_execif('$["${EMERGENCYROUTE}" = "YES"]', 'Set', 'ALLOWTHISROUTE=YES'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1 & ${ALLOWTHISROUTE} = NO ]', 'Hangup'));
+
+	// Keep the original CallerID number, for failover to the next trunk.
+
+	$ext->add($context, $exten, '', new ext_execif('$["${REALCALLERIDNUM:1:2}" = ""]', 'Set', 'REALCALLERIDNUM=${CALLERID(number)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[$["${CIDMASQUERADING}" = "TRUE"] & $[$["${AMPUSER}" = ""] | $["${AMPUSER}" = "${DB(AMPUSER/${FROMEXTEN}/cidnum)}"]]]', 'Set', 'AMPUSER=${FROMEXTEN}'));
+	// If this came through a ringgroup or CF, then we want to retain original CID unless
+	// OUTKEEPCID_${trunknum} is set.
+	// Save then CIDNAME while it is still intact in case we end up sending out this same CID
+
+	$ext->add($context, $exten, 'start', new ext_gotoif('$[ $[${LEN(${REALCALLERIDNUM})} = 0] | $["${KEEPCID}" != "TRUE"] | $["${OUTKEEPCID_${ARG1}}" = "on"] ]', 'normcid'));  // Set to TRUE if coming from ringgroups, CF, etc.
+	$ext->add($context, $exten, '', new ext_set('USEROUTCID', '${CALLERID(name)} <${REALCALLERIDNUM}>'));
+	//$ext->add($context, $exten, '', new ext_set('REALCALLERIDNAME', '${CALLERID(name)}'));
+
+	//FREEPBX-13173 if we are masquerading we need to reset the CID otherwise we will masquerade out as the masquerade
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CIDMASQUERADING}" = "TRUE"]', 'normcid'));
+	// We now have to make sure the CID is valid. If we find an AMPUSER with the same CID, we assume it is an internal
+	// call (would be quite a conincidence if not) and go through the normal processing to get that CID. If a device
+	// is set for this CID, then it must be internal
+	// If we end up using USEROUTCID at the end, it may still be the REALCALLERIDNUM we saved above. That is determined
+	// if the two are equal, AND there is no CALLERID(name) present since it has been removed by the CALLERID(all)=${USEROUTCID}
+	// setting. If this is the case, then we put the orignal name back in to send out. Although the CNAME is not honored by most
+	// carriers, there are cases where it is so this preserves that information to be used by those carriers who do honor it.
+
+	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(DEVICE/${REALCALLERIDNUM}/user)}" = ""]', 'bypass'));
+	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
+	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
+	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
+
+	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
+	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
+	$ext->add($context, $exten, '', new ext_set('CALLERID(all)', '${EMERGENCYCID}'));  // emergency cid for device
+	//FREEPBX-18066 if CNAM is empty skip setting it...
+	$ext->add($context, $exten, '', new ext_gotoif('$["${CALLERID(name)}" = ""]', 'cnum'));
+	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${CALLERID(name)}'));
+	$ext->add($context, $exten, 'cnum', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
+	$ext->add($context, $exten, 'exit', new ext_return());
+
+	$ext->add($context, $exten, 'trunkcid', new ext_execif('$[${LEN(${TRUNKOUTCID})} != 0]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
+	$ext->add($context, $exten, 'usercid', new ext_execif('$[${LEN(${USEROUTCID})} != 0]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
+	/* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of
+	* an Emergency CID on an Emergency Route
+	*/
+	$ext->add($context, $exten, '', new ext_execif('$[${LEN(${TRUNKCIDOVERRIDE})} != 0 | ${LEN(${FORCEDOUTCID_${ARG1}})} != 0]', 'Set', 'CALLERID(all)=${IF($[${LEN(${FORCEDOUTCID_${ARG1}})}=0]?${TRUNKCIDOVERRIDE}:${FORCEDOUTCID_${ARG1}})}'));
+	//check queue callback callerid ,if  No force trunkcid is set the send queue callback cid
+	$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1" & ${LEN(${FORCEDOUTCID_${ARG1}})} = 0]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
+	$freepbx_conf =& freepbx_conf::create();
+	$extemode = $freepbx_conf->get_conf_setting('AMPEXTENSIONS');
+	if($extemode != 'deviceanduser'){
+		$ext->add($context, $exten, '', new ext_execif('$[${LEN(${CALLERIDNUMINTERNAL})} = 0 & ${LEN(${AMPUSER})} = 0 &  ${LEN(${USEROUTCID})} = 0 & "${OUTKEEPCID_${ARG1}}" ="off" & ${LEN(${REALCALLERIDNUM})} != 0 ]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
+	}
+	if(!empty($tio_hide) && $tio_hide == "yes"){
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'yes'));
+	}
+	else{
+		$ext->add($context, $exten, '', new ext_set('TIOHIDE', 'no'));
+	}
+	if (version_compare($version, "18.5", "le")) {
+		$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+		//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
+		$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+		// $has_keepcid_cnum is checked and set when the globals are being generated above
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(name-pres)=prohib_passed_screen'));
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERPRES(num-pres)=prohib_passed_screen'));
+	}else {
+		$ext->add($context, $exten, 'hidecid', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERID(name-pres)=prohib_passed_screen'));
+		//We are checking to see if the CallerID name is <hidden> (from freepbx) so we hide both the name and the number. I believe this is correct.
+		$ext->add($context, $exten, '', new ext_execif('$["${CALLERID(name)}"="hidden"]', 'Set', 'CALLERID(num-pres)=prohib_passed_screen'));
+		// $has_keepcid_cnum is checked and set when the globals are being generated above
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERID(name-pres)=prohib_passed_screen'));
+		$ext->add($context, $exten, '', new ext_execif('$["${TIOHIDE}"="yes"]', 'Set', 'CALLERID(num-pres)=prohib_passed_screen'));
+	}
+	
+	if ($has_keepcid_cnum || $amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
+		if ($amp_conf['BLOCK_OUTBOUND_TRUNK_CNAM']) {
+			$ext->add($context, $exten, '', new ext_set('CALLERID(name)', ''));
+		} else {
+			$ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "cnum"]', 'Set', 'CALLERID(name)='));
+		}
+	}
+	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
+	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${CALLERID(name)}'));
+	$ext->add($context, $exten, 'exit', new ext_return());
+
+	// Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
+	$ext->addInclude('from-zaptel', 'from-dahdi');
+	$ext->add('from-zaptel', 'foo','', new ext_noop('bar'));
+
 
 	$context = 'from-dahdi';
 	$exten = '_X.';
@@ -3069,6 +3613,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_noop('Returned from Macro from-dahdi-${CHAN}'));
 	$ext->add($context, $exten, '', new ext_goto(1, '${DID}', 'from-pstn'));
 
+	
 	/*
 	;------------------------------------------------------------------------
 	; [macro-dial-confirm]
@@ -3088,6 +3633,30 @@ function core_do_get_config($engine) {
 	*/
 
 	$mcontext = 'macro-dial-confirm';
+	$exten = 's';
+	
+	$ext->add($mcontext, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+
+	// set to ringing so confirm macro can keep from passing the channel during confirmation if
+	// someone beat them to it.
+	//
+	$ext->add($mcontext, $exten, '', new ext_set('DB(RG/${ARG4}/${CHANNEL})','RINGING'));
+	$ext->add($mcontext, $exten, '', new ext_set('__UNIQCHAN','${CHANNEL}'));
+
+	// Tell dialparites to place the call through the [grps] context
+	//
+	$ext->add($mcontext, $exten, '', new ext_set('USE_CONFIRMATION','TRUE'));
+	$ext->add($mcontext, $exten, '', new ext_set('RINGGROUP_INDEX','${ARG4}'));
+
+	$ext->add($mcontext, $exten, '', new ext_set('FORCE_CONFIRM',''));
+	$ext->add($mcontext, $exten, '', new ext_set('ARG4',''));
+	$ext->add($mcontext, $exten, '', new ext_macro('dial','${ARG1},${ARG2},${ARG3}'));
+	$ext->add($mcontext, $exten, '', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+	$ext->add($mcontext, $exten, '', new ext_set('USE_CONFIRMATION',''));
+	$ext->add($mcontext, $exten, '', new ext_set('RINGGROUP_INDEX',''));
+
+
+	$mcontext = 'sub-dial-confirm';
 	$exten = 's';
 
 	// set to ringing so confirm macro can keep from passing the channel during confirmation if
@@ -3124,9 +3693,15 @@ function core_do_get_config($engine) {
 	$mcontext = 'macro-setmusic';
 	$exten = 's';
 
+	$ext->add($mcontext, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext, $exten, '', new ext_noop_trace('Setting Outbound Route MoH To: ${ARG1}'));
 	$ext->add($mcontext, $exten, '', new ext_setmusiconhold('${ARG1}'));
 
+	$mcontext = 'sub-setmusic';
+	$exten = 's';
+
+	$ext->add($mcontext, $exten, '', new ext_noop_trace('Setting Outbound Route MoH To: ${ARG1}'));
+	$ext->add($mcontext, $exten, '', new ext_setmusiconhold('${ARG1}'));
 
 	/*
 	;------------------------------------------------------------------------
@@ -3146,9 +3721,15 @@ function core_do_get_config($engine) {
 	$context = 'macro-block-cf';
 	$exten = '_X.';
 
+	$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($context, $exten, '', new ext_noop_trace('Blocking callforward to ${EXTEN} because CF is blocked'));
 	$ext->add($context, $exten, '', new ext_hangup(''));
 
+	$context = 'sub-block-cf';
+	$exten = '_X.';
+
+	$ext->add($context, $exten, '', new ext_noop_trace('Blocking callforward to ${EXTEN} because CF is blocked'));
+	$ext->add($context, $exten, '', new ext_hangup(''));
 
 	/*
 	* macro-vm
@@ -3280,216 +3861,433 @@ function core_do_get_config($engine) {
 	// ARG2 - DIRECTDIAL/BUSY
 	// ARG3 - RETURN makes macro return, otherwise hangup
 	//
-	$ext->add('macro-vm', 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
-	$ext->add('macro-vm','s', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})": )}'));
+	$context = 'macro-vm';
+
+	$ext->add($context, 's', '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($context, 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
+	$ext->add($context, 's', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})": )}'));
 
 	// If blkvm-check is set TRUE, then someone told us to block calls from going to
 	// voicemail. This variable is reset by the answering channel so subsequent
 	// transfers will properly function.
 	//
-	$ext->add('macro-vm','s', '', new ext_macro('blkvm-check'));
-	$ext->add('macro-vm','s', '', new ext_gotoif('$["${GOSUB_RETVAL}" != "TRUE"]','vmx,1'));
+	$ext->add($context,'s', '', new ext_macro('blkvm-check'));
+	$ext->add($context,'s', '', new ext_gotoif('$["${GOSUB_RETVAL}" != "TRUE"]','vmx,1'));
 
 	// we didn't branch so block this from voicemail
 	//
-	$ext->add('macro-vm','s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE'));
-	$ext->add('macro-vm','s', '', new ext_hangup(''));
+	$ext->add($context,'s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE'));
+	$ext->add($context,'s', '', new ext_hangup(''));
 
 	// If vmx not enabled for the current mode,then jump to normal voicemail behavior
 	// also - if not message (no-msg) is requested, straight to voicemail
 	//
 
-	$ext->add('macro-vm','vmx', '', new ext_setvar("MEXTEN", '${ARG1}'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("MMODE", '${ARG2}'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("RETVM", '${ARG3}'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
-	$ext->add('macro-vm','vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]?temp:${MODE})}'));
-	$ext->add('macro-vm','vmx', '', new ext_noop('MODE IS: ${MODE}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MEXTEN", '${ARG1}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MMODE", '${ARG2}'));
+	$ext->add($context,'vmx', '', new ext_setvar("RETVM", '${ARG3}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
+	$ext->add($context,'vmx', '', new ext_macro('get-vmcontext', '${MEXTEN}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]?temp:${MODE})}'));
+	$ext->add($context,'vmx', '', new ext_noop('MODE IS: ${MODE}'));
 	// If this use has individual option set for playing standardized message, then override the global option
 	// but only if the vmx state is 'enabled'
 	//
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','chknomsg'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','chknomsg'));
 
-	$ext->add('macro-vm','vmx', '', new ext_set('VM_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "1"]?${DB_RESULT}:${VM_OPTS})}'));
-	$ext->add('macro-vm','vmx', 'chknomsg', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
-	$ext->add('macro-vm','vmx', 'notdirect', new ext_NoOp('Checking if ext ${MEXTEN} is enabled: ${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','s-${MMODE},1'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
+	$ext->add($context,'vmx', '', new ext_set('VM_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "1"]?${DB_RESULT}:${VM_OPTS})}'));
+	$ext->add($context,'vmx', 'chknomsg', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
+	$ext->add($context,'vmx', 'notdirect', new ext_NoOp('Checking if ext ${MEXTEN} is enabled: ${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','s-${MMODE},1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
 
 
 	$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
 	$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
 	$loops = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_LOOPS'", "getOne");
-	$ext->add('macro-vm','vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 2)));
-	$ext->add('macro-vm','vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 1)));
-	$ext->add('macro-vm','vmx', '', new ext_set("VMX_LOOPS", (isset($loops) ? $loops : 1)));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT", '0'));
-	$ext->add('macro-vm','vmx', '', new ext_set('VMX_REPEAT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "1"]?${DB_RESULT}:${VMX_REPEAT})}'));
-	$ext->add('macro-vm','vmx', 'vmxtime', new ext_set('VMX_TIMEOUT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timeout)}" = "1"]?${DB_RESULT}:${VMX_TIMEOUT})}'));
-	$ext->add('macro-vm','vmx', 'vmxloops', new ext_set('VMX_LOOPS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loops)}" = "1"]?${DB_RESULT}:${VMX_LOOPS})}'));
-	$ext->add('macro-vm','vmx','vmxanswer',new ext_answer(''));
+	$ext->add($context,'vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 2)));
+	$ext->add($context,'vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 1)));
+	$ext->add($context,'vmx', '', new ext_set("VMX_LOOPS", (isset($loops) ? $loops : 1)));
+	$ext->add($context,'vmx', '', new ext_setvar("LOOPCOUNT", '0'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_REPEAT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "1"]?${DB_RESULT}:${VMX_REPEAT})}'));
+	$ext->add($context,'vmx', 'vmxtime', new ext_set('VMX_TIMEOUT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timeout)}" = "1"]?${DB_RESULT}:${VMX_TIMEOUT})}'));
+	$ext->add($context,'vmx', 'vmxloops', new ext_set('VMX_LOOPS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loops)}" = "1"]?${DB_RESULT}:${VMX_LOOPS})}'));
+	$ext->add($context,'vmx','vmxanswer',new ext_answer(''));
 
 	// Now play the users voicemail recording as the basis for their ivr, the Read command will repeat as needed and if it timesout
 	// then we go to the timeout. Otherwise handle invalid options by looping until the limit until a valid option is played.
 	//
-	$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
+	$ext->add($context,'vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
 
 	// If we are here we timed out, go to the required destination
 	//
-	$ext->add('macro-vm','vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));
+	$ext->add($context,'vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));
 	// this is always set, if not it will default to no options
-	$ext->add('macro-vm','vmx', '', new ext_set('VMX_OPTS', '${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_OPTS', '${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}'));
 
 	// TODO should we just go do the other sets and skip the complexity, will have to if we remove the globals since they will be gonein dotime
-	$ext->add('macro-vm','vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));
 	/* this is the alternative if re the above TODO
-	$ext->add('macro-vm','vmx', 'chktime', new ext_set('VMX_TIMEDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_EXT})}'));
+	$ext->add($context,'vmx', 'chktime', new ext_set('VMX_TIMEDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_EXT})}'));
 	*/
 
-	$ext->add('macro-vm','vmx', '', new ext_set('VMX_TIMEDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/context)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_CONTEXT})}'));
-	$ext->add('macro-vm','vmx', 'timepri', new ext_set('VMX_TIMEDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/pri)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_PRI})}'));
-	$ext->add('macro-vm','vmx','dotime',new ext_goto('${VMX_TIMEDEST_PRI}', '${VMX_TIMEDEST_EXT}', '${VMX_TIMEDEST_CONTEXT}'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_TIMEDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/context)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_CONTEXT})}'));
+	$ext->add($context,'vmx', 'timepri', new ext_set('VMX_TIMEDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/pri)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_PRI})}'));
+	$ext->add($context,'vmx','dotime',new ext_goto('${VMX_TIMEDEST_PRI}', '${VMX_TIMEDEST_EXT}', '${VMX_TIMEDEST_CONTEXT}'));
 
 	// We got an option, check if the option is defined, or one of the system defaults
 	//
-	$ext->add('macro-vm','vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "0"]','o,1'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${ACTION}" = "*"]','adef,1'));
+	$ext->add($context,'vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${ACTION}" = "0"]','o,1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${ACTION}" = "*"]','adef,1'));
 
 	// Got invalid option loop until the max
 	//
-	$ext->add('macro-vm','vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${LOOPCOUNT}" > "${VMX_LOOPS}"]','toomany'));
-	$ext->add('macro-vm','vmx','',new ext_playback('pm-invalid-option&please-try-again'));
-	$ext->add('macro-vm','vmx','',new ext_goto('loopstart'));
+	$ext->add($context,'vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${LOOPCOUNT}" > "${VMX_LOOPS}"]','toomany'));
+	$ext->add($context,'vmx','',new ext_playback('pm-invalid-option&please-try-again'));
+	$ext->add($context,'vmx','',new ext_goto('loopstart'));
 
 	// tomany: to many invalid options, go to the specified destination
 	//
-	$ext->add('macro-vm','vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOP}'));
-	$ext->add('macro-vm','vmx', '', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/loops)}" = "1"]?${DB_RESULT}:${VMX_OPTS})}'));
+	$ext->add($context,'vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOP}'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/loops)}" = "1"]?${DB_RESULT}:${VMX_OPTS})}'));
 
 	// TODO: same as above, if we just set them then we don't depend on the globals at doloop
-	$ext->add('macro-vm','vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_LOOPDEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_LOOPDEST_EXT",'${DB_RESULT}'));
 	/* this would go with the above TODO
-	$ext->add('macro-vm','vmx', 'chkloop', new ext_set('VMX_LOOPDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_EXT})}'));
+	$ext->add($context,'vmx', 'chkloop', new ext_set('VMX_LOOPDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_EXT})}'));
 	*/
-	$ext->add('macro-vm','vmx', '', new ext_set('VMX_LOOPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/context)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_CONTEXT})}'));
-	$ext->add('macro-vm','vmx', 'looppri', new ext_set('VMX_LOOPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/pri)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_PRI})}'));
-	$ext->add('macro-vm','vmx','doloop',new ext_goto('${VMX_LOOPDEST_PRI}','${VMX_LOOPDEST_EXT}','${VMX_LOOPDEST_CONTEXT}'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_LOOPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/context)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_CONTEXT})}'));
+	$ext->add($context,'vmx', 'looppri', new ext_set('VMX_LOOPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/pri)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_PRI})}'));
+	$ext->add($context,'vmx','doloop',new ext_goto('${VMX_LOOPDEST_PRI}','${VMX_LOOPDEST_EXT}','${VMX_LOOPDEST_CONTEXT}'));
 
 	// doopt: execute the valid option that was chosen
 	//
-	$ext->add('macro-vm','vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));
-	$ext->add('macro-vm','vmx', '', new ext_setvar("VMX_EXT",'${DB_RESULT}'));
+	$ext->add($context,'vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_EXT",'${DB_RESULT}'));
 
 	// Special case, if this option was to go to voicemail, set options and go
 	//
-	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${VMX_EXT}" != "dovm"]','getdest'));
-	$ext->add('macro-vm','vmx', 'vmxopts', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/dovm)}" = "1"]?${DB_RESULT}:${VMX_OPTS_DOVM})}'));
-	$ext->add('macro-vm','vmx','vmxdovm',new ext_goto('1','dovm'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${VMX_EXT}" != "dovm"]','getdest'));
+	$ext->add($context,'vmx', 'vmxopts', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/dovm)}" = "1"]?${DB_RESULT}:${VMX_OPTS_DOVM})}'));
+	$ext->add($context,'vmx','vmxdovm',new ext_goto('1','dovm'));
 
 	// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
 	// reasonable values
 
-	$ext->add('macro-vm','vmx', 'getdest', new ext_set('VMX_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
-	$ext->add('macro-vm','vmx', 'vmxpri', new ext_set('VMX_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
-	$ext->add('macro-vm','vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
+	$ext->add($context,'vmx', 'getdest', new ext_set('VMX_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'vmx', 'vmxpri', new ext_set('VMX_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
 
 	// If the required voicemail file is not present, then revert to normal voicemail
 	// behavior treating as if it was not set
 	//
-	$ext->add('macro-vm','vmx', 'nofile', new ext_NoOp('File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail'));
-	$ext->add('macro-vm','vmx','',new ext_goto('1','s-${MMODE}'));
-	$ext->add('macro-vm','vmx', 'tmpgreet', new ext_NoOp('Temporary Greeting Detected, going to normal voicemail'));
-	$ext->add('macro-vm','vmx','',new ext_goto('1','s-${MMODE}'));
+	$ext->add($context,'vmx', 'nofile', new ext_NoOp('File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail'));
+	$ext->add($context,'vmx','',new ext_goto('1','s-${MMODE}'));
+	$ext->add($context,'vmx', 'tmpgreet', new ext_NoOp('Temporary Greeting Detected, going to normal voicemail'));
+	$ext->add($context,'vmx','',new ext_goto('1','s-${MMODE}'));
 
 	// Drop into voicemail either as a direct destination (in which case VMX_OPTS might be set to something) or
 	// if the user timed out or broke out of the loop then VMX_OPTS is always cleared such that an Allison
 	// message is played and the caller know's what is going on.
 	//
-	$ext->add('macro-vm','dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
-	$ext->add('macro-vm','dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}'));
-	$ext->add('macro-vm','dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
+	$ext->add($context,'dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}'));
+	$ext->add($context,'dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
 
-	$ext->add('macro-vm','s-BUSY','',new ext_NoOp('BUSY voicemail'));
-	$ext->add('macro-vm','s-BUSY','',new ext_macro('get-vmcontext','${MEXTEN}'));
-	$ext->add('macro-vm','s-BUSY', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
-	$ext->add('macro-vm','s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'s-BUSY','',new ext_NoOp('BUSY voicemail'));
+	$ext->add($context,'s-BUSY','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-BUSY', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
+	$ext->add($context,'s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
 
-	$ext->add('macro-vm','s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beep only) voicemail'));
-	$ext->add('macro-vm','s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
-	$ext->add('macro-vm','s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
-	$ext->add('macro-vm','s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beep only) voicemail'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
 
-	$ext->add('macro-vm','s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
-	$ext->add('macro-vm','s-INSTRUCT','',new ext_macro('get-vmcontext','${MEXTEN}'));
-	$ext->add('macro-vm','s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
-	$ext->add('macro-vm','s-INSTRUCT','',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
+	$ext->add($context,'s-INSTRUCT','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
+	$ext->add($context,'s-INSTRUCT','',new ext_goto('1','exit-${VMSTATUS}'));
 
-	$ext->add('macro-vm','s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
-	$ext->add('macro-vm','s-DIRECTDIAL','',new ext_macro('get-vmcontext','${MEXTEN}'));
-	$ext->add('macro-vm','s-DIRECTDIAL','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
-	$ext->add('macro-vm','s-DIRECTDIAL','',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_goto('1','exit-${VMSTATUS}'));
 
-	$ext->add('macro-vm','_s-.','',new ext_macro('get-vmcontext','${MEXTEN}'));
-	$ext->add('macro-vm','_s-.','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
-	$ext->add('macro-vm','_s-.','',new ext_goto('1','exit-${VMSTATUS}'));
+	$ext->add($context,'_s-.','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'_s-.','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
+	$ext->add($context,'_s-.','',new ext_goto('1','exit-${VMSTATUS}'));
 
 	// If the user has a 0 option defined, use that for operator zero-out from within voicemail
 	// as well to keep it consistant with the menu structure
 	//
-	$ext->add('macro-vm','o','',new ext_playback('one-moment-please'));
-	$ext->add('macro-vm','o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
-	$ext->add('macro-vm','o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
-	$ext->add('macro-vm','o', 'opcontext', new ext_set('VMX_OPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
-	$ext->add('macro-vm','o', 'oppri', new ext_set('VMX_OPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
-	$ext->add('macro-vm','o','',new ext_goto('${VMX_OPDEST_PRI}','${VMX_OPDEST_EXT}','${VMX_OPDEST_CONTEXT}'));
-	$ext->add('macro-vm','o','doopdef',new ext_gotoif('$["x${OPERATOR_XTN}"="x"]','nooper','from-internal,${OPERATOR_XTN},1'));
-	$ext->add('macro-vm','o','nooper',new ext_gotoif('$["x${FROM_DID}"="x"]','nodid'));
-	$ext->add('macro-vm','o','',new ext_dial('Local/${FROM_DID}@from-pstn',''));
-	$ext->add('macro-vm','o','',new ext_macro('hangup'));
-	$ext->add('macro-vm','o','nodid',new ext_dial('Local/s@from-pstn',''));
-	$ext->add('macro-vm','o','',new ext_macro('hangup'));
+	$ext->add($context,'o','',new ext_playback('one-moment-please'));
+	$ext->add($context,'o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
+	$ext->add($context,'o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'o', 'opcontext', new ext_set('VMX_OPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'o', 'oppri', new ext_set('VMX_OPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'o','',new ext_goto('${VMX_OPDEST_PRI}','${VMX_OPDEST_EXT}','${VMX_OPDEST_CONTEXT}'));
+	$ext->add($context,'o','doopdef',new ext_gotoif('$["x${OPERATOR_XTN}"="x"]','nooper','from-internal,${OPERATOR_XTN},1'));
+	$ext->add($context,'o','nooper',new ext_gotoif('$["x${FROM_DID}"="x"]','nodid'));
+	$ext->add($context,'o','',new ext_dial('Local/${FROM_DID}@from-pstn',''));
+	$ext->add($context,'o','',new ext_macro('hangupcall'));
+	$ext->add($context,'o','nodid',new ext_dial('Local/s@from-pstn',''));
+	$ext->add($context,'o','',new ext_macro('hangupcall'));
 
 	// If the user has a * option defined, use that for the * out from within voicemail
 	// as well to keep it consistant with the menu structure
 	//
-	$ext->add('macro-vm','a','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'a','',new ext_macro('get-vmcontext','${MEXTEN}'));
 	//Dont allow (*) to be dialed to hack voicemail
 	//http://issues.freepbx.org/browse/FREEPBX-7757
-	$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/novmstar)}" = "1"]','s,1'));
+	$ext->add($context,'a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/novmstar)}" = "1"]','s,1'));
 
-	$ext->add('macro-vm','a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
-	$ext->add('macro-vm','a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
-	$ext->add('macro-vm','a','acontext', new ext_set('VMX_ADEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
-	$ext->add('macro-vm','a','apri', new ext_set('VMX_ADEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
-	$ext->add('macro-vm','a','',new ext_goto('${VMX_ADEST_PRI}','${VMX_ADEST_EXT}','${VMX_ADEST_CONTEXT}'));
-	$ext->add('macro-vm','adef','',new ext_vmmain('${MEXTEN}@${VMCONTEXT}'));
-	$ext->add('macro-vm','adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
-	$ext->add('macro-vm','adef','',new ext_hangup(''));
+	$ext->add($context,'a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
+	$ext->add($context,'a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'a','acontext', new ext_set('VMX_ADEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'a','apri', new ext_set('VMX_ADEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'a','',new ext_goto('${VMX_ADEST_PRI}','${VMX_ADEST_EXT}','${VMX_ADEST_CONTEXT}'));
+	$ext->add($context,'adef','',new ext_vmmain('${MEXTEN}@${VMCONTEXT}'));
+	$ext->add($context,'adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'adef','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-FAILED','',new ext_playback('im-sorry&an-error-has-occurred'));
-	$ext->add('macro-vm','exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
-	$ext->add('macro-vm','exit-FAILED','',new ext_hangup(''));
+	$ext->add($context,'exit-FAILED','',new ext_playback('im-sorry&an-error-has-occurred'));
+	$ext->add($context,'exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-FAILED','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-SUCCESS','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
-	$ext->add('macro-vm','exit-SUCCESS','',new ext_playback('goodbye'));
-	$ext->add('macro-vm','exit-SUCCESS','',new ext_hangup(''));
+	$ext->add($context,'exit-SUCCESS','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-SUCCESS','',new ext_playback('goodbye'));
+	$ext->add($context,'exit-SUCCESS','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-USEREXIT','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
-	$ext->add('macro-vm','exit-USEREXIT','',new ext_playback('goodbye'));
-	$ext->add('macro-vm','exit-USEREXIT','',new ext_hangup(''));
+	$ext->add($context,'exit-USEREXIT','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-USEREXIT','',new ext_playback('goodbye'));
+	$ext->add($context,'exit-USEREXIT','',new ext_hangup(''));
 
-	$ext->add('macro-vm','exit-RETURN','',new ext_noop('Returning From Voicemail because macro'));
-	$ext->add('macro-vm','t','',new ext_hangup(''));
+	$ext->add($context,'exit-RETURN','',new ext_noop('Returning From Voicemail because macro'));
+	$ext->add($context,'t','',new ext_hangup(''));
+
+
+	$context = 'sub-vm';
+
+	$ext->add($context, 's', '', new ext_macro('user-callerid', 'SKIPTTL'));
+	$ext->add($context, 's', '', new ext_setvar("VMGAIN", '${IF($["foo${VM_GAIN}"!="foo"]?"g(${VM_GAIN})": )}'));
+
+	// If blkvm-check is set TRUE, then someone told us to block calls from going to
+	// voicemail. This variable is reset by the answering channel so subsequent
+	// transfers will properly function.
+	//
+	$ext->add($context,'s', '', new ext_macro('blkvm-check'));
+	$ext->add($context,'s', '', new ext_gotoif('$["${GOSUB_RETVAL}" != "TRUE"]','vmx,1'));
+
+	// we didn't branch so block this from voicemail
+	//
+	$ext->add($context,'s', '', new ext_noop_trace('CAME FROM: ${NODEST} - Blocking VM macro-blkvm-check returned TRUE'));
+	$ext->add($context,'s', '', new ext_hangup(''));
+
+	// If vmx not enabled for the current mode,then jump to normal voicemail behavior
+	// also - if not message (no-msg) is requested, straight to voicemail
+	//
+
+	$ext->add($context,'vmx', '', new ext_setvar("MEXTEN", '${ARG1}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MMODE", '${ARG2}'));
+	$ext->add($context,'vmx', '', new ext_setvar("RETVM", '${ARG3}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($["${MMODE}"="BUSY"]?busy:unavail)}'));
+	$ext->add($context,'vmx', '', new ext_gosub('1','s','get-vmcontext', '${MEXTEN}'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]?temp:${MODE})}'));
+	$ext->add($context,'vmx', '', new ext_noop('MODE IS: ${MODE}'));
+	// If this use has individual option set for playing standardized message, then override the global option
+	// but only if the vmx state is 'enabled'
+	//
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','chknomsg'));
+
+	$ext->add($context,'vmx', '', new ext_set('VM_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}" = "1"]?${DB_RESULT}:${VM_OPTS})}'));
+	$ext->add($context,'vmx', 'chknomsg', new ext_gotoif('$["${MMODE}"="NOMESSAGE"]','s-${MMODE},1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${MMODE}" != "DIRECTDIAL"]','notdirect'));
+	$ext->add($context,'vmx', '', new ext_setvar("MODE", '${IF($["${REGEX("[b]" ${VM_DDTYPE})}" = "1"]?busy:${MODE})}'));
+	$ext->add($context,'vmx', 'notdirect', new ext_NoOp('Checking if ext ${MEXTEN} is enabled: ${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/state)}" != "enabled"]','s-${MMODE},1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.wav)} = 1) || (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/temp.WAV)} = 1)]','tmpgreet'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$[(${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.wav)} = 0) && (${STAT(f,${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}.WAV)} = 0)]','nofile'));
+
+
+	$repeat = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_REPEAT'", "getOne");
+	$to = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_TIMEOUT'", "getOne");
+	$loops = sql("SELECT `value` FROM `voicemail_admin` WHERE `variable` = 'VMX_LOOPS'", "getOne");
+	$ext->add($context,'vmx', '', new ext_set("VMX_TIMEOUT", (isset($to) ? $to : 2)));
+	$ext->add($context,'vmx', '', new ext_set("VMX_REPEAT", (isset($repeat) ? $repeat : 1)));
+	$ext->add($context,'vmx', '', new ext_set("VMX_LOOPS", (isset($loops) ? $loops : 1)));
+	$ext->add($context,'vmx', '', new ext_setvar("LOOPCOUNT", '0'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_REPEAT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/repeat)}" = "1"]?${DB_RESULT}:${VMX_REPEAT})}'));
+	$ext->add($context,'vmx', 'vmxtime', new ext_set('VMX_TIMEOUT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timeout)}" = "1"]?${DB_RESULT}:${VMX_TIMEOUT})}'));
+	$ext->add($context,'vmx', 'vmxloops', new ext_set('VMX_LOOPS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loops)}" = "1"]?${DB_RESULT}:${VMX_LOOPS})}'));
+	$ext->add($context,'vmx','vmxanswer',new ext_answer(''));
+
+	// Now play the users voicemail recording as the basis for their ivr, the Read command will repeat as needed and if it timesout
+	// then we go to the timeout. Otherwise handle invalid options by looping until the limit until a valid option is played.
+	//
+	$ext->add($context,'vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
+
+	// If we are here we timed out, go to the required destination
+	//
+	$ext->add($context,'vmx', 'noopt', new ext_NoOp('Timeout: going to timeout dest'));
+	// this is always set, if not it will default to no options
+	$ext->add($context,'vmx', '', new ext_set('VMX_OPTS', '${DB(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/timeout)}'));
+
+	// TODO should we just go do the other sets and skip the complexity, will have to if we remove the globals since they will be gonein dotime
+	$ext->add($context,'vmx', 'chktime', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "0"]','dotime'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_TIMEDEST_EXT",'${DB_RESULT}'));
+	/* this is the alternative if re the above TODO
+	$ext->add($context,'vmx', 'chktime', new ext_set('VMX_TIMEDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/ext)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_EXT})}'));
+	*/
+
+	$ext->add($context,'vmx', '', new ext_set('VMX_TIMEDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/context)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_CONTEXT})}'));
+	$ext->add($context,'vmx', 'timepri', new ext_set('VMX_TIMEDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/timedest/pri)}" = "1"]?${DB_RESULT}:${VMX_TIMEDEST_PRI})}'));
+	$ext->add($context,'vmx','dotime',new ext_goto('${VMX_TIMEDEST_PRI}', '${VMX_TIMEDEST_EXT}', '${VMX_TIMEDEST_CONTEXT}'));
+
+	// We got an option, check if the option is defined, or one of the system defaults
+	//
+	$ext->add($context,'vmx', 'checkopt', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/ext)}" = "1"]','doopt'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${ACTION}" = "0"]','o,1'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${ACTION}" = "*"]','adef,1'));
+
+	// Got invalid option loop until the max
+	//
+	$ext->add($context,'vmx', '', new ext_setvar("LOOPCOUNT",'$[${LOOPCOUNT} + 1]'));
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${LOOPCOUNT}" > "${VMX_LOOPS}"]','toomany'));
+	$ext->add($context,'vmx','',new ext_playback('pm-invalid-option&please-try-again'));
+	$ext->add($context,'vmx','',new ext_goto('loopstart'));
+
+	// tomany: to many invalid options, go to the specified destination
+	//
+	$ext->add($context,'vmx', 'toomany', new ext_NoOp('Too Many invalid entries, got to invalid dest'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_OPTS",'${VMX_OPTS_LOOP}'));
+	$ext->add($context,'vmx', '', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/loops)}" = "1"]?${DB_RESULT}:${VMX_OPTS})}'));
+
+	// TODO: same as above, if we just set them then we don't depend on the globals at doloop
+	$ext->add($context,'vmx', 'chkloop', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "0"]','doloop'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_LOOPDEST_EXT",'${DB_RESULT}'));
+	/* this would go with the above TODO
+	$ext->add($context,'vmx', 'chkloop', new ext_set('VMX_LOOPDEST_EXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/ext)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_EXT})}'));
+	*/
+	$ext->add($context,'vmx', '', new ext_set('VMX_LOOPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/context)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_CONTEXT})}'));
+	$ext->add($context,'vmx', 'looppri', new ext_set('VMX_LOOPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/loopdest/pri)}" = "1"]?${DB_RESULT}:${VMX_LOOPDEST_PRI})}'));
+	$ext->add($context,'vmx','doloop',new ext_goto('${VMX_LOOPDEST_PRI}','${VMX_LOOPDEST_EXT}','${VMX_LOOPDEST_CONTEXT}'));
+
+	// doopt: execute the valid option that was chosen
+	//
+	$ext->add($context,'vmx', 'doopt', new ext_NoOp('Got a valid option: ${DB_RESULT}'));
+	$ext->add($context,'vmx', '', new ext_setvar("VMX_EXT",'${DB_RESULT}'));
+
+	// Special case, if this option was to go to voicemail, set options and go
+	//
+	$ext->add($context,'vmx', '', new ext_gotoif('$["${VMX_EXT}" != "dovm"]','getdest'));
+	$ext->add($context,'vmx', 'vmxopts', new ext_set('VMX_OPTS', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/vmxopts/dovm)}" = "1"]?${DB_RESULT}:${VMX_OPTS_DOVM})}'));
+	$ext->add($context,'vmx','vmxdovm',new ext_goto('1','dovm'));
+
+	// General case, setup the goto destination and go there (no error checking, its up to the GUI's to assure
+	// reasonable values
+
+	$ext->add($context,'vmx', 'getdest', new ext_set('VMX_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'vmx', 'vmxpri', new ext_set('VMX_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/${ACTION}/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'vmx','vmxgoto',new ext_goto('${VMX_PRI}','${VMX_EXT}','${VMX_CONTEXT}'));
+
+	// If the required voicemail file is not present, then revert to normal voicemail
+	// behavior treating as if it was not set
+	//
+	$ext->add($context,'vmx', 'nofile', new ext_NoOp('File for mode: ${MODE} does not exist, SYSTEMSTATUS: ${SYSTEMSTATUS}, going to normal voicemail'));
+	$ext->add($context,'vmx','',new ext_goto('1','s-${MMODE}'));
+	$ext->add($context,'vmx', 'tmpgreet', new ext_NoOp('Temporary Greeting Detected, going to normal voicemail'));
+	$ext->add($context,'vmx','',new ext_goto('1','s-${MMODE}'));
+
+	// Drop into voicemail either as a direct destination (in which case VMX_OPTS might be set to something) or
+	// if the user timed out or broke out of the loop then VMX_OPTS is always cleared such that an Allison
+	// message is played and the caller know's what is going on.
+	//
+	$ext->add($context,'dovm', '', new ext_NoOp('VMX Timeout - go to voicemail'));
+	$ext->add($context,'dovm', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VMX_OPTS}${VMGAIN}'));
+	$ext->add($context,'dovm', '',new ext_goto('1','exit-${VMSTATUS}'));
+
+	$ext->add($context,'s-BUSY','',new ext_NoOp('BUSY voicemail'));
+	$ext->add($context,'s-BUSY','',new ext_gosub('1','s','get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-BUSY', '',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}b${VMGAIN}'));
+	$ext->add($context,'s-BUSY', '',new ext_goto('1','exit-${VMSTATUS}'));
+
+	$ext->add($context,'s-NOMESSAGE','',new ext_NoOp('NOMESSAGE (beep only) voicemail'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_macro('get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_vm('${MEXTEN}@${VMCONTEXT},s${VM_OPTS}${VMGAIN}'));
+	$ext->add($context,'s-NOMESSAGE','',new ext_goto('1','exit-${VMSTATUS}'));
+
+	$ext->add($context,'s-INSTRUCT','',new ext_NoOp('NOMESSAGE (beeb only) voicemail'));
+	$ext->add($context,'s-INSTRUCT','',new ext_gosub('1','s','get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-INSTRUCT','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VMGAIN}'));
+	$ext->add($context,'s-INSTRUCT','',new ext_goto('1','exit-${VMSTATUS}'));
+
+	$ext->add($context,'s-DIRECTDIAL','',new ext_NoOp('DIRECTDIAL voicemail'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_gosub('1','s','get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}${VM_DDTYPE}${VMGAIN}'));
+	$ext->add($context,'s-DIRECTDIAL','',new ext_goto('1','exit-${VMSTATUS}'));
+
+	$ext->add($context,'_s-.','',new ext_gosub('1','s','get-vmcontext','${MEXTEN}'));
+	$ext->add($context,'_s-.','',new ext_vm('${MEXTEN}@${VMCONTEXT},${VM_OPTS}u${VMGAIN}'));
+	$ext->add($context,'_s-.','',new ext_goto('1','exit-${VMSTATUS}'));
+
+	// If the user has a 0 option defined, use that for operator zero-out from within voicemail
+	// as well to keep it consistant with the menu structure
+	//
+	$ext->add($context,'o','',new ext_playback('one-moment-please'));
+	$ext->add($context,'o','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/ext)}" = "0"]','doopdef'));
+	$ext->add($context,'o','',new ext_setvar("VMX_OPDEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'o', 'opcontext', new ext_set('VMX_OPDEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'o', 'oppri', new ext_set('VMX_OPDEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/0/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'o','',new ext_goto('${VMX_OPDEST_PRI}','${VMX_OPDEST_EXT}','${VMX_OPDEST_CONTEXT}'));
+	$ext->add($context,'o','doopdef',new ext_gotoif('$["x${OPERATOR_XTN}"="x"]','nooper','from-internal,${OPERATOR_XTN},1'));
+	$ext->add($context,'o','nooper',new ext_gotoif('$["x${FROM_DID}"="x"]','nodid'));
+	$ext->add($context,'o','',new ext_dial('Local/${FROM_DID}@from-pstn',''));
+	$ext->add($context,'o','',new ext_gosub('1','s','sub-hangupcall'));
+	$ext->add($context,'o','nodid',new ext_dial('Local/s@from-pstn',''));
+	$ext->add($context,'o','',new ext_gosub('1','s','sub-hangupcall'));
+
+	// If the user has a * option defined, use that for the * out from within voicemail
+	// as well to keep it consistant with the menu structure
+	//
+	$ext->add($context,'a','',new ext_gosub('1','s','get-vmcontext','${MEXTEN}'));
+	//Dont allow (*) to be dialed to hack voicemail
+	//http://issues.freepbx.org/browse/FREEPBX-7757
+	$ext->add($context,'a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/novmstar)}" = "1"]','s,1'));
+
+	$ext->add($context,'a','',new ext_gotoif('$["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/ext)}" = "0"]','adef,1'));
+	$ext->add($context,'a','',new ext_setvar("VMX_ADEST_EXT",'${DB_RESULT}'));
+	$ext->add($context,'a','acontext', new ext_set('VMX_ADEST_CONTEXT', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/context)}" = "1"]?${DB_RESULT}:${VMX_CONTEXT})}'));
+	$ext->add($context,'a','apri', new ext_set('VMX_ADEST_PRI', '${IF($["${DB_EXISTS(AMPUSER/${MEXTEN}/vmx/${MODE}/*/pri)}" = "1"]?${DB_RESULT}:${VMX_PRI})}'));
+	$ext->add($context,'a','',new ext_goto('${VMX_ADEST_PRI}','${VMX_ADEST_EXT}','${VMX_ADEST_CONTEXT}'));
+	$ext->add($context,'adef','',new ext_vmmain('${MEXTEN}@${VMCONTEXT}'));
+	$ext->add($context,'adef','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'adef','',new ext_hangup(''));
+
+	$ext->add($context,'exit-FAILED','',new ext_playback('im-sorry&an-error-has-occurred'));
+	$ext->add($context,'exit-FAILED','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-FAILED','',new ext_hangup(''));
+
+	$ext->add($context,'exit-SUCCESS','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-SUCCESS','',new ext_playback('goodbye'));
+	$ext->add($context,'exit-SUCCESS','',new ext_hangup(''));
+
+	$ext->add($context,'exit-USEREXIT','',new ext_gotoif('$["${RETVM}" = "RETURN"]','exit-RETURN,1'));
+	$ext->add($context,'exit-USEREXIT','',new ext_playback('goodbye'));
+	$ext->add($context,'exit-USEREXIT','',new ext_hangup(''));
+
+	$ext->add($context,'exit-RETURN','',new ext_noop('Returning From Voicemail because macro'));
+	$ext->add($context,'t','',new ext_hangup(''));
 
 	/* end macro-vm  */
 
@@ -3503,6 +4301,7 @@ function core_do_get_config($engine) {
 	$mcontext = 'macro-exten-vm';
 	$exten = 's';
 
+	$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
 	$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
 	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
@@ -3606,7 +4405,226 @@ function core_do_get_config($engine) {
 	$ext->add($mcontext,$exten,'', new ext_playback('beep&line-busy-transfer-menu&silence/1'));
 	$ext->add($mcontext,$exten,'', new ext_macroexit());
 
-	/* macro-exten-vm  */
+	/**
+     * Gosub's Beginning 
+     */
+
+	$mcontext = 'sub-exten-vm';
+	$exten = 's';
+
+	$ext->add($context, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
+	$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
+	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | "${ARG3}"="1" | "${ARG4}"="1" | "${ARG5}"="1"]?${RINGTIMER}:)}'));
+	$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},dontcare'));
+
+	// If paging module is not present, then what happens?
+	// TODO: test with no paging module
+	$fcc = new featurecode('paging', 'intercom-prefix');
+	$intercom_code = $fcc->getCodeActive();
+	unset($fcc);
+
+	// I think it is adequate that if AMPUSER is blank, it's not internal (don't think FROM_DID has to be checked though I don't think it hurts)
+	$macrodial = 'macrodial';
+	if ($intercom_code != '') {
+		$ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, FROM_QUEUE: $["${CUT(CHANNEL,@,2):5:5}"="queue"], answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, ATTTXF: ${ATTENDEDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}, CC_RECALL: ${CC_RECALL}'));
+		if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL}@ext-local)}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
+		} else {
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL}@ext-local)}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
+		}
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", '${DIAL_OPTIONS}'));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", 'TRUE'));
+		$ext->add($mcontext,$exten,'', new ext_gosub('1',$intercom_code.'${EXTTOCALL}','ext-intercom'));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", ''));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", ''));
+
+		// If it was a blind transfer and there was a previous auto-answer, then we cleanup all the auto-answer headers left in the channel
+		// It won't be from this call because we don't ever intercom in a blind transfer scenario (hmm unless it was blind transfered to a
+		// specific intercom code but in that case, they won't have been able to subsequently transfered the call
+		//
+		$ext->add($mcontext,$exten,$macrodial, new ext_gosubif('$["${INTERCOM_CALL}"="TRUE" & ${LEN(${BLINDTRANSFER})}]','clrheader,1'));
+		$macrodial = '';
+	}
+	$ext->add($mcontext,$exten,$macrodial, new ext_gosub('1','s','sub-dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+	$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
+
+	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$[("${SV_DIALSTATUS}"="NOANSWER"|"${SV_DIALSTATUS}"="CHANUNAVAIL") & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
+	$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfb,1'));
+	$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
+
+	$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&"${ARG3}"="1")|("${DIALSTATUS}"="BUSY"&"${ARG4}"="1")|("${DIALSTATUS}"="CHANUNAVAIL"&"${ARG5}"="1")]','MacroExit'));
+
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Voicemail is \'${ARG1}\'',1));
+	$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"="novm"]','s-${DIALSTATUS},1'));
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Sending to Voicemail box ${EXTTOCALL}',1));
+	$ext->add($mcontext,$exten,'', new ext_macro('vm','${ARG1},${DIALSTATUS},${IVR_RETVM}'));
+
+	$exten = 'docfu';
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'unavailable'));
+	$ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG3}"="1")]', 'StackPop'));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG3}"="1")]', 'from-internal,${DB(CFU/${EXTTOCALL})},1'));
+	$ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFU/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	$exten = 'docfb';
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
+	$ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG4}"="1")]', 'StackPop'));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG4}"="1")]', 'from-internal,${DB(CFB/${EXTTOCALL})},1'));
+	$ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFB/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	// If we are here it was determined that there had been intercom sip headers left over in the channel. If 1.6.2+ then we can use
+	// the SIPRemoveHeader() option to remove the specific headers. We are trying to be careful not to remove similar headers that
+	// may be used for 'distinctive ring' type reasons from elsewhere in the dialplan. Thus only if we detected the intercom situation
+	// do we do it here.
+	//
+	// If we are pre 1.6.2 then some experimentation on 1.4.X has shown that we are able to clear the SIPADDHEADERnn channel variables
+	// that result from setting the headers so we start from 1 (the first) and iterate up until we find one. In some weird situations
+	// if a header had been removed, we could miss out since it is not possible to detect the existence of a blank channel variable
+	//
+	if ($intercom_code != '') {
+		$exten = 'clrheader';
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPURI})}&"${SIPURI}"="${SIP_URI_OPTIONS}"]', 'Set','SIP_URI_OPTIONS='));
+
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
+		$ext->add($mcontext,$exten,'', new ext_return(''));
+	}
+
+	$exten = 's-BUSY';
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Extension is reporting BUSY and not passing to Voicemail',1));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+	$ext->add($mcontext,$exten, '', new ext_playtones('busy'));
+	$ext->add($mcontext,$exten, '', new ext_busy(20));
+
+	$exten = '_s-!';
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}',1));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+	$ext->add($mcontext,$exten,'', new ext_playtones('congestion'));
+	$ext->add($mcontext,$exten,'', new ext_congestion('10'));
+
+	$exten = 'exit';
+	$ext->add($mcontext,$exten,'', new ext_playback('beep&line-busy-transfer-menu&silence/1'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit());
+
+
+
+	$mcontext = 'sub-exten-vm';
+	$exten = 's';
+
+	$ext->add($mcontext,$exten,'', new ext_macro('user-callerid'));
+	$ext->add($mcontext,$exten,'', new ext_set("RingGroupMethod", 'none'));
+	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("__PICKUPMARK", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("RT", '${IF($["${ARG1}"!="novm" | "${DB(CFU/${EXTTOCALL})}"!="" | "${DB(CFB/${EXTTOCALL})}"!="" | "${ARG3}"="1" | "${ARG4}"="1" | "${ARG5}"="1"]?${RINGTIMER}:)}'));
+	$ext->add($mcontext,$exten,'checkrecord', new ext_gosub('1','s','sub-record-check','exten,${EXTTOCALL},dontcare'));
+
+	// If paging module is not present, then what happens?
+	// TODO: test with no paging module
+	$fcc = new featurecode('paging', 'intercom-prefix');
+	$intercom_code = $fcc->getCodeActive();
+	unset($fcc);
+
+	// I think it is adequate that if AMPUSER is blank, it's not internal (don't think FROM_DID has to be checked though I don't think it hurts)
+	$macrodial = 'macrodial';
+	if ($intercom_code != '') {
+		$ext->add($mcontext,$exten,'', new ext_noop_trace('AMPUSER: ${AMPUSER}, FROM_DID: ${FROM_DID}, FROM_QUEUE: $["${CUT(CHANNEL,@,2):5:5}"="queue"], answermode: ${DB(AMPUSER/${EXTTOCALL}/answermode)}, BLINDTXF: ${BLINDTRANSFER}, ATTTXF: ${ATTENDEDTRANSFER}, EXT_STATE: ${EXTENSION_STATE(${EXTTOCALL})}, CC_RECALL: ${CC_RECALL}'));
+		if ($amp_conf['FORCE_INTERNAL_AUTO_ANSWER_ALL']) {
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL}@ext-local)}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
+		} else {
+			$ext->add($mcontext,$exten,'',new ext_gotoif('$["${CUT(CHANNEL,@,2):5:5}"="queue"|"${AMPUSER}"=""|${LEN(${FROM_DID})}|"${DB(AMPUSER/${EXTTOCALL}/answermode)}"!="intercom"|${LEN(${BLINDTRANSFER})}|"${EXTENSION_STATE(${EXTTOCALL}@ext-local)}"!="NOT_INUSE"|"${CC_RECALL}"!=""]','macrodial'));
+		}
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", '${DIAL_OPTIONS}'));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", 'TRUE'));
+		$ext->add($mcontext,$exten,'', new ext_gosub('1',$intercom_code.'${EXTTOCALL}','ext-intercom'));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_RETURN", ''));
+		$ext->add($mcontext,$exten,'', new ext_set("INTERCOM_EXT_DOPTIONS", ''));
+
+		// If it was a blind transfer and there was a previous auto-answer, then we cleanup all the auto-answer headers left in the channel
+		// It won't be from this call because we don't ever intercom in a blind transfer scenario (hmm unless it was blind transfered to a
+		// specific intercom code but in that case, they won't have been able to subsequently transfered the call
+		//
+		$ext->add($mcontext,$exten,$macrodial, new ext_gosubif('$["${INTERCOM_CALL}"="TRUE" & ${LEN(${BLINDTRANSFER})}]','clrheader,1'));
+		$macrodial = '';
+	}
+	$ext->add($mcontext,$exten,$macrodial, new ext_gosub('1','s','dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+	$ext->add($mcontext,$exten,'', new ext_set("SV_DIALSTATUS", '${DIALSTATUS}'));
+
+	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$[("${SV_DIALSTATUS}"="NOANSWER"|"${SV_DIALSTATUS}"="CHANUNAVAIL") & "${DB(CFU/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfu,1'));
+	$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${SV_DIALSTATUS}"="BUSY" & "${DB(CFB/${EXTTOCALL})}"!="" & "${SCREEN}"=""]','docfb,1'));
+	$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${SV_DIALSTATUS}'));
+
+	$ext->add($mcontext,$exten,'', new ext_execif('$[("${DIALSTATUS}"="NOANSWER"&"${ARG3}"="1")|("${DIALSTATUS}"="BUSY"&"${ARG4}"="1")|("${DIALSTATUS}"="CHANUNAVAIL"&"${ARG5}"="1")]','MacroExit'));
+
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Voicemail is \'${ARG1}\'',1));
+	$ext->add($mcontext,$exten,'',new ext_gotoif('$["${ARG1}"="novm"]','s-${DIALSTATUS},1'));
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Sending to Voicemail box ${EXTTOCALL}',1));
+	$ext->add($mcontext,$exten,'', new ext_macro('vm','${ARG1},${DIALSTATUS},${IVR_RETVM}'));
+
+	$exten = 'docfu';
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'unavailable'));
+	$ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG3}"="1")]', 'StackPop'));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG3}"="1")]', 'from-internal,${DB(CFU/${EXTTOCALL})},1'));
+	$ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFU/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	$exten = 'docfb';
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', 'user-busy'));
+	$ext->add($mcontext,$exten,'docfu', new ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG4}"="1")]', 'StackPop'));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="-1"|("${ARG1}"="novm"&"${ARG4}"="1")]', 'from-internal,${DB(CFB/${EXTTOCALL})},1'));
+	$ext->add($mcontext,$exten,'', new ext_set("RTCF", '${IF($["${DB(AMPUSER/${EXTTOCALL}/cfringtimer)}"="0"]?${RT}:${DB(AMPUSER/${EXTTOCALL}/cfringtimer)})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${DB(CFB/${EXTTOCALL})}@from-internal/n', '${RTCF},${DIAL_OPTIONS}'));
+	if ($amp_conf['DIVERSIONHEADER']) $ext->add($mcontext,$exten,'', new ext_set('__DIVERSION_REASON', ''));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	// If we are here it was determined that there had been intercom sip headers left over in the channel. If 1.6.2+ then we can use
+	// the SIPRemoveHeader() option to remove the specific headers. We are trying to be careful not to remove similar headers that
+	// may be used for 'distinctive ring' type reasons from elsewhere in the dialplan. Thus only if we detected the intercom situation
+	// do we do it here.
+	//
+	// If we are pre 1.6.2 then some experimentation on 1.4.X has shown that we are able to clear the SIPADDHEADERnn channel variables
+	// that result from setting the headers so we start from 1 (the first) and iterate up until we find one. In some weird situations
+	// if a header had been removed, we could miss out since it is not possible to detect the existence of a blank channel variable
+	//
+	if ($intercom_code != '') {
+		$exten = 'clrheader';
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${SIPURI})}&"${SIPURI}"="${SIP_URI_OPTIONS}"]', 'Set','SIP_URI_OPTIONS='));
+
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${ALERTINFO})}]', 'SIPRemoveHeader','${ALERTINFO}'));
+		$ext->add($mcontext, $exten, '', new ext_execif('$[${LEN(${CALLINFO})}]', 'SIPRemoveHeader','${CALLINFO}'));
+		$ext->add($mcontext,$exten,'', new ext_return(''));
+	}
+
+	$exten = 's-BUSY';
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Extension is reporting BUSY and not passing to Voicemail',1));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+	$ext->add($mcontext,$exten, '', new ext_playtones('busy'));
+	$ext->add($mcontext,$exten, '', new ext_busy(20));
+
+	$exten = '_s-!';
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('IVR_RETVM: ${IVR_RETVM} IVR_CONTEXT: ${IVR_CONTEXT}',1));
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${IVR_RETVM}"="RETURN" & "${IVR_CONTEXT}"!=""]','exit,1'));
+	$ext->add($mcontext,$exten,'', new ext_playtones('congestion'));
+	$ext->add($mcontext,$exten,'', new ext_congestion('10'));
+
+	$exten = 'exit';
+	$ext->add($mcontext,$exten,'', new ext_playback('beep&line-busy-transfer-menu&silence/1'));
+	$ext->add($mcontext,$exten,'', new ext_macroexit());
+
+	/* End macro-exten-vm  */
 
 
 	/*
@@ -3625,6 +4643,72 @@ function core_do_get_config($engine) {
 	;------------------------------------------------------------------------
 	*/
 	$mcontext = 'macro-simple-dial';
+	$exten = 's';
+	$ext->add($mcontext,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG1}'));
+	$ext->add($mcontext,$exten,'', new ext_set("RT", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
+	$ext->add($mcontext,$exten,'macrodial', new ext_macro('dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+	$ext->add($mcontext,$exten,'', new ext_set("__CWIGNORE", '${CWI_TMP}'));
+	$ext->add($mcontext,$exten,'', new ext_set("PR_DIALSTATUS", '${DIALSTATUS}'));
+	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${PR_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!=""]','docfu,1'));
+	$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${PR_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
+	$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${PR_DIALSTATUS}'));
+	$ext->add($mcontext,$exten,'', new ext_goto('1','s-${DIALSTATUS}'));
+
+	$mcontext = 'sub-simple-dial';
+	$exten = 's';
+	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG1}'));
+	$ext->add($mcontext,$exten,'', new ext_set("RT", '${ARG2}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CFUEXT", '${DB(CFU/${EXTTOCALL})}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CFBEXT", '${DB(CFB/${EXTTOCALL})}'));
+	$ext->add($mcontext,$exten,'', new ext_set("CWI_TMP", '${CWIGNORE}'));
+	$ext->add($mcontext,$exten,'macrodial', new ext_gosub('1','s','dial-one','${RT},${DIAL_OPTIONS},${EXTTOCALL}'));
+	$ext->add($mcontext,$exten,'', new ext_set("__CWIGNORE", '${CWI_TMP}'));
+	$ext->add($mcontext,$exten,'', new ext_set("PR_DIALSTATUS", '${DIALSTATUS}'));
+	$ext->add($mcontext,$exten,'calldocfu', new ext_gosubif('$["${PR_DIALSTATUS}"="NOANSWER" & "${CFUEXT}"!=""]','docfu,1'));
+	$ext->add($mcontext,$exten,'calldocfb', new ext_gosubif('$["${PR_DIALSTATUS}"="BUSY" & "${CFBEXT}"!=""]','docfb,1'));
+	$ext->add($mcontext,$exten,'', new ext_set("DIALSTATUS", '${PR_DIALSTATUS}'));
+	$ext->add($mcontext,$exten,'', new ext_goto('1','s-${DIALSTATUS}'));
+
+	/*
+	; Try the Call Forward on No Answer / Unavailable number.
+	; We want to try CFU if set, but we want the same ring timer as was set to our call (or do we want the
+	; system ringtimer? - probably not). Then if no answer there (assuming it doesn't drop into their vm or
+	; something we return, which will have the net effect of returning to the followme setup.)
+	;
+	; want to avoid going to other follow-me settings here. So check if the CFUEXT is a user and if it is
+	; then direct it straight to ext-local (to avoid getting intercepted by findmefollow) otherwise send it
+	; to from-internal since it may be an outside line.
+	;
+	*/
+	$exten = 'docfu';
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFUEXT}/device)}" = "" ]','chlocal'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+	$ext->add($mcontext,$exten,'chlocal', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFUEXT}@from-internal/n', '${RT},${DIAL_OPTIONS}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	$exten = 'docfb';
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$["${DB(AMPUSER/${CFBEXT}/device)}" = "" ]','chlocal'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@ext-local', '${RT},${DIAL_OPTIONS}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+	$ext->add($mcontext,$exten,'chlocal', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+	$ext->add($mcontext,$exten,'', new ext_dial('Local/${CFBEXT}@from-internal/n', '${RT},${DIAL_OPTIONS}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
+	/*
+	; In all cases of no connection, come here and simply return, since the calling dialplan will
+	; decide what to do next
+	*/
+	$exten = '_s-.';
+	$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting ${EXTEN}'));
+
+	
+	$mcontext = 'sub-simple-dial';
 	$exten = 's';
 	$ext->add($mcontext,$exten,'', new ext_set("__EXTTOCALL", '${ARG1}'));
 	$ext->add($mcontext,$exten,'', new ext_set("RT", '${ARG2}'));
@@ -3673,6 +4757,7 @@ function core_do_get_config($engine) {
 	$exten = '_s-.';
 	$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting ${EXTEN}'));
 
+
 	/*
 		Originate a call but skip voicemail if the device does not answer
 	 */
@@ -3717,10 +4802,13 @@ function core_do_get_config($engine) {
 	* a GoSub() call which would be slightly more efficient.
 	*/
 
-	$exten = 's';
+	
 	// If it BLKVM_CHANNEL exists, return it's value. If not, then set it and return TRUE
 	//
 	$mcontext = 'macro-blkvm-setifempty';
+	$exten = 's';
+
+	$ext->add($mcontext,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_CHANNEL})}]', 'init'));
 	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
 	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
@@ -3729,31 +4817,75 @@ function core_do_get_config($engine) {
 	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
 	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
+	$mcontext = 'sub-blkvm-setifempty';
+	$ext->add($mcontext,$exten,'', new ext_gotoif('$[!${EXISTS(${BLKVM_CHANNEL})}]', 'init'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+	$ext->add($mcontext,$exten,'init', new ext_set('__BLKVM_CHANNEL','${CHANNEL}'));
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
 	// If BLKVM_CHANNEL not set or 'reset' is passed, then initialize it to this channel then set and retrun TRUE
 	//
 	$mcontext = 'macro-blkvm-set';
+	$ext->add($mcontext,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_CHANNEL})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_CHANNEL=${CHANNEL}'));
 	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
 	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
 	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
+	$mcontext = 'sub-blkvm-set';
+	$ext->add($mcontext,$exten,'', new ext_execif('$[!${EXISTS(${BLKVM_CHANNEL})} | "{ARG1}" = "reset"]', 'Set','__BLKVM_CHANNEL=${CHANNEL}'));
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
 	// if clearing, BLKVM_CHANNEL should already exist (if not, we clear our channel's copy)
 	//
 	$mcontext = 'macro-blkvm-clr';
+	$ext->add($mcontext,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})',''));
 	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL',''));
 	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
+
+	$mcontext = 'sub-blkvm-clr';
+	$ext->add($mcontext,$exten,'', new ext_set('SHARED(BLKVM,${BLKVM_CHANNEL})',''));
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL',''));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
 
 	// if checking, BLKVM_CHANNEL should already exist (if not, we check our channel's copy)
 	// CC_RECALL was originally used for CallCompletion but is used elsewhere as well for recall automated
 	// calls that should therefore not go to voicemail, for example a wakeup call
 	//
 	$mcontext = 'macro-blkvm-check';
+	$ext->add($mcontext,$exten,'', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
 	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
 	$ext->add($mcontext,$exten,'', new ext_execif('$["${GOSUB_RETVAL}"="" & "${CC_RECALL}"="1"]', 'Set','GOSUB_RETVAL=TRUE'));
 	$ext->add($mcontext,$exten,'', new ext_macroexit(''));
 
+	$mcontext = 'sub-blkvm-check';
+	$ext->add($mcontext,$exten,'', new ext_set('GOSUB_RETVAL','${SHARED(BLKVM,${BLKVM_CHANNEL})}'));
+	$ext->add($mcontext,$exten,'', new ext_execif('$["${GOSUB_RETVAL}"="" & "${CC_RECALL}"="1"]', 'Set','GOSUB_RETVAL=TRUE'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
+
 	$mcontext = 'macro-hangupcall';
+	$exten = 's';
+	/*
+	; Cleanup any remaining RG flag
+	*/
+	$skip_label = 'theend';
+	$ext->add($mcontext, $exten, '', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($mcontext,$exten,'start', new ext_gotoif('$["${USE_CONFIRMATION}"="" | "${RINGGROUP_INDEX}"="" | "${CHANNEL}"!="${UNIQCHAN}"]',$skip_label));
+	$ext->add($mcontext,$exten,'', new ext_noop_trace('Cleaning Up Confirmation Flag: RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+	$ext->add($mcontext,$exten,'delrgi', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
+
+	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
+	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
+	$ext->add($mcontext, $exten,'', new ext_hangup());
+	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
+
+	$mcontext = 'sub-hangupcall';
 	$exten = 's';
 	/*
 	; Cleanup any remaining RG flag
@@ -3766,11 +4898,57 @@ function core_do_get_config($engine) {
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
 	$ext->add($mcontext, $exten,'', new ext_hangup());
-	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
+	$ext->add($mcontext, $exten,'', new ext_return(''));
 
 	// Used to log a user onto an adhoc device. Most of the work is done by
 	// user_login_out.agi AGI script
 	$mcontext = 'macro-user-logon';
+	$ext->add($mcontext, 's','', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
+	$ext->add($mcontext, 's','', new ext_answer());
+	$ext->add($mcontext, 's','', new ext_wait(1));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICETYPE}" = "fixed"]','s-FIXED,1'));
+
+	// get user's extension
+	$ext->add($mcontext, 's','', new ext_set('AMPUSER','${ARG1}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${AMPUSER}" != ""]','gotpass'));
+	$ext->add($mcontext, 's','', new ext_read('AMPUSER', 'please-enter-your-extension-then-press-pound', '', '', 4));
+
+	// get user's password and authenticate
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${AMPUSER}" = ""]','s-MAXATTEMPTS,1'));
+	$ext->add($mcontext, 's','gotpass', new ext_gotoif('$["${DB_EXISTS(AMPUSER/${AMPUSER}/password)}" = "0"]','s-NOUSER,1'));
+	$ext->add($mcontext, 's','', new ext_set('AMPUSERPASS','${DB_RESULT}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$[${LEN(${AMPUSERPASS})} = 0]','s-NOPASSWORD,1'));
+
+	// do not continue if the user has already logged onto this device
+	$ext->add($mcontext, 's','', new ext_set('DEVICEUSER','${DB(DEVICE/${CALLERID(number)}/user)}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICEUSER}" = "${AMPUSER}"]','s-ALREADYLOGGEDON,1'));
+	$ext->add($mcontext, 's','', new ext_authenticate('${AMPUSERPASS}'));
+	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,login,${CALLERID(number)},${AMPUSER}'));
+	$ext->add($mcontext, 's','', new ext_playback('agent-loginok'));
+
+	$ext->add($mcontext, 's-FIXED','', new ext_noop('Device is FIXED and cannot be logged into'));
+	$ext->add($mcontext, 's-FIXED','', new ext_saynumber('${CALLERID(number)}'));
+	$ext->add($mcontext, 's-FIXED','', new ext_playback('vm-isunavail&vm-goodbye'));
+	$ext->add($mcontext, 's-FIXED','', new ext_hangup());
+
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_noop('This device has already been logged into by this user'));
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_playback('vm-goodbye'));
+	$ext->add($mcontext, 's-ALREADYLOGGEDON','', new ext_hangup()); //TODO should play msg indicated device is already logged into
+
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_noop('This extension does not exist or no password is set'));
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_playback('pbx-invalid'));
+	$ext->add($mcontext, 's-NOPASSWORD','', new ext_hangup());
+
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_noop('Too many login attempts'));
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_playback('vm-goodbye'));
+	$ext->add($mcontext, 's-MAXATTEMPTS','', new ext_hangup());
+
+	$ext->add($mcontext, 's-NOUSER','', new ext_noop('Invalid extension ${AMPUSER} entered'));
+	$ext->add($mcontext, 's-NOUSER','', new ext_playback('pbx-invalid'));
+	$ext->add($mcontext, 's-NOUSER','', new ext_goto('s,playagain'));
+
+	$mcontext = 'sub-user-logon';
 	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
 	$ext->add($mcontext, 's','', new ext_answer());
 	$ext->add($mcontext, 's','', new ext_wait(1));
@@ -3818,6 +4996,17 @@ function core_do_get_config($engine) {
 	// Used to log a user off of an adhoc device. Most of the work is done by
 	// user_login_out.agi AGI script
 	$mcontext = 'macro-user-logoff';
+	$ext->add($mcontext, 's','', new ext_gosub('1','s','deprecated-macro','${CONTEXT}'));
+	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
+	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICETYPE}" = "fixed"]','s-FIXED,1'));
+	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,logout,${CALLERID(number)}'));
+	$ext->add($mcontext, 's','done', new ext_playback('agent-loggedoff'));
+
+	$ext->add($mcontext, 's-FIXED','', new ext_noop('Device is FIXED and cannot be logged into'));
+	$ext->add($mcontext, 's-FIXED','', new ext_playback('an-error-has-occured&vm-goodbye'));
+	$ext->add($mcontext, 's-FIXED','', new ext_hangup()); //TODO should play msg indicated device cannot be logged into
+
+	$mcontext = 'sub-user-logoff';
 	$ext->add($mcontext, 's','', new ext_set('DEVICETYPE','${DB(DEVICE/${CALLERID(number)}/type)}'));
 	$ext->add($mcontext, 's','', new ext_gotoif('$["${DEVICETYPE}" = "fixed"]','s-FIXED,1'));
 	$ext->add($mcontext, 's','', new ext_agi('user_login_out.agi,logout,${CALLERID(number)}'));
