@@ -498,6 +498,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function install() {
+		$this->startdaemon();
 	}
 	private function startdaemon($output=null) {
 		$this->writeln('Starting Call Transfer Monitoring Service');
@@ -3909,8 +3910,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Start FreePBX for fwconsole hook
 	 * @param object $output The output object.
 	 */
-	public function startFreepbx($output=null, $debug=true) {
-		$this->startdaemon();
+	public function startFreepbx($output=null, $debug=true, $startdaemon=true) {
+		if($startdaemon){
+			$this->startdaemon();
+		}
 		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
 			return;
 		}
@@ -4056,7 +4059,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			//its not so lets try to start it!
 			try {
 				//attempting
-				$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput());
+				$this->startFreepbx(new \Symfony\Component\Console\Output\NullOutput(), false, false);
 			} catch(\Exception $e) {
 				//it failed. log out the reason why and return
 				$this->freepbx->Notifications->add_warning('core','FASTAGI',_("Fast AGI Server not running"),sprintf(_("Launch local AGIs through FastAGI Server' was enabled in Advanced Settings but we were unable to start FastAGI server because: %s, As a result all AGIs will be forked inside of Asterisk until this is resolved"),$e->getMessage()),"",true,true);
@@ -4096,7 +4099,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 					//This will be resolved on next reload
 					return;
 				}
-				$this->startFreepbx(null, false);
+				$this->startFreepbx(null, false, false);
 			} else {
 				$this->stopFreepbx(null, false);
 			}
