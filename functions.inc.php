@@ -3922,7 +3922,7 @@ function core_devices_list($tech="all",$detail=false,$get_all=false) {
 	$sql .= ' ORDER BY id';
 	$results = sql($sql,"getAll",DB_FETCHMODE_ASSOC);
 
-	$extens = null;
+	$extens = array();
 	foreach ($results as $result) {
 		if ($get_all || checkRange($result['id'])) {
 
