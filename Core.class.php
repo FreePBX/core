@@ -498,6 +498,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function install() {
+		dbug('install getting called from Install');
 	}
 	private function startdaemon($output=null) {
 		$this->writeln('Starting Call Transfer Monitoring Service');
@@ -3909,7 +3910,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * Start FreePBX for fwconsole hook
 	 * @param object $output The output object.
 	 */
-	public function startFreepbx($output=null, $debug=true) {
+	public function startFreepbx($output=null, $debug=true) {dbug(' startFreepbx starting now ');
 		$this->startdaemon();
 		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
 			return;
@@ -4035,7 +4036,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return $this->fastAGIState;
 	}
 
-	public function preReloadFreepbx() {
+	public function preReloadFreepbx() {dbug(' preReloadFreepbx calllin g');
 		//dont do anything if FASTAGI is disabled
 		if(!$this->freepbx->Config->get('LAUNCH_AGI_AS_FASTAGI')) {
 			//should we do a notification here? probably not.
@@ -4088,7 +4089,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	}
 
-	public function updateFreePBXSetting($keyword, $value) {
+	public function updateFreePBXSetting($keyword, $value) {dbug('updateFreePBXSetting called !!!!!!!!!!!');
 		if($keyword === 'LAUNCH_AGI_AS_FASTAGI') {
 			if(!empty($value)) {
 				if(!$this->freepbx->Modules->checkStatus("pm2")) {
