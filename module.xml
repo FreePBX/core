@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.16</version>
+	<version>15.0.17</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.17* FREEI-4577 and FREEI-4459 
 		*15.0.16* FREEPBX-23226 Expand pjsip match setting to support 8192 bytes 
 		*15.0.15* FREEPBX-23249 Deleting an extension doesn't mark database as needing reload 
 		*15.0.14* FREEI-4267 
