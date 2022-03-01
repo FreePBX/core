@@ -498,6 +498,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function install() {
+		$this->startdaemon();
 		dbug('install getting called from Install');
 	}
 	private function startdaemon($output=null) {
