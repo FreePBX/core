@@ -287,17 +287,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 															<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
 													</div>
 													<div class="col-md-9">
-													<?php
-														$default = (isset($keepcid) ? $keepcid : 'off');
-														$outciddisable='';
-														if($default == 'off'){
-															$outcid='';
-															$outciddisable='disabled';
-														}
-													?>
-														<input type="text" class="form-control" name="outcid" id="outcid" value="<?php echo $outcid;?>"  <?php echo $outciddisable;?>/>
-														<input type="hidden" name="outcidhidden" id="outcidhidden" value="<?php echo $outcid;?>" />
-
+														<input type="text" class="form-control" name="outcid" id="outcid" value="<?php echo $outcid;?>" />
 													</div>
 												</div>
 											</div>
