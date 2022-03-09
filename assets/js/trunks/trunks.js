@@ -187,6 +187,16 @@ $('input[name="outbound_proxy"]').on('change', function(){
 	}
 });
 
+$('input[name="keepcid"]').on('change', function(){
+	if($(this).val() == "off"){
+		$('input[name="outcid"]').prop('disabled', true);
+		$("#outcid").val("");
+	}else{
+		$('input[name="outcid"]').prop('disabled', false);
+		$("#outcid").val($("#outcidhidden").val());
+	}
+});
+
 $('input[name="dialoutopts_cb"]').on('change', function(){
 	if($(this).val() == "or"){
 		$('input[name="dialopts"]').prop('disabled', false);
