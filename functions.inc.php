@@ -2984,6 +2984,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, 'exit', new ext_macroexit());
 
 	$ext->add($context, $exten, 'trunkcid', new ext_execif('$[${LEN(${TRUNKOUTCID})} != 0]', 'Set', 'CALLERID(all)=${TRUNKOUTCID}'));
+	$ext->add($context, $exten, '', new ext_execif('$["${OUTKEEPCID_${ARG1}}" = "off"]', 'Set', 'CALLERID(all)=${REALCALLERIDNUM}'));
 	$ext->add($context, $exten, 'usercid', new ext_execif('$[${LEN(${USEROUTCID})} != 0]', 'Set', 'CALLERID(all)=${USEROUTCID}'));  // check CID override for extension
 	/* TRUNKCIDOVERRIDE is used by followme and can be used by other functions. It forces the specified CID except for the case of
 	* an Emergency CID on an Emergency Route
