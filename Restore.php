@@ -112,4 +112,12 @@ class Restore Extends Base\RestoreBase{
         }
         return $final;
     }
+
+	public function getResetInfo() {
+		$backupinfo = $this->getBackupInfo();
+		if ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes') {
+			return true;
+		}
+		return false;
+	}
 }
