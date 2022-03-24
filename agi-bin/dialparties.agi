@@ -647,7 +647,6 @@ if (($rgmethod == "hunt") || ($rgmethod == "random") || ($rgmethod == "memoryhun
 }
 
 $ds = chop($ds," &");
-
 if ($nodest != '' && $use_confirmation == 'FALSE') {
 	if (strpos($dialopts,"M(auto-blkvm)") > 0  || strpos($dialopts,"M(auto-blkvm)") === 0 ||
 	    strpos($dialopts,"M(auto-confirm") > 0 || strpos($dialopts,"M(auto-confirm") === 0 ||
@@ -770,7 +769,15 @@ if (!strlen($ds)) {
 				$AGI->set_variable('__CALLCONFIRMCID',"999");
 			}
 		}
-		$AGI->set_variable('ds',$ds);
+		//Max length ~2000 ,split the ds in two and join them later in the Dialplan
+		if(strlen($ds) > 2000) {
+			$ds1 = substr($ds,0,2000);
+			$dsextra = substr($ds,2000);
+			$AGI->set_variable('ds',$ds1);
+			$AGI->set_variable('dsextra',$dsextra);
+		}else {
+			$AGI->set_variable('ds',$ds);
+		}
 		$AGI->set_variable("MACRODIALGOTO_PRI","normdial"); // dial command was at priority 10
 	}
 }

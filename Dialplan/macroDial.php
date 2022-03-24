@@ -51,6 +51,10 @@ class macroDial{
         //Ringall
         $ext->add($c,$s,'normdial', new \ext_noop('Returned from dialparties with groups to dial')); // dialparties will set the priority to 10 if $ds is not null
         $ext->add($c,$s,'', new \ext_noop('ringall array ${FMGL_DIAL} '));
+		$ext->add($c,$s,'', new \ext_noop('ds= ${ds} '));
+		$ext->add($c,$s,'', new \ext_noop('dsextra= ${dsextra}'));
+		$ext->add($c,$s,'', new \ext_set('ds','${ds}${dsextra}'));
+		$ext->add($c,$s,'', new \ext_noop('ds= ${ds}'));
         $ext->add($c,$s,'', new \ext_set('__FMGL_DIAL','${FMGL_DIAL}'));
         $ext->add($c,$s,'', new \ext_set('LOOPCNT','${FIELDQTY(FILTERED_DIAL,-)}'));
         $ext->add($c,$s,'', new \ext_set('ITER','1'));
