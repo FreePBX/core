@@ -120,6 +120,10 @@ class Dids extends Base {
 								}
 							}
 							$output = array_merge($defaults, $input);
+							$validator = $this->inputvalidator($output);
+							if ($validator['status']) {
+								return ['response' => $output,'message' => _("Please provide the valid `destination` value, for example extension (100) :`from-did-direct,100,1`"), 'status' => false];
+							}
 							$res = $this->freepbx->Core->addDID($output);
 							$didInfo = $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
 							if($res){
@@ -488,11 +492,25 @@ class Dids extends Base {
 	}
 
 	private function getMutationExecuteArray($input) {
-		$input['privacyman'] = $input['privacyman'] == true ? 1 : 0;
-		$input['pricid'] = $input['pricid'] == true ? "CHECKED" : "";
-		$input['reversal'] = $input['reversal'] == true ? "CHECKED" : "";
-		$input['fanswer'] = $input['fanswer'] == true ? "CHECKED" : "";
-		$input['ringing'] = $input['ringing'] == true ? "CHECKED" : "";
+		$input['privacyman'] = (isset($input['privacyman']) && $input['privacyman'] == true)? 1 : 0;
+		$input['pricid'] = (isset($input['pricid']) && $input['pricid'] == true)? "CHECKED" : "";
+		$input['reversal'] = (isset($input['reversal']) && $input['reversal'] == true) ? "CHECKED" : "";
+		$input['fanswer'] = (isset($input['fanswer']) && $input['fanswer'] == true) ? "CHECKED" : "";
+		$input['ringing'] = (isset($input['ringing']) && $input['ringing'] == true) ? "CHECKED" : "";
 		return $input;
+	}
+
+	private function inputvalidator($input) {
+		$validator = array();
+		$validator['status'] = false;
+		$destination = isset($input['destination'])? explode(',',$input['destination']) :'';
+		if (is_array($destination) && count($destination) >=3) {
+			if (trim($destination[0])=='' || trim($destination[1])=='' || trim($destination[2])=='') {
+				$validator['status'] = true;
+			}
+		} else {
+			$validator['status'] = true;
+		}
+		return $validator;
 	}
 }
