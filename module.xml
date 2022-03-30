@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.60</version>
+	<version>16.0.61</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.61* FREEPBX-23376 , FREEI-4650 , FREEI-4267 and FREEI-4639 
 		*16.0.60* Packaging of ver 16.0.60
 		*16.0.59* FREEI-4459 CID when routing Inbound Route to Misc Destination using trunk CID 
 		*16.0.58* FREEI-4577 and FREEI-4459 
