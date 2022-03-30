@@ -615,7 +615,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function uninstall() {
-		$this->stopdaemon();
+		if (!$this->freepbx->Modules->checkStatus("pm2")) {
+			return;
+		}
+		try {
+			$this->freepbx->pm2->delete("core-calltransfer-monitor");
+		} catch(\Exception $e) {}
 	}
 
 	public function doTests($db) {
