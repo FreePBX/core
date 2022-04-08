@@ -30,7 +30,7 @@ class Dids extends Base {
 						'description' => _('Add a new inbound route to the system'),
 						'inputFields' => [
 							'extension' => [
-								'type' => Type::nonNull(Type::string()),
+								'type' => Type::string(),
 								'description' => _('Define the expected DID Number if your trunk passes DID on incoming calls.')
 							],
 							'cidnum' => [
@@ -122,7 +122,7 @@ class Dids extends Base {
 							$output = array_merge($defaults, $input);
 							$validator = $this->inputvalidator($output);
 							if ($validator['status']) {
-								return ['response' => $output,'message' => _("Please provide the valid `destination` value, for example extension (100) :`from-did-direct,100,1`"), 'status' => false];
+								return ['response' => $output,'message' => $validator['message'], 'status' => false];
 							}
 							$res = $this->freepbx->Core->addDID($output);
 							$didInfo = $this->freepbx->Core->getDID($input['extension'], $input['cidnum']);
@@ -503,10 +503,20 @@ class Dids extends Base {
 	private function inputvalidator($input) {
 		$validator = array();
 		$validator['status'] = false;
+		$validator['message'] = _("Please provide the valid `destination` value, for example extension (100) :`from-did-direct,100,1`");
 		$destination = isset($input['destination'])? explode(',',$input['destination']) :'';
+		$getDestinations = \FreePBX::Modules()->getDestinations();
+		$destination_description = isset($getDestinations[trim($input['destination'])])? $getDestinations[trim($input['destination'])] : null;
+		$name = isset($destination_description['name'])? $destination_description['name'] :'';
+		$category = isset($destination_description['category'])? $destination_description['category'] : $name;
+		$valuefrom_db = isset($destination_description['description'])? $category.':'.$destination_description['description']:null;
 		if (is_array($destination) && count($destination) >=3) {
 			if (trim($destination[0])=='' || trim($destination[1])=='' || trim($destination[2])=='') {
 				$validator['status'] = true;
+			}
+			if(trim($valuefrom_db) =='') {
+				$validator['status'] = true;
+				$validator['message'] = _("Input variable destination does not exists in this system, Please provide the valid `destination`");
 			}
 		} else {
 			$validator['status'] = true;

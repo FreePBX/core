@@ -2703,6 +2703,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	/* Fill non-mandatory fields with default if not present */
 	public function addDIDDefaults(&$settings) {
+		$settings['extension'] = isset($settings['extension'])?$settings['extension']:'';
 		$settings['cidnum'] = isset($settings['cidnum'])?$settings['cidnum']:'';
 		$settings['description'] = isset($settings['description'])?$settings['description']:'';
 		$settings['fanswer'] = isset($settings['fanswer'])?$settings['fanswer']:'';
