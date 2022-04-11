@@ -912,7 +912,8 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
 				$mimes = array('text/csv');
 				if (!in_array($_FILES['pattern_file']['type'], $mimes)) {
-					throw new \Exception(_("Unsupported Pattern file format"));
+					echo "<script>javascript:alert('" . _("Unsupported Pattern file format") . "')</script>";
+					return;
 				}
 				$fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
 				if ($fh !== false) {
