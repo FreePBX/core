@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>13.0.131.29</version>
+	<version>13.0.132</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*13.0.132*    bump 
 		*13.0.131.29* Fixed the bulkhandler validation issue 
 		*13.0.131.28* FREEI-1481 Outbound Routes - move paging Notifications setting to the new tab 
 		*13.0.131.27* FREEPBX-21565 Call confirm does not work since updates 
