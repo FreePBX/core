@@ -910,6 +910,10 @@ class Core extends \FreePBX_Helpers implements \BMO  {
 			// Check if they uploaded a CSV file for their route patterns
 			//
 			if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
+				$mimes = array('text/csv');
+				if (!in_array($_FILES['pattern_file']['type'], $mimes)) {
+					throw new \Exception(_("Unsupported Pattern file format"));
+				}
 				$fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
 				if ($fh !== false) {
 					$csv_file = array();
