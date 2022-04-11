@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>14.0.28.93</version>
+	<version>14.0.29</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*14.0.29*    FREEI-4350 Added backend validation for validating file format
 		*14.0.28.93* FREEPBX-22892 D&amp;amp;U MODE-Ring Group CID stops working correctly 
 		*14.0.28.92* Fixing the bulkhandler validation issue 
 		*14.0.28.91* FREEPBX-22483 confirm-call-bug-ringroup-with-confirm-call-to-extension-with-follow-me-call-is-no-longer-available 
