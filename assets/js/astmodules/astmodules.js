@@ -14,7 +14,7 @@ $(document).ready(function(){
 	}
 });
 $("#addmodule").click(function(){
-	var currentTab = $("ul li.active").data('name');
+	var currentTab = $(".fpbx-submit > ul li.active").data('name');
 	var modName = $("#module").val();
 	if(modName.match(/[a-zA-Z0-9_]+\.so/) === null){
 		fpbxToast(_("The field must match module_name.so"));
@@ -41,7 +41,7 @@ $('a[href="#amodnoload"],a[href="#amodpreload"],a[href="#amodload"]').on('click'
 $("#amodnoload,#amodpreload,#amodload").on('post-body.bs.table',function(){
 $('[id^="del"]').on('click', function(e){
 	e.preventDefault();
-	var currentTab = $("ul li.active").data('name');
+	var currentTab = $(".fpbx-submit > ul li.active").data('name');
 	localStorage.setItem('astmodules.tab', currentTab);
 	var modName = $(this).data('mod');
 	var row = $(this).closest('tr');
