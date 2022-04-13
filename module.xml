@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.63</version>
+	<version>16.0.63.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.63.1* FREEPBX-23417  
 		*16.0.63* FREEI-4350 Added backend validation for validating file format
 		*16.0.62* FREEPBX-23376 
 		*16.0.61* FREEPBX-23376 , FREEI-4650 , FREEI-4267 and FREEI-4639 
