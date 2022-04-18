@@ -235,6 +235,10 @@ class Dids extends Base {
 									$input[$key] = $value;
 								}
 							}
+							$validator = $this->inputvalidator($input);
+							if ($validator['status']) {
+								return ['response' => $input,'message' => $validator['message'], 'status' => false];
+							}
 							$oldExtension = isset($input['oldExtension']) ? $input['oldExtension'] : $input['extension'];
 							$oldCidNum = isset($input['oldCidnum']) ? $input['oldCidnum'] : $input['cidnum'];
 							$res = $this->freepbx->Core->editGqlDID($oldExtension, $oldCidNum, $input);
