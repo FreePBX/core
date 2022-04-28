@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.1</version>
+	<version>15.0.22.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.2* FREEPBX-23329 
 		*15.0.22.1* FREEI-4698 Inbound GQL api issue fix 
 		*15.0.22* FREEI-4350 Added backend validation for validating file format
 		*15.0.21* FREEPBX-23376- AddInboundRoute Graphql API optional fields are mandatory 
