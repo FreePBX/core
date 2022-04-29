@@ -25,7 +25,7 @@ class macroUserCallerid{
 	$ext->add($context, $exten, '', new \ext_set('CHANCONTEXT','${CUT(CHANCONTEXT,-,1)}'));
 	$ext->add($context, $exten, '', new \ext_set('CHANEXTENCONTEXT','${CUT(CHANNEL,/,2)}'));
 	$ext->add($context, $exten, '', new \ext_set('CHANEXTEN','${CUT(CHANEXTENCONTEXT,@,1)}'));
-	$ext->add($context, $exten, '', new \ext_set('CALLERID(number)', '${IF($["${CHANCONTEXT}" = "webcallback"]?${CHANEXTEN})}'));
+    $ext->add($context, $exten, '', new \ext_set('CALLERID(number)', '${IF($["${CHANCONTEXT}" = "webcallback"]?${CHANEXTEN}:${CALLERID(number)})}'));
     $ext->add($context, $exten, '', new \ext_set('AMPUSER', '${IF($["${AMPUSER}" = ""]?${CALLERID(number)}:${AMPUSER})}'));
     $ext->add($context, $exten, '', new \ext_set('HOTDESCKCHAN','${CUT(CHANNEL,/,2)}'));
     $ext->add($context, $exten, '', new \ext_set('HOTDESKEXTEN','${CUT(HOTDESCKCHAN,-,1)}'));
