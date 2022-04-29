@@ -28,8 +28,8 @@
 <h3><?php echo _("PJSIP Settings")?></h3>
 
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" data-name="pjsgeneral" class="change-tab active">
-		<a href="#pjsgeneral" aria-controls="pjsgeneral" role="tab" data-toggle="tab">
+	<li role="presentation" data-name="pjsgeneral" class="change-tab">
+		<a href="#pjsgeneral" aria-controls="pjsgeneral" class="active" role="tab" data-toggle="tab">
 			<?php echo _("General")?>
 		</a>
 	</li>
@@ -48,8 +48,8 @@
 	<div role="tabpanel" id="pjsgeneral" class="tab-pane active">
 		<!--USERNAME-->
 		<div class="element-container">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="username"><?php echo _("Username") ?></label>
 					</div>
@@ -61,8 +61,8 @@
 		</div>
 		<!--END USERNAME-->
 		<div class="element-container">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="secret"><?php echo _("Auth username") ?></label>
 						 <i class="fa fa-question-circle fpbx-help-icon" data-for="auth_username"></i>
@@ -78,8 +78,8 @@
 		</div>
 		<!--SECRET-->
 		<div class="element-container">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
 					</div>
@@ -158,8 +158,8 @@
 		</div>
 		<!--SIP SERVER-->
 		<div class="element-container">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="sip_server"><?php echo _("SIP Server") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server"></i>
@@ -176,8 +176,8 @@
 		<!--END SIP SERVER-->
 		<!--SIP SERVER PORT-->
 		<div class="element-container">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="sip_server_port"><?php echo _("SIP Server Port") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server_port"></i>
@@ -196,8 +196,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="context"><?php echo _("Context") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="context"></i>
@@ -220,8 +220,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="transport"><?php echo _("Transport") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="transport"></i>
@@ -247,8 +247,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="dtmfmode"><?php echo _("DTMF Mode") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="dtmfmode"></i>
@@ -280,8 +280,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="pjsip line"><?php echo _("Send Line in Registration") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
@@ -307,8 +307,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="send_connected_linew"><?php echo _("Send Connected Line") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="send_connected_linew"></i>
@@ -335,8 +335,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="auth_rejection_permanentw"><?php echo _("Permanent Auth Rejection") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
@@ -362,8 +362,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-grou row">
 							<div class="col-md-3">
 								<label class="control-label" for="forbidden_retry_interval"><?php echo _("Forbidden Retry Interval") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="forbidden_retry_interval"></i>
@@ -389,8 +389,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="fatal_retry_interval"><?php echo _("Fatal Retry Interval") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="fatal_retry_interval"></i>
@@ -416,8 +416,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="retry_interval"><?php echo _("General Retry Interval")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="retry_interval"></i>
@@ -443,8 +443,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="expiration"><?php echo _("Expiration") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="expiration"></i>
@@ -470,8 +470,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="max_retries"><?php echo _("Max Retries") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="max_retries"></i>
@@ -494,8 +494,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="qualify_frequency"><?php echo _("Qualify Frequency") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="qualify_frequency"></i>
@@ -521,8 +521,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="outbound_proxy"><?php echo _("Outbound Proxy") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="outbound_proxy"></i>
@@ -545,8 +545,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="user_eq_phone"><?php echo _("User = Phone") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="user_eq_phone"></i>
@@ -572,8 +572,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="contact_user"><?php echo _("Contact User") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="contact_user"></i>
@@ -596,8 +596,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="from_domain"><?php echo _("From Domain")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_domain"></i>
@@ -619,8 +619,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="from_user"><?php echo _("From User")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_user"></i>
@@ -642,8 +642,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="client_uri"><?php echo _("Client URI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="client_uri"></i>
@@ -668,8 +668,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="server_uri"><?php echo _("Server URI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="server_uri"></i>
@@ -694,8 +694,8 @@
         <div class="element-container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="row">
-                        <div class="form-group">
+                    <div class="">
+                        <div class="form-group row">
                             <div class="col-md-3">
                                 <label class="control-label" for="media_address"><?php echo _("Media Address") ?></label>
                                 <i class="fa fa-question-circle fpbx-help-icon" data-for="media_address"></i>
@@ -720,8 +720,8 @@
                 <div class="element-container">
                         <div class="row">
                                 <div class="col-md-12">
-                                        <div class="row">
-                                                <div class="form-group">
+                                        <div class="">
+                                                <div class="form-group row">
                                                         <div class="col-md-3">
                                                                 <label class="control-label" for="aors"><?php echo _("AOR")?></label>
                                                                 <i class="fa fa-question-circle fpbx-help-icon" data-for="aors"></i>
@@ -744,8 +744,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="aor_contact"><?php echo _("AOR Contact")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="aor_contact"></i>
@@ -770,8 +770,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="match"><?php echo _("Match (Permit)")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="match"></i>
@@ -793,8 +793,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="support_path"><?php echo _("Support Path") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="support_path"></i>
@@ -820,8 +820,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="t38_udptl"><?php echo _("Support T.38 UDPTL") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl"></i>
@@ -847,8 +847,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="t38_udptl_ec"><?php echo _("T.38 UDPTL Error Correction") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_ec"></i>
@@ -876,8 +876,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="t38_udptl_nat"><?php echo _("T.38 UDPTL NAT") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_nat"></i>
@@ -903,8 +903,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="t38_udptl_maxdatagram"><?php echo _("T.38 UDPTL MAXDATAGRAM") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_maxdatagram"></i>
@@ -927,8 +927,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="fax_detect"><?php echo _("Fax Detect") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="fax_detect"></i>
@@ -954,8 +954,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="trust_rpid"><?php echo _("Trust RPID/PAI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_rpid"></i>
@@ -981,8 +981,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="sendrpid"><?php echo _("Send RPID/PAI") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
@@ -1012,8 +1012,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="trust_id_outbound"><?php echo _("Send Private CallerID Information") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_id_outbound"></i>
@@ -1039,8 +1039,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="identify_by"><?php echo _("Match Inbound Authentication") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="identify_by"></i>
@@ -1069,8 +1069,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="inband_progress"><?php echo _("Inband Progress") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
@@ -1096,8 +1096,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="direct_media"><?php echo _("Direct Media") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
@@ -1122,8 +1122,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="rrewrite_contact"><?php echo _("Rewrite Contact") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rewrite_contact"></i>
@@ -1147,8 +1147,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="rtp_symmetric"><?php echo _("RTP Symmetric") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
@@ -1173,8 +1173,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label for="media_encryption"><?php echo _('Media Encryption')?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="media_encryption"></i>
@@ -1201,8 +1201,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="force_rport"><?php echo _("Force rport") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="force_rport"></i>
@@ -1227,8 +1227,8 @@
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="message_context"><?php echo _("Message Context")?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="message_context"></i>

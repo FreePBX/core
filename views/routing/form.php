@@ -248,7 +248,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
 	<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
 <ul class="nav nav-tabs">
-  <li role="presentation" data-name="routesettings" class="change-tab active"><a href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
+  <li role="presentation" data-name="routesettings" class="change-tab"><a class="active" href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
   <li role="presentation" data-name="dialpatterns" class="change-tab"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
   <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
   <li role="presentation" data-name="notifications" class="change-tab"><a href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
@@ -261,8 +261,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="routename"><?php echo _("Route Name") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routename"></i>
@@ -285,8 +285,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="outcid"><?php echo _("Route CID") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
@@ -309,8 +309,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="outcid_mode_wrapper"><?php echo _("Override Extension") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid_mode_wrapper"></i>
@@ -338,8 +338,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="routepass"><?php echo _("Route Password") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routepass"></i>
@@ -362,8 +362,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="routetype"><?php echo _("Route Type") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routetype"></i>
@@ -393,8 +393,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="trunkwrap"><?php echo _("Trunk Sequence for Matched Routes") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="trunkwrap"></i>
@@ -417,8 +417,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="goto0"><?php echo _("Optional Destination on Congestion") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="goto0"></i>
@@ -459,8 +459,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="row">
-								<div class="form-group">
+							<div class="">
+								<div class="form-group row">
 									<div class="col-md-3">
 										<label class="control-label" for="importwrapper"><?php echo _("Upload from CSV") ?></label>
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="importwrapper"></i>
@@ -484,8 +484,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="row">
-								<div class="form-group">
+							<div class="">
+								<div class="form-group row">
 									<div class="col-md-3">
 										<label class="control-label" for="export_file"><?php echo _("Export Dialplans as CSV")?></label>
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="export_file"></i>
@@ -514,8 +514,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="row">
-								<div class="form-group">
+							<div class="">
+								<div class="form-group row">
 									<div class="col-md-3">
 										<label class="control-label" for="notification_on"><?php echo _("Notification when") ?></label>
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="notification_on"></i>
@@ -543,8 +543,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 				  <div class="row">
 					<div class="col-md-12">
-					  <div class="row">
-						<div class="form-group">
+					  <div class="">
+						<div class="form-group row">
 						  <div class="col-md-3">
 							<label class="control-label" for="emailto"><?php echo _("Email To") ?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailto"></i>
@@ -567,8 +567,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 				  <div class="row">
 					<div class="col-md-12">
-					  <div class="row">
-						<div class="form-group">
+					  <div class="">
+						<div class="form-group row">
 						  <div class="col-md-3">
 							<label class="control-label" for="emailfrom"><?php echo _("Email From") ?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailfrom"></i>
@@ -591,8 +591,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 				  <div class="row">
 					<div class="col-md-12">
-					  <div class="row">
-						<div class="form-group">
+					  <div class="">
+						<div class="form-group row">
 						  <div class="col-md-3">
 							<label class="control-label" for="emailsubject"><?php echo _("Email Subject") ?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailsubject"></i>
@@ -636,8 +636,8 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 				<div class="element-container">
 				  <div class="row">
 					<div class="col-md-12">
-					  <div class="row">
-						<div class="form-group">
+					  <div class="">
+						<div class="form-group row">
 						  <div class="col-md-3">
 							<label class="control-label" for="emailbody"><?php echo _("Email Body") ?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="emailbody"></i>

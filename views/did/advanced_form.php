@@ -18,8 +18,8 @@ if (function_exists('music_list')) {
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="row">
-				<div class="form-group">
+			<div class="">
+				<div class="form-group row">
 					<div class="col-md-3">
 						<label class="control-label" for="mohclass">$mohlabel</label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="mohclass"></i>
@@ -54,8 +54,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 	<input type="hidden" name="old_extension" value="<?php echo $extension?>">
 	<input type="hidden" name="old_cidnum" value="<?php echo $cidnum?>">
 	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation" data-name="didgeneral" class="active">
-			<a href="#didgeneral" aria-controls="didgeneral" role="tab" data-toggle="tab">
+		<li role="presentation" data-name="didgeneral">
+			<a href="#didgeneral" aria-controls="didgeneral" class="active" role="tab" data-toggle="tab">
 				<?php echo _("General")?>
 			</a>
 		</li>
@@ -82,8 +82,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="description"><?php echo _("Description") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="description"></i>
@@ -106,8 +106,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="extension"><?php echo _("DID Number") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
@@ -130,8 +130,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="cidnum"><?php echo _("CallerID Number") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="cidnum"></i>
@@ -154,8 +154,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="pricidw"><?php echo _("CID Priority Route") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="pricidw"></i>
@@ -181,8 +181,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="alertinfo"><?php echo _("Alert Info") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="alertinfo"></i>
@@ -205,8 +205,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="rvolume"><?php echo _("Ringer Volume Override") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="rvolume"></i>
@@ -234,8 +234,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="grppre"><?php echo _("CID name prefix") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="grppre"></i>
@@ -259,8 +259,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="goto0"><?php echo _("Set Destination") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="goto0"></i>
@@ -285,8 +285,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 		<div class="element-container">
 			 <div class="row">
 				<div class="col-md-12">
-					<div class="row">
-						<div class="form-group">
+					<div class="">
+						<div class="form-group row">
 							<div class="col-md-3">
 								<label class="control-label" for="indication_zone"><?php echo _("Indication Zone Country") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="indication_zone"></i>
@@ -314,8 +314,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="ringing"><?php echo _("Signal RINGING") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="ringing"></i>
@@ -341,8 +341,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="reversalw"><?php echo _("Reject Reverse Charges") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="reversalw"></i>
@@ -368,8 +368,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="reversalw"><?php echo _("Force Answer") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="fanswer"></i>
@@ -395,8 +395,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="delay_answer"><?php echo _("Pause Before Answer") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="delay_answer"></i>
@@ -422,8 +422,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="privacyman"><?php echo _("Privacy Manager") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="privacyman"></i>
@@ -449,8 +449,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="pmmaxretries"><?php echo _("Max attempts") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="pmmaxretries"></i>
@@ -474,8 +474,8 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
+						<div class="">
+							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="pmminlength"><?php echo _("Min Length") ?></label>
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="pmminlength"></i>
