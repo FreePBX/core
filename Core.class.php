@@ -1574,6 +1574,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}else{
 				$settings['max_contacts']['value'] = 1;
 			}
+
+			if($settings['max_contacts']['value'] == 1) {
+				$settings['remove_existing']['value'] = 'yes';
+			}
 		}
 
 		if (trim($id) == '' || empty($settings)) {
