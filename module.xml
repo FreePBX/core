@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.63.4</version>
+	<version>16.0.63.5</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.63.5* FREEI-4789 
 		*16.0.63.4* Packaging of ver 16.0.63.4
 		*16.0.63.3* FREEPBX-23329 
 		*16.0.63.2* FREEI-4698 Inbound GQL api issue fix 
