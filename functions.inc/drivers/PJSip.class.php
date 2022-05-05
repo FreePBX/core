@@ -1351,11 +1351,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$aor[]="remove_existing=no";
 		}
 
-		if(isset($config['maximum_expiration'])) {
+		if(isset($config['maximum_expiration']) && !empty($config['maximum_expiration'])) {
 			$aor[] = "maximum_expiration=".$config['maximum_expiration'];
 		}
 
-		if(isset($config['minimum_expiration'])) {
+		if(isset($config['minimum_expiration']) && !empty($config['minimum_expiration'])) {
 			$aor[] = "minimum_expiration=".$config['minimum_expiration'];
 		}
 
