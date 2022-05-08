@@ -97,7 +97,7 @@ foreach ($conf as $c){
 			if($display_friendly_name == 1){
 				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("KEYWORD").":".$c['keyword']."<br/>"._($c['description']).'</span>';
 			}else{
-				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendy Name").":".$c['name']."<br/>"._($c['description']).'</span>';
+				$forminputs .= '<span id="'.$c['keyword'].'-help" class="help-block fpbx-help-block">'._("Friendly Name").":".$c['name']."<br/>"._($c['description']).'</span>';
 			}
 			$forminputs .= $inputhtmlend;
 		break;
