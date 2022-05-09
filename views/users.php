@@ -8,7 +8,7 @@
     } ?>
     <ul class="nav nav-tabs" role="tablist">
       <?php foreach(array_keys($html['middle']) as $category) { ?>
-        <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo ucfirst($category)?></a></li>
+        <li data-name="<?php echo strtolower($category)?>" class="change-tab"><a class="<?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo ucfirst($category)?></a></li>
       <?php $c++;} ?>
     </ul>
     <div class="tab-content display">
@@ -23,16 +23,14 @@
                     <?php if(!empty($elem['prompttext'])) {?>
                       <div class="row">
                         <div class="col-md-12">
-                          <div class="row">
-                            <div class="form-group">
-                              <div class="col-md-4 control-label">
-                                <label for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
-                                <?php if(!empty($elem['helptext'])) { ?>
-                                  <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
-                                <?php } ?>
-                              </div>
-                              <div class="col-md-8"><?php echo $elem['html']?></div>
+                          <div class="form-group row">
+                            <div class="col-md-4 control-label">
+                              <label for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
+                              <?php if(!empty($elem['helptext'])) { ?>
+                                <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
+                              <?php } ?>
                             </div>
+                            <div class="col-md-8"><?php echo $elem['html']?></div>
                           </div>
                         </div>
                       </div>

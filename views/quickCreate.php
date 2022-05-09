@@ -1,12 +1,11 @@
 <div class="element-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="tech"><?php echo _('Type')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="tech"></i>
-			</div>
-			<div class="col-md-9">
-				<select class="form-control" name="tech" id="tech">
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="tech"><?php echo _('Type')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="tech"></i>
+		</div>
+		<div class="col-md-9">
+			<select class="form-control" name="tech" id="tech">
 <?php 
 // Ask SipSettings who is the default driver for 5060
 try {
@@ -29,8 +28,7 @@ foreach($drivers as $driver) {
 	}
 }
 ?>
-				</select>
-			</div>
+			</select>
 		</div>
 	</div>
 	<div class="row">
@@ -47,14 +45,12 @@ foreach($drivers as $driver) {
 	</div>
 </div>
 <div class="element-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="extension"><?php echo _('Extension Number')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
-			</div>
-			<div class="col-md-9"><input type="number" class="form-control" id="extension" name="extension" placeholder="<?php echo _('Enter Extension')?>" data-for="extension" value="<?php echo $startExt?>"></div>
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="extension"><?php echo _('Extension Number')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="extension"></i>
 		</div>
+		<div class="col-md-9"><input type="number" class="form-control" id="extension" name="extension" placeholder="<?php echo _('Enter Extension')?>" data-for="extension" value="<?php echo $startExt?>"></div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
@@ -63,14 +59,12 @@ foreach($drivers as $driver) {
 	</div>
 </div>
 <div class="element-container" id="channel-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="channel"><?php echo _('Channel')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
-			</div>
-			<div class="col-md-9"><input type="number" class="form-control" id="channel" name="channel" placeholder="<?php echo _('Enter Channel')?>" data-for="channel"></div>
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="channel"><?php echo _('Channel')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
 		</div>
+		<div class="col-md-9"><input type="number" class="form-control" id="channel" name="channel" placeholder="<?php echo _('Enter Channel')?>" data-for="channel"></div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
@@ -79,14 +73,12 @@ foreach($drivers as $driver) {
 	</div>
 </div>
 <div class="element-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="name"><?php echo _('Display Name')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="name"></i>
-			</div>
-			<div class="col-md-9"><input type="text" class="form-control" id="name" name="name" placeholder="<?php echo _('Enter name')?>" data-for="name"></div>
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="name"><?php echo _('Display Name')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="name"></i>
 		</div>
+		<div class="col-md-9"><input type="text" class="form-control" id="name" name="name" placeholder="<?php echo _('Enter name')?>" data-for="name"></div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
@@ -95,14 +87,12 @@ foreach($drivers as $driver) {
 	</div>
 </div>
 <div class="element-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="outboundcid"><?php echo _('Outbound Caller ID')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="outboundcid"></i>
-			</div>
-			<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder="<?php echo _('Caller Name')?> <#######>" data-for="outboundcid"></div>
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="outboundcid"><?php echo _('Outbound Caller ID')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="outboundcid"></i>
 		</div>
+		<div class="col-md-9"><input type="text" class="form-control" name="outboundcid" id="outboundcid" placeholder="<?php echo _('Caller Name')?> <#######>" data-for="outboundcid"></div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
@@ -111,14 +101,12 @@ foreach($drivers as $driver) {
 	</div>
 </div>
 <div class="element-container">
-	<div class="row">
-		<div class="form-group">
-			<div class="col-md-3">
-				<label class="control-label" for="email"><?php echo _('Email Address')?></label>
-				<i class="fa fa-question-circle fpbx-help-icon" data-for="email"></i>
-			</div>
-			<div class="col-md-9"><input type="email" class="form-control" id="email" name="email" placeholder="<?php echo _('name@domain.tld')?>" data-for="email"></div>
+	<div class="form-group row">
+		<div class="col-md-3">
+			<label class="control-label" for="email"><?php echo _('Email Address')?></label>
+			<i class="fa fa-question-circle fpbx-help-icon" data-for="email"></i>
 		</div>
+		<div class="col-md-9"><input type="email" class="form-control" id="email" name="email" placeholder="<?php echo _('name@domain.tld')?>" data-for="email"></div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
