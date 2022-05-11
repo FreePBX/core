@@ -7,12 +7,12 @@
       echo $elem['html'];
     } ?>
     <div class="nav-container">
-      <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
-      <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+      <div class="scroller scroller-left"><i class="fa fa-chevron-left"></i></div>
+      <div class="scroller scroller-right"><i class="fa fa-chevron-right"></i></div>
       <div class="wrapper">
         <ul class="nav nav-tabs list" role="tablist">
           <?php foreach(array_keys($html['middle']) as $category) { ?>
-            <li data-name="<?php echo strtolower($category)?>" class="change-tab"><a class="<?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo ucfirst($category)?></a></li>
+            <li data-name="<?php echo strtolower($category)?>" class="change-tab"><a class="nav-link <?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo ucfirst($category)?></a></li>
           <?php isset($c)?$c++:$c = 1;} ?>
         </ul>
       </div>

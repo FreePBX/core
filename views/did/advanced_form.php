@@ -53,25 +53,25 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 	<input type="hidden" name="extdisplay" value="<?php echo $extdisplay ?>">
 	<input type="hidden" name="old_extension" value="<?php echo $extension?>">
 	<input type="hidden" name="old_cidnum" value="<?php echo $cidnum?>">
-	<ul class="nav nav-tabs" role="tablist">
+	<ul class="nav nav-tabs pb-0" role="tablist">
 		<li role="presentation" data-name="didgeneral">
-			<a href="#didgeneral" aria-controls="didgeneral" class="active" role="tab" data-toggle="tab">
+			<a href="#didgeneral" aria-controls="didgeneral" class="active nav-link" role="tab" data-toggle="tab">
 				<?php echo _("General")?>
 			</a>
 		</li>
 		<li role="presentation" data-name="didadvanced" class="change-tab">
-			<a href="#didadvanced" aria-controls="didadvanced" role="tab" data-toggle="tab">
+			<a href="#didadvanced" aria-controls="didadvanced" role="tab" class="nav-link"  data-toggle="tab">
 				<?php echo _("Advanced")?>
 			</a>
 		</li>
 		<li role="presentation" data-name="didprivacy" class="change-tab">
-			<a href="#didprivacy" aria-controls="didprivacy" role="tab" data-toggle="tab">
+			<a href="#didprivacy" aria-controls="didprivacy" role="tab" class="nav-link"  data-toggle="tab">
 				<?php echo _("Privacy")?>
 			</a>
 		</li>
 		<?php echo $hooks['hookTabs']?>
-		<li role="presentation" data-name="didother" class="change-tab <?php echo (empty($hooks['oldHooks'])?'hidden':'')?>">
-			<a href="#didother" aria-controls="didother" role="tab" data-toggle="tab">
+		<li role="presentation" data-name="didother" class="change-tab <?php echo (empty($hooks['oldHooks'])?'d-none':'')?>">
+			<a href="#didother" aria-controls="didother" role="tab" class="nav-link"  data-toggle="tab">
 				<?php echo _("Other")?>
 			</a>
 		</li>

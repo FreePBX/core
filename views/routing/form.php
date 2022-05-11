@@ -35,7 +35,7 @@ $emailbody = $emailInfo['emailbody'];
 //$module_hook = moduleHook::create();
 //if (!empty($module_hook->hookHtml)) {
 if (!empty($hooks['oldHooks'])) {
-	$hooktab = 	'<li role="presentation" data-name="additionalsettings" class="change-tab"><a href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
+	$hooktab = 	'<li role="presentation" data-name="additionalsettings" class="change-tab"><a class="nav-link" href="#additionalsettings" data-toggle="tab">'._("Additional Settings").'</a></li>';
 
 }
 //Dialpattern Help
@@ -85,7 +85,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		}
 		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td class="hidden-xs prepend">';
+		$dpinput[] = '<td class="d-none prepend">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" class="form-control ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" >';
@@ -108,7 +108,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpinput[] = '	</div>';
 		$dpinput[] = '</td>';
 		$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td class="hidden-xs hidden-sm callerid">';
+		$dpinput[] = '<td class="d-sm-none callerid">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" class="form-control '.$dpt_class.'" value="'.$pattern['match_cid'].'" >';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'6">]</span>';
@@ -247,11 +247,11 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 	<input type="hidden" id="repotrunkkey" name="repotrunkkey" value="">
 	<input type="hidden" id="reporoutedirection" name="reporoutedirection" value="">
 	<input type="hidden" id="reporoutekey" name="reporoutekey" value="">
-<ul class="nav nav-tabs">
-  <li role="presentation" data-name="routesettings" class="change-tab"><a class="active" href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
-  <li role="presentation" data-name="dialpatterns" class="change-tab"><a href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
-  <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
-  <li role="presentation" data-name="notifications" class="change-tab"><a href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
+<ul class="nav nav-tabs pb-0">
+  <li role="presentation" data-name="routesettings" class="change-tab"><a class="nav-link active" href="#routesettings" data-toggle="tab"><?php echo _("Route Settings")?></a></li>
+  <li role="presentation" data-name="dialpatterns" class="change-tab"><a class="nav-link" href="#dialpatterns" data-toggle="tab"><?php echo _("Dial Patterns")?></a></li>
+  <li role="presentation" data-name="importexport" class="change-tab"><a class="nav-link" href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
+  <li role="presentation" data-name="notifications" class="change-tab"><a class="nav-link" href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
     <?php echo $hooks['hookTabs'] ?>
   <?php echo $hooktab ?>
 </ul>
