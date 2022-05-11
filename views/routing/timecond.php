@@ -20,8 +20,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 							<label for="mode_disabled"><?php echo _("Disabled");?></label>
 							<input type="radio" name="time_mode" id="mode_legacy" value="time-group" <?php echo ($time_mode == "time-group"?"CHECKED":"") ?>>
 							<label for="mode_legacy"><?php echo _("Time Group Mode");?></label>
-							<input type="radio" name="time_mode" id="mode_calendar" class="<?php echo !$iscal ? 'hidden' : ''?>" value="calendar-group" <?php echo ($time_mode == "calendar-group"?"CHECKED":"") ?>>
-							<label for="mode_calendar" class="<?php echo !$iscal ? 'hidden' : ''?>"><?php echo _("Calendar Mode");?></label>
+							<input type="radio" name="time_mode" id="mode_calendar" class="<?php echo !$iscal ? 'd-none' : ''?>" value="calendar-group" <?php echo ($time_mode == "calendar-group"?"CHECKED":"") ?>>
+							<label for="mode_calendar" class="<?php echo !$iscal ? 'd-none' : ''?>"><?php echo _("Calendar Mode");?></label>
 						</span>
 					</div>
 				</div>
@@ -65,7 +65,7 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 </div>
 <!--END Timezone-->
 <!--
-<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
+<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'd-none' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
 			<div class="">
@@ -92,7 +92,7 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 		</div>
 	</div>
 </div>
-<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
+<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'd-none' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
 			<div class="">
@@ -147,17 +147,17 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <script>
 	$("input[name=time_mode]").change(function() {
 		if($(this).val() == "time-group") {
-			$(".calendar-container").addClass("hidden");
-			$(".time-container").removeClass("hidden");
-			$(".timezone-container").removeClass("hidden");
+			$(".calendar-container").addClass("d-none");
+			$(".time-container").removeClass("d-none");
+			$(".timezone-container").removeClass("d-none");
 		} else if($(this).val() == "calendar-group") {
-			$(".calendar-container").removeClass("hidden");
-			$(".time-container").addClass("hidden");
-			$(".timezone-container").removeClass("hidden");
+			$(".calendar-container").removeClass("d-none");
+			$(".time-container").addClass("d-none");
+			$(".timezone-container").removeClass("d-none");
 		} else {
-			$(".calendar-container").addClass("hidden");
-			$(".time-container").addClass("hidden");
-			$(".timezone-container").addClass("hidden");
+			$(".calendar-container").addClass("d-none");
+			$(".time-container").addClass("d-none");
+			$(".timezone-container").addClass("d-none");
 		}
 	});
 

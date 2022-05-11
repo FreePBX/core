@@ -110,7 +110,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		}
 		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td class="hidden-xs prepend">';
+		$dpinput[] = '<td class="d-none prepend">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control dp-prepend ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" >';
@@ -146,7 +146,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	}
 	$dpinput[] = '<tr id = "dprow'.$idx.'">';
 	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td class="hidden-xs prepend">';
+	$dpinput[] = '<td class="d-none prepend">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 	$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control dp-prepend ' . $dpt_class.'" value="" >';
@@ -206,19 +206,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 						<input type="hidden" name="sv_usercontext" value="<?php echo $usercontext?>"/>
 						<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
 						<input id="npanxx" name="npanxx" type="hidden" />
-						<ul class="nav nav-tabs" role="tablist">
+						<ul class="nav nav-tabs pb-0" role="tablist">
 							<li role="presentation" data-name="tgeneral" class="change-tab">
-								<a href="#tgeneral" aria-controls="tgeneral" class="active" role="tab" data-toggle="tab">
+								<a href="#tgeneral" aria-controls="tgeneral" class="active nav-link" role="tab" data-toggle="tab">
 									<?php echo _("General")?>
 								</a>
 							</li>
 							<li role="presentation" data-name="tdialplan" class="change-tab">
-								<a href="#tdialplan" aria-controls="tdialplan" role="tab" data-toggle="tab">
+								<a href="#tdialplan" aria-controls="tdialplan" role="tab" class="nav-link" data-toggle="tab">
 									<?php echo _("Dialed Number Manipulation Rules")?>
 								</a>
 							</li>
 							<li role="presentation" data-name="ttech" class="change-tab">
-								<a href="#ttech" aria-controls="ttech" role="tab" data-toggle="tab">
+								<a href="#ttech" aria-controls="ttech" role="tab" class="nav-link" data-toggle="tab">
 									<?php echo $tech .' '. _("Settings")?>
 								</a>
 							</li>
