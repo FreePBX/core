@@ -7,6 +7,9 @@ $astman->add_event_handler("AttendedTransfer", function($event, $data, $server, 
 	core_AttendedTransfer($data);
 });
 
+$astman->add_event_handler("UnParkedCall", function($event, $data, $server, $port) {
+	core_UnParkedCall($data,$event);
+});
 $last_db_ping = time();
 while (true) {
 	if (time() > ($last_db_ping + (60 * 60))) {
@@ -33,7 +36,34 @@ while (true) {
 	}
 }
 
-
+function core_UnParkedCall($data,$type){
+	global $astman,$monitordir;
+	$ParkeeChannel = $data['ParkeeChannel'];
+	//get the call recording file name from the channel
+	$response = $astman->send_request('Command',array('Command'=>"core show channel ".$ParkeeChannel));
+	$responseArray = explode("\n",trim($response['data']));
+	$callfilename =  preg_grep("/CALLFILENAME/",$responseArray);
+	$monitor =  preg_grep("/MIXMONITOR_FILENAME/",$responseArray);
+	if(is_array($monitor)&& count($monitor) > 0) {
+		$monitor = array_values($monitor);
+		$file = explode('MIXMONITOR_FILENAME=',$monitor[0]);
+		$filename = $file[1];
+	}
+	if($filename != ""){
+		$re = $astman->mixmonitor($ParkeeChannel, "$filename", "ai(LOCAL_MIXMON_ID)");
+		dbug(" Starting Park call recording from Channel $ParkeeChannel with existing file $filename");
+		return ;
+	}
+	// no mix monitor file
+	if(is_array($callfilename)&& count($callfilename) > 0) {
+		$callfilename = array_values($callfilename);
+		$file = explode('CALLFILENAME=',$callfilename[0]);
+		$filename = $monitordir.'/'.$file[1];
+		$re = $astman->mixmonitor($ParkeeChannel, "$filename", "ai(LOCAL_MIXMON_ID)");
+		dbug(" Starting UnPark call recording from Channel $ParkeeChannel with existing file $filename");
+	}
+	return;
+}
 function core_AttendedTransfer($data) {
 	global $astman;
 	$OrigTransfererChannel = $data['OrigTransfererChannel'];
@@ -51,5 +81,6 @@ function core_AttendedTransfer($data) {
 		$re = $astman->mixmonitor($TransfereeChannel, "$filename", "ai(LOCAL_MIXMON_ID)");
 		dbug(" Starting AttendedTransfer recording from Channel $TransfereeChannel with existing file $filename");
 	}
+	return;
 }
 ?>
