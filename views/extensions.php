@@ -11,7 +11,7 @@
         <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
         <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
         <div class="wrapper">
-          <ul class="nav nav-tabs list pb-0 mt-2p" role="tablist">
+          <ul class="nav nav-tabs list" role="tablist">
             <?php foreach(array_keys($html['middle']) as $category) { ?>
 							<?php $hidden = is_array($hideCategory) && in_array($category,$hideCategory) ? "hidden" : ""?>
               <li data-name="<?php echo strtolower($category)?>" class="change-tab  <?php echo $hidden?>">
