@@ -157,12 +157,12 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			</div>
 		</div>
 		<!--END Set Destination-->
-		<div class="d-none">
+		<div class="hidden">
 			<!--Signal RINGING-->
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="">
+						<div class="row">
 							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="ringing"><?php echo _("Signal RINGING") ?></label>
@@ -189,7 +189,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="">
+						<div class="row">
 							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="reversalw"><?php echo _("Reject Reverse Charges") ?></label>
@@ -216,7 +216,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="">
+						<div class="row">
 							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="delay_answer"><?php echo _("Pause Before Answer") ?></label>
@@ -240,7 +240,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="">
+						<div class="row">
 							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="privacyman"><?php echo _("Privacy Manager") ?></label>
@@ -267,7 +267,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="">
+						<div class="row">
 							<div class="form-group row">
 								<div class="col-md-3">
 									<label class="control-label" for="pmmaxretries"><?php echo _("Max attempts") ?></label>

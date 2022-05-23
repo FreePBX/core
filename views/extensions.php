@@ -8,14 +8,14 @@
     } ?>
     <div role="tabpanel">
       <div class="nav-container">
-        <div class="scroller scroller-left"><i class="fa fa-chevron-left"></i></div>
-        <div class="scroller scroller-right"><i class="fa fa-chevron-right"></i></div>
+        <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+        <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
         <div class="wrapper">
           <ul class="nav nav-tabs list pb-0 mt-2p" role="tablist">
             <?php foreach(array_keys($html['middle']) as $category) { ?>
-							<?php $hidden = is_array($hideCategory) && in_array($category,$hideCategory) ? "d-none" : ""?>
+							<?php $hidden = is_array($hideCategory) && in_array($category,$hideCategory) ? "hidden" : ""?>
               <li data-name="<?php echo strtolower($category)?>" class="change-tab  <?php echo $hidden?>">
-                <a class="nav-link <?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a>
+                <a class="<?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a>
               </li>
             <?php } ?>
           </ul>

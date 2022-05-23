@@ -29,14 +29,14 @@ if(!empty($trunk_usercontexts)){
 }
 ?>
 </script>
-<ul class="nav nav-tabs pb-0" role="tablist">
+<ul class="nav nav-tabs" role="tablist">
 	<li role="presentation" data-name="sipoutset" class="change-tab">
-		<a href="#sipoutset" aria-controls="sipoutset" class="active nav-link" role="tab" data-toggle="tab">
+		<a href="#sipoutset" aria-controls="sipoutset" class="active" role="tab" data-toggle="tab">
 			<?php echo _("Outgoing")?>
 		</a>
 	</li>
 	<li role="presentation" data-name="sipinset" class="change-tab">
-		<a href="#sipinset" aria-controls="sipinset" class="nav-link" role="tab" data-toggle="tab">
+		<a href="#sipinset" aria-controls="sipinset" role="tab" data-toggle="tab">
 			<?php echo _("Incoming")?>
 		</a>
 	</li>

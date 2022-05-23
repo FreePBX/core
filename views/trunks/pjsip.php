@@ -27,19 +27,19 @@
 
 <h3><?php echo _("PJSIP Settings")?></h3>
 
-<ul class="nav nav-tabs pb-0" role="tablist">
+<ul class="nav nav-tabs" role="tablist">
 	<li role="presentation" data-name="pjsgeneral" class="change-tab">
-		<a href="#pjsgeneral" aria-controls="pjsgeneral" class="active nav-link" role="tab" data-toggle="tab">
+		<a href="#pjsgeneral" aria-controls="pjsgeneral" class="active" role="tab" data-toggle="tab">
 			<?php echo _("General")?>
 		</a>
 	</li>
 	<li role="presentation" data-name="pjsadvances" class="change-tab">
-		<a href="#pjsadvanced" aria-controls="pjsadvanced" class="nav-link" role="tab" data-toggle="tab">
+		<a href="#pjsadvanced" aria-controls="pjsadvanced" role="tab" data-toggle="tab">
 			<?php echo _("Advanced")?>
 		</a>
 	</li>
 	<li role="presentation" data-name="pjscodecs" class="change-tab">
-		<a href="#pjscodecs" aria-controls="pjscodecs" class="nav-link" role="tab" data-toggle="tab">
+		<a href="#pjscodecs" aria-controls="pjscodecs" role="tab" data-toggle="tab">
 			<?php echo _("Codecs")?>
 		</a>
 	</li>
@@ -71,8 +71,6 @@
 						<input type="text" class="form-control" name="auth_username" id="auth_username" value="<?php echo $auth_username ?>">
 					</div>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
 					<span id="auth_username-help" class="help-block fpbx-help-block"><?php echo _("This need to be set only  when auth username not same as the username. ")?> </span>
 				</div>
@@ -170,8 +168,6 @@
 						<input type="text" class="form-control" name="sip_server" id="sip_server" value="<?php echo $sip_server?>"/>
 					</div>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
 					<span id="sip_server-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Address. This is ignored when Registration is set to 'Receive'.")?></span>
 				</div>
@@ -190,8 +186,6 @@
 						<input type="number" class="form-control" name="sip_server_port" id="sip_server_port" value="<?php echo !empty($sip_server_port) ? $sip_server_port : ''?>"/>
 					</div>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
 					<span id="sip_server_port-help" class="help-block fpbx-help-block"><?php echo _("SIP Server Port. This is ignored when Registration is set to 'Receive'.")?></span>
 				</div>
