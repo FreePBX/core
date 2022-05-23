@@ -36,8 +36,8 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			} else { ?>
 				<div class="display no-border">
 					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" data-name="alldids">
-							<a href="#alldids" aria-controls="alldids" class="active" role="tab" data-toggle="tab">
+						<li role="presentation" data-name="alldids" class="active">
+							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
 								<?php echo _("All Users")?>
 							</a>
 						</li>

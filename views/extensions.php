@@ -14,9 +14,7 @@
           <ul class="nav nav-tabs list" role="tablist">
             <?php foreach(array_keys($html['middle']) as $category) { ?>
 							<?php $hidden = is_array($hideCategory) && in_array($category,$hideCategory) ? "hidden" : ""?>
-              <li data-name="<?php echo strtolower($category)?>" class="change-tab  <?php echo $hidden?>">
-                <a class="<?php echo ($active == strtolower($category)) ? 'active' : ''?>" href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a>
-              </li>
+              <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?> <?php echo $hidden?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a></li>
             <?php } ?>
           </ul>
         </div>
@@ -33,14 +31,16 @@
                       <?php if(!empty($elem['prompttext'])) {?>
                         <div class="row">
                           <div class="col-md-12">
-                            <div class="form-group row">
-                              <div class="col-md-4 control-label">
-                                <label for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
-                                <?php if(!empty($elem['helptext'])) { ?>
-                                  <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
-                                <?php } ?>
+                            <div class="row">
+                              <div class="form-group">
+                                <div class="col-md-4 control-label">
+                                  <label for="<?php echo $elem['name']?>"><?php echo $elem['prompttext']?></label>
+                                  <?php if(!empty($elem['helptext'])) { ?>
+                                    <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $elem['name']?>"></i>
+                                  <?php } ?>
+                                </div>
+                                <div class="col-md-8"><?php echo $elem['html']?></div>
                               </div>
-                              <div class="col-md-8"><?php echo $elem['html']?></div>
                             </div>
                           </div>
                         </div>

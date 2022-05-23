@@ -30,8 +30,8 @@ if(!empty($trunk_usercontexts)){
 ?>
 </script>
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" data-name="sipoutset" class="change-tab">
-		<a href="#sipoutset" aria-controls="sipoutset" class="active" role="tab" data-toggle="tab">
+	<li role="presentation" data-name="sipoutset" class="change-tab active">
+		<a href="#sipoutset" aria-controls="sipoutset" role="tab" data-toggle="tab">
 			<?php echo _("Outgoing")?>
 		</a>
 	</li>
@@ -47,8 +47,8 @@ if(!empty($trunk_usercontexts)){
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="">
-						<div class="form-group row">
+					<div class="row">
+						<div class="form-group">
 							<div class="col-md-3">
 								<label class="control-label" for="channelid"><?php echo _("Trunk Name") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="channelid"></i>
@@ -71,8 +71,8 @@ if(!empty($trunk_usercontexts)){
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="">
-						<div class="form-group row">
+					<div class="row">
+						<div class="form-group">
 							<div class="col-md-3">
 								<label class="control-label" for="peerdetails"><?php echo _("PEER Details") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="peerdetails"></i>
@@ -97,8 +97,8 @@ if(!empty($trunk_usercontexts)){
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="">
-						<div class="form-group row">
+					<div class="row">
+						<div class="form-group">
 							<div class="col-md-3">
 								<label class="control-label" for="usercontext"><?php echo _("USER Context") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="usercontext"></i>
@@ -121,8 +121,8 @@ if(!empty($trunk_usercontexts)){
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="">
-						<div class="form-group row">
+					<div class="row">
+						<div class="form-group">
 							<div class="col-md-3">
 								<label class="control-label" for="userconfig"><?php echo _("USER Details") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="userconfig"></i>
@@ -145,8 +145,8 @@ if(!empty($trunk_usercontexts)){
 		<div class="element-container">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="">
-						<div class="form-group row">
+					<div class="row">
+						<div class="form-group">
 							<div class="col-md-3">
 								<label class="control-label" for="register"><?php echo _("Register String") ?></label>
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="register"></i>

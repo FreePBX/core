@@ -8,8 +8,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="mode"><?php echo _("Time Match Mode") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="mode"></i>
@@ -39,8 +39,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container timezone-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="timezone"><?php echo _("Time Match Time Zone:")?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="timezone"></i>
@@ -68,8 +68,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="calendar_id"><?php echo _("Time Match Calendar") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="calendar_id"></i>
@@ -95,8 +95,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="calendar_group_id"><?php echo _("Time Match Calendar Group") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="calendar_group_id"></i>
@@ -124,8 +124,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container time-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="time_group_id"><?php echo _("Time Match Time Group") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="time_group_id"></i>

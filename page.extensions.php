@@ -90,8 +90,8 @@ if($display_mode == "basic") { ?>
 							<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
 							<div class="wrapper">
 								<ul class="nav nav-tabs list" role="tablist">
-									<li role="presentation" data-name="alldids">
-										<a href="#alldids" aria-controls="alldids" class="active" role="tab" data-toggle="tab">
+									<li role="presentation" data-name="alldids" class="active">
+										<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
 											<?php echo _("All Extensions")?>
 										</a>
 									</li>
@@ -176,11 +176,11 @@ if($display_mode == "basic") { ?>
 
 					<div class="modal fade paged" id="quickCreate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-pages="<?php echo count($quickCreateDisplay)?>" data-currentpage="1">
 						<form>
-							<div class="modal-dialog modal-md">
+							<div class="modal-dialog">
 								<div class="modal-content">
 									<div class="modal-header">
-										<h4 class="modal-title" id="quickCreateLabel"><?php echo _("Quick Create Extension")?></h4>
 										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										<h4 class="modal-title" id="quickCreateLabel"><?php echo _("Quick Create Extension")?></h4>
 									</div>
 									<div class="modal-body swMain" id="wizard">
 										<ul>

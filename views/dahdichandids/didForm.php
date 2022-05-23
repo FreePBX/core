@@ -29,13 +29,15 @@ if(!empty($channel_val)) {
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="form-group row">
-				<div class="col-md-3">
-					<label class="control-label" for="channel"><?php echo _("Channel") ?></label>
-					<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
-				</div>
-				<div class="col-md-9">
-					<input type="text" class="form-control" id="channel" name="channel" value="<?php  echo $channel; ?>" <?php echo $editmode?>>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="channel"><?php echo _("Channel") ?></label>
+						<i class="fa fa-question-circle fpbx-help-icon" data-for="channel"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="channel" name="channel" value="<?php  echo $channel; ?>" <?php echo $editmode?>>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -51,13 +53,15 @@ if(!empty($channel_val)) {
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="form-group row">
-				<div class="col-md-3">
-					<label class="control-label" for="description"><?php echo _("Description")?></label>
-					<i class="fa fa-question-circle fpbx-help-icon" data-for="description"></i>
-				</div>
-				<div class="col-md-9">
-					<input type="text" class="form-control" id="description" name="description" value="<?php  echo $description; ?>">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="description"><?php echo _("Description")?></label>
+						<i class="fa fa-question-circle fpbx-help-icon" data-for="description"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="description" name="description" value="<?php  echo $description; ?>">
+					</div>
 				</div>
 			</div>
 		</div>
@@ -73,13 +77,15 @@ if(!empty($channel_val)) {
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="form-group row">
-				<div class="col-md-3">
-					<label class="control-label" for="did"><?php echo _("DID")?></label>
-					<i class="fa fa-question-circle fpbx-help-icon" data-for="did"></i>
-				</div>
-				<div class="col-md-9">
-					<input type="text" class="form-control" id="did" name="did" value="<?php  echo $did; ?>">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-md-3">
+						<label class="control-label" for="did"><?php echo _("DID")?></label>
+						<i class="fa fa-question-circle fpbx-help-icon" data-for="did"></i>
+					</div>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="did" name="did" value="<?php  echo $did; ?>">
+					</div>
 				</div>
 			</div>
 		</div>
