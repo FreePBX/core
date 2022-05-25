@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.64</version>
+	<version>16.0.65</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.65* FREEI-3988, FREEI-4787 and FREEPBX-16216 
 		*16.0.64* Reverting the bootstrap and dependent libs commits 
 		*16.0.63.8* Packaging of ver 16.0.63.8
 		*16.0.63.7* Packaging of ver 16.0.63.7
