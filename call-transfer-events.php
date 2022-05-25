@@ -8,4 +8,7 @@ $restrict_mods = array(
 );
 $bootstrap_settings['astman_options']['cachemode'] = false;
 include '/etc/freepbx.conf';
+$freepbx = \FreePBX::Create();
+$config = $freepbx->Config();
+$monitordir  = $config->get('ASTSPOOLDIR').'/moinitor';
 include __DIR__.'/functions.inc/calltrasnfer-eventlistener.php';
