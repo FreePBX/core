@@ -1579,7 +1579,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$settings['remove_existing']['value'] = 'yes';
 			}
 		}
-
 		if (trim($id) == '' || empty($settings)) {
 			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
