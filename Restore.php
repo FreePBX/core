@@ -10,13 +10,13 @@ class Restore Extends Base\RestoreBase{
 		$astman->database_deltree("AMPUSER");
 		$astman->database_deltree("AMPDEV");
 		$astman->database_deltree("CW");
-		
+		$skipoptions = $this->getCliarguments();
 		$configs = $this->getConfigs();
 		$files = $this->getFiles();
 		$backupinfo = $this->getBackupInfo();
 		$dirs = $this->getDirs();
 		$excludetrunks = false;
-		if($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes') {
+		if((isset($skipoptions['skiptrunksandroutes']) && $skipoptions['skiptrunksandroutes']) || ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes')) {
 			$excludetrunks = true;
 			$trunkConfig = $this->getTrunksconfig();
 			$outbound_routes = $this->getRouteConfigs();
@@ -115,7 +115,8 @@ class Restore Extends Base\RestoreBase{
 
 	public function getResetInfo() {
 		$backupinfo = $this->getBackupInfo();
-		if ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes') {
+		$skipoptions = $this->getCliarguments();
+		if ((isset($skipoptions['skiptrunksandroutes']) && $skipoptions['skiptrunksandroutes']) || ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes')) {
 			return true;
 		}
 		return false;
