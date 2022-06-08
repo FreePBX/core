@@ -11,7 +11,7 @@
   id="dahdidid-side">
     <thead>
         <tr>
-            <th data-sortable="true"  data-field="channel" class="col-xs-2"><?php echo _('DAHDI Channel')?></th>
+            <th data-sortable="true"  data-field="channel"><?php echo _('DAHDI Channel')?></th>
             <th data-sortable="true"  data-field="did"><?php echo _('DID')?></th>
         </tr>
     </thead>
