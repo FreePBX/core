@@ -37,7 +37,7 @@ while (true) {
 }
 
 function core_UnParkedCall($data,$type){
-	global $astman,$monitordir;
+	global $astman,$monitordir,$format;
 	$ParkeeChannel = $data['ParkeeChannel'];
 	//get the call recording file name from the channel
 	$response = $astman->send_request('Command',array('Command'=>"core show channel ".$ParkeeChannel));
@@ -58,7 +58,7 @@ function core_UnParkedCall($data,$type){
 	if(is_array($callfilename)&& count($callfilename) > 0) {
 		$callfilename = array_values($callfilename);
 		$file = explode('CALLFILENAME=',$callfilename[0]);
-		$filename = $monitordir.'/'.$file[1];
+		$filename = $monitordir.'/'.date("Y/m/d/").$file[1].".".$format;
 		$re = $astman->mixmonitor($ParkeeChannel, "$filename", "ai(LOCAL_MIXMON_ID)");
 		dbug(" Starting UnPark call recording from Channel $ParkeeChannel with existing file $filename");
 	}
