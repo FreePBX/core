@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.65.2</version>
+	<version>16.0.65.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.65.3* FREEI-4787 Trunk Call Recording Not Working After Parking Call 
 		*16.0.65.2* FREEI-4830 skip restoring trunks and routes 
 		*16.0.65.1* FREEPBX-16216 Tooltip changed for remove existing option
 		*16.0.65* FREEI-3988, FREEI-4787 and FREEPBX-16216 
