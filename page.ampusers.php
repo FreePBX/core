@@ -89,6 +89,7 @@ switch ($action) {
 				$userData['email'] = '';
 				\FreePBX::Pbxsecurity()->passwordReminder->resetPasswordExpiry($userData, $userType);
 			}
+			remove_user_sessions($username);
 		}
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
 			unset($_SESSION['AMP_user']);
