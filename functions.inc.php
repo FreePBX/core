@@ -5297,3 +5297,25 @@ function core_module_repo_parameters_callback($opts) {
 	}
 	return $final;
 }
+
+function remove_user_sessions($username) {
+	$allSessions = [];
+	$sessionNames = scandir(session_save_path());
+	foreach($sessionNames as $sessionName) {
+		$sessionName = str_replace("sess_","",$sessionName);
+		if(strpos($sessionName,".") === false) { //This skips temp files that aren't sessions
+			session_id($sessionName);
+			session_start();
+			if($_SESSION['AMP_user'] && is_object($_SESSION['AMP_user']) && $_SESSION['AMP_user']->username == $username) {
+				$allSessions[$sessionName] = $_SESSION;
+			}
+			session_abort();
+		}
+	}
+
+	$sessPath = session_save_path();
+	foreach ($allSessions as $key => $value) {
+		unlink($sessPath."/sess_".$key);
+	}
+	return;
+}
