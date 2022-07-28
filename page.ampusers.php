@@ -84,10 +84,10 @@ switch ($action) {
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
 			$userType = 'admin';
-			if (\FreePBX::Modules()->checkStatus('pbxsecurity') && \FreePBX::Pbxsecurity()->passwordReminder->checkPasswordReminderExists($username, $userType)) {
+			if (\FreePBX::Modules()->checkStatus('pbxsecurity')) {
 				$userData['username'] = $username;
 				$userData['email'] = '';
-				\FreePBX::Pbxsecurity()->passwordReminder->resetPasswordExpiry($userData, $userType);
+				\FreePBX::Pbxsecurity()->passwordManagement->resetPasswordExpiry($userData, $userType);
 			}
 		}
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
