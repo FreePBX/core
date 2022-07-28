@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.10</version>
+	<version>15.0.22.11</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.11* Packaging of ver 15.0.22.11
 		*15.0.22.10* Packaging of ver 15.0.22.10
 		*15.0.22.9* FREEI-4787 park call recording 
 		*15.0.22.8* FREEI-4830 skip restoring trunks and routes 
