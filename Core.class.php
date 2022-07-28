@@ -3684,6 +3684,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$stmt = $this->database->prepare($sql);
 		try{
 			$stmt->execute($vars);
+			
+			$userType = 'admin';
+			if ($this->freepbx->Modules->checkStatus('pbxsecurity')) {
+				$userData['username'] = $username;
+				$userData['email'] = '';
+				$this->freepbx->Pbxsecurity->passwordManagement->resetPasswordExpiry($userData, $userType);
+			}
+
 			return true;
 		}catch(PDOException $e){
 			//data colission
