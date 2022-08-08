@@ -215,9 +215,11 @@ $("[id='routinggetlocalprefixes']").click(function(){
 	if ($('#fwemergency').prop('checked')){
 		patterns.push({match:'911'});
 		patterns.push({match:'933'});
-		patterns.push({match:'911',prefix:'1'});
-		patterns.push({match:'911',prefix:'9'});
-		patterns.push({match:'911',prefix:'91'});
+		patterns.push({match:'911', prefix:'1'});
+		patterns.push({match:'911', prefix:'9'});
+		patterns.push({match:'911', prefix:'91'});
+      	//National Suicide Hotline; Added to emergency due to the nature of the number.
+      	patterns.push({match: '988'});
 	}
 	if ($('#fwint').prop('checked')){
 		patterns.push({match:'011.'});
