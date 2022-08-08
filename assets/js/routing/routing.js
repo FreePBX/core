@@ -221,6 +221,25 @@ $("[id='routinggetlocalprefixes']").click(function(){
       	//National Suicide Hotline; Added to emergency due to the nature of the number.
       	patterns.push({match: '988'});
 	}
+	if ($('#fwemergencyeu').prop('checked')){
+		// https://europa.eu/youreurope/citizens/travel/security-and-emergencies/emergency/index_en.htm
+		// https://europa.eu/youreurope/citizens/travel/security-and-emergencies/emergency/faq/index_en.htm
+		
+		//Emergency Number in Europan
+		patterns.push({match:'112'});
+		//Missing children
+		patterns.push({match:'116000'});
+		//helpline for children
+		patterns.push({match:'116111'});
+		//emotional support helpline
+		patterns.push({match:'116123'});
+		//helpline for crime victims
+		patterns.push({match:'116006'});
+	}
+	if ($('#fwinfoeu').prop('checked')){
+		//Non-emergency medical assistance
+		patterns.push({match:'116117'});
+	}
 	if ($('#fwint').prop('checked')){
 		patterns.push({match:'011.'});
 	}
