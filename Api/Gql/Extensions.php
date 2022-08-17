@@ -177,6 +177,19 @@ class Extensions extends Base {
 							}
 						},
 					],
+					'fetchAllValidExtensions' => [
+						'type' => $this->typeContainer->get('extension')->getConnectionType(),
+						'description' => '',
+						'args' => Relay::connectionArgs(),
+						'resolve' => function($root, $args) {
+							$list = Relay::connectionFromArray($this->freepbx->Core->getAllValidDevices(), $args);
+							if(isset($list) && $list != null){
+								return ['response'=> $list,'status'=>true, 'message'=> _("Valid core extensions")];
+							}else{
+								return ['message'=> _("Sorry, unable to find any extensions"),'status' => false];
+							}
+						},
+					],
 					'fetchExtension' => [
 						'type' => $this->typeContainer->get('extension')->getObject(),
 						'description' => '',
@@ -311,6 +324,12 @@ class Extensions extends Base {
 					'type' => Type::int(),
 					'resolve' => function($value) {
 						return count($this->freepbx->Core->getAllDevicesByType());
+					}
+				],
+				'count' => [
+					'type' => Type::int(),
+					'resolve' => function($value) {
+						return count($this->freepbx->Core->getAllValidDevices());
 					}
 				],
 				'extension' => [
