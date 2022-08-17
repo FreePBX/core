@@ -2390,6 +2390,24 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	/**
+	 * Get all valid devices
+	 * @param null
+	 */
+	public function getAllValidDevices() {
+	
+		$sql = "SELECT devices.* FROM users LEFT JOIN devices ON users.extension = devices.id WHERE devices.tech in ('pjsip','chainsip') ORDER BY devices.id";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array());
+			$results = $sth->fetchAll(PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		
+		return $results;
+	}
+
+	/**
 	* Get All Routes
 	*/
 	public function getAllRoutes(){

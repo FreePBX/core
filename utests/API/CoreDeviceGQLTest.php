@@ -383,4 +383,137 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 		// //status 200 success check
 		$this->assertEquals(200, $response->getStatusCode());
 	}
+
+	public function test_fetchAllValidExtensions_whenAllIsWell_shouldReturnAllValidExtensions() {
+
+		$mockcore = $this->getMockBuilder(\FreePBX\modules\core\Core::class)
+			->disableOriginalConstructor()
+			->disableOriginalClone()
+			->setMethods(array('getAllValidDevices','getUser'))
+			->getMock();
+		
+		$mockcore->method('getAllValidDevices')
+			->willReturn(array(
+							array(
+								"id" => 123123,
+								"tech" => "pjsip",
+								"dial" => "PJSIP/123123",
+								"devicetype" => "fixed",
+								"user" => "123123",
+								"description" => "123123 APi ",
+								"emergency_cid" => "1231233333",
+								"hint_override" => ""
+							)
+						));
+		
+		$mockcore->method('getUser')
+			->willReturn(array());
+
+		self::$freepbx->Core = $mockcore; 
+
+		$response = $this->request("
+									query{
+										fetchAllValidExtensions {
+											status
+											message
+											count
+											extension {
+													id
+													extensionId
+													user {
+													name
+													password
+													outboundCid
+													ringtimer
+													noanswer
+													sipname
+													password
+													extPassword
+													}
+													coreDevice {
+													deviceId
+													dial
+													devicetype
+													description
+													emergencyCid
+													}
+											}
+										}
+									}");
+
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals('{"data":{"fetchAllValidExtensions":{"status":true,"message":"Valid core extensions","count":1,"extension":[{"id":"ZXh0ZW5zaW9uOg==","extensionId":"123123","user":{"name":null,"password":null,"outboundCid":null,"ringtimer":null,"noanswer":null,"sipname":null,"extPassword":null},"coreDevice":{"deviceId":"123123","dial":"PJSIP\/123123","devicetype":"fixed","description":"123123 APi ","emergencyCid":"1231233333"}}]}}}', $json);
+
+		//status 200 success check
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
+	public function test_fetchAllValidExtensions_InvalidArgument_shouldReturn_false() {
+
+		$mockcore = $this->getMockBuilder(\FreePBX\modules\core\Core::class)
+			->disableOriginalConstructor()
+			->disableOriginalClone()
+			->setMethods(array('getAllValidDevices','getUser'))
+			->getMock();
+		
+		$mockcore->method('getAllValidDevices',)
+			->willReturn(array(
+							array(
+								"id" => 123123,
+								"tech" => "pjsip",
+								"dial" => "PJSIP/123123",
+								"devicetype" => "fixed",
+								"user" => "123123",
+								"description" => "123123 APi ",
+								"emergency_cid" => "1231233333",
+								"hint_override" => ""
+							)
+						));
+		
+		$mockcore->method('getUser')
+			->willReturn(array());
+
+		self::$freepbx->Core = $mockcore; 
+
+		$response = $this->request("
+									query{
+										fetchAllValidExtensions {
+											status
+											message
+											count
+											data
+											extension {
+													id
+													extensionId
+													user {
+													name
+													password
+													outboundCid
+													ringtimer
+													noanswer
+													sipname
+													password
+													extPassword
+													}
+													coreDevice {
+													deviceId
+													dial
+													devicetype
+													description
+													emergencyCid
+													}
+											}
+										}
+									}");
+
+
+		$json = (string)$response->getBody();
+
+		$this->assertEquals('{"errors":[{"message":"Cannot query field \"data\" on type \"ExtensionConnection\".","status":false}]}', $json);
+
+		//status 400 failure 
+		$this->assertEquals(400, $response->getStatusCode());
+	}
 }
