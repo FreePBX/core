@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.13</version>
+	<version>15.0.22.14</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.14* Packaging of ver 15.0.22.14
 		*15.0.22.13* Packaging of ver 15.0.22.13
 		*15.0.22.12* FREEPBX-23646 Add 988 to the routing pattern generator 
 		*15.0.22.11* Packaging of ver 15.0.22.11
