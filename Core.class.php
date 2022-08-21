@@ -3690,6 +3690,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$userData['username'] = $username;
 				$userData['email'] = '';
 				$this->freepbx->Pbxsecurity->passwordManagement->resetPasswordExpiry($userData, $userType);
+				$this->freepbx->Pbxsecurity->mfa->syncMFAUsers($userType);
 			}
 
 			return true;
