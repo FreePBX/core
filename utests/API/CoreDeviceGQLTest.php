@@ -392,7 +392,7 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 			->setMethods(array('getAllValidDevices','getUser'))
 			->getMock();
 		
-		$mockcore->method('getAllValidDevices',)
+		$mockcore->method('getAllValidDevices')
 			->willReturn(array(
 							array(
 								"id" => 123123,
@@ -458,7 +458,7 @@ class CoreDeviceGQLTest extends ApiBaseTestCase {
 			->setMethods(array('getAllValidDevices','getUser'))
 			->getMock();
 		
-		$mockcore->method('getAllValidDevices',)
+		$mockcore->method('getAllValidDevices')
 			->willReturn(array(
 							array(
 								"id" => 123123,
