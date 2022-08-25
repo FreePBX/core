@@ -2106,6 +2106,15 @@ function core_do_get_config($engine) {
 		}
 	}
 
+	/**add generals
+	 * clear global vars
+	*/
+	$freepbx_conf =& freepbx_conf::create();
+	$clearglb = $freepbx_conf->get_conf_setting('CLEARGLOBALVARS');
+	if($clearglb && function_exists('addGeneral')) {
+		$ext->addGeneral('clearglobalvars', 'TRUE');
+	}
+
 	/* macro-prepend-cid */
 	// prepend a cid and if set to replace previous prepends, do so, otherwise stack them
 	//
