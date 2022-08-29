@@ -728,6 +728,12 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 					<input type="checkbox" id="fwld">
 					<label for="fwld"><?php echo _("Long Distance")?></label>
 					</div>
+					<div class = "form-group radioset">
+						<input type="checkbox" id="fwinfoeu">
+						<label for="fwinfoeu"><?php echo _("EU Information")?></label>
+						<input type="checkbox" id="fwemergencyeu" checked>
+						<label for="fwemergencyeu"><?php echo _("EU Emergency")?></label>
+					</div>
 					<div id ="lpresults"></div>
 				</div>
 				<div class="modal-footer">
