@@ -456,7 +456,7 @@ $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('CONNECTEDLINE_PRESENCESTATE',$set);
 
 //CLEARGLOBALVARS
-$set['value'] = false;
+$set['value'] = true;
 $set['defaultval'] =& $set['value'];
 $set['options'] = '';
 $set['readonly'] = 0;
