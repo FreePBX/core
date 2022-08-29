@@ -5304,7 +5304,9 @@ function remove_user_sessions($username) {
 	foreach($sessionNames as $sessionName) {
 		$sessionName = str_replace("sess_","",$sessionName);
 		if(strpos($sessionName,".") === false) { //This skips temp files that aren't sessions
-			session_id($sessionName);
+			if(!session_id()) {
+				session_id($sessionName);
+			}
 			session_start();
 			if($_SESSION['AMP_user'] && is_object($_SESSION['AMP_user']) && $_SESSION['AMP_user']->username == $username) {
 				$allSessions[$sessionName] = $_SESSION;
