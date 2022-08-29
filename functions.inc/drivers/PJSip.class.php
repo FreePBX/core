@@ -956,6 +956,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$transport[$t]['external_signaling_address'] = $extip;
 				}
 
+				$extport = $ss->getConfig($protocol."extport-$ip");
+				if ($extport) {
+					$transport[$t]['external_signaling_port'] = $extport;
+				}
+
 				// Is this a TLS transport?
 				if ($protocol === "tls") {
 					$tls = $ss->getTLSConfig();
