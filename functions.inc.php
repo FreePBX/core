@@ -2111,7 +2111,7 @@ function core_do_get_config($engine) {
 	*/
 	$freepbx_conf =& freepbx_conf::create();
 	$clearglb = $freepbx_conf->get_conf_setting('CLEARGLOBALVARS');
-	if($clearglb && function_exists('addGeneral')) {
+	if($clearglb && method_exists($ext,'addGeneral')) {
 		$ext->addGeneral('clearglobalvars', 'TRUE');
 	}
 
