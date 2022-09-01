@@ -438,7 +438,7 @@
 		<table name="outbound_routes">
 			<field name="route_id" type="integer" primarykey="true" autoincrement="true"/>
 			<field name="name" type="string" length="40" notnull="false"/>
-			<field name="outcid" type="string" length="40" notnull="false"/>
+			<field name="outcid" type="string" length="255" notnull="false"/>
 			<field name="outcid_mode" type="string" length="20" notnull="false"/>
 			<field name="password" type="string" length="30" notnull="false"/>
 			<field name="emergency_route" type="string" length="4" notnull="false"/>
