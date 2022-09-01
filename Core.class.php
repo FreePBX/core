@@ -3703,12 +3703,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 		try{
 			$stmt->execute($vars);
 			
-			$userType = 'admin';
-			if ($this->freepbx->Modules->checkStatus('pbxsecurity')) {
-				$userData['username'] = $username;
-				$userData['email'] = '';
-				$this->freepbx->Pbxsecurity->passwordManagement->resetPasswordExpiry($userData, $userType);
-				$this->freepbx->Pbxsecurity->mfa->syncMFAUsers($userType);
+			if ($this->freepbx->Modules->checkStatus('pbxmfa')) {
+				$this->freepbx->Pbxmfa->mfa->syncMFAUsers('admin');
 			}
 
 			return true;
