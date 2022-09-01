@@ -79,19 +79,15 @@ switch ($action) {
 			// Password unchanged
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, "", $sections);
-			if (\FreePBX::Modules()->checkStatus('pbxsecurity')) {
-				\FreePBX::Pbxsecurity()->mfa->syncMFAUsers('admin');
+			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
+				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
 			}
 		} elseif ($password != "******") {
 			// Password has been changed
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
-			$userType = 'admin';
-			if (\FreePBX::Modules()->checkStatus('pbxsecurity')) {
-				$userData['username'] = $username;
-				$userData['email'] = '';
-				\FreePBX::Pbxsecurity()->passwordManagement->resetPasswordExpiry($userData, $userType);
-				\FreePBX::Pbxsecurity()->mfa->syncMFAUsers($userType);
+			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
+				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
 			}
 			remove_user_sessions($username);
 		}
