@@ -145,7 +145,7 @@
 			<field name="trunkid" type="integer" default="0" primaryKey="true"/>
 			<field name="name" type="string" length="50" default=""/>
 			<field name="tech" type="string" length="20" primaryKey="true"/>
-			<field name="outcid" type="string" length="40" default=""/>
+			<field name="outcid" type="string" length="255" default=""/>
 			<field name="keepcid" type="string" length="4" default="off" notnull="false"/>
 			<field name="maxchans" type="string" length="6" default="" notnull="false"/>
 			<field name="failscript" type="string" length="255" default=""/>
@@ -266,7 +266,7 @@
 		<table name="outbound_routes">
 			<field name="route_id" type="integer" primarykey="true" autoincrement="true"/>
 			<field name="name" type="string" length="40" notnull="false"/>
-			<field name="outcid" type="string" length="40" notnull="false"/>
+			<field name="outcid" type="string" length="255" notnull="false"/>
 			<field name="outcid_mode" type="string" length="20" notnull="false"/>
 			<field name="password" type="string" length="30" notnull="false"/>
 			<field name="emergency_route" type="string" length="4" notnull="false"/>
