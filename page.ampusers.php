@@ -89,6 +89,11 @@ switch ($action) {
 			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
 				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
 			}
+			if (\FreePBX::Modules()->checkStatus('userman')) {
+				$userData['username'] = $username;
+				$userData['email'] = '';
+				\FreePBX::Userman()->pwdExpReminder()->resetPasswordExpiry($userData, 'admin');
+			}
 			remove_user_sessions($username);
 		}
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
