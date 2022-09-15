@@ -77,7 +77,35 @@ class Restore Extends Base\RestoreBase{
 
 	public function processLegacy($pdo, $data, $tables, $unknownTables) {
 		global $astman;
-		$this->restoreLegacyAll($pdo);
+		$this->log("Processing legacy backup");
+		$skipoptions = $this->getCliarguments();
+		$excludetrunks = false;
+		if((isset($skipoptions['skiptrunksandroutes']) && $skipoptions['skiptrunksandroutes']) ) {
+			$excludetrunks = true;
+			$this->log("skiptrunksandroutes option passed ");
+			$trunkConfig = $this->getTrunksconfig();
+			$outbound_routes = $this->getRouteConfigs();
+			$this->log("preserve the trunk and outbound_routes");
+			$modulefunction = \module_functions::create();
+			$uninstall = $modulefunction->uninstall('core', 'true');
+			if(is_array($uninstall)) {
+				throw new \Exception(sprintf(_('Error uninstalling core reason(s): %s'),implode(",",$uninstall)));
+			}
+			$install = $modulefunction->install('core', 'true');
+			if(is_array($install)) {
+				throw new \Exception(sprintf(_('Error installing core reason(s): %s'),implode(",",$install)));
+			}
+		}
+		if($excludetrunks){
+			$this->log("skiping Trunks and outboundroutes  From backup");
+			$ignoretables = ['pjsip','sip','iax','trunks','outbound_route_patterns','outbound_route_sequence','outbound_route_trunks','outbound_routes','outbound_route_email','trunk_dialpatterns'];
+			$this->restoreLegacyDatabase($pdo,[],$ignoretables);
+		}else {
+			$this->restoreLegacyDatabase($pdo);
+		}
+		$this->restoreLegacyKvstore($pdo);
+		$this->restoreLegacyFeatureCodes($pdo);
+		$this->restoreLegacySettings($pdo);
 		$this->FreePBX->Core->devices2astdb();
 		if(isset($data['astdb']['AMPUSER'])) {
 			$ampuser = array();
@@ -87,6 +115,19 @@ class Restore Extends Base\RestoreBase{
         }
         $astman->database_deltree("AMPUSER");
         $this->importAstDB($ampuser);
+		if($excludetrunks){
+			foreach ($this->getClasses($this->transactionId) as $class) {
+				if(empty($class)){
+					continue;
+				}
+				$this->log(sprintf(_("Processing %s"),$class->className));
+				if( $class->className == 'Trunks' && $excludetrunks) {
+					$class->setConfigs($trunkConfig);
+				}elseif( $class->className == 'Routing' && $excludetrunks){
+					$class->setConfigs($outbound_routes);
+				}
+			}
+		}
 
 	}
 
