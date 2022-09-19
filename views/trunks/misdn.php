@@ -14,8 +14,8 @@ foreach($gps as $gp) {
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="channelid"><?php echo _("mISDN Group/Port") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="channelid"></i>

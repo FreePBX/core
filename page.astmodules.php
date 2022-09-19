@@ -62,8 +62,8 @@ HERE;
 					<div class="fpbx-container">
 						<form class="fpbx-submit" name="frm_extensions" action="" method="post" data-fpbx-delete="" role="form">
 							<ul class="nav nav-tabs" role="tablist">
-								<li role="presentation" data-name="amodnoload">
-									<a href="#amodnoload" aria-controls="amodnoload"  class="active" role="tab" data-toggle="tab">
+								<li role="presentation" data-name="amodnoload" class="active">
+									<a href="#amodnoload" aria-controls="amodnoload" role="tab" data-toggle="tab">
 										<?php echo _("Excluded Modules")?>
 									</a>
 								</li>

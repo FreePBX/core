@@ -8,8 +8,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="mode"><?php echo _("Time Match Mode") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="mode"></i>
@@ -20,8 +20,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 							<label for="mode_disabled"><?php echo _("Disabled");?></label>
 							<input type="radio" name="time_mode" id="mode_legacy" value="time-group" <?php echo ($time_mode == "time-group"?"CHECKED":"") ?>>
 							<label for="mode_legacy"><?php echo _("Time Group Mode");?></label>
-							<input type="radio" name="time_mode" id="mode_calendar" class="<?php echo !$iscal ? 'd-none' : ''?>" value="calendar-group" <?php echo ($time_mode == "calendar-group"?"CHECKED":"") ?>>
-							<label for="mode_calendar" class="<?php echo !$iscal ? 'd-none' : ''?>"><?php echo _("Calendar Mode");?></label>
+							<input type="radio" name="time_mode" id="mode_calendar" class="<?php echo !$iscal ? 'hidden' : ''?>" value="calendar-group" <?php echo ($time_mode == "calendar-group"?"CHECKED":"") ?>>
+							<label for="mode_calendar" class="<?php echo !$iscal ? 'hidden' : ''?>"><?php echo _("Calendar Mode");?></label>
 						</span>
 					</div>
 				</div>
@@ -39,8 +39,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container timezone-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="timezone"><?php echo _("Time Match Time Zone:")?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="timezone"></i>
@@ -65,11 +65,11 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 </div>
 <!--END Timezone-->
 <!--
-<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'd-none' : ''?>">
+<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="calendar_id"><?php echo _("Time Match Calendar") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="calendar_id"></i>
@@ -92,11 +92,11 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 		</div>
 	</div>
 </div>
-<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'd-none' : ''?>">
+<div class="element-container calendar-container <?php echo (!$iscal || $time_mode != "calendar-group") ? 'hidden' : ''?>">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="calendar_group_id"><?php echo _("Time Match Calendar Group") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="calendar_group_id"></i>
@@ -124,8 +124,8 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <div class="element-container time-container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="">
-				<div class="form-group row">
+			<div class="row">
+				<div class="form-group">
 					<div class="col-md-3">
 						<label class="control-label" for="time_group_id"><?php echo _("Time Match Time Group") ?></label>
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="time_group_id"></i>
@@ -147,17 +147,17 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 <script>
 	$("input[name=time_mode]").change(function() {
 		if($(this).val() == "time-group") {
-			$(".calendar-container").addClass("d-none");
-			$(".time-container").removeClass("d-none");
-			$(".timezone-container").removeClass("d-none");
+			$(".calendar-container").addClass("hidden");
+			$(".time-container").removeClass("hidden");
+			$(".timezone-container").removeClass("hidden");
 		} else if($(this).val() == "calendar-group") {
-			$(".calendar-container").removeClass("d-none");
-			$(".time-container").addClass("d-none");
-			$(".timezone-container").removeClass("d-none");
+			$(".calendar-container").removeClass("hidden");
+			$(".time-container").addClass("hidden");
+			$(".timezone-container").removeClass("hidden");
 		} else {
-			$(".calendar-container").addClass("d-none");
-			$(".time-container").addClass("d-none");
-			$(".timezone-container").addClass("d-none");
+			$(".calendar-container").addClass("hidden");
+			$(".time-container").addClass("hidden");
+			$(".timezone-container").addClass("hidden");
 		}
 	});
 

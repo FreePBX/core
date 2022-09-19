@@ -736,7 +736,18 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 
 //dont allow inbound callers to transfer around inside the system
 $dir = get_var( $AGI, "DIRECTION" );
-$dialopts = ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
+if ($dir == "INBOUND") {
+	// extract the music class for avoid to catch a T 
+	if(preg_match('/m\((.*?)\)/', $dialopts, $matched)){
+		$m 			= $matched[1];
+		$dialopts 	= str_replace($m,"[mclass]", $dialopts);
+		$dialopts 	= ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
+		$dialopts 	= str_replace("[mclass]",$m, $dialopts);
+	} else {
+		$dialopts 	= ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
+	}
+}
+
 if (!strlen($ds)) {
 	$AGI->noop('');
 } else {

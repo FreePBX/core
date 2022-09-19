@@ -2106,6 +2106,15 @@ function core_do_get_config($engine) {
 		}
 	}
 
+	/**add generals
+	 * clear global vars
+	*/
+	$freepbx_conf =& freepbx_conf::create();
+	$clearglb = $freepbx_conf->get_conf_setting('CLEARGLOBALVARS');
+	if($clearglb && method_exists($ext,'addGeneral')) {
+		$ext->addGeneral('clearglobalvars', 'TRUE');
+	}
+
 	/* macro-prepend-cid */
 	// prepend a cid and if set to replace previous prepends, do so, otherwise stack them
 	//
@@ -2972,7 +2981,7 @@ function core_do_get_config($engine) {
 	$ext->add($context, $exten, '', new ext_gotoif('$["${DB(AMPUSER/${REALCALLERIDNUM}/device)}" = "" & "${DB(DEVICE/${REALCALLERIDNUM}/user)}" = ""]', 'bypass'));
 	$ext->add($context, $exten, 'normcid', new ext_set('USEROUTCID', '${DB(AMPUSER/${AMPUSER}/outboundcid)}'));
 	$ext->add($context, $exten, 'bypass', new ext_set('EMERGENCYCID', '${DB(DEVICE/${REALCALLERIDNUM}/emergency_cid)}'));
-	$ext->add($context, $exten, '', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
+	$ext->add($context, $exten, 'hotdesk', new ext_execif('$[${HOTDESKCALL}= 1]', 'Set', 'EMERGENCYCID=${DB(EDEVICE/${HOTDESKEXTEN}/emergency_cid)}'));
 
 	$ext->add($context, $exten, '', new ext_set('TRUNKOUTCID', '${OUTCID_${ARG1}}'));
 	$ext->add($context, $exten, '', new ext_gotoif('$["${EMERGENCYROUTE:1:2}" = "" | "${EMERGENCYCID:1:2}" = ""]', 'trunkcid'));  // check EMERGENCY ROUTE
@@ -5287,4 +5296,28 @@ function core_module_repo_parameters_callback($opts) {
 		$final['udmode'] = \FreePBX::Config()->get('AMPEXTENSIONS');
 	}
 	return $final;
+}
+
+function remove_user_sessions($username) {
+	$allSessions = [];
+	$sessionNames = scandir(session_save_path());
+	foreach($sessionNames as $sessionName) {
+		$sessionName = str_replace("sess_","",$sessionName);
+		if(strpos($sessionName,".") === false) { //This skips temp files that aren't sessions
+			if(!session_id()) {
+				session_id($sessionName);
+			}
+			session_start();
+			if($_SESSION['AMP_user'] && is_object($_SESSION['AMP_user']) && $_SESSION['AMP_user']->username == $username) {
+				$allSessions[$sessionName] = $_SESSION;
+			}
+			session_abort();
+		}
+	}
+
+	$sessPath = session_save_path();
+	foreach ($allSessions as $key => $value) {
+		unlink($sessPath."/sess_".$key);
+	}
+	return;
 }

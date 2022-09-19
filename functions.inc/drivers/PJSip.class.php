@@ -126,6 +126,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "1",
 				"flag" => $flag++
 			),
+			"remove_existing" => array(
+				"value" => "no",
+				"flag" => $flag++
+			),
 			"media_use_received_transport" => array(
 				"value" => "no",
 				"flag" => $flag++
@@ -238,6 +242,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$select[] = array('value' => 'yes', 'text' => 'Yes');
 		$select[] = array('value' => 'no', 'text' => 'No');
+
+		$allDevices=$this->getAllDevs();
+		$removeExtngVal=($allDevices[$deviceInfo['id']]['remove_existing']) ? $allDevices[$deviceInfo['id']]['remove_existing'] : 'no';
+
+		$tt = _("Controls whether an additional registration will be permitted when max_contacts has already been met. If set to 'Yes', new registrations will be allowed by displacing an old one. If max_contacts is set to 1, this setting will be ignored and forcefully set to yes to conform with the older chan_sip behaviour.");
+		$tmparr['remove_existing'] = array('prompttext' => _('Remove Existing'), 'value' => $removeExtngVal, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		if (version_compare($this->version,'12.4.0','ge')) {
 			//media_use_received_transport
@@ -946,6 +956,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$transport[$t]['external_signaling_address'] = $extip;
 				}
 
+				$extport = trim($ss->getConfig($protocol."extport-$ip"));
+				if ($extport) {
+					$transport[$t]['external_signaling_port'] = $extport;
+				}
+
 				// Is this a TLS transport?
 				if ($protocol === "tls") {
 					$tls = $ss->getTLSConfig();
@@ -1348,6 +1363,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$config['max_contacts'] = 100;
 			}
 			$aor[]="max_contacts=".$config['max_contacts'];
+		}
+
+		if (isset($config['remove_existing']) && $config['remove_existing'] == 'yes' && $config['max_contacts'] > 1) {
+			$aor[]="remove_existing=yes";
+		} else if (!in_array("remove_existing=yes",$aor)) {
 			$aor[]="remove_existing=no";
 		}
 

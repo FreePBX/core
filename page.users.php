@@ -36,8 +36,8 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 			} else { ?>
 				<div class="display no-border">
 					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" data-name="alldids">
-							<a href="#alldids" aria-controls="alldids" class="active" role="tab" data-toggle="tab">
+						<li role="presentation" data-name="alldids" class="active">
+							<a href="#alldids" aria-controls="alldids" role="tab" data-toggle="tab">
 								<?php echo _("All Users")?>
 							</a>
 						</li>
@@ -46,7 +46,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-users">
 								<button id="remove-user" class="btn btn-danger btn-remove" data-type="users" disabled>
-									<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
+									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 								<a href="?display=users&view=add" class="btn btn-default"><i class="fa fa-plus"></i>&nbsp;<?php echo _("Add User")?></a>
 							</div>

@@ -1574,8 +1574,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}else{
 				$settings['max_contacts']['value'] = 1;
 			}
-		}
 
+			if($settings['max_contacts']['value'] == 1) {
+				$settings['remove_existing']['value'] = 'yes';
+			}
+		}
 		if (trim($id) == '' || empty($settings)) {
 			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
@@ -2383,6 +2386,24 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$results = $this->deviceCache[$type];
 			}
 		}
+		return $results;
+	}
+
+	/**
+	 * Get all valid devices
+	 * @param null
+	 */
+	public function getAllValidDevices() {
+	
+		$sql = "SELECT devices.* FROM users LEFT JOIN devices ON users.extension = devices.id WHERE devices.tech in ('pjsip','chainsip') ORDER BY devices.id";
+		$sth = $this->database->prepare($sql);
+		try {
+			$sth->execute(array());
+			$results = $sth->fetchAll(PDO::FETCH_ASSOC);
+		} catch(\Exception $e) {
+			return array();
+		}
+		
 		return $results;
 	}
 
@@ -3308,7 +3329,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 		$hookTabs = $hookcontent = '';
 		foreach ($sections as $data) {
-			$hookTabs .= '<li role="presentation"><a class="nav-link" href="#corehook'.$data['rawname'].'" aria-controls="corehook'.$data['rawname'].'" role="tab" data-toggle="tab">'.$data['title'].'</a></li>';
+			$hookTabs .= '<li role="presentation"><a href="#corehook'.$data['rawname'].'" aria-controls="corehook'.$data['rawname'].'" role="tab" data-toggle="tab">'.$data['title'].'</a></li>';
 			$hookcontent .= '<div role="tabpanel" class="tab-pane" id="corehook'.$data['rawname'].'">';
 			$hookcontent .=	 $data['content'];
 			$hookcontent .= '</div>';
@@ -3681,6 +3702,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$stmt = $this->database->prepare($sql);
 		try{
 			$stmt->execute($vars);
+			
+			if ($this->freepbx->Modules->checkStatus('pbxmfa')) {
+				$this->freepbx->Pbxmfa->mfa->syncMFAUsers('admin');
+			}
+
 			return true;
 		}catch(PDOException $e){
 			//data colission

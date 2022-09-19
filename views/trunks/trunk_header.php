@@ -47,8 +47,8 @@ switch($tech){
 	$mtfhtml .= '<div class="element-container">';
 	$mtfhtml .= '	<div class="row">';
 	$mtfhtml .= '		<div class="col-md-12">';
-	$mtfhtml .= '			<div class="">';
-	$mtfhtml .= '				<div class="form-group row">';
+	$mtfhtml .= '			<div class="row">';
+	$mtfhtml .= '				<div class="form-group">';
 	$mtfhtml .= '					<div class="col-md-3">';
 	$mtfhtml .= '						<label class="control-label" for="failtrunk">'._("Monitor Trunk Failures").'</label>';
 	$mtfhtml .= '						<i class="fa fa-question-circle fpbx-help-icon" data-for="failtrunk"></i>';
@@ -110,7 +110,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		}
 		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-		$dpinput[] = '<td class="d-none prepend">';
+		$dpinput[] = '<td class="hidden-xs prepend">';
 		$dpinput[] = '	<div class="input-group">';
 		$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 		$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit['.$idx.']" class="form-control dp-prepend ' . $dpt_class.'" value="'. $pattern['prepend_digits'].'" >';
@@ -146,7 +146,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	}
 	$dpinput[] = '<tr id = "dprow'.$idx.'">';
 	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
-	$dpinput[] = '<td class="d-none prepend">';
+	$dpinput[] = '<td class="hidden-xs prepend">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
 	$dpinput[] = '		<input placeholder="' . $pp_tit . '" type="text" id="prepend_digit_'.$idx.'" name="prepend_digit[]" class="form-control dp-prepend ' . $dpt_class.'" value="" >';
@@ -206,19 +206,19 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 						<input type="hidden" name="sv_usercontext" value="<?php echo $usercontext?>"/>
 						<input type="hidden" name="sv_channelid" value="<?php echo $channelid?>"/>
 						<input id="npanxx" name="npanxx" type="hidden" />
-						<ul class="nav nav-tabs pb-0" role="tablist">
-							<li role="presentation" data-name="tgeneral" class="change-tab">
-								<a href="#tgeneral" aria-controls="tgeneral" class="active nav-link" role="tab" data-toggle="tab">
+						<ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" data-name="tgeneral" class="change-tab active">
+								<a href="#tgeneral" aria-controls="tgeneral" role="tab" data-toggle="tab">
 									<?php echo _("General")?>
 								</a>
 							</li>
 							<li role="presentation" data-name="tdialplan" class="change-tab">
-								<a href="#tdialplan" aria-controls="tdialplan" role="tab" class="nav-link" data-toggle="tab">
+								<a href="#tdialplan" aria-controls="tdialplan" role="tab" data-toggle="tab">
 									<?php echo _("Dialed Number Manipulation Rules")?>
 								</a>
 							</li>
 							<li role="presentation" data-name="ttech" class="change-tab">
-								<a href="#ttech" aria-controls="ttech" role="tab" class="nav-link" data-toggle="tab">
+								<a href="#ttech" aria-controls="ttech" role="tab" data-toggle="tab">
 									<?php echo $tech .' '. _("Settings")?>
 								</a>
 							</li>
@@ -229,8 +229,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="trunk_name"><?php echo _("Trunk Name") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="trunk_name"></i>
@@ -253,8 +253,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="hcid"><?php echo _("Hide CallerID") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="hcid"></i>
@@ -280,8 +280,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="outcid"><?php echo _("Outbound CallerID") ?></label>
 															<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
@@ -304,8 +304,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="keepcid"><?php echo _("CID Options") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="keepcid"></i>
@@ -338,8 +338,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="maxchans"><?php echo _("Maximum Channels") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="maxchans"></i>
@@ -362,8 +362,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="dialopts"><?php echo _('Asterisk Trunk Dial Options') ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="dialopts"></i>
@@ -392,8 +392,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="continuew"><?php echo _("Continue if Busy") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="continuew"></i>
@@ -419,8 +419,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="disabletrunkw"><?php echo _("Disable Trunk")?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="disabletrunkw"></i>
@@ -458,8 +458,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 								<div class="element-container">
 									<div class="row">
 										<div class="col-md-12">
-											<div class="">
-												<div class="form-group row">
+											<div class="row">
+												<div class="form-group">
 													<div class="col-md-3">
 														<label class="control-label" for="dialoutprefix"><?php echo _("Outbound Dial Prefix") ?></label>
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="dialoutprefix"></i>

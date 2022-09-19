@@ -79,10 +79,17 @@ switch ($action) {
 			// Password unchanged
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, "", $sections);
+			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
+				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
+			}
 		} elseif ($password != "******") {
 			// Password has been changed
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
+			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
+				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
+			}
+			remove_user_sessions($username);
 		}
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
 			unset($_SESSION['AMP_user']);
@@ -201,13 +208,15 @@ foreach ($module_list as $key => $val) {
 							<div class="element-container">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="form-group row">
-											<div class="col-md-3 control-label">
-												<label for="username"><?php echo _("Username") ?></label>
-												<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
-											</div>
-											<div class="col-md-9">
-												<input type="text" class="form-control" id="username" name="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
+										<div class="row">
+											<div class="form-group">
+												<div class="col-md-3 control-label">
+													<label for="username"><?php echo _("Username") ?></label>
+													<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
+												</div>
+												<div class="col-md-9">
+													<input type="text" class="form-control" id="username" name="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
+												</div>
 											</div>
 										</div>
 									</div>
@@ -221,12 +230,14 @@ foreach ($module_list as $key => $val) {
 							<div class="element-container">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="form-group row">
-											<div class="col-md-3 control-label">
-												<label for="password"><?php echo _("Password") ?></label>
-												<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
-											</div>
-											<div class="col-md-9"><input type="password" class="form-control clicktoedit" id="password" name="password" value = "<?php echo $password ?>">
+										<div class="row">
+											<div class="form-group">
+												<div class="col-md-3 control-label">
+													<label for="password"><?php echo _("Password") ?></label>
+													<i class="fa fa-question-circle fpbx-help-icon" data-for="password"></i>
+												</div>
+												<div class="col-md-9"><input type="password" class="form-control clicktoedit" id="password" name="password" value = "<?php echo $password ?>">
+												</div>
 											</div>
 										</div>
 									</div>
@@ -253,7 +264,7 @@ foreach ($module_list as $key => $val) {
 							<div class="element-container">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="form-group row">
+										<div class="form-group">
 											<div class="col-md-2 control-label">
 												<label for="sections"><?php echo _("Admin Access") ?></label>
 												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
@@ -271,7 +282,7 @@ foreach ($module_list as $key => $val) {
 															</ol>
   														</div>
 													</div>
-													<div class="panel col-md-1">
+													<div class="panel col-md-2">
 														<div class="panel-heading"><h3 class="panel-title"><?php echo _("Action")?> </h3></div>
 														<div class="panel-body" style="height:500px;">
 															<button id="selectall"  type="button"><i class="fa fa-angle-double-left"></i></button><br/>
