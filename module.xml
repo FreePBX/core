@@ -3,132 +3,24 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.63.8</version>
+	<version>17.0.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*16.0.63.8* Packaging of ver 16.0.63.8
-		*16.0.63.7* Packaging of ver 16.0.63.7
-		*16.0.63.6* FREEI-4793 
-		*16.0.63.5* FREEI-4789 
-		*16.0.63.4* Packaging of ver 16.0.63.4
-		*16.0.63.3* FREEPBX-23329 
-		*16.0.63.2* FREEI-4698 Inbound GQL api issue fix 
-		*16.0.63.1* FREEPBX-23417  
-		*16.0.63* FREEI-4350 Added backend validation for validating file format
-		*16.0.62* FREEPBX-23376 
-		*16.0.61* FREEPBX-23376 , FREEI-4650 , FREEI-4267 and FREEI-4639 
-		*16.0.60* Packaging of ver 16.0.60
-		*16.0.59* FREEI-4459 CID when routing Inbound Route to Misc Destination using trunk CID 
-		*16.0.58* FREEI-4577 and FREEI-4459 
-		*16.0.57* bump 
-		*16.0.56.37* FREEPBX-23226 Expand pjsip match setting to support 8192 bytes 
-		*16.0.56.36* FREEPBX-23249 Deleting an extension doesn't mark database as needing reload 
-		*16.0.56.35* FREEI-4267 
-		*16.0.56.34* Bugfix/FREEPBX-23256 graphql api did does not include destination information 
-		*16.0.56.33* FREEI-4499 Added condition to check settings fields are exists or not 
-		*16.0.56.32* FREEPBX-23267 Add controls for asterisk http server TLS version 
-		*16.0.56.31* FREEI-4491 added condition to accept boolean value of string type 
-		*16.0.56.30* FREEI-4490 Added condition to check whether the setting is already updated 
-		*16.0.56.29* update macroDialone.php to fix FREEPBX-22038 
-		*16.0.56.28* FREEI-4269 Modified condition for the fields 'emergency_cid' and 'outboundcid' to accept the empty value same as GUI 
-		*16.0.56.27* FREEI-4033 Created new GQL Api to update, fetch advance settings with unit tests 
-		*16.0.56.26* FREEI-4100 Updated default settings with actual input values 
-		*16.0.56.25* FREEI-4153 fixed the issue in outbound routes when a non-used trunk is deleted 
-		*16.0.56.24* FREEI-4100 Refactored all core device gql api's with new unit tests and replaced unexistent field with correct value 
-		*16.0.56.23* FREEI-4126 
-		*16.0.56.22* FREEPBX-22892 D&amp;amp;U ringgroup callerid issue 
-		*16.0.56.21* FREEPBX-23025 Revert DID change check 
-		*16.0.56.20* FREEI-4126 and FREEI-4127 GQL API fixes 
-		*16.0.56.19* FREEI-4101 Changed 'rvolume', 'pmmaxretries' and 'pmminlength' field type to string because it is causing internal error for already existing data which has empty string and added default value for 'rvolume' field 
-		*16.0.56.18* FREEI-4058 Added condition to limit max contacts value to 100 while adding new device 
-		*16.0.56.17* FREEI-4101 Added default values for pmmaxretries and pmminlength fields 
-		*16.0.56.16* FREEI-4058 Added condition to limit max contacts value to 100 
-		*16.0.56.15* FREEI-4018 added condition to throw error whern trying to add extensions beyond the system extension license limit 
-		*16.0.56.14* FREEPBX-22676 Function CALLERPRES not registered 
-		*16.0.56.13* FREEPBX-22676 Function CALLERPRES not registered 
-		*16.0.56.12* Fixing the bulkhandler validation issue 
-		*16.0.56.11* process MaxContacts if provided, and keep existing value if not set. 
-		*16.0.56.10* FREEPBX-22796 changed query field type of 'id' from type int to type id 
-		*16.0.56.9* FREEPBX-22794 and FREEPBX-22800 
-		*16.0.56.8* FREEPBX-22723/setMaxContactsOnQuickCreate 
-		*16.0.56.7* FREEPBX-22785/UnitTestFixes 
-		*16.0.56.6* FREEI-3869 
-		*16.0.56.5* FREEI-3532 Web callback caller ID number 
-		*16.0.56.4* FREEPBX-22628 bulk handler noanswer/busy/chanunvail_cid is being ignored 
-		*16.0.56.3* FREEPBX-22625 bulk extension cwtone is ignored 
-		*16.0.56.2* FREEI-3477 backup restore 
-		*16.0.56.1* bump 
-		*16.0.56* Fixing FREEI-2691 GQL API for createExtention and updateExtension issue 
-		*16.0.55* FREEI-2691 Updated fetchExtension and fetchAllExtensions by including sip secret and user manager password 
-		*16.0.54* FREE-2691 removing umpassword for range creation and renaming secret to extPassword 
-		*16.0.53* FREEI-2691 adding password and secret in gql core 
-		*16.0.52* Packaging of ver 16.0.52
-		*16.0.51* FREEPBX-22483 confirm-call-bug-ringroup-with-confirm-call-to-extension-with-follow-me-call-is-no-longer-available 
-		*16.0.50* FREEI-2625 bugfix for callerId not updating and not able to fetch 
-		*16.0.49* FREEI-3110 Remove 'this is a non standard port' text in gui 
-		*16.0.48* FREEPBX-22406 Outbound CID name is stripped following core upgrade 
-		*16.0.47* FREEPBX-22361 Asterisk 18 integration still incomplete 
-		*16.0.46* FREEI-3073 Error - Pjsip Keep alive Interval button not working (Sipsetting) 
-		*16.0.45* FREEI-1065 When Video Support is Enabled, PJSIP trunks should be able to select them 
-		*16.0.44* Added hidding of trunks on core destinations when routedisplay is off 
-		*16.0.43* FREEI-3039 
-		*16.0.42* Packaging of ver 16.0.42
-		*16.0.41* FREEPBX-22337 Restore fails on trunks 
-		*16.0.40* FREEI-2762 974250 - PJSIP - Set Auth User Name 
-		*16.0.39* FREEPBX-22331 Backup and Restore Module does not restore trunks and outbound routes 
-		*16.0.38* FREEI-2762 Ticket#974250 - PJSIP - Set Auth User Name 
-		*16.0.37* Add ability to hide trunks in routes ui 
-		*16.0.36* FREEI-2848 core with outbound CID 
-		*16.0.35* FREEI-2828 GraphQL server error on query allInboundRoutes 
-		*16.0.34* FREEI-2738  PBX does not forward the original callerID to a misc destination 
-		*16.0.33* Fixes FREEPBX-20269 
-		*16.0.32* FREEI-2765 array_product() expects parameter 1 to be array, object given 
-		*16.0.31* FREEPBX-22130 SIP to PJSIP conversion tool needs a couple of bugs fixed 
-		*16.0.30* FREEI-2629 updated issue fixed 
-		*16.0.29* FREEPBX-22068 UCP Allowing access to extensions edit allow create new extensions 
-		*16.0.28* FREEPBX-21971 Deleting an Outbound Route does not delete related database records 
-		*16.0.27* FREEPBX-21970 taskprocessor_overload_trigger=pjsip_only in pjsip.conf 
-		*16.0.26* FREEPBX-21996 Undefined variable: extension 
-		*16.0.25* Api device query return an unwanted ID , And it suppose to take the input var Device_Id 
-		*16.0.24* FREEPBX-21952 Update comment note for from-pstn-custom 
-		*16.0.23* FREEPBX-21978 Undefined index "callwaiting" 
-		*16.0.22* typo error 
-		*16.0.21* FREEI-2276  extension APIs 
-		*16.0.20* Fixing FREEI-2137 displaying only  pjsip extensions during basic mode 
-		*16.0.19* FREEI-2157 warm spare backup exclude trunks should exclude outbound route 
-		*16.0.18* FREEI-1977 Importing Extensions causes calls to no longer ring on Zulu 
-		*16.0.17* FREEI-2013 Not all extension data imported and applied on a 15 restore 
-		*16.0.16* Fixing FREEI-2095 Adding API call to Commercial Endpoint Manager(if 
-		*16.0.15* FREEPBX-21736 Fixing - Backup&amp;amp;Restore : all astdb variables are not getting restored 
-		*16.0.14* FREEI-2058 COS not working after restoring the legacy backup on Freepbx 15 
-		*16.0.13* FREEI-1964 making PJSIP extension's rewrite_contact 'yes' 
-		*16.0.12* FREEPBX-21732 Execute notification email before dial on pattern match 
-		*16.0.11* FREEPBX-21603 Unable to dial LOCAL/XX from TAPI since FreePBX 15 
-		*16.0.10* Resolve FREEPBX-21582 conflict 
-		*16.0.9* FREEPBX-21582 Custom device caller ID broken 
-		*16.0.8* FREEPBX-21582 Custom device caller ID broken 
-		*16.0.7* FREEI-1481 Outbound Routes - move paging Notifications setting to the new tab 
-		*16.0.6* Fixing FREEI-1617 Keeping auto reload only for commercial deployments 
-		*16.0.5* FREEI-1468 if default_user is coming blank, it should be equal to user 
-		*16.0.4* Fixe back slash 
-		*16.0.3* FREEI-21449 : taking line parameter with endpoint field. 
-		*16.0.2* FREEI-1180 Fixes issue with contact_user not being added to PJSIP trunk endpoints. 
-		*16.0.1alpha1* Inital Release
+		*17.0.1* initial release 
 	</changelog>
 	<depends>
-		<version>15.0.8.1</version>
-		<module>framework ge 15.0.16.40</module>
+		<version>17.0.1</version>
 	</depends>
 	<database>
 		<table name="trunks">
 			<field name="trunkid" type="integer" default="0" primaryKey="true"/>
 			<field name="name" type="string" length="50" default=""/>
 			<field name="tech" type="string" length="20" primaryKey="true"/>
-			<field name="outcid" type="string" length="40" default=""/>
+			<field name="outcid" type="string" length="255" default=""/>
 			<field name="keepcid" type="string" length="4" default="off" notnull="false"/>
 			<field name="maxchans" type="string" length="6" default="" notnull="false"/>
 			<field name="failscript" type="string" length="255" default=""/>
@@ -249,7 +141,7 @@
 		<table name="outbound_routes">
 			<field name="route_id" type="integer" primarykey="true" autoincrement="true"/>
 			<field name="name" type="string" length="40" notnull="false"/>
-			<field name="outcid" type="string" length="40" notnull="false"/>
+			<field name="outcid" type="string" length="255" notnull="false"/>
 			<field name="outcid_mode" type="string" length="20" notnull="false"/>
 			<field name="password" type="string" length="30" notnull="false"/>
 			<field name="emergency_route" type="string" length="4" notnull="false"/>
