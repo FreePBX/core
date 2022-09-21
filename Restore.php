@@ -98,8 +98,10 @@ class Restore Extends Base\RestoreBase{
 		}
 		if($excludetrunks){
 			$this->log("skiping Trunks and outboundroutes  From backup");
-			$ignoretables = ['pjsip','sip','iax','trunks','outbound_route_patterns','outbound_route_sequence','outbound_route_trunks','outbound_routes','outbound_route_email','trunk_dialpatterns'];
+			$ignoretables = ['pjsip','iax','trunks','outbound_route_patterns','outbound_route_sequence','outbound_route_trunks','outbound_routes','outbound_route_email','trunk_dialpatterns'];
 			$this->restoreLegacyDatabase($pdo,[],$ignoretables);
+			// remove the sip trunks from sip
+			$this->FreePBX->Database->query("Delete from sip where `id` like 'tr-peer-%'");
 		}else {
 			$this->restoreLegacyDatabase($pdo);
 		}
