@@ -15,3 +15,9 @@ div.dialpatterns {
 
 th { padding-top: 1em; border-bottom: 2px solid black; }
 tr>td:first-child { width: 20em; }
+
+#selectall,
+#unselectall {
+	border: 1px solid grey !important;
+	border-radius: 3px;
+}
