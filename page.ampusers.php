@@ -264,7 +264,7 @@ foreach ($module_list as $key => $val) {
 							<div class="element-container">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="form-group">
+										<div class="form-group row">
 											<div class="col-md-2 control-label">
 												<label for="sections"><?php echo _("Admin Access") ?></label>
 												<i class="fa fa-question-circle fpbx-help-icon" data-for="sections"></i>
