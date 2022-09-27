@@ -3774,7 +3774,7 @@ function core_do_get_config($engine) {
 
 	// Work around Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-19853
 	$ext->add($mcontext, $exten,'theend', new ext_execif('$["${ONETOUCH_RECFILE}"!="" & "${CDR(recordingfile)}"=""]','Set','CDR(recordingfile)=${ONETOUCH_RECFILE}'));
-	$ext->add($mcontext, $exten,'', new ext_hangup());
+	$ext->add($mcontext, $exten,'hangup', new ext_hangup());
 	$ext->add($mcontext, $exten,'', new ext_macroexit(''));
 
 	// Used to log a user onto an adhoc device. Most of the work is done by
