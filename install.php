@@ -1062,7 +1062,6 @@ $set['emptyok'] = 0;
 $set['sortorder'] = -133;
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('EXPOSE_ALL_FEATURE_CODES',$set);
-$freepbx_conf->commit_conf_settings();
 
 $mf = \module_functions::create();
 $info = $mf->getinfo("core");
@@ -1154,3 +1153,19 @@ foreach($res as $row) {
 	} catch(\Exception $e) {}
 }
 out(_("done"));
+
+$set['value'] = false;
+$set['defaultval'] =& $set['value'];
+$set['category'] = _("Outbound Routes Email Notifications");
+$set['name'] = _("Allow Data from other Modules");
+$set['description'] = _("Enabling this will allow data to be hooked in from other modules which will be added to the mail body of the notification email which is sent when a call is made.");
+$set['options'] = '';
+$set['readonly'] = 0;
+$set['hidden'] = 0;
+$set['level'] = 0;
+$set['module'] = '';
+$set['emptyok'] = 0;
+$set['sortorder'] = 100;
+$set['type'] = CONF_TYPE_BOOL;
+$freepbx_conf->define_conf_setting('ALLOW_MODULE_HOOK_IN',$set);
+$freepbx_conf->commit_conf_settings();

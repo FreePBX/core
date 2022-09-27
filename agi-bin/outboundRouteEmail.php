@@ -19,6 +19,8 @@
 ; ${ARG9} - the calling party's Name
 ; ${ARG10}- the calling party's Number
 ; ${ARG11}- the call's LINKEDID
+; ${ARG12}- the call's HOTDESKEXTEN
+; ${ARG13}- the call's EMERGENCYROUTE
 ;------------------------------------------------------------------------
 */
 if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
@@ -38,6 +40,8 @@ $routeName = !empty($argv[8]) ? $argv[8]:'';
 $callerName = !empty($argv[9]) ? $argv[9]:'';
 $callerNumber = !empty($argv[10]) ? $argv[10]:'';
 $cuid = !empty($argv[11]) ? $argv[11]:'';
+$hotDeskExten = !empty($argv[12]) ? $argv[12]:'';
+$emergencyRoute = !empty($argv[13]) ? $argv[13]:'NO';
 
 //If we don't get a routeId, something's wrong.
 if (empty($routeId)) {
@@ -88,7 +92,7 @@ exit();
 //Replace the {{VAR}}'s in the email subject and body templates with current values
 function parse_email_vars($emailText) {
 	global $cuid, $dialedNumber, $dialedNumberRaw, $routeName, $callerName, $callerNumber,
-		$trunkName, $outgoingCallerIdNumber, $outgoingCallerIdName, $nowEpoch;
+		$trunkName, $outgoingCallerIdNumber, $outgoingCallerIdName, $nowEpoch, $hotDeskExten, $emergencyRoute;
 
 	$callerAll = '"' . $callerName . '"' . ' <' . $callerNumber . '>';
 	$outgoingCallerIdAll = '"' . $outgoingCallerIdName . '"' . ' <' . $outgoingCallerIdNumber . '>';
@@ -128,6 +132,8 @@ function parse_email_vars($emailText) {
 	$emailText = str_replace('{{TIMEAMPM}}', $timeampm, $emailText);
 	$emailText = str_replace('{{TZFULL}}', $timezoneFull, $emailText);
 	$emailText = str_replace('{{TZSHORT}}', $timezoneShort, $emailText);
+	$emailText = \FreePBX::Core()->hookAdditionalVariableValues($emailText, $hotDeskExten, $emergencyRoute);
+	$emailText = preg_replace('/\{\{.*\}\}/', '', $emailText);
 
 	return $emailText;
 }

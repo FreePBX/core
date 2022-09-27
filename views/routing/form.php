@@ -627,7 +627,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 						<b>{{TIMEAMPM}}</b> - example: 5:30:00 PM<br />
 						<b>{{TZFULL}}</b> - Full Timezone.  ex. America/New_York<br />
 						<b>{{TZSHORT}}</b> - Short Timezone.  ex. UTC, PST, +12
-						")?></span>
+						");
+						echo isset($hooksAdditionalContent['emailHelpText']) ? $hooksAdditionalContent['emailHelpText'] : '';
+						?></span>
 					</div>
 				  </div>
 				</div>
