@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.21</version>
+	<version>15.0.22.22</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.22* Packaging of ver 15.0.22.22
 		*15.0.22.21* Packaging of ver 15.0.22.21
 		*15.0.22.20* FREEPBX-23697 outcid allowed chars increase 
 		*15.0.22.19* Packaging of ver 15.0.22.19
