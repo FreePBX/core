@@ -1,3 +1,4 @@
 *.pyc
 module.sig
 assets/less/**
+logs/**
