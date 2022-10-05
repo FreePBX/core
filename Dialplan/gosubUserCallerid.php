@@ -61,7 +61,6 @@ class gosubUserCallerid{
         * This is where to splice in things like setting the language based on a user's astdb setting,
         * or where you might set the CID account code based on a user instead of the device settings.
         */
-
         $ext->add($context, $exten, '', new \ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
         $ext->add($context, $exten, '', new \ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
         $ext->add($context, $exten, '', new \ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
@@ -85,12 +84,14 @@ class gosubUserCallerid{
         $ext->add($context, $exten, '', new \ext_gotoif('$["${CALLERID(name)}" = ""]', 'cnum'));
         $ext->add($context, $exten, '', new \ext_set('CDR(cnam)','${CALLERID(name)}'));
         $ext->add($context, $exten, 'cnum', new \ext_set('CDR(cnum)','${CALLERID(num)}'));
-        $ext->add($context, $exten, '', new \ext_return());
+
         // CHANNEL(language) does not get inherited (which seems like an Asterisk bug as musicclass does)
         // so if whe have MASTER_CHANNEL() available to us let's rectify that
         //
         $ext->add($context, $exten, '', new \ext_set('CHANNEL(language)', '${MASTER_CHANNEL(CHANNEL(language))}'));
         $ext->add($context, $exten, '', new \ext_noop_trace('Using CallerID ${CALLERID(all)}'));
+        $ext->add($context, $exten, '', new \ext_return());
+
         $ext->add($context, 'h', '', new \ext_gosub('1','s','sub-hangupcall'));
 
         $lang = 'en'; //English
