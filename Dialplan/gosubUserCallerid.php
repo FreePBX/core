@@ -61,26 +61,21 @@ class gosubUserCallerid{
         * This is where to splice in things like setting the language based on a user's astdb setting,
         * or where you might set the CID account code based on a user instead of the device settings.
         */
-        /*$ext->add($context, $exten, 'report', new \ext_noop('Macro Depth is ${MACRO_DEPTH}'));
-        $ext->add($context, $exten, '', new \ext_gotoif('$["${MACRO_DEPTH}" = "" | ${MACRO_DEPTH} < 6 ]', 'report2','macroerror'));
-        $ext->add($context, $exten, 'report2', new \ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));*/
-        $ext->add($context, $exten, 'report3', new \ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
+
+        $ext->add($context, $exten, '', new \ext_gotoif('$[ "${ARG1}" = "SKIPTTL" | "${ARG1}" = "LIMIT" ]', 'continue'));
+        $ext->add($context, $exten, '', new \ext_set('__TTL', '${IF($["foo${TTL}" = "foo"]?64:$[ ${TTL} - 1 ])}'));
         $ext->add($context, $exten, '', new \ext_gotoif('$[ ${TTL} > 0 ]', 'continue'));
         $ext->add($context, $exten, '', new \ext_wait('${RINGTIMER}'));  // wait for a while, to give it a chance to be picked up by voicemail
         $ext->add($context, $exten, '', new \ext_answer());
         $ext->add($context, $exten, '', new \ext_wait('1'));
         $ext->add($context, $exten, '', new \ext_gosub('1', 'lang-playback', $context, 'hook_0'));
         $ext->add($context, $exten, '', new \ext_gosub('1','s','sub-hangupcall'));
-        /*$ext->add($context, $exten, 'macroerror', new \ext_noop('Macro Limit Reached. Aborting Call'));
-        $ext->add($context, $exten, '', new \ext_answer());
-        $ext->add($context, $exten, '', new \ext_wait('1'));
-        $ext->add($context, $exten, '', new \ext_gosub('1', 'lang-playback', $context, 'hook_2'));
-        $ext->add($context, $exten, '', new \ext_gosub('1','s','sub-hangupcall'));
+
         $ext->add($context, $exten, 'limit', new \ext_answer());
         $ext->add($context, $exten, '', new \ext_wait('1'));
         $ext->add($context, $exten, '', new \ext_gosub('1', 'lang-playback', $context, 'hook_1'));
         $ext->add($context, $exten, '', new \ext_gosub('1','s','sub-hangupcall'));
-        $ext->add($context, $exten, '', new \ext_congestion(20));*/
+        $ext->add($context, $exten, '', new \ext_congestion(20));
 
         // Address Security Vulnerability in many earlier versions of Asterisk from an external source tranmitting a
         // malicious CID that can cause overflows in the Asterisk code.
@@ -90,7 +85,7 @@ class gosubUserCallerid{
         $ext->add($context, $exten, '', new \ext_gotoif('$["${CALLERID(name)}" = ""]', 'cnum'));
         $ext->add($context, $exten, '', new \ext_set('CDR(cnam)','${CALLERID(name)}'));
         $ext->add($context, $exten, 'cnum', new \ext_set('CDR(cnum)','${CALLERID(num)}'));
-
+        $ext->add($context, $exten, '', new \ext_return());
         // CHANNEL(language) does not get inherited (which seems like an Asterisk bug as musicclass does)
         // so if whe have MASTER_CHANNEL() available to us let's rectify that
         //
