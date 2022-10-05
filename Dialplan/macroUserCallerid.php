@@ -18,7 +18,7 @@ class macroUserCallerid{
     // for i18n playback in multiple languages
     $ext->add($context, 'lang-playback', '', new \ext_gosubif('$[${DIALPLAN_EXISTS('.$context.',${CHANNEL(language)})}]', $context.',${CHANNEL(language)},${ARG1}', $context.',en,${ARG1}'));
     $ext->add($context, 'lang-playback', '', new \ext_return());
-
+    $ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro', $context));
     $ext->add($context, $exten, '', new \ext_set('TOUCH_MONITOR','${UNIQUEID}'));
     // make sure AMPUSER is set if it doesn't get set below
 	$ext->add($context, $exten, '', new \ext_set('CHANCONTEXT','${CUT(CHANNEL,@,2)}'));

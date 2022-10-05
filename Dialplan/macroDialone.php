@@ -11,6 +11,7 @@ class macroDialone{
 		$mcontext = 'macro-dial-one';
 		$exten = 's';
 
+		$ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro', $context));
 		$ext->add($mcontext,$exten,'', new \ext_set('DEXTEN', '${ARG3}'));
 		$ext->add($mcontext,$exten,'setexttocall', new \ext_execif('$[${LEN(${EXTTOCALL})}=0 & ${LEN(${DEXTEN})}>0]', 'Set', '__EXTTOCALL=${DEXTEN}'));
 

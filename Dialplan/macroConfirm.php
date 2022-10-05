@@ -19,7 +19,8 @@ class macroConfirm{
         */
         $context = 'macro-confirm';
         $exten = 's';
-
+        $ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro', $context));
+        $ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro'));
         $ext->add($context, $exten, '', new \ext_setvar('LOOPCOUNT','0'));
         $ext->add($context, $exten, '', new \ext_setvar('__MACRO_RESULT','ABORT'));
         //FREEPBX-15217 QUEUE call confirm -> default voice prompt can not override the findmefollowme confirm file

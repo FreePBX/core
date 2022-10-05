@@ -15,7 +15,7 @@ class macroDial{
         */
         $c = "macro-dial";
         $s = "s";
-
+        $ext->add($c, $s, '', new \ext_gosub('1','s','deprecated-macro', $c));
         //Advanced settings alert info internal calls
         $ext->add($c,$s,'', new \ext_noop('Blind Transfer: ${BLINDTRANSFER}, Attended Transfer: ${ATTENDEDTRANSFER}, User: ${AMPUSER}, Alert Info: ${ALERT_INFO}'));
         $ai = \FreePBX::Config()->get('INTERNALALERTINFO');

@@ -16,6 +16,8 @@ class macroAutoConfirm{
         */
         $context = 'macro-auto-confirm';
         $exten = 's';
+        $ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro', $context));
+        $ext->add($context, $exten, '', new \ext_gosub('1','s','deprecated-macro'));
         $ext->add($context, $exten, '', new \ext_setvar('__MACRO_RESULT',''));
         $ext->add($context, $exten, '', new \ext_set('CFIGNORE',''));
         $ext->add($context, $exten, '', new \ext_set('MASTER_CHANNEL(CFIGNORE)',''));
