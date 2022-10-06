@@ -1304,6 +1304,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = "rtp_timeout=".(!empty($config['rtp_timeout']) ? $config['rtp_timeout'] : $chan_sip_settings['rtptimeout']);
 		$endpoint[] = "rtp_timeout_hold=".(!empty($config['rtp_timeout_hold']) ? $config['rtp_timeout_hold'] : $chan_sip_settings['rtpholdtimeout']);
+		$endpoint[] = "rtp_keepalive=".(!empty($config['rtp_keepalive']) ? $config['rtp_keepalive'] : $chan_sip_settings['rtpkeepalive']);
 
 		if(!empty($config['device_state_busy_at']) && is_numeric($config['device_state_busy_at']) && $config['device_state_busy_at'] > 0) {
 			$endpoint[] = "device_state_busy_at=".$config['device_state_busy_at'];
