@@ -460,6 +460,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			unset($conf['pjsip.conf']['global']['taskprocessor_overload_trigger']);
 		}
 		$conf['pjsip.conf']['global'][] = "#include pjsip_custom_post.conf";
+
+		$chan_sip_settings 	= $this->freepbx->Sipsettings->getChanSipSettings();
+
 		$trunks = $this->getAllTrunks();
 		foreach($trunks as $trunk) {
 			/**
@@ -616,6 +619,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
 			}
+
+			$conf['pjsip.endpoint.conf'][$tn]['rtp_keepalive'] = $chan_sip_settings['rtpkeepalive'];
 
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
