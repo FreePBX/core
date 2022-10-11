@@ -460,6 +460,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			unset($conf['pjsip.conf']['global']['taskprocessor_overload_trigger']);
 		}
 		$conf['pjsip.conf']['global'][] = "#include pjsip_custom_post.conf";
+
+		$chan_sip_settings 	= $this->freepbx->Sipsettings->getChanSipSettings();
+
 		$trunks = $this->getAllTrunks();
 		foreach($trunks as $trunk) {
 			/**
@@ -616,6 +619,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
 				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
 			}
+
+			$conf['pjsip.endpoint.conf'][$tn]['rtp_keepalive'] = $chan_sip_settings['rtpkeepalive'];
 
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
 			if (!empty($lang)) {
@@ -1299,6 +1304,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		$endpoint[] = "rtp_timeout=".(!empty($config['rtp_timeout']) ? $config['rtp_timeout'] : $chan_sip_settings['rtptimeout']);
 		$endpoint[] = "rtp_timeout_hold=".(!empty($config['rtp_timeout_hold']) ? $config['rtp_timeout_hold'] : $chan_sip_settings['rtpholdtimeout']);
+		$endpoint[] = "rtp_keepalive=".(!empty($config['rtp_keepalive']) ? $config['rtp_keepalive'] : $chan_sip_settings['rtpkeepalive']);
 
 		if(!empty($config['device_state_busy_at']) && is_numeric($config['device_state_busy_at']) && $config['device_state_busy_at'] > 0) {
 			$endpoint[] = "device_state_busy_at=".$config['device_state_busy_at'];
