@@ -80,14 +80,14 @@ switch ($action) {
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, "", $sections);
 			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
-				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
+				\FreePBX::Pbxmfa()->syncMFAUsers('admin');
 			}
 		} elseif ($password != "******") {
 			// Password has been changed
 			core_ampusers_del($userdisplay);
 			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
 			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
-				\FreePBX::Pbxmfa()->mfa->syncMFAUsers('admin');
+				\FreePBX::Pbxmfa()->syncMFAUsers('admin');
 			}
 			remove_user_sessions($username);
 		}

@@ -3704,7 +3704,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$stmt->execute($vars);
 			
 			if ($this->freepbx->Modules->checkStatus('pbxmfa')) {
-				$this->freepbx->Pbxmfa->mfa->syncMFAUsers('admin');
+				$this->freepbx->Pbxmfa->syncMFAUsers('admin');
 			}
 
 			return true;
