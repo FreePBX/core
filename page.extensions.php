@@ -52,7 +52,7 @@ if($display_mode == "basic") { ?>
 <?php } else { ?>
 <div class="fpbx-container container-fluid">
 	<?php if((isset($_REQUEST['fw_popover']) && empty($_REQUEST['tech_hardware']) && ((!isset($_REQUEST['extdisplay']) || (trim($_REQUEST['extdisplay']) === "") || !ctype_digit($_REQUEST['extdisplay']))))) { ?>
-		<div class="row">
+		<div class="align-item-start">
 			<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) { ?>
 				<a class="btn btn-default" href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" ><i class="fa fa-plus"></i> <strong><?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></strong></a></br>
 			<?php } ?>
