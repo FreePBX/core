@@ -45,7 +45,7 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'', new \ext_gotoif('$["${DEXTEN:-1}"="#"]','skiptrace'));
 		$ext->add($mcontext,$exten,'', new \ext_gosubif('$[${REGEX("^[\+]?[0-9]+$" ${CALLERID(number)})} = 1]','ctset,1','ctclear,1'));
 		//TODO: do we need to check for anything beyond auto-blkvm in this call path?
-		$ext->add($mcontext,$exten,'skiptrace', new \ext_set('D_OPTIONS', '${IF($["${NODEST}"!="" & ${REGEX("(M[(]auto-blkvm[)])" ${ARG2})} != 1]?${ARG2}M(auto-blkvm):${ARG2})}'));
+		$ext->add($mcontext,$exten,'skiptrace', new \ext_set('D_OPTIONS', '${IF($["${NODEST}"!="" & ${REGEX("(U[(]macro-auto-blkvm[)])" ${ARG2})} != 1]?${ARG2}U(macro-auto-blkvm):${ARG2})}'));
 
 		$ext->add($mcontext,$exten,'', new \ext_gosubif('$["${ALERT_INFO}"!="" & "${HASH(SIPHEADERS,Alert-Info)}"=""]', 'func-set-sipheader,s,1', false, 'Alert-Info,${ALERT_INFO}'));
 		//Advanced settings alert info internal calls
