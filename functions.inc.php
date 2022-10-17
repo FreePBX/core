@@ -2181,11 +2181,11 @@ function core_do_get_config($engine) {
 			// generated contexts that don't have an 'outbound-allroutes' wrapper around them, of course in those cases the
 			// CID part of the dialplan will not get executed
 			if (!isset($add_extra_pri1[$fpattern['base_pattern']])) {
-				$ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid,LIMIT,EXTERNAL'));
+				$ext->add($context, $fpattern['base_pattern'], '', new ext_macro('user-callerid','LIMIT,EXTERNAL'));
 				$add_extra_pri1[$fpattern['base_pattern']] = true;
 			}
 			if ($fpattern['base_pattern'] != $exten) {
-				$ext->add($context, $exten, '', new ext_macro('user-callerid,LIMIT,EXTERNAL'));
+				$ext->add($context, $exten, '', new ext_macro('user-callerid','LIMIT,EXTERNAL'));
 			}
 			$ext->add($context, $exten, '', new ext_noop_trace(sprintf(_('Calling Out Route: %s'),'${SET(OUTBOUND_ROUTE_NAME='.$route['name'].')}'),1));
 			if ($route['dest']) {
@@ -2248,8 +2248,9 @@ function core_do_get_config($engine) {
 					$trunk_macro = 'dialout-trunk';
 					break;
 				}
-				$ext->add($context, $exten, '', new ext_macro(
-				$trunk_macro, $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue']));
+				//$ext->add($context, $exten, '', new ext_macro($trunk_macro, $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue']"));
+				$argv = $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue'];
+				$ext->add($context, $exten, '', new ext_macro($trunk_macro,$argv));
 				$password = '';
 				$trunk_type_needed['macro-' . $trunk_macro] = true;
 			}
@@ -3037,7 +3038,7 @@ function core_do_get_config($engine) {
 	}
 	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnum)','${CALLERID(num)}'));
 	$ext->add($context, $exten, '', new ext_set('CDR(outbound_cnam)','${CALLERID(name)}'));
-
+	$ext->add($context, $exten, '', new ext_return());
 
 	// Combined from-zpatel / from-dahdi and all macros now from-dahdi-channum
 	//
