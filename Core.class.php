@@ -1465,7 +1465,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"noanswer_cid" => "",
 			"busy_cid" => "",
 			"chanunavail_cid" => "",
-			"cwtone" =>"disabled",
+			"cwtone" => "disabled",
 			"concurrency_limit" => "",
 			"chanunavail_dest" => ""
 		);
@@ -3452,7 +3452,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	/**
 	 * Bulk Handler import
-	 * @param  string $type            The type of import
+	 * @param  string $type           The type of import
 	 * @param  array $rawData         Array of data to import
 	 * @param  boolean $replaceExisting Should we replace existing data?
 	 * @return array                  Message containing status
