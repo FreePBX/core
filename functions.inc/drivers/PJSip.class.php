@@ -174,6 +174,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"minimum_expiration" => array(
+				"value" => "60",
+				"flag" => $flag++
+			),
 			"maximum_expiration" => array(
 			        "value" => "7200",
 			        "flag" => $flag++
@@ -221,7 +225,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			"message_context" => array(
 					"value" => "",
 					"flag" => $flag++
-			)
+			),
+			"refer_blind_progress" => array(
+				"value" => "yes",
+				"flag" => $flag++
+			),
+			"vmexten" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 		);
 		return array(
 			"dial" => $dial,
