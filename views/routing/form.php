@@ -191,9 +191,9 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 	foreach ($trunkpriority as $key=>$trunk) {
 				$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
 				$trunkhtml .= '<td>';
-				$trunkhtml .= '<div class="input-group">';
-				$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
-			 	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control '. ($trunkstate[$trunk]=='off' &&  $trunkdisplay[$trunk] == 'on'?"":'text-danger').'">';
+				$trunkhtml .= '<div class="input-group mb-1">';
+				$trunkhtml .= '<div class="input-group-prepend" id="basic-addon'.$key.'"><i class="input-group-text fa fa-arrows" style="display: flex;"></i></div>';
+				$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="custom-select '. ($trunkstate[$trunk]=='off' &&  $trunkdisplay[$trunk] == 'on'?"":'text-danger').'">';
 				$trunkhtml .= '<option value=""></option>';
 				foreach ($trunks as $name=>$display_description) {
 					if ($trunkstate[$name] == 'off' && $trunkdisplay[$trunk] == 'on') {
@@ -204,7 +204,7 @@ if(!empty($trunkpriority) && is_array($trunkpriority)) {
 				}
 
 				$trunkhtml .= '</select>';
-				$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></span>';
+				$trunkhtml .= '<div class="input-group-append"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></div>';
 				$trunkhtml .= '</div>';
 				$trunkhtml .= '</td>';
 				$trunkhtml .= '</tr>';
@@ -217,9 +217,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 
 	$trunkhtml .= '<tr id=trunkrow'.$key.' data-id="'.$key.'">';
 	$trunkhtml .= '<td>';
-	$trunkhtml .= '<div class="input-group">';
-	$trunkhtml .= '<span class="input-group-addon move" id="basic-addon'.$key.'"><i class="fa fa-arrows"></i></span>';
-	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="form-control">';
+	$trunkhtml .= '<div class="input-group mb-1">';
+	$trunkhtml .= '<div class="input-group-prepend" id="basic-addon'.$key.'"><i class="input-group-text fa fa-arrows" style="display:flex;"></i></div>';
+	$trunkhtml .= '<select id="trunkpri'.$key.'" name="trunkpriority['.$key.']" class="custom-select">';
 	$trunkhtml .= '<option value="" SELECTED></option>';
 	foreach ($trunks as $name=>$display_description) {
 		if ($trunkstate[$name] == 'off') {
@@ -229,7 +229,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 		}
 	}
 	$trunkhtml .= '</select>';
-	$trunkhtml .= '<span class="input-group-btn"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></span>';
+	$trunkhtml .= '<div class="input-group-append"><button type="button" class="btn btn-default deltrunkrow"><i class = "fa fa-trash-o"></i></button></div>';
 	$trunkhtml .= '</div>';
 	$trunkhtml .= '</td>';
 	$trunkhtml .= '</tr>';

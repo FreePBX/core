@@ -29,7 +29,7 @@ if($display_mode == "basic") { ?>
 							<span id="bt-add-ex"><a class="btn btn-default" href="config.php?display=extensions&amp;tech_hardware=pjsip_generic"><i class="fa fa-plus">&nbsp;</i><?php echo _("Add Extension")?></a></span>
 						<?php } ?>
 							<button id="remove-sip" class="btn btn-danger btn-remove" data-type="extensions" data-section="sip" disabled>
-								<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+								<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
 							</button>
 						</div>
 						<table data-cookie="true" data-cookie-id-table="extensions-sip" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=pjsip" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-sip" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-sip">
@@ -86,8 +86,8 @@ if($display_mode == "basic") { ?>
 					?>
 					<div class="display no-border">
 						<div class="nav-container">
-							<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
-							<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+							<div class="scroller scroller-left"><i class="fa fa-chevron-left"></i></div>
+							<div class="scroller scroller-right"><i class="fa fa-chevron-right"></i></div>
 							<div class="wrapper">
 								<ul class="nav nav-tabs list" role="tablist">
 									<li role="presentation" data-name="alldids" class="active">
@@ -122,7 +122,7 @@ if($display_mode == "basic") { ?>
 									<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#quickCreate"><i class="fa fa-bolt"></i> <?php echo _("Quick Create Extension");?></button>
 									<?php  } ?>
 									<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
-										<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+										<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
 									</button>
 								</div>
 								<table data-cookie="true" data-cookie-id-table="extensions-all" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
@@ -150,7 +150,7 @@ if($display_mode == "basic") { ?>
 											<span id="bt-add-dev"><a href="?display=extensions&amp;tech_hardware=<?php echo $driver['hardware']?><?php echo $popover?>" class="btn btn-primary"><i class="fa fa-plus"></i> <?php echo sprintf(_('Add New %s Extension'),$driver['shortName'])?></a></span>
 										<?php } ?>
 										<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="extensions" data-section="<?php echo $driver['rawName']?>" disabled>
-											<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+											<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
 										</button>
 									</div>
 									<table data-cookie="true" data-cookie-id-table="extensions-<?php echo $driver['rawName']?>" data-url="ajax.php?module=core&amp;command=getExtensionGrid&amp;type=<?php echo $driver['rawName']?>" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-<?php echo $driver['rawName']?>" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-<?php echo $driver['rawName']?>">
