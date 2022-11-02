@@ -99,7 +99,7 @@
 			</key>
 		</table>
 		<table name="incoming">
-			<field name="cidnum" type="string" length="20" notnull="false"/>
+			<field name="cidnum" type="string" length="50" notnull="false"/>
 			<field name="extension" type="string" length="50"/>
 			<field name="destination" type="string" length="50" notnull="false"/>
 			<field name="privacyman" type="boolean" notnull="false"/>
