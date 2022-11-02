@@ -8,8 +8,8 @@
     } ?>
     <div role="tabpanel">
       <div class="nav-container">
-        <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
-        <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+        <div class="scroller scroller-left"><i class="fa fa-chevron-left"></i></div>
+        <div class="scroller scroller-right"><i class="fa fa-chevron-right"></i></div>
         <div class="wrapper">
           <ul class="nav nav-tabs list" role="tablist">
             <?php foreach(array_keys($html['middle']) as $category) { ?>
