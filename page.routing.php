@@ -73,6 +73,7 @@ switch($request['view']){
 							'notification_on' => $notification_on,
 							'emailInfo' => $emailInfo,
 							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
+							'hooksAdditionalContent' => \FreePBX::Core()->hookAdditionalContent($request['display'])
 							);
 							$subhead .= ": ". $routename;
 		}else{

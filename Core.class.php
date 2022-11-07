@@ -1465,7 +1465,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"noanswer_cid" => "",
 			"busy_cid" => "",
 			"chanunavail_cid" => "",
-			"cwtone" =>"disabled",
+			"cwtone" => "disabled",
 			"concurrency_limit" => "",
 			"chanunavail_dest" => ""
 		);
@@ -3452,7 +3452,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	/**
 	 * Bulk Handler import
-	 * @param  string $type            The type of import
+	 * @param  string $type           The type of import
 	 * @param  array $rawData         Array of data to import
 	 * @param  boolean $replaceExisting Should we replace existing data?
 	 * @return array                  Message containing status
@@ -4289,5 +4289,53 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 
+	}
+
+	/**
+	 * Hook for adding additional contents
+	 * @param  string $page
+	 * @return array  $data
+	 */
+	public function hookAdditionalContent($page) {
+		$data = array();
+		if ($this->config->get('ALLOW_MODULE_HOOK_IN')) {
+			$mods = $this->freepbx->Hooks->processHooks($page);
+			foreach($mods as $contents) {
+				if(empty($contents)) {
+					continue;
+				}
+	
+				foreach($contents as $key => $content) {
+					if(!isset($data[$key])) {
+						$data[$key] = '';
+					}
+					$data[$key] .= $content;
+				}
+			}
+		}
+		return $data;
+	}
+
+	/**
+	 * Hook for adding additional parameters to mail
+	 * @param  string $emailText
+	 * @param  string $hotDeskExten
+	 * @param  string $emergencyRoute
+	 * @return string $emailText
+	 */
+	public function hookAdditionalVariableValues($emailText, $hotDeskExten, $emergencyRoute) {
+		if ($this->config->get('ALLOW_MODULE_HOOK_IN')) {
+			$mods = $this->freepbx->Hooks->processHooks($hotDeskExten, $emergencyRoute);
+			foreach($mods as $contents) {
+				if(empty($contents)) {
+					continue;
+				}
+
+				foreach($contents as $key => $value) {
+					$emailText = str_replace('{{' . $key . '}}', $value, $emailText);
+				}
+			}
+		}
+		return $emailText;
 	}
 }
