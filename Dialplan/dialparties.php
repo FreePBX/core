@@ -355,11 +355,11 @@ class dialparties{
 	static function checkBlkvm($ext) {
 		$c = 'dialparties-checkblkvm'; // Context
 		$ext->add($c, 's', '', new \ext_gotoif('$[$["${HASH(dialparties,NODEST)}"!="" & "${HASH(dialparties,USE_CONFIRMATION)}"="FALSE"] = 0]','endblkvm'));
-		$ext->add($c, 's', '', new \ext_gotoif('$[$[${REGEX("auto-blkvm" ${HASH(dialparties,DIALOPTS)})} | ${REGEX("auto-confirm" ${HASH(dialparties,DIALOPTS)})} | ${REGEX("confirm" ${HASH(dialparties,DIALOPTS)})}] = 0]','addblkvm'));
+		$ext->add($c, 's', '', new \ext_gotoif('$[$[${REGEX("macro-auto-blkvm" ${HASH(dialparties,DIALOPTS)})} | ${REGEX("auto-confirm" ${HASH(dialparties,DIALOPTS)})} | ${REGEX("confirm" ${HASH(dialparties,DIALOPTS)})}] = 0]','addblkvm'));
 		$ext->add($c, 's', '', new \ext_noop('NODEST: ${HASH(dialparties,NODEST)} blkvm enabled macro already in dialopts: ${HASH(dialparties,DIALOPTS)}'));
 		$ext->add($c, 's', '', new \ext_goto('endblkvm'));
-		$ext->add($c, 's', 'addblkvm', new \ext_sethash('dialparties','DIALOPTS','${HASH(dialparties,DIALOPTS)}M(auto-blkvm)'));
-		$ext->add($c, 's', '', new \ext_noop('NODEST: ${HASH(dialparties,NODEST)} adding M(auto-blkvm) to dialopts: ${HASH(dialparties,DIALOPTS)}'));
+		$ext->add($c, 's', 'addblkvm', new \ext_sethash('dialparties','DIALOPTS','${HASH(dialparties,DIALOPTS)}U(macro-auto-blkvm)'));
+		$ext->add($c, 's', '', new \ext_noop('NODEST: ${HASH(dialparties,NODEST)} adding U(macro-auto-blkvm) to dialopts: ${HASH(dialparties,DIALOPTS)}'));
 		$ext->add($c, 's', 'endblkvm', new \ext_return());
 	}
 
