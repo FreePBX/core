@@ -648,14 +648,14 @@ if (($rgmethod == "hunt") || ($rgmethod == "random") || ($rgmethod == "memoryhun
 
 $ds = chop($ds," &");
 if ($nodest != '' && $use_confirmation == 'FALSE') {
-	if (strpos($dialopts,"M(auto-blkvm)") > 0  || strpos($dialopts,"M(auto-blkvm)") === 0 ||
-	    strpos($dialopts,"M(auto-confirm") > 0 || strpos($dialopts,"M(auto-confirm") === 0 ||
-	    strpos($dialopts,"M(confirm") > 0      || strpos($dialopts,"M(confirm") === 0) {
+	if (strpos($dialopts,"U(macro-auto-blkvm)") > 0  || strpos($dialopts,"U(macro-auto-blkvm)") === 0 ||
+	    strpos($dialopts,"U(macro-auto-confirm") > 0 || strpos($dialopts,"U(macro-auto-confirm") === 0 ||
+	    strpos($dialopts,"U(macro-confirm") > 0      || strpos($dialopts,"U(macro-confirm") === 0) {
 		debug("NODEST: $nodest blkvm enabled macro already in dialopts: $dialopts",4);
 	} else {
 		if($rgconfirm != 1){
-			$dialopts .= "M(auto-blkvm)";
-			debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+			$dialopts .= "U(macro-auto-blkvm)";
+			debug("NODEST: $nodest adding U(macro-auto-blkvm) to dialopts: $dialopts",4);
 		}
 	}
 }
@@ -722,14 +722,14 @@ if ($rgmethod == 'ringallv2') {
 }
 
 if ($nodest != '' && $use_confirmation == 'FALSE') {
-	if (strpos($dialopts,"M(auto-blkvm)") > 0  || strpos($dialopts,"M(auto-blkvm)") === 0 ||
-	    strpos($dialopts,"M(auto-confirm") > 0 || strpos($dialopts,"M(auto-confirm") === 0 ||
-	    strpos($dialopts,"M(confirm") > 0      || strpos($dialopts,"M(confirm") === 0) {
+	if (strpos($dialopts,"U(macro-auto-blkvm)") > 0  || strpos($dialopts,"U(macro-auto-blkvm)") === 0 ||
+	    strpos($dialopts,"U(macro-auto-confirm") > 0 || strpos($dialopts,"U(macro-auto-confirm") === 0 ||
+	    strpos($dialopts,"U(macro-confirm") > 0      || strpos($dialopts,"U(macro-confirm") === 0) {
 		debug("NODEST: $nodest blkvm enabled macro already in dialopts: $dialopts",4);
 	} else {
 		if($rgconfirm != 1){
-			$dialopts .= "M(auto-blkvm)";
-			debug("NODEST: $nodest adding M(auto-blkvm) to dialopts: $dialopts",4);
+			$dialopts .= "U(macro-auto-blkvm)";
+			debug("NODEST: $nodest adding U(macro-auto-blkvm) to dialopts: $dialopts",4);
 		}
 	}
 }
