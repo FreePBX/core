@@ -1120,7 +1120,7 @@ function core_do_get_config($engine) {
 			$code = $fcc->getCodeActive();
 			unset($fcc);
 			if ($code != '') {
-				$core_conf->addApplicationMap('apprecord', $code . ',caller,Macro,one-touch-record', true);
+				$core_conf->addApplicationMap('apprecord', $code . ',caller,Gosub(macro-one-touch-record,s,1)', true);
 			}
 
 			$fcc = new featurecode($modulename, 'disconnect');
