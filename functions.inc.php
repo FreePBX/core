@@ -160,7 +160,8 @@ class core_conf {
 	}
 
 	function generate_http_additional($ast_version) {
-		$freepbx_conf =& freepbx_conf::create();
+		$freepbxConfCreate = freepbx_conf::create();
+		$freepbx_conf =& $freepbxConfCreate;
 
 		$output = "[general]\n";
 		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
