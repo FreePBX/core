@@ -518,7 +518,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
 				);
 
-				if ($trunk['pjsip_line'] == 'true') {
+				if (isset($trunk['pjsip_line']) && $trunk['pjsip_line'] == 'true') {
 					$conf['pjsip.registration.conf'][$tn]['line'] = 'yes';
 					$conf['pjsip.registration.conf'][$tn]['endpoint'] = str_replace(' ', '', $tn);
 				} else {
