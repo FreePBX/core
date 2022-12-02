@@ -2839,7 +2839,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if (!empty($coredid) && count($coredid)) {
 			return $this->editDIDProperties($did_vars); //already exists so just edit properties
 		} else {
-			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
+			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '0';
 			$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries']) && $did_vars['pmmaxretries'] != '' ? $did_vars['pmmaxretries']  : '3';
 			$did_create['pmminlength']  = isset($did_vars['pmminlength']) && $did_vars['pmminlength'] != ''  ? $did_vars['pmminlength']  : '10';
 			$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
