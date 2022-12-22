@@ -3133,6 +3133,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if ($astman->connected() && !$editmode) {
 			// TODO just change this to delete everything
 			$astman->database_deltree("AMPUSER/".$extension);
+			$astman->database_deltree("CustomDevstate/FOLLOWME".$extension);
+			$astman->database_deltree("DEVICE/".$extension);
+			$astman->database_deltree("ZULU/".$extension);
 		}
 
 		$astman->database_del("CW",$extension);
