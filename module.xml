@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.66.2</version>
+	<version>16.0.66.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.66.3* FREEPBX-23582 
 		*16.0.66.2* FREEPBX-23847 
 		*16.0.66.1* FREEI-5396 Fix undefined index errors
 		*16.0.66* FREEPBX-23784 Add support for trunk import/export to Bulk Export for PJSIP Trunks
