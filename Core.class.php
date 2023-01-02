@@ -1672,6 +1672,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
 
+		$this->setPresenceState($id, 'available');
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
 		//
 		if (isset($settings['devinfo_secret_origional'])) {
@@ -2277,6 +2278,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$astman->database_del("DEVICE",$account."/user");
 				$astman->database_del("DEVICE",$account."/default_user");
 				$astman->database_del("DEVICE",$account."/emergency_cid");
+				$astman->database_del("CustomPresence",$account);
 			}
 
 			//delete from devices table
@@ -4494,5 +4496,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 		return $emailText;
+	}
+
+	private function setPresenceState($device, $type) {
+		$astman = $this->FreePBX->astman;
+		$astman->set_global(\FreePBX::Config()->get_conf_setting('AST_FUNC_PRESENCE_STATE') . '(CustomPresence:' . $device . ')', '"'.$type . ',,"');
 	}
 }
