@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.66.3</version>
+	<version>16.0.67</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.67*   FREEPBX-23698 
 		*16.0.66.3* FREEPBX-23582 
 		*16.0.66.2* FREEPBX-23847 
 		*16.0.66.1* FREEI-5396 Fix undefined index errors
@@ -148,8 +149,8 @@
 		*16.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>15.0.8.1</version>
-		<module>framework ge 15.0.16.40</module>
+		<version>16.0.31</version>
+		<module>framework ge 16.0.31</module>
 	</depends>
 	<database>
 		<table name="trunks">
