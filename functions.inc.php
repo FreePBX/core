@@ -1117,30 +1117,6 @@ function core_do_get_config($engine) {
 			unset($fcc);
 			$core_conf->addFeatureMap('atxfer',$code);
 
-			$fcc_array = array(
-				array(
-					'module'  => $modulename,
-					'feature' => 'atxferabort',
-				),
-				array(
-					'module'  => $modulename,
-					'feature' => 'atxfercomplete',
-				),
-				array(
-					'module'  => $modulename,
-					'feature' => 'atxferthreeway',
-				),
-				array(
-					'module'  => $modulename,
-					'feature' => 'atxferswap',
-				),
-			);
-			foreach($fcc_array as $fcc_item)
-			{
-				$code = \featurecode::CodeActive($fcc_item['module'], $fcc_item['feature']);
-				$core_conf->addFeatureGeneral($fcc_item['feature'], $code);
-			}
-
 			$fcc = new featurecode($modulename, 'automon');
 			$code = $fcc->getCodeActive();
 			unset($fcc);

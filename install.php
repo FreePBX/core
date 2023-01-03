@@ -76,51 +76,11 @@ $fcc->setDefault('##');
 $fcc->update();
 unset($fcc);
 
-$fcc_array = array(
-	array(
-		'module' 	  => 'core',
-		'feature' 	  => 'atxfer',
-		'default' 	  => '*2',
-		'description' => _('In-Call Asterisk Attended Transfer'),
-	),
-	array(
-		'module' 	  => 'core',
-		'feature' 	  => 'atxferabort',
-		'default' 	  => '*3',
-		'description' => _('In-Call Asterisk Attended Transfer Aborting'),
-		'depend'	  => 'atxfer',
-	),
-	array(
-		'module' 	  => 'core',
-		'feature' 	  => 'atxfercomplete',
-		'default' 	  => '*4',
-		'description' => _('In-Call Asterisk Attended Transfer Completing'),
-		'depend'	  => 'atxfer',
-	),
-	array(
-		'module' 	  => 'core',
-		'feature' 	  => 'atxferthreeway',
-		'default' 	  => '*5',
-		'description' => _('In-Call Asterisk Attended Transfer Completing as a three-way bridge'),
-		'depend'	  => 'atxfer',
-	),
-	array(
-		'module' 	  => 'core',
-		'feature' 	  => 'atxferswap',
-		'default' 	  => '*6',
-		'description' => _('In-Call Asterisk Attended Transfer Swapping between the transferee and destination'),
-		'depend'	  => 'atxfer',
-	),
-);
-foreach ($fcc_array as $fcc)
-{
-	$fcc_new = new \featurecode($fcc['module'], $fcc['feature']);
-	$fcc_new->setDescription($fcc['description']);
-	$fcc_new->setDefault($fcc['default']);
-	$fcc_new->setDepend($fcc['depend']);
-	$fcc_new->update();
-	unset($fcc_new);
-}
+$fcc = new featurecode('core', 'atxfer');
+$fcc->setDescription('In-Call Asterisk Attended Transfer');
+$fcc->setDefault('*2');
+$fcc->update();
+unset($fcc);
 
 $fcc = new featurecode('core', 'automon');
 $fcc->setDescription('In-Call Asterisk Toggle Call Recording');
