@@ -27,8 +27,9 @@ class macroConfirm{
         $ext->add($context, $exten, '', new \ext_noop('${ALT_CONFIRM_MSG} and arv= ${ARG1}'));
         $ext->add($context, $exten, '', new \ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ARG1='));
         $ext->add($context, $exten, '', new \ext_execif('$["${ALT_CONFIRM_MSG}"="default"]', 'Set', 'ALT_CONFIRM_MSG='));
+        $ext->add($context, $exten, '', new \ext_execif('$["${CBKLANGUAGE}"=""]', 'Set', '__CBKLANGUAGE=${CHANNEL(language)}'));
         $ext->add($context, $exten, '', new \ext_setvar('MSG1','${IF($["${ARG1}${ALT_CONFIRM_MSG}"=""]?incoming-call-1-accept-2-decline:${IF($[${LEN(${ALT_CONFIRM_MSG})}>0]?${ALT_CONFIRM_MSG}:${ARG1})})}'));
-        $ext->add($context, $exten, 'start', new \ext_background('${MSG1},m,${CHANNEL(language)},macro-confirm'));
+        $ext->add($context, $exten, 'start', new \ext_background('${MSG1},m,${CBKLANGUAGE},macro-confirm'));
         $ext->add($context, $exten, '', new \ext_read('INPUT', '', 1, '', '', 4));
         $ext->add($context, $exten, '', new \ext_gotoif('$[${LEN(${INPUT})} > 0]', '${INPUT},1', 't,1'));
 
