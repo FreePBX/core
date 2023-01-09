@@ -19,80 +19,142 @@ if (false) {
 
 $freepbx_conf = freepbx_conf::create();
 
-$fcc = new featurecode('core', 'userlogon');
-$fcc->setDescription('User Logon');
-$fcc->setDefault('*11');
-$fcc->update();
-unset($fcc);
+$version 	= $amp_conf["ASTVERSION"];
+$fcc_exists = \featurecodes_getAllFeaturesDetailed(true);
+$fcc_array 	= array(
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'userlogon',
+		'default' 	  => '*11',
+		'description' => _('User Logon'),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'userlogoff',
+		'default' 	  => '*12',
+		'description' => _('User Logoff'),
+		'provideDest' => true,
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'zapbarge',
+		'default' 	  => '888',
+		'description' => _('ZapBarge'),
+		'provideDest' => true,
+		'needDelete'  => ! version_compare($version, "12.5", "<"),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'chanspy',
+		'default' 	  => '555',
+		'description' => _('ChanSpy'),
+		'provideDest' => true,
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'simu_pstn',
+		'default' 	  => '7777',
+		'description' => _('Simulate Incoming Call'),
+		'provideDest' => true,
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'pickup',
+		'default' 	  => '**',
+		'description' => _('Directed Call Pickup'),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'pickupexten',
+		'default' 	  => '*8',
+		'description' => _('Asterisk General Call Pickup'),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'blindxfer',
+		'default' 	  => '##',
+		'description' => _('In-Call Asterisk Blind Transfer'),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'atxfer',
+		'default' 	  => '*2',
+		'description' => _('In-Call Asterisk Attended Transfer'),
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'atxferabort',
+		'default' 	  => '*3',
+		'description' => _('In-Call Asterisk Attended Transfer Aborting'),
+		'depend'	  => 'atxfer',
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'atxfercomplete',
+		'default' 	  => '*4',
+		'description' => _('In-Call Asterisk Attended Transfer Completing'),
+		'depend'	  => 'atxfer',
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'atxferthreeway',
+		'default' 	  => '*5',
+		'description' => _('In-Call Asterisk Attended Transfer Completing as a three-way bridge'),
+		'depend'	  => 'atxfer',
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'atxferswap',
+		'default' 	  => '*6',
+		'description' => _('In-Call Asterisk Attended Transfer Swapping between the transferee and destination'),
+		'depend'	  => 'atxfer',
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'automon',
+		'default' 	  => '*1',
+		'description' => _('In-Call Asterisk Toggle Call Recording'),
+		'depend'	  => '',
+	),
+	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'disconnect',
+		'default' 	  => '**',
+		'description' => _('In-Call Asterisk Disconnect Code'),
+		'depend'	  => '',
+	),
+);
 
-$fcc = new featurecode('core', 'userlogoff');
-$fcc->setDescription('User Logoff');
-$fcc->setDefault('*12');
-$fcc->update();
-unset($fcc);
+foreach ($fcc_array as $fcc)
+{
+	$fcc_enabled = true;
+	foreach ($fcc_exists as $fid => $fdata)
+	{
+		if ($fdata['customcode'] == $fcc['default'])
+		{
+			$fcc_enabled = false;
+		}
+	}
 
-$version = $amp_conf["ASTVERSION"];
-if(version_compare($version, "12.5", "<")) {
-	$fcc = new featurecode('core', 'zapbarge');
-	$fcc->setDescription('ZapBarge');
-	$fcc->setDefault('888');
-	$fcc->setProvideDest();
-	$fcc->update();
-	unset($fcc);
-} else {
-	$fcc = new featurecode('core', 'zapbarge');
-	$fcc->delete();
+	$fcc_item = new \featurecode($fcc['module'], $fcc['feature']);
+	if ( isset($fcc['needDelete']) && $fcc['needDelete'] == true)
+	{
+		$fcc_item->delete();
+	}
+	else
+	{
+		$fcc_item->setDescription($fcc['description']);
+		$fcc_item->setDefault($fcc['default']);
+		$fcc_item->setEnabled($fcc_enabled);
+		$fcc_item->setDepend(empty($fcc['depend']) ? "" : $fcc['depend']);
+		if (isset($fcc['provideDest']) && $fcc['provideDest'] == true)
+		{
+			$fcc_item->setProvideDest();
+		}
+		$fcc_item->update();
+	}
+	unset($fcc_item);
 }
-
-$fcc = new featurecode('core', 'chanspy');
-$fcc->setDescription('ChanSpy');
-$fcc->setDefault('555');
-$fcc->setProvideDest();
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'simu_pstn');
-$fcc->setDescription('Simulate Incoming Call');
-$fcc->setDefault('7777');
-$fcc->setProvideDest();
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'pickup');
-$fcc->setDescription('Directed Call Pickup');
-$fcc->setDefault('**');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'pickupexten');
-$fcc->setDescription('Asterisk General Call Pickup');
-$fcc->setDefault('*8');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'blindxfer');
-$fcc->setDescription('In-Call Asterisk Blind Transfer');
-$fcc->setDefault('##');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'atxfer');
-$fcc->setDescription('In-Call Asterisk Attended Transfer');
-$fcc->setDefault('*2');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'automon');
-$fcc->setDescription('In-Call Asterisk Toggle Call Recording');
-$fcc->setDefault('*1');
-$fcc->update();
-unset($fcc);
-
-$fcc = new featurecode('core', 'disconnect');
-$fcc->setDescription('In-Call Asterisk Disconnect Code');
-$fcc->setDefault('**');
-$fcc->update();
-unset($fcc);
 
 // The following are from General Settings that may need to be migrated.
 // We will first create them all, the define_conf_settings() method will
