@@ -74,23 +74,37 @@ switch ($action) {
 		//redirect_standard();
 	break;
 	case "editampuser":
+		$freePBX = \FreePBX::create();
+		$user = core_getAmpUser($userdisplay);
+		$oldUsername = !empty($user['username']) ? $user['username'] : '';
+		$userExtension = !empty($user['extension']) ? $user['extension'] : '';
+		$userEmail = !empty($user['email']) ? $user['email'] : '';
+		$passwordChanged = 0;
+
 		// Check to make sure the hidden var is sane, and that they haven't changed the password field
 		if (strlen($form_password_sha1)==40 && $password == "******") {
 			// Password unchanged
 			core_ampusers_del($userdisplay);
-			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, "", $sections);
-			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
-				\FreePBX::Pbxmfa()->syncMFAUsers('admin');
-			}
+			core_ampusers_add($username, $form_password_sha1, $extension_low, $extension_high, "", $sections, $userExtension, $userEmail);
+			
 		} elseif ($password != "******") {
 			// Password has been changed
 			core_ampusers_del($userdisplay);
-			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections);
-			if (\FreePBX::Modules()->checkStatus('pbxmfa')) {
-				\FreePBX::Pbxmfa()->syncMFAUsers('admin');
-			}
+			core_ampusers_add($username, $password, $extension_low, $extension_high, "", $sections, $userExtension, $userEmail);
 			remove_user_sessions($username);
+			$passwordChanged = 1;
 		}
+
+		if ($freePBX->Modules->checkStatus('pbxmfa')) {
+			if ($passwordChanged) {
+				$freePBX->Pbxmfa->resetTrustedDevices($oldUsername, 'admin');
+			}
+			$syncData['oldUsername'] = $oldUsername;
+			$syncData['newUsername'] = $username;
+			$syncData['usertype'] = 'admin';
+			$freePBX->Pbxmfa->syncMFAUsers($syncData);
+		}
+
 		if(($userdisplay != $username) || (($username == $_SESSION['AMP_user']->username) && ($password != "******"))) {
 			unset($_SESSION['AMP_user']);
 		}
@@ -98,6 +112,11 @@ switch ($action) {
 	break;
 	case "delampuser":
 		core_ampusers_del($userdisplay);
+		if ($freePBX->Modules->checkStatus('pbxmfa')) {
+			$syncData['usertype'] = 'admin';
+			$syncData['deleteUser'] = true;
+			$freePBX->Pbxmfa->syncMFAUsers($syncData);
+		}
 		echo '<script>window.location = "?display=ampusers";</script>';
 	//	redirect_standard();
 	break;

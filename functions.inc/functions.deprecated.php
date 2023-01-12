@@ -169,9 +169,9 @@ function core_trunks_delete_dialrules($trunknum){
 	return \FreePBX::Core()->deleteTrunkDialRulesByID($trunknum);
 }
 
-function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections){
+function core_ampusers_add($username, $password, $extension_low, $extension_high, $deptname, $sections, $userExtension, $userEmail){
 	FreePBX::Modules()->deprecatedFunction();
-	return \FreePBX::Core()->addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections);
+	return \FreePBX::Core()->addAMPUser($username, $password, $extension_low, $extension_high, $deptname, $sections, false,$userExtension, $userEmail);
 }
 
 

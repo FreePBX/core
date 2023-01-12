@@ -4555,21 +4555,25 @@ function core_timegroups_usage($group_id) {
 function core_getAmpUser($username) {
 	global $db;
 
-	$sql = "SELECT username, password_sha1, extension_low, extension_high, deptname, sections FROM ampusers WHERE username = '".$db->escapeSimple($username)."'";
-	$results = $db->getAll($sql);
+	$sql = "SELECT username, email, extension, password_sha1, extension_low, extension_high, deptname, sections FROM ampusers WHERE username = '" . $db->escapeSimple($username) . "'";
+	$results = $db->getAll($sql,DB_FETCHMODE_ASSOC);
 	if(DB::IsError($results)) {
 	   die_freepbx($sql."<br>\n".$results->getMessage());
 	}
 
 	if (count($results) > 0) {
-		$user = array();
-		$user["username"] = $results[0][0];
-		$user["password_sha1"] = $results[0][1];
-		$user["extension_low"] = $results[0][2];
-		$user["extension_high"] = $results[0][3];
-		$user["deptname"] = $results[0][4];
-		$user["sections"] = explode(";",$results[0][5]);
-		return $user;
+		foreach ($results as $key => $res) {
+			$user = array();
+			$user["username"] = $res['username'];
+			$user["email"] = $res['email'];
+			$user["extension"] = $res['extension'];
+			$user["password_sha1"] = $res['password_sha1'];
+			$user["extension_low"] = $res['extension_low'];
+			$user["extension_high"] = $res['extension_high'];
+			$user["deptname"] = $res['deptname'];
+			$user["sections"] = explode(";",$res['sections']);
+			return $user;
+		}
 	} else {
 		return false;
 	}
