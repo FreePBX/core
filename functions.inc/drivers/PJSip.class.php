@@ -234,6 +234,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "",
 				"flag" => $flag++
 			),
+			"outbound_auth" => array(
+				"value" => "no",
+				"flag" => $flag++	
+			)
 		);
 		return array(
 			"dial" => $dial,
@@ -376,6 +380,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		unset($select);
 
 		$tmparr['outbound_proxy'] = array('prompttext' => _('Outbound Proxy'), 'value' => '', 'level' => 1);
+
+		$select[] = array('value' => 'no', 'text' => _('No'));
+		$select[] = array('value' => 'yes', 'text' => _('Yes'));
+		$tt = _('Some extensions must use outbound_auth.');
+		$tmparr['outbound_auth'] = array('prompttext' => _('Outbound Auth'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
 		$tt = _("Context where SIP MESSAGEs from this endpoint will be processed");
 		$tmparr['message_context'] = array('prompttext' => _('Messages Context'), 'value' => '', 'tt' => $tt, 'level' => 1);
@@ -647,6 +656,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if ($trunk['authentication'] == "outbound" || $trunk['authentication'] == "both") {
 				$conf['pjsip.endpoint.conf'][$tn]['outbound_auth'] = $tn;
 			}
+
+			if(empty($trunk)){
+				$conf['pjsip.endpoint.conf'][$tn]['outbound_auth'] = $tn;
+			}
+			
 			if ($trunk['authentication'] == "inbound" || $trunk['authentication'] == "both") {
 				$conf['pjsip.endpoint.conf'][$tn]['auth'] = $tn;
 			}
@@ -1085,7 +1099,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 	 * @param {array} &$retarr Returned Array
 	 */
 	private function generateEndpoint($config, &$retarr, $enableRecordingFeature=false) {
-
+		
 		// Validate $config array
 		$this->validateEndpoint($config);
 		if($config['sipdriver'] != 'chan_pjsip') {
@@ -1180,6 +1194,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['vmexten'])) {
 			$endpoint[] = "voicemail_extension=".$config['vmexten'];
+		}
+
+		if (!empty($config['outbound_auth']) && $config['outbound_auth'] == "yes") {
+			$endpoint[] = "outbound_auth=".$config['user']."-auth";
 		}
 
 		//http://issues.freepbx.org/browse/FREEPBX-12151
