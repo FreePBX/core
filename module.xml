@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.3</version>
+	<version>16.0.68.4</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.4* FREEPBX-23976 
 		*16.0.68.3* FREEPBX-23698 
 		*16.0.68.2* Packaging of ver 16.0.68.2
 		*16.0.68.1* FREEI-5490 
