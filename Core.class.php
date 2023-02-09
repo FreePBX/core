@@ -3325,7 +3325,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
 
 			$results['cwtone'] = $astman->database_get("AMPUSER",$extension."/cwtone");
-
+			$results['accountcode'] = $astman->database_get("AMPUSER",$extension."/accountcode");
+			
 			$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
 			$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
 			$results['recording_in_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/internal"));
