@@ -385,6 +385,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
 		$tt = _('Some extensions must use outbound_auth.');
 		$tmparr['outbound_auth'] = array('prompttext' => _('Outbound Auth'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+		unset($select);
 
 		$tt = _("Context where SIP MESSAGEs from this endpoint will be processed");
 		$tmparr['message_context'] = array('prompttext' => _('Messages Context'), 'value' => '', 'tt' => $tt, 'level' => 1);
