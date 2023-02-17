@@ -56,7 +56,6 @@ class Restore Extends Base\RestoreBase{
 		$this->importKVStore($configs['kvstore']);
 		$this->importFeatureCodes($configs['features']);
 		$this->importAdvancedSettings($configs['settings']);
-		$this->importAstDB($configs['astdb']);
 	}
 	public function getClasses($transaction){
 		$classList = new DirectoryIterator(__DIR__ . '/Restore');
