@@ -1129,7 +1129,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		// Endpoint
 		$endpoint[] = "aors=$aorname";
-		$endpoint[] = "auth=$authname";
+		if(!empty($config['secret'])){
+			$endpoint[] = "auth=$authname";
+		}
 		$endpoint[] = "tos_audio=ef";
 		$endpoint[] = "tos_video=af41";
 		$endpoint[] = "cos_audio=5";
@@ -1202,7 +1204,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "voicemail_extension=".$config['vmexten'];
 		}
 
-		if (!empty($config['outbound_auth']) && $config['outbound_auth'] == "yes") {
+		if (!empty($config['outbound_auth']) && $config['outbound_auth'] == "yes" && !empty($config['secret'])) {
 			$endpoint[] = "outbound_auth=".$config['user']."-auth";
 		}
 
@@ -1434,12 +1436,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (isset($retarr["pjsip.auth.conf"][$authname])) {
 			throw new \Exception("Auth $authname already exists.");
 		}
-		$retarr["pjsip.auth.conf"][$authname] = $auth;
-		if(!empty($this->_auth[$authname]) && is_array($this->_auth[$authname])) {
-			foreach($this->_auth[$authname] as $el) {
-				$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
+		if(!empty($config['secret'])){
+			$retarr["pjsip.auth.conf"][$authname] = $auth;
+			if(!empty($this->_auth[$authname]) && is_array($this->_auth[$authname])) {
+				foreach($this->_auth[$authname] as $el) {
+					$retarr["pjsip.auth.conf"][$authname][] = "{$el['key']}={$el['value']}";
+				}
+				unset($this->_auth[$authname]);
 			}
-			unset($this->_auth[$authname]);
 		}
 
 		if (isset($retarr["pjsip.aor.conf"][$aorname])) {
