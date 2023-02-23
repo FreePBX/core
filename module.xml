@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.7</version>
+	<version>16.0.68.8</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.8* FREEPBX-23201 , FREEI-5569 
 		*16.0.68.7* Packaging of ver 16.0.68.7
 		*16.0.68.6* FREEPBX-23957 and FREEI-5573 
 		*16.0.68.5* FREEPBX-21360 Add Accontcode to Virtual Extensions 
