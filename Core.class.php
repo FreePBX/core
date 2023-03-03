@@ -1673,7 +1673,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
 
-		$this->setPresenceState($id, 'available');
+		if(!$editmode){
+			$this->setPresenceState($id, 'available');
+		}
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
 		//
 		if (isset($settings['devinfo_secret_origional'])) {
