@@ -220,7 +220,34 @@ class Users extends Base {
 					'description' => '',
 
 				],
-
+				'callwaiting' => [
+					'type' => Type::string(),
+					'description' => _('Call Waiting state for this user\'s extension')
+				],
+				'recording_in_external' => [
+					'type' => Type::string(),
+					'description' => _('Recording of inbound calls from external sources')
+				],
+				'recording_out_external' => [
+					'type' => Type::string(),
+					'description' => _('Recording of outbound calls to external sources')
+				],
+				'recording_in_internal' => [
+					'type' => Type::string(),
+					'description' => _('Recording of calls received from other extensions on the system')
+				],
+				'recording_out_internal' => [
+					'type' => Type::string(),
+					'description' => _('Recording of calls made to other extensions on the system')
+				],
+				'recording_ondemand' => [
+					'type' => Type::string(),
+					'description' => _('Enable or disable the ability to do on demand (one-touch) recording. The overall calling policy rules still apply and if calls are already being recorded by \'Force\' or \'Never\', they can not be paused unless \'Override\' is selected.')
+				],
+				'recording_priority' => [
+					'type' => Type::int(),
+					'description' => _('Call recording policy priority relative to other extensions when there is a conflict between an extension wanting recording and the other not wanting it. The higher of the two determines the policy, on a tie the global policy (caller or callee) determines the policy')
+				],
 			];
 		});
 
@@ -318,8 +345,31 @@ class Users extends Base {
 			'callwaiting' => [
 				'type' => Type::string(),
 				'description' => "Call Waiting option. default is 'enabled'"
+			],			
+			'recording_in_external' => [
+				'type' => Type::string(),
+				'description' => "Inbound External Calls Recording option 'force', 'yes', 'no', 'never' or 'dontcare'. default is 'dontcare'"
 			],
-
+			'recording_out_external' => [
+				'type' => Type::string(),
+				'description' => "Outbound External Calls Recording option 'force', 'yes', 'no', 'never' or 'dontcare'. default is 'dontcare'"
+			],
+			'recording_in_internal' => [
+				'type' => Type::string(),
+				'description' => "Inbound Internal Calls Recording option 'force', 'yes', 'no', 'never' or 'dontcare'. default is 'dontcare'"
+			],
+			'recording_out_internal' => [
+				'type' => Type::string(),
+				'description' => "Outbound Internal Calls Recording option 'force', 'yes', 'no', 'never' or 'dontcare'. default is 'dontcare'"
+			],
+			'recording_ondemand' => [
+				'type' => Type::string(),
+				'description' => "On Demand Recording option 'enabled', 'disabled' or 'override'. default is 'disabled'"
+			],
+			'recording_priority' => [
+				'type' => Type::int(),
+				'description' => "Record Priority Policy option. default is 10"
+			],
 		];
 	}
 
@@ -343,6 +393,12 @@ class Users extends Base {
 			"mohclass" => isset($input['mohclass']) ? $input['mohclass'] : null,
 			"callwaiting" => isset($input['callwaiting']) ? $input['callwaiting'] : 'enabled',
 			"pinless" => isset($input['pinless']) ? $input['pinless'] : 'disabled',
+			"recording_in_external" => isset($input['recording_in_external']) ? $input['recording_in_external'] : 'dontcare',
+			"recording_out_external" => isset($input['recording_out_external']) ? $input['recording_out_external'] : 'dontcare',
+			"recording_in_internal" => isset($input['recording_in_internal']) ? $input['recording_in_internal'] : 'dontcare',
+			"recording_out_internal" => isset($input['recording_out_internal']) ? $input['recording_out_internal'] : 'dontcare',
+            "recording_ondemand" => isset($input['recording_ondemand']) ? $input['recording_ondemand'] : 'disabled',
+			"recording_priority" => isset($input['recording_priority']) ? $input['recording_priority'] : null,
 		];
 	}
 }
