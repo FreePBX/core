@@ -47,10 +47,15 @@ class Restore Extends Base\RestoreBase{
                                         ->setConfigs($outbound_routes);
 			}
 			else {
-			$class->setDirs($dirs)
+				$class->setDirs($dirs)
 					->setbackupinfo($backupinfo)
-					->setFiles($files)
-					->setConfigs($configs[$class->className]);
+					->setFiles($files);
+
+				$this->restoreDataFromDump($class->className, $this->tmpdir, $files);
+				
+				if(isset($configs[$class->className])){
+					$class->setConfigs($configs[$class->className]);
+				}
 			}
 		}
 		$this->importKVStore($configs['kvstore']);
