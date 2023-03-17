@@ -4,7 +4,9 @@ namespace FreePBX\modules\Core\Restore;
 
 class Devices extends Corebase{
 	public function setConfigs($configs){
-		$this->updateDevices($configs);
+		if(count($configs) > 0){
+			$this->updateDevices($configs);
+		}
 		return $this;
 	}
 

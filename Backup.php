@@ -4,7 +4,6 @@ use DirectoryIterator;
 use SplObjectStorage;
 use FilesystemIterator;
 use FreePBX\modules\Backup\BackupBase;
-
 class Backup Extends BackupBase{
 	public function runBackup($id,$transaction){
 		$files = [];
@@ -16,7 +15,12 @@ class Backup Extends BackupBase{
 			foreach ($module->getFiles() as $file ){
 				$this->addFile($file['basename'], $file['path'], $file['basevar'], $module->className);
 			}
-
+			if (method_exists($module, 'getSpecialTables')) {
+				$tables = $module->getSpecialTables();
+				if ($tables) {
+					$this->dumpTableIntoFile($module->className, $tables, false, false);
+				}
+			}
 			foreach($module->getDeps() as $dependency){
 				$this->addDependency($dependency);
 			}
