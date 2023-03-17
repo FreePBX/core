@@ -1,21 +1,34 @@
 <?php
 
 namespace FreePBX\modules\Core\Backup;
-
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 class Devices extends Corebase{
 	public function getConfigs(){
-		return [
-			"devices" => $this->FreePBX->Database->query("SELECT * FROM devices")->fetchAll(\PDO::FETCH_ASSOC),
-			"techTables" => [
-				//pjsip uses sip table
-				"sip" => $this->FreePBX->Database->query("SELECT s.* FROM sip s, devices d WHERE s.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
-				"dahdi" => $this->FreePBX->Database->query("SELECT dh.* FROM dahdi dh, devices d WHERE dh.id = d.id")->fetchAll(\PDO::FETCH_ASSOC),
-				"iax" => $this->FreePBX->Database->query("SELECT i.* FROM iax i, devices d WHERE i.id = d.id")->fetchAll(\PDO::FETCH_ASSOC)
-			]
-		];
+		return [];
 	}
 	public function getFiles(){
 	return [];
+	}
+	public function getspecialFiles() {
+		global $amp_conf;
+		$dbuser = $amp_conf['AMPDBUSER'];
+		$dbpass = $amp_conf['AMPDBPASS'];
+		$dbname = $amp_conf['AMPDBNAME'];
+		$fs = new Filesystem();
+		$tmpdir = sys_get_temp_dir().'/coredump';
+		$fs->remove($tmpdir);
+		$fs->mkdir($tmpdir);
+		$tmpfile = $tmpdir."/core_devices.sql";
+		$tables = array('devices','sip','dahdi','iax');
+		$coretables = implode(' ', $tables);
+		$mysqldump = fpbx_which('mysqldump');
+		$command = "{$mysqldump} -u{$dbuser} -p{$dbpass} {$dbname} {$coretables} --result-file={$tmpfile}";
+		$process= new Process($command);
+		$process->disableOutput();
+		$process->mustRun();
+		$fileObj = new \SplFileInfo($tmpfile);
+		return [$tmpfile];
 	}
 	public function getDirs(){
 	return [];

@@ -11,4 +11,7 @@ class Corebase {
     public function getDeps(){
 	return [];
    }
+   public function getspecialFiles(){
+    return [];
+    }
 }

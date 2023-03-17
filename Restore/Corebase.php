@@ -17,6 +17,9 @@ class Corebase {
 	public function setDirs(){
 		return $this;
 	}
+	public function setspecialFiles($tmppath,$files){
+		return $this;
+	}
 	public function setbackupinfo($backupinfo){
 		return $this;
 	}

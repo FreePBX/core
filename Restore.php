@@ -50,7 +50,10 @@ class Restore Extends Base\RestoreBase{
 			$class->setDirs($dirs)
 					->setbackupinfo($backupinfo)
 					->setFiles($files)
-					->setConfigs($configs[$class->className]);
+					->setspecialFiles($this->tmpdir,$files);
+				if(isset($configs[$class->className])){
+					$class->setConfigs($configs[$class->className]);
+				}
 			}
 		}
 		$this->importKVStore($configs['kvstore']);

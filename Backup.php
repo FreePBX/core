@@ -4,7 +4,7 @@ use DirectoryIterator;
 use SplObjectStorage;
 use FilesystemIterator;
 use FreePBX\modules\Backup\BackupBase;
-
+use Symfony\Component\Filesystem\Filesystem;
 class Backup Extends BackupBase{
 	public function runBackup($id,$transaction){
 		$files = [];
@@ -15,6 +15,10 @@ class Backup Extends BackupBase{
 			$configs[$module->className] = $module->getConfigs();
 			foreach ($module->getFiles() as $file ){
 				$this->addFile($file['basename'], $file['path'], $file['basevar'], $module->className);
+			}
+			foreach ($module->getspecialFiles() as $file ){
+				$fileObj = new \SplFileInfo($file);
+				$this->addSplFile($fileObj);
 			}
 
 			foreach($module->getDeps() as $dependency){
