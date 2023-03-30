@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.29</version>
+	<version>15.0.22.30</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.30* Packaging of ver 15.0.22.30
 		*15.0.22.29* FREEI-5679 
 		*15.0.22.28* FREEI-5569 
 		*15.0.22.27* Packaging of ver 15.0.22.27
@@ -323,6 +324,7 @@
 	<depends>
 		<version>15.0.8.1</version>
 		<module>framework ge 15.0.16.40</module>
+		<module>backup ge 15.0.22</module>
 	</depends>
 	<database>
 		<table name="trunks">
