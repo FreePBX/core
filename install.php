@@ -145,7 +145,6 @@ foreach ($fcc_array as $fcc)
 	{
 		$fcc_item->setDescription($fcc['description']);
 		$fcc_item->setDefault($fcc['default']);
-		$fcc_item->setEnabled($fcc_enabled);
 		$fcc_item->setDepend(empty($fcc['depend']) ? "" : $fcc['depend']);
 		if (isset($fcc['provideDest']) && $fcc['provideDest'] == true)
 		{
