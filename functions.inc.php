@@ -1177,6 +1177,10 @@ function core_do_get_config($engine) {
 		$fcc = new featurecode($modulename, 'chanspy');
 		$fc_chanspy = $fcc->getCodeActive();
 		unset($fcc);
+        
+        $fcc = new featurecode($modulename, 'callseize');
+        $fc_callseize = $fcc->getCodeActive();
+        unset($fcc);
 
 		$fcc = new featurecode($modulename, 'simu_pstn');
 		$fc_simu_pstn = $fcc->getCodeActive();
@@ -1460,6 +1464,16 @@ function core_do_get_config($engine) {
 			$ext->add('app-chanspy', $fc_chanspy, '', new ext_chanspy(''));
 			$ext->add('app-chanspy', $fc_chanspy, '', new ext_hangup(''));
 		}
+        
+        // call seize
+        if ($fc_callseize != '') {
+        	$ext->addInclude('from-internal-additional', 'app-callseize'); // Add the include from from-internal
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_macro('user-callerid'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_noop('${CALLERID(num)} is seizing the call from ${EXTEN:3}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_bridge('${IMPORT(${CHANNELS(${EXTEN:3})},BRIDGEPEER)}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_execif('$["${BRIDGERESULT}"!="SUCCESS"]','Playback','im-sorry&an-error-has-occurred&please-try-again-later&goodbye'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_hangup(''));
+        }
 
 		// Simulate Inbound call
 		if ($fc_simu_pstn != '') {
