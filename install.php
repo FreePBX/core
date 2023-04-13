@@ -50,6 +50,13 @@ $fcc_array 	= array(
 		'description' => _('ChanSpy'),
 		'provideDest' => true,
 	),
+  	array(
+		'module' 	  => 'core',
+		'feature' 	  => 'callseize',
+		'default' 	  => '*37',
+		'description' => _('Call Seize'),
+		'helptext' => 'Seizes an ACTIVE internal or external call on the passed extension. Example: *37201 will seize the call from extension 201.',
+	),
 	array(
 		'module' 	  => 'core',
 		'feature' 	  => 'simu_pstn',
