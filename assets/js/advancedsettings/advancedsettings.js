@@ -48,7 +48,14 @@ $(document).ready(function() {
 			$(this).removeClass("hidden");
 		});
 	}
+	
+	// We add a delay to prevent the automatic scrolling of the browser from changing our position
+	setTimeout(fixScrollPageSection, 500);
+	$(window).on('hashchange', function() {
+		fixScrollPageSection();
+    });
 });
+
 //visibility/ro updates
 $("input[name='AS_DISPLAY_READONLY_SETTINGS']").change(function(){
 	if($(this).val()){
@@ -198,4 +205,22 @@ function toggleResetIcons(){
 			break;
 		}
 	});
+}
+
+function fixScrollPageSection(section, animateSpeed)
+{
+	if (section === '' || section === undefined || section === null)
+	{
+		section = window.location.hash;
+	}
+	if (animateSpeed === '' || animateSpeed === undefined || animateSpeed === null || isNaN(animateSpeed)) {
+		animateSpeed = 500;
+	}
+	animateSpeed = parseInt(animateSpeed);
+	if (section)
+	{
+		// We modify the position now to prevent the section from staying below the menu
+		var position = $(section).offset().top - 40;
+		$('html, body').animate({scrollTop: position}, animateSpeed);
+	}
 }
