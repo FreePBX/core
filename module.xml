@@ -162,8 +162,8 @@
 		*16.0.1alpha1* Inital Release
 	</changelog>
 	<depends>
-		<version>16.0.32</version>
-		<module>framework ge 16.0.32</module>
+		<version>16.0.40.1</version>
+		<module>framework ge 16.0.40.1</module>
 		<module>backup ge 16.0.63</module>
 	</depends>
 	<database>
