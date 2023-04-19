@@ -135,8 +135,13 @@ $fcc_array 	= array(
 foreach ($fcc_array as $fcc)
 {
 	$fcc_enabled = true;
+	$alreadyenabled = false;
 	foreach ($fcc_exists as $fid => $fdata)
 	{
+		if($fcc_exists['module'] == $fcc['module'] && $fcc_exists['featurename'] == $fcc['feature']  ){
+			// existing setting enabled ?
+			$alreadyenabled = ($fcc_exists['featureenabled']==1)?true:false;
+		}
 		if ($fdata['customcode'] == $fcc['default'])
 		{
 			$fcc_enabled = false;
@@ -151,7 +156,7 @@ foreach ($fcc_array as $fcc)
 	else
 	{
 		$fcc_item->setDescription($fcc['description']);
-		$fcc_item->setDefault($fcc['default']);
+		$fcc_item->setDefault($fcc['default'],$alreadyenabled);
 		$fcc_item->setDepend(empty($fcc['depend']) ? "" : $fcc['depend']);
 		if (isset($fcc['provideDest']) && $fcc['provideDest'] == true)
 		{
