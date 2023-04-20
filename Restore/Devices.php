@@ -7,6 +7,7 @@ class Devices extends Corebase{
 		if(count($configs) > 0){
 			$this->updateDevices($configs);
 		}
+		$this->FreePBX->Core->devices2astdb();
 		return $this;
 	}
 
@@ -21,6 +22,5 @@ class Devices extends Corebase{
 				$sth->execute($row);
 			}
 		}
-		$this->FreePBX->Core->devices2astdb();
 	}
 }
