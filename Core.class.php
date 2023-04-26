@@ -1467,7 +1467,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			"chanunavail_cid" => "",
 			"cwtone" => "disabled",
 			"concurrency_limit" => "",
-			"chanunavail_dest" => ""
+			"chanunavail_dest" => "",
+			"accountcode" => "",
 		);
 	}
 
@@ -1672,6 +1673,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
 		}
 
+		if(!$editmode){
+			$this->setPresenceState($id, 'available');
+		}
 		// before calling device specifc funcitions, get rid of any bogus fields in the array
 		//
 		if (isset($settings['devinfo_secret_origional'])) {
@@ -2277,6 +2281,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$astman->database_del("DEVICE",$account."/user");
 				$astman->database_del("DEVICE",$account."/default_user");
 				$astman->database_del("DEVICE",$account."/emergency_cid");
+				$astman->database_del("CustomPresence",$account);
 			}
 
 			//delete from devices table
@@ -2648,7 +2653,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 			case "pjsip":
 				$pjsip = $this->getDriver('pjsip');
 				if($pjsip !== false) {
-					$settings = array_merge($settings, $_POST);
+					if(!empty($_POST["imports"])){
+						$settings = $this->checkPJSIPsettings($settings, $_POST);
+					}
+
+					$settings = array_merge($settings, $_POST);	
+
 					$pjsip->addTrunk($trunknum,$settings);
 				}
 			break;
@@ -2680,6 +2690,108 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$this->freepbx->astman->database_del("TRUNK", $trunknum . '/dialopts');
 		}
 		return $trunknum;
+	}
+
+	public function checkPJSIPsettings($settings, $posts){
+		$imports 										= $posts["imports"];
+		$settings										= [];
+		$default_settings["channelid"] 					= "";
+		$default_settings["dialoutprefix"] 				= "";
+		$default_settings["maxchans"] 					= "";
+		$default_settings["outcid"] 					= "";
+		$default_settings["peerdetails"] 				= "";
+		$default_settings["usercontext"] 				= "";
+		$default_settings["userconfig"] 				= "";
+		$default_settings["register"]					= "";
+		$default_settings["keepcid"] 					= "off";
+		$default_settings["failtrunk"] 					= "";
+		$default_settings["disabletrunk"] 				= "off";
+		$default_settings["provider"] 					= "";
+		$default_settings["continue"] 					= "off";
+		$default_settings["dialopts"] 					= "";
+		$default_settings["tech"] 						= "pjsip";
+		$default_settings["extdisplay"] 				=  "";
+		$default_settings["sv_trunk_name"] 				= "";
+		$default_settings["sv_usercontext"] 			= "";
+		$default_settings["sv_channelid"] 				= "";
+		$default_settings["npanxx"] 					= "";
+		$default_settings["trunk_name"] 				= "";
+		$default_settings["hcid"] 						= "on";
+		$default_settings["dialoutopts_cb"] 			= "sys";
+		$default_settings["failtrunk_enable"] 			= "0";
+		$default_settings["prepend_digit"] 				= "";
+		$default_settings["username"] 					= "";
+		$default_settings["auth_username"] 				= "";
+		$default_settings["secret"] 					= "";
+		$default_settings["authentication"] 			= "outbound";
+		$default_settings["registration"] 				= "send";
+		$default_settings["language"] 					= "";
+		$default_settings["sip_server"] 				=  "";
+		$default_settings["sip_server_port"] 			= "";
+		$default_settings["context"] 					= "from-pstn";
+		$default_settings["transport"] 					= "0.0.0.0-udp";
+		$default_settings["dtmfmode"] 					= "auto";
+		$default_settings["auth_rejection_permanent"] 	= "off";
+		$default_settings["forbidden_retry_interval"] 	= "30";
+		$default_settings["fatal_retry_interval"] 		= "30";
+		$default_settings["retry_interval"] 			= "60";
+		$default_settings["expiration"] 				= "3600";
+		$default_settings["max_retries"] 				= "10000";
+		$default_settings["qualify_frequency"] 			= "60";
+		$default_settings["outbound_proxy"] 			= "";
+		$default_settings["user_eq_phone"] 				= "no";
+		$default_settings["contact_user"] 				= "";
+		$default_settings["from_domain"] 				= "";
+		$default_settings["from_user"] 					= "";
+		$default_settings["client_uri"] 				= "";
+		$default_settings["server_uri"] 				= "";
+		$default_settings["media_address"] 				= "";
+		$default_settings["aors"] 						= "";
+		$default_settings["aor_contact"] 				= "";
+		$default_settings["match"] 						= "";
+		$default_settings["support_path"] 				= "no";
+		$default_settings["t38_udptl"] 					= "no";
+		$default_settings["t38_udptl_ec"]				= "none";
+		$default_settings["t38_udptl_nat"] 				= "no";
+		$default_settings["t38_udptl_maxdatagram"] 		= "";
+		$default_settings["fax_detect"] 				= "no";
+		$default_settings["trust_rpid"] 				= "no";
+		$default_settings["sendrpid"] 					= "no";
+		$default_settings["trust_id_outbound"] 			= "no";
+		$default_settings["identify_by"] 				= "default";
+		$default_settings["inband_progress"] 			= "no";
+		$default_settings["direct_media"] 				= "no";
+		$default_settings["rewrite_contact"] 			= "no";
+		$default_settings["rtp_symmetric"] 				= "yes";
+		$default_settings["media_encryption"] 			= "no";
+		$default_settings["force_rport"] 				= "yes";
+		$default_settings["message_context"] 			= "";
+
+		foreach($default_settings as $key => $value){
+			if(empty($settings[$key])){
+				$settings[$key] = $value;
+			}
+
+			if(!empty($imports[$key])){
+				$settings[$key] = $imports[$key];
+
+				/**
+				 * If $codec doesn't exist, It will take the default values with PJSIP driver.
+				 * Else, we parse them.
+				 */
+				if($key == "codec" && !empty($value) && is_string($value) ){
+					$codecs = explode(",",$value);
+					$i = 0;
+					foreach($codecs as $c){
+						$i++;
+						$codec[$c] = $i;
+					}
+					$settings[$key] = $codec;
+				}
+			}
+		}
+
+		return $settings;
 	}
 
 	public function addSipOrIaxTrunk($config,$table,$channelid,$trunknum,$disable_flag=0,$type='peer') {
@@ -2839,7 +2951,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if (!empty($coredid) && count($coredid)) {
 			return $this->editDIDProperties($did_vars); //already exists so just edit properties
 		} else {
-			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '';
+			$did_create['privacyman']  = isset($did_vars['privacyman'])  ? $did_vars['privacyman']  : '0';
 			$did_create['pmmaxretries']  = isset($did_vars['pmmaxretries']) && $did_vars['pmmaxretries'] != '' ? $did_vars['pmmaxretries']  : '3';
 			$did_create['pmminlength']  = isset($did_vars['pmminlength']) && $did_vars['pmminlength'] != ''  ? $did_vars['pmminlength']  : '10';
 			$did_create['alertinfo']   = isset($did_vars['alertinfo'])   ? $did_vars['alertinfo']   : '';
@@ -3015,7 +3127,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
 			$astman->database_put("AMPUSER",$extension."/cwtone",isset($settings['cwtone']) ? $settings['cwtone'] : '');
-			$astman->database_put("AMPUSER",$extension."/accountcode",!empty($settings["devinfo_accountcode"]) ? $settings["devinfo_accountcode"] : '');
+			$astman->database_put("AMPUSER",$extension."/accountcode",!empty($settings["accountcode"]) ? $settings["accountcode"] : '');
 			$astman->database_put("AMPUSER",$extension."/rvolume",isset($settings['rvolume']) ? $settings['rvolume'] : '');
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
@@ -3133,6 +3245,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if ($astman->connected() && !$editmode) {
 			// TODO just change this to delete everything
 			$astman->database_deltree("AMPUSER/".$extension);
+			$astman->database_deltree("CustomDevstate/FOLLOWME".$extension);
+			$astman->database_deltree("DEVICE/".$extension);
+			$astman->database_deltree("ZULU/".$extension);
 		}
 
 		$astman->database_del("CW",$extension);
@@ -3212,7 +3327,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
 
 			$results['cwtone'] = $astman->database_get("AMPUSER",$extension."/cwtone");
-
+			$results['accountcode'] = $astman->database_get("AMPUSER",$extension."/accountcode");
+			
 			$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
 			$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
 			$results['recording_in_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/internal"));
@@ -3337,7 +3453,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return array("hookTabs" => $hookTabs, "hookContent" => $hookcontent, "oldHooks" => $module_hook->hookHtml);
 	}
 
-	public function bulkhandlerGetTypes() {
+	public function bulkhandlerGetTypes() {	
 		return array(
 			'extensions' => array(
 				'name' => _('Extensions'),
@@ -3346,7 +3462,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 			'dids' => array(
 				'name' => _('DIDs'),
 				'description' => _('DIDs / Inbound Routes')
-			)
+			),
+			'trunks' => array(
+				'name' => _('Trunks'),
+				'description' => _('Use Bulk Handler to import or export PJSIP trunk configuration.')
+			),			
 		);
 	}
 
@@ -3357,65 +3477,77 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 */
 	public function bulkhandlerGetHeaders($type) {
 		switch ($type) {
-		case 'extensions':
-			$headers = array(
-				'extension' => array(
-					'required' => true,
-					'identifier' => _('Extension'),
-					'description' => _('Extension'),
-				),
-				'name' => array(
-					'required' => true,
-					'identifier' => _('Name'),
-					'description' => _('Name'),
-				),
-				'description' => array(
-					'identifier' => _('Description'),
-					'description' => _('Description'),
-				),
-				'tech' => array(
-					'identifier' => _('Device Technology'),
-					'description' => _('Device Technology'),
-				),
-			);
+			case 'extensions':
+				$headers = array(
+					'extension' => array(
+						'required' => true,
+						'identifier' => _('Extension'),
+						'description' => _('Extension'),
+					),
+					'name' => array(
+						'required' => true,
+						'identifier' => _('Name'),
+						'description' => _('Name'),
+					),
+					'description' => array(
+						'identifier' => _('Description'),
+						'description' => _('Description'),
+					),
+					'tech' => array(
+						'identifier' => _('Device Technology'),
+						'description' => _('Device Technology'),
+					),
+				);
 
-			foreach($this->drivers as $driver) {
-				if (method_exists($driver, 'getDeviceHeaders')) {
-					$driverheaders = $driver->getDeviceHeaders();
-					if ($driverheaders) {
-						$headers = array_merge($headers, $driverheaders);
+				foreach($this->drivers as $driver) {
+					if (method_exists($driver, 'getDeviceHeaders')) {
+						$driverheaders = $driver->getDeviceHeaders();
+						if ($driverheaders) {
+							$headers = array_merge($headers, $driverheaders);
+						}
 					}
 				}
+				return $headers;
+
+				break;
+			case 'dids':
+				$headers = array(
+					'description' => array(
+						'identifier' => _('Description'),
+						'description' => _('Description'),
+					),
+					'extension' => array(
+						'identifier' => _('Incoming DID'),
+						'description' => _('Incoming DID')
+					),
+					'cidnum' => array(
+						'identifier' => _('Caller ID'),
+						'description' => _('Caller ID Number')
+					),
+					'destination' => array(
+						'identifier' => _('Destination'),
+						'description' => _('The context, extension, priority to go to when this DID is matched. Example: app-daynight,0,1'),
+						'type' => 'destination',
+					),
+				);
+
+				return $headers;
+
+				break;
+			case "trunks":	
+				$headers = [
+					'trunk_name' => [
+						'identifier' => _('trunk name'),
+						'description' => _('trunk name'),
+						],
+					'sip_server' => [
+						'identifier' => _('sip server'),
+						'description' => _('sip server'),
+						],
+					];	
+				return $headers;				
+				break;
 			}
-
-			return $headers;
-
-			break;
-		case 'dids':
-			$headers = array(
-				'description' => array(
-					'identifier' => _('Description'),
-					'description' => _('Description'),
-				),
-				'extension' => array(
-					'identifier' => _('Incoming DID'),
-					'description' => _('Incoming DID')
-				),
-				'cidnum' => array(
-					'identifier' => _('Caller ID'),
-					'description' => _('Caller ID Number')
-				),
-				'destination' => array(
-					'identifier' => _('Destination'),
-					'description' => _('The context, extension, priority to go to when this DID is matched. Example: app-daynight,0,1'),
-					'type' => 'destination',
-				),
-			);
-
-			return $headers;
-
-			break;
-		}
 	}
 
 	/**
@@ -3427,27 +3559,34 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function bulkhandlerValidate($type, $rawData) {
 		$techType = array('pjsip', 'sip', 'virtual', 'iax2', 'dahdi', 'custom');
 		switch ($type) {
-		case 'extensions':
-			foreach ($rawData as $data) {
+			case 'extensions':
+				foreach ($rawData as $data) {
+					if (empty($data['extension'])) {
+						return array("status" => false, "message" => _("Extension is missing."));
+					}
+					if (!is_numeric($data['extension'])) {
+						return array("status" => false, "message" => _("Extension is not numeric."));
+					}
+					if(empty($data['name'])){
+						return array("status" => false, "message" => _("Extension name is blank."));
+					}
+					if(!empty($data['tech']) && !in_array($data['tech'], $techType)) {
+						return array("status" => false, "message" => _("Please provide valid device technology"));
+					}
+				}
+				return array("status" => true);
 
-				if (empty($data['extension'])) {
-					return array("status" => false, "message" => _("Extension is missing."));
+			case "trunks":
+				foreach ($rawData as $data) {
+					if (empty($data['trunk_name'])) {
+						return array("status" => false, "message" => _("trunk_name is missing."));
+					}
+					if (empty($data['sip_server'])) {
+						return array("status" => false, "message" => _("sip_server is missing."));
+					}
 				}
-				if (!is_numeric($data['extension'])) {
-					return array("status" => false, "message" => _("Extension is not numeric."));
-				}
-				if(empty($data['name'])){
-					return array("status" => false, "message" => _("Extension name is blank."));
-				}
-				if(!empty($data['tech']) && !in_array($data['tech'], $techType)) {
-					return array("status" => false, "message" => _("Please provide valid device technology"));
-				}
-			}
-			return array("status" => true);
-
-			break;
+				return array("status" => true);
 		}
-
 	}
 
 	/**
@@ -3461,112 +3600,115 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$ret = NULL;
 
 		switch ($type) {
-		case 'extensions':
-			$defaulttech = $this->FreePBX->Sipsettings->getSipPortOwner();
-			foreach ($rawData as $data) {
-				$data = array_change_key_case($data, CASE_LOWER);
-				if(empty($data['tech'])) {
-					if ($defaulttech == "none") {
-						$data['tech'] = 'sip';
-					} else {
-						$data['tech'] = $defaulttech;
-					}
-				}
-				$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
-				foreach ($settings as $key => $value) {
-					$data_tech = strtoupper($data['tech']);
-					if (isset($data[$key])) {
-						/* Override default setting with our value. */
-						if($key == "secret" && $data[$key] == "REGEN"){
-							continue;
-						}
-						if(isset($data['user']) && $data_tech == "VIRTUAL" && $data['user'] == ""){
-							continue;
-						}
-						$settings[$key]['value'] = $data[$key];
-					}
-				}
-				$device = $this->getDevice($data['extension']);
-				if($replaceExisting && !empty($device)) {
-					$this->delDevice($data['extension'],true);
-				}
-				$user = $this->getUser($data['extension']);
-				if($replaceExisting && !empty($user)) {
-					$this->delUser($data['extension'],true);
-				}
-				try {
-					if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
-						return array("status" => false, "message" => _("Device could not be added."));
-					}
-				} catch(\Exception $e) {
-					return array("status" => false, "message" => $e->getMessage());
-				}
-
-				$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
-				foreach ($settings as $key => $value) {
-					if (isset($data[$key])) {
-						/* Override default setting with our value. */
-						// if concurrency_limit is "" dont override
-						if ($key == 'concurrency_limit') {
-							if ($data[$key] != "") {// there is some valid value
-								$settings[$key] = $data[$key];
-							} else { // unsetting.. So while adding it will set default value
-								unset($settings[$key]);
-							}
+			case 'extensions':
+				$defaulttech = $this->FreePBX->Sipsettings->getSipPortOwner();
+				foreach ($rawData as $data) {
+					$data = array_change_key_case($data, CASE_LOWER);
+					if(empty($data['tech'])) {
+						if ($defaulttech == "none") {
+							$data['tech'] = 'sip';
 						} else {
-							$settings[$key] = $data[$key];
+							$data['tech'] = $defaulttech;
 						}
 					}
-				}
+					$settings = $this->generateDefaultDeviceSettings($data['tech'], $data['extension'], $data['name']);
+					foreach ($settings as $key => $value) {
+						$data_tech = strtoupper($data['tech']);
+						if (isset($data[$key])) {
+							/* Override default setting with our value. */
+							if($key == "secret" && $data[$key] == "REGEN"){
+								continue;
+							}
+							if(isset($data['user']) && $data_tech == "VIRTUAL" && $data['user'] == ""){
+								continue;
+							}
+							$settings[$key]['value'] = $data[$key];
+						}
+					}
+					$device = $this->getDevice($data['extension']);
+					if($replaceExisting && !empty($device)) {
+						$this->delDevice($data['extension'],true);
+					}
+					$user = $this->getUser($data['extension']);
+					if($replaceExisting && !empty($user)) {
+						$this->delUser($data['extension'],true);
+					}
+					try {
+						if (!$this->addDevice($data['extension'], $data['tech'], $settings)) {
+							return array("status" => false, "message" => _("Device could not be added."));
+						}
+					} catch(\Exception $e) {
+						return array("status" => false, "message" => $e->getMessage());
+					}
 
-				try {
-					if (!$this->addUser($data['extension'], $settings)) {
+					$settings = $this->generateDefaultUserSettings($data['extension'], $data['name']);
+					foreach ($settings as $key => $value) {
+						if (isset($data[$key])) {
+							/* Override default setting with our value. */
+							// if concurrency_limit is "" dont override
+							if ($key == 'concurrency_limit') {
+								if ($data[$key] != "") {// there is some valid value
+									$settings[$key] = $data[$key];
+								} else { // unsetting.. So while adding it will set default value
+									unset($settings[$key]);
+								}
+							} else {
+								$settings[$key] = $data[$key];
+							}
+						}
+					}
+
+					try {
+						if (!$this->addUser($data['extension'], $settings)) {
+							//cleanup
+							$this->delDevice($data['extension'], $replaceExisting);
+							return array("status" => false, "message" => _("User could not be added."));
+						}
+					} catch(\Exception $e) {
 						//cleanup
 						$this->delDevice($data['extension'], $replaceExisting);
-						return array("status" => false, "message" => _("User could not be added."));
+						return array("status" => false, "message" => $e->getMessage());
 					}
-				} catch(\Exception $e) {
-					//cleanup
-					$this->delDevice($data['extension'], $replaceExisting);
-					return array("status" => false, "message" => $e->getMessage());
+					if(isset($data['devicedata']) && $data['devicedata'] !=''){
+						$this->astman->database_put("AMPUSER",$data['extension']."/device",$data['devicedata']);
+					}
 				}
-				if(isset($data['devicedata']) && $data['devicedata'] !=''){
-					$this->astman->database_put("AMPUSER",$data['extension']."/device",$data['devicedata']);
+				$ret = ['status' => true];
+				break;
+			case "dids":
+				foreach ($rawData as $data) {
+					$exists = $this->getDID($data['extension'], $data['cidnum']);
+					//FREEPBX-15285 bulk handler for did's check case on destination
+					$data['destination'] = strtolower($data['destination']);
+					if(!$replaceExisting && !empty($exists)) {
+						return array("status" => false, "message" => _("DID already exists"));
+					} elseif($replaceExisting && !empty($exists)) {
+						$this->delDID($data['extension'], $data['cidnum']);
+					}
+					if (isset($data['sf_enable']) && !empty($data['sf_enable'])) {
+					//Superfect module presence
+					if ($this->freepbx->Modules->checkStatus("superfecta")) {
+						\FreePBX::Superfecta()->bulkhandler_superfecta_cfg($data);
+						}
+					}
+					$this->addDID($data);
 				}
-			}
-
-			needreload();
-			$ret = array(
-				'status' => true,
-			);
-
-			break;
-		case "dids":
-			foreach ($rawData as $data) {
-				$exists = $this->getDID($data['extension'], $data['cidnum']);
-				//FREEPBX-15285 bulk handler for did's check case on destination
-				$data['destination'] = strtolower($data['destination']);
-				if(!$replaceExisting && !empty($exists)) {
-					return array("status" => false, "message" => _("DID already exists"));
-				} elseif($replaceExisting && !empty($exists)) {
-					$this->delDID($data['extension'], $data['cidnum']);
+				$ret = ['status' => true];
+				break;
+			case "trunks":				
+				foreach ($rawData as $data) {
+					$this_trunk = $this->getPJSIPtrunkIDByName($data["trunk_name"]);
+					if(!empty($this_trunk)){
+						$this->deleteTrunk($this_trunk["id"], "pjsip");
+					}			
+					$this->addTrunk($data["trunk_name"], "pjsip", $data);
 				}
-				if (isset($data['sf_enable']) && !empty($data['sf_enable'])) {
-				   //Superfect module presence
-				  if ($this->freepbx->Modules->checkStatus("superfecta")) {
-					\FreePBX::Superfecta()->bulkhandler_superfecta_cfg($data);
-				     }
-				}
-				$this->addDID($data);
-			}
-
-			needreload();
-			$ret = array(
-				'status' => true,
-			);
-
-			break;
+				$ret = ['status' => true];
+				break;
+		
 		}
+
+		if(is_array($ret)){needreload();}
 
 		return $ret;
 	}
@@ -3580,48 +3722,63 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$data = NULL;
 
 		switch ($type) {
-		case 'extensions':
-			$users = $this->getAllUsersByDeviceType();
-			foreach ($users as $user) {
-				$device = $this->getDevice($user['extension']);
-				if (isset($device['secret_origional'])) {
-					/* Don't expose our typo laden craziness to users.  We like our users! */
-					unset($device['secret_origional']);
+			case 'extensions':
+				$users = $this->getAllUsersByDeviceType();
+				foreach ($users as $user) {
+					$device = $this->getDevice($user['extension']);
+					if (isset($device['secret_origional'])) {
+						/* Don't expose our typo laden craziness to users.  We like our users! */
+						unset($device['secret_origional']);
+					}
+					if (isset($device['vm'])) {
+						/* This value doesnt make sense since we control vm externally through voicemail */
+						unset($device['vm']);
+					}
+					$du = $this->freepbx->Config->get("AMPEXTENSIONS");
+					if($du != "deviceanduser") {
+						unset($device['password']);
+						unset($device['devicetype']);
+						unset($device['user']);
+						unset($device['id']);
+						unset($device['name']);
+						unset($device['account']);
+					}
+					$tmp_user_data = $this->getUser($user['extension']);
+					if(isset($tmp_user_data['cid_masquerade'])) {
+						$user['cid_masquerade'] = $tmp_user_data['cid_masquerade'];
+					}
+					if(isset($tmp_user_data['concurrency_limit'])) {
+						$user['concurrency_limit'] = $tmp_user_data['concurrency_limit'];;
+					}
+					$existingdevices = $this->astman->database_get("AMPUSER",$user['extension']."/device");
+					$user['devicedata'] = $existingdevices;
+					$data[$user['extension']] = array_merge($user, $device);
 				}
-				if (isset($device['vm'])) {
-					/* This value doesnt make sense since we control vm externally through voicemail */
-					unset($device['vm']);
-				}
-				$du = $this->freepbx->Config->get("AMPEXTENSIONS");
-				if($du != "deviceanduser") {
-					unset($device['password']);
-					unset($device['devicetype']);
-					unset($device['user']);
-					unset($device['id']);
-					unset($device['name']);
-					unset($device['account']);
-				}
-				$tmp_user_data = $this->getUser($user['extension']);
-				if(isset($tmp_user_data['cid_masquerade'])) {
-					$user['cid_masquerade'] = $tmp_user_data['cid_masquerade'];
-				}
-				if(isset($tmp_user_data['concurrency_limit'])) {
-					$user['concurrency_limit'] = $tmp_user_data['concurrency_limit'];;
-				}
-				$existingdevices = $this->astman->database_get("AMPUSER",$user['extension']."/device");
-				$user['devicedata'] = $existingdevices;
-				$data[$user['extension']] = array_merge($user, $device);
-			}
 
-			break;
-		case 'dids':
-			$dids = $this->getAllDIDs();
-			$data = array();
-			foreach($dids as $did) {
-				$key = $did['extension']."/".$did["cidnum"];
-				$data[$key] = $did;
-			}
-			break;
+				break;
+			case 'dids':
+				$dids = $this->getAllDIDs();
+				$data = array();
+				foreach($dids as $did) {
+					$key = $did['extension']."/".$did["cidnum"];
+					$data[$key] = $did;
+				}
+				break;
+			case "trunks":
+				$data = [];
+				$pjsip_trunks = $this->drivers['pjsip']->getAllTrunks();
+				foreach($pjsip_trunks as $pjsip_trunk){
+					$trunks = $this->getPJSIPtrunkIDByName($pjsip_trunk["trunk_name"]);
+					$sql	= "SELECT * FROM trunks WHERE trunkid = :id and tech = 'pjsip' LIMIT 1";
+					$sth 	= $this->database->prepare($sql);
+					$sth->execute([":id" => $trunks["id"]]);
+					$row 	= $sth->fetch(PDO::FETCH_ASSOC);
+					foreach($row as $key => $setting){
+						$pjsip_trunk[$key] = $setting;
+					}
+					$data[] = $pjsip_trunk;
+				}
+				break;
 		}
 
 		return $data;
@@ -3868,7 +4025,13 @@ class Core extends FreePBX_Helpers implements BMO  {
 		return $ret;
 	}
 
-
+	public function getPJSIPtrunkIDByName($name){
+		$sql	= "SELECT id FROM pjsip WHERE keyword = 'trunk_name' and data = :name LIMIT 1";
+		$sth 	= $this->database->prepare($sql);
+		$sth->execute([":name" => $name]);
+		$rows = $sth->fetch(PDO::FETCH_ASSOC);
+		return $rows;
+	}
 
 	/**
 	 * Hide Trunk in routes ui
@@ -4337,5 +4500,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 		return $emailText;
+	}
+
+	private function setPresenceState($device, $type) {
+		$astman = $this->FreePBX->astman;
+		$astman->set_global(\FreePBX::Config()->get_conf_setting('AST_FUNC_PRESENCE_STATE') . '(CustomPresence:' . $device . ')', '"'.$type . ',,"');
 	}
 }

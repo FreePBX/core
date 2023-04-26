@@ -109,7 +109,8 @@ class Extensions extends Base {
 									return ['message' => _("Please enter only numeric values"),'status' => false];
 								}
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
-								if (empty($extensionExists)) {
+								$userExists = $this->freepbx->Core->getUser($input['extension']);
+								if (empty($extensionExists) && empty($userExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);

@@ -160,7 +160,8 @@ class core_conf {
 	}
 
 	function generate_http_additional($ast_version) {
-		$freepbx_conf =& freepbx_conf::create();
+		$freepbxConfCreate = freepbx_conf::create();
+		$freepbx_conf =& $freepbxConfCreate;
 
 		$output = "[general]\n";
 		$output .= "enabled=".($freepbx_conf->get_conf_setting('HTTPENABLED') ? 'yes' : 'no')."\n";
@@ -1116,6 +1117,30 @@ function core_do_get_config($engine) {
 			unset($fcc);
 			$core_conf->addFeatureMap('atxfer',$code);
 
+			$fcc_array = array(
+				array(
+					'module'  => $modulename,
+					'feature' => 'atxferabort',
+				),
+				array(
+					'module'  => $modulename,
+					'feature' => 'atxfercomplete',
+				),
+				array(
+					'module'  => $modulename,
+					'feature' => 'atxferthreeway',
+				),
+				array(
+					'module'  => $modulename,
+					'feature' => 'atxferswap',
+				),
+			);
+			foreach($fcc_array as $fcc_item)
+			{
+				$code = \featurecode::CodeActive($fcc_item['module'], $fcc_item['feature']);
+				$core_conf->addFeatureGeneral($fcc_item['feature'], $code);
+			}
+
 			$fcc = new featurecode($modulename, 'automon');
 			$code = $fcc->getCodeActive();
 			unset($fcc);
@@ -1152,6 +1177,10 @@ function core_do_get_config($engine) {
 		$fcc = new featurecode($modulename, 'chanspy');
 		$fc_chanspy = $fcc->getCodeActive();
 		unset($fcc);
+        
+        $fcc = new featurecode($modulename, 'callseize');
+        $fc_callseize = $fcc->getCodeActive();
+        unset($fcc);
 
 		$fcc = new featurecode($modulename, 'simu_pstn');
 		$fc_simu_pstn = $fcc->getCodeActive();
@@ -1435,6 +1464,16 @@ function core_do_get_config($engine) {
 			$ext->add('app-chanspy', $fc_chanspy, '', new ext_chanspy(''));
 			$ext->add('app-chanspy', $fc_chanspy, '', new ext_hangup(''));
 		}
+        
+        // call seize
+        if ($fc_callseize != '') {
+        	$ext->addInclude('from-internal-additional', 'app-callseize'); // Add the include from from-internal
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_macro('user-callerid'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_noop('${CALLERID(num)} is seizing the call from ${EXTEN:3}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_bridge('${IMPORT(${CHANNELS(${EXTEN:3})},BRIDGEPEER)}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_execif('$["${BRIDGERESULT}"!="SUCCESS"]','Playback','im-sorry&an-error-has-occurred&please-try-again-later&goodbye'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_hangup(''));
+        }
 
 		// Simulate Inbound call
 		if ($fc_simu_pstn != '') {
@@ -4735,12 +4774,13 @@ function core_users_configpageload() {
 
 			if (!isset($GLOBALS['abort']) || $GLOBALS['abort'] !== true) {
 				$extenInfo=\FreePBX::Core()->getUser($extdisplay);
+				$deviceInfo=\FreePBX::Core()->getDevice($extdisplay);
 				extract($extenInfo);
 			}
 			if (isset($deviceInfo) && is_array($deviceInfo)) {
 				extract($deviceInfo);
 			}
-
+			
 			if ( $display == 'extensions' ) {
 				$currentcomponent->addguielem('_top', new gui_pageheading('title', _("Extension").": $extdisplay", false), 0);
 			} else {
@@ -4816,6 +4856,11 @@ function core_users_configpageload() {
 		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false), "advanced");
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")), "advanced");
+
+		if($_REQUEST["tech_hardware"] === "virtual" || empty($tech)){
+			// Account code for Virtual extension.
+			$currentcomponent->addguielem($section, new gui_textbox('accountcode', $accountcode, _("Accountcode"), _("Accountcode for this device.")), "advanced");
+		}
 
 		// If user mode, list devices associated with this user
 		//
