@@ -53,9 +53,9 @@ $fcc_array 	= array(
   	array(
 		'module' 	  => 'core',
 		'feature' 	  => 'callseize',
-		'default' 	  => '*37',
+		'default' 	  => '*59',
 		'description' => _('Call Seize'),
-		'helptext' => 'Seizes an ACTIVE internal or external call on the passed extension. Example: *37201 will seize the call from extension 201.',
+		'helptext' => _('Seizes an ACTIVE internal or external call on the passed extension. Example: *59201 will seize the call from extension 201.'),
 	),
 	array(
 		'module' 	  => 'core',
