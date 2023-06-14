@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>15.0.22.32</version>
+	<version>15.0.22.33</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*15.0.22.33* FREEI-176 
 		*15.0.22.32* FREEI-5870 
 		*15.0.22.31* FREEI-5863 
 		*15.0.22.30* Packaging of ver 15.0.22.30
