@@ -21,7 +21,7 @@ class Trunks extends Command {
 			new InputOption('list', null, InputOption::VALUE_NONE, _('list trunks')),
 			new InputOption('xml', null, InputOption::VALUE_NONE, _('format list as json')),
 			new InputOption('json', null, InputOption::VALUE_NONE, _('format list as xml')),
-			new InputArgument('args', InputArgument::IS_ARRAY, null, null),));
+			new InputArgument('args', InputArgument::IS_ARRAY, '', null),));
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$args = $input->getArgument('args');

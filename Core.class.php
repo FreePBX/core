@@ -4255,7 +4255,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$pm2 = $this->freepbx->Pm2;
 		$status = $pm2->getStatus("core-fastagi");
 		//its not started so lets attempt to start it
-		if($status['pm2_env']['status'] !== 'online') {
+		if($status && $status['pm2_env']['status'] !== 'online') {
 			//its not so lets try to start it!
 			try {
 				//attempting
