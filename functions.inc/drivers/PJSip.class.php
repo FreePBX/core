@@ -260,7 +260,11 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => 'No');
 
 		$allDevices=$this->getAllDevs();
-		$removeExtngVal=($allDevices[$deviceInfo['id']]['remove_existing']) ? $allDevices[$deviceInfo['id']]['remove_existing'] : 'no';
+		if(isset($deviceInfo['id'])) {
+			$removeExtngVal = ($allDevices[$deviceInfo['id']]['remove_existing']) ? $allDevices[$deviceInfo['id']]['remove_existing'] : 'no';
+		} else {
+			$removeExtngVal = 'no';
+		}
 
 		$tt = _("Controls whether an additional registration will be permitted when max_contacts has already been met. If set to 'Yes', new registrations will be allowed by displacing an old one. If max_contacts is set to 1, this setting will be ignored and forcefully set to yes to conform with the older chan_sip behaviour.");
 		$tmparr['remove_existing'] = array('prompttext' => _('Remove Existing'), 'value' => $removeExtngVal, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');

@@ -3999,6 +3999,7 @@ function core_devices_get_user_mappings() {
 
 function core_devices_add($id,$tech,$dial,$devicetype,$user,$description,$emergency_cid=null,$hint_override=null,$editmode=false){
 	_core_backtrace();
+	$account = null;
 	$flag = 2;
 	$fields = FreePBX::Core()->convertRequest2Array($id,$tech,$flag);
 	$settings = array(
@@ -4748,7 +4749,7 @@ function core_users_configpageload() {
 	global $amp_conf;
 
 	// Ensure variables possibly extracted later exist
-	$name = $outboundcid = $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = null;
+	$name = $outboundcid = $sipname = $cid_masquerade = $newdid_name = $newdid = $newdidcid = $call_screen = $pinless = $accountcode = null;
 
 	// Init vars from $_REQUEST[]
 	$display = isset($_REQUEST['display'])?$_REQUEST['display']:null;;
@@ -4853,11 +4854,11 @@ function core_users_configpageload() {
 			}", 9);
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '(typeof isCorrectLengthExtensions != "undefined") ? !isCorrectLengthExtensions() || !isUnicodeLetter || isWhitespace() : !isUnicodeLetter() || isWhitespace()', $msgInvalidDispName, false), 3, null, $category);
-		$cid_masquerade = (trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
+		$cid_masquerade = (trim($cid_masquerade ?? '') == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false), "advanced");
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")), "advanced");
 
-		if($_REQUEST["tech_hardware"] === "virtual" || empty($tech)){
+		if(isset($_REQUEST["tech_hardware"]) && $_REQUEST["tech_hardware"] === "virtual" || empty($tech)){
 			// Account code for Virtual extension.
 			$currentcomponent->addguielem($section, new gui_textbox('accountcode', $accountcode, _("Accountcode"), _("Accountcode for this device.")), "advanced");
 		}
@@ -4893,6 +4894,7 @@ function core_users_configpageload() {
 		$section = _("Extension Options");
 		$category = "advanced";
 		$ringtimer = (isset($ringtimer) ? $ringtimer : '0');
+		$rvolume = (isset($rvolume) ? $rvolume : '0');
 
 		$dialopts = isset($dialopts) ? $dialopts : false;
 		$disable_dialopts = $dialopts === false;
@@ -5269,7 +5271,7 @@ function core_devices_configprocess() {
 	}
 
 	//create vars from the request
-	$tech = $action = null;
+	$tech = $action = $hint_override = $devinfo_dial = $emergency_cid = null;
 	extract($_REQUEST);
 
 	if ($action == "edit" && $tech == '') {

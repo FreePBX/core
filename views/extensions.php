@@ -13,7 +13,7 @@
         <div class="wrapper">
           <ul class="nav nav-tabs list" role="tablist">
             <?php foreach(array_keys($html['middle']) as $category) { ?>
-							<?php $hidden = is_array($hideCategory) && in_array($category,$hideCategory) ? "hidden" : ""?>
+							<?php $hidden = (isset($hideCategory) && is_array($hideCategory) && in_array($category,$hideCategory)) ? "hidden" : ""?>
               <li data-name="<?php echo strtolower($category)?>" class="change-tab <?php echo ($active == strtolower($category)) ? 'active' : ''?> <?php echo $hidden?>"><a href="#<?php echo strtolower($category)?>" aria-controls="<?php echo strtolower($category)?>" role="tab" data-toggle="tab"><?php echo $tabtranslations[$category]?></a></li>
             <?php } ?>
           </ul>
