@@ -375,9 +375,9 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="fanswer"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="radio" name="fanswer" id="fansweryes" value="CHECKED" <?php echo ($fanswer == "CHECKED"?"CHECKED":"") ?>>
+									<input type="radio" name="fanswer" id="fansweryes" value="CHECKED" <?php echo ((isset($fanswer) && $fanswer == "CHECKED")?"CHECKED":"") ?>>
 									<label for="fansweryes"><?php echo _("Yes");?></label>
-									<input type="radio" name="fanswer" id="fanswerno" value="" <?php echo ($fanswer == "CHECKED"?"":"CHECKED") ?>>
+									<input type="radio" name="fanswer" id="fanswerno" value="" <?php echo ((isset($fanswer) && $fanswer == "CHECKED")?"":"CHECKED") ?>>
 									<label for="fanswerno"><?php echo _("No");?></label>
 								</div>
 							</div>

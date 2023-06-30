@@ -1,9 +1,10 @@
 <?php
 	foreach($transports as $tp) {
-		$transportopts .= '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
+		$transportopts = '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
 	}
 	$seq = 1;
 	$codechtml = '<ul class="sortable">';
+	$tabindex = 0;
 	foreach ($codecs as $codec => $codec_state) {
 		$tabindex++;
 		$codec_trans = _($codec);
@@ -54,7 +55,7 @@
 						<label class="control-label" for="username"><?php echo _("Username") ?></label>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" name="username" id="username" value="<?php echo $username?>"/>
+						<input type="text" class="form-control" name="username" id="username" value="<?php echo $username ?? ''; ?>"/>
 					</div>
 				</div>
 			</div>
@@ -68,7 +69,7 @@
 						 <i class="fa fa-question-circle fpbx-help-icon" data-for="auth_username"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" name="auth_username" id="auth_username" value="<?php echo $auth_username ?>">
+						<input type="text" class="form-control" name="auth_username" id="auth_username" value="<?php echo $auth_username ?? ''; ?>">
 					</div>
 				</div>
 				<div class="col-md-12">
@@ -84,7 +85,7 @@
 						<label class="control-label" for="secret"><?php echo _("Secret") ?></label>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control password-meter confidential" name="secret" id="secret" value="<?php echo $secret?>"/>
+						<input type="text" class="form-control password-meter confidential" name="secret" id="secret" value="<?php echo $secret ?? ''; ?>"/>
 					</div>
 				</div>
 			</div>
@@ -165,7 +166,7 @@
 						<i class="fa fa-question-circle fpbx-help-icon" data-for="sip_server"></i>
 					</div>
 					<div class="col-md-9">
-						<input type="text" class="form-control" name="sip_server" id="sip_server" value="<?php echo $sip_server?>"/>
+						<input type="text" class="form-control" name="sip_server" id="sip_server" value="<?php echo $sip_server ?? ''; ?>"/>
 					</div>
 				</div>
 				<div class="col-md-12">
@@ -287,9 +288,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php echo ($pjsip_line == "true" || empty($pjsip_line)?"CHECKED":"") ?>>
+								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php echo ((isset($pjsip_line) && ($pjsip_line == "true" || empty($pjsip_line)))?"CHECKED":"") ?>>
 								<label for="pjsip_lineyes"><?php echo _("Yes")?></label>
-								<input type="radio" name="pjsip_line" id="pjsip_lineno" value="false" <?php echo ($pjsip_line == "false" ?"CHECKED":"") ?>>
+								<input type="radio" name="pjsip_line" id="pjsip_lineno" value="false" <?php echo ((isset($pjsip_line) && $pjsip_line == "false") ?"CHECKED":"") ?>>
 								<label for="pjsip_lineno"><?php echo _("No")?></label>
 							</div>
 						</div>
@@ -314,9 +315,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="send_connected_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php echo ($send_connected_line == "true"?"CHECKED":"") ?>>
+								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php echo ((isset($send_connected_line) && $send_connected_line) == "true"?"CHECKED":"") ?>>
 								<label for="send_connected_lineyes"><?php echo _("Yes")?></label>
-								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="false" <?php echo ($send_connected_line == "false" || empty($send_connected_line) ?"CHECKED":"") ?>>
+								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="false" <?php echo ((isset($send_connected_line) && ($send_connected_line == "false" || empty($send_connected_line))) ?"CHECKED":"") ?>>
 								<label for="send_connected_lineno"><?php echo _("No")?></label>
 							</div>
 						</div>
@@ -528,7 +529,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="outbound_proxy"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="outbound_proxy" id="outbound_proxy" value="<?php echo $outbound_proxy?>"/>
+								<input type="text" class="form-control" name="outbound_proxy" id="outbound_proxy" value="<?php echo $outbound_proxy ?? ''; ?>"/>
 							</div>
 						</div>
 					</div>
@@ -552,9 +553,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="user_eq_phone"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php echo ($user_eq_phone == "yes") ? "CHECKED" : "" ?>>
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php echo (isset($user_eq_phone) && $user_eq_phone == "yes") ? "CHECKED" : "" ?>>
 								<label for="user_eq_phoneyes"><?php echo _("Yes")?></label>
-								<input type="radio" name="user_eq_phone" id="user_eq_phoneno" value="no" <?php echo ($user_eq_phone == "no" || empty($user_eq_phone)) ? "CHECKED" : "" ?>>
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneno" value="no" <?php echo (isset($user_eq_phone) && ($user_eq_phone == "no" || empty($user_eq_phone))) ? "CHECKED" : "" ?>>
 								<label for="user_eq_phoneno"><?php echo _("No")?></label>
 							</div>
 						</div>
@@ -579,7 +580,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="contact_user"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="contact_user" id="contact_user" value="<?php echo $contact_user?>"/>
+								<input type="text" class="form-control" name="contact_user" id="contact_user" value="<?php echo $contact_user ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -603,7 +604,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_domain"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="from_domain" id="from_domain" value="<?php echo $from_domain?>"/>
+								<input type="text" class="form-control" name="from_domain" id="from_domain" value="<?php echo $from_domain ?? ''?>"/>
 							</div>
 						</div>
 					</div>
@@ -626,7 +627,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="from_user"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="from_user" id="from_user" value="<?php echo $from_user?>"/>
+								<input type="text" class="form-control" name="from_user" id="from_user" value="<?php echo $from_user ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -649,7 +650,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="client_uri"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="client_uri" id="client_uri" value="<?php echo $client_uri?>"/>
+								<input type="text" class="form-control" name="client_uri" id="client_uri" value="<?php echo $client_uri ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -675,7 +676,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="server_uri"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="server_uri" id="server_uri" value="<?php echo $server_uri?>"/>
+								<input type="text" class="form-control" name="server_uri" id="server_uri" value="<?php echo $server_uri ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -727,7 +728,7 @@
                                                                 <i class="fa fa-question-circle fpbx-help-icon" data-for="aors"></i>
                                                         </div>
                                                         <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="aors" id="aors" value="<?php echo $aors?>"/>
+                                                                <input type="text" class="form-control" name="aors" id="aors" value="<?php echo $aors ?? '';?>"/>
                                                         </div>
                                                 </div>
                                         </div>
@@ -751,7 +752,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="aor_contact"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="aor_contact" id="aor_contact" value="<?php echo $aor_contact?>"/>
+								<input type="text" class="form-control" name="aor_contact" id="aor_contact" value="<?php echo $aor_contact ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -777,7 +778,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="match"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="match" id="match" value="<?php echo $match?>"/>
+								<input type="text" class="form-control" name="match" id="match" value="<?php echo $match ?? '';?>"/>
 							</div>
 						</div>
 					</div>
@@ -827,9 +828,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="t38_udptl" id="t38_udptlyes" value="yes" <?php echo ($t38_udptl == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="t38_udptl" id="t38_udptlyes" value="yes" <?php echo ((isset($t38_udptl) && $t38_udptl == "yes")?"CHECKED":"") ?>>
 								<label for="t38_udptlyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="t38_udptl" id="t38_udptlno" value="no" <?php echo ($t38_udptl == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="t38_udptl" id="t38_udptlno" value="no" <?php echo ((isset($t38_udptl) && $t38_udptl == "yes")?"":"CHECKED") ?>>
 								<label for="t38_udptlno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -856,9 +857,9 @@
 							<div class="col-md-9 radioset">
 								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecnone" value="none" <?php echo (!isset($t38_udptl_ec) || $t38_udptl_ec == "none" || $t38_udptl_ec == "" ?"CHECKED":"") ?>>
 								<label for="t38_udptl_ecnone"><?php echo _("None");?></label>
-								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ($t38_udptl_ec == "fec"?"CHECKED":"") ?>>
+								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecfec" value="fec" <?php echo ((isset($t38_udptl_ec) && $t38_udptl_ec == "fec")?"CHECKED":"") ?>>
 								<label for="t38_udptl_ecfec"><?php echo _("Forward");?></label>
-								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecred" value="redundancy" <?php echo ($t38_udptl_ec == "redundancy"?"CHECKED":"") ?>>
+								<input type="radio" name="t38_udptl_ec" id="t38_udptl_ecred" value="redundancy" <?php echo ((isset($t38_udptl_ec) && $t38_udptl_ec == "redundancy")?"CHECKED":"") ?>>
 								<label for="t38_udptl_ecred"><?php echo _("Redundancy");?></label>
 							</div>
 						</div>
@@ -883,9 +884,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_nat"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natyes" value="yes" <?php echo ($t38_udptl_nat == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natyes" value="yes" <?php echo ((isset($t38_udptl_nat) && $t38_udptl_nat == "yes")?"CHECKED":"") ?>>
 								<label for="t38_udptl_natyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natno" value = "no" <?php echo ($t38_udptl_nat == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="t38_udptl_nat" id="t38_udptl_natno" value = "no" <?php echo ((isset($t38_udptl_nat) && $t38_udptl_nat == "yes")?"":"CHECKED") ?>>
 								<label for="t38_udptl_natno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -910,7 +911,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="t38_udptl_maxdatagram"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="number" class="form-control" name="t38_udptl_maxdatagram" min=0 id="t38_udptl_maxdatagram" value="<?php echo $t38_udptl_maxdatagram?>"/>
+								<input type="number" class="form-control" name="t38_udptl_maxdatagram" min=0 id="t38_udptl_maxdatagram" value="<?php echo $t38_udptl_maxdatagram ?? ''?>"/>
 							</div>
 						</div>
 					</div>
@@ -934,9 +935,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="fax_detect"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="fax_detect" id="fax_detectyes" value="yes" <?php echo ($fax_detect == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="fax_detect" id="fax_detectyes" value="yes" <?php echo ((isset($fax_detect) && $fax_detect == "yes")?"CHECKED":"") ?>>
 								<label for="fax_detectyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="fax_detect" id="fax_detectno" value="no" <?php echo ($fax_detect == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="fax_detect" id="fax_detectno" value="no" <?php echo ((isset($fax_detect) && $fax_detect == "yes")?"":"CHECKED") ?>>
 								<label for="fax_detectno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -961,9 +962,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_rpid"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="trust_rpid" id="trust_rpidyes" value="yes" <?php echo ($trust_rpid == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="trust_rpid" id="trust_rpidyes" value="yes" <?php echo ((isset($trust_rpid) && $trust_rpid == "yes")?"CHECKED":"") ?>>
 								<label for="trust_rpidyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="trust_rpid" id="trust_rpidno" value="no" <?php echo ($trust_rpid == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="trust_rpid" id="trust_rpidno" value="no" <?php echo ((isset($trust_rpid) && $trust_rpid == "yes")?"":"CHECKED") ?>>
 								<label for="trust_rpidno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1019,9 +1020,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="trust_id_outbound"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="trust_id_outbound" id="trust_id_outboundyes" value="yes" <?php echo ($trust_id_outbound == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundyes" value="yes" <?php echo ((isset($trust_id_outbound) && $trust_id_outbound == "yes")?"CHECKED":"") ?>>
 								<label for="trust_id_outboundyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="trust_id_outbound" id="trust_id_outboundno" value = "no" <?php echo ($trust_id_outbound == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="trust_id_outbound" id="trust_id_outboundno" value = "no" <?php echo ((isset($trust_id_outbound) && $trust_id_outbound == "yes")?"":"CHECKED") ?>>
 								<label for="trust_id_outboundno"><?php echo _("No");?></label>
 							</div>
 						</div>

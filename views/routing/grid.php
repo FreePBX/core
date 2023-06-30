@@ -56,7 +56,7 @@ HERE;
 </div>
 <div class="table-responsive">
 <table id="routes"
-			data-url="<?php echo $dataurl?>"
+			data-url="<?php echo $dataurl ?? ''?>"
 			data-cache="false"
 			data-cookie="true"
 			data-cookie-id-table="routing-grid-table"

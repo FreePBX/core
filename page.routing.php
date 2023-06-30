@@ -79,7 +79,7 @@ switch($request['view']){
 		}else{
 			$sql = "SELECT MAX(`seq`) as max FROM outbound_route_sequence";
 			$res = \FreePBX::Database()->query($sql)->fetch(\PDO::FETCH_COLUMN);
-			$route_seq = ctype_digit($res) ? $res + 1 : 0;
+			$route_seq = is_numeric($res) ? $res + 1 : 0;
 			if (!isset($dialpattern_array)) {
 				$dialpattern_array = array();
 			}
@@ -87,7 +87,7 @@ switch($request['view']){
 							'formAction' => 'addroute',
 							'route_seq' => $route_seq,
 							'dialpattern_array' => $dialpattern_array,
-							'trunkpriority' => $trunkpriority,
+							'trunkpriority' => $trunkpriority ?? '',
 							'hooks' => \FreePBX::Core()->hookTabs($request['display']),
 						);
 		}

@@ -8,7 +8,7 @@ if(!empty($viewinfo) && is_array($viewinfo)) {
 //Set the page parameters...
 $request = $_REQUEST;
 $display = $request['display']?$request['display']:'routing';
-$extdisplay = $request['id']?$request['id']:'';
+$extdisplay = (isset($request['id']))?$request['id']:'';
 $dpt_title_class = 'dpt-title';
 
 if(!empty($request['id'])){
@@ -18,7 +18,7 @@ if(!empty($request['id'])){
 }
 //Optional elements
 if (function_exists('music_list')){
-	$optionalelems = load_view(__DIR__.'/moh.php', array("mohsilence" => $mohsilence));
+	$optionalelems = load_view(__DIR__.'/moh.php', array("mohsilence" => $mohsilence ?? ''));
 }
 
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
@@ -26,10 +26,10 @@ if (function_exists('timeconditions_timegroups_drawgroupselect')){
 }
 
 //Notification tab email settings
-$emailfrom = $emailInfo['emailfrom'];
-$emailto = $emailInfo['emailto'];
-$emailsubject = $emailInfo['emailsubject'];
-$emailbody = $emailInfo['emailbody'];
+$emailfrom = (isset($emailInfo) && isset($emailInfo['emailfrom'])) ? $emailInfo['emailfrom'] : '';
+$emailto = (isset($emailInfo) && isset($emailInfo['emailto'])) ? $emailInfo['emailto'] : '';
+$emailsubject = (isset($emailInfo) && isset($emailInfo['emailsubject'])) ? $emailInfo['emailsubject'] : '';
+$emailbody = (isset($emailInfo) && isset($emailInfo['emailbody'])) ? $emailInfo['emailbody'] : '';
 
 //Hooks....
 //$module_hook = moduleHook::create();
@@ -126,7 +126,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpt_title_class = 'dpt-title dpt-nodisplay';
 	}
 	$dpinput[] = '<tr id = "dprow'.$idx.'">';
-	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['prepend_digits'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
@@ -134,14 +134,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'2">)</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
-	$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['match_pattern_prefix'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" class="form-control '.$dpt_class.'" value="" > ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
-	$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['match_pattern_pass'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
@@ -149,7 +149,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'5">/</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
-	$dpt_class = $pattern['match_cid'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['match_cid'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td>';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<input placeholder="'.$ci_tit.'" type="text" id="match_cid_'.$idx.'" class="form-control '.$dpt_class.'" value="">';
@@ -268,7 +268,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routename"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo htmlspecialchars($routename);?>" required>
+									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo htmlspecialchars($routename ?? '');?>" required>
 								</div>
 							</div>
 						</div>
@@ -292,7 +292,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="outcid" name="outcid" value="<?php echo htmlspecialchars($outcid);?>">
+									<input type="text" class="form-control" id="outcid" name="outcid" value="<?php echo htmlspecialchars($outcid ?? '');?>">
 								</div>
 							</div>
 						</div>
@@ -317,9 +317,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 								</div>
 								<div class="col-md-9 radioset">
 									<span class="radioset">
-									<input type="radio" name="outcid_mode" id="outcid_modeyes" value="override_extension" <?php echo ($outcid_mode == "override_extension"?"CHECKED":"") ?>>
+									<input type="radio" name="outcid_mode" id="outcid_modeyes" value="override_extension" <?php echo ((isset($outcid_mode) && $outcid_mode == "override_extension")?"CHECKED":"") ?>>
 									<label for="outcid_modeyes"><?php echo _("Yes");?></label>
-									<input type="radio" name="outcid_mode" id="outcid_modeno" value="" <?php echo ($outcid_mode == "override_extension"?"":"CHECKED") ?>>
+									<input type="radio" name="outcid_mode" id="outcid_modeno" value="" <?php echo ((isset($outcid_mode) && $outcid_mode == "override_extension")?"":"CHECKED") ?>>
 									<label for="outcid_modeno"><?php echo _("No");?></label>
 									</span>
 								</div>
@@ -345,7 +345,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routepass"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control confidential" id="routepass" name="routepass" value="<?php echo htmlspecialchars($routepass);?>"/>
+									<input type="text" class="form-control confidential" id="routepass" name="routepass" value="<?php echo htmlspecialchars($routepass ?? '');?>"/>
 								</div>
 							</div>
 						</div>
@@ -369,9 +369,9 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routetype"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type='checkbox' name='emergency' id="emergency" value='YES' <?php echo ($emergency ? "CHECKED" : "") ?>>
+									<input type='checkbox' name='emergency' id="emergency" value='YES' <?php echo ((isset($emergency) && $emergency )? "CHECKED" : "") ?>>
 									<label for="emergency"><?php echo _("Emergency")?></label>
-									<input type='checkbox' name='intracompany' id="intracompany" value='YES' <?php echo ($intracompany ? "CHECKED" : "") ?>>
+									<input type='checkbox' name='intracompany' id="intracompany" value='YES' <?php echo ((isset($intracompany) && $intracompany) ? "CHECKED" : "") ?>>
 									<label for="intracompany"><?php echo _("Intra-Company")?></label>
 								</div>
 							</div>
@@ -524,7 +524,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 										<span class="radioset">
 										<input type="radio" name="notification_on" id="call" value="call" <?php echo (empty($notification_on) || $notification_on == "call"?"CHECKED":"") ?>>
 										<label for="call"><?php echo _("Call successful");?></label>
-										<input type="radio" name="notification_on" id="pattern" value="pattern" <?php echo ($notification_on == "pattern"?"CHECKED":"") ?>>
+										<input type="radio" name="notification_on" id="pattern" value="pattern" <?php echo ((isset($notification_on) && $notification_on == "pattern")?"CHECKED":"") ?>>
 										<label for="pattern"><?php echo _("Dial pattern matched");?></label>
 										</span>
 									</div>

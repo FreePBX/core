@@ -36,10 +36,10 @@ if($extdisplay){
 	if (is_array($ininfo) && !empty($ininfo)) {
 		extract($ininfo);
 	}
-	$description = htmlspecialchars($description);
-	$extension   = htmlspecialchars($extension);
-	$cidnum      = htmlspecialchars($cidnum);
-	$grppre      = htmlspecialchars($grppre);
+	$description = htmlspecialchars($description ?? "");
+	$extension   = htmlspecialchars($extension ?? "");
+	$cidnum      = htmlspecialchars($cidnum ?? "");
+	$grppre      = htmlspecialchars($grppre ?? "");
 	$heading = '<h2>'._("Route").': ';
 	if($description){
 		$heading .= $description . '</h2>';
@@ -52,22 +52,22 @@ if($extdisplay){
 	$formdata['description'] = $description;
 	$formdata['extension'] = $extension;
 	$formdata['cidnum'] = $cidnum;
-	$formdata['alertinfo'] = $alertinfo;
+	$formdata['alertinfo'] = $alertinfo ?? "";
 	$formdata['grppre'] = $grppre;
-	$formdata['destination'] = $destination;
-	$formdata['pricid'] = $pricid;
-	$formdata['alertinfo'] = $alertinfo;
-	$formdata['ringing'] = $ringing;
-	$formdata['fanswer'] = $fanswer;
-	$formdata['reversal'] = $reversal;
-	$formdata['delay_answer'] = $delay_answer;
-	$formdata['privacyman'] = $privacyman;
-	$formdata['pmmaxretries'] = $pmmaxretries;
-	$formdata['pmminlength'] = $pmminlength;
-	$formdata['pmminlength'] = $pmminlength;
-	$formdata['mohclass'] = $mohclass;
-	$formdata['rvolume'] = $rvolume;
-	$formdata['indication_zone'] = $indication_zone;
+	$formdata['destination'] = $destination ?? "";
+	$formdata['pricid'] = $pricid ?? "";
+	$formdata['alertinfo'] = $alertinfo ?? "";
+	$formdata['ringing'] = $ringing ?? "";
+	$formdata['fanswer'] = $fanswer ?? "";
+	$formdata['reversal'] = $reversal ?? "";
+	$formdata['delay_answer'] = $delay_answer ?? "";
+	$formdata['privacyman'] = $privacyman ?? "";
+	$formdata['pmmaxretries'] = $pmmaxretries ?? "";
+	$formdata['pmminlength'] = $pmminlength ?? "";
+	$formdata['pmminlength'] = $pmminlength ?? "";
+	$formdata['mohclass'] = $mohclass ?? "";
+	$formdata['rvolume'] = $rvolume ?? "";
+	$formdata['indication_zone'] = $indication_zone ?? "";
 
 }else{
 	$extension = isset($extarray[0]) ? $extarray[0] : '';

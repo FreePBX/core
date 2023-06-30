@@ -2,7 +2,7 @@
 $pageheading = sprintf(_("%s %s Trunk"),(empty($extdisplay) ? _('Add'): _('Edit')),$upper_tech);
 if(!empty($extdisplay)){
 	if ($num_routes > 0){
-		$pageinfoinuse .= '<div class="panel panel-default" id="inusepanel">';
+		$pageinfoinuse = '<div class="panel panel-default" id="inusepanel">';
 		$pageinfoinuse .= '<div class="panel-heading">';
 		$pageinfoinuse .= '<h4>'._("In use by")." ".$num_routes." ".($num_routes == 1 ? _("route") : _("routes"));
 		$pageinfoinuse .= '<a  class="pull-right" data-toggle="collapse" data-target="#inusetable" href="#inusetable">';
@@ -20,14 +20,14 @@ if(!empty($extdisplay)){
 		$pageinfoinuse .= '</div>';
 		$pageinfoinuse .= '</div>';
 	}else{
-		$pageinfoinuse .= '<div class="alert alert-warning"><h3>'._("WARNING: This trunk is not used by any routes!").'</h3>';
+		$pageinfoinuse = '<div class="alert alert-warning"><h3>'._("WARNING: This trunk is not used by any routes!").'</h3>';
 		$pageinfoinuse .= '<p>'._("This trunk will not be able to be used for outbound calls until a route is setup that uses it.").'</p>';
 		$pageinfoinuse .= '<p>'._("Click on <a href='?display=routing'>Outbound Routes</a> to setup routing.").'</p>';
 		$pageinfoinuse .= '</div>';
 	}
 }
 if(!empty($helptext)) {
-	$pageinfohelp .= '<div class="well well-info">';
+	$pageinfohelp = '<div class="well well-info">';
 	$pageinfohelp .= $helptext;
 	$pageinfohelp .= '</div>';
 }
@@ -82,7 +82,7 @@ switch($tech){
 	$mtfhtml .= '<!--END MONITOR TRUNK FAILURES-->';
 
 $dpmrtop = _("These rules can manipulate the dialed number before sending it out this trunk. If no rule applies, the number is not changed. The original dialed number is passed down from the route where some manipulation may have already occurred. This trunk has the option to further manipulate the number. If the number matches the combined values in the <b>prefix</b> plus the <b>match pattern</b> boxes, the rule will be applied and all subsequent rules ignored.<br/> Upon a match, the <b>prefix</b>, if defined, will be stripped. Next the <b>prepend</b> will be inserted in front of the <b>match pattern</b> and the resulting number will be sent to the trunk. All fields are optional.").'<br /><br />';
-$dpmrhtml .= '<b>' . _("Rules:") . '</b><br />';
+$dpmrhtml = '<b>' . _("Rules:") . '</b><br />';
 $dpmrhtml .= '<strong>X</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 0-9") . '<br />';
 $dpmrhtml .= '<strong>Z</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 1-9") . '<br />';
 $dpmrhtml .= '<strong>N</strong>&nbsp;&nbsp;&nbsp;' . _("matches any digit from 2-9") . '<br />';
@@ -145,7 +145,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$dpt_title_class = 'dpt-title dpt-nodisplay';
 	}
 	$dpinput[] = '<tr id = "dprow'.$idx.'">';
-	$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['prepend_digits'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td class="hidden-xs prepend">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'1">(</span>';
@@ -153,14 +153,14 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'2">)</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
-	$dpt_class = $pattern['match_pattern_prefix'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['match_pattern_prefix'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td class="prefix">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<input placeholder="'. $pf_tit .'" type="text" id="pattern_prefix_'.$idx.'" name="pattern_prefix[]" class="form-control dp-prefix '.$dpt_class.'" value="" > ';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'3">|</span>';
 	$dpinput[] = '	</div>';
 	$dpinput[] = '</td>';
-	$dpt_class = $pattern['match_pattern_pass'] == '' ? $dpt_title_class : 'dpt-value';
+	$dpt_class = (isset($pattern) && $pattern['match_pattern_pass'] == '') ? $dpt_title_class : 'dpt-value';
 	$dpinput[] = '<td class="match">';
 	$dpinput[] = '	<div class="input-group">';
 	$dpinput[] = '		<span class="input-group-addon" id="basic-addon'.$idx.'4">[</span>';
@@ -190,8 +190,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 ?>
 <div class="container-fluid">
 	<h1><?php echo $pageheading ?></h1>
-	<?php echo $pageinfoinuse ?>
-	<?php echo $pageinfohelp ?>
+	<?php echo $pageinfoinuse ?? ''; ?>
+	<?php echo $pageinfohelp ?? ''; ?>
 	<div class = "display full-border">
 		<div class="row">
 			<div class="col-sm-12">

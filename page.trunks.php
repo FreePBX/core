@@ -386,7 +386,7 @@ $displayvars = array(
 	'display' => $display,
 	'trunks' => $trunks,
 	'trunknum' => $trunknum,
-	'popover' => $_REQUEST['fw_popover']
+	'popover' => $_REQUEST['fw_popover'] ?? null
 );
 show_view(dirname(__FILE__).'/views/trunks/header.php',$displayvars);
 
@@ -397,7 +397,7 @@ if (!$tech && !$extdisplay) {
 	$trunk_types = \FreePBX::Core()->listTrunkTypes();
 
 	$displayvars['trunk_types'] = $trunk_types;
-	if ($_REQUEST['fw_popover'] == 1) {
+	if (isset($_REQUEST['fw_popover']) && $_REQUEST['fw_popover'] == 1) {
 		show_view(dirname(__FILE__).'/views/trunks/popover_main.php',$displayvars);
 	}else{
 	        show_view(dirname(__FILE__).'/views/trunks/main.php',$displayvars);
@@ -461,6 +461,8 @@ if (!$tech && !$extdisplay) {
 		$outcid = "";
 		$maxchans = "";
 		$dialoutprefix = "";
+		$routes = core_trunks_gettrunkroutes($trunknum);
+		$num_routes = count($routes);
 
 		if ($tech == 'zap' || $tech == 'dahdi') {
 			$channelid = 'g0';
@@ -508,9 +510,9 @@ if (!$tech && !$extdisplay) {
 		'tabindex' => &$tabindex,
 		'outcid' => $outcid,
 		'keepcid' => $keepcid,
-		'pr_tech' => $pr_tech,
+		'pr_tech' => $tech,
 		'maxchans' => $maxchans,
-		'data' => $data,
+		'data' => $data ?? '',
 		'dialopts' => $dialopts,
 		'dialoutprefix' => $dialoutprefix,
 		'amp_conf' => $amp_conf,
@@ -522,8 +524,9 @@ if (!$tech && !$extdisplay) {
 		'dialoutprefix' => $dialoutprefix,
 		'num_routes' => $num_routes,
 		'routes' => $routes,
-		'helptext' => $helptext,
-		'hookHtml' => $hookhtml
+		'helptext' => $helptext ?? '',
+		'hookHtml' => $hookhtml,
+		'upper_tech' => strtoupper($tech)
 	);
 	show_view(dirname(__FILE__).'/views/trunks/trunk_header.php',$displayvars);
 	switch ($tech) {

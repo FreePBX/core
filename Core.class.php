@@ -1955,7 +1955,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if(!$edit){
 			$this->delRouteTrunkByID($trunknum);
 		}
-		if($ret & $ret1){
+		if($ret){
 			return true;
 		}else{
 			return array('status' => false, 'techdelete' => $ret1, 'trunksdel' => $ret);

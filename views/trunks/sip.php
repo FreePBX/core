@@ -152,7 +152,7 @@ if(!empty($trunk_usercontexts)){
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="register"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="register" id="register" value="<?php echo htmlspecialchars($register) ?>" tabindex="<?php echo ++$tabindex;?>" />
+								<input type="text" class="form-control" name="register" id="register" value="<?php echo htmlspecialchars($register ?? ''); ?>" tabindex="<?php echo ++$tabindex;?>" />
 							</div>
 						</div>
 					</div>
