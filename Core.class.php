@@ -993,7 +993,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 							$val = ($val == 'true') ? 1 : 0;
 						break;
 						default:
-							$val = trim($val);
+							$val = trim($val ?? "");
 						break;
 					}
 					//FREEPBX-11431 Call Forward Ringtimer Default - Setting does not work
@@ -1122,7 +1122,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			//
 			if (!empty($csv_file)) {
 				foreach ($csv_file as $row) {
-					$this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']])) : '';
+					$this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']] ?? "")) : '';
 					$this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
 					$this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
 					$this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
