@@ -268,7 +268,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routename"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo htmlspecialchars($routename ?? '');?>" required>
+									<input type="text" class="form-control" id="routename" name="routename" value="<?php echo _htmlspecialchars($routename);?>" required>
 								</div>
 							</div>
 						</div>
@@ -292,7 +292,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="outcid"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control" id="outcid" name="outcid" value="<?php echo htmlspecialchars($outcid ?? '');?>">
+									<input type="text" class="form-control" id="outcid" name="outcid" value="<?php echo _htmlspecialchars($outcid);?>">
 								</div>
 							</div>
 						</div>
@@ -345,7 +345,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="routepass"></i>
 								</div>
 								<div class="col-md-9">
-									<input type="text" class="form-control confidential" id="routepass" name="routepass" value="<?php echo htmlspecialchars($routepass ?? '');?>"/>
+									<input type="text" class="form-control confidential" id="routepass" name="routepass" value="<?php echo _htmlspecialchars($routepass);?>"/>
 								</div>
 							</div>
 						</div>

@@ -36,10 +36,10 @@ if($extdisplay){
 	if (is_array($ininfo) && !empty($ininfo)) {
 		extract($ininfo);
 	}
-	$description = htmlspecialchars($description ?? "");
-	$extension   = htmlspecialchars($extension ?? "");
-	$cidnum      = htmlspecialchars($cidnum ?? "");
-	$grppre      = htmlspecialchars($grppre ?? "");
+	$description = _htmlspecialchars($description);
+	$extension   = _htmlspecialchars($extension);
+	$cidnum      = _htmlspecialchars($cidnum);
+	$grppre      = _htmlspecialchars($grppre);
 	$heading = '<h2>'._("Route").': ';
 	if($description){
 		$heading .= $description . '</h2>';

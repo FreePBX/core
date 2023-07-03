@@ -79,8 +79,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			case 'extensions':
 			case 'devices':
 				$popover = isset($request['fw_popover']) ? "&amp;fw_popover=".$request['fw_popover'] : '';
-				$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && trim($request['extdisplay']) != "");
-				if($display_mode == "basic" && (!isset($request['extdisplay']) || trim($request['extdisplay']) == "")) {
+				$show = isset($request['tech_hardware']) || (isset($request['view']) && $request['view'] == "add") || (isset($request['extdisplay']) && _trim($request['extdisplay']) != "");
+				if($display_mode == "basic" && (!isset($request['extdisplay']) || _trim($request['extdisplay']) == "")) {
 					return array();
 				}
 				return load_view(__DIR__."/views/rnav.php",array("show" => $show, "display" => $request['display'], "popover"=>$popover));
@@ -363,7 +363,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				);
 				if($request['view'] == 'add' || !empty($request['tech_hardware'])) {
 					unset($buttons['delete']);
-				} elseif(!isset($request['extdisplay']) || trim($request['extdisplay']) == '') {
+				} elseif(!isset($request['extdisplay']) || _trim($request['extdisplay']) == '') {
 					$buttons = array();
 				}
 			break;
@@ -553,7 +553,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	private function stopdaemon($output=null){
 		$this->writeln('Stopping Call Transfer Monitoring Service');
 		// Kill the monitoring script
-		$launcher = trim(`pidof -x call-transfer-events.php`);
+		$launcher = _trim(`pidof -x call-transfer-events.php`);
 		if ($launcher) {
 			$pids = explode(" ", $launcher);
 			foreach ($pids as $pid) {
@@ -572,7 +572,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				return true;
 			}
 				//fallback
-			$adv = trim(`pidof -x call-transfer-events.php.php`);
+			$adv = _trim(`pidof -x call-transfer-events.php.php`);
 			if ($adv) {
 				$pids = explode(" ", $adv);
 				foreach ($pids as $p) {
@@ -910,7 +910,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 							$dialpattern_array[] = array(
 								'prepend_digits' => '',
 								'match_pattern_prefix' => '1',
-								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_pattern_pass' => _htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
 								'match_cid' => '',
 								);
 						}
@@ -924,7 +924,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 							$dialpattern_array[] = array(
 								'prepend_digits' => '',
 								'match_pattern_prefix' => '',
-								'match_pattern_pass' => htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
+								'match_pattern_pass' => _htmlspecialchars($prefix['npa'].$prefix['nxx']).'XXXX',
 								'match_cid' => '',
 								);
 						}
@@ -938,7 +938,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 								$dialpattern_array[] = array(
 									'prepend_digits' => '',
 									'match_pattern_prefix' => '',
-									'match_pattern_pass' => htmlspecialchars($prefix['nxx']).'XXXX',
+									'match_pattern_pass' => _htmlspecialchars($prefix['nxx']).'XXXX',
 									'match_cid' => '',
 									);
 						}
@@ -993,7 +993,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 							$val = ($val == 'true') ? 1 : 0;
 						break;
 						default:
-							$val = trim($val ?? "");
+							$val = _trim($val ?? "");
 						break;
 					}
 					//FREEPBX-11431 Call Forward Ringtimer Default - Setting does not work
@@ -1122,10 +1122,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 			//
 			if (!empty($csv_file)) {
 				foreach ($csv_file as $row) {
-					$this_prepend = isset($index['prepend']) ? htmlspecialchars(trim($row[$index['prepend']] ?? "")) : '';
-					$this_prefix = isset($index['prefix']) ? htmlspecialchars(trim($row[$index['prefix']])) : '';
-					$this_match_pattern = isset($index['match pattern']) ? htmlspecialchars(trim($row[$index['match pattern']])) : '';
-					$this_callerid = isset($index['callerid']) ? htmlspecialchars(trim($row[$index['callerid']])) : '';
+					$this_prepend = isset($index['prepend']) ? _htmlspecialchars(_trim($row[$index['prepend']])) : '';
+					$this_prefix = isset($index['prefix']) ? _htmlspecialchars(_trim($row[$index['prefix']])) : '';
+					$this_match_pattern = isset($index['match pattern']) ? _htmlspecialchars(_trim($row[$index['match pattern']])) : '';
+					$this_callerid = isset($index['callerid']) ? _htmlspecialchars(_trim($row[$index['callerid']])) : '';
 
 					if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '' || $this_callerid != '') {
 						$dialpattern_insert[] = array(
@@ -1166,10 +1166,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 					}
 
 					$dialpattern_insert[] = array(
-						'prepend_digits' => htmlspecialchars(trim($this_prepend)),
-						'match_pattern_prefix' => htmlspecialchars(trim($this_prefix)),
-						'match_pattern_pass' => htmlspecialchars(trim($list)),
-						'match_cid' => htmlspecialchars(trim($this_callerid)),
+						'prepend_digits' => _htmlspecialchars(_trim($this_prepend)),
+						'match_pattern_prefix' => _htmlspecialchars(_trim($this_prefix)),
+						'match_pattern_pass' => _htmlspecialchars(_trim($list)),
+						'match_cid' => _htmlspecialchars(_trim($this_callerid)),
 					);
 
 					$i++;
@@ -1180,10 +1180,10 @@ class Core extends FreePBX_Helpers implements BMO  {
 				foreach ($dp as $pattern) {
 					if ($pattern['prepend_digit'] !='' || $pattern['pattern_prefix']!='' || $pattern['pattern_pass'] !='' || $pattern['match_cid'] !='') {
 						$dialpattern_insert[] = array(
-							'prepend_digits' => htmlspecialchars(trim($pattern['prepend_digit'])),
-							'match_pattern_prefix' => htmlspecialchars(trim($pattern['pattern_prefix'])),
-							'match_pattern_pass' => htmlspecialchars(trim($pattern['pattern_pass'])),
-							'match_cid' => htmlspecialchars(trim($pattern['match_cid'])),
+							'prepend_digits' => _htmlspecialchars(_trim($pattern['prepend_digit'])),
+							'match_pattern_prefix' => _htmlspecialchars(_trim($pattern['pattern_prefix'])),
+							'match_pattern_pass' => _htmlspecialchars(_trim($pattern['pattern_pass'])),
+							'match_cid' => _htmlspecialchars(_trim($pattern['match_cid'])),
 						);
 					}
 				}
@@ -1287,7 +1287,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}// $page == "routing"
 
 		if ($page == "did") {
-			$extdisplay= htmlspecialchars(isset($request['extdisplay'])?$request['extdisplay']:'');
+			$extdisplay= _htmlspecialchars(isset($request['extdisplay'])?$request['extdisplay']:'');
 			$old_extdisplay = $extdisplay;
 			$dispnum = 'did'; //used for switch on config.php
 			$action = isset($request['action'])?$request['action']:'';
@@ -1393,7 +1393,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param {int} &$flag   The Flag Number
 	 */
 	public function convertRequest2Array($account,$tech,&$flag = 2) {
-		if(!isset($account) || (trim($account) === "") || !ctype_digit($account)) {
+		if(!isset($account) || (_trim($account) === "") || !ctype_digit($account)) {
 			throw new \Exception("Account must be set!");
 		}
 		if(empty($tech)) {
@@ -1409,7 +1409,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 			if ( substr($req, 0, 8) == 'devinfo_' ) {
 				$keyword = substr($req, 8);
-				$data = trim($data);
+				$data = _trim($data);
 				if ( $keyword == 'dial' && $data == '' ) {
 					if($tech == 'ZAP' || $tech == 'DAHDI') {
 						$chan = $_REQUEST['devinfo_channel'] != '' ? $_REQUEST['devinfo_channel'] : $_REQUEST['channel'];
@@ -1580,7 +1580,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$settings['remove_existing']['value'] = 'yes';
 			}
 		}
-		if (trim($id) == '' || empty($settings)) {
+		if (_trim($id) == '' || empty($settings)) {
 			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
 		}
@@ -1609,9 +1609,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		$settings['user']['value'] = ($settings['user']['value'] == 'new') ? $id : $settings['user']['value'];
-		$settings['emergency_cid']['value'] = trim($settings['emergency_cid']['value']);
-		$settings['description']['value'] = trim($settings['description']['value']);
-		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?trim($settings['hint_override']['value']) : null;
+		$settings['emergency_cid']['value'] = _trim($settings['emergency_cid']['value']);
+		$settings['description']['value'] = _trim($settings['description']['value']);
+		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?_trim($settings['hint_override']['value']) : null;
 
 		//insert into devices table
 		if($tech != 'virtual'){
@@ -1808,11 +1808,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 	* Allowed only sip and Pjsip
 	*/
 	public function emergencyAddDevice($id,$tech,$settings=array(),$editmode=false) {
-		if ($tech == '' || trim($tech) == 'virtual') {
+		if ($tech == '' || _trim($tech) == 'virtual') {
 			return true;
 		}
 
-		if (trim($id) == '' || empty($settings)) {
+		if (_trim($id) == '' || empty($settings)) {
 			throw new \Exception(_("Device Extension was blank or there were no settings defined"));
 			return false;
 		}
@@ -1829,9 +1829,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		$settings['user']['value'] = 'DummyUser';
-		$settings['emergency_cid']['value'] = trim($settings['emergency_cid']['value']);
-		$settings['description']['value'] = trim($settings['calleridname']['value']);
-		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?trim($settings['hint_override']['value']) : null;
+		$settings['emergency_cid']['value'] = _trim($settings['emergency_cid']['value']);
+		$settings['description']['value'] = _trim($settings['calleridname']['value']);
+		$settings['hint_override']['value'] = isset($settings['hint_override']['value'])?_trim($settings['hint_override']['value']) : null;
 
 		//insert into devices table
 		$sql="INSERT INTO emergencydevices (id,tech,dial,devicetype,user,description,emergency_cid,hint_override) values (?,?,?,?,?,?,?,?)";
@@ -2036,9 +2036,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$insert_pattern = array();
 		$seq = 0;
 		foreach ($patterns as $pattern) {
-			$match_pattern_prefix = preg_replace($filter_prefix,'',strtoupper(trim($pattern['match_pattern_prefix'])));
-			$match_pattern_pass = preg_replace($filter_match,'',strtoupper(trim($pattern['match_pattern_pass'])));
-			$prepend_digits = str_replace('W', 'w', preg_replace($filter_prepend,'',strtoupper(trim($pattern['prepend_digits']))));
+			$match_pattern_prefix = preg_replace($filter_prefix,'',strtoupper(_trim($pattern['match_pattern_prefix'])));
+			$match_pattern_pass = preg_replace($filter_match,'',strtoupper(_trim($pattern['match_pattern_pass'])));
+			$prepend_digits = str_replace('W', 'w', preg_replace($filter_prepend,'',strtoupper(_trim($pattern['prepend_digits']))));
 			if ($match_pattern_prefix.$match_pattern_pass == '') {
 				continue;
 			}
@@ -2295,7 +2295,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			//voicemail symlink
 			$spooldir = $this->config->get('ASTSPOOLDIR');
 			$account = preg_replace("/\D/","",$account);
-			if(trim($account) !== "" && file_exists($spooldir."/voicemail/device/".$account)) {
+			if(_trim($account) !== "" && file_exists($spooldir."/voicemail/device/".$account)) {
 				exec("rm -f ".escapeshellarg($spooldir."/voicemail/device/".$account));
 			}
 		} else {
@@ -2550,7 +2550,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param int $extension The Extension to check against
 	 */
 	public function checkSipnameInUse($sipname, $extension) {
-		if (!isset($sipname) || trim($sipname)=='') {
+		if (!isset($sipname) || _trim($sipname)=='') {
 			return true;
 		}
 
@@ -2563,7 +2563,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			die_freepbx($e->getMessage().$sql);
 		}
 
-		if (isset($results['sipname']) && trim($results['sipname']) == $sipname) {
+		if (isset($results['sipname']) && _trim($results['sipname']) == $sipname) {
 			return false;
 		} else {
 			return true;
@@ -2808,11 +2808,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$gimmieabreak = nl2br($config);
 		$lines = preg_split('#<br />#',$gimmieabreak);
 		foreach ($lines as $line) {
-			$line = trim($line);
+			$line = _trim($line);
 			if (count(preg_split('/=/',$line)) > 1) {
 				$tmp = preg_split('/=/',$line,2);
-				$key=trim($tmp[0]);
-				$value=trim($tmp[1]);
+				$key=_trim($tmp[0]);
+				$value=_trim($tmp[1]);
 				if (isset($confitem[$key]) && !empty($confitem[$key]))
 				$confitem[$key].="&".$value;
 				else
@@ -2868,8 +2868,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	public function addDID($settings) {
 		//Strip <> just to be on the safe side otherwise this is not deleteable from the GUI
 		$invalidDIDChars = array('<', '>');
-		$settings['extension'] = trim(str_replace($invalidDIDChars, "", $settings['extension']));
-		$settings['cidnum'] = trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
+		$settings['extension'] = _trim(str_replace($invalidDIDChars, "", $settings['extension']));
+		$settings['cidnum'] = _trim(str_replace($invalidDIDChars, "", $settings['cidnum']));
 
 		// Check to make sure the did is not being used elsewhere
 		//
@@ -2922,8 +2922,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param  array $incoming     Array of new data to use
 	 */
 	public function editDID($oldExtension,$oldCidnum, $incoming) {
-		$extension = trim($incoming['extension']);
-		$cidnum = trim($incoming['cidnum']);
+		$extension = _trim($incoming['extension']);
+		$cidnum = _trim($incoming['cidnum']);
 
 		// if did or cid changed, then check to make sure that this pair is not already being used.
 		//
@@ -3020,7 +3020,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param bool $editmode  If in edit mode (So that the AsteriskDB is not destroyed)
 	 */
 	public function addUser($extension, $settings, $editmode=false) {
-		if (trim($extension) == '' ) {
+		if (_trim($extension) == '' ) {
 			throw new \Exception(_("You must put in an extension (or user) number"));
 		}
 		//ensure this id is not already in use
@@ -3034,8 +3034,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		$settings['newdid_name'] = isset($settings['newdid_name']) ? $settings['newdid_name'] : '';
-		$settings['newdid'] = isset($settings['newdid']) ? preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", trim($settings['newdid'])) : '';
-		$settings['newdidcid'] = isset($settings['newdidcid']) ? trim($settings['newdidcid']) : '';
+		$settings['newdid'] = isset($settings['newdid']) ? preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", _trim($settings['newdid'])) : '';
+		$settings['newdidcid'] = isset($settings['newdidcid']) ? _trim($settings['newdidcid']) : '';
 
 		if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym|^withheld/',strtolower($settings['newdidcid']))) {
 			$settings['newdidcid'] = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $settings['newdidcid']);
@@ -3048,7 +3048,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 
-		$settings['sipname'] = isset($settings['sipname']) ? preg_replace("/\s/" ,"", trim($settings['sipname'])) : '';
+		$settings['sipname'] = isset($settings['sipname']) ? preg_replace("/\s/" ,"", _trim($settings['sipname'])) : '';
 		if (!$this->checkSipnameInUse($settings['sipname'], $extension)) {
 			throw new \Exception(_("This sipname: {$sipname} is already in use"));
 		}
@@ -3104,7 +3104,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$sth->execute(array(
 				"extension" => $extension,
 				"password" => isset($settings['password']) ? $settings['password'] : '',
-				"name" => isset($settings['name']) ? preg_replace(array('/</','/>/'), array('(',')'), trim($settings['name'])) : '',
+				"name" => isset($settings['name']) ? preg_replace(array('/</','/>/'), array('(',')'), _trim($settings['name'])) : '',
 				"voicemail" => isset($settings['voicemail']) ? $settings['voicemail'] : 'default',
 				"ringtimer" => isset($settings['ringtimer']) ? $settings['ringtimer'] : '',
 				"noanswer" => isset($settings['noanswer']) ? $settings['noanswer'] : '',
@@ -3137,7 +3137,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$astman->database_put("AMPUSER",$extension."/recording",isset($settings['recording']) ? $settings['recording'] : '');
 			$astman->database_put("AMPUSER",$extension."/outboundcid",isset($settings['outboundcid']) ? $settings['outboundcid'] : '');
 			$astman->database_put("AMPUSER",$extension."/cidname",isset($settings['name']) ? $settings['name'] : '');
-			$astman->database_put("AMPUSER",$extension."/cidnum",(isset($settings['cid_masquerade']) && trim($settings['cid_masquerade']) != "") ? trim($settings['cid_masquerade']) : $extension);
+			$astman->database_put("AMPUSER",$extension."/cidnum",(isset($settings['cid_masquerade']) && _trim($settings['cid_masquerade']) != "") ? _trim($settings['cid_masquerade']) : $extension);
 			$astman->database_put("AMPUSER",$extension."/voicemail",isset($settings['voicemail']) ? $settings['voicemail'] : '');
 			//TODO need to be in paging soon
 			$astman->database_put("AMPUSER",$extension."/answermode",isset($settings['answermode']) ? $settings['answermode']: 'disabled');
@@ -3177,15 +3177,15 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$astman->database_put("AMPUSER",$extension."/device",isset($settings['device']) ? $settings['device'] : $extension);
 			}
 
-			if (trim($settings['callwaiting']) == 'enabled') {
+			if (_trim($settings['callwaiting']) == 'enabled') {
 				$astman->database_put("CW",$extension,"ENABLED");
-			} else if (trim($settings['callwaiting']) == 'disabled') {
+			} else if (_trim($settings['callwaiting']) == 'disabled') {
 				$astman->database_del("CW",$extension);
 			}
 
-			if (trim($settings['pinless']) == 'enabled') {
+			if (_trim($settings['pinless']) == 'enabled') {
 				$astman->database_put("AMPUSER",$extension."/pinless","NOPASSWD");
-			} else if (trim($settings['pinless']) == 'disabled') {
+			} else if (_trim($settings['pinless']) == 'disabled') {
 				$astman->database_del("AMPUSER",$extension."/pinless");
 			}
 		} else {
@@ -3301,23 +3301,23 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 			if ($this->FreePBX->Modules->checkStatus("paging")) {
 				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
-				$results['answermode'] = (trim($answermode) == '') ? $this->freepbx->Config->get("DEFAULT_INTERNAL_AUTO_ANSWER") : $answermode;
+				$results['answermode'] = (_trim($answermode) == '') ? $this->freepbx->Config->get("DEFAULT_INTERNAL_AUTO_ANSWER") : $answermode;
 				$astman->database_put("AMPUSER",$extension."/answermode",$results['answermode']); //incase it was updated from above
 
 				$intercom=$astman->database_get("AMPUSER",$extension."/intercom");
-				$results['intercom'] = (trim($intercom) == '') ? 'enabled' : $intercom;
+				$results['intercom'] = (_trim($intercom) == '') ? 'enabled' : $intercom;
 			}
 
 			$cw = $astman->database_get("CW",$extension);
-			$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
+			$results['callwaiting'] = (_trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
 			$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
-			$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
+			$results['cid_masquerade'] = (_trim($cid_masquerade) != "")?$cid_masquerade:$extension;
 
 			$call_screen=$astman->database_get("AMPUSER",$extension."/screen");
-			$results['call_screen'] = (trim($call_screen) != "")?$call_screen:'0';
+			$results['call_screen'] = (_trim($call_screen) != "")?$call_screen:'0';
 
 			$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
-			$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
+			$results['pinless'] = (_trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
 
 			$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
 
@@ -4349,7 +4349,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$this->astman->database_put("DEVICE",$dev['id']."/user",$dev['user']);
 				$this->astman->database_put("DEVICE",$dev['id']."/default_user",$dev['user']);
 				$this->astman->database_put("DEVICE",$dev['id']."/tech",$dev['tech']);
-				if(trim($dev['emergency_cid']) != '') {
+				if(_trim($dev['emergency_cid']) != '') {
 					$this->astman->database_put("DEVICE",$dev['id']."/emergency_cid",$dev['emergency_cid']);
 				}
 				// If a user is selected, add this device to the user
@@ -4433,8 +4433,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function editGqlDID($oldExtension,$oldCidnum, $incoming) {
-		$extension = trim($incoming['extension']);
-		$cidnum = trim($incoming['cidnum']);
+		$extension = _trim($incoming['extension']);
+		$cidnum = _trim($incoming['cidnum']);
 
 		// if did or cid changed, then delete the old did and create new did.
 		if(!empty($oldExtension) && !empty($oldCidnum)){
