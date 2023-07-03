@@ -136,9 +136,10 @@ foreach ($fcc_array as $fcc)
 {
 	$fcc_enabled = true;
 	$alreadyenabled = false;
+	$fcc_item;
 	foreach ($fcc_exists as $fid => $fdata)
 	{
-		if($fcc_exists['module'] == $fcc['module'] && $fcc_exists['featurename'] == $fcc['feature']  ){
+		if(array_key_exists('module', $fcc_exists) && array_key_exists('featurename', $fcc_exists) && $fcc_exists['module'] == $fcc['module'] && $fcc_exists['featurename'] == $fcc['feature']  ){
 			// existing setting enabled ?
 			$alreadyenabled = ($fcc_exists['featureenabled']==1)?true:false;
 		}
@@ -147,7 +148,7 @@ foreach ($fcc_array as $fcc)
 			$fcc_enabled = false;
 		}
 	}
-
+	if($fcc['module'] && $fcc['feature'])
 	$fcc_item = new \featurecode($fcc['module'], $fcc['feature']);
 	if ( isset($fcc['needDelete']) && $fcc['needDelete'] == true)
 	{

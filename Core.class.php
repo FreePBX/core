@@ -4124,64 +4124,61 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 		$pm2 = $this->freepbx->Pm2;
 		$status = $pm2->getStatus("core-fastagi");
-		switch($status['pm2_env']['status']) {
-			case 'online':
-				if($debug) {
-					$this->writeln(sprintf(_("Core FastAGI Server has already been running on PID %s for %s"),$status['pid'],$status['pm2_env']['created_at_human_diff']));
-				}
-				return $status['pid'];
-			break;
-			default:
-				if($debug) {
-					$this->writeln(_("Starting Core FastAGI Server..."));
-				}
-				$opts = array(
-					'ASTAGIDIR' => $this->freepbx->Config->get('ASTAGIDIR')
-				);
-				if($this->freepbx->Config->get('DEVEL')) {
-					$opts['NODE_ENV'] = 'development';
-				}
-				$this->freepbx->pm2->start(
-					"core-fastagi",
-					__DIR__."/node/fastagi-server.js",
-					$opts
-				);
-				if(is_object($output)) {
-					$progress = new ProgressBar($output, 0);
-					$progress->setFormat('[%bar%] %elapsed%');
-					$progress->start();
-				}
-				$i = 0;
-				while($i < 100) {
-					$data = $pm2->getStatus("core-fastagi");
-					if(!empty($data) && $data['pm2_env']['status'] == 'online') {
-						if(is_object($output)) {
-							$progress->finish();
-						}
-						break;
-					}
+		if($status && $status['pm2_env']['status']) {
+			if($debug) {
+				$this->writeln(sprintf(_("Core FastAGI Server has already been running on PID %s for %s"),$status['pid'],$status['pm2_env']['created_at_human_diff']));
+			}
+			return $status['pid'];
+		} else {
+			if($debug) {
+				$this->writeln(_("Starting Core FastAGI Server..."));
+			}
+			$opts = array(
+				'ASTAGIDIR' => $this->freepbx->Config->get('ASTAGIDIR')
+			);
+			if($this->freepbx->Config->get('DEVEL')) {
+				$opts['NODE_ENV'] = 'development';
+			}
+			$this->freepbx->pm2->start(
+				"core-fastagi",
+				__DIR__."/node/fastagi-server.js",
+				$opts
+			);
+			if(is_object($output)) {
+				$progress = new ProgressBar($output, 0);
+				$progress->setFormat('[%bar%] %elapsed%');
+				$progress->start();
+			}
+			$i = 0;
+			while($i < 100) {
+				$data = $pm2->getStatus("core-fastagi");
+				if(!empty($data) && $data['pm2_env']['status'] == 'online') {
 					if(is_object($output)) {
-						$progress->setProgress($i);
+						$progress->finish();
 					}
-					$i++;
-					usleep(100000);
+					break;
 				}
 				if(is_object($output)) {
-					if($debug) {
-						$this->writeln("");
-					}
+					$progress->setProgress($i);
 				}
-				if(!empty($data)) {
-					$pm2->reset("core-fastagi");
-					if($debug) {
-						$this->writeln(sprintf(_("Started Core FastAGI Server. PID is %s"),$data['pid']));
-					}
-					return $data['pid'];
-				}
+				$i++;
+				usleep(100000);
+			}
+			if(is_object($output)) {
 				if($debug) {
-					$this->writeln("<error>".sprintf(_("Failed to run: '%s'")."</error>",$command));
+					$this->writeln("");
 				}
-			break;
+			}
+			if(!empty($data)) {
+				$pm2->reset("core-fastagi");
+				if($debug) {
+					$this->writeln(sprintf(_("Started Core FastAGI Server. PID is %s"),$data['pid']));
+				}
+				return $data['pid'];
+			}
+			if($debug) {
+				$this->writeln("<error>".sprintf(_("Failed to run: '%s'")."</error>",$command));
+			}
 		}
 	}
 
