@@ -37,7 +37,7 @@ switch($tech){
 	case "iax":
 	case "iax2":
 		$pr_tech = ($tech == "iax") ? "iax2":$tech;
-		$maxchanshelp = sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. ONLY limits outbound calls. Inbound calls will still proceed regardless of whether they are included in the concurrent channel count or not. Leave blank to specify no maximum. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf)."),((isset($channelid) && _trim($channelid)!="")?"from-trunk-$pr_tech-$channelid":"from-trunk-[trunkname]"));
+		$maxchanshelp = sprintf(_("Controls the maximum number of outbound channels (simultaneous calls) that can be used on this trunk. ONLY limits outbound calls. Inbound calls will still proceed regardless of whether they are included in the concurrent channel count or not. Leave blank to specify no maximum. To count inbound calls against this maximum, use the auto-generated context: %s as the inbound trunk's context. (see extensions_additional.conf)."),((isset($channelid) && freepbx_trim ($channelid)!="")?"from-trunk-$pr_tech-$channelid":"from-trunk-[trunkname]"));
 	break;
 	default:
 	break;
@@ -59,7 +59,7 @@ switch($tech){
 	}else{
 		$mtfcheck = "CHECKED";
 	}
-	$mtfhtml .= '						<input type="text" class="form-control" name="failtrunk" id="failtrunk" '.$mtfenable.' value="'._htmlspecialchars($failtrunk).'"/>';
+	$mtfhtml .= '						<input type="text" class="form-control" name="failtrunk" id="failtrunk" '.$mtfenable.' value="'.freepbx_htmlspecialchars($failtrunk).'"/>';
 	$mtfhtml .=	'
 											<span class="radioset">
 											<input type="radio" name="failtrunk_enable" id="failtrunk_enableyes" value="1" '. ($failtrunk_enable == "CHECKED"?"CHECKED":"").'>
@@ -345,7 +345,7 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 														<i class="fa fa-question-circle fpbx-help-icon" data-for="maxchans"></i>
 													</div>
 													<div class="col-md-9">
-														<input type="number" class="form-control" name="maxchans" id="maxchans" value="<?php echo _htmlspecialchars($maxchans); ?>" />
+														<input type="number" class="form-control" name="maxchans" id="maxchans" value="<?php echo freepbx_htmlspecialchars($maxchans); ?>" />
 													</div>
 												</div>
 											</div>

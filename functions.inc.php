@@ -432,7 +432,7 @@ class core_conf {
 
 					$element['data'] = implode(",",$prts);
 				}
-				if (strtolower(_trim($element['keyword'])) != 'secret') {
+				if (strtolower(freepbx_trim ($element['keyword'])) != 'secret') {
 					$options = explode("&", $element['data']);
 					foreach ($options as $option) {
 						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
@@ -658,7 +658,7 @@ class core_conf {
 			//
 			$results2 = array();
 			foreach ($results2_pre as $element) {
-				if (strtolower(_trim($element['keyword'])) != 'secret') {
+				if (strtolower(freepbx_trim ($element['keyword'])) != 'secret') {
 					$options = explode("&", $element['data']);
 					foreach ($options as $option) {
 						if (($element['keyword'] == 'disallow' && $option == 'all') | ($element['keyword'] == 'deny')) {
@@ -945,13 +945,13 @@ function core_getdestinfo($dest) {
 	// Check for Extension Number Destinations
 	//
 	$users = \FreePBX::Core()->getAllUsers();
-  	if (substr(_trim($dest),0,11) == 'from-trunk,') {
+  	if (substr(freepbx_trim ($dest),0,11) == 'from-trunk,') {
 		$did = explode(',',$dest);
 		$did = $did[1];
 		return array('description' => sprintf(_('Inbound Routes : %s'),$did),
 		'edit_url' => "config.php?display=did&view=form&extdisplay=$did%2F");
 	}
-	if (substr(_trim($dest),0,16) == 'from-did-direct,') {
+	if (substr(freepbx_trim ($dest),0,16) == 'from-did-direct,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
 		if (!isset($users[$exten])) {
@@ -967,7 +967,7 @@ function core_getdestinfo($dest) {
 				'data' => $data
 			);
 		}
-	} else if (substr(_trim($dest),0,10) == 'ext-trunk,') {
+	} else if (substr(freepbx_trim ($dest),0,10) == 'ext-trunk,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
 		$thisexten = core_trunks_getDetails($exten);
@@ -987,7 +987,7 @@ function core_getdestinfo($dest) {
 
 	// Check for voicemail box destinations
 	//
-	} else if (substr(_trim($dest),0,12) == 'ext-local,vm') {
+	} else if (substr(freepbx_trim ($dest),0,12) == 'ext-local,vm') {
 		$exten = explode(',',$dest);
 		$exten = substr($exten[1],3);
 		if (!function_exists('voicemail_mailbox_get')) {
@@ -1012,7 +1012,7 @@ function core_getdestinfo($dest) {
 
 	// Check for blackhole Termination Destinations
 	//
-	} else if (substr(_trim($dest),0,14) == 'app-blackhole,') {
+	} else if (substr(freepbx_trim ($dest),0,14) == 'app-blackhole,') {
 		$exten = explode(',',$dest);
 		$exten = $exten[1];
 
@@ -1497,12 +1497,12 @@ function core_do_get_config($engine) {
 			$catchall = false;
 			$catchall_context='ext-did-catchall';
 			foreach($didlist as $item) {
-				if (_trim($item['destination']) == '') {
+				if (freepbx_trim ($item['destination']) == '') {
 					throw new \Exception("Inbound Route {$item['extension']}/{$item['cidnum']} does not have a valid destination");
 				}
-				$exten = _trim($item['extension']);
-				$cidnum = _trim($item['cidnum']);
-				$tonezone = _trim($item['indication_zone']);
+				$exten = freepbx_trim ($item['extension']);
+				$cidnum = freepbx_trim ($item['cidnum']);
+				$tonezone = freepbx_trim ($item['indication_zone']);
 
 				// If the user put in just a cid number for routing, we add _. pattern to catch
 				// all DIDs with that CID number. Asterisk will complain about _. being dangerous
@@ -1800,7 +1800,7 @@ function core_do_get_config($engine) {
 			$generate_tcustom = false;
 
 			foreach ($trunklist as $trunkprops) {
-				if (_trim($trunkprops['disabled']) == 'on') {
+				if (freepbx_trim ($trunkprops['disabled']) == 'on') {
 					continue;
 				}
 				$trunkgroup = 'OUT_'.$trunkprops['trunkid'];
@@ -2068,7 +2068,7 @@ function core_do_get_config($engine) {
 				$tech = 'DAHDI';
 			}
 			if ($tech == 'CUSTOM') {
-				$ext->addGlobal('OUT_'.$tid, 'AMP:'._trim($trunk['channelid']));
+				$ext->addGlobal('OUT_'.$tid, 'AMP:'.freepbx_trim ($trunk['channelid']));
 			} elseif ($tech != 'PJSIP') {
 				$ext->addGlobal('OUT_'.$tid, $tech."/".$trunk['channelid']);
 			} else {
@@ -4290,9 +4290,9 @@ function core_users_edit($extension, $vars){
 	//
 	$newdid_name = isset($newdid_name) ? $db->escapeSimple($newdid_name) : '';
 	$newdid = isset($vars['newdid']) ? $vars['newdid'] : '';
-	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", _trim($newdid));
+	$newdid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", freepbx_trim ($newdid));
 
-	$newdidcid = isset($vars['newdidcid']) ? _trim($vars['newdidcid']) : '';
+	$newdidcid = isset($vars['newdidcid']) ? freepbx_trim ($vars['newdidcid']) : '';
 	if (!preg_match('/^priv|^block|^unknown|^restrict|^unavail|^anonym|^withheld/',strtolower($newdidcid))) {
 		$newdidcid = preg_replace("/[^0-9._XxNnZz\[\]\-\+]/" ,"", $newdidcid);
 	}
@@ -4805,7 +4805,7 @@ function core_users_configpageload() {
 		$msgInvalidCIDNum = _("Please enter a valid CallerID Number or leave it blank for your Assigned DID/CID pair");
 
 		// This is the actual gui stuff
-		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && _trim($extdisplay) !== '') ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && freepbx_trim ($extdisplay) !== '') ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display == 'extensions' ) {
@@ -4814,7 +4814,7 @@ function core_users_configpageload() {
 			$section = ($extdisplay ? _("Edit User") : _("Add User"));
 		}
 		$category = "general";
-		if ( _trim($extdisplay) != '' ) {
+		if ( freepbx_trim ($extdisplay) != '' ) {
 			$currentcomponent->addguielem($section, new gui_hidden('extension', $extdisplay), 2, null, $category);
 		} else {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, _("User Extension"), _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3, null, $category);
@@ -4854,7 +4854,7 @@ function core_users_configpageload() {
 			}", 9);
 		}
 		$currentcomponent->addguielem($section, new gui_textbox('name', $name, _("Display Name"), _("The CallerID name for calls from this user will be set to this name. Only enter the name, NOT the number."),  '(typeof isCorrectLengthExtensions != "undefined") ? !isCorrectLengthExtensions() || !isUnicodeLetter || isWhitespace() : !isUnicodeLetter() || isWhitespace()', $msgInvalidDispName, false), 3, null, $category);
-		$cid_masquerade = (_trim($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
+		$cid_masquerade = (freepbx_trim ($cid_masquerade) == $extdisplay)?"":$cid_masquerade;
 		$currentcomponent->addguielem($section, new gui_textbox('cid_masquerade', $cid_masquerade, _("CID Num Alias"), _("The CID Number to use for internal calls, if different from the extension number. This is used to masquerade as a different user. A common example is a team of support people who would like their internal CallerID to display the general support number (a ringgroup or queue). There will be no effect on external calls."), '!isWhitespace() && !isInteger()', $msgInvalidCidNum, false), "advanced");
 		$currentcomponent->addguielem($section, new gui_textbox('sipname', $sipname, _("SIP Alias"), _("If you want to support direct sip dialing of users internally or through anonymous sip calls, you can supply a friendly name that can be used in addition to the users extension to call them.")), "advanced");
 
@@ -4865,7 +4865,7 @@ function core_users_configpageload() {
 
 		// If user mode, list devices associated with this user
 		//
-		if ($display == 'users' && _trim($extdisplay != '')) {
+		if ($display == 'users' && freepbx_trim ($extdisplay != '')) {
 			$section = _("User Devices");
 			$device_list = core_devices_list('all','full');
 			$device_list = is_array($device_list)?$device_list:array();
@@ -4946,11 +4946,11 @@ function core_users_configpageload() {
 
 				$addURL = '?display=did&view=form&extdisplay='.urlencode($did['extension'].'/'.$did['cidnum']);
 				$did_icon = 'images/email_edit.png';
-				$did_label = _trim($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
-				if (_trim($did['cidnum']) != '') {
+				$did_label = freepbx_trim ($did['extension']) == '' ? ' '._("Any DID") : ' '.$did['extension'];
+				if (freepbx_trim ($did['cidnum']) != '') {
 					$did_label .= ' / '.$did['cidnum'];
 				}
-				if (_trim($did['description']) != '') {
+				if (freepbx_trim ($did['description']) != '') {
 					$did_label .= ' ('.$did['description'].')';
 				}
 
@@ -5167,7 +5167,7 @@ function core_devices_configpageload() {
 		$msgInvalidExtNum = _("Please enter a valid extension number.");
 
 		// Actual gui
-		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && _trim($extdisplay) !== '') ? 'edit' : 'add')));
+		$currentcomponent->addguielem('_top', new gui_hidden('action', ((isset($extdisplay) && freepbx_trim ($extdisplay) !== '') ? 'edit' : 'add')));
 		$currentcomponent->addguielem('_top', new gui_hidden('extdisplay', $extdisplay));
 
 		if ( $display != 'extensions' ) {

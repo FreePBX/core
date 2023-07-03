@@ -992,7 +992,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$transport[$t]['external_signaling_address'] = $extip;
 				}
 
-				$extport = _trim($ss->getConfig($protocol."extport-$ip"));
+				$extport = freepbx_trim ($ss->getConfig($protocol."extport-$ip"));
 				if ($extport) {
 					$transport[$t]['external_signaling_port'] = $extport;
 				}
@@ -1229,7 +1229,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				break;
 			}
 		}
-		if (version_compare($this->version,'12.5.0','ge') && isset($config['accountcode']) && _trim($config['accountcode']) != "") {
+		if (version_compare($this->version,'12.5.0','ge') && isset($config['accountcode']) && freepbx_trim ($config['accountcode']) != "") {
 			$endpoint[] = "accountcode=".$config['accountcode'];
 		}
 		//check transport to make sure it's valid

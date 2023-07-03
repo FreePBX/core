@@ -94,9 +94,9 @@ $n_idx = 0;
 //
 if (!empty($csv_file)) {
 	foreach ($csv_file as $row) {
-		$this_prepend = isset($index['prepend']) ? _htmlspecialchars(_trim($row[$index['prepend']])) : '';
-		$this_prefix = isset($index['prefix']) ? _htmlspecialchars(_trim($row[$index['prefix']])) : '';
-		$this_match_pattern = isset($index['match pattern']) ? _htmlspecialchars(_trim($row[$index['match pattern']])) : '';
+		$this_prepend = isset($index['prepend']) ? freepbx_htmlspecialchars(freepbx_trim ($row[$index['prepend']])) : '';
+		$this_prefix = isset($index['prefix']) ? freepbx_htmlspecialchars(freepbx_trim ($row[$index['prefix']])) : '';
+		$this_match_pattern = isset($index['match pattern']) ? freepbx_htmlspecialchars(freepbx_trim ($row[$index['match pattern']])) : '';
 
 		if ($this_prepend != '' || $this_prefix  != '' || $this_match_pattern != '') {
 			$dialpattern_insert[] = array(
@@ -115,9 +115,9 @@ if (!empty($csv_file)) {
 		if ($prepend_digit[$key]!='' || $pattern_prefix[$key]!='' || $pattern_pass[$key]!='') {
 
 			$dialpattern_insert[] = array(
-				'prepend_digits' => _htmlspecialchars(_trim($prepend_digit[$key])),
-				'match_pattern_prefix' => _htmlspecialchars(_trim($pattern_prefix[$key])),
-				'match_pattern_pass' => _htmlspecialchars(_trim($pattern_pass[$key])),
+				'prepend_digits' => freepbx_htmlspecialchars(freepbx_trim ($prepend_digit[$key])),
+				'match_pattern_prefix' => freepbx_htmlspecialchars(freepbx_trim ($pattern_prefix[$key])),
+				'match_pattern_pass' => freepbx_htmlspecialchars(freepbx_trim ($pattern_pass[$key])),
 			);
 		}
 	}
@@ -151,10 +151,10 @@ if (!empty($csv_file)) {
 		}
 
 		$dialpattern_insert[] = array(
-			'prepend_digits' => _htmlspecialchars(_trim($this_prepend)),
-			'match_pattern_prefix' => _htmlspecialchars(_trim($this_prefix)),
-			'match_pattern_pass' => _htmlspecialchars(_trim($list)),
-			'match_cid' => _htmlspecialchars(_trim($this_callerid)),
+			'prepend_digits' => freepbx_htmlspecialchars(freepbx_trim ($this_prepend)),
+			'match_pattern_prefix' => freepbx_htmlspecialchars(freepbx_trim ($this_prefix)),
+			'match_pattern_pass' => freepbx_htmlspecialchars(freepbx_trim ($list)),
+			'match_cid' => freepbx_htmlspecialchars(freepbx_trim ($this_callerid)),
 		);
 
 		$i++;
@@ -190,7 +190,7 @@ switch ($action) {
 		if($tech == 'pjsip') {
 			$channelid = !empty($request['trunk_name']) ? $request['trunk_name'] : '';
 		}
-		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, _trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
+		$trunknum = core_trunks_add($tech, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, freepbx_trim ($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert);
 		needreload();
@@ -200,7 +200,7 @@ switch ($action) {
 		if($tech == 'pjsip') {
 			$channelid = !empty($request['trunk_name']) ? $request['trunk_name'] : '';
 		}
-		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, _trim($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
+		core_trunks_edit($trunknum, $channelid, $dialoutprefix, $maxchans, $outcid, $peerdetails, $usercontext, $userconfig, $register, $keepcid, freepbx_trim ($failtrunk), $disabletrunk, $trunk_name, $provider, $continue, $dialopts);
 
 		// this can rewrite too, so edit is the same
 		core_trunks_update_dialrules($trunknum, $dialpattern_insert, true);
@@ -248,7 +248,7 @@ switch ($action) {
 					$dialpattern_array[] = array(
 						'prepend_digits' => '',
 						'match_pattern_prefix' => '',
-						'match_pattern_pass' => _htmlspecialchars($matches[1].'NXXXXXX'),
+						'match_pattern_pass' => freepbx_htmlspecialchars($matches[1].'NXXXXXX'),
 					);
 					// add NPA to 7-digits
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
@@ -258,9 +258,9 @@ switch ($action) {
 							$hash_filter[$prefix['npa'].'+'.$prefix['nxx']] = true;
 						}
 						$dialpattern_array[] = array(
-							'prepend_digits' =>  _htmlspecialchars($prefix['npa']),
+							'prepend_digits' =>  freepbx_htmlspecialchars($prefix['npa']),
 							'match_pattern_prefix' => '',
-							'match_pattern_pass' => _htmlspecialchars($prefix['nxx'].'XXXX'),
+							'match_pattern_pass' => freepbx_htmlspecialchars($prefix['nxx'].'XXXX'),
 						);
 					}
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
@@ -272,7 +272,7 @@ switch ($action) {
 						$dialpattern_array[] = array(
 							'prepend_digits' =>  '',
 							'match_pattern_prefix' => '',
-							'match_pattern_pass' => _htmlspecialchars($prefix['npa'].$prefix['nxx'].'XXXX'),
+							'match_pattern_pass' => freepbx_htmlspecialchars($prefix['npa'].$prefix['nxx'].'XXXX'),
 						);
 					}
 					// if a number was not matched as local, dial it with '1' prefix
@@ -294,8 +294,8 @@ switch ($action) {
 						}
 						$dialpattern_array[] = array(
 							'prepend_digits' =>  '',
-							'match_pattern_prefix' => _htmlspecialchars( $prefix['npa']),
-							'match_pattern_pass' => _htmlspecialchars($prefix['nxx'].'XXXX'),
+							'match_pattern_prefix' => freepbx_htmlspecialchars( $prefix['npa']),
+							'match_pattern_pass' => freepbx_htmlspecialchars($prefix['nxx'].'XXXX'),
 						);
 					}
 					foreach ($xmldata['lca-data']['prefix'] as $prefix) {
@@ -307,7 +307,7 @@ switch ($action) {
 						$dialpattern_array[] = array(
 							'prepend_digits' =>  '',
 							'match_pattern_prefix' => '',
-							'match_pattern_pass' => _htmlspecialchars($prefix['nxx'].'XXXX'),
+							'match_pattern_pass' => freepbx_htmlspecialchars($prefix['nxx'].'XXXX'),
 						);
 					}
 					$dialpattern_array[] = array(
@@ -316,7 +316,7 @@ switch ($action) {
 						'match_pattern_pass' => 'NXXNXXXXXX',
 					);
 					$dialpattern_array[] = array(
-						'prepend_digits' => _htmlspecialchars('1'.$matches[1]),
+						'prepend_digits' => freepbx_htmlspecialchars('1'.$matches[1]),
 						'match_pattern_prefix' => '',
 						'match_pattern_pass' => 'NXXXXXX',
 					);
@@ -358,7 +358,7 @@ foreach ($tresults as $tresult) {
 		case 'zap':
 		case 'dahdi':
 			$label = substr($tresult['name'],0,15);
-			if (_trim($label) == '') {
+			if (freepbx_trim ($label) == '') {
 				$label = sprintf(_('Channel %s'),substr($tresult['channelid'],0,15));
 			}
 			$label .= " (".$tresult['tech'].")";
@@ -369,7 +369,7 @@ foreach ($tresults as $tresult) {
 		case 'custom':
 		default:
 			$label = substr($tresult['name'],0,15);
-			if (_trim($label) == '') {
+			if (freepbx_trim ($label) == '') {
 				$label = substr($tresult['channelid'],0,15);
 			}
 			$label .= " (".$tresult['tech'].")";
@@ -446,7 +446,7 @@ if (!$tech && !$extdisplay) {
 			$dialpattern_array = core_trunks_get_dialrules($trunknum);
 		}
 		$upper_tech = strtoupper($tech);
-		if (_trim($trunk_name) == '') {
+		if (freepbx_trim ($trunk_name) == '') {
 			$trunk_name = ($upper_tech == 'ZAP'|$upper_tech == 'DAHDI'?sprintf(_('%s Channel %s'),$upper_tech,$channelid):$channelid);
 		}
 

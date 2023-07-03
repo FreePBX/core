@@ -36,10 +36,10 @@ if($extdisplay){
 	if (is_array($ininfo) && !empty($ininfo)) {
 		extract($ininfo);
 	}
-	$description = _htmlspecialchars($description);
-	$extension   = _htmlspecialchars($extension);
-	$cidnum      = _htmlspecialchars($cidnum);
-	$grppre      = _htmlspecialchars($grppre);
+	$description = freepbx_htmlspecialchars($description ?? '');
+	$extension   = freepbx_htmlspecialchars($extension ?? '');
+	$cidnum      = freepbx_htmlspecialchars($cidnum ?? '');
+	$grppre      = freepbx_htmlspecialchars($grppre ?? '');
 	$heading = '<h2>'._("Route").': ';
 	if($description){
 		$heading .= $description . '</h2>';
