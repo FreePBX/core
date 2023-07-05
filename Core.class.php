@@ -1403,12 +1403,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$fields = array();
 		$tech = strtoupper($tech);
 		foreach ($_REQUEST as $req=>$data) {
+			$keyword = substr($req, 8);
 			if($tech == 'VIRTUAL'){
 				$fields[$keyword] = array("value" => $data, "flag" => $flag++);
 				continue;
 			}
 			if ( substr($req, 0, 8) == 'devinfo_' ) {
-				$keyword = substr($req, 8);
 				$data = freepbx_trim ($data);
 				if ( $keyword == 'dial' && $data == '' ) {
 					if($tech == 'ZAP' || $tech == 'DAHDI') {
@@ -2876,9 +2876,28 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$existing = $this->getDID($settings['extension'], $settings['cidnum']);
 		if (empty($existing)) {
 			$this->addDIDDefaults($settings);
-			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, description, grppre, delay_answer, pricid, indication_zone) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid, :indication_zone)";
+			$sql="INSERT INTO incoming (rvolume, cidnum, extension, destination, privacyman, pmmaxretries, pmminlength, alertinfo, ringing,fanswer, reversal, mohclass, `description`, grppre, delay_answer, pricid, indication_zone) VALUES (:rvolume, :cidnum, :extension, :destination, :privacyman, :pmmaxretries, :pmminlength, :alertinfo, :ringing,:fanswer, :reversal, :mohclass, :description, :grppre, :delay_answer, :pricid, :indication_zone)";
 			$sth = $this->database->prepare($sql);
-			$sth->execute(array(':rvolume' => $settings['rvolume'], ':cidnum' => $settings['cidnum'], ':extension' => $settings['extension'], ':destination' => $settings['destination'], ':privacyman' => $settings['privacyman'], ':pmmaxretries' => $settings['pmmaxretries'], ':pmminlength' => $settings['pmminlength'], ':alertinfo' => $settings['alertinfo'], ':ringing' => $settings['ringing'],':fanswer' => $settings['fanswer'], ':reversal' => $settings['reversal'], ':mohclass' => $settings['mohclass'], ':description' => $settings['description'], ':grppre' => $settings['grppre'], ':delay_answer' => $settings['delay_answer'], ':pricid' => $settings['pricid'], ':indication_zone' => $settings['indication_zone']));
+			$params = array(
+				':rvolume' => (isset($settings['rvolume']) && $settings['rvolume']) ? $settings['rvolume'] :  "",
+				':cidnum' => (isset($settings['cidnum']) && $settings['cidnum']) ? $settings['cidnum'] :  "",
+				':extension' => (isset($settings['extension']) && $settings['extension']) ? $settings['extension'] :  "",
+				':destination' => (isset($settings['destination']) && $settings['destination']) ? $settings['destination'] :   "",
+				':privacyman' => (isset($settings['privacyman']) && !empty($settings['privacyman'])) ? $settings['privacyman'] : "0",
+				':pmmaxretries' => (isset($settings['pmmaxretries']) && $settings['pmmaxretries']) ? $settings['pmmaxretries'] :  "",
+				':pmminlength' => (isset($settings['pmminlength']) && $settings['pmminlength']) ? $settings['pmminlength'] :  "",
+				':alertinfo' => (isset($settings['alertinfo']) && $settings['alertinfo']) ? $settings['alertinfo'] :  "",
+				':ringing' => (isset($settings['ringing']) && $settings['ringing']) ? $settings['ringing'] :  "",
+				':fanswer' => (isset($settings['fanswer']) && $settings['fanswer']) ? $settings['fanswer'] :  "",
+				':reversal' => (isset($settings['reversal']) && $settings['reversal']) ? $settings['reversal'] :  "",
+				':mohclass' => (isset($settings['mohclass']) && $settings['mohclass']) ? $settings['mohclass'] :  "",
+				':description' => (isset($settings['description']) && $settings['description']) ? $settings['description'] :  "",
+				':grppre' => (isset($settings['grppre']) && $settings['grppre']) ? $settings['grppre'] :  "",
+				':delay_answer' => (isset($settings['delay_answer']) && $settings['delay_answer']) ? $settings['delay_answer'] : "0",
+				':pricid' => (isset($settings['pricid']) && $settings['pricid']) ? $settings['pricid'] :  "",
+				':indication_zone' => (isset($settings['indication_zone']) && $settings['indication_zone']) ? $settings['indication_zone'] :  ""
+			);
+			$sth->execute($params);
 			$this->freepbx->Hooks->processHooks($settings);
 			return true;
 		} else {
@@ -3197,7 +3216,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 		// newdid and newdidcid
 
 		// Now if $newdid is set we need to add the DID to the routes
-		//
 		if ($settings['newdid'] != '' || $settings['newdidcid'] != '') {
 			$did_dest                = 'from-did-direct,'.$extension.',1';
 			$did_vars = array();
