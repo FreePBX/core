@@ -837,7 +837,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
-		if(!empty($this->_identify) && is_array($this->_indentify)) {
+		if(!empty($this->_identify) && is_array($this->_identify)) {
 			foreach($this->_identify as $section => $els) {
 				$conf["pjsip.identify.conf"][$section][] = "type=identify";
 				foreach($els as $el) {
