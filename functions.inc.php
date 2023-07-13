@@ -1469,8 +1469,8 @@ function core_do_get_config($engine) {
         if ($fc_callseize != '') {
         	$ext->addInclude('from-internal-additional', 'app-callseize'); // Add the include from from-internal
           	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_macro('user-callerid'));
-          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_noop('${CALLERID(num)} is seizing the call from ${EXTEN:3}'));
-          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_bridge('${IMPORT(${CHANNELS(${EXTEN:3})},BRIDGEPEER)}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_noop('${CALLERID(num)} is seizing the call from ${EXTEN:'.strlen($fc_callseize).'}'));
+          	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_bridge('${IMPORT(${CHANNELS(${EXTEN:'.strlen($fc_callseize).'})},BRIDGEPEER)}'));
           	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_execif('$["${BRIDGERESULT}"!="SUCCESS"]','Playback','im-sorry&an-error-has-occurred&please-try-again-later&goodbye'));
           	$ext->add('app-callseize', "_$fc_callseize.", '', new ext_hangup(''));
         }

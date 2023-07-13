@@ -448,7 +448,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$conf['pjsip.transports.conf'][$transport] = $tmparr;
 		}
 
-		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0");
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0","20.0.0");
         if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
   			$use_callerid_contact = \FreePBX::create()->Sipsettings->getConfig('pjsip_use_callerid_contact');
 			$use_callerid_contact = (empty($use_callerid_contact))? "no": $use_callerid_contact;
@@ -841,7 +841,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		}
 
-		if(!empty($this->_identify) && is_array($this->_indentify)) {
+		if(!empty($this->_identify) && is_array($this->_identify)) {
 			foreach($this->_identify as $section => $els) {
 				$conf["pjsip.identify.conf"][$section][] = "type=identify";
 				foreach($els as $el) {
