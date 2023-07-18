@@ -1840,8 +1840,8 @@ function core_do_get_config($engine) {
 						$_trunks 	= $pjsip->getAllTrunks();
 						$tio_hide 	= "no";
 						if(!empty($trunkprops["trunkid"]) && !empty($_trunks[$trunkprops["trunkid"]])){
-							$tio 	= $_trunks[$trunkprops["trunkid"]]["trust_id_outbound"];
-							$cu 	= $_trunks[$trunkprops["trunkid"]]["contact_user"];
+							$tio 	= $_trunks[$trunkprops["trunkid"]]["trust_id_outbound"] ?? '';
+							$cu 	= $_trunks[$trunkprops["trunkid"]]["contact_user"] ?? '';
 							if($cu == "Anonymous" && $tio == "yes"){
 								$tio_hide = "yes";
 							}							
