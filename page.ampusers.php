@@ -117,12 +117,12 @@ $sections = $user["sections"];
 if (!empty($userdisplay)) {
 	$title =  '<h2>' . _("Edit Administrator") . '</h2>';
 	$user = core_getAmpUser($userdisplay);
-	$username = $user["username"];
+	$username = (is_array($user)) ? $user["username"] : '';
 	$password = "******";
-	$password_sha1 = $user["password_sha1"];
-	$extension_high = $user["extension_high"];
-	$extension_low = $user["extension_low"];
-	$sections = $user["sections"];
+	$password_sha1 = (is_array($user)) ? $user["password_sha1"] : '';
+	$extension_high = (is_array($user)) ? $user["extension_high"] : '';
+	$extension_low = (is_array($user)) ? $user["extension_low"] : '';
+	$sections = (is_array($user)) ? $user["sections"] : '';
 }
 
 
