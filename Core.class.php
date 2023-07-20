@@ -2673,18 +2673,18 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$name,
 			$settings['tech'],
 			$settings['outcid'],
-			$settings['keepcid'],
-			$settings['maxchans'],
-			$settings['failtrunk'],
-			$settings['dialoutprefix'],
-			$settings['channelid'],
-			$settings['usercontext'],
-			$settings['provider'],
-			$settings['disabletrunk'],
-			$settings['continue']
+			$settings['keepcid'] ?? '',
+			$settings['maxchans'] ?? '',
+			$settings['failtrunk'] ?? '',
+			$settings['dialoutprefix'] ?? '',
+			$settings['channelid'] ?? '',
+			$settings['usercontext'] ?? '',
+			$settings['provider'] ?? '',
+			$settings['disabletrunk'] ?? '',
+			$settings['continue'] ?? ''
 		));
 
-		if ($settings['dialopts'] !== false) {
+		if (isset($settings['dialopts']) && $settings['dialopts'] !== false) {
 			$this->freepbx->astman->database_put("TRUNK", $trunknum . '/dialopts',$settings['dialopts']);
 		} else {
 			$this->freepbx->astman->database_del("TRUNK", $trunknum . '/dialopts');

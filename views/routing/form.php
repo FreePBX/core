@@ -387,7 +387,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
 			<!--END ROUTE TYPE-->
 
 			<!--OPTIONAL ELEMENTS-->
-			<?php echo $optionalelems?>
+			<?php echo $optionalelems ?? ''?>
 			<!--END OPTIONAL ELEMENTS-->
 			<!--TRUNK PRIORITY-->
 			<div class="element-container">

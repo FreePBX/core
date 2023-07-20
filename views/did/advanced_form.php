@@ -254,7 +254,7 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 				</div>
 			</div>
 			<!--END CID name prefix-->
-			<?php echo $mohhtml ?>
+			<?php echo $mohhtml ?? '' ?>
 			<!--Set Destination-->
 			<div class="element-container">
 				<div class="row">
