@@ -46,5 +46,5 @@ const server = net.createServer((sock) => {
 	});
 });
 
-server.listen(4573, 'localhost');
+server.listen(4573, "127.0.0.1");
 console.log(`FastAGI Server is ready to process calls`);
