@@ -9,6 +9,7 @@ $display = isset($_REQUEST['display'])?$_REQUEST['display']:'';
 $action = isset($_REQUEST['action'])?$_REQUEST['action']:'';
 $tech = isset($_REQUEST['tech'])?$_REQUEST['tech']:'';
 $display = isset($_REQUEST['display'])?$_REQUEST['display']:'ampusers';
+$tabindex = 0;
 
 // populate some global variables from the request string
 $set_globals = array("username","password","extension_high","extension_low");
