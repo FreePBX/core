@@ -90,7 +90,7 @@ class Outboundrouting extends ComponentBase{
 		}
 		if ($order === 'new') {
 			array_unshift($sequence,$route_id);
-		} elseif(ctype_digit($order) && (empty($sequence[$order]) || $sequence[$order] !== $route_id)) {
+		} elseif(ctype_digit((string) $order) && (empty($sequence[$order]) || $sequence[$order] !== $route_id)) {
 			$key = array_search($route_id,$sequence);
 			if($key !== false) {
 				unset($sequence[$key]);
