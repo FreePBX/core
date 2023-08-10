@@ -215,7 +215,7 @@ foreach ($module_list as $key => $val) {
 													<i class="fa fa-question-circle fpbx-help-icon" data-for="username"></i>
 												</div>
 												<div class="col-md-9">
-													<input type="text" class="form-control" id="username" name="username" value="<?php echo $username?>" tabindex="<?php ++$tabindex?>">
+													<input type="text" class="form-control" id="username" name="username" value="<?php echo $username?>" tabindex="<?php $tabindex??=0; ++$tabindex?>">
 												</div>
 											</div>
 										</div>
