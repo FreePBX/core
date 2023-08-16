@@ -3127,7 +3127,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$fpc = $this->FreePBX->Config();
 		if ($astman->connected()) {
 			$astman->database_put("AMPUSER",$extension."/cwtone",isset($settings['cwtone']) ? $settings['cwtone'] : '');
-			$astman->database_put("AMPUSER",$extension."/accountcode",!empty($settings["accountcode"]) ? $settings["accountcode"] : '');
+			if( !empty($settings["devinfo_accountcode"]) ){
+				$astman->database_put("AMPUSER",$extension."/accountcode",$settings["devinfo_accountcode"]);
+			} else {
+				$astman->database_put("AMPUSER",$extension."/accountcode",!empty($settings["accountcode"]) ? $settings["accountcode"] : '');
+			}
 			$astman->database_put("AMPUSER",$extension."/rvolume",isset($settings['rvolume']) ? $settings['rvolume'] : '');
 			$astman->database_put("AMPUSER",$extension."/password",isset($settings['password']) ? $settings['password'] : '');
 			$astman->database_put("AMPUSER",$extension."/ringtimer",isset($settings['ringtimer']) ? $settings['ringtimer'] : $fpc->get('RINGTIMER'));
