@@ -736,6 +736,7 @@ if ($nodest != '' && $use_confirmation == 'FALSE') {
 
 //dont allow inbound callers to transfer around inside the system
 $dir = get_var( $AGI, "DIRECTION" );
+$queuecall = get_var( $AGI, "FROMQ" );
 if ($dir == "INBOUND") {
 	// extract the music class for avoid to catch a T 
 	if(preg_match('/m\((.*?)\)/', $dialopts, $matched)){
@@ -747,7 +748,9 @@ if ($dir == "INBOUND") {
 		$dialopts 	= ($dir == "INBOUND") ? str_replace("T","",$dialopts) : $dialopts;
 	}
 }
-
+if($queuecall == true){
+	$dialopts 	= ($queuecall == "true") ? str_replace("T","",$dialopts) : $dialopts;
+}
 if (!strlen($ds)) {
 	$AGI->noop('');
 } else {
