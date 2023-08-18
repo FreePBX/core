@@ -2462,6 +2462,8 @@ function core_do_get_config($engine) {
 		$exten = 's';
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,t)}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
 		$ext->add($context, $exten, '', new ext_execif('$["${INTRACOMPANYROUTE}" = "YES" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', 'CALLERID(num)=${DB(AMPUSER/${AMPUSER}/cidnum)}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
@@ -2469,6 +2471,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
 		$ext->add($context, $exten, '', new ext_set('OUTBOUND_GROUP', 'OUT_${DIAL_TRUNK}'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${IF($["${DB_EXISTS(TRUNK/${DIAL_TRUNK}/dialopts)}" = "1"]?${DB_RESULT}:${TRUNK_OPTIONS})}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["${OUTMAXCHANS_${DIAL_TRUNK}}" = ""]', 'nomax'));
 		$ext->add($context, $exten, '', new ext_gotoif('$[ ${GROUP_COUNT(OUT_${DIAL_TRUNK})} >= ${OUTMAXCHANS_${DIAL_TRUNK}} ]', 'chanfull'));
 		$ext->add($context, $exten, 'nomax', new ext_gotoif('$["${INTRACOMPANYROUTE}" = "YES"]', 'skipoutcid'));  // Set to YES if treated like internal
