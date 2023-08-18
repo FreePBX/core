@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.22</version>
+	<version>16.0.68.23</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.23* FREEI-314 Fixing Queue callback issue 
 		*16.0.68.22* FREEPBX-24324 
 		*16.0.68.21* FREEI-253 
 		*16.0.68.20* FREEPBX-24284 
