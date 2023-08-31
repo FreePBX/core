@@ -93,7 +93,8 @@ if (isset($did_dest[0]) && $did_dest[0] == 'from-did-direct') {
 		$EXTorUSER = _("Extension");
 	}
 	$result = core_users_get($did_dest[1]);
-	$label = '<span><img width="16" height="16" border="0" title="'.sprintf(_("Edit %s"),$EXTorUSER).'" alt="" src="images/user_edit.png"/>&nbsp;'.sprintf(_("Edit %s %s (%s)"),$EXTorUSER, $did_dest[1],$result['name']).'</span>';
+	$name = $result['name'] ?? '';
+	$label = '<span><img width="16" height="16" border="0" title="'.sprintf(_("Edit %s"),$EXTorUSER).'" alt="" src="images/user_edit.png"/>&nbsp;'.sprintf(_("Edit %s %s (%s)"),$EXTorUSER, $did_dest[1],$name).'</span>';
 	$link= "<p><a href=".$editURL.">".$label."</a></p>";
 	$formdata['userlink'] = $link;
 }
