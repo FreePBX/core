@@ -22,7 +22,7 @@ if (function_exists('music_list')){
 }
 
 if (function_exists('timeconditions_timegroups_drawgroupselect')){
-	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id, 'time_mode' => $time_mode,'timezone' => $timezone,'calendar_id' => $calendar_id,'calendar_group_id' => $calendar_group_id));
+	$optionalelems .= load_view(__DIR__.'/timecond.php', array('time_group_id' => $time_group_id ?? '', 'time_mode' => $time_mode ?? '','timezone' => $timezone ?? '','calendar_id' => $calendar_id ?? '','calendar_group_id' => $calendar_group_id ?? ''));
 }
 
 //Notification tab email settings

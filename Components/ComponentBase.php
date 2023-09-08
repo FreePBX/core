@@ -3,6 +3,7 @@ namespace FreePBX\modules\Core\Components;
 
 use PDO;
 use Exception;
+#[\AllowDynamicProperties]
 class ComponentBase{
     public function __construct($logger = null){
         $this->Database = \FreePBX::Database();

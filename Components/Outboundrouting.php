@@ -3,6 +3,7 @@ namespace FreePBX\modules\Core\Components;
 use PDO;
 use Exception;
 
+#[\AllowDynamicProperties]
 class Outboundrouting extends ComponentBase{
 	public function add($name, $outcid, $outcid_mode, $password, $emergency_route, $intracompany_route, $mohclass, $time_group_id, $patterns, $trunks, $seq = 'new', $dest = '', $time_mode = '', $timezone = '', $calendar_id = '', $calendar_group_id = '', $notification_on = '', $emailfrom = '', $emailto = '', $emailsubject = '', $emailbody = ''){
 		$sql = "INSERT INTO `outbound_routes` (`name`, `outcid`, `outcid_mode`, `password`, `emergency_route`, `intracompany_route`, `mohclass`, `time_group_id`, `dest`, `time_mode`, `timezone`, `notification_on`)

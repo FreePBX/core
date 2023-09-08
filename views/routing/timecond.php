@@ -47,9 +47,9 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 					</div>
 					<div class="col-md-9">
 						<select id="timezone" class="chosenselect form-control" name="timezone" id="timezone">
-							<option value="default" <?php echo (isset($timezone) && $timezone == $tz ? 'selected' : ''); ?>><?php echo _("Use System Timezone")?>
+							<option value="default" <?php echo (isset($timezone) && isset($tz) && $timezone == $tz ? 'selected' : ''); ?>><?php echo _("Use System Timezone")?>
 							<?php foreach(DateTimeZone::listIdentifiers(DateTimeZone::ALL) as $tz) {?>
-								<option value="<?php echo $tz?>" <?php echo (isset($timezone) && $timezone == $tz ? 'selected' : ''); ?>><?php echo $tz?></option>
+								<option value="<?php echo $tz?>" <?php echo (isset($timezone) && isset($tz) && $timezone == $tz ? 'selected' : ''); ?>><?php echo $tz?></option>
 							<?php } ?>
 						</select>
 					</div>
@@ -77,9 +77,9 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 					<div class="col-md-9">
 						<select class="form-control" id="calendar_id" name="calendar_id">
 							<option value=""><?php echo _("--Select a Calendar--")?></option>
-							<?php foreach($calendars as $id=> $group) { ?>
-								<option value="<?php echo $id?>" <?php echo ($calendar_id == $id) ? "selected" : ""?>><?php echo $group['name']?></option>
-							<?php } ?>
+							<?php //foreach($calendars as $id=> $group) { ?>
+								<option value="<?php //echo $id?>" <?php //echo ($calendar_id == $id) ? "selected" : ""?>><?php //echo $group['name']?></option>
+							<?php //} ?>
 						</select>
 					</div>
 				</div>
@@ -88,7 +88,7 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<span id="calendar_id-help" class="help-block fpbx-help-block"><?php echo sprintf(_("If set the hint will be INUSE if the time condition is matched, and NOT_INUSE if it fails"),$tcval)?></span>
+			<span id="calendar_id-help" class="help-block fpbx-help-block"><?php //echo sprintf(_("If set the hint will be INUSE if the time condition is matched, and NOT_INUSE if it fails"),$tcval)?></span>
 		</div>
 	</div>
 </div>
@@ -115,7 +115,7 @@ $calendars = $iscal ? FreePBX::Calendar()->listCalendars() : array();
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<span id="calendar_group_id-help" class="help-block fpbx-help-block"><?php echo sprintf(_("If set the hint will be INUSE if the time condition is matched, and NOT_INUSE if it fails"),$tcval)?></span>
+			<span id="calendar_group_id-help" class="help-block fpbx-help-block"><?php //echo sprintf(_("If set the hint will be INUSE if the time condition is matched, and NOT_INUSE if it fails"),$tcval)?></span>
 		</div>
 	</div>
 </div>
