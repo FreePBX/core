@@ -5,6 +5,7 @@ use \FreePBX\modules\Core\Driver as techDriver;
 if(!class_exists("\\FreePBX\\Modules\\Core\\Drivers\\Sip")) {
 	include(__DIR__."/Sip.class.php");
 }
+#[\AllowDynamicProperties]
 class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 	//res_pjproject.so removed 5/14/2018 https://issues.freepbx.org/browse/FREEPBX-17437
