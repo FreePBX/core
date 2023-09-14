@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.9</version>
+	<version>17.0.9.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*17.0.9.1 Packaging of ver 17.0.9.1
 		*17.0.9* Packaging of ver 17.0.9
 		*17.0.8* Packaging of ver 17.0.8
 		*17.0.7* Packaging of ver 17.0.7
