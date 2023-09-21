@@ -3156,6 +3156,7 @@ function core_do_get_config($engine) {
 	$ext->add($mcontext, $exten, '', new ext_dbdel('RG/${RINGGROUP_INDEX}/${CHANNEL}'));
 	$ext->add($mcontext, $exten, '', new ext_set('USE_CONFIRMATION',''));
 	$ext->add($mcontext, $exten, '', new ext_set('RINGGROUP_INDEX',''));
+	$ext->add($mcontext, $exten, '', new ext_return(''));
 
 	/*
 	;------------------------------------------------------------------------
