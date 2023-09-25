@@ -94,6 +94,7 @@ $fcc_array 	= array(
 		'default' 	  => '*3',
 		'description' => _('In-Call Asterisk Attended Transfer Aborting'),
 		'depend'	  => 'atxfer',
+		'defaultenablevalue'	  => true
 	),
 	array(
 		'module' 	  => 'core',
@@ -101,6 +102,7 @@ $fcc_array 	= array(
 		'default' 	  => '*4',
 		'description' => _('In-Call Asterisk Attended Transfer Completing'),
 		'depend'	  => 'atxfer',
+		'defaultenablevalue'	  => true
 	),
 	array(
 		'module' 	  => 'core',
@@ -108,6 +110,7 @@ $fcc_array 	= array(
 		'default' 	  => '*5',
 		'description' => _('In-Call Asterisk Attended Transfer Completing as a three-way bridge'),
 		'depend'	  => 'atxfer',
+		'defaultenablevalue'	  => true
 	),
 	array(
 		'module' 	  => 'core',
@@ -115,6 +118,7 @@ $fcc_array 	= array(
 		'default' 	  => '*6',
 		'description' => _('In-Call Asterisk Attended Transfer Swapping between the transferee and destination'),
 		'depend'	  => 'atxfer',
+		'defaultenablevalue'	  => true
 	),
 	array(
 		'module' 	  => 'core',
@@ -136,10 +140,12 @@ foreach ($fcc_array as $fcc)
 {
 	$fcc_enabled = true;
 	$alreadyenabled = false;
+	$fcc_already_exists = false;
 	foreach ($fcc_exists as $fid => $fdata)
 	{
 		if($fcc_exists['module'] == $fcc['module'] && $fcc_exists['featurename'] == $fcc['feature']  ){
 			// existing setting enabled ?
+			$fcc_already_exists = true;
 			$alreadyenabled = ($fcc_exists['featureenabled']==1)?true:false;
 		}
 		if ($fdata['customcode'] == $fcc['default'])
@@ -156,7 +162,13 @@ foreach ($fcc_array as $fcc)
 	else
 	{
 		$fcc_item->setDescription($fcc['description']);
-		$fcc_item->setDefault($fcc['default'],$alreadyenabled);
+		if($fcc_already_exists){
+			$fcc_item->setDefault($fcc['default'],$alreadyenabled);
+		}elseif( isset($fcc['defaultenablevalue'])){
+			$fcc_item->setDefault($fcc['default'],$fcc['defaultenablevalue']);
+		}else{
+			$fcc_item->setDefault($fcc['default'],false);
+		}
 		$fcc_item->setDepend(empty($fcc['depend']) ? "" : $fcc['depend']);
 		if (isset($fcc['provideDest']) && $fcc['provideDest'] == true)
 		{
@@ -1242,3 +1254,8 @@ $set['sortorder'] = 100;
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('ALLOW_MODULE_HOOK_IN',$set);
 $freepbx_conf->commit_conf_settings();
+
+if(\FreePBX::Core()->getConfig('gotatxfernotification') !== true){
+	$nt->add_warning('core','FEATURECODES','Feature Codes Disabled : Attended Transfer','The in call attended transfer feature codes may have been disabled by an update. Please click resolve to check.','config.php?display=featurecodeadmin',false,true);
+	\FreePBX::Core()->setConfig('gotatxfernotification',true);
+}
