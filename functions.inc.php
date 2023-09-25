@@ -1304,7 +1304,7 @@ function core_do_get_config($engine) {
 		if ($fc_pickup != '') {
 			$ext->addInclude('from-internal-additional', 'app-pickup');
 			$fclen = strlen($fc_pickup);
-			$ext_pickup = (strstr($engineinfo['raw'], 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
+			$ext_pickup = (strstr($engineinfo['raw'] ?? '', 'BRI')) ? 'ext_dpickup' : 'ext_pickup';
 
 			$fcc = new featurecode('paging', 'intercom-prefix');
 			$intercom_code = $fcc->getCodeActive();
