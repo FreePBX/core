@@ -1,6 +1,6 @@
 <?php
 	foreach($transports as $tp) {
-		$transportopts = '<option value="'.$tp.'" '.(($tp == $transport) ? 'selected' : '').'>'.$tp.'</option>';
+		$transportopts = '<option value="'.$tp.'" '.((isset($transport) && ($tp == $transport)) ? 'selected' : '').'>'.$tp.'</option>';
 	}
 	$seq = 1;
 	$codechtml = '<ul class="sortable">';
@@ -145,7 +145,7 @@
 						<select name="language" class="form-control">
 							<option value=""><?php echo _("Default")?></option>
 							<?php foreach($langs as $key => $lang) { ?>
-								<option value="<?php echo $key?>" <?php echo ($language == $key) ? "selected" : ""?>><?php echo $lang?></option>
+								<option value="<?php echo $key?>" <?php echo ((isset($language) && $language == $key)) ? "selected" : ""?>><?php echo $lang?></option>
 							<?php } ?>
 						</select>
 					<?php } else { ?>
@@ -343,9 +343,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentyes" value="on" <?php echo ($auth_rejection_permanent == "on"?"CHECKED":"") ?>>
+								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentyes" value="on" <?php echo ((isset($auth_rejection_permanent) && $auth_rejection_permanent == "on")?"CHECKED":"") ?>>
 								<label for="auth_rejection_permanentyes"><?php echo _("Yes")?></label>
-								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentno" value="off" <?php echo ($auth_rejection_permanent == "off"?"CHECKED":"") ?>>
+								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentno" value="off" <?php echo ((isset($auth_rejection_permanent) &&$auth_rejection_permanent == "off")?"CHECKED":"") ?>>
 								<label for="auth_rejection_permanentno"><?php echo _("No")?></label>
 							</div>
 						</div>
@@ -371,7 +371,7 @@
 							</div>
 							<div class="col-md-9">
 								<div class="input-group">
-									<input type="number" class="form-control" name="forbidden_retry_interval" id="forbidden_retry_interval" value="<?php echo $forbidden_retry_interval?>"/>
+									<input type="number" class="form-control" name="forbidden_retry_interval" id="forbidden_retry_interval" value="<?php echo $forbidden_retry_interval ?? ''; ?>"/>
 									<span class="input-group-addon"><?php echo _("Seconds")?></span>
 								</div>
 							</div>
@@ -398,7 +398,7 @@
 							</div>
 							<div class="col-md-9">
 								<div class="input-group">
-									<input type="number" class="form-control" name="fatal_retry_interval" id="fatal_retry_interval" value="<?php echo $fatal_retry_interval?>"/>
+									<input type="number" class="form-control" name="fatal_retry_interval" id="fatal_retry_interval" value="<?php echo $fatal_retry_interval ?? ''; ?>"/>
 									<span class="input-group-addon"><?php echo _("Seconds")?></span>
 								</div>
 							</div>
@@ -425,7 +425,7 @@
 							</div>
 							<div class="col-md-9">
 								<div class="input-group">
-									<input type="number" class="form-control" name="retry_interval" id="retry_interval" value="<?php echo $retry_interval?>"/>
+									<input type="number" class="form-control" name="retry_interval" id="retry_interval" value="<?php echo $retry_interval ?? ''; ?>"/>
 									<span class="input-group-addon"><?php echo _("Seconds")?></span>
 								</div>
 							</div>
@@ -452,7 +452,7 @@
 							</div>
 							<div class="col-md-9">
 								<div class="input-group">
-									<input type="number" class="form-control" name="expiration" id="expiration" value="<?php echo $expiration?>"/>
+									<input type="number" class="form-control" name="expiration" id="expiration" value="<?php echo $expiration ?? ''; ?>"/>
 									<span class="input-group-addon"><?php echo _("Seconds")?></span>
 								</div>
 							</div>
@@ -478,7 +478,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="max_retries"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="number" class="form-control" name="max_retries" id="max_retries" value="<?php echo $max_retries?>"/>
+								<input type="number" class="form-control" name="max_retries" id="max_retries" value="<?php echo $max_retries ?? ''; ?>"/>
 							</div>
 						</div>
 					</div>
@@ -503,7 +503,7 @@
 							</div>
 							<div class="col-md-9">
 								<div class="input-group">
-									<input type="number" class="form-control" name="qualify_frequency" id="qualify_frequency" value="<?php echo $qualify_frequency?>"/>
+									<input type="number" class="form-control" name="qualify_frequency" id="qualify_frequency" value="<?php echo $qualify_frequency ?? '' ?>"/>
 									<span class="input-group-addon"><?php echo _("Seconds")?></span>
 								</div>
 							</div>
@@ -702,7 +702,7 @@
                                 <i class="fa fa-question-circle fpbx-help-icon" data-for="media_address"></i>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="media_address" id="media_address" value="<?php echo $media_address?>"/>
+                                <input type="text" class="form-control" name="media_address" id="media_address" value="<?php echo $media_address ?? ''; ?>"/>
                             </div>
                         </div>
                     </div>
@@ -801,9 +801,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="support_path"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="support_path" id="support_pathyes" value="yes" <?php echo ($support_path == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="support_path" id="support_pathyes" value="yes" <?php echo ((isset($support_path) && $support_path == "yes")?"CHECKED":"") ?>>
 								<label for="support_pathyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="support_path" id="support_pathno" value="no" <?php echo ($support_path == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="support_path" id="support_pathno" value="no" <?php echo ((isset($support_path) && $support_path == "yes")?"":"CHECKED") ?>>
 								<label for="support_pathno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -989,13 +989,13 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="sendrpid" id="sendrpidno" value="no" <?php echo ($sendrpid == "no"?"CHECKED":"") ?>>
+								<input type="radio" name="sendrpid" id="sendrpidno" value="no" <?php echo ((isset($sendrpid) && $sendrpid == "no")?"CHECKED":"") ?>>
 								<label for="sendrpidno"><?php echo _("No")?></label>
-								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ($sendrpid == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ((isset($sendrpid) && $sendrpid == "yes")?"CHECKED":"") ?>>
 								<label for="sendrpidyes"><?php echo _("Send Remote-Party-ID header")?></label>
-								<input type="radio" name="sendrpid" id="sendrpidpai" value="pai" <?php echo ($sendrpid == "pai"?"CHECKED":"") ?>>
+								<input type="radio" name="sendrpid" id="sendrpidpai" value="pai" <?php echo ((isset($sendrpid) && $sendrpid == "pai")?"CHECKED":"") ?>>
 								<label for="sendrpidpai"><?php echo _("Send P-Asserted-Identity header")?></label>
-								<input type="radio" name="sendrpid" id="sendrpidboth" value="both" <?php echo ($sendrpid == "both"?"CHECKED":"") ?>>
+								<input type="radio" name="sendrpid" id="sendrpidboth" value="both" <?php echo ((isset($sendrpid) && $sendrpid == "both")?"CHECKED":"") ?>>
 								<label for="sendrpidboth"><?php echo _("Both")?></label>
 							</div>
 						</div>
@@ -1077,9 +1077,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="inband_progress"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ($inband_progress == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="inband_progress" id="inband_progressyes" value="yes" <?php echo ((isset($inband_progress) && $inband_progress == "yes")?"CHECKED":"") ?>>
 								<label for="inband_progressyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ($inband_progress == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="inband_progress" id="inband_progressno" value = "no" <?php echo ((isset($inband_progress) && $inband_progress == "yes")?"":"CHECKED") ?>>
 								<label for="inband_progressno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1104,9 +1104,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="direct_media"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ($direct_media == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="direct_media" id="direct_mediayes" value="yes" <?php echo ((isset($direct_media) && $direct_media == "yes")?"CHECKED":"") ?>>
 								<label for="direct_mediayes"><?php echo _("Yes");?></label>
-								<input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ($direct_media == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="direct_media" id="direct_mediano" value = "no" <?php echo ((isset($direct_media) && $direct_media == "yes")?"":"CHECKED") ?>>
 								<label for="direct_mediano"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1130,9 +1130,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rewrite_contact"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="rewrite_contact" id="rewrite_contactyes" value="yes" <?php echo ($rewrite_contact == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="rewrite_contact" id="rewrite_contactyes" value="yes" <?php echo ((isset($rewrite_contact) && $rewrite_contact == "yes")?"CHECKED":"") ?>>
 								<label for="rewrite_contactyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="rewrite_contact" id="rewrite_contactno" value = "no" <?php echo ($rewrite_contact == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="rewrite_contact" id="rewrite_contactno" value = "no" <?php echo ((isset($rewrite_contact) && $rewrite_contact == "yes")?"":"CHECKED") ?>>
 								<label for="rewrite_contactno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1155,9 +1155,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="rtp_symmetric"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="rtp_symmetric" id="rtp_symmetricyes" value="yes" <?php echo ($rtp_symmetric == "yes"?"CHECKED":"") ?>>
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricyes" value="yes" <?php echo ((isset($rtp_symmetric) && $rtp_symmetric == "yes")?"CHECKED":"") ?>>
 								<label for="rtp_symmetricyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="rtp_symmetric" id="rtp_symmetricno" value = "no" <?php echo ($rtp_symmetric == "yes"?"":"CHECKED") ?>>
+								<input type="radio" name="rtp_symmetric" id="rtp_symmetricno" value = "no" <?php echo ((isset($rtp_symmetric) && $rtp_symmetric == "yes")?"":"CHECKED") ?>>
 								<label for="rtp_symmetricno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1183,7 +1183,7 @@
 							<div class="col-md-9">
 								<select name="media_encryption" class="form-control " id="media_encryption">
 									<option value="no" <?php echo (empty($media_encryption) || $media_encryption == "no"?"selected":"")?>><?php echo _('None')?></option>
-									<option value="sdes" <?php echo ($media_encryption == "sdes"?"selected":"")?>><?php echo _('SRTP via in-SDP (recommended)')?></option>
+									<option value="sdes" <?php echo ((isset($media_encryption) && $media_encryption == "sdes")?"selected":"")?>><?php echo _('SRTP via in-SDP (recommended)')?></option>
 									<!--<option value="dtls">DTLS-SRTP (not recommended)</option>-->
 								</select>
 							</div>
@@ -1209,9 +1209,9 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="force_rport"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="force_rport" id="force_rportyes" value="yes" <?php echo ($force_rport != "no"?"CHECKED":"") ?>>
+								<input type="radio" name="force_rport" id="force_rportyes" value="yes" <?php echo ((isset($force_rport) && $force_rport != "no")?"CHECKED":"") ?>>
 								<label for="force_rportyes"><?php echo _("Yes");?></label>
-								<input type="radio" name="force_rport" id="force_rportno" value = "no" <?php echo ($force_rport == "no"?"CHECKED":"") ?>>
+								<input type="radio" name="force_rport" id="force_rportno" value = "no" <?php echo ((isset($force_rport) && $force_rport == "no")?"CHECKED":"") ?>>
 								<label for="force_rportno"><?php echo _("No");?></label>
 							</div>
 						</div>
@@ -1235,7 +1235,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="message_context"></i>
 							</div>
 							<div class="col-md-9">
-								<input type="text" class="form-control" name="message_context" id="message_context" value="<?php echo $message_context?>"/>
+								<input type="text" class="form-control" name="message_context" id="message_context" value="<?php echo $message_context ?? ''; ?>"/>
 							</div>
 						</div>
 					</div>

@@ -1636,7 +1636,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				$dispvars[$key] = $val[0];
 			}
 
-			$codecs = explode(",",$dispvars['codecs']);
+			$codecs = isset($dispvars['codecs']) ? explode(",",$dispvars['codecs']) : [];
 			$dispvars['codecs'] = array();
 			foreach($codecs as $codec) {
 				$dispvars['codecs'][$codec] = true;
