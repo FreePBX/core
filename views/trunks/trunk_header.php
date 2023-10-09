@@ -107,6 +107,8 @@ if(!$amp_conf['ENABLEOLDDIALPATTERNS']) {
 		$tabindex++;
 		if ($idx == 50) {
 			$dpt_title_class = 'dpt-title dpt-nodisplay';
+		} else {
+			$dpt_title_class = 'dpt-value';
 		}
 		$dpinput[] = '<tr id = "dprow'.$idx.'">';
 		$dpt_class = $pattern['prepend_digits'] == '' ? $dpt_title_class : 'dpt-value';
