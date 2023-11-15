@@ -25,6 +25,7 @@ class Trunks extends Command {
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$args = $input->getArgument('args');
+		$ARGUSED = false;
 		$trunks = $this->listTrunks();
 		$trunkids = array();
 		foreach($trunks as $trunk){
@@ -63,7 +64,7 @@ class Trunks extends Command {
 			$table->setRows($trunks);
 			$output->writeln(_('Choose an ID to enable/disable'));
 			$helper = $this->getHelper('question');
-			$question = new ChoiceQuestion($table->render(),$trunkids,0);
+			$question = new ChoiceQuestion($table->render() ?? '',$trunkids,0);
 			$id = $helper->ask($input, $output, $question);
 			if($trunks[($id -1 )]['disabled'] == 'off'){
 				$output->writeln(sprintf(_('Disabling Trunk %s'),$id));
@@ -87,6 +88,7 @@ class Trunks extends Command {
 		$db = \FreePBX::Database();
 		$sql = "SELECT `trunkid` , `tech` , `channelid` , `disabled` FROM `trunks` ORDER BY `trunkid`";
 		$ob = $db->query($sql,\PDO::FETCH_ASSOC);
+		$gotRows = [];
 		if($ob->rowCount()){
 			$gotRows = $ob->fetchAll();
 		}
