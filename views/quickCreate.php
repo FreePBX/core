@@ -23,9 +23,9 @@ $drivers = \FreePBX::Core()->getAllDriversInfo();
 foreach($drivers as $driver) {
 	$rawname = $driver['rawName'];
 	if ($default === $rawname) { 
-		echo "<option value='$rawname' selected>${driver['shortName']}</option>\n";
+		echo "<option value='$rawname' selected>{$driver['shortName']}</option>\n";
 	} else {
-		echo "<option value='$rawname'>${driver['shortName']}</option>\n";
+		echo "<option value='$rawname'>{$driver['shortName']}</option>\n";
 	}
 }
 ?>
