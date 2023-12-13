@@ -1511,7 +1511,7 @@ function core_do_get_config($engine) {
 				//
 				$cidroute = false;
 				if ($cidnum != '' && $exten == '') {
-					$exten = '_.';
+					$exten = '_X.';
 					$pricid = ($item['pricid']) ? true:false;
 					$cidroute = true;
 				} else if (($cidnum != '' && $exten != '') || ($cidnum == '' && $exten == '')) {
@@ -1634,9 +1634,9 @@ function core_do_get_config($engine) {
 				$ext->add($catchall_context, 's', '', new ext_playback('ss-noservice'));
 				$ext->add($catchall_context, 's', '', new ext_sayalpha('${FROM_DID}'));
 				$ext->add($catchall_context, 's', '', new ext_hangup(''));
-				$ext->add($catchall_context, '_.', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
-				$ext->add($catchall_context, '_.', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
-				$ext->add($catchall_context, '_.', '', new ext_goto('a2','s'));
+				$ext->add($catchall_context, '_X.', '', new ext_setvar('__FROM_DID', '${EXTEN}'));
+				$ext->add($catchall_context, '_X.', '', new ext_noop('Received an unknown call with DID set to ${EXTEN}'));
+				$ext->add($catchall_context, '_X.', '', new ext_goto('a2','s'));
 				$ext->add($catchall_context, 'h', '', new ext_hangup(''));
 			}
 
@@ -1811,8 +1811,8 @@ function core_do_get_config($engine) {
 					$ext->add($macro_name, 's', '', new ext_goto('1','${ARG1}'));
 
 					$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
-					$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
-					$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
+					$ext->add($trunkcontext, '_X.', '', new ext_set('GROUP()',$trunkgroup));
+					$ext->add($trunkcontext, '_X.', '', new ext_goto('1','${EXTEN}','from-trunk'));
 
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_set('OUTBOUND_GROUP', $trunkgroup));
 					$ext->add($tcontext,$trunkprops['trunkid'],'',new ext_gotoif('$["${OUTMAXCHANS_'.$trunkprops['trunkid'].'}" = ""]', 'nomax'));
@@ -1850,8 +1850,8 @@ function core_do_get_config($engine) {
 					case 'iax2':
 					case 'sip':
 					$trunkcontext  = "from-trunk-".$trunkprops['tech']."-".$trunkprops['channelid'];
-					$ext->add($trunkcontext, '_.', '', new ext_set('GROUP()',$trunkgroup));
-					$ext->add($trunkcontext, '_.', '', new ext_goto('1','${EXTEN}','from-trunk'));
+					$ext->add($trunkcontext, '_X.', '', new ext_set('GROUP()',$trunkgroup));
+					$ext->add($trunkcontext, '_X.', '', new ext_goto('1','${EXTEN}','from-trunk'));
 					// fall-through
 					case 'zap':
 					case 'dahdi':
