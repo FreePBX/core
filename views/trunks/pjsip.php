@@ -288,7 +288,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="pjsip_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php echo ((isset($pjsip_line) && ($pjsip_line == "true" || empty($pjsip_line)))?"CHECKED":"") ?>>
+								<input type="radio" name="pjsip_line" id="pjsip_lineyes" value="true" <?php $pjsip_line = $pjsip_line ?? '';  echo ((isset($pjsip_line) && ($pjsip_line == "true" || empty($pjsip_line)))?"CHECKED":"") ?>>
 								<label for="pjsip_lineyes"><?php echo _("Yes")?></label>
 								<input type="radio" name="pjsip_line" id="pjsip_lineno" value="false" <?php echo ((isset($pjsip_line) && $pjsip_line == "false") ?"CHECKED":"") ?>>
 								<label for="pjsip_lineno"><?php echo _("No")?></label>
@@ -315,7 +315,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="send_connected_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php echo ((isset($send_connected_line) && $send_connected_line) == "true"?"CHECKED":"") ?>>
+								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php $send_connected_line = $send_connected_line ?? '';  echo ((isset($send_connected_line) && $send_connected_line) == "true"?"CHECKED":"") ?>>
 								<label for="send_connected_lineyes"><?php echo _("Yes")?></label>
 								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="false" <?php echo ((isset($send_connected_line) && ($send_connected_line == "false" || empty($send_connected_line))) ?"CHECKED":"") ?>>
 								<label for="send_connected_lineno"><?php echo _("No")?></label>
@@ -343,7 +343,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="auth_rejection_permanentw"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentyes" value="on" <?php echo ((isset($auth_rejection_permanent) && $auth_rejection_permanent == "on")?"CHECKED":"") ?>>
+								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentyes" value="on" <?php $auth_rejection_permanent = $auth_rejection_permanent ?? 'off';  echo ((isset($auth_rejection_permanent) && $auth_rejection_permanent == "on")?"CHECKED":"") ?>>
 								<label for="auth_rejection_permanentyes"><?php echo _("Yes")?></label>
 								<input type="radio" name="auth_rejection_permanent" id="auth_rejection_permanentno" value="off" <?php echo ((isset($auth_rejection_permanent) &&$auth_rejection_permanent == "off")?"CHECKED":"") ?>>
 								<label for="auth_rejection_permanentno"><?php echo _("No")?></label>
@@ -553,7 +553,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="user_eq_phone"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php echo (isset($user_eq_phone) && $user_eq_phone == "yes") ? "CHECKED" : "" ?>>
+								<input type="radio" name="user_eq_phone" id="user_eq_phoneyes" value="yes" <?php $user_eq_phone = $user_eq_phone ?? ''; echo (isset($user_eq_phone) && $user_eq_phone == "yes") ? "CHECKED" : "" ?>>
 								<label for="user_eq_phoneyes"><?php echo _("Yes")?></label>
 								<input type="radio" name="user_eq_phone" id="user_eq_phoneno" value="no" <?php echo (isset($user_eq_phone) && ($user_eq_phone == "no" || empty($user_eq_phone))) ? "CHECKED" : "" ?>>
 								<label for="user_eq_phoneno"><?php echo _("No")?></label>
@@ -989,7 +989,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="sendrpid"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="sendrpid" id="sendrpidno" value="no" <?php echo ((isset($sendrpid) && $sendrpid == "no")?"CHECKED":"") ?>>
+								<input type="radio" name="sendrpid" id="sendrpidno" value="no" <?php $sendrpid = $sendrpid ?? 'no'; echo ((isset($sendrpid) && $sendrpid == "no")?"CHECKED":"") ?>>
 								<label for="sendrpidno"><?php echo _("No")?></label>
 								<input type="radio" name="sendrpid" id="sendrpidyes" value="yes" <?php echo ((isset($sendrpid) && $sendrpid == "yes")?"CHECKED":"") ?>>
 								<label for="sendrpidyes"><?php echo _("Send Remote-Party-ID header")?></label>
@@ -1209,7 +1209,7 @@
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="force_rport"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="force_rport" id="force_rportyes" value="yes" <?php echo ((isset($force_rport) && $force_rport != "no")?"CHECKED":"") ?>>
+								<input type="radio" name="force_rport" id="force_rportyes" value="yes" <?php $force_rport = $force_rport ?? 'yes'; echo ((isset($force_rport) && $force_rport != "no")?"CHECKED":"") ?>>
 								<label for="force_rportyes"><?php echo _("Yes");?></label>
 								<input type="radio" name="force_rport" id="force_rportno" value = "no" <?php echo ((isset($force_rport) && $force_rport == "no")?"CHECKED":"") ?>>
 								<label for="force_rportno"><?php echo _("No");?></label>
