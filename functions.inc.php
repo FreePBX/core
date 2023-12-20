@@ -2521,7 +2521,7 @@ function core_do_get_config($engine) {
 		// But add the macro-setmusic if we don't want music on this outbound call
 		// if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
 		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
-		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}M(confirm)'));
+		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}U(macro-confirm)'));
 
 		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
 		// such as adding SIP header information or other requirements. All the channel variables from above are present
