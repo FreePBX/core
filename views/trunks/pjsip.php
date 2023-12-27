@@ -1,6 +1,7 @@
 <?php
+$transportopts = '';
 	foreach($transports as $tp) {
-		$transportopts = '<option value="'.$tp.'" '.((isset($transport) && ($tp == $transport)) ? 'selected' : '').'>'.$tp.'</option>';
+		$transportopts .= '<option value="'.$tp.'" '.((isset($transport) && ($tp == $transport)) ? 'selected' : '').'>'.$tp.'</option>';
 	}
 	$seq = 1;
 	$codechtml = '<ul class="sortable">';
