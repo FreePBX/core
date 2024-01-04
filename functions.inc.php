@@ -2441,7 +2441,9 @@ function core_do_get_config($engine) {
 	*/
     $context = 'sub-send-obroute-email';
     $exten = 's';
-    $ext->add($context, $exten, '', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
+    $ext->add($context, $exten, '', new ext_gotoif('$["${FORCE_CONFIRM}"!="" ]','gosubconfirm','normal'));
+    $ext->add($context, $exten, 'gosubconfirm', new ext_gosub('1','s','macro-confirm'));
+    $ext->add($context, $exten, 'normal', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
     $ext->add($context, $exten, '', new ext_noop('email notifications disabled..exiting.'));
     $ext->add($context, $exten, '', new ext_return(''));
     $ext->add($context, $exten, 'sendEmail', new ext_agi('outboundRouteEmail.php,${ARG1},${ARG2},${ARG3},${ARG4},${ARG5},${ARG6},${ROUTEID},${ROUTENAME},${CALLERIDNAMEINTERNAL},${CALLERIDNUMINTERNAL},${CHANNEL(LINKEDID)},${HOTDESKEXTEN},${EMERGENCYROUTE}'));

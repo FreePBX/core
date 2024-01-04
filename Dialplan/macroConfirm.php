@@ -85,13 +85,13 @@ class macroConfirm{
 
         $exten = 'noanswer';
         $ext->add($context, $exten, '', new \ext_setvar('__MACRO_RESULT','ABORT'));
-        $ext->add($context, $exten, 'exitnoanswer', new \ext_macroexit());
+        $ext->add($context, $exten, 'exitnoanswer', new \ext_hangup());
 
         $exten = 'toolate';
         $ext->add($context, $exten, '', new \ext_setvar('MSG2','${IF($["foo${ARG2}" != "foo"]?${ARG2}:"incoming-call-no-longer-avail")}'));
         $ext->add($context, $exten, '', new \ext_playback('${MSG2}'));
         $ext->add($context, $exten, '', new \ext_setvar('__MACRO_RESULT','ABORT'));
-        $ext->add($context, $exten, 'exittoolate', new \ext_macroexit());
+        $ext->add($context, $exten, 'exittoolate', new \ext_hangup());
 
         $exten = 'h';
         $ext->add($context, $exten, '', new \ext_macro('hangupcall'));
