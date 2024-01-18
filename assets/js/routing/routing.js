@@ -75,9 +75,7 @@ $('#routes').on("post-body.bs.table", function () {
 			data: 'module=core&command=delroute&id='+id,
 			dataType: 'json',
 			success: function(data) {
-				curRow.fadeOut("slow", function(){
-					$(this).remove();
-				});
+				window.location = window.location.href;
 				toggle_reload_button('show');
 			}
 		});
