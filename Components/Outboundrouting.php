@@ -91,7 +91,7 @@ class Outboundrouting extends ComponentBase{
 		}
 		if ($order === 'new') {
 			array_unshift($sequence,$route_id);
-		} elseif(ctype_digit((string) $order) && (empty($sequence[$order]) || $sequence[$order] !== $route_id)) {
+		} elseif(is_numeric($order) && (empty($sequence[$order]) || $sequence[$order] !== $route_id)) {
 			$key = array_search($route_id,$sequence);
 			if($key !== false) {
 				unset($sequence[$key]);
@@ -99,14 +99,14 @@ class Outboundrouting extends ComponentBase{
 			}
 			array_splice($sequence, $order, 0, $route_id);
 			$sequence = array_values($sequence); //jic
-		} elseif(!ctype_digit($order) && in_array($order,['top','bottom'])) {
+		} elseif(!is_numeric($order) && in_array($order,['top','bottom'])) {
 			if($order === 'bottom') {
 				$sequence[] = $route_id;
 			} else {
 				array_unshift($sequence, $route_id);
 			}
 			$sequence = array_values($sequence); //jic
-		} elseif(!ctype_digit($order)) {
+		} elseif(!is_numeric($order)) {
 			throw new \Exception("Dont know what to do with $order");
 		} else {
 			//order didnt change
