@@ -2273,7 +2273,7 @@ function core_do_get_config($engine) {
 			$ext->add($context, $exten, '', new ext_set("_NODEST",""));
 
 			if($route['notification_on'] == 'pattern'){
-				$ext->add($context, $exten, '', new ext_gosub('1','s','sub-send-obroute-email',$pattern['prepend_digits'] . '${EXTEN' . $offset . '},${EXTEN},,${NOW},${CALLERID(name)},${CALLERID(number)}'));
+				$ext->add($context, $exten, '', new ext_gosub('1','s','sub-send-obroute-email',$pattern['prepend_digits'] . '${EXTEN' . $offset . '},${EXTEN},,${NOW},${CALLERID(name)},${CALLERID(number)},${DIAL_TRUNK_MOH}'));
 			}
 			
 			$password = $route['password'];
@@ -2438,10 +2438,12 @@ function core_do_get_config($engine) {
 	; ${ARG4} - the epoch time of the call
 	; ${ARG5} - the outgoing callerId name
 	; ${ARG6} - the outgoing callerId number
+	; ${ARG8} - the outboundroute moh
 	;------------------------------------------------------------------------
 	*/
     $context = 'sub-send-obroute-email';
     $exten = 's';
+    $ext->add($context, $exten, '', new ext_gosubif('$["${ARG8}"!="" ]','macro-setmusic,s,1(${ARG8})'));
     $ext->add($context, $exten, '', new ext_gotoif('$["${FORCE_CONFIRM}"!="" ]','gosubconfirm','normal'));
     $ext->add($context, $exten, 'gosubconfirm', new ext_gosub('1','s','macro-confirm'));
     $ext->add($context, $exten, 'normal', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
@@ -2526,7 +2528,7 @@ function core_do_get_config($engine) {
 		// Back to normal processing, whether intracompany or not.
 		// But add the macro-setmusic if we don't want music on this outbound call
 		// if FORCE_CONFIRM then that macro will set any necessary MOHCLASS, and we will also call the confirm macro
-		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=M(setmusic^${MOHCLASS})${DIAL_TRUNK_OPTIONS}'));
+		$ext->add($context, $exten, '', new ext_execif('$["${MOHCLASS}"!="default" & "${MOHCLASS}"!="" & "${FORCE_CONFIRM}"="" ]', 'Set', 'DIAL_TRUNK_MOH=${MOHCLASS}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${FORCE_CONFIRM}"!="" ]', 'Set', 'DIAL_TRUNK_OPTIONS=${DIAL_TRUNK_OPTIONS}U(macro-confirm)'));
 
 		// This macro call will always be blank and is provided as a hook for customization required prior to making a call
@@ -2547,7 +2549,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_TRUNK_OPTIONS=${STRREPLACE(DIAL_TRUNK_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_set("HASH(__SIPHEADERS,Alert-Info)", "unset"));
 
-		$obroute_email = ($route['notification_on'] == 'call') ? 'U(sub-send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)})' : '';
+		$obroute_email = ($route['notification_on'] == 'call') ? 'U(sub-send-obroute-email^${DIAL_NUMBER}^${MACRO_EXTEN}^${DIAL_TRUNK}^${NOW}^${CALLERID(name)}^${CALLERID(number)},^${DIAL_TRUNK_MOH})' : '';
 
 		$ext->add($context, $exten, '', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));  // Regular Trunk Dial
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
@@ -3182,6 +3184,7 @@ function core_do_get_config($engine) {
 
 	$ext->add($mcontext, $exten, '', new ext_noop_trace('Setting Outbound Route MoH To: ${ARG1}'));
 	$ext->add($mcontext, $exten, '', new ext_setmusiconhold('${ARG1}'));
+	$ext->add($mcontext, $exten, '', new ext_return());
 
 
 	/*
