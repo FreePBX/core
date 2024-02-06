@@ -2443,7 +2443,7 @@ function core_do_get_config($engine) {
 	*/
     $context = 'sub-send-obroute-email';
     $exten = 's';
-    $ext->add($context, $exten, '', new ext_gosubif('$["${ARG8}"!="" ]','macro-setmusic,s,1(${ARG8})'));
+    $ext->add($context, $exten, '', new ext_gosubif('$["${ARG8}"!="" ]','macro-setmusic,s,1','','${ARG8}'));
     $ext->add($context, $exten, '', new ext_gotoif('$["${FORCE_CONFIRM}"!="" ]','gosubconfirm','normal'));
     $ext->add($context, $exten, 'gosubconfirm', new ext_gosub('1','s','macro-confirm'));
     $ext->add($context, $exten, 'normal', new ext_gotoif('$["${EMAILNOTIFICATION}" = "TRUE"]', 'sendEmail'));
