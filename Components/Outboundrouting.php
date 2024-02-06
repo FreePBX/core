@@ -49,7 +49,7 @@ class Outboundrouting extends ComponentBase{
 			":emergency_route" => strtoupper($emergency_route),
 			":intracompany_route" => strtoupper($intracompany_route),
 			":mohclass" => $mohclass,
-			":time_group_id" => $time_group_id,
+			":time_group_id" => (is_numeric($time_group_id) ? $time_group_id : 0),
 			":dest" => $dest,
 			":time_mode" => $time_mode,
 			":timezone" => $timezone,
