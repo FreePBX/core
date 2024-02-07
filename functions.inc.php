@@ -2421,7 +2421,7 @@ function core_do_get_config($engine) {
 	*/
 	$context = 'sub-pincheck';
 	$exten = 's';
-	$ext->add($context, $exten, '', new ext_authenticate('${ARG3}'));
+	$ext->add($context, $exten, '', new ext_authenticate('${ARG1}'));
 	$ext->add($context, $exten, '', new ext_resetcdr(''));
 	$ext->add($context, $exten, '', new ext_return(''));
 
@@ -2509,7 +2509,7 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,t)}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${QCALLBACK}" = "1"]', 'Set', 'DIAL_OPTIONS=${STRREPLACE(DIAL_OPTIONS,T)}'));
-		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1','','${ARG3}'));
 		$ext->add($context, $exten, '', new ext_execif('$["${INTRACOMPANYROUTE}" = "YES" & ${DB_EXISTS(AMPUSER/${AMPUSER}/cidnum)} & "${AMPUSER}" != "${DB(AMPUSER/${AMPUSER}/cidnum)}"]', 'Set', 'CALLERID(num)=${DB(AMPUSER/${AMPUSER}/cidnum)}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
@@ -2663,7 +2663,7 @@ function core_do_get_config($engine) {
 		* Dialout Dundi Trunk
 		*/
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK', '${ARG1}'));
-		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1'));
+		$ext->add($context, $exten, '', new ext_gosubif('$[$["${ARG3}" != ""] & $["${DB(AMPUSER/${AMPUSER}/pinless)}" != "NOPASSWD"]]','sub-pincheck,s,1','','${ARG3}'));
 		$ext->add($context, $exten, '', new ext_gotoif('$["x${OUTDISABLE_${DIAL_TRUNK}}" = "xon"]', 'disabletrunk,1'));
 		$ext->add($context, $exten, '', new ext_set('DIAL_NUMBER', '${ARG2}')); // fixlocalprefix depends on this
 		$ext->add($context, $exten, '', new ext_set('DIAL_TRUNK_OPTIONS', '${DIAL_OPTIONS}')); // will be reset to TRUNK_OPTIONS if not intra-company
