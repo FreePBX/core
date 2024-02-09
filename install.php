@@ -1243,3 +1243,5 @@ $set['sortorder'] = 100;
 $set['type'] = CONF_TYPE_BOOL;
 $freepbx_conf->define_conf_setting('ALLOW_MODULE_HOOK_IN',$set);
 $freepbx_conf->commit_conf_settings();
+
+\FreePBX::Notifications()->add_notice('core', 'EXTENSIONS_MOVE', _("Extensions now located within 'Connectivity' category"), _("The 'Extensions' menu item previously listed under 'Applications' has been relocated to the 'Connectivity' menu."),true,true);
