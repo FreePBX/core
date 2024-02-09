@@ -173,7 +173,7 @@
 		</table>
 	</database>
 	<menuitems>
-		<extensions needsenginedb="yes">Extensions</extensions>
+		<extensions needsenginedb="yes" category="Connectivity">Extensions</extensions>
 		<users needsenginedb="yes">Users</users>
 		<devices needsenginedb="yes">Devices</devices>
 		<did needsenginedb="yes" category="Connectivity">Inbound Routes</did>
