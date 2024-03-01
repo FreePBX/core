@@ -253,7 +253,7 @@ for ($i=0; $i < $num_new_boxes; $i++) {
   <li role="presentation" data-name="importexport" class="change-tab"><a href="#importexport" data-toggle="tab"><?php echo _("Import/Export Patterns")?></a></li>
   <li role="presentation" data-name="notifications" class="change-tab"><a href="#notifications" data-toggle="tab"><?php echo _("Notifications")?></a></li>
     <?php echo $hooks['hookTabs'] ?>
-  <?php echo $hooktab ?>
+  <?php echo $hooktab ?? ''; ?>
 </ul>
 <div id="formtabs" class="tab-content display">
 	<div class="tab-pane active" id="routesettings">
