@@ -5,6 +5,7 @@
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 $request = $_REQUEST;
 $request['view'] = !empty($request['view']) ? $request['view'] : '';
+$action = isset($request['action'])?$request['action']:'';
 $subhead = '';
 if(!empty($request['id']) && !empty($request['view']) && $request['view'] == 'form'){
 	$subhead = _("Edit Route");
