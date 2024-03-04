@@ -17,7 +17,7 @@ $tabindex = 0;
 $dialpattern_insert = array();
 $p_idx = 0;
 $n_idx = 0;
-if ($action == 'populatenpanxx') {
+if (isset($action) && $action == 'populatenpanxx') {
 	return true;
 }
 $pageinfo = '<div class="well well-info">';
