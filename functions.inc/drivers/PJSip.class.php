@@ -261,7 +261,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$select[] = array('value' => 'no', 'text' => 'No');
 
 		$allDevices=$this->getAllDevs();
-		if(isset($allDevices[$deviceInfo['id']])) {
+		if(isset($deviceInfo['id']) && isset($allDevices[$deviceInfo['id']])) {
 			$removeExtngVal = ($allDevices[$deviceInfo['id']]['remove_existing']) ? $allDevices[$deviceInfo['id']]['remove_existing'] : 'no';
 		} else {
 			$removeExtngVal = 'no';
