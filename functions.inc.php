@@ -3395,7 +3395,7 @@ function core_do_get_config($engine) {
 	// Now play the users voicemail recording as the basis for their ivr, the Read command will repeat as needed and if it timesout
 	// then we go to the timeout. Otherwise handle invalid options by looping until the limit until a valid option is played.
 	//
-	$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'skip', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
+	$ext->add('macro-vm','vmx','loopstart',new ext_read('ACTION', '${ASTSPOOLDIR}/voicemail/${VMCONTEXT}/${MEXTEN}/${MODE}', 1, 'si', '${VMX_REPEAT}', '${VMX_TIMEOUT}'));
 	$ext->add('macro-vm','vmx', '', new ext_gotoif('$["${EXISTS(${ACTION})}" = "1"]','checkopt'));
 
 	// If we are here we timed out, go to the required destination
