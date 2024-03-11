@@ -1113,14 +1113,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		
 		// Validate $config array
 		$this->validateEndpoint($config);
-		if($config['sipdriver'] != 'chan_pjsip') {
+		if(isset($config['sipdriver']) && $config['sipdriver'] != 'chan_pjsip') {
 			return false;
 		}
 
 		$endpoint = $auth = $aor = $identify = array();
 
 		// With pjsip, we need three sections.
-		$endpointname = $config['account'];
+		$endpointname = $config['account'] ?? '';
 		$endpoint[] = "type=endpoint";
 		$authname = "$endpointname-auth";
 		$identifyname = "$endpointname-identify";
@@ -1179,12 +1179,12 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 		$endpoint[] = "allow=".$this->filterValidCodecs($config['allow']); // & is invalid in pjsip
 
-		$endpoint[] = "context=".$config['context'];
+		$endpoint[] = "context=".($config['context'] ?? '');
 		// If the config is sure it has the correct callerid, use that. Otherwise, try to map it from the dev
 		if (isset($config['force_callerid']) && $config['force_callerid'] === 'yes') {
 			$endpoint[] = "callerid=".$config['callerid'];
 		} else {
-			$endpoint[] = techDriver::map_dev_user($config['account'], 'callerid', $config['callerid']);
+			$endpoint[] = techDriver::map_dev_user(($config['account'] ?? ''), 'callerid', ($config['callerid'] ?? ''));
 		}
 		
 		// PJSIP Has a limited number of dtmf settings. If we don't know what it is, set it to RFC.
@@ -1192,14 +1192,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if(version_compare($this->version,'13','ge')) {
 			$validdtmf[] = "auto";
 		}
-		if (!in_array($config['dtmfmode'],$validdtmf)) {
+		if (isset($config['dtmfmode']) && !in_array($config['dtmfmode'],$validdtmf)) {
 			if(version_compare($this->version,'13','ge')) {
 				$config['dtmfmode'] = "auto";
 			} else {
 				$config['dtmfmode'] = "rfc4733";
 			}
 		}
-		$endpoint[] = "dtmf_mode=".$config['dtmfmode'];
+		$endpoint[] = "dtmf_mode=".($config['dtmfmode'] ?? '');
 
 		if (!empty($config['direct_media'])) {
 			$endpoint[] = "direct_media=".$config['direct_media'];
@@ -1394,8 +1394,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		// Auth
 		$auth[] = "auth_type=userpass";
-		$auth[] = "password=".$config['secret'];
-		$auth[] = "username=".$config['username'];
+		$auth[] = "password=".($config['secret'] ?? '');
+		$auth[] = "username=".($config['username'] ?? '');
 
 		// AOR
 		// Never allow zero. Zero is not what you want.
@@ -1488,19 +1488,19 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		//   accountcode, callgroup,
 
 		// DTMF Mode has changed.
-		if ($config['dtmfmode'] == "rfc2833") {
+		if (isset($config['dtmfmode']) && $config['dtmfmode'] == "rfc2833") {
 			$config['dtmfmode'] = "rfc4733";
 		}
 
 		if(version_compare($this->version,'13','lt')) {
-			if ($config['dtmfmode'] == "auto") {
+			if (isset($config['dtmfmode']) && $config['dtmfmode'] == "auto") {
 				$config['dtmfmode'] = "rfc4733";
 			}
 		}
 
 		// 'username' is for when username != exten.
 		if (!isset($config['username'])) {
-			$config['username'] = $config['account'];
+			$config['username'] = $config['account'] ?? '';
 		}
 
 		// Codec allow is now mandatory
