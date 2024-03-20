@@ -32,8 +32,8 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 				</div>
 				<div class="display no-border">
 					<div class="nav-container">
-						<div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
-						<div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+						<div class="scroller scroller-left"><i class="fa fa-chevron-left"></i></div>
+						<div class="scroller scroller-right"><i class="fa fa-chevron-right"></i></div>
 						<div class="wrapper">
 							<ul class="nav nav-tabs list" role="tablist">
 								<li role="presentation" data-name="alldids" class="active">
@@ -55,7 +55,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						<div role="tabpanel" id="alldids" class="tab-pane active">
 							<div id="toolbar-all">
 								<button id="remove-all" class="btn btn-danger btn-remove" data-type="devices" data-section="all" disabled>
-									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+									<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
 							<table data-url="ajax.php?module=core&amp;command=getDeviceGrid&amp;type=all" data-cache="false" data-show-refresh="true" data-toolbar="#toolbar-all" data-cookie="true" data-cookie-id-table="devices-table" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped ext-list" id="table-all">
@@ -75,7 +75,7 @@ if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 						<?php foreach(FreePBX::Core()->getAllDriversInfo() as $driver) {?>
 							<div id="toolbar-<?php echo $driver['rawName']?>">
 								<button id="remove-<?php echo $driver['rawName']?>" class="btn btn-danger btn-remove" data-type="devices" data-section="<?php echo $driver['rawName']?>" disabled>
-									<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
+									<i class="fa fa-remove"></i> <span><?php echo _('Delete')?></span>
 								</button>
 							</div>
 							<div role="tabpanel" id="<?php echo $driver['hardware']?>" class="tab-pane">
