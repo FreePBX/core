@@ -134,7 +134,7 @@ HERE;
 						</form>
 					</div>
 				</div>
-				<div class="col-sm-3 hidden-xs bootnav" id='addform'>
+				<div class="col-sm-3 hidden-xs bootnav" id='addform' style="position: static !important;">
 					<label class="control-label" for="module"><b><?php echo _("Add Module") ?></b></label>
 					<input type="text" class="form-control" id="module" name="module" value="">
 					<button class="btn btn-default" id="addmodule"><i class="fa fa-plus"></i> <?php echo _("Add")?></button>
