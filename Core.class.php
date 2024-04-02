@@ -2673,15 +2673,15 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$name,
 			$settings['tech'],
 			$settings['outcid'],
-			$settings['keepcid'] ?? '',
+			$settings['keepcid'] ?? 'off',
 			$settings['maxchans'] ?? '',
 			$settings['failtrunk'] ?? '',
 			$settings['dialoutprefix'] ?? '',
 			$settings['channelid'] ?? '',
-			$settings['usercontext'] ?? '',
-			$settings['provider'] ?? '',
-			$settings['disabletrunk'] ?? '',
-			$settings['continue'] ?? ''
+			$settings['usercontext'] ?? NULL,
+			$settings['provider'] ?? NULL,
+			$settings['disabletrunk'] ?? 'off',
+			$settings['continue'] ?? 'off'
 		));
 
 		if (isset($settings['dialopts']) && $settings['dialopts'] !== false) {
