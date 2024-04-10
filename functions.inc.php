@@ -4830,7 +4830,7 @@ function core_users_configpageload() {
 			$currentcomponent->addguielem($section, new gui_textbox('extension', $extdisplay, _("User Extension"), _("The extension number to dial to reach this user."), '!isInteger()', $msgInvalidExtNum, false), 3, null, $category);
 		}
 		if ( $display != 'extensions' ) {
-			$currentcomponent->addguielem($section, new gui_password('password', $password, _("User Password"), _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true), $category);
+			$currentcomponent->addguielem($section, new gui_password('password', $password ?? '', _("User Password"), _("A user will enter this password when logging onto a device.").' '.$fc_logon.' '._("logs into a device.").' '.$fc_logoff.' '._("logs out of a device."), '!isInteger() && !isWhitespace()', $msgInvalidExtPwd, true), $category);
 			// extra JS function check required for blank password warning -- call last in the onsubmit() function
 			$currentcomponent->addjsfunc('onsubmit()', "\treturn checkBlankUserPwd();\n", 9);
 		}
