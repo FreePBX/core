@@ -54,6 +54,7 @@ switch($tech){
 	$mtfhtml .= '						<i class="fa fa-question-circle fpbx-help-icon" data-for="failtrunk"></i>';
 	$mtfhtml .= '					</div>';
 	$mtfhtml .= '					<div class="col-md-9">';
+	$mtfenable='';
 	if(!$failtrunk_enable){
 		$mtfenable = "disabled";
 	}else{
