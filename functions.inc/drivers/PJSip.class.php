@@ -59,6 +59,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => $this->freepbx->Core()->generateSecret(),
 				"flag" => $flag++
 			),
+			"md5_cred" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 			"dtmfmode" => array(
 				"value" => $dtmf,
 				"flag" => $flag++
@@ -1393,8 +1397,13 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
                 }
 
 		// Auth
-		$auth[] = "auth_type=userpass";
-		$auth[] = "password=".($config['secret'] ?? '');
+		if (!empty($config['md5_cred'])) {
+			$auth[] = "auth_type=md5";
+			$auth[] = "md5_cred=".$config['md5_cred'];
+		} else {
+			$auth[] = "auth_type=userpass";
+			$auth[] = "password=".($config['secret'] ?? '');
+		}
 		$auth[] = "username=".($config['username'] ?? '');
 
 		// AOR
