@@ -2356,7 +2356,11 @@ function core_do_get_config($engine) {
 		$context = 'bad-number';
 		$exten = '_X.';
 		$ext->add($context, $exten, '', new extension('ResetCDR()'));
-		$ext->add($context, $exten, '', new extension('NoCDR()'));
+		if (version_compare($version,"20.0","ge")) {
+			$ext->add($context, $exten, '', new extension('Set(CDR_PROP(disable)=true)'));
+		} else {
+			$ext->add($context, $exten, '', new extension('NoCDR()'));
+		}
 		$ext->add($context, $exten, '', new ext_progress());
 		$ext->add($context, $exten, '', new ext_wait('1'));
 		$ext->add($context, $exten, '', new ext_playback('silence/1&cannot-complete-as-dialed&check-number-dial-again,noanswer'));
