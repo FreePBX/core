@@ -30,6 +30,15 @@ class Restore Extends Base\RestoreBase{
 				throw new \Exception(sprintf(_('Error installing core reason(s): %s'),implode(",",$install)));
 			}
 		}
+
+		if(isset($skipoptions['convertchansipexts']) && $skipoptions['convertchansipexts']) {
+			$backupinfo['convertchansipexts'] = true;
+		}
+
+		if(isset($skipoptions['skipchansipexts']) && $skipoptions['skipchansipexts']) {
+			$backupinfo['skipchansipexts'] = true;
+		}
+
 		foreach ($this->getClasses($this->transactionId) as $class) {
 			if(empty($class)){
 				continue;
@@ -57,6 +66,13 @@ class Restore Extends Base\RestoreBase{
 					$class->setConfigs($configs[$class->className]);
 				}
 			}
+		}
+		if(isset($backupinfo['convertchansipexts'])) {
+			$this->log("chansip extensions will be converted to pjsip extensions!");
+		}
+
+		if(isset($backupinfo['skipchansipexts'])) {
+			$this->log("chansip extensions will be skipped!");
 		}
 		$this->importKVStore($configs['kvstore']);
 		$this->importFeatureCodes($configs['features']);
@@ -135,6 +151,15 @@ class Restore Extends Base\RestoreBase{
 			}
 		}
 
+		if((isset($skipoptions['convertchansipexts']) && $skipoptions['convertchansipexts']) ) {
+			$this->log("chansip extensions will be converted to pjsip extensions!");
+			$this->FreePBX->Core->convert2pjsip();
+		}
+
+		if((isset($skipoptions['skipchansipexts']) && $skipoptions['skipchansipexts']) ) {
+			$this->log("chansip extensions will be skipped!");
+			$this->FreePBX->Core->skipchansip();
+		}
 	}
 
 	private function getTrunksconfig(){
