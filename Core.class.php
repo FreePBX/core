@@ -4525,4 +4525,36 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$astman = $this->FreePBX->astman;
 		$astman->set_global(\FreePBX::Config()->get_conf_setting('AST_FUNC_PRESENCE_STATE') . '(CustomPresence:' . $device . ')', '"'.$type . ',,"');
 	}
+
+	public function convert2pjsip() {
+		// get a list of all sip extensions
+		$extensions = $this->getAllDevicesByType('sip');
+		foreach($extensions as $exten) {
+			try {
+				$this->changeDeviceTech($exten['id'], 'pjsip');
+			} catch(Exception $e) {
+				dbug($e->getMessage());
+			}
+		}
+	}
+
+	public function skipchansip() {
+		$extensions = $this->getAllDevicesByType('sip');
+		foreach($extensions as $exten) {
+			try {
+				//delete from users table
+				$sthu = $this->FreePBX->Database->prepare("DELETE FROM users WHERE `extension`= ".$exten['id']);
+				$sthu->execute();
+				//delete from sip table
+				$sth = $this->FreePBX->Database->prepare("DELETE FROM ".$exten['tech']." WHERE `id`= ".$exten['id']);
+				$sth->execute();
+
+				//delete from devices table
+				$sthd = $this->FreePBX->Database->prepare("DELETE FROM devices WHERE `id`= ".$exten['id']);
+				$sthd->execute();
+			} catch(Exception $e) {
+				dbug($e->getMessage());
+			}
+		}
+	}
 }

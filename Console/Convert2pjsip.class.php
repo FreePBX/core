@@ -30,7 +30,10 @@ class Convert2pjsip extends Command {
 		}
 
 		// get an array of extensions to convert from arguments
-		$convertExtensions = $this->convertArgsToArray($rangeArgs);
+		$convertExtensions = [];
+		if($rangeArgs) {
+			$convertExtensions = $this->convertArgsToArray($rangeArgs);
+		}
 
 		// get a list of all sip extensions
 		$extensions = \FreePBX::Core()->getAllDevicesByType('sip');
