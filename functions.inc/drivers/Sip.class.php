@@ -11,6 +11,9 @@ class Sip extends techDriver {
 	}
 
 	public function getInfo() {
+		if ((version_compare("21.0", $this->version) <=0)) {
+			return false;
+		}
 		$sipdriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 		if(($sipdriver != "chan_sip" && $sipdriver != "both")) {
 			return false;
