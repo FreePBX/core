@@ -14,14 +14,6 @@ class Devices extends Corebase{
 		if(count($configs) > 0){
 			$this->updateDevices($configs);
 		}
-		//method to convet the chansip extensions to pjsip
-		if(isset($this->backupinfo['convertchansipexts']) && $this->backupinfo['convertchansipexts']) {
-			$this->FreePBX->Core->convert2pjsip();
-		}
-		//method to convet the chansip extensions
-		if(isset($this->backupinfo['skipchansipexts']) && $this->backupinfo['skipchansipexts']) {
-			$this->FreePBX->Core->skipchansip();
-		}
 		$this->FreePBX->Core->devices2astdb();
 		return $this;
 	}
