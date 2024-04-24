@@ -31,14 +31,6 @@ class Restore Extends Base\RestoreBase{
 			}
 		}
 
-		if(isset($skipoptions['convertchansipexts']) && $skipoptions['convertchansipexts']) {
-			$backupinfo['convertchansipexts'] = true;
-		}
-
-		if(isset($skipoptions['skipchansipexts']) && $skipoptions['skipchansipexts']) {
-			$backupinfo['skipchansipexts'] = true;
-		}
-
 		foreach ($this->getClasses($this->transactionId) as $class) {
 			if(empty($class)){
 				continue;
@@ -67,12 +59,14 @@ class Restore Extends Base\RestoreBase{
 				}
 			}
 		}
-		if(isset($backupinfo['convertchansipexts'])) {
+		if(isset($skipoptions['convertchansipexts']) && $skipoptions['convertchansipexts']) {
 			$this->log("chansip extensions will be converted to pjsip extensions!");
+			$this->FreePBX->Core->convert2pjsip();
 		}
 
-		if(isset($backupinfo['skipchansipexts'])) {
+		if(isset($skipoptions['skipchansipexts']) && $skipoptions['skipchansipexts']) {
 			$this->log("chansip extensions will be skipped!");
+			$this->FreePBX->Core->skipchansip();
 		}
 		$this->importKVStore($configs['kvstore']);
 		$this->importFeatureCodes($configs['features']);

@@ -2290,6 +2290,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			try {
 				$sth->execute(array($account));
 			} catch(\Exception $e) {
+				dbug($e->getMessage());
 			}
 
 			//voicemail symlink
