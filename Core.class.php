@@ -4558,4 +4558,54 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 	}
+
+	public function getTrunksByTech($type=null) {
+		$listTrunks = $this->listTrunks();
+		$trunks = [];
+		if (!empty($listTrunks) && !empty($type)) {
+			foreach($listTrunks as $key=>$trunk) {
+				if ($trunk['tech'] == $type) {
+					$trunks[$key] = $trunk;
+				}
+			}
+		}
+		return $trunks;
+	}
+
+	public function confirmPJSIPAdoption() {
+		$astversion = $this->freepbx->Config->get('ASTVERSION');
+		if (version_compare("21.0", $astversion)<=0) {
+			$sipChannelText = $sipExtText = $sipTrunkText = '';
+			$sipTrunks = $this->getTrunksByTech('sip');
+			$extensions	= $this->getAllDevicesByType('sip');
+			$sipDriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
+			if (empty($sipTrunks) && empty($extensions)) {
+				$this->freepbx->Config->set('ASTSIPDRIVER', 'chan_pjsip');
+				$this->freepbx->Notifications->delete('core','NO_CHANSIP');
+				return true;
+			}
+			$heading = _('Chan_sip module deprecated in Asterisk V21+');
+			if (!empty($extensions)) {
+				$sipExtText = _(' Convert the chan_sip extension to PJSIP. Please Run: ') . '<b>' . _('fwconsole convert2pjsip -a.').'</b>';
+			}
+			if (!empty($sipTrunks)) {
+				$sipTrunkText = _(' Convert the sip trunks to pjsip.');
+			}
+			if ($sipDriver == "chan_sip" || $sipDriver == "both") {
+				$sipChannelText = _(' In Advance settings set SIP Channel Driver option to chan_pjsip.');
+			}
+			if (!$this->freepbx->Notifications->exists('core', 'NO_CHANSIP')) {
+				$text = $heading . _('. It is recommended not to use chan_sip settings.');
+				$text.= $sipExtText.$sipTrunkText.$sipChannelText;
+				$this->freepbx->Notifications->add_warning('core', 'NO_CHANSIP', $heading, $text, '', true, true);
+			}
+			if (!empty($extensions) || !empty($sipTrunks)) {
+				echo json_encode(["error" => $heading, "trace" => trim($sipExtText). '<br>' . trim($sipTrunkText)]);
+				exit(-1);
+			}
+		} else {
+			$this->freepbx->Notifications->delete('core','NO_CHANSIP');
+			return true;
+		}
+	}
 }
