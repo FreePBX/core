@@ -31,7 +31,7 @@ class Trunks extends Corebase{
 				}
 			}
 		}			
-		if (($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_remotetrunks'] == 'yes') || (!empty($disable_trunk) && $disable_trunk == 'yes')) {
+		if ((isset($backupinfo['warmspareenabled']) && isset($backupinfo['warmspare_remotetrunks']) && $backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_remotetrunks'] == 'yes') || (!empty($disable_trunk) && $disable_trunk == 'yes')) {
 			core_trunks_disable('reg', true);
 		}
 		return $this;
