@@ -4355,7 +4355,8 @@ function core_trunks_disable($trunk, $switch) {
 		case 'reg':
 		case 'registered':
 			foreach (core_trunks_getDetails() as $t) {
-				if($reg = FreePBX::Core()->getTrunkRegisterStringByID($t['trunkid'])) {
+				$tech = FreePBX::Core()->getTrunkTech($trunkid);
+				if(($tech == 'chan_sip' && FreePBX::Core()->getTrunkRegisterStringByID($t['trunkid'])) || ($tech == 'pjsip')) {
 					$trunks[] = $t;
 				}
 			}
