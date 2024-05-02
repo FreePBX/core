@@ -3,14 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.9.42</version>
+	<version>17.0.9.43</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*17.0.9.42* disable trunks on warmspare restore 
+		*17.0.9.43* disable trunks on warmspare restore 
 		*17.0.9.38* bump 
 		*17.0.9.7* Packaging of ver 17.0.9.7
 		*17.0.1* initial release
