@@ -182,7 +182,7 @@ class Restore Extends Base\RestoreBase{
 	public function getResetInfo() {
 		$backupinfo = $this->getBackupInfo();
 		$skipoptions = $this->getCliarguments();
-		if ((isset($skipoptions['skiptrunksandroutes']) && $skipoptions['skiptrunksandroutes']) || ($backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes')) {
+		if ((isset($skipoptions['skiptrunksandroutes']) && $skipoptions['skiptrunksandroutes']) || (isset($backupinfo['warmspareenabled']) && isset($backupinfo['warmspare_excludetrunks']) && $backupinfo['warmspareenabled'] == 'yes' && $backupinfo['warmspare_excludetrunks'] == 'yes')) {
 			return true;
 		}
 		return false;
