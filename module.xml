@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.24</version>
+	<version>16.0.68.25</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.25* Fixing disable trunks on warmspare restore issue 
 		*16.0.68.24* FREEI-348 Fixing Uganda ringback tone issue 
 		*16.0.68.23* FREEI-314 Fixing Queue callback issue 
 		*16.0.68.22* FREEPBX-24324 
