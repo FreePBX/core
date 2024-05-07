@@ -29,6 +29,20 @@ $transportopts = '';
 
 <h3><?php echo _("PJSIP Settings")?></h3>
 
+<?php 
+	if (isset($sipdetails) && !empty($sipdetails)) {
+		$data = json_decode($sipdetails);
+		$row = '';
+		foreach ($data as $item) {
+			$row .='<tr><td>'.$item->keyword . '</td><td>' . $item->data .'<td></tr>';
+		}
+		if (!empty($row)) {
+			$helptext ='<table>'.$row.'</table><br />';
+			$helptext .='<button type="button" class="btn btn-primary" onclick="delChanSipdetails('.$trunkid.')" ><i class="fa fa-trash"></i></button>';
+			echo show_help($helptext, 'Converted Chansip details',true);
+		}
+	}
+?>
 <ul class="nav nav-tabs" role="tablist">
 	<li role="presentation" data-name="pjsgeneral" class="change-tab active">
 		<a href="#pjsgeneral" aria-controls="pjsgeneral" role="tab" data-toggle="tab">
@@ -1374,4 +1388,21 @@ function checkAuthButtons() {
 	}
 }
 
+function delChanSipdetails(trunkid) {
+	if (confirm(_("Are you sure you wish to delete this details?, Once deleted, it cannot be recovered."))) {
+		$.ajax({
+			type: 'POST',
+			url: 'ajax.php',
+			data: 'module=core&command=deleteChansipDetails&trunkid='+trunkid,
+			dataType: 'json',
+			async:false,
+			success: function(data) {
+				window.location.reload();
+			},
+			error: function() {
+				fpbxToast(_('Something went wrong this functionality'));
+			}
+		});
+	}
+}
 </script>
