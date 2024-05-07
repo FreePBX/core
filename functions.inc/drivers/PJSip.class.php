@@ -1656,7 +1656,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					$dispvars['codecs'][$codec] = false;
 				}
 			}
-
+			$sipdetails =\FreePBX::create()->Core->getConfig("converted_SIP", str_replace('OUT_','',$trunkid));
+			$dispvars['sipdetails']= $sipdetails;
+			$dispvars['trunkid']= str_replace('OUT_','',$trunkid);
 		} else {
 			$dispvars = array(
 				"auth_rejection_permanent" => "off",

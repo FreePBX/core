@@ -1260,6 +1260,34 @@ $transportopts = '';
 	</div><!--END CODECS TAB-->
 </div>
 
+<?php 
+		if (isset($sipdetails) && !empty($sipdetails)) {
+			$data = json_decode($sipdetails);
+			$row = '';
+			$display_array=[];
+			foreach ($data as $item) {
+				$display_array[$item->id][$item->keyword]= $item->data;
+			}
+			$table_head=array('tr-peer'=>'Outgoing','tr-reg'=>'Register String','tr-user'=>'Incoming');
+			if (!empty($display_array)) {
+				$helptext='';
+				foreach ($display_array as $key => $data) {
+					preg_match('/^(tr-peer|tr-reg|tr-user)-\d+$/', $key, $matches);
+					dbug($matches);
+					$tableKey = isset($matches[1]) ? $matches[1] : '';
+					$helptext .='<table class="table table-striped table-bordered table-hover">';
+					$helptext .= '<tr><th colspan="2">' . ($table_head[$tableKey] ?? '') . '</th></tr>';
+					foreach ($data as $key => $value) {
+						$helptext .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+					}
+					$helptext .= '</table> </br>';
+				}
+				$helptext .='<button type="button" class="btn btn-primary" onclick="delChanSipdetails('.$trunkid.')" ><i class="fa fa-trash"></i></button>';
+				echo show_help($helptext, 'Converted Chansip details',false);
+			}
+		}
+	?>
+
 <script>
 $(function() {
 	$( ".sortable" ).sortable();
@@ -1374,4 +1402,21 @@ function checkAuthButtons() {
 	}
 }
 
+function delChanSipdetails(trunkid) {
+	if (confirm(_("Are you sure you wish to delete this details?, Once deleted, it cannot be recovered."))) {
+		$.ajax({
+			type: 'POST',
+			url: 'ajax.php',
+			data: 'module=core&command=deleteChansipDetails&trunkid='+trunkid,
+			dataType: 'json',
+			async:false,
+			success: function(data) {
+				window.location.reload();
+			},
+			error: function() {
+				fpbxToast(_('Something went wrong this functionality'));
+			}
+		});
+	}
+}
 </script>

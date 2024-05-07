@@ -642,6 +642,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			case "getnpanxxjson":
 			case "populatenpanxx":
 			case "updatetrunks":
+			case "deleteChansipDetails":
 				return true;
 			break;
 		}
@@ -875,6 +876,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 					$retdata[$inpa.$inxx] = array('npa' => $inpa, 'nxx' => $inxx);
 				}
 				return $retdata;
+			break;
+			case 'deleteChansipDetails':
+				$trunkid = $request['trunkid'] ?? 0;
+				$this->freepbx->Core->delConfig("converted_SIP",$trunkid);
+				return true;
 			break;
 			case 'populatenpanxx':
 				$dialpattern_array = $dialpattern_insert;
@@ -1949,6 +1955,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		if ($this->astman) {
 			$this->astman->database_del("TRUNK", $trunknum . '/dialopts');
 		}
+		$this->freepbx->Core->delConfig("converted_SIP",$trunknum);
 		//Handle hooks
 		$this->freepbx->Hooks->processHooks($trunknum, $tech);
 		//Remove trunk from inbound routes
@@ -2694,7 +2701,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function checkPJSIPsettings($settings, $posts){
-		$imports 										= $posts["imports"];
+		$imports 										= $posts["imports"] ?? '';
 		$settings										= [];
 		$default_settings["channelid"] 					= "";
 		$default_settings["dialoutprefix"] 				= "";
@@ -4559,12 +4566,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 	}
 
-	public function getTrunksByTech($type=null) {
+	public function getTrunksByTech($type=null,$trunkid='') {
 		$listTrunks = $this->listTrunks();
 		$trunks = [];
 		if (!empty($listTrunks) && !empty($type)) {
 			foreach($listTrunks as $key=>$trunk) {
-				if ($trunk['tech'] == $type) {
+				if ($trunk['tech'] == $type && (empty($trunkid) || $trunkid == $trunk['trunkid'])) {
 					$trunks[$key] = $trunk;
 				}
 			}
@@ -4606,6 +4613,67 @@ class Core extends FreePBX_Helpers implements BMO  {
 		} else {
 			$this->freepbx->Notifications->delete('core','NO_CHANSIP');
 			return true;
+		}
+	}
+
+	public function chansipToPJSIP($output='',$trunkid='') {
+		$sipTrunks = $this->getTrunksByTech('sip',$trunkid);
+		if (!empty($sipTrunks)) {
+			foreach($sipTrunks as $rowData) {
+				if(!empty($output))	$output->writeln(_("Convert the sip trunks to pjsip (Trunk name : ".($rowData['name'] ?? '').")"));
+				$trunkid = $rowData['trunkid'] ?? 0;
+				$sth = $this->database->prepare("SELECT * FROM sip where `id` = 'tr-peer-".$trunkid."' or `id` = 'tr-reg-".$trunkid."' or `id` = 'tr-user-".$trunkid."'");
+				$sth->execute();
+				$res = $sth->fetchAll(\PDO::FETCH_ASSOC);
+				$result = [];
+				$result['sip_server_port'] = 5060;
+				$result['trunk_name'] = $rowData['name'] ?? '';
+				$result['secret'] = $result['username'] = $result['auth_username'] ='';
+				$pjsipcolumn = ["host" => "sip_server","port" => "sip_server_port"];
+				if (is_array($res) && count($res) > 0) {
+					foreach ($res as $item) {
+						if (isset($item['keyword']) && isset($item['data'])) {
+							$array_key = isset($pjsipcolumn[$item['keyword']]) ? $pjsipcolumn[$item['keyword']] : $item['keyword'];
+							$result[$array_key] = $item['data'];
+						}
+					}
+				}
+				$settings = $this->checkPJSIPsettings([],[]);
+				$settings = array_merge($settings, $result);
+				if (!empty($settings['register'])) {
+					$host=$username=$password ='';
+					try {
+						list($usernamePassword, $host) = explode("@", $settings['register'],2);
+						list($username, $password) = explode(":", $usernamePassword,2);
+						$settings['authentication'] = 'outbound';
+						$settings['registration'] = 'send';
+						$settings['secret'] = $password;
+						$settings['username'] = $username;
+						$settings['auth_username'] = $username;
+						$settings['sip_server'] = $host;
+					} catch(\Exception $e) { } finally { unset($settings['register']); }
+				} else {
+					$settings['authentication'] = 'off';
+					$settings['registration'] = 'none';
+				}
+				$settings['pjsip_line'] = 'true';
+				$settings['sv_trunk_name'] = $settings['sv_channelid'] = $rowData['name'] ?? '';
+				$settings['send_connected_line'] = 'false';
+				$settings['extdisplay'] = 'ÓUT_'.$trunkid;
+				$pjsip = $this->getDriver('pjsip');
+				$pjsip->addTrunk($trunkid,$settings);
+				$sql = "UPDATE trunks SET tech = 'pjsip' WHERE trunkid = ?";
+				$ob = $this->database->prepare($sql);
+				$ret = $ob->execute(array($trunkid));
+				$this->database->query("Delete from sip where `id` ='tr-peer-".$trunkid."'");
+				$this->database->query("Delete from sip where `id` ='tr-reg-".$trunkid."'");
+				$this->database->query("Delete from sip where `id` ='tr-user-".$trunkid."'");
+				$this->setConfig("converted_SIP",json_encode($res), $trunkid);
+			}
+			if(!empty($output)) $output->writeln(_("Trunk converted successfully!"));
+			if(!empty($output)) $output->writeln(_("Run 'fwconsole reload' to reload config"));
+		} else {
+			if(!empty($output)) $output->writeln(_("No SIP trunks found."));
 		}
 	}
 }
