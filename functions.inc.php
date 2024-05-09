@@ -5230,7 +5230,12 @@ function core_devices_configpageload() {
 			}
 
 			if (is_array($devopts)) {
+				$version = \FreePBX::Config()->get('ASTVERSION');
+				$vercompare = version_compare($version, '21', 'ge');
 				foreach ($devopts as $devopt => $devoptarr) {
+					if($vercompare && $devopt == 'changecdriver') {
+						continue;
+					}
 					$devopname = 'devinfo_'.$devopt;
 					$devoptcurrent = isset($$devopname) ? $$devopname : $devoptarr['value'];
 					$devoptjs = isset($devoptarr['jsvalidation']) ? $devoptarr['jsvalidation'] : '';
