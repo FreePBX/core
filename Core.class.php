@@ -4581,6 +4581,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$sipDriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 			if (empty($sipTrunks) && empty($extensions)) {
 				$this->freepbx->Config->set('ASTSIPDRIVER', 'chan_pjsip');
+				$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 1 WHERE `keyword` = 'ASTSIPDRIVER' ";
+				$sth = $this->database->prepare($sql_update);
+				$sth->execute();
 				$this->freepbx->Notifications->delete('core','NO_CHANSIP');
 				return true;
 			}
@@ -4604,6 +4607,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 				exit(-1);
 			}
 		} else {
+			$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 0 WHERE `keyword` = 'ASTSIPDRIVER' ";
+			$sth = $this->database->prepare($sql_update);
+			$sth->execute();
 			$this->freepbx->Notifications->delete('core','NO_CHANSIP');
 			return true;
 		}
