@@ -4599,7 +4599,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				$sipExtText = _(' Convert the chan_sip extension to PJSIP. Please Run: ') . '<b>' . _('fwconsole convert2pjsip -a.').'</b>';
 			}
 			if (!empty($sipTrunks)) {
-				$sipTrunkText = _(' Convert the sip trunks to pjsip.');
+				$sipTrunkText = _(' Convert the sip trunks to pjsip. Please Run: ') . '<b>' . _('fwconsole trunks --converttopjsip <all/trunkid>.').'</b>';
 			}
 			if ($sipDriver == "chan_sip" || $sipDriver == "both") {
 				$sipChannelText = _(' In Advance settings set SIP Channel Driver option to chan_pjsip.');
@@ -4680,6 +4680,21 @@ class Core extends FreePBX_Helpers implements BMO  {
 			if(!empty($output)) $output->writeln(_("Run 'fwconsole reload' to reload config"));
 		} else {
 			if(!empty($output)) $output->writeln(_("No SIP trunks found."));
+		}
+	}
+
+	public function skipchansipTrunk() {
+		$sipTrunks = $this->getTrunksByTech('sip');
+		if (!empty($sipTrunks)) {
+			foreach($sipTrunks as $rowData) {
+				try {
+					$trunkid = $rowData['trunkid'] ?? 0;
+					$this->database->query("Delete from sip where `id` ='tr-peer-".$trunkid."'");
+					$this->database->query("Delete from sip where `id` ='tr-reg-".$trunkid."'");
+					$this->database->query("Delete from sip where `id` ='tr-user-".$trunkid."'");
+					$this->database->query("Delete from trunks where `trunkid` ='".$trunkid."'");
+				} catch(\Exception $e) { dbug($e->getMessage()); }
+			}
 		}
 	}
 }

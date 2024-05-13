@@ -68,6 +68,17 @@ class Restore Extends Base\RestoreBase{
 			$this->log("chansip extensions will be skipped!");
 			$this->FreePBX->Core->skipchansip();
 		}
+
+		if(isset($skipoptions['convertchansiptrunks']) && $skipoptions['convertchansiptrunks']) {
+			$this->log("chansip trunks will be converted to pjsip trunks!");
+			$this->FreePBX->Core->chansipToPJSIP();
+		}
+
+		if(isset($skipoptions['skipchansiptrunks']) && $skipoptions['skipchansiptrunks']) {
+			$this->log("chansip trunks will be skipped!");
+			$this->FreePBX->Core->skipchansipTrunk();
+		}
+
 		$this->importKVStore($configs['kvstore']);
 		$this->importFeatureCodes($configs['features']);
 		$this->importAdvancedSettings($configs['settings']);
@@ -154,6 +165,17 @@ class Restore Extends Base\RestoreBase{
 			$this->log("chansip extensions will be skipped!");
 			$this->FreePBX->Core->skipchansip();
 		}
+
+		if(isset($skipoptions['convertchansiptrunks']) && $skipoptions['convertchansiptrunks']) {
+			$this->log("chansip trunks will be converted to pjsip trunks!");
+			$this->FreePBX->Core->chansipToPJSIP();
+		}
+
+		if(isset($skipoptions['skipchansiptrunks']) && $skipoptions['skipchansiptrunks']) {
+			$this->log("chansip trunks will be skipped!");
+			$this->FreePBX->Core->skipchansipTrunk();
+		}
+		
 	}
 
 	private function getTrunksconfig(){
