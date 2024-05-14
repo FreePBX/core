@@ -3,14 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.9.46</version>
+	<version>17.0.9.47</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*17.0.9.46* chansip to pjsip trunk conversion 
+		*17.0.9.47* chansip to pjsip trunk conversion 
 		*17.0.9.45* disable trunks on warmspare restore 
 		*17.0.9.38* bump 
 		*17.0.9.7* Packaging of ver 17.0.9.7
