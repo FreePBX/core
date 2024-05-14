@@ -47,6 +47,10 @@ class Extensions extends Base {
 							if(!empty($res)){
 								return ['message' => _("This device id is already in use"),'status' => false];
 							}
+							$version = \FreePBX::Config()->get('ASTVERSION');
+							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
+								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+							}
 							try{
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							}catch(\Exception $ex){
