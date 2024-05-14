@@ -247,9 +247,9 @@ $hooks = \FreePBX::Core()->hookTabs($_REQUEST['display']);
 									<i class="fa fa-question-circle fpbx-help-icon" data-for="privacyman"></i>
 								</div>
 								<div class="col-md-9 radioset">
-									<input type="radio" name="privacyman" id="privacymanYES" value="1" <?php  echo ($privacyman === '1' ? 'CHECKED' : '')?>>
+									<input type="radio" name="privacyman" id="privacymanYES" value="1" <?php  echo ($privacyman == '1' ? 'CHECKED' : '')?>>
 									<label for="privacymanYES"><?php echo _("Yes")?></label>
-									<input type="radio" name="privacyman" id="privacymanNO" value="0" <?php  echo ($privacyman === '1' ? '' : 'CHECKED')?>>
+									<input type="radio" name="privacyman" id="privacymanNO" value="0" <?php  echo ($privacyman == '1' ? '' : 'CHECKED')?>>
 									<label for="privacymanNO"><?php echo _("No")?></label>
 								</div>
 							</div>
