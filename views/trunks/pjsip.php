@@ -1273,7 +1273,6 @@ $transportopts = '';
 				$helptext='';
 				foreach ($display_array as $key => $data) {
 					preg_match('/^(tr-peer|tr-reg|tr-user)-\d+$/', $key, $matches);
-					dbug($matches);
 					$tableKey = isset($matches[1]) ? $matches[1] : '';
 					$helptext .='<table class="table table-striped table-bordered table-hover">';
 					$helptext .= '<tr><th colspan="2">' . ($table_head[$tableKey] ?? '') . '</th></tr>';
