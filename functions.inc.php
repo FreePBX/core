@@ -2278,6 +2278,7 @@ function core_do_get_config($engine) {
 			
 			$password = $route['password'];
 			foreach ($trunks as $trunk_id) {
+				$trunk_macro = 'dialout-trunk';
 				if (isset($trunk_table[$trunk_id])) switch(strtolower($trunk_table[$trunk_id]['tech'])) {
 					case 'dundi':
 					$trunk_macro = 'dialout-dundi';
@@ -2289,7 +2290,7 @@ function core_do_get_config($engine) {
 					$trunk_macro = 'dialout-trunk';
 					break;
 				}
-				$argv = $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . $trunk_table[$trunk_id]['continue'];
+				$argv = $trunk_id . ',' . $pattern['prepend_digits'] . '${EXTEN' . $offset . '},' . $password . ',' . ($trunk_table[$trunk_id]['continue'] ?? '');
 				$ext->add($context, $exten, '', new ext_macro($trunk_macro,$argv));
 				$password = '';
 				$trunk_type_needed['macro-' . $trunk_macro] = true;
