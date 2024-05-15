@@ -62,6 +62,10 @@ class Devices extends Base {
 							if (empty($item)) {
 								return ['message' => _("Core device does not exists"), 'status' => false];
 							} 
+							$version = \FreePBX::Config()->get('ASTVERSION');
+							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
+								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+							}
 							$output = $this->getMutationExecuteArray($input);
 							$this->freepbx->Core->delDevice($input['id'], true);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'], $output['description']);

@@ -82,6 +82,10 @@ class Extensions extends Base {
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
 								}
+								$version = \FreePBX::Config()->get('ASTVERSION');
+								if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
+									return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+								}
 								$users = $this->freepbx->Core->getUser($input['extension']);
 								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
 								$input = $this->getUpdatedValues($extensionExists,$users,$userman,$input);
@@ -135,6 +139,10 @@ class Extensions extends Base {
 							$res = $this->freepbx->core->checkExtensionLicenseCount();
 							if(!$res){
 								return ['message' => _('Can not add extension beyond the extensions license limit'), 'status' => false];
+							}
+							$version = \FreePBX::Config()->get('ASTVERSION');
+							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
+								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
 							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
