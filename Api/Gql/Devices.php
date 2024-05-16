@@ -37,7 +37,15 @@ class Devices extends Base {
 							$version = \FreePBX::Config()->get('ASTVERSION');
 							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
 								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
-							} 
+							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = $input['tech'] ?? '';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use sip instead'), 'status' => false];
+							}
 							$output = $this->getMutationExecuteArray($input);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'],$output['description']);
 							$defaults['emergency_cid']['value'] = isset($input['emergency_cid']) ? $input['emergency_cid'] : "";
@@ -65,6 +73,14 @@ class Devices extends Base {
 							$version = \FreePBX::Config()->get('ASTVERSION');
 							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
 								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = $input['tech'] ?? '';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use sip instead'), 'status' => false];
 							}
 							$output = $this->getMutationExecuteArray($input);
 							$this->freepbx->Core->delDevice($input['id'], true);
