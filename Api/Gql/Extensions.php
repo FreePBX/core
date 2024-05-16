@@ -47,6 +47,14 @@ class Extensions extends Base {
 							if(!empty($res)){
 								return ['message' => _("This device id is already in use"),'status' => false];
 							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = isset($input['tech'])? $input['tech'] :'';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use sip instead'), 'status' => false];
+							}
 							try{
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							}catch(\Exception $ex){
@@ -77,6 +85,14 @@ class Extensions extends Base {
 								$extensionExists = $this->freepbx->Core->getDevice($input['extension']);
 								if (empty($extensionExists)) {
 									return array("status" => false, "message" => _("Extension does not exists."));
+								}
+								$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+								$tech = isset($input['tech'])? $input['tech'] :'';
+								if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+									return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use pjsip instead'), 'status' => false];
+								}
+								if ($sipdriver == 'chan_sip' && $tech !='sip') {
+									return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use sip instead'), 'status' => false];
 								}
 								$users = $this->freepbx->Core->getUser($input['extension']);
 								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
@@ -131,6 +147,14 @@ class Extensions extends Base {
 							$res = $this->freepbx->core->checkExtensionLicenseCount();
 							if(!$res){
 								return ['message' => _('Can not add extension beyond the extensions license limit'), 'status' => false];
+							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = isset($input['tech'])? $input['tech'] :'';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use sip instead'), 'status' => false];
 							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];

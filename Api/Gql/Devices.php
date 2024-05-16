@@ -33,7 +33,15 @@ class Devices extends Base {
 							$item = $this->freepbx->Core->getDevice($input['id']);
 							if (!empty($item)) {
 								return ['message' => _("This device id is already in use"), 'status' => false];
-							} 
+							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = isset($input['tech'])? $input['tech'] :'';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use sip instead'), 'status' => false];
+							}
 							$output = $this->getMutationExecuteArray($input);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'],$output['description']);
 							$defaults['emergency_cid']['value'] = isset($input['emergency_cid']) ? $input['emergency_cid'] : "";
@@ -58,6 +66,14 @@ class Devices extends Base {
 							if (empty($item)) {
 								return ['message' => _("Core device does not exists"), 'status' => false];
 							} 
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = isset($input['tech'])? $input['tech'] :'';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech('.$tech.') option . Please use sip instead'), 'status' => false];
+							}
 							$output = $this->getMutationExecuteArray($input);
 							$this->freepbx->Core->delDevice($input['id'], true);
 							$defaults = $this->freepbx->Core->generateDefaultDeviceSettings($output['tech'], $output['id'], $output['description']);
