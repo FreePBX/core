@@ -51,6 +51,14 @@ class Extensions extends Base {
 							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
 								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
 							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = $input['tech'] ?? '';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use sip instead'), 'status' => false];
+							}
 							try{
 								$status = $this->freepbx->Core->processQuickCreate($input['tech'],$input['extension'],$input);
 							}catch(\Exception $ex){
@@ -85,6 +93,14 @@ class Extensions extends Base {
 								$version = \FreePBX::Config()->get('ASTVERSION');
 								if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
 									return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+								}
+								$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+								$tech = $input['tech'] ?? '';
+								if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+									return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use pjsip instead'), 'status' => false];
+								}
+								if ($sipdriver == 'chan_sip' && $tech !='sip') {
+									return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use sip instead'), 'status' => false];
 								}
 								$users = $this->freepbx->Core->getUser($input['extension']);
 								$userman = $this->freepbx->userman->getUserByUsername($input['extension']);
@@ -143,6 +159,14 @@ class Extensions extends Base {
 							$version = \FreePBX::Config()->get('ASTVERSION');
 							if((isset($input['tech']) && $input['tech'] == 'sip') && version_compare($version, '21', 'ge')) {
 								return ['message' => _('The installed version of Asterisk does not support chan_sip. Please use pjsip instead'), 'status' => false];
+							}
+							$sipdriver = \FreePBX::Config()->get('ASTSIPDRIVER');
+							$tech = $input['tech'] ?? '';
+							if ($sipdriver == 'chan_pjsip' && $tech !='pjsip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use pjsip instead'), 'status' => false];
+							}
+							if ($sipdriver == 'chan_sip' && $tech !='sip') {
+								return ['message' => _('The existing driver not support this tech(`'.$tech.'`) option . Please use sip instead'), 'status' => false];
 							}
 							$count= 0;
 							$max =$input['startExtension'] + $input['numberOfExtensions'];
