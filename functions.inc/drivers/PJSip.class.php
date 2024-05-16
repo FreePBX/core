@@ -1055,6 +1055,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$cssettings 	= $this->freepbx->Sipsettings->getChanSipSettings();
 
 		if (!$codecs) {
+			if(!is_array($codecs)) { $codecs = []; }
 			// Sipsettings doesn't have any codecs yet.
 			// Grab the default codecs from BMO
 			foreach ($this->freepbx->Codecs->getAudio(true) as $c => $en) {
