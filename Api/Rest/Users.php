@@ -17,9 +17,11 @@ class Users extends Base {
 		 * @return - a list of users
 		 * @uri /core/users
 		 */
-		$app->get('/users', function ($request, $response, $args) {
-			$users = $this->freepbx->Core->getAllUsers();
-			return $response->withJson($users);
+		$freepbx = $this->freepbx;
+		$app->get('/users', function ($request, $response, $args) use($freepbx) {
+			$users = $freepbx->Core->getAllUsers();
+			$response->getBody()->write(json_encode($users));
+			return $response->withHeader('Content-Type', 'application/json');
 		})->add($this->checkReadScopeMiddleware('users'));
 
 		/**
@@ -27,8 +29,8 @@ class Users extends Base {
 		 * @returns - a user resource
 		 * @uri /core/users/:id
 		 */
-		$app->get('/users/{id}', function ($request, $response, $args) {
-			$base = $this->freepbx->Core->getUser($args['id']);
+		$app->get('/users/{id}', function ($request, $response, $args) use($freepbx) {
+			$base = $freepbx->Core->getUser($args['id']);
 
 			// Now, find their voicemail information.
 			$z = file("/etc/asterisk/voicemail.conf");
@@ -44,7 +46,8 @@ class Users extends Base {
 			}
 
 			// No voicemail found.
-			return $response->withJson($base);
+			$response->getBody()->write(json_encode($base));
+			return $response->withHeader('Content-Type', 'application/json');
 		})->add($this->checkReadScopeMiddleware('users'));
 	}
 }
