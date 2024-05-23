@@ -4588,7 +4588,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$sipDriver = $this->freepbx->Config->get_conf_setting('ASTSIPDRIVER');
 			if (empty($sipTrunks) && empty($extensions)) {
 				$this->freepbx->Config->set('ASTSIPDRIVER', 'chan_pjsip');
-				$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 1 WHERE `keyword` = 'ASTSIPDRIVER' ";
+				$this->freepbx->Config->set('HTTPWEBSOCKETMODE', 'pjsip');
+				//hide ASTSIPDRIVER and HTTPWEBSOCKETMODE if asterisk version is 21+
+				$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 1 WHERE `keyword` IN ('ASTSIPDRIVER','HTTPWEBSOCKETMODE') ";
 				$sth = $this->database->prepare($sql_update);
 				$sth->execute();
 				$this->freepbx->Notifications->delete('core','NO_CHANSIP');
@@ -4614,7 +4616,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				exit(-1);
 			}
 		} else {
-			$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 0 WHERE `keyword` = 'ASTSIPDRIVER' ";
+			$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 0 WHERE `keyword` IN ('ASTSIPDRIVER','HTTPWEBSOCKETMODE) ";
 			$sth = $this->database->prepare($sql_update);
 			$sth->execute();
 			$this->freepbx->Notifications->delete('core','NO_CHANSIP');
