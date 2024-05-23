@@ -18,7 +18,7 @@ class Trunks extends Command {
 		->setDefinition(array(
 			new InputOption('enable', null, InputOption::VALUE_REQUIRED, _('Enable given trunk')),
 			new InputOption('disable', null, InputOption::VALUE_REQUIRED, _('Disable given trunk')),
-			new InputOption('converttopjsip', null, InputOption::VALUE_REQUIRED, _('Convert chanSip to PJSIP, eg: <all/trunkid>')),
+			new InputOption('convert2pjsip', null, InputOption::VALUE_REQUIRED, _('Convert legacy chan_sip trunks to chan_pjsip trunks. eg: <all/trunkid>')),
 			new InputOption('list', null, InputOption::VALUE_NONE, _('list trunks')),
 			new InputOption('xml', null, InputOption::VALUE_NONE, _('format list as json')),
 			new InputOption('json', null, InputOption::VALUE_NONE, _('format list as xml')),
@@ -26,7 +26,7 @@ class Trunks extends Command {
 	}
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$args = $input->getArgument('args');
-		$converttopjsip = $input->getOption('converttopjsip');
+		$converttopjsip = $input->getOption('convert2pjsip');
 		$ARGUSED = false;
 		$trunks = $this->listTrunks();
 		$trunkids = array();
