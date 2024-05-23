@@ -4551,11 +4551,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 		foreach($extensions as $exten) {
 			try {
 				//delete from users table
-				$sthu = $this->FreePBX->Database->prepare("DELETE FROM users WHERE `extension`= ".$exten['id']);
-				$sthu->execute();
+				$sthuser = $this->FreePBX->Database->prepare("DELETE FROM users WHERE `extension`= ".$exten['id']);
+				$sthuser->execute();
 				//delete from sip table
-				$sth = $this->FreePBX->Database->prepare("DELETE FROM ".$exten['tech']." WHERE `id`= ".$exten['id']);
-				$sth->execute();
+				$sthsip = $this->FreePBX->Database->prepare("DELETE FROM ".$exten['tech']." WHERE `id`= ".$exten['id']);
+				$sthsip->execute();
+				//unlink from userman_users table
+				$sthuserman = $this->FreePBX->Database->prepare("UPDATE userman_users SET default_extension = '' WHERE `username`= ".$exten['id']);
+				$sthuserman->execute();
 
 				//delete from devices table
 				$sthd = $this->FreePBX->Database->prepare("DELETE FROM devices WHERE `id`= ".$exten['id']);
