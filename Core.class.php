@@ -4619,7 +4619,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				exit(-1);
 			}
 		} else {
-			$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 0 WHERE `keyword` IN ('ASTSIPDRIVER','HTTPWEBSOCKETMODE) ";
+			$sql_update = "UPDATE `freepbx_settings` SET `hidden` = 0 WHERE `keyword` IN ('ASTSIPDRIVER','HTTPWEBSOCKETMODE') ";
 			$sth = $this->database->prepare($sql_update);
 			$sth->execute();
 			$this->freepbx->Notifications->delete('core','NO_CHANSIP');
