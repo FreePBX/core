@@ -4583,7 +4583,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function confirmPJSIPAdoption() {
-		$astversion = $this->freepbx->Config->get('ASTVERSION');
+		$curversion = engine_getinfo();
+		$astversion = $curversion['version'];
 		if (version_compare("21.0", $astversion)<=0) {
 			$sipChannelText = $sipExtText = $sipTrunkText = '';
 			$sipTrunks = $this->getTrunksByTech('sip');
