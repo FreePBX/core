@@ -4360,6 +4360,7 @@ function core_trunks_disable($trunk, $switch) {
 	if(empty($trunk)){
 		return false;
 	}
+	$trunks=[];
 	switch ($trunk) {
 		case 'all':
 		case '*':
@@ -4369,7 +4370,7 @@ function core_trunks_disable($trunk, $switch) {
 		case 'registered':
 			foreach (core_trunks_getDetails() as $t) {
 				$tech = FreePBX::Core()->getTrunkTech($t['trunkid']);
-				if(($tech == 'chan_sip' && FreePBX::Core()->getTrunkRegisterStringByID($t['trunkid'])) || ($tech == 'pjsip')) {
+				if((($tech == 'chan_sip' || $tech == 'sip') && FreePBX::Core()->getTrunkRegisterStringByID($t['trunkid'])) || ($tech == 'pjsip')) {
 					$trunks[] = $t;
 				}
 			}
