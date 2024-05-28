@@ -59,7 +59,7 @@ class Restore Extends Base\RestoreBase{
 				}
 			}
 		}
-		if(isset($skipoptions['convertchansipexts']) && $skipoptions['convertchansipexts']) {
+		if(isset($skipoptions['convertchansipexts2pjsip']) && $skipoptions['convertchansipexts2pjsip']) {
 			$this->log("chansip extensions will be converted to pjsip extensions!");
 			$this->FreePBX->Core->convert2pjsip();
 		}
@@ -69,7 +69,7 @@ class Restore Extends Base\RestoreBase{
 			$this->FreePBX->Core->skipchansip();
 		}
 
-		if(isset($skipoptions['convertchansiptrunks']) && $skipoptions['convertchansiptrunks']) {
+		if(isset($skipoptions['convertchansiptrunks2pjsip']) && $skipoptions['convertchansiptrunks2pjsip']) {
 			$this->log("chansip trunks will be converted to pjsip trunks!");
 			$this->FreePBX->Core->chansipToPJSIP();
 		}
