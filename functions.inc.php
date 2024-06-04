@@ -5144,7 +5144,7 @@ function core_devices_configpageload() {
 				$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/telephone_delete.png"/>&nbsp;'.$tlabel.'</span>';
 				$currentcomponent->addguielem('_top', new gui_link('del', $label, $delURL, true, false), 0);
 
-				if ($deviceInfo['device_user'] != 'none') {
+				if (isset($deviceInfo['device_user']) && $deviceInfo['device_user'] != 'none') {
 					$editURL = '?display=users&skip=0&extdisplay='.urlencode($deviceInfo['user']);
 					$tlabel =  $deviceInfo['devicetype'] == 'adhoc' ? sprintf(_("Edit Default User: %s"),$deviceInfo['user']) : sprintf(_("Edit Fixed User: %s"),$deviceInfo['user']);
 					$label = '<span><img width="16" height="16" border="0" title="'.$tlabel.'" alt="" src="images/user_edit.png"/>&nbsp;'.$tlabel.'</span>';
