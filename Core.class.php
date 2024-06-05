@@ -361,9 +361,9 @@ class Core extends FreePBX_Helpers implements BMO  {
 						'value' => _('Submit')
 					)
 				);
-				if($request['view'] == 'add' || !empty($request['tech_hardware'])) {
+				if ((isset($request['view']) && $request['view'] == 'add') || !empty($request['tech_hardware'])) {
 					unset($buttons['delete']);
-				} elseif(!isset($request['extdisplay']) || freepbx_trim ($request['extdisplay']) == '') {
+				} elseif (!isset($request['extdisplay']) || freepbx_trim($request['extdisplay']) == '') {
 					$buttons = array();
 				}
 			break;
