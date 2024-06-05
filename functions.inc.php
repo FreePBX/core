@@ -3736,6 +3736,7 @@ function core_do_get_config($engine) {
 	*/
 	$exten = '_s-.';
 	$ext->add($mcontext,$exten,'', new ext_noop('Extension is reporting ${EXTEN}'));
+	$ext->add($mcontext,$exten,'', new ext_return(''));
 
 	/*
 		Originate a call but skip voicemail if the device does not answer
