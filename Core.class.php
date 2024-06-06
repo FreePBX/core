@@ -141,7 +141,14 @@ class Core extends FreePBX_Helpers implements BMO  {
 			include(__DIR__."/functions.inc/Driver.class.php");
 		}
 		$driverNamespace = "\\FreePBX\\Modules\\Core\\Drivers";
-		foreach(glob(__DIR__."/functions.inc/drivers/*.class.php") as $driver) {
+		$driverList = glob(__DIR__."/functions.inc/drivers/*.class.php");
+		$order = ['PJSip.class.php','Sip.class.php','Virtual.class.php','Dahdi.class.php','Iax2.class.php','Custom.class.php'];
+		usort($driverList, function($a, $b) use ($order) {
+			$indexA = array_search(basename($a), $order);
+			$indexB = array_search(basename($b), $order);
+			return $indexA <=> $indexB;
+		});
+		foreach($driverList as $driver) {
 			if(preg_match("/\/([a-z1-9]*)\.class\.php$/i",$driver,$matches)) {
 				$name = $matches[1];
 				$class = $driverNamespace . "\\" . $name;
