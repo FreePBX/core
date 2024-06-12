@@ -4710,4 +4710,67 @@ class Core extends FreePBX_Helpers implements BMO  {
 			}
 		}
 	}
+
+	public function getAstdbConfigs($extension) {
+		$results = [];
+		$astman = $this->FreePBX->astman;
+		if ($astman->connected()) {
+
+			if ($this->FreePBX->Modules->checkStatus("paging")) {
+				$answermode=$astman->database_get("AMPUSER",$extension."/answermode");
+				$results['answermode'] = (trim($answermode) == '') ? $this->freepbx->Config->get("DEFAULT_INTERNAL_AUTO_ANSWER") : $answermode;
+
+				$intercom=$astman->database_get("AMPUSER",$extension."/intercom");
+				$results['intercom'] = (trim($intercom) == '') ? 'enabled' : $intercom;
+			}
+
+			$cw = $astman->database_get("CW",$extension);
+			$results['callwaiting'] = (trim($cw) == 'ENABLED') ? 'enabled' : 'disabled';
+			$cid_masquerade=$astman->database_get("AMPUSER",$extension."/cidnum");
+			$results['cid_masquerade'] = (trim($cid_masquerade) != "")?$cid_masquerade:$extension;
+
+			$call_screen=$astman->database_get("AMPUSER",$extension."/screen");
+			$results['call_screen'] = (trim($call_screen) != "")?$call_screen:'0';
+
+			$pinless=$astman->database_get("AMPUSER",$extension."/pinless");
+			$results['pinless'] = (trim($pinless) == 'NOPASSWD') ? 'enabled' : 'disabled';
+
+			$results['ringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/ringtimer");
+
+			$results['cfringtimer'] = (int) $astman->database_get("AMPUSER",$extension."/cfringtimer");
+			$results['concurrency_limit'] = (int) $astman->database_get("AMPUSER",$extension."/concurrency_limit");
+
+			$results['dialopts'] = $astman->database_get("AMPUSER",$extension."/dialopts");
+
+			$results['cwtone'] = $astman->database_get("AMPUSER",$extension."/cwtone");
+
+			$results['recording_in_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/external"));
+			$results['recording_out_external'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/external"));
+			$results['recording_in_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/in/internal"));
+			$results['recording_out_internal'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/out/internal"));
+			$results['recording_ondemand'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/ondemand"));
+			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
+			$results['rvolume'] = strtolower($astman->database_get("AMPUSER",$extension."/rvolume"));
+
+		} else {
+			throw new \Exception("Cannot connect to Asterisk Manager with using user[".$this->FreePBX->Config->get("AMPMGRUSER")."]");
+		}
+		return $results;
+	}
+
+	public function putAstdbConfigs($configs) {
+		$astman = $this->FreePBX->astman;
+		//add details to astdb
+		if ($astman->connected()) {
+			$replace_char = ['recording_in_external','recording_out_external','recording_in_internal','recording_out_internal','recording_ondemand','recording_priority'];
+			foreach ($configs as $ext => $confs) {
+				foreach ($confs as $key => $value) {
+					if(in_array($key,$replace_char)) {
+						$key = str_replace("_","/",$key);
+					}
+					$astman->database_put("AMPUSER",$ext."/".$key,$value);
+				}
+			}
+		}
+	}
 }
