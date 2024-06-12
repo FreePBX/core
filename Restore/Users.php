@@ -6,6 +6,9 @@ class Users extends Corebase{
 
 	public function setConfigs($configs){
 		$this->updateUsers($configs['users']);
+		if( isset($configs['astdbConfigs'])){
+			$this->updateAstdbConfigs($configs['astdbConfigs']);
+		}
 		return $this;
 	}
 
@@ -15,5 +18,9 @@ class Users extends Corebase{
 			$sth->execute($user);
 		}
 		$this->FreePBX->Core->users2astdb();
+	}
+
+	private function updateAstdbConfigs($confs) {
+		$this->FreePBX->Core->putAstdbConfigs($confs);
 	}
 }
