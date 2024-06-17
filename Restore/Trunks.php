@@ -12,7 +12,7 @@ class Trunks extends Corebase{
 	public function setConfigs($configs){
 		$this->updateTrunks($configs);		
 		$backupinfo = $this->backupinfo;
-		$items = json_decode($backupinfo["backup_items"]);
+		$items = isset($backupinfo["backup_items"])? json_decode($backupinfo["backup_items"]) : '';
 		if(isset($backupinfo['core_disabletrunks'])){
 			$disable_trunk = $backupinfo['core_disabletrunks']=='yes'?'yes':'no';
 		}else {
