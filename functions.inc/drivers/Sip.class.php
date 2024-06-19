@@ -328,7 +328,7 @@ class Sip extends techDriver {
 		$tt = _("Whether Asterisk should trust the RPID settings from this device. Usually should be yes for CONNECTEDLINE() functionality to work if supported by the endpoint.").'[trustrpid]';
 		$tmparr['trustrpid'] = array('prompttext' => _('Trust RPID'), 'value' => $this->freepbx->Config->get_conf_setting('DEVICE_SIP_TRUSTRPID'), 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 
-		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0");
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0", "21.0.0");
 		if ($deviceInfo['tech'] == "pjsip" && version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true) {
 			unset($select);
 			$select[] 	= array('value' => 'no', 'text' => _('No'));
