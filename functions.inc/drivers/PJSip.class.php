@@ -96,7 +96,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"flag" => $flag++
 			),
 			"send_connected_line" => array(
-				"value" => "yes",
+				"value" => "no",
 				"flag" => $flag++
 			),
 			"user_eq_phone" => array(
@@ -637,7 +637,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			}
 		
 			//fixing true/false vs yes/no goofup
-			$send_connected_line_val = "yes"; //default value
+			$send_connected_line_val = "no"; //default value
 			if (!empty($trunk['send_connected_line'])) {
 				if (($trunk['send_connected_line'] == 'true') || ($trunk['send_connected_line'] == 'yes')) {
 					$send_connected_line_val = "yes";
@@ -1311,7 +1311,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		if (!empty($config['send_connected_line'])) {
 			$endpoint[] = "send_connected_line=".$config['send_connected_line'];
 		} else {
-			$endpoint[] = "send_connected_line=yes";
+			$endpoint[] = "send_connected_line=no";
 		}
 
 		if (!empty($config['match'])) {
