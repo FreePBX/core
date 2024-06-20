@@ -1214,7 +1214,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "voicemail_extension=".$config['vmexten'];
 		}
 
-		if (!empty($config['outbound_auth']) && $config['outbound_auth'] == "yes" && !empty($config['secret'])) {
+		if (!empty($config['outbound_auth']) && $config['outbound_auth'] == "yes" && empty($config['secret'])) {
 			$endpoint[] = "outbound_auth=".$config['user']."-auth";
 		}
 
@@ -1304,7 +1304,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "user_eq_phone=no";
 		}
 		
-		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0", "21.0.0");
+		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0", "20.0.0", "21.0.0");
 		if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
 			if (!empty($config['send_connected_line'])) {
 				$endpoint[] = "send_connected_line=".$config['send_connected_line'];
@@ -1335,10 +1335,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['media_encryption_optimistic'])) {
 			$endpoint[] = "media_encryption_optimistic=".$config['media_encryption_optimistic'];
-		}
-
-		if (!empty($config['refer_blind_progress'])) {
-			$endpoint[] = "refer_blind_progress=".$config['refer_blind_progress'];
 		}
 
 		if (!empty($config['refer_blind_progress'])) {
