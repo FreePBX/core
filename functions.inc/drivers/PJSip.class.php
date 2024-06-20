@@ -636,6 +636,15 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				unset($this->_aor[$tn]);
 			}
 		
+			//fixing true/false vs yes/no goofup
+			$send_connected_line_val = "yes"; //default value
+			if (!empty($trunk['send_connected_line'])) {
+				if (($trunk['send_connected_line'] == 'true') || ($trunk['send_connected_line'] == 'yes')) {
+					$send_connected_line_val = "yes";
+				} else {
+					$send_connected_line_val = "no";
+				}
+			}
 			$conf['pjsip.endpoint.conf'][$tn] = array(
 				'type' => 'endpoint',
 				'transport' => !empty($trunk['transport']) ? $trunk['transport'] : 'udp',
@@ -643,14 +652,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
-				'send_connected_line' => !empty($trunk['send_connected_line']) ? $trunk['send_connected_line'] : 'yes'
+				'send_connected_line' => $send_connected_line_val;
 			);
 			
-			$ver_list = array("13.24.0", "16.1.0", "18.0.0", "20.0.0", "21.0.0"); // include all versions to test.
-			if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == false){
-				unset($conf['pjsip.endpoint.conf'][$tn]['send_connected_line']);
-			}
-
 			$conf['pjsip.endpoint.conf'][$tn]['rtp_keepalive'] = $chan_sip_settings['rtpkeepalive'];
 
 			$lang = !empty($trunk['language']) ? $trunk['language'] : ($this->freepbx->Modules->moduleHasMethod('Soundlang', 'getLanguage') ? $this->freepbx->Soundlang->getLanguage() : "");
@@ -1304,13 +1308,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "user_eq_phone=no";
 		}
 		
-		$ver_list = array("13.24.0", "16.1.0", "17.0.0", "18.0.0", "20.0.0", "21.0.0");
-		if(version_min($this->freepbx->Config->get('ASTVERSION'), $ver_list) == true){
-			if (!empty($config['send_connected_line'])) {
-				$endpoint[] = "send_connected_line=".$config['send_connected_line'];
-			}else{
-				$endpoint[] = "send_connected_line=yes";
-			}
+		if (!empty($config['send_connected_line'])) {
+			$endpoint[] = "send_connected_line=".$config['send_connected_line'];
+		} else {
+			$endpoint[] = "send_connected_line=yes";
 		}
 
 		if (!empty($config['match'])) {

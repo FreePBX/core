@@ -316,9 +316,9 @@ $transportopts = '';
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="send_connected_linew"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="true" <?php $send_connected_line = $send_connected_line ?? '';  echo ((isset($send_connected_line) && $send_connected_line) == "true"?"CHECKED":"") ?>>
+								<input type="radio" name="send_connected_line" id="send_connected_lineyes" value="yes" <?php $send_connected_line = $send_connected_line ?? '';  echo ((isset($send_connected_line) && $send_connected_line) == "yes"?"CHECKED":"") ?>>
 								<label for="send_connected_lineyes"><?php echo _("Yes")?></label>
-								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="false" <?php echo ((isset($send_connected_line) && ($send_connected_line == "false" || empty($send_connected_line))) ?"CHECKED":"") ?>>
+								<input type="radio" name="send_connected_line" id="send_connected_lineno" value="no" <?php echo ((isset($send_connected_line) && ($send_connected_line == "no" || empty($send_connected_line))) ?"CHECKED":"") ?>>
 								<label for="send_connected_lineno"><?php echo _("No")?></label>
 							</div>
 						</div>

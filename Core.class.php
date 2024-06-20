@@ -4677,7 +4677,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 				}
 				$settings['pjsip_line'] = 'true';
 				$settings['sv_trunk_name'] = $settings['sv_channelid'] = $rowData['name'] ?? '';
-				$settings['send_connected_line'] = 'false';
+				$settings['send_connected_line'] = 'no';
 				$settings['extdisplay'] = 'ÓUT_'.$trunkid;
 				$pjsip = $this->getDriver('pjsip');
 				$pjsip->addTrunk($trunkid,$settings);
