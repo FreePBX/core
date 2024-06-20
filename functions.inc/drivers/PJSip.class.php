@@ -652,7 +652,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				'disallow' => 'all',
 				'allow' => $this->filterValidCodecs(!empty($trunk['codecs']) ? $trunk['codecs'] : 'ulaw'), // '&' is invalid in pjsip
 				'aors' => !empty($trunk['aors']) ? $trunk['aors'] : $tn,
-				'send_connected_line' => $send_connected_line_val;
+				'send_connected_line' => $send_connected_line_val
 			);
 			
 			$conf['pjsip.endpoint.conf'][$tn]['rtp_keepalive'] = $chan_sip_settings['rtpkeepalive'];
