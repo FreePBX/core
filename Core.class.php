@@ -1184,8 +1184,6 @@ class Core extends FreePBX_Helpers implements BMO  {
 						'match_pattern_pass' => freepbx_htmlspecialchars(freepbx_trim ($list)),
 						'match_cid' => freepbx_htmlspecialchars(freepbx_trim ($this_callerid)),
 					);
-
-					$i++;
 				}
 			} else if (isset($_REQUEST["dialpatterndata"])) {
 				$dp = json_decode($_REQUEST['dialpatterndata'],true);
