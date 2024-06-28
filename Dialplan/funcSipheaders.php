@@ -21,6 +21,9 @@ class funcSipheaders{
 		$c = 'func-apply-sipheaders';
 
 		$ext->add($c,$e,'', new \ext_noop('Applying SIP Headers to channel ${CHANNEL}'));
+		$ext->add($c,$e,'', new \ext_set('Dchan','${CUT(CHANNEL,/,2)}'));
+                $ext->add($c,$e,'', new \ext_set('Dnum','${CUT(localchan,-,1)}'));
+                $ext->add($c,$e,'', new \ext_execif('$["${DIALPARTIES}" = "1"]','Set','__PICKUPMARK=${Dnum}'));
 		$ext->add($c,$e,'', new \ext_set('TECH', '${CUT(CHANNEL,/,1)}'));
 		$ext->add($c,$e,'', new \ext_set('SIPHEADERKEYS', '${HASHKEYS(SIPHEADERS)}'));
 		$ext->add($c,$e,'', new \ext_while('$["${SET(sipkey=${SHIFT(SIPHEADERKEYS)})}" != ""]'));

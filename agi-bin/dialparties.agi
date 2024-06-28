@@ -850,7 +850,7 @@ switch($rvol_mode){
 		break;
 }
 //END OF RVOL MODIFICATION
-
+$AGI->set_variable('__DIALPARTIES',"1");
 $AGI->set_variable('TIMEOUT',$timer);
 $AGI->set_variable('DIALOPTS',$dialopts);
 
