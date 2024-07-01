@@ -115,6 +115,7 @@ class Extensions extends Base {
 								}
 								$this->freepbx->Core->delDevice($input['extension'], true);
 								$this->freepbx->Core->delUser($input['extension']);
+								needreload();
 								return array("status" => true ,"message"=> _("Extension has been deleted"));
 							}catch(Exception $ex){
 								FormattedError::setInternalErrorMessage($ex->getMessage());
