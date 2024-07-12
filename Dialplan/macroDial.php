@@ -67,7 +67,8 @@ class macroDial{
         $ext->add($c,$s,'', new \ext_macro('dial-ringall-predial-hook'));
 	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 	/****************************************************/
-	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${EXTTOCALL}','dial_with_exten'));
+	$ext->add($c,$s,'', new \ext_execif('$["${FMFM}" = "TRUE"]','Set','RGFMDIAL=${EXTTOCALL}','Set','RGFMDIAL=${NODEST}'));
+	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${RGFMDIAL}','dial_with_exten'));
 	$ext->add('dial_with_exten', '_X.', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
         $ext->add('dial_with_exten','_X.','', new \ext_return());
 	/******************************************************/
@@ -104,7 +105,8 @@ class macroDial{
         $ext->add($c,$s,'', new \ext_macro('dial-hunt-predial-hook'));
 	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 	/*********************************************************/
-	$ext->add($c,$s, 'hsdialapp', new \ext_gosub(1,'${EXTTOCALL}','dial_ext_with_exten'));
+	$ext->add($c,$s,'', new \ext_execif('$["${FMFM}" = "TRUE"]','Set','RGFMDIAL=${EXTTOCALL}','Set','RGFMDIAL=${NODEST}'));
+	$ext->add($c,$s, 'hsdialapp', new \ext_gosub(1,'${RGFMDIAL}','dial_ext_with_exten'));
 	$ext->add('dial_ext_with_exten', '_X.','', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
 	$ext->add('dial_ext_with_exten', '_X.','', new \ext_return());
 	/*******************************************************************/
