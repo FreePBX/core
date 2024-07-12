@@ -65,8 +65,12 @@ class macroDial{
         $ext->add($c,$s,'', new \ext_set('ITER','$[${ITER}+1]'));
         $ext->add($c,$s,'', new \ext_gotoif('$[${ITER}<=${LOOPCNT}]', 'ndloopbegin')); // if this is from rg-group, don't strip prefix
         $ext->add($c,$s,'', new \ext_macro('dial-ringall-predial-hook'));
-        $ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
-        $ext->add($c,$s,'nddialapp', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', '')); // dialparties will set the priority to 10 if $ds is not null
+	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
+	/****************************************************/
+	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${EXTTOCALL}','dial_with_exten'));
+	$ext->add('dial_with_exten', '_X.', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
+        $ext->add('dial_with_exten','_X.','', new \ext_return());
+	/******************************************************/
         $ext->add($c,$s,'', new \ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
         $ext->add($c,$s,'', new \ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
         $ext->add($c,$s,'groupnoanswer', new \ext_noop('Returning since nobody answered'));
@@ -98,9 +102,13 @@ class macroDial{
         $ext->add($c,$s,'', new \ext_execif('$["${RVOL}"!=""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${IF($["${ALERT_INFO}"!=""]?${ALERT_INFO}:Normal)}\;volume=${RVOL}'));
         $ext->add($c,$s,'', new \ext_execif('$["${RVOL}"="" & "${DB(AMPUSER/${EXTTOCALL}/rvolume)}" != ""]', 'Set', 'HASH(__SIPHEADERS,Alert-Info)=${IF($["${ALERT_INFO}"!=""]?${ALERT_INFO}:Normal)}\;volume=${DB(AMPUSER/${EXTTOCALL}/rvolume)}'));
         $ext->add($c,$s,'', new \ext_macro('dial-hunt-predial-hook'));
-        $ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
-        $ext->add($c,$s,'hsdialapp', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
-        $ext->add($c,$s,'', new \ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
+	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
+	/*********************************************************/
+	$ext->add($c,$s, 'hsdialapp', new \ext_gosub(1,'${EXTTOCALL}','dial_ext_with_exten'));
+	$ext->add('dial_ext_with_exten', '_X.','', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
+	$ext->add('dial_ext_with_exten', '_X.','', new \ext_return());
+	/*******************************************************************/
+	$ext->add($c,$s,'', new \ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
         $ext->add($c,$s,'', new \ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));
         $ext->add($c,$s,'', new \ext_gotoif('$[$["${RingGroupMethod}" = "firstavailable"] | $["${RingGroupMethod}" = "firstnotonphone"]] & $[$["${DIALSTATUS}" != "CHANUNAVAIL"] & $["${DIALSTATUS}" != "CONGESTION"]]]', 'huntreset', 'a46'));
         $ext->add($c,$s,'huntreset', new \ext_set('HuntMembers', (string) '1')); // String zeros.
