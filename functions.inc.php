@@ -2970,7 +2970,10 @@ function core_do_get_config($engine) {
 		$ext->add($context, $exten, '', new ext_return());
 
 		$ext->add($context, 'disabletrunk', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} DISABLED - falling through to next trunk'));
+		$ext->add($context, 'disabletrunk', '', new ext_return());
+
 		$ext->add($context, 'bypass', '', new ext_noop('TRUNK: ${OUT_${DIAL_TRUNK}} BYPASSING because dialout-trunk-predial-hook'));
+		$ext->add($context, 'bypass', '', new ext_return());
 
 		$ext->add($context, 'h', '', new ext_macro('hangupcall'));
 	} // if trunk_type_needed
