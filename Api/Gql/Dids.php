@@ -458,6 +458,7 @@ class Dids extends Base {
 					'type' => Type::string(),
 					'description' => _('Destination for route'),
 					'resolve' => function($row) {
+						\FreePBX::Modules()->loadFunctionsInc("voicemail");
 						$getDestinations = \FreePBX::Modules()->getDestinations();
 						$destination = isset($row['destination'])? $row['destination'] : null;
 						$destination_description = isset($getDestinations[$destination])? $getDestinations[$destination] : null;
@@ -505,6 +506,7 @@ class Dids extends Base {
 	}
 
 	private function inputvalidator($input) {
+		\FreePBX::Modules()->loadFunctionsInc("voicemail");
 		$validator = array();
 		$validator['status'] = false;
 		$validator['message'] = _("Please provide the valid `destination` value, for example extension (100) :`from-did-direct,100,1`");
@@ -518,7 +520,7 @@ class Dids extends Base {
 			if (trim($destination[0])=='' || trim($destination[1])=='' || trim($destination[2])=='') {
 				$validator['status'] = true;
 			}
-			if(trim($valuefrom_db) =='') {
+			if(empty($valuefrom_db) || trim($valuefrom_db) == '') {
 				$validator['status'] = true;
 				$validator['message'] = _("Input variable destination does not exists in this system, Please provide the valid `destination`");
 			}
