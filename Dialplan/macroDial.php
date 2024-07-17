@@ -68,9 +68,9 @@ class macroDial{
 	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 	/****************************************************/
 	$ext->add($c,$s,'', new \ext_execif('$["${FMFM}" = "TRUE"]','Set','RGFMDIAL=${EXTTOCALL}','Set','RGFMDIAL=${NODEST}'));
-	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${RGFMDIAL}','dial_with_exten'));
-	$ext->add('dial_with_exten', '_X.', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
-        $ext->add('dial_with_exten','_X.','', new \ext_return());
+	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${RGFMDIAL}','dial-with-exten'));
+	$ext->add('dial-with-exten', '_X.', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
+        $ext->add('dial-with-exten','_X.','', new \ext_return());
 	/******************************************************/
         $ext->add($c,$s,'', new \ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
         $ext->add($c,$s,'', new \ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
@@ -106,9 +106,9 @@ class macroDial{
 	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 	/*********************************************************/
 	$ext->add($c,$s,'', new \ext_execif('$["${FMFM}" = "TRUE"]','Set','RGFMDIAL=${EXTTOCALL}','Set','RGFMDIAL=${NODEST}'));
-	$ext->add($c,$s, 'hsdialapp', new \ext_gosub(1,'${RGFMDIAL}','dial_ext_with_exten'));
-	$ext->add('dial_ext_with_exten', '_X.','', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
-	$ext->add('dial_ext_with_exten', '_X.','', new \ext_return());
+	$ext->add($c,$s, 'hsdialapp', new \ext_gosub(1,'${RGFMDIAL}','dial-ext-with-exten'));
+	$ext->add('dial-ext-with-exten', '_X.','', new \ext_dial('${${HuntMember}}${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
+	$ext->add('dial-ext-with-exten', '_X.','', new \ext_return());
 	/*******************************************************************/
 	$ext->add($c,$s,'', new \ext_gotoif('$["${DIALSTATUS}" = "ANSWER"]', 'ANSWER,1'));
         $ext->add($c,$s,'', new \ext_set('HuntLoop', '$[1 + ${HuntLoop}]'));

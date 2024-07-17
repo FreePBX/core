@@ -2558,9 +2558,9 @@ function core_do_get_config($engine) {
 		/* Dial command moved to  different context  dial with real dail  number as the extension 
 		 *https://sangoma.atlassian.net/browse/ASTDEV-439
 		 */
-		$ext->add($context, $exten, '', new ext_gosub(1,'${DIAL_NUMBER}','trunk_dial_with_exten'));
-		$ext->add('trunk_dial_with_exten', '_X.','', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));
-		$ext->add('trunk_dial_with_exten', '_X.', '', new ext_return());
+		$ext->add($context, $exten, '', new ext_gosub(1,'${DIAL_NUMBER}','trunk-dial-with-exten'));
+		$ext->add('trunk-dial-with-exten', '_X.','', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));
+		$ext->add('trunk-dial_with-exten', '_X.', '', new ext_return());
 		/***********************************************************/
 	
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));
