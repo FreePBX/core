@@ -334,7 +334,7 @@ class Sip extends techDriver {
 			$select[] 	= array('value' => 'yes', 'text' => _('Yes'));
 			$tt 		= _("Send Connected Line updates to this endpoint.").' [send_connected_line]';
 			$scl_val 	= $this->freepbx->Config->get_conf_setting('send_connected_line');
-			$tmparr['send_connected_line'] = array('prompttext' => _('Send Connected Line'), 'value' => empty($scl_val) ? 'no': $scl_val, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
+			$tmparr['send_connected_line'] = array('prompttext' => _('Send Connected Line'), 'value' => empty($scl_val) ? 'yes': $scl_val, 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		}
 
 		unset($select);
