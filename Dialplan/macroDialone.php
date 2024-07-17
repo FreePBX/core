@@ -105,10 +105,10 @@ class macroDialone{
 		$ext->add($mcontext,$exten,'dialapp', new \ext_noop(''));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${FROMQ}" = "true"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}'));
 		/* dail using different context */
-		$ext->add($mcontext,$exten, 'dial', new \ext_gosub(1,'${DEXTEN}','dialOne_with_exten'));
+		$ext->add($mcontext,$exten, 'dial', new \ext_gosub(1,'${DEXTEN}','dialOne-with-exten'));
 
-		$ext->add('dialOne_with_exten', '_X.', '', new \ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}${CWRING}b(func-apply-sipheaders^s^1)'));
-		$ext->add('dialOne_with_exten','_X.','', new \ext_return());
+		$ext->add('dialOne-with-exten', '_X.', '', new \ext_dial('${DSTRING}', '${ARG1},${D_OPTIONS}${CWRING}b(func-apply-sipheaders^s^1)'));
+		$ext->add('dialOne-with-exten','_X.','', new \ext_return());
 		/****************************************************************/
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIALSTATUS}"="ANSWER" & "${CALLER_DEST}"!=""]', 'Return'));
 
