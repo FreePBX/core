@@ -28,10 +28,8 @@ const server = net.createServer((sock) => {
 			return;
 		}
 		if(!init) {
-			let s = line.split(":").map((item) => {
-				return item.trim();
-			});
-			settings[s[0]] = s[1];
+			let idx = line.indexOf(":");
+			settings[line.substring(0,idx).trim()] = line.substring(idx+1).trim();
 		} else {
 			agi.scriptStdin(line)
 		}
