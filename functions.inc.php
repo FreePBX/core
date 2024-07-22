@@ -2559,8 +2559,10 @@ function core_do_get_config($engine) {
 		 *https://sangoma.atlassian.net/browse/ASTDEV-439
 		 */
 		$ext->add($context, $exten, '', new ext_gosub(1,'${DIAL_NUMBER}','trunk-dial-with-exten'));
+		$ext->add('trunk-dial-with-exten', '_X','', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));
+		$ext->add('trunk-dial-with-exten', '_X', '', new ext_return());
 		$ext->add('trunk-dial-with-exten', '_[+-X].','', new ext_dial('${OUT_${DIAL_TRUNK}}/${OUTNUM}${OUT_${DIAL_TRUNK}_SUFFIX}', '${TRUNK_RING_TIMER},${DIAL_TRUNK_OPTIONS}b(func-apply-sipheaders^s^1,(${DIAL_TRUNK}))'.$obroute_email));
-		$ext->add('trunk-dial-with-exten', '_[+-X}.', '', new ext_return());
+		$ext->add('trunk-dial-with-exten', '_[+-X].', '', new ext_return());
 		/***********************************************************/
 	
 		$ext->add($context, $exten, '', new ext_noop('Dial failed for some reason with DIALSTATUS = ${DIALSTATUS} and HANGUPCAUSE = ${HANGUPCAUSE}'));

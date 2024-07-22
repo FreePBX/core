@@ -71,6 +71,8 @@ class macroDial{
 	$ext->add($c,$s, 'nddialapp', new \ext_gosub(1,'${RGFMDIAL}','dial-with-exten'));
 	$ext->add('dial-with-exten', '_X.', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
         $ext->add('dial-with-exten','_X.','', new \ext_return());
+	$ext->add('dial-with-exten', '_X', '', new \ext_dial('${ds}${CWRING}b(func-apply-sipheaders^s^1)', ''));
+        $ext->add('dial-with-exten','_X','', new \ext_return());
 	/******************************************************/
         $ext->add($c,$s,'', new \ext_set('DIALSTATUS', '${IF($["${DIALSTATUS_CW}"!="" ]?${DIALSTATUS_CW}:${DIALSTATUS})}'));
         $ext->add($c,$s,'', new \ext_gosubif('$[("${SCREEN}" != "" & ("${DIALSTATUS}" = "TORTURE" | "${DIALSTATUS}" = "DONTCALL"))  | "${DIALSTATUS}" = "ANSWER"]', '${DIALSTATUS},1'));
