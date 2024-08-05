@@ -788,7 +788,7 @@ class dialparties{
 		$ext->add($c, 's', '', new \ext_setvar('__DIVERSION_REASON','unconditional'));
 		$ext->add($c, 's', '', new \ext_sethash('dialparties','CFRT','${DB(AMPUSER/${HASH(dialparties,workingext)}/cfringtimer)}'));
 		$ext->add($c, 's', '', new \ext_gotoif('$["${HASH(dialparties,CFRT)}" = ""]','next'));
-		$ext->add($c, 's', '', new \ext_execif('$["${HASH(dialparties,CFRT)}" < "0"]','Set','${HASH(dialparties,CFRT)='));
+		$ext->add($c, 's', '', new \ext_execif('$["${HASH(dialparties,CFRT)}" < "0"]','Set','HASH(dialparties,CFRT)='));
 		$ext->add($c, 's', '', new \ext_noop('Ring timer changed to CF ringtimer value of ${HASH(dialparties,CFRT)}'));
 		// if this is the primary extension and CF enabled, then cancel mastermode
 		// whether it is or not, no need to check.
