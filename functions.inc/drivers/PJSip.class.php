@@ -139,6 +139,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 				"value" => "no",
 				"flag" => $flag++
 			),
+			"media_address" => array(
+				"value" => "",
+				"flag" => $flag++
+			),
 			"rtp_symmetric" => array(
 				"value" => "yes",
 				"flag" => $flag++
@@ -351,6 +355,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		$tt = _("Determines whether media may flow directly between endpoints.");
 		$tmparr['direct_media'] = array('prompttext' => _('Direct Media'), 'value' => 'yes', 'tt' => $tt, 'select' => $select, 'level' => 1, 'type' => 'radio');
 		unset($select);
+
+		$tt = _("IP address used in SDP for media handling. At the time of SDP creation, the IP address defined here will be used with this parameter.");
+		$tmparr['media_address'] = array('prompttext' => _('Media Address'), 'value' => '', 'tt' => $tt, 'level' => 1);
 
 		$select[] = array('value' => 'no', 'text' => _('No'));
 		$select[] = array('value' => 'yes', 'text' => _('Yes'));
@@ -1205,6 +1212,14 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			$endpoint[] = "direct_media=".$config['direct_media'];
 		}
 
+		if (!empty($config['media_address'])) {
+			$endpoint[] = "media_address=".$config['media_address'];
+		}
+
+		if (!empty($config['direct_media'])) {
+			$endpoint[] = "direct_media=".$config['direct_media'];
+		}
+		
 		if (!empty($config['vmexten'])) {
 			$endpoint[] = "voicemail_extension=".$config['vmexten'];
 		}
