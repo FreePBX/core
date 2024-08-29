@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.28</version>
+	<version>16.0.68.29</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.29* Packaging of ver 16.0.68.29
 		*16.0.68.28* Packaging of ver 16.0.68.28
 		*16.0.68.27* Packaging of ver 16.0.68.27
 		*16.0.68.26* Packaging of ver 16.0.68.26
