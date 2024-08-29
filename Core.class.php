@@ -4388,6 +4388,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 			$results['recording_ondemand'] = strtolower($astman->database_get("AMPUSER",$extension."/recording/ondemand"));
 			$results['recording_priority'] = (int) $astman->database_get("AMPUSER",$extension."/recording/priority");
 			$results['rvolume'] = strtolower($astman->database_get("AMPUSER",$extension."/rvolume"));
+			$results['novmpw'] = strtolower($astman->database_get("AMPUSER",$extension."/novmpw"));
 
 		} else {
 			throw new \Exception("Cannot connect to Asterisk Manager with using user[".$this->FreePBX->Config->get("AMPMGRUSER")."]");
@@ -4405,7 +4406,12 @@ class Core extends FreePBX_Helpers implements BMO  {
 					if(in_array($key,$replace_char)) {
 						$key = str_replace("_","/",$key);
 					}
-					$astman->database_put("AMPUSER",$ext."/".$key,$value);
+
+					if($key == 'callwaiting') {
+						$astman->database_put("CW",$ext,strtoupper($value));
+					} else {
+						$astman->database_put("AMPUSER",$ext."/".$key,$value);
+					}
 				}
 			}
 		}
