@@ -1208,10 +1208,6 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 		}
 		$endpoint[] = "dtmf_mode=".($config['dtmfmode'] ?? '');
 
-		if (!empty($config['direct_media'])) {
-			$endpoint[] = "direct_media=".$config['direct_media'];
-		}
-
 		if (!empty($config['media_address'])) {
 			$endpoint[] = "media_address=".$config['media_address'];
 		}
