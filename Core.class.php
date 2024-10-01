@@ -1681,7 +1681,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		}
 
 		if ( $this->FreePBX->Modules->moduleHasMethod('Voicemail','mapMailBox') ) {
-			$this->FreePBX->Voicemail->mapMailBox($settings['user']['value']);
+			$this->FreePBX->Voicemail->mapMailBox($id);
 		}
 
 		if(!$editmode){
