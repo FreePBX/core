@@ -358,6 +358,35 @@
 			</div>
 		</div>
 		<!--END PERMINENT AUTH REJECTION-->
+		<!-- START allow_unauthenticated_options-->
+		<div class="element-container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="form-group">
+							<div class="col-md-3">
+								<label class="control-label" for="allow_unauthenticated_options"><?php echo _("Allow Unauthenticated") ?></label>
+								<i class="fa fa-question-circle fpbx-help-icon" data-for="allow_unauthenticated_options"></i>
+							</div>
+							<div class="col-md-9 radioset">
+								<input type="radio" name="allow_unauthenticated_options" id="allow_unauthenticated_optionsyes" value="on" <?php echo ($allow_unauthenticated_options == "on"?"CHECKED":"") ?>>
+								<label for="allow_unauthenticated_optionsyes"><?php echo _("Yes")?></label>
+								<input type="radio" name="allow_unauthenticated_options" id="allow_unauthenticated_optionsno" value="off" <?php echo ($allow_unauthenticated_options == "off"?"CHECKED":"") ?>>
+								<label for="allow_unauthenticated_optionsno"><?php echo _("No")?></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<span id="allow_unauthenticated_options-help" class="help-block fpbx-help-block"><?php echo _("Enabling 'allow_unauthenticated_options' will skip authentication of OPTIONS requests for the given endpoint. 
+Please note that there are security implications to enabling this setting as it can allow information disclosure to occur - specifically, 
+if enabled, an external party could enumerate and find the endpoint name by sending OPTIONS requests and examining the responses.")?></span>
+				</div>
+			</div>
+		</div>
+		<!-- END allow_unauthenticated_options-->
 		<!--FORBIDDEN RETRY INTERVAL-->
 		<div class="element-container">
 			<div class="row">

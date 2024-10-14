@@ -511,6 +511,9 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 			if (!isset($trunk['auth_rejection_permanent'])) {
 				$trunk['auth_rejection_permanent'] = 'off';
 			}
+			if (!isset($trunk['allow_unauthenticated_options'])) {
+				$trunk['allow_unauthenticated_options'] = 'off';
+			}
 			// Ensure our registration and auth values are set sanely
 			if (!isset($trunk['registration'])) {
 				$trunk['registration'] = "send";
@@ -536,7 +539,8 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 					'forbidden_retry_interval' => (empty($trunk['forbidden_retry_interval']))? "0" : $trunk['forbidden_retry_interval'],
 					'max_retries' => $retries,
 					'expiration' => $trunk['expiration'],
-					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no'
+					'auth_rejection_permanent' => ($trunk['auth_rejection_permanent'] == 'on') ? 'yes' : 'no',
+					'allow_unauthenticated_options' => ($trunk['allow_unauthenticated_options'] == 'on') ? 'yes' : 'no'
 				);
 
 				if (isset($trunk['pjsip_line']) && $trunk['pjsip_line'] == 'true') {
@@ -1665,6 +1669,7 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		} else {
 			$dispvars = array(
+				"allow_unauthenticated_options" => "off",
 				"auth_rejection_permanent" => "off",
 				"expiration" => 3600,
 				"retry_interval" => 60,
