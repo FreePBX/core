@@ -2745,6 +2745,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$default_settings["transport"] 					= "0.0.0.0-udp";
 		$default_settings["dtmfmode"] 					= "auto";
 		$default_settings["auth_rejection_permanent"] 	= "off";
+		$default_settings["allow_unauthenticated_options"] 	= "off";
 		$default_settings["forbidden_retry_interval"] 	= "30";
 		$default_settings["fatal_retry_interval"] 		= "30";
 		$default_settings["retry_interval"] 			= "60";
