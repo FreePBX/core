@@ -371,7 +371,7 @@ $transportopts = '';
 								<i class="fa fa-question-circle fpbx-help-icon" data-for="allow_unauthenticated_options"></i>
 							</div>
 							<div class="col-md-9 radioset">
-								<input type="radio" name="allow_unauthenticated_options" id="allow_unauthenticated_optionsyes" value="on" <?php echo ($allow_unauthenticated_options == "on"?"CHECKED":"") ?>>
+								<input type="radio" name="allow_unauthenticated_options" id="allow_unauthenticated_optionsyes" value="on" <?php $allow_unauthenticated_options = $allow_unauthenticated_options ?? 'off'; echo ($allow_unauthenticated_options == "on"?"CHECKED":"") ?>>
 								<label for="allow_unauthenticated_optionsyes"><?php echo _("Yes")?></label>
 								<input type="radio" name="allow_unauthenticated_options" id="allow_unauthenticated_optionsno" value="off" <?php echo ($allow_unauthenticated_options == "off"?"CHECKED":"") ?>>
 								<label for="allow_unauthenticated_optionsno"><?php echo _("No")?></label>
