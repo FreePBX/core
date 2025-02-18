@@ -657,7 +657,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 	}
 
 	public function ajaxHandler() {
-		$request = $this->getSanitizedRequest();
+		$request = freepbxGetSanitizedRequest();
 		switch($request['command']) {
 			case "updatetrunks":
 				$this->routing->updateTrunks($request['route_id'], $request['trunkpriority'], true);
@@ -974,7 +974,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 
 	public function doConfigPageInit($page) {
 		//Reassign $_REQUEST as it will be immutable in the future.
-		$request = $this->getSanitizedRequest();
+		$request = freepbxGetSanitizedRequest();
 		$unsanitized = array(
 			'CC_AGENT_ALERT_INFO_DEFAULT',
 			'CC_MONITOR_ALERT_INFO_DEFAULT',
