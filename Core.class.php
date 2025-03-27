@@ -1081,10 +1081,22 @@ class Core extends FreePBX_Helpers implements BMO  {
 			// Check if they uploaded a CSV file for their route patterns
 			//
 			if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
-				$mimes = array('text/csv');
-				if (!in_array($_FILES['pattern_file']['type'], $mimes)) {
-					echo "<script>javascript:alert('" . _("Unsupported Pattern file format") . "')</script>";
-					return;
+				 foreach($uploaded_file AS $line) {
+					if($first_line) {
+						if($line != 'prepend,prefix,"match pattern",callerid') {
+							echo "<script>javascript:alert('" . _("Unsupported Pattern file format") . "')</script>";
+							return;
+						}
+						else {
+							$first_line = false;
+						}
+					}
+					else {
+						if(!preg_match("/^[XZN0-9\+\.\-\[\]]*,[XZN0-9\+\.\-\[\]]*,[XZN0-9\+\.\-\[\]]*,[XZN0-9\+\.\-\[\]]*$/i", $line)) {
+							echo "<script>javascript:alert('" . _("Unsupported Pattern file format") . "')</script>";
+							return;
+						}
+					}
 				}
 				$fh = fopen($_FILES['pattern_file']['tmp_name'], 'r');
 				if ($fh !== false) {
