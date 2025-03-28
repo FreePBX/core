@@ -1068,6 +1068,8 @@ class Core extends FreePBX_Helpers implements BMO  {
 			// Check if they uploaded a CSV file for their route patterns
 			//
 			if (isset($_FILES['pattern_file']) && $_FILES['pattern_file']['tmp_name'] != '') {
+				$uploaded_file = file($_FILES['pattern_file']['tmp_name'], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+				$first_line = true;
 				foreach($uploaded_file AS $line) {
 					if($first_line) {
 						if($line != 'prepend,prefix,"match pattern",callerid') {
