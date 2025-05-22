@@ -252,7 +252,7 @@ class Core extends FreePBX_Helpers implements BMO  {
             $settings['namedpickupgroup']['value'] = isset($data['namedpickupgroup']) ? $data['namedpickupgroup'] : "";
             $settings['disallow']['value'] = isset($data['disallow']) ? $data['disallow'] : "";
             $settings['allow']['value'] = isset($data['allow']) ? $data['allow'] : "";
-            $settings['dial']['value'] = isset($data['dial']) ? $data['dial'] : "PJSIP/3";
+            $settings['dial']['value'] = isset($data['dial']) ? $data['dial'] : "PJSIP/".$extension;
             $settings['mailbox']['value'] = isset($data['mailbox']) ? $data['mailbox'] : $extension."@device";
             $settings['vmexten']['value'] = isset($data['vmexten']) ? $data['vmexten'] : "";
             $settings['accountcode']['value'] = isset($data['accountcode']) ? $data['accountcode'] : "";
