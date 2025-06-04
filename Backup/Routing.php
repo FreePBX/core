@@ -10,6 +10,7 @@ class Routing extends Corebase{
         foreach($routes as $route){
             $route['patterns'] = $routing->getRoutePatternsByID($route['route_id']);
             $route['trunks'] = $routing->getRouteTrunksById($route['route_id']);
+            $route['notification'] = $routing->getRouteEmailByID($route['route_id']);
             $final[] = $route;
         }
         return $final;
