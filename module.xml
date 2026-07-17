@@ -3,66 +3,17 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.18.50</version>
+	<version>18.0.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
-		*17.0.18.50* FREEI-2966 route order issue 
-		*17.0.18.49* FREEI-2916 changes done for fixing issue on Ringer-volume-override 
-		*17.0.18.48* FREEI-2916 changes done for fixing issue on Ringer-volume-override 
-		*17.0.18.47* FREEI-2916 changes done for fixing issue on Ringer-volume-override 
-		*17.0.18.46* #issue 1009 - Changes done to fix outboundrouting issue on restore 
-		*17.0.18.45* #issue-992 Extension level call recording issue fix for ringgroup call 
-		*17.0.18.44* FREEI-2823 - Changes done for fixing exception in invalid sequence 
-		*17.0.18.43* #993 Editing Outbound Route REORDERS the routes 
-		*17.0.18.42* #972 Changes for fixing Bulk Handler Trunk Import Bug 
-		*17.0.18.41* FREEI-2728 Changes for fixing the MFA disabled in Administration 
-		*17.0.18.40* FREEI-2512 pattern matching to allow * for prefix column in dial patterns import 
-		*17.0.18.39* Github Issue#926 Allow toggling of the Asterisk httpstatus page 
-		*17.0.18.37* FREEI-2317  HTTP Bind Address Setting &#x2013; Adjusted for Local Access Only 
-		*17.0.18.36* FREEI-2317  HTTP Bind Address Setting &#x2013; Adjusted for Local Access Only 
-		*17.0.18.35* GitHUB Issue #870 
-		*17.0.18.34* Fixing undefined variable issue 
-		*17.0.18.33* Fixing Github #168  Restore issue
-		*17.0.18.32* FREEI-2203 Whoops Error while editing Trunks 
-		*17.0.18.31* Packaging of ver 17.0.18.31
-		*17.0.18.30* FREEI-2148 added webrtc bundle column into csv 
-		*17.0.18.29* FREEI-2129 Fixing restore issue 
-		*17.0.18.28* #issue 805  Route Password will crash gui 
-		*17.0.18.27* #164 core: do not display app_meetme as conference option when Asterisk is v21 or higher 
-		*17.0.18.26* #iissue/771  and #issues/769 Increased the column length 
-		*17.0.18.25* #issues/740 backup and restore ignores outbound routes notifications 
-		*17.0.18.24* #issues/160 PJSIP.class.php has incorrect bindParm second parameter 
-		*17.0.18.23* #741 quick create extension 
-		*17.0.18.22* Github Issue#528 and Issue#581  
-		*17.0.18.21* bump 
-		*17.0.18.20* FREEI-1927  is int check added 
-		*17.0.18.19* #678 revert : Outbound Routes Dial patterns from CSV 
-		*17.0.18.18* #678 Outbound Routes Dial patterns from CSV 
-		*17.0.18.17* FREEI-1637 Adding missing Hangup Handling in certain contexts. 
-		*17.0.18.16* FREEI-1733 Follow me issue with external number + sign 
-		*17.0.18.15* Fixing Github #536 Send Connected line parameter issue 
-		*17.0.18.14* Fixing Github #640 Trunk failover does not work on Outbound Routes 
-		*17.0.18.13* Fixing Github #611 Empty dialopts astdb key after backup restore issue 
-		*17.0.18.12* Fixing Github #620 undefined transport key error 
-		*17.0.18.11* #530 Passing ARG to the macro-user-callerid subroutine to make the accountcode module work 
-		*17.0.18.10* Fixing Github #613 
-		*17.0.18.9* FREEI-1528 apply config error in Freepbx17 
-		*17.0.18.8* Github#542 increasing length of trunk name field 
-		*17.0.18.2* Github #482 Adding allow_unauthenticated_options config option
-		*17.0.10* Github #313 Fixing GoSub related multiple dialplan issues 
-		*17.0.9.72* bump 
-		*17.0.9.52* chansip to pjsip trunk conversion 
-		*17.0.9.45* disable trunks on warmspare restore 
-		*17.0.9.38* bump 
-		*17.0.9.7* Packaging of ver 17.0.9.7
-		*17.0.1* initial release
+		*18.0.1* initial release
 	</changelog>
 	<depends>
-		<version>17.0.1</version>
+		<version>18.0</version>
 	</depends>
 	<database>
 		<table name="trunks">
@@ -281,6 +232,6 @@
 		</framework>
 	</hooks>
 	<supported>
-		<version>17.0</version>
+		<version>18.0</version>
 	</supported>
 </module>
