@@ -1286,11 +1286,17 @@ if ($current_httpbindaddress == '::' || $current_httptlsbindaddress == '::') {
 		$nt->delete('core', 'core_bindaddress_changed');
 	}
 	if (!\FreePBX::Core()->getConfig('general_notice_bindaddress')) {
-		if(!$nt->exists('core', 'general_notice_bindaddress	')) {
-			$nt->add_error('core', 'general_notice_bindaddress', 
-				_('Asterisk Mini HTTP Server Bind Address Security Notice'), 
-				_('The HTTP/HTTPS Bind Address is set to a non-default value. Please ensure that external access to this address is properly restricted to prevent unauthorized connections.'), 
-				"?display=advancedsettings&view=category&category_id=Asterisk%20Builtin%20mini-HTTP%20server", 
+		// notifications.id is varchar(24). Remove legacy FREEI-2317 ids that were
+		// truncated (general_notice_bindaddress -> general_notice_bindaddre) and
+		// caused duplicate PRIMARY key failures on every Core install/upgrade.
+		$nt->delete('core', 'general_notice_bindaddre');
+		$nt->delete('core', 'general_notice_bindaddress');
+		$uid = 'notice_bindaddress';
+		if(!$nt->exists('core', $uid)) {
+			$nt->add_error('core', $uid,
+				_('Asterisk Mini HTTP Server Bind Address Security Notice'),
+				_('The HTTP/HTTPS Bind Address is set to a non-default value. Please ensure that external access to this address is properly restricted to prevent unauthorized connections.'),
+				"?display=advancedsettings&view=category&category_id=Asterisk%20Builtin%20mini-HTTP%20server",
 				true, true);
 		}
 		\FreePBX::Core()->setConfig('general_notice_bindaddress',true);
