@@ -4,7 +4,6 @@ use PDO;
 use Exception;
 use PDOException;
 
-#[\AllowDynamicProperties]
 class Dahdichannels extends ComponentBase{
 
     public static function getButtons($request){
