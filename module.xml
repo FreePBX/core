@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>16.0.68.40</version>
+	<version>16.0.68.41</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*16.0.68.41* FREEI-3048 core module bind address notification entry 
 		*16.0.68.40* FREEI-2512 pattern matching to allow * for prefix column in dial part 
 		*16.0.68.39* Packaging of ver 16.0.68.39
 		*16.0.68.38* FREEI-2317  HTTP Bind Address Setting &#x2013; Adjusted for Local Access Only 
