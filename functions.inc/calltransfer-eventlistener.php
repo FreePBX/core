@@ -62,7 +62,7 @@ function core_UnParkedCall($data,$type){
 	$callfilename = core_channel_var($responseArray, 'CALLFILENAME');
 	if($callfilename != ""){
 		$filename = $monitordir.'/'.date("Y/m/d/").$callfilename.".".$format;
-		core_start_mixmonitor($ParkeeChannel, $filename, 'UnPark');
+		core_start_mixmonitor($ParkeeChannel, $filename, 'UnPark', $responseArray);
 	}
 	return;
 }
@@ -118,8 +118,55 @@ function core_transfer_continue_recording($fromChannel, $toChannel, $reason = 'T
 		$filename = core_channel_var(core_channel_dump($toChannel), 'MIXMONITOR_FILENAME');
 	}
 	if ($filename != '') {
-		core_start_mixmonitor($toChannel, $filename, $reason);
+		$vars = ($fromChannel !== '') ? core_channel_dump($fromChannel) : core_channel_dump($toChannel);
+		core_start_mixmonitor($toChannel, $filename, $reason, $vars);
 	}
+}
+
+/**
+ * Expand the channel's MIXMON_POST for AMI MixMonitor restart.
+ * Stops MixMonitor on the transferer (POST runs early). Re-attach
+ * the same POST on the remaining channel so it runs again on the full WAV.
+ */
+function core_mixmon_post_cmd($filename, $responseArray = array()) {
+	global $astman;
+	$post = core_channel_var($responseArray, 'MIXMON_POST');
+	if ($post === '' && class_exists('FreePBX')) {
+		$post = (string) \FreePBX::Config()->get('MIXMON_POST');
+	}
+	// DB can be empty while dialplan global is set after Apply Config.
+	if ($post === '' && !empty($astman)) {
+		$r = $astman->GetVar(null, 'MIXMON_POST');
+		if (!empty($r['Value'])) {
+			$post = $r['Value'];
+		}
+	}
+	if ($post === '' || $filename === '') {
+		return '';
+	}
+	$filename = core_resolve_monitor_filename($filename);
+	$post = str_replace('^{MIXMONITOR_FILENAME}', $filename, $post);
+	if (preg_match('#/monitor/(\d{4})/(\d{2})/(\d{2})/([^/]+)\.([^.]+)$#', $filename, $m)) {
+		$post = str_replace(
+			array('^{YEAR}', '^{MONTH}', '^{DAY}', '^{CALLFILENAME}', '^{MIXMON_FORMAT}'),
+			array($m[1], $m[2], $m[3], $m[4], $m[5]),
+			$post
+		);
+	}
+	if (class_exists('FreePBX')) {
+		$post = str_replace('^{ASTSPOOLDIR}', (string) \FreePBX::Config()->get('ASTSPOOLDIR'), $post);
+		$post = str_replace('^{MIXMON_DIR}', (string) \FreePBX::Config()->get('MIXMON_DIR'), $post);
+	}
+	// AMI mixmonitor drops unquoted arguments after the first space.
+	return '"' . str_replace('"', '\\"', $post) . '"';
+}
+
+function core_resolve_monitor_filename($filename) {
+	global $monitordir;
+	if ($filename === '' || $filename[0] === '/') {
+		return $filename;
+	}
+	return rtrim($monitordir, '/').'/'.$filename;
 }
 
 function core_channel_dump($channel) {
@@ -154,7 +201,7 @@ function core_channel_has_mixmonitor($channel) {
 	return (bool) preg_match('/\.\w{2,4}\b/', $data);
 }
 
-function core_start_mixmonitor($channel, $filename, $reason) {
+function core_start_mixmonitor($channel, $filename, $reason, $responseArray = array()) {
 	global $astman;
 	if ($channel === '' || $filename === '') {
 		return;
@@ -163,7 +210,8 @@ function core_start_mixmonitor($channel, $filename, $reason) {
 		dbug(" Skipping $reason MixMonitor on $channel; already recording $filename");
 		return;
 	}
-	$astman->mixmonitor($channel, "$filename", "ai(LOCAL_MIXMON_ID)");
+	$post = core_mixmon_post_cmd($filename, $responseArray);
+	$astman->mixmonitor($channel, "$filename", "ai(LOCAL_MIXMON_ID)", $post);
 	dbug(" Starting $reason recording from Channel $channel with file $filename");
 }
 ?>
