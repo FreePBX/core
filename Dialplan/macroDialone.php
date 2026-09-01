@@ -107,7 +107,7 @@ class macroDialone{
 
 		//dont allow inbound callers to transfer around inside the system
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}I'));
-		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(AMPUSER/${DEXTEN}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${DEXTEN}@ext-local)}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
+		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DB(AMPUSER/${DEXTEN}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${DEXTEN}@ext-local)}" =~ "^(RING|HOLD)?INUSE$" ]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 		$ext->add($mcontext,$exten,'dialapp', new \ext_noop(''));
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${FROMQ}" = "true"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}'));
 		/* dail using different context */
