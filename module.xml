@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.18.53</version>
+	<version>17.0.18.54</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*17.0.18.54* #1078 - Changes for fixing post call recording script 
 		*17.0.18.53* FREEI-2269 Skip MixMonitor on park retrieve when the channel is already recording 
 		*17.0.18.52* FREEI-3048 core module bind address notification entry 
 		*17.0.18.51* FREEI-2850 Changes for fixing CDR report error 
