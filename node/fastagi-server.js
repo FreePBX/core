@@ -29,7 +29,14 @@ const server = net.createServer((sock) => {
 		}
 		if(!init) {
 			let idx = line.indexOf(":");
-			settings[line.substring(0,idx).trim()] = line.substring(idx+1).trim();
+			if (idx <= 0) {
+				return;
+			}
+			let key = line.substring(0,idx).trim();
+			if (!/^agi_[A-Za-z0-9_]+$/.test(key)) {
+				return;
+			}
+			settings[key] = line.substring(idx+1).trim();
 		} else {
 			agi.scriptStdin(line)
 		}
