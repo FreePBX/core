@@ -20,20 +20,48 @@ class AGI extends EventEmitter {
 	}
 
 	kill() {
-		this.agiScript.kill();
+		if (this.agiScript) {
+			this.agiScript.kill();
+		}
+	}
+
+	/**
+	 * Resolve an AGI script only if it stays inside ASTAGIDIR.
+	 * Absolute paths and parent-directory traversal are rejected.
+	 */
+	resolveSafeScript(scriptName, agiDir) {
+		if (!scriptName || typeof scriptName !== 'string') {
+			return null;
+		}
+		if (scriptName.indexOf('\0') !== -1 || /[\x00-\x1f]/.test(scriptName)) {
+			return null;
+		}
+		if (path.isAbsolute(scriptName)) {
+			return null;
+		}
+		const root = path.resolve(agiDir);
+		const resolved = path.resolve(root, scriptName);
+		if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+			return null;
+		}
+		return resolved;
 	}
 
 	/**
 	 * Launch AGI Script
 	 */
 	launch() {
-		let scriptPath = `./${this.settings.agi_network_script}`;
-		if(path.isAbsolute(this.settings.agi_network_script)) {
-			scriptPath = this.settings.agi_network_script;
+		const agiDir = this.settings.agi_ASTAGIDIR || process.env.ASTAGIDIR || '/var/lib/asterisk/agi-bin';
+		const scriptPath = this.resolveSafeScript(this.settings.agi_network_script, agiDir);
+		if (!scriptPath) {
+			console.log(`[${this.settings.agi_port}] Rejected AGI script: ${this.settings.agi_network_script}`);
+			this.exited = true;
+			this.emit('exit', 1, null);
+			return;
 		}
 		console.log(`[${this.settings.agi_port}] Launching ${scriptPath} with args: ${this.args.join(',')}`);
 
-		this.agiScript = spawn(scriptPath, this.args, {cwd: this.settings.agi_ASTAGIDIR});
+		this.agiScript = spawn(scriptPath, this.args, {cwd: agiDir, shell: false});
 		this.agiScript.stdout.on('data', this.scriptStdout.bind(this));
 		this.agiScript.on('exit', this.scriptExit.bind(this));
 
