@@ -237,7 +237,7 @@ class Core extends FreePBX_Helpers implements BMO  {
 		$settings['callerid']['value'] = isset($data['callerid']) ? $data['callerid'] : '' ;
 
         if($tech == "pjsip"){
-            $settings['dtmfmode']['value'] = isset($data['dtmfmode']) ? $data['dtmfmode'] : "rfc4733";
+            $settings['dtmfmode']['value'] = isset($data['dtmfmode']) ? $data['dtmfmode'] : ($settings['dtmfmode']['value'] ?: "rfc4733");
             $settings['defaultuser']['value'] = isset($data['defaultuser']) ? $data['defaultuser'] : "";
             $settings['trustrpid']['value'] = isset($data['trustrpid']) ? $data['trustrpid'] : "yes";
             $settings['send_connected_line']['value'] = isset($data['send_connected_line']) ? $data['send_connected_line'] : "yes";
