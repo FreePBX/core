@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Convert2pjsip extends Command {
-	protected function configure(){
+	protected function configure(): void {
 		$this->setName('convert2pjsip')
 		->setDescription(_('Convert legacy chan_sip extensions to chan_pjsip'))
 		->setDefinition(array(
@@ -18,7 +18,7 @@ class Convert2pjsip extends Command {
 		));
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output){
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$convertAllExtensions = $input->getOption('all');
 		$rangeArgs = $input->getOption('range');
 

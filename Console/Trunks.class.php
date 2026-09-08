@@ -12,7 +12,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Helper\Table;
 
 class Trunks extends Command {
-	protected function configure(){
+	protected function configure(): void {
 		$this->setName('trunks')
 		->setDescription(_('Enable and disable trunks from the command line'))
 		->setDefinition(array(
@@ -24,7 +24,7 @@ class Trunks extends Command {
 			new InputOption('json', null, InputOption::VALUE_NONE, _('format list as xml')),
 			new InputArgument('args', InputArgument::IS_ARRAY, '', null),));
 	}
-	protected function execute(InputInterface $input, OutputInterface $output){
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$args = $input->getArgument('args');
 		$converttopjsip = $input->getOption('convert2pjsip');
 		$ARGUSED = false;
@@ -90,6 +90,7 @@ class Trunks extends Command {
 				}
 			}
 		}
+		return 0;
 	}
 	private function listTrunks(){
 		$db = \FreePBX::Database();
