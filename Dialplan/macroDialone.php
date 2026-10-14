@@ -104,6 +104,9 @@ class macroDialone{
 		//Purpose is to have the option to add sip-headers as with the trunk pre dial out hook.
 		//We need to have this as we have mobile extensions connected directly to the pbx as sip extensions.
 		$ext->add($mcontext,$exten,'godial', new \ext_macro('dialout-one-predial-hook'));
+		// An outside caller stays in the default parking lot. Copy the called
+		// extension's lot onto that caller so parking uses the extension lot.
+		$ext->add($mcontext,$exten,'', new \ext_execif('$[("${CHANNEL(parkinglot)}"="" | "${CHANNEL(parkinglot)}"="default") & "${DB(AMPDEV/${EXTTOCALL}/parkinglot)}"!="" & "${DB(AMPDEV/${EXTTOCALL}/parkinglot)}"!="default"]', 'Set', 'CHANNEL(parkinglot)=${DB(AMPDEV/${EXTTOCALL}/parkinglot)}'));
 
 		//dont allow inbound callers to transfer around inside the system
 		$ext->add($mcontext,$exten,'', new \ext_execif('$["${DIRECTION}" = "INBOUND"]', 'Set', 'D_OPTIONS=${STRREPLACE(D_OPTIONS,T)}I'));
