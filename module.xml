@@ -3,13 +3,14 @@
 	<repo>standard</repo>
 	<category>Applications</category>
 	<name>Core</name>
-	<version>17.0.18.55</version>
+	<version>17.0.18.56</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<candisable>no</candisable>
 	<canuninstall>no</canuninstall>
 	<changelog>
+		*17.0.18.56* Regression in core 17.0.18.51 (FREEI-2850) breaks transfer to single digit destinations 
 		*17.0.18.55* FREEI-3190 Private Parking Lot Not Working After Module Upgrade 
 		*17.0.18.54* #1078 - Changes for fixing post call recording script 
 		*17.0.18.53* FREEI-2269 Skip MixMonitor on park retrieve when the channel is already recording 
