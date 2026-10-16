@@ -2049,7 +2049,7 @@ function core_do_get_config($engine) {
 		 */
 		$xfer_dest_ctx = 'from-internal-xfer-dest';
 		$ext->addGlobal('TRANSFER_CONTEXT', $xfer_dest_ctx);
-		foreach (['_X.', '_*X.', '_#X.'] as $pat) {
+		foreach (['_X','_X.', '_*X.', '_#X.'] as $pat) {
 			// Dial must be the first application so CDR destination can update.
 			$ext->add($xfer_dest_ctx, $pat, '', new ext_dial('Local/${EXTEN}@from-internal-xfer/n', ',${DIAL_OPTIONS}'));
 			$ext->add($xfer_dest_ctx, $pat, '', new ext_hangup(''));
