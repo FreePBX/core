@@ -2037,6 +2037,25 @@ function core_do_get_config($engine) {
 		}
 		unset($add_globals);
 
+		/*
+		 * Feature blind/attended transfers (## / *2) land in TRANSFER_CONTEXT.
+		 *
+		 * On Asterisk 12+/22, continuing the same channel into macro-dial/Gosub leaves
+		 * CDR(dst) stuck on the original dialed number. Asterisk's pattern for a correct
+		 * post-transfer destination is Dial(...) as the first app after transfer.
+		 *
+		 * Dedicated context (not included from from-internal). Use _X. (full match), never _X!.
+		 * Dial Local into from-internal-xfer so noxfer-only destinations stay hidden.
+		 */
+		$xfer_dest_ctx = 'from-internal-xfer-dest';
+		$ext->addGlobal('TRANSFER_CONTEXT', $xfer_dest_ctx);
+		foreach (['_X','_X.', '_*X.', '_#X.'] as $pat) {
+			// Dial must be the first application so CDR destination can update.
+			$ext->add($xfer_dest_ctx, $pat, '', new ext_dial('Local/${EXTEN}@from-internal-xfer/n', ',${DIAL_OPTIONS}'));
+			$ext->add($xfer_dest_ctx, $pat, '', new ext_hangup(''));
+		}
+		$ext->add($xfer_dest_ctx, 'h', '', new ext_hangup(''));
+
 		// Put the asterisk version in a global for agi etc.
 		$ext->addGlobal('ASTVERSION', $version);
 		// Put the use of chan_dahdi in a global for dialparties
