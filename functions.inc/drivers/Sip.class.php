@@ -307,7 +307,8 @@ class Sip extends techDriver {
 		$select[] = array('value' => 'info', 'text' => _('SIP INFO (application/dtmf-relay)'));
 		$select[] = array('value' => 'inband', 'text' => _('In band audio (Not recommended)'));
 		$tt = _("The DTMF signaling mode used by this device, usually RFC for most phones.").' [dtmfmode]';
-		$tmparr['dtmfmode'] = array('prompttext' => _('DTMF Signaling'), 'value' => 'rfc2833', 'tt' => $tt, 'select' => $select, 'level' => 0);
+		$DEVICE_SIP_DTMF = $this->freepbx->Config->get_conf_setting('DEVICE_SIP_DTMF') ?: 'rfc2833';
+		$tmparr['dtmfmode'] = array('prompttext' => _('DTMF Signaling'), 'value' => $DEVICE_SIP_DTMF, 'tt' => $tt, 'select' => $select, 'level' => 0);
 
 		unset($select);
 		$tt = _("Re-Invite policy for this device, see Asterisk documentation for details.").' [canreinvite]';
