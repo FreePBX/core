@@ -70,7 +70,7 @@ class macroDial{
         // Mixed ringall: one Dial() shares headers; B-legs need per-leg P/S adjustment (inherits to all legs).
         $ext->add($c,$s,'', new \ext_execif('$["${IS_PPHONE_ANY}"="1"]', 'Set', '__RG_SHARED_RVOL=1'));
         $ext->add($c,$s,'', new \ext_macro('dial-ringall-predial-hook'));
-	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
+	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" =~ "^(RING|HOLD)?INUSE$" ]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
         // Ring groups and follow-me use macro-dial instead of macro-exten-vm, so sub-record-check was
         // never run per extension when inbound/ring-group recording was dontcare. Apply extension
         // recording policy before Dial(); use the first member for ringall (one Dial() to all).
@@ -119,7 +119,7 @@ class macroDial{
         $ext->add($c,$s,'', new \ext_gosub('1','s','sub-check-pseries','${EXTTOCALL}'));
         $ext->add($c,$s,'', new \ext_gosub('1','s','sub-set-rvol-headers','single'));
         $ext->add($c,$s,'', new \ext_macro('dial-hunt-predial-hook'));
-	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" = "INUSE"]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
+	$ext->add($c,$s,'', new \ext_execif('$["${DB(AMPUSER/${EXTTOCALL}/cwtone)}" = "enabled" & "${EXTENSION_STATE(${EXTTOCALL})}" =~ "^(RING|HOLD)?INUSE$" ]', 'Set','CWRING=r(callwaiting)','Set','CWRING='));
 	$ext->add($c,$s,'', new \ext_gosub(1,'s','sub-record-check','exten,${EXTTOCALL},dontcare'));
 	/*********************************************************/
 	$ext->add($c,$s,'', new \ext_execif('$["${FMFM}" = "TRUE"]','Set','RGFMDIAL=${EXTTOCALL}','Set','RGFMDIAL=${NODEST}'));
