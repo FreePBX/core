@@ -1325,6 +1325,10 @@ class PJSip extends \FreePBX\modules\Core\Drivers\Sip {
 
 		if (!empty($config['media_encryption'])) {
 			$endpoint[] = "media_encryption=".$config['media_encryption'];
+			if ($config['media_encryption'] === 'dtls') {
+				$endpoint[] = "dtls_auto_generate_cert=yes";
+				$endpoint[] = "dtls_setup=actpass";
+			}
 		}
 
 		if (!empty($config['timers'])) {
