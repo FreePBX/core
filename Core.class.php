@@ -3173,8 +3173,11 @@ class Core extends FreePBX_Helpers implements BMO  {
 	 * @param bool $editmode  If in edit mode (So that the AsteriskDB is not destroyed)
 	 */
 	public function addUser($extension, $settings, $editmode=false) {
-		if (freepbx_trim ($extension) == '' ) {
+		if (!is_scalar($extension) || freepbx_trim ($extension) == '' ) {
 			throw new \Exception(_("You must put in an extension (or user) number"));
+		}
+		if (!preg_match('/^[0-9*#+]+$/', (string)$extension)) {
+			throw new \Exception(_("Extension must contain only digits, *, #, or +"));
 		}
 		//ensure this id is not already in use
 		$extens = $this->listUsers();
