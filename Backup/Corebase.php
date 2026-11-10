@@ -2,7 +2,7 @@
 namespace FreePBX\modules\Core\Backup;
 
 class Corebase {
-	protected $className = '';
+	public $className = '';
 	protected $FreePBX = null;
 	protected $backupID = null;
 	protected $transaction = null;
